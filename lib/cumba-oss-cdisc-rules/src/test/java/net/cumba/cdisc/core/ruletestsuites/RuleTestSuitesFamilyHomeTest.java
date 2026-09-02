@@ -43,9 +43,8 @@ class RuleTestSuitesFamilyHomeTest
      * must be added here).
      */
     private static final List<AbstractRuleTestSuitesFactory> FACTORIES = List.of(
-            new RuleTestSuitesCdiscFactoryTest(), new RuleTestSuitesCoreFactoryTest(),
-            new RuleTestSuitesDraftFactoryTest(), new RuleTestSuitesFdaFactoryTest(),
-            new RuleTestSuitesPmdaFactoryTest());
+            new RuleTestSuitesCdiscFactoryTest(), new RuleTestSuitesDraftFactoryTest(),
+            new RuleTestSuitesFdaFactoryTest(), new RuleTestSuitesPmdaFactoryTest());
 
     /** {@code Core.Id} prefix of the unpublished draft rules. */
     private static final String DRAFT_PREFIX = "DRAFT-";
@@ -140,8 +139,10 @@ class RuleTestSuitesFamilyHomeTest
             actual.put(factory.family(), Boolean.valueOf(factory.requireDeclaredStandard()));
         }
         assertEquals(
-                Map.of("cdisc", Boolean.FALSE, "core", Boolean.FALSE, DRAFT_FAMILY, Boolean.TRUE,
-                        "fda", Boolean.TRUE, "pmda", Boolean.TRUE),
+                // The CORE family is not redistributed with this repository, so its factory
+                // and scenario home do not exist here.
+                Map.of("cdisc", Boolean.FALSE, DRAFT_FAMILY, Boolean.TRUE, "fda", Boolean.TRUE,
+                        "pmda", Boolean.TRUE),
                 actual, "the per-family requireDeclaredStandard() policy changed");
     }
 

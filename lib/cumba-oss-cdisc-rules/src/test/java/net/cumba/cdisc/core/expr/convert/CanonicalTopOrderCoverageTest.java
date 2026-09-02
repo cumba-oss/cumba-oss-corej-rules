@@ -63,7 +63,8 @@ class CanonicalTopOrderCoverageTest
         // key -> the files carrying it, so a failure names something actionable rather than a set.
         TreeMap<String, TreeSet<String>> unlisted = new TreeMap<>();
         List<Path> files = yamlFiles();
-        assertTrue(files.size() >= 3700, "expected the full authored corpus, got " + files.size());
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         for (Path file : files)
         {
             JsonNode rule = YAML.readTree(file.toFile());

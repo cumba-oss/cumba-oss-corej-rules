@@ -105,12 +105,13 @@ class ShippedRulesUnresolvedWildcardCorpusTest
                 collect(findings, file, rule, rule.getLoadWarning());
             }
         }
-        // Guard the guard: without these, an empty or half-read corpus would report a clean
-        // ratchet — the exact failure mode this pass exists to prevent.
-        assertTrue(packages >= 56, "expected the full shipped corpus in " + folder + "/, saw "
-                + packages + " packages");
-        assertTrue(rules > 13900,
-                "expected the full shipped corpus in " + folder + "/, saw " + rules + " rules");
+        // ⚠ The corpus-SIZE floor that stood here was removed when this repository was
+        // extracted: it asserted the FULL internal corpus (>= 56 packages), which this
+        // subset deliberately is not. The internal repository still enforces the size.
+        // What is kept is the non-vacuity half, which is subset-safe: an empty or
+        // mis-resolved corpus must red rather than report a clean pass over nothing.
+        assertTrue(packages > 0, "no rule packages found in " + folder + "/ —"
+                + " the corpus did not generate; a pass over nothing is not a check");
         assertTrue(findings.isEmpty(),
                 "shipped rules whose Operation parks a `--` in reference / ordering / offset —"
                         + " resolvePrefixes copies those verbatim, so the operation reads a"

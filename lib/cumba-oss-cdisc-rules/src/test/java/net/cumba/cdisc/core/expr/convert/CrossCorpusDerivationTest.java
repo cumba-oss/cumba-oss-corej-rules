@@ -195,7 +195,8 @@ class CrossCorpusDerivationTest
             packages = files.filter(p -> p.getFileName().toString().startsWith("rules-"))
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
-        assertTrue(packages.size() >= 56, "expected the full native corpus, got " + packages);
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
 
         List<String> diffs = new ArrayList<>();
         List<String> loadErrors = new ArrayList<>();
@@ -259,7 +260,8 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        assertTrue(entries > 13900, "expected the whole shipped corpus, got " + entries);
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(List.of(), loadErrors,
                 "stripping the derived fields must not break loading, and the shipped corpus"
                         + " must carry zero load warnings");
@@ -314,7 +316,8 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        assertTrue(byId.size() > 3500, "expected the whole shipped corpus, got " + byId.size());
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
 
         long dataset = byId.values().stream().filter(Domain.DATASET::equals).count();
         long variable = byId.values().stream().filter(Domain.VARIABLE::equals).count();
@@ -379,7 +382,8 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        assertTrue(entries > 13900, "expected the whole shipped corpus, got " + entries);
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(List.of(), offenders,
                 "rules/ must ship stripped: Rule_Type never, Sensitivity only on the documented"
                         + " override set");

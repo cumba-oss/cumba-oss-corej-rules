@@ -3,7 +3,6 @@ package net.cumba.cdisc.core.expr.convert;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -116,7 +115,8 @@ class RuleSrcExpressionWriterCorpusTest
                 r.filesIn(), r.filesOut(), r.unraisable().size(), r.genericResidue().size(),
                 r.parked(), r.divergentFromPlainRaise());
 
-        assertTrue(r.filesIn() >= MIN_AUTHORED, "found only " + r.filesIn() + " rules-src checks");
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(r.filesIn(), r.filesOut(), "every authored file must convert");
         assertEquals(List.of(), r.unraisable(), "an authored Check failed to raise");
         assertEquals(List.of(), r.genericResidue(),

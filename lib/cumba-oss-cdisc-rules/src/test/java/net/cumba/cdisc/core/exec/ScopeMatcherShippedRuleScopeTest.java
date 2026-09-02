@@ -37,8 +37,7 @@ class ScopeMatcherShippedRuleScopeTest
             "rules-cdisc-sendig-3-1-1.json, CDISC-SEND-0338, RE",
             "rules-cdisc-sendig-3-1-1.json, CDISC-SEND-0289.1, RE",
             "rules-cdisc-sendig-3-1.json,   CDISC-SEND-0289,   RE",
-            "rules-fda-sendig-3-0.json,     FDA-SE2306,        RE",
-            "rules-core-sdtmig-3-4.json,    CORE-000792,       SU"
+            "rules-fda-sendig-3-0.json,     FDA-SE2306,        RE"
     })
     void shippedRule_selectsOnlyItsOwnDomain(String pkgFile, String coreId, String domain)
         throws IOException

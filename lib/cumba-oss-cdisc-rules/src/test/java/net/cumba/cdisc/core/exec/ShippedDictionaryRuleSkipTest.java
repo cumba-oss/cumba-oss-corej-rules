@@ -48,8 +48,8 @@ class ShippedDictionaryRuleSkipTest
     private static final Path SHIPPED_PMDA_SDTMIG_3_4 = CorpusPaths
             .rules("rules-pmda-sdtmig-3-4.json");
 
-    private static final Path DUMMY_MEDDRA = Path.of(System.getProperty("repoRoot"),
-            "lib/corej-cdisc-core/dictionaries/meddra.json");
+    private static final Path DUMMY_MEDDRA = Path.of(System.getProperty("projectBasedir"),
+            "src/test/resources/dictionaries/meddra.json");
 
     private static RulePackage shipped;
 

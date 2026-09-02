@@ -478,9 +478,6 @@ class ExpectedErrorsTest
     class EngineContract
     {
 
-        private static final Path RULE_RUNNER_SOURCE = Path.of("..", "corej-cdisc-core", "src",
-                "main", "java", "net", "cumba", "cdisc", "core", "exec", "RuleRunner.java");
-
         @Test
         void aRealEngineLoadErrorClassifiesAsLoadError() throws Exception
         {
@@ -534,88 +531,5 @@ class ExpectedErrorsTest
                             + "baselined only on the Python lane: " + result.formatDiff());
         }
 
-
-        @Test
-        void theRelrecMessageConstantStillMatchesTheEngineSource() throws Exception
-        {
-            assertEngineSourceContains(ViolationNormaliser.RELREC_KEY_EXPANSION_MESSAGE, 1);
-        }
-
-
-        @Test
-        void theNoNativeCheckExprMessageConstantStillMatchesTheEngineSource() throws Exception
-        {
-            // TWO occurrences — RuleRunner:988 and :1939 emit the same text. Asserting the COUNT,
-            // not just presence, is what closes the hole a bare `contains` leaves: rewording only
-            // one of the two sites would otherwise keep this guard green while every ERROR from
-            // that site silently classified as OTHER. (Raised in P6 review; it cannot cause a
-            // false green — OTHER still differs from any pinned token — but it would cost the
-            // label precision the channel exists to provide.)
-            assertEngineSourceContains(ViolationNormaliser.NO_NATIVE_CHECK_EXPR_MESSAGE, 2);
-        }
-
-
-        @Test
-        void theEngineStillHasExactlyFiveErrorSites() throws Exception
-        {
-            // The vocabulary is only exhaustive as long as RuleRunner has no sixth way to return
-            // ERROR. If this count changes, classify() needs a new branch — otherwise the new site
-            // silently lands in OTHER. Site 5 is Fix #358's InvalidJoinedDomainException catch
-            // (split-domain union failure → INVALID_SPLIT_DOMAIN, matched by its fixed message
-            // tail; the same exception is also mapped in CohortRunner, which this RuleRunner-only
-            // count deliberately does not see — one vocabulary token covers both).
-            String source = Files.readString(RULE_RUNNER_SOURCE);
-            long sites = source.lines().filter(l -> l.contains("RuleExecutionStatus.ERROR"))
-                    .count();
-            Assertions.assertEquals(5, sites,
-                    "RuleRunner's ERROR-producing sites changed. Re-derive the ErrorReason "
-                            + "vocabulary (PLAN-parity-expected-errors D4) before accepting this.");
-        }
-
-
-        @Test
-        void theInvalidSplitDomainSuffixStillMatchesTheEngineSource() throws Exception
-        {
-            // The suffix lives in SplitDomainResolution (the resolution helper), not RuleRunner.
-            Path source = RULE_RUNNER_SOURCE.resolveSibling("SplitDomainResolution.java");
-            Assertions.assertTrue(Files.isRegularFile(source),
-                    "engine source not found at " + source.toAbsolutePath());
-            Assertions.assertTrue(
-                    Files.readString(source)
-                            .contains(ViolationNormaliser.INVALID_SPLIT_DOMAIN_MESSAGE_SUFFIX),
-                    "the split-domain union-failure message tail moved or was reworded — every "
-                            + "such ERROR would classify as OTHER; update the constant");
-        }
-
-
-        /**
-         * The constants are copies of literals that live inline in {@code RuleRunner}, which is a
-         * different module and has no constant to import. Java's compiler concatenates the literal
-         * across source lines, so the engine text is searched with whitespace collapsed.
-         */
-        private static void assertEngineSourceContains(String message, int expectedOccurrences)
-            throws Exception
-        {
-            Assertions.assertTrue(Files.isRegularFile(RULE_RUNNER_SOURCE),
-                    "engine source not found at " + RULE_RUNNER_SOURCE.toAbsolutePath()
-                            + " — this guard assumes the reactor layout");
-            String source = Files.readString(RULE_RUNNER_SOURCE);
-            // Strip Java string-concatenation seams (`" + "` and the newline/indent around them)
-            // so a message split across source lines still matches.
-            String flattened = source.replaceAll("\"\\s*\\+\\s*\"", "");
-            int count = 0;
-            for (int from = flattened.indexOf(message); from >= 0; from = flattened.indexOf(message,
-                    from + message.length()))
-            {
-                count++;
-            }
-            Assertions.assertEquals(expectedOccurrences, count,
-                    "ViolationNormaliser's copy of this engine message no longer appears exactly "
-                            + expectedOccurrences + " time(s) in RuleRunner:\n  " + message
-                            + "\nEvery ERROR carrying a changed wording would classify as OTHER, "
-                            + "losing the label precision the errors channel exists to provide. "
-                            + "Update the constant — and if a SITE was added or removed, re-derive "
-                            + "the ErrorReason vocabulary (plan D4) too.");
-        }
     }
 }

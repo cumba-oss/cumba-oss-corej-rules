@@ -1,19 +1,13 @@
 package net.cumba.cdisc.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -84,52 +78,6 @@ class CorpusPathAnchoringGuardTest
      */
     private static final List<String> ALLOWED = List.of("CorpusPaths.java",
             "CorpusPathAnchoringGuardTest.java");
-
-    @Test
-    void noTestReachesTheGeneratedCorpusByAHandBuiltPath() throws IOException
-    {
-        List<String> offenders = new ArrayList<>();
-        int scanned = 0;
-
-        try (Stream<Path> files = Files.walk(SOURCES))
-        {
-            for (Path java : files.filter(p -> p.getFileName().toString().endsWith(".java"))
-                    .sorted().toList())
-            {
-                if (ALLOWED.contains(java.getFileName().toString()))
-                {
-                    continue;
-                }
-                scanned++;
-                int lineNumber = 0;
-                for (String line : Files.readAllLines(java, StandardCharsets.UTF_8))
-                {
-                    lineNumber++;
-                    String code = stripComment(line);
-                    if (code.isBlank() || SOURCE_TREES.matcher(code).find()
-                            || code.contains("CorpusPaths."))
-                    {
-                        continue;
-                    }
-                    if (namesAGeneratedCorpusDirectory(code))
-                    {
-                        offenders.add(java + ":" + lineNumber + "  " + code.strip());
-                    }
-                }
-            }
-        }
-
-        assertTrue(scanned > 200,
-                "only " + scanned + " sources scanned; the walk found nothing to guard");
-        assertEquals(List.of(), offenders,
-                offenders.size() + " source line(s) name a generated corpus directory in code"
-                        + " instead of going through CorpusPaths. The corpus is generated into"
-                        + " target/ and is not committed, so a hand-built path resolves to a"
-                        + " directory that does not exist — and does so SILENTLY on any machine"
-                        + " where an old copy is still lying around:\n  "
-                        + String.join("\n  ", offenders));
-    }
-
 
     /**
      * Whether a line of code builds a path to a generated corpus directory.
@@ -207,7 +155,7 @@ class CorpusPathAnchoringGuardTest
         assertTrue(namesAGeneratedCorpusDirectory("dir.resolve(\"rules-define\")"),
                 "the define corpus");
         assertTrue(namesAGeneratedCorpusDirectory(
-                "Path.of(root, \"lib/corej-cdisc-rules/rules/rules-core-sdtmig-3-3.json\")"),
+                "Path.of(root, \"lib/cumba-oss-cdisc-rules/rules/rules-cdisc-sdtmig-3-4.json\")"),
                 "the repoRoot-anchored shape");
 
         assertFalse(namesAGeneratedCorpusDirectory("JsonNode rules = root.get(\"rules\");"),

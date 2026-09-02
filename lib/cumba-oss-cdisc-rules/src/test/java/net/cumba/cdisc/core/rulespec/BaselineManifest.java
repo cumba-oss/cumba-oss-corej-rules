@@ -24,11 +24,11 @@ import java.util.Optional;
  * remove the baseline entry in the same PR.
  *
  * <p>
- * Loaded from {@code documentation/parity-diff-baseline.json} at test-discovery time. Kept minimal
- * — spec name + Fix #/finding ref + optional notes. No payload-shape checks in M1 of the baseline;
- * we treat the spec as opaquely "known-divergent" and verify only that a divergence IS still
- * present. Tightening to "the divergence matches the recorded shape" is a follow-up if we start
- * hitting drift.
+ * Loaded from {@code rulespec/parity-diff-baseline.json} at test-discovery time. Kept minimal —
+ * spec name + Fix #/finding ref + optional notes. No payload-shape checks in M1 of the baseline; we
+ * treat the spec as opaquely "known-divergent" and verify only that a divergence IS still present.
+ * Tightening to "the divergence matches the recorded shape" is a follow-up if we start hitting
+ * drift.
  */
 public final class BaselineManifest
 {
@@ -271,8 +271,8 @@ public final class BaselineManifest
     {
         Path[] candidates =
         {
-                Path.of("documentation/parity-diff-baseline.json").toAbsolutePath(),
-                Path.of("lib/corej-cdisc-rules/documentation/parity-diff-baseline.json")
+                Path.of("rulespec/parity-diff-baseline.json").toAbsolutePath(),
+                Path.of("lib/cumba-oss-cdisc-rules/rulespec/parity-diff-baseline.json")
                         .toAbsolutePath()
         };
         for (Path p : candidates)
@@ -282,6 +282,14 @@ public final class BaselineManifest
                 return load(p);
             }
         }
-        return new Manifest(null, List.of());
+        // ⚠⚠ An ABSENT baseline must never degrade to an empty one. This method used to return
+        // Manifest(null, List.of()) here, and the caller only guards against an IOException — so a
+        // missing file was silent. That is the worst shape available: every baselined spec stops
+        // being an expected divergence and reds as a fresh failure, and the cause is invisible.
+        // Measured 2026-09-02: 145 of this repository's 535 specs are baselined, so absence turns
+        // a green suite into 145 failures that look like engine regressions.
+        throw new java.nio.file.NoSuchFileException(candidates[0].toString(), null,
+                "parity-diff baseline not found (also tried " + candidates[1] + "). "
+                        + "Without it every baselined spec reports as a fresh failure.");
     }
 }

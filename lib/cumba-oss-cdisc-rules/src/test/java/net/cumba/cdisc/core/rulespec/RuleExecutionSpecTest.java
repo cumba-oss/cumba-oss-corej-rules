@@ -65,7 +65,7 @@ class RuleExecutionSpecTest
             return candidate;
         }
         // Surefire may run from the parent project root; try the module-relative path.
-        Path moduleRel = Path.of("lib/corej-cdisc-rules/rulespec/specs").toAbsolutePath();
+        Path moduleRel = Path.of("lib/cumba-oss-cdisc-rules/rulespec/specs").toAbsolutePath();
         if (java.nio.file.Files.isDirectory(moduleRel))
         {
             return moduleRel;

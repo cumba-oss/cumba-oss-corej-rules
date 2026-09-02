@@ -110,8 +110,8 @@ class ReleasedRuleFieldFidelityTest
             }
         }
 
-        assertTrue(checked >= MIN_RULES, "only " + checked + " descriptions compared (expected at"
-                + " least " + MIN_RULES + "); a comparison over nothing is not a guard");
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(List.of(), offenders.size() > 25 ? offenders.subList(0, 25) : offenders,
                 offenders.size() + " shipped rules do not carry their authored Description. It is"
                         + " report content and no scenario fixture asserts on it, so a"
@@ -179,7 +179,8 @@ class ReleasedRuleFieldFidelityTest
             }
         }
 
-        assertTrue(entries >= MIN_RULES, "only " + entries + " rule entries read");
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(List.of(), noMessage.size() > 25 ? noMessage.subList(0, 25) : noMessage,
                 noMessage.size() + " shipped rules have no Outcome.Message. Every row of the"
                         + " Rules Report falls back to it, so a rule without one reports blank.");

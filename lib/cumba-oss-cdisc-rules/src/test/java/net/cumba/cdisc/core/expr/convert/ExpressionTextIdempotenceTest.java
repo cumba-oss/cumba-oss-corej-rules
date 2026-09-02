@@ -69,7 +69,8 @@ class ExpressionTextIdempotenceTest
     void p4aShippedExpressionsAreAFixedPointOfPrintAfterParse()
     {
         Map<String, String> expressions = BackConversionScan.shippedExpressions();
-        assertTrue(expressions.size() >= MIN_SHIPPED, "scanned only " + expressions.size());
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         Map<String, String> unstable = new LinkedHashMap<>();
         expressions.forEach((id, text) ->
         {
@@ -96,8 +97,8 @@ class ExpressionTextIdempotenceTest
     void p4bAuthoredExpressionsAreCanonicalFixedPoints() throws IOException
     {
         List<Path> files = authoredCheckFiles();
-        assertTrue(files.size() >= MIN_AUTHORED,
-                "found only " + files.size() + " rules-src checks");
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
 
         Map<String, String> notExpressionForm = new LinkedHashMap<>();
         Map<String, String> unstable = new LinkedHashMap<>();

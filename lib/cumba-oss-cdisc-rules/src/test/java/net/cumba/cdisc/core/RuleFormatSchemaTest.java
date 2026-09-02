@@ -17,11 +17,11 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
- * R-P5 ({@code plans/done/PLAN-native-engine-residuals.md}) — every shipped rule package in the
- * expression-syntax {@code rules/} corpus must validate against the machine-readable format schema
- * {@code documentation/rule-format.schema.json}. The schema is strict on the shapes the engine
- * dispatches on (package envelope, Check tree, Operations, Match_Datasets) and deliberately
- * permissive on extra fields (the loader runs with {@code FAIL_ON_UNKNOWN_PROPERTIES} off).
+ * R-P5 — every shipped rule package in the expression-syntax {@code rules/} corpus must validate
+ * against the machine-readable format schema {@code schema/rule-format.schema.json}. The schema is
+ * strict on the shapes the engine dispatches on (package envelope, Check tree, Operations,
+ * Match_Datasets) and deliberately permissive on extra fields (the loader runs with
+ * {@code FAIL_ON_UNKNOWN_PROPERTIES} off).
  *
  * <p>
  * ⚠ This used to validate <b>two</b> folders against the one schema, and the agreement between them
@@ -45,8 +45,13 @@ class RuleFormatSchemaTest
 
     private static Schema schema() throws Exception
     {
-        Path schemaPath = Path.of(System.getProperty("projectBasedir"), "documentation",
+        Path schemaPath = Path.of(System.getProperty("projectBasedir"), "schema",
                 "rule-format.schema.json");
+        if (!Files.isRegularFile(schemaPath))
+        {
+            throw new IllegalStateException(schemaPath + " not found — the format gate cannot run "
+                    + "without the schema, and a missing schema must never read as a pass.");
+        }
         SchemaRegistry registry = SchemaRegistry
                 .withDefaultDialect(SpecificationVersion.DRAFT_2020_12);
         return registry.getSchema(Files.readString(schemaPath), InputFormat.JSON);
@@ -89,12 +94,13 @@ class RuleFormatSchemaTest
             }
             validated++;
         }
-        // Guard the guard: `validated == expectedPackages` is satisfied by 0 == 0, so an empty or
-        // mis-resolved folder whose manifest is equally unreadable would report a clean pass. This
-        // floor is the replacement for the cross-folder agreement the second corpus used to give.
-        assertTrue(expectedPackages >= SHIPPED_PACKAGES,
-                "the " + folder + "/ manifest declares only " + expectedPackages
-                        + " packages — expected at least " + SHIPPED_PACKAGES);
+        // ⚠ The corpus-SIZE floor that stood here was removed when this repository was
+        // extracted: it asserted the FULL internal corpus (>= 56 packages), which this
+        // subset deliberately is not. The internal repository still enforces the size.
+        // What is kept is the non-vacuity half, which is subset-safe: an empty or
+        // mis-resolved corpus must red rather than report a clean pass over nothing.
+        assertTrue(expectedPackages > 0, "no rule packages found in " + folder + "/ —"
+                + " the corpus did not generate; a pass over nothing is not a check");
         assertTrue(validated == expectedPackages, "expected all shipped packages in " + folder
                 + "/, saw " + validated + " (manifest declares " + expectedPackages + ")");
         assertTrue(failures.isEmpty(),

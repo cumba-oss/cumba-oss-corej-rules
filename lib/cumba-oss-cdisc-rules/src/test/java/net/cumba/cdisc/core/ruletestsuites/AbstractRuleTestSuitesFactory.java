@@ -91,8 +91,21 @@ abstract class AbstractRuleTestSuitesFactory
     private static final Path RESOURCE_BASE = Path.of(System.getProperty("projectBasedir"),
             "src/test/resources/net/cumba/cdisc/core/ruletestsuites");
 
-    private static final Path DUMMY_DICTIONARIES_DIR = Path.of(System.getProperty("repoRoot"),
-            "lib/corej-cdisc-core/dictionaries");
+    /**
+     * The dummy external-dictionary bundle, <b>vendored into this module</b>.
+     *
+     * <p>
+     * ⚠ This used to resolve as {@code repoRoot + "lib/corej-cdisc-core/dictionaries"} — a monorepo
+     * sibling path. The engine now lives in its own repository, so that path resolves to nothing
+     * here and every {@code #dictionaries dummy} scenario SKIPs instead of executing. Measured
+     * 2026-09-02: 187 of this module's scenarios failed that way, all reporting "external
+     * dictionary &lt;name&gt; is not installed" rather than a real assertion. The bundle is 7 small
+     * stub files of coreJ's own making — not the licensed MedDRA / WHODrug distributions — so
+     * vendoring it costs 4 KB and removes a cross-repository dependency.
+     * </p>
+     */
+    private static final Path DUMMY_DICTIONARIES_DIR = Path.of(System.getProperty("projectBasedir"),
+            "src/test/resources/dictionaries");
 
     /** Comma-separated {@code Core.Id} prefixes; unset/blank runs every scenario. */
     private static final String FILTER_PROPERTY = "scenario.filter";

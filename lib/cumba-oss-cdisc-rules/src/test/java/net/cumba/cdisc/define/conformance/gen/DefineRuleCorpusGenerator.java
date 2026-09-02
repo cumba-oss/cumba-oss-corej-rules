@@ -3,6 +3,7 @@ package net.cumba.cdisc.define.conformance.gen;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -141,12 +142,18 @@ public final class DefineRuleCorpusGenerator
     /** Pure assembly: authored rules in, corpus text out. No filesystem writes. */
     public static Result generate(List<ConformanceRule> aAuthored) throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         // Absent, not null. The CDISC corpus emits no nulls at all, and an absent field
         // deserializes to null anyway, so this keeps the two corpora stylistically identical
         // and the packaged rule a close mirror of its authored YAML.
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        // Built through JsonMapper.builder() rather than the setters: both
+        // ObjectMapper.setSerializationInclusion and the builder's serializationInclusion
+        // shorthand are deprecated in Jackson 2.22, and this module compiles with -Werror.
+        // defaultPropertyInclusion(Value) is what the shorthand delegates to; Value.construct
+        // (NON_NULL, NON_NULL) reproduces its value/content pair exactly.
+        ObjectMapper mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT)
+                .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL,
+                        JsonInclude.Include.NON_NULL))
+                .build();
 
         // (family, version) -> rules. TreeSet on the key pair keeps the output order stable
         // regardless of the order the source directory happened to be walked in.

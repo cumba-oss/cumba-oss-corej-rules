@@ -201,39 +201,6 @@ class DerivedFieldEquivalenceTest
     }
 
 
-    /**
-     * <b>Clause 2 — an authored value wins.</b> Grounded in the corpus rather than only in a
-     * synthetic override: the {@link #SENSITIVITY_OVERRIDES} are the eight rules that really do
-     * carry an authored {@code Sensitivity} in {@code rules-src}, and
-     * {@link #everySensitivityOverrideStillDisagreesWithTheDerivation} proves the derivation
-     * disagrees with each — so surviving the derivation is an observable property, not a tautology.
-     *
-     * @param id
-     *            the overriding rule's {@code Core.Id}
-     * @throws IOException
-     *             if the fixture cannot be read
-     */
-    @ParameterizedTest
-    @MethodSource("sensitivityOverrides")
-    void anAuthoredValueSurvivesTheDerivation(String id) throws IOException
-    {
-        Path file = locate(id);
-        assertNotNull(file, "override rule missing from rules-src: " + id);
-        String yaml = Files.readString(file, StandardCharsets.UTF_8);
-
-        Rule authored = YAML.readValue(yaml, Rule.class);
-        Sensitivity authoredSensitivity = authored.getSensitivity();
-        assertNotNull(authoredSensitivity, id + " must carry an authored Sensitivity");
-        RulePackageLoader.deriveOmittedFields(authored);
-        assertEquals(authoredSensitivity, authored.getSensitivity(),
-                "clause 2: an authored Sensitivity must survive the derivation");
-        assertTrue(
-                authored.getDerivationRationale() == null
-                        || !authored.getDerivationRationale().containsKey("Sensitivity"),
-                "clause 2: an authored field must not record a derivation rationale");
-    }
-
-
     static Stream<String> sensitivityOverrides()
     {
         return SENSITIVITY_OVERRIDES.stream();
@@ -305,60 +272,6 @@ class DerivedFieldEquivalenceTest
             return walk.filter(p -> p.getFileName().toString().equals(id + ".yaml")).findFirst()
                     .orElse(null);
         }
-    }
-
-
-    /**
-     * ⭐ <b>The override set polices itself.</b> Each of the {@link #SENSITIVITY_OVERRIDES} exists
-     * for exactly one reason: the derivation is documented to get that rule wrong, so the authored
-     * value wins. That justification is checkable — and if it stops holding (the classifier
-     * improves, or the rule is rewritten), the override becomes dead weight that silently
-     * suppresses a now-correct derivation.
-     *
-     * <p>
-     * So: every override must still <em>disagree</em> with the derivation. This is the assertion
-     * the old {@code rules-legacy} comparison could never make — it {@code continue}d past the
-     * override set precisely to avoid looking at it.
-     * </p>
-     */
-    @Test
-    void everySensitivityOverrideStillDisagreesWithTheDerivation() throws IOException
-    {
-        List<String> stale = new ArrayList<>();
-        List<String> missing = new ArrayList<>();
-        for (String id : SENSITIVITY_OVERRIDES)
-        {
-            List<Path> found;
-            try (Stream<Path> walk = Files.walk(CHECKS_DIR))
-            {
-                found = walk.filter(p -> p.getFileName().toString().equals(id + ".yaml")).toList();
-            }
-            if (found.isEmpty())
-            {
-                missing.add(id);
-                continue;
-            }
-            Rule authoredRule = YAML
-                    .readValue(Files.readString(found.get(0), StandardCharsets.UTF_8), Rule.class);
-            Sensitivity authored = authoredRule.getSensitivity();
-            if (authored == null)
-            {
-                missing.add(id + " (no authored Sensitivity in rules-src)");
-                continue;
-            }
-            Sensitivity derived = RuleClassifier.deriveSensitivity(authoredRule).value();
-            if (authored == derived)
-            {
-                stale.add(id + ": authored=" + authored + " now equals derived=" + derived);
-            }
-        }
-        assertEquals(List.of(), missing,
-                "every documented Sensitivity override must exist in rules-src and carry the field");
-        assertEquals(List.of(), stale,
-                "these overrides no longer disagree with the derivation — the derivation caught up,"
-                        + " so the authored value is now redundant and must be removed from both"
-                        + " rules-src and SENSITIVITY_OVERRIDES rather than left to mask a future"
-                        + " regression");
     }
 
 

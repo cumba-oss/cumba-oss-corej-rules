@@ -138,11 +138,11 @@ class ExcludedOutputVariableShippedRuleTest
 
     /**
      * {@code Fix #357} — the class-(c) apply: 109 guard-only {@code Output_Variables} entries over
-     * 90 rules, ruling (A) of {@code rule-review-results-r3/PROPOSAL-plan-A-class-c-exclusions.md}
-     * (owner 2026-08-24, Message-usage criterion). The three cases above cover {@code $}-operation
-     * results; these cover the other two token shapes the ruling introduces — <b>plain columns</b>
-     * and <b>{@code --} wildcard columns</b>, plus the two dotted {@code DM.ARM} references — where
-     * the projection key is the <em>resolved</em> name, not the authored token.
+     * 90 rules, ruling (A) of the class-(c) exclusions proposal (owner 2026-08-24, Message-usage
+     * criterion). The three cases above cover {@code $}-operation results; these cover the other
+     * two token shapes the ruling introduces — <b>plain columns</b> and <b>{@code --} wildcard
+     * columns</b>, plus the two dotted {@code DM.ARM} references — where the projection key is the
+     * <em>resolved</em> name, not the authored token.
      *
      * <p>
      * ⚠ The wildcard half of this ruling was blocked until {@code Fix #356}: the per-domain
@@ -154,10 +154,15 @@ class ExcludedOutputVariableShippedRuleTest
      * </p>
      *
      * <p>
-     * A sample of 12 rules / 17 excluded entries spanning all four families (CDISC, CORE, FDA,
-     * PMDA), 11 domains and all three {@code kind}s of the proposal's TSV, each run on the rule's
-     * own {@code expect=violation} fixture. Of the 90 edited rules, 72 have such a fixture; the
-     * other 18 have none and are not assertable this way.
+     * A sample of 11 rules spanning the three families shipped here (CDISC, FDA, PMDA) and all
+     * three {@code kind}s of the proposal's TSV, each run on the rule's own
+     * {@code expect=violation} fixture. Of the 90 edited rules, 72 have such a fixture; the other
+     * 18 have none and are not assertable this way.
+     *
+     * <p>
+     * ⚠ Four CORE-family rows (CORE-000018 / -000040 / -000095 / -001043) were dropped when this
+     * repository was extracted: the CORE rule family is not redistributed here, so neither their
+     * packages nor their {@code .cdt} fixtures exist. The internal corpus still covers them.
      * </p>
      */
     static Stream<Arguments> columnExclusions()
@@ -166,18 +171,6 @@ class ExcludedOutputVariableShippedRuleTest
                 Arguments.of("CDISC-SEND-0085.1", "rules-cdisc-sendig-3-1-1.json",
                         "cdisc/CDISC-SEND-0085.1/CDISC-SEND-0085.1-invalid_blank_stat-BW.cdt",
                         "BWSTAT", Set.of("--ORRES"), Set.of("BWORRES")),
-                Arguments.of("CORE-000018", "rules-core-sdtmig-3-4.json",
-                        "core/CORE-000018/CORE-000018-invalid-CM.cdt", "CMPRESP",
-                        Set.of("--OCCUR", "--STAT"), Set.of("CMOCCUR", "CMSTAT")),
-                Arguments.of("CORE-000040", "rules-core-sdtmig-3-4.json",
-                        "core/CORE-000040/CORE-000040-invalid-SV.cdt", "VISITNUM",
-                        Set.of("SVPRESP"), Set.of("SVPRESP")),
-                Arguments.of("CORE-000095", "rules-core-sdtmig-3-4.json",
-                        "core/CORE-000095/CORE-000095-invalid-SE.cdt", "ETCD", Set.of("SEUPDES"),
-                        Set.of("SEUPDES")),
-                Arguments.of("CORE-001043", "rules-core-sdtmig-3-4.json",
-                        "core/CORE-001043/CORE-001043-invalid-DM-1.cdt", "ARMCD", Set.of("AGE"),
-                        Set.of("AGE")),
                 Arguments.of("FDA-SD0021", "rules-fda-sdtmig-3-4.json",
                         "fda/FDA-SD0021/FDA-SD0021-invalid-occur-CM.cdt", "CMOCCUR",
                         Set.of("--ENDTC", "--ENRF", "--ENRTPT", "--STAT", "--DUR"),

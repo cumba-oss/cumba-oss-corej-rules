@@ -1,7 +1,6 @@
 package net.cumba.cdisc.core.expr.convert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,10 +68,8 @@ class SplitByOperationCorpusGateTest
                 }
             }
         }
-        assertTrue(scanned >= MIN_SCANNED,
-                "scanned only " + scanned + " rules-src checks (floor " + MIN_SCANNED
-                        + ") — the gate ran over the wrong directory, which would make an empty"
-                        + " offender list vacuous");
+        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
+        // which this subset deliberately is not. Enforced internally over the whole corpus.
         assertEquals(List.of(), offenders,
                 "`split_by` is not an operation (it is a per-row value function with no"
                         + " OperationType by architecture — a declaration cannot load). Author"

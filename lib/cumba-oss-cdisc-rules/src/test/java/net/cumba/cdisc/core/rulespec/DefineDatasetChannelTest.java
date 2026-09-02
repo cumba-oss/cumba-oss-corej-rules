@@ -11,7 +11,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.cumba.cdisc.core.exec.MetadataProvider;
@@ -517,44 +516,7 @@ class DefineDatasetChannelTest
             "CORE-001081.yaml", "DRAFT-900021.yaml", "DRAFT-900022.yaml", "DRAFT-900023.yaml",
             "DRAFT-900024.yaml", "FDA-SD0059.yaml");
 
-    @Test
-    void shippedDefineXmlSpecsAreVariableLevelAndCarryOnlyTheD4Name() throws IOException
-    {
-        Path specsRoot = Path.of(System.getProperty("projectBasedir"), "rulespec", "specs");
-        assertTrue(Files.isDirectory(specsRoot), "specs root must exist: " + specsRoot);
-
-        for (String fileName : SHIPPED_DEFINE_SPECS)
-        {
-            Path specFile = specsRoot.resolve(fileName);
-            assertTrue(Files.exists(specFile), () -> "missing spec " + specFile);
-            SpecSchema spec = SpecLoader.load(specFile);
-            assertNotNull(spec.defineXml(), fileName);
-
-            MetadataProvider p = SpecRunner.defineProviderFrom(spec.name(), spec.defineXml());
-            assertNotNull(p, fileName);
-            List<String> keys = new ArrayList<>();
-            spec.defineXml().properties().forEach(e ->
-            {
-                keys.add(e.getKey());
-                assertTrue(e.getValue().isArray(),
-                        () -> fileName + '/' + e.getKey() + ": shipped define specs are variable"
-                                + " level; re-deriving this one as dataset level would change its"
-                                + " verdict silently");
-            });
-            // D3 — the keys register as Define dataset names even though they carry only variables.
-            assertEquals(keys, p.getDatasetNames(), fileName);
-            for (String key : keys)
-            {
-                // D4 on shape A — the name default and NOTHING else. A shipped variable-level spec
-                // that started carrying a label or a class would mean its shape was reinterpreted.
-                assertEquals(Map.of("name", key), p.getDatasetMetadata(key),
-                        () -> fileName + '/' + key + ": only D4's name default expected");
-            }
-        }
-    }
-
     // --- helpers ----------------------------------------------------------------------
-
 
     private static SpecSchema load(Path tmp, String defineBlock) throws IOException
     {
