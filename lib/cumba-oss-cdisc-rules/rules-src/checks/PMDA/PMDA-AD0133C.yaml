@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0133C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Range y Lower Limit (AyLO) equals 0\
+  \ but the Ratio to Analysis Range y Lower Limit (R2AyLO) is populated. Because R2AyLO\
+  \ equals AVAL divided by AyLO, it cannot be derived when AyLO is 0 (division by\
+  \ zero), so R2AyLO must be missing in that case."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(R2AyLO) and AyLO == 0
+Outcome:
+  Message: "AyLO equals 0 but R2AyLO is populated; R2AyLO cannot be derived because\
+    \ it would require dividing by 0."
+  Output_Variables:
+  - "R2AyLO"
+  - "AyLO"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Calculation issue: AyLO = 0, but R2AyLO is populated"
+  Description: "When Analysis Range Low (AyLO) equals 0, the Ratio to Analysis Range\
+    \ Low (R2AyLO) should not be populated since you cannot divide by 0. AD0133 checks\
+    \ the calculation is correct when AyLO does not equal 0."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133C"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-AD0047"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable that the ADaM standard designates as\
+  \ Required for the dataset's structure is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Operations:
+- id: "$required_variables"
+  expression: "required_variables()"
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$missing_required_variables"
+  expression: "minus($required_variables, subtract=$dataset_variables)"
+Check:
+  expression: >-
+    not contains_all($dataset_variables, $required_variables)
+Outcome:
+  Message: "A Required ADaM variable is not present in the dataset."
+  Output_Variables:
+  - "$missing_required_variables"
+Source:
+  Message: "Required variable is not present"
+  Description: "Variables described in ADaM as Required must be included in the dataset."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0047"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0047"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0047"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0047"
+        Version: "1"
+      Version: "6.0"

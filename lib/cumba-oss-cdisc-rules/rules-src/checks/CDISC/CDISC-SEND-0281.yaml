@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0281"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Trial Summary Parameter Value (TSVAL) is longer\
+  \ than 200 characters, indicating the value was not broken into 200-character sections\
+  \ across sequentially named TSVAL...TSVALn columns."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    len(TSVAL) > 200
+Outcome:
+  Message: "TSVAL is longer than 200 characters; the value must be broken into 200-character\
+    \ sections across sequentially named TSVAL...TSVALn columns."
+  Output_Variables:
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Plain_Text_Explanation: "If the trial summary parameter value is over 200 characters\
+    \ the trial summary parameter value must be broken into 200 character-sections\
+    \ in columns labelled TSVAL-TSVALn."
+  Condition: "Trial summary parameter value > 200 characters in length"
+  Rule: "Trial summary parameter value is broken into 200-character sections AND each\
+    \ 200-character section is in a separate column AND each column is named sequentially\
+    \ from TSVAL through TSVALn is broken into 200-character sections AND each 200-character\
+    \ section is in a separate column AND each column is named sequentially from TSVAL\
+    \ through TSVALn"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND281"
+        Version: "1"
+      Version: "5.0"

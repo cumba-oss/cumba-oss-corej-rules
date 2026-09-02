@@ -1,0 +1,93 @@
+name: PMDA-SD9999
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5a — group-A backfill. `PMDA-SD9999` is the PMDA twin
+  of `FDA-SD9999`: byte-identical in every executable field (same three Check leaves, same
+  `$domain_is_custom` Operation, same `Domains.Exclude: [SUPP--, AP--]` scope, same native
+  expression
+  `$domain_is_custom == true and not empty(ds_class("DEFINE")) and upper(ds_class("DEFINE")) not in ["EVENTS", "FINDINGS", "INTERVENTIONS"]`),
+  differing only in `Core.Id`, `Authorities` and the `Source` prose. It had **no `.cdt`
+  scenario and no other executable coverage anywhere in the tree** before this spec.
+
+  The twin is not redundant: the Java lane resolves `coreId:` from the shipped native
+  `rules/` bundle and the Python lane from `rules-legacy/`, and both reach the **PMDA**
+  family file (`rules-pmda-sdtmig-3-4.json`) here. A regeneration that dropped or
+  mis-derived the PMDA copy would leave `FDA-SD9999` green and only this spec red.
+
+  **The single-dataset shape is deliberate.** `FDA-SD9999` carries the three-submitted-plus-
+  one-Define-only fixture P3 needed to quantify EC-41/H5; this backfill wants the rule's
+  *own* semantics pinned with nothing else in the frame. P3 measured that the single-dataset
+  control (one custom dataset, one Define key, no Define-only key) reproduces the identical
+  one-key divergence, so nothing is lost.
+
+  NO `library_mocks` block — deliberately, and this was MEASURED, not reasoned. The Check's
+  first leaf gates the whole rule on the `domain_is_custom` Operation, so custom-ness must hold
+  on both lanes; what makes it hold is the DATASET NAME, not a mock:
+
+  * Java resolves `CompositeMetadataProvider.isDomainCustom` = `mock || pickle`. `XX` is
+    deliberately not an SDTM dataset name, so the SDTMIG-3.4 offline pickle already answers
+    "custom" and the disjunct is satisfied with no mock present.
+  * The fork has **no consumer for `domain_custom` at all** —
+    `sdtm_utilities.is_custom_domain` asks whether the name is absent from
+    `library_metadata`'s `standard_metadata` / `model_metadata` `dataset_names`, and with no
+    `classes` / `dataset_metadata` mock the container is empty, so every dataset is custom.
+
+  An earlier revision declared `domain_custom` and asserted in bold that it was MANDATORY,
+  adding that "without the mock the rule fires zero on both lanes". Both claims were false:
+  removing it leaves the Java suite green and the Python result byte-identical (verified by
+  running them). A declaration that reads as load-bearing while being inert is exactly the
+  blindness this plan exists to remove, so it was deleted rather than re-labelled. It WOULD
+  matter for a spec using a REAL domain name — the pickle would say "not custom", only the mock
+  could make Java disagree, and the fork (which ignores it) would then diverge. Use a
+  non-standard dataset name instead, as here.
+
+  Only `define_dataset_class` is declared — the single attribute the rule reads, and one of
+  the three with a Java sink. It lands under `className`, not under the YAML spelling
+  (D10); copying it literally would leave the operand undefined and the rule would silently
+  stop firing on the Java lane. `define_dataset_name` / `define_dataset_location` are left to
+  D4's derivation so the default stays on the execution path; the location default is
+  load-bearing on the Python lane, where the fork merges on
+  (`dataset_name`, `dataset_location`).
+
+  **The lanes DO diverge here — same cause as `FDA-SD9999`, and it is NOT a Define-channel
+  or EC-41 symptom.** Both lanes fire on the same dataset with the same verdict and the same
+  `EXECUTED` status; only the finding's `output_variables` differ. Java reports
+  `$domain_is_custom: 'true'` alongside `define_dataset_class`, because EC-37 / Fix #127
+  derives the effective `Output_Variables` at load time and the Check's first leaf consumes
+  the Operation. The fork consumes the authored list verbatim —
+  `RuleProcessor.extract_target_names_from_rule` short-circuits to
+  `_extract_targets_from_output_variables` whenever `output_variables` is non-empty
+  (`rule_processor.py:878-882`) — and the rule declares `Output_Variables:
+  [define_dataset_class]`, so the Operation id is never projected. `expected_violations` is
+  Java-canonical, so this spec carries a `parity-diff-baseline.json` entry with
+  `lane: python`, `channels: ["violations"]` and the EC-37 fix_ref — the same shape as its
+  FDA twin's.
+
+  `expected_status` is hand-authored (capture is status-blind). The Java status channel is
+  blind to a dead Define channel — killing it yields `EXECUTED` with zero findings, not
+  `SKIPPED` — so the non-zero Java count below, not the status, is what proves the fixture
+  live.
+python_source: rules-pmda-sdtmig-3-4.json (PMDA-SD9999)
+rule:
+  coreId: PMDA-SD9999
+datasets:
+  XX:
+    row_key: [STUDYID, USUBJID, XXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: XX, USUBJID: '001', XXSEQ: 1, XXTERM: FOO}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  XX:
+    define_dataset_class: TRIAL DESIGN
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: PMDA-SD9999
+    dataset: XX
+    row_key: {STUDYID: S1, USUBJID: '001', XXSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $domain_is_custom: 'true'
+      define_dataset_class: TRIAL DESIGN
+expected_errors: []

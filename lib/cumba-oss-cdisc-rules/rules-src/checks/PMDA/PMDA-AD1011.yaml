@@ -1,0 +1,76 @@
+Core:
+  Id: "PMDA-AD1011"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a secondary variable (the same root name with an\
+  \ N or C suffix) is populated on a record but its corresponding primary analysis\
+  \ variable is not populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*N) and empty(*) or not empty(*C) and empty(*)
+Outcome:
+  Message: "A secondary variable is populated on a record, but its corresponding primary\
+    \ analysis variable is not populated."
+  Output_Variables:
+  - "*"
+wildcardExclude:
+- "*DTC"
+- "*FN"
+- "TRTPN"
+- "TRT01PN"
+- "PARAMN"
+- "AVALC"
+- "BASEC"
+- "*LOC"
+- "*HIC"
+Source:
+  Message: "Secondary variable is populated, but its primary variable * is not populated"
+  Description: "In a pair of corresponding character and numeric variables (* and\
+    \ *N or *C) the primary or most commonly used variable must be populated if its\
+    \ secondary variable describing it is populated. Exceptions: *DTC, *FN, TRTPN,\
+    \ TRT01PN, PARAMN, AVALC, BASEC, *LOC, and *HIC. Corresponding character and numeric\
+    \ values must also have a one-to-one mapping consistency when the primary variable\
+    \ is populated, which are addressed in other rules."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, MDOCCDS, ADAMOTHER"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1011"
+        Version: "1"
+      Version: "6.0"

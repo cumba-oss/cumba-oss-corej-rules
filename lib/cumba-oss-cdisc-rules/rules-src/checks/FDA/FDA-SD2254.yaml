@@ -1,0 +1,119 @@
+Core:
+  Id: "FDA-SD2254"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Value Code (TSVALCD) for a 'COMPTRT'\
+  \ trial-summary parameter is not a valid Unique Ingredient Identifier (UNII) in\
+  \ the FDA Substance Registration System (SRS)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$comptrt_unii_valid"
+  expression: "valid_external_dictionary_code(TSVALCD, external_dictionary_type=\"\
+    unii\", dictionary_term_type=\"UNII\")"
+Check:
+  expression: >-
+    TSPARMCD == "COMPTRT" and $comptrt_unii_valid == false
+Outcome:
+  Message: "TSVALCD is not a valid FDA-SRS Unique Ingredient Identifier (UNII) for\
+    \ the 'COMPTRT' parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVALCD"
+Source:
+  FDA_Validator_Rule_Message: "Invalid TSVALCD value for COMPTRT"
+  FDA_Validator_Rule_Description: "TSVALCD for COMPTRT record must be a valid unique\
+    \ ingredient identifier from FDA Substance Registration System (SRS)."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2254"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2254"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2254"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2254"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2254"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0446"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0446"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0446"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0446"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0446"
+        Version: "1"
+      Version: "2.0"

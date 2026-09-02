@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0591 expect=noViolation domain=ADAE
+#note "SEX agrees with ADSL for the same USUBJID -> no violation. The expansion still RUNS, so this is not a vacuous pass: the invalid sibling differs only in the ADSL SEX value."
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col SEX     type=Char
+col AETERM  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | M | HEADACHE
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+CDISCPILOT01 | 01-701-1015 | M
+---

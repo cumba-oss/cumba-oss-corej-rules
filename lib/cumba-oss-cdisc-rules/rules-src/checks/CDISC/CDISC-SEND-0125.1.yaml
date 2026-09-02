@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0125.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Element is unplanned (ETCD equals \"UNPLAN\"\
+  ) but the Description of Unplanned Element (SEUPDES) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+    - "SEUPDES"
+Check:
+  expression: >-
+    ETCD == "UNPLAN" and empty(SEUPDES)
+Outcome:
+  Message: "SEUPDES is empty when ETCD is \"UNPLAN\"."
+  Output_Variables:
+  - "ETCD"
+  - "SEUPDES"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEUPDES"
+  Plain_Text_Explanation: "SEUPDES is the description of the unplanned element.  This\
+    \ variable should only be populated if ETCD is UNPLAN."
+  Condition: "ETCD = \"UNPLAN\""
+  Rule: "SEUPDES ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND125.1"
+        Version: "1"
+      Version: "5.0"

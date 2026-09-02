@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0364"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Related Subject or Pool Identifier (RSUBJID)\
+  \ is populated and equal to the Pool Identifier (POOLID)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELSUB"
+Requirements:
+  Variables:
+    All:
+    - "POOLID"
+    - "RSUBJID"
+Check:
+  expression: >-
+    not empty(RSUBJID) and RSUBJID == POOLID
+Outcome:
+  Message: "RSUBJID is equal to POOLID."
+  Output_Variables:
+  - "POOLID"
+  - "RSUBJID"
+Source:
+  Class: "SPC"
+  Domain: "RELSUB"
+  Variable: "RSUBJID"
+  Condition: "RSUBJID ^= null"
+  Rule: "RSUBJID ^= POOLID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0364"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0364"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0364"
+        Version: "1"
+      Version: "2.0"

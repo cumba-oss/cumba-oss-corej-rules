@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0170 expect=skipped domain=ADAE
+#note "Scope pin on the data-structure axis. The data would fire (STARTDT declared, CNSR absent), but structure=OCCDS is the DECLARED tier and beats the column heuristic (Fix #154), and this rule's Scope.Data_Structures.Include is BASIC DATA STRUCTURE alone, so an OCCDS dataset is out of scope and the rule never executes. Note the single BDS token already covers medical-device BDS datasets via the Fix #179 structure set, so this narrower-looking Include is behaviourally identical to PMDA-AD0245's BDS + MDBDS pair. The mandatory #library line is the carrier for the declaration."
+#library standard=adamig version=1-1
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col STARTDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 21915
+CDISCPILOT01 | 01-701-1023 | NAUSEA | 21915

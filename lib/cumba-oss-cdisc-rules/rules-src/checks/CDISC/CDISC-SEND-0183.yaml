@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0183"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Relationship to Death (--DTHREL) is populated with\
+  \ a value other than \"Y\", \"N\", or \"U\"."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MA"
+    - "MI"
+Requirements:
+  Variables:
+    All:
+    - "--DTHREL"
+Check:
+  expression: >-
+    not empty(--DTHREL) and --DTHREL not in ["Y", "N", "U"]
+Outcome:
+  Message: "--DTHREL is populated with a value that is not \"Y\", \"N\", or \"U\"."
+  Output_Variables:
+  - "--DTHREL"
+Source:
+  Class: "FND"
+  Domain: "MA, MI"
+  Variable: "--DTHREL"
+  Plain_Text_Explanation: "DTHREL must be populated with \"Y\", \"N\", \"U\" or null."
+  Condition: "DTHREL ^= null"
+  Rule: "DTHREL = \"Y\" OR DTHREL = \"N\" OR DTHREL = \"U\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND183"
+        Version: "1"
+      Version: "5.0"

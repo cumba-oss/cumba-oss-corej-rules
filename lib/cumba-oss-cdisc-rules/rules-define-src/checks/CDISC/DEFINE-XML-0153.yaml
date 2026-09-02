@@ -1,0 +1,22 @@
+Rule_Id: "DEFINE-XML-0153"
+Sheet_Rule_Identifier: "153"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute def:IsNonStandard must be provided for a CodeList element where CDISC Controlled Terminology is required and there is no Alias provided."
+# P5 adjudication of the dual-reading flag (gaps doc / review-batch-e): the
+# sheet's FORMAL Rule column - '@def:IsNonStandard must be provided when there
+# is no CodeList/Alias[@Context="nci:ExtCodeID"]' - is purely intra-document,
+# so this rule needs NO CT input and is not Requires:-gated. The plain-text
+# column's extra "where CDISC Controlled Terminology is required" trigger is
+# IG-library knowledge (the CDISC-149 family) and is deliberately not encoded.
+Message: "Attribute def:IsNonStandard is missing and Alias[@Context=\"nci:ExtCodeID\"] is not provided for a variable with required controlled terminology."
+Check:
+  kind: "exists"
+  target: "@IsNonStandard"
+  when:
+    not:
+      path: "Alias/@Context"
+      equals: "nci:ExtCodeID"

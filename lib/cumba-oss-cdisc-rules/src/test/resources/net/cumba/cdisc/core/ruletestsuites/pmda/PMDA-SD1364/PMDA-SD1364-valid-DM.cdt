@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1364 expect=noViolation domain=DM
+#note "Rows 1-3: the three untreated ARMNRS reasons carry empty ACTARMCD/ACTARM. Row 4: a treated subject has no ARMNRS. Row 5 boundary: 'UNPLANNED TREATMENT' is outside the rule's three named reasons, so it is not flagged here."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |   |       | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1023 |   |       | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-701-1028 |   |       | ASSIGNED, NOT TREATED
+CDISCPILOT01 | DM | 01-701-1034 | A | Arm A |
+CDISCPILOT01 | DM | 01-701-1047 | A | Arm A | UNPLANNED TREATMENT

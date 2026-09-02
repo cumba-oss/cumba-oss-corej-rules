@@ -1,0 +1,35 @@
+Core:
+  Id: "CDISC-CG0568"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when EXMETHOD is present in the EX dataset, as EXMETHOD\
+  \ is not to be used with human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Check:
+  expression: >-
+    var_exists("EXMETHOD")
+Outcome:
+  Message: "EXMETHOD is present in the EX dataset, but it is not to be used with human\
+    \ clinical trials."
+  Output_Variables:
+  - "EXMETHOD"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "EXMETHOD"
+  Rule: "EXMETHOD not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0568"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,51 @@
+Core:
+  Id: "PMDA-AD0405"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, within a subject (USUBJID), the character Analysis\
+  \ Toxicity Description High (ATOXDSCH) does not have a single consistent value for\
+  \ a given value of Parameter Code (PARAMCD), evaluated only on rows where both ATOXDSCH\
+  \ and PARAMCD are populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ATOXDSCH) and var_exists("USUBJID") and not empty(PARAMCD) and
+    is_inconsistent_across_dataset(ATOXDSCH, keys=[USUBJID, PARAMCD])
+Outcome:
+  Message: "ATOXDSCH has inconsistent values for the same PARAMCD within a subject."
+  Output_Variables:
+  - "PARAMCD"
+  - "ATOXDSCH"
+Source:
+  Message: "Inconsistent value for ATOXDSCH within a subject and parameter"
+  Description: "Within a subject, there should be only a single value of Analysis\
+    \ Toxicity Description High (ATOXDSCH) variable for a given value of Parameter\
+    \ Code (PARAMCD) variable, considering only those rows on which both variables\
+    \ are populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0405"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0405"
+        Version: "1"
+      Version: "6.0"

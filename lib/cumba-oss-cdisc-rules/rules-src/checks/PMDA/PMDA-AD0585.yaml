@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0585"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a parameter, the Change to Baseline Category\
+  \ y (N) (BCHGCAyN) variable does not hold a single consistent value for a given\
+  \ value of the Change to Baseline Category y (BCHGCATy) variable, evaluated only\
+  \ over the records where both BCHGCAyN and BCHGCATy are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BCHGCAyN"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and var_exists("BCHGCATy") and not empty(BCHGCATy) and not empty(BCHGCAyN)
+    and not empty(PARAMCD) and is_inconsistent_across_dataset(BCHGCAyN, keys=[PARAMCD, BCHGCATy])
+Outcome:
+  Message: "Inconsistent value for BCHGCAyN within a unique PARAMCD."
+  Output_Variables:
+  - "PARAMCD"
+  - "BCHGCATy"
+  - "BCHGCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for BCHGCAyN within a unique PARAMCD"
+  Description: "Within a parameter, there should be only a single value of Change\
+    \ to Baseline Category y (N) (BCHGCAyN) variable for a given value of Change to\
+    \ Baseline Category y (BCHGCATy) variable, considering only those rows on which\
+    \ both variables are populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0585"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0585"
+        Version: "1"
+      Version: "6.0"

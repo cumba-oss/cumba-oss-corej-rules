@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0352 expect=noViolation domain=ADLBC
+# Rule:Description: AyIND is present and AyLO, AyHI, AyLOC, and AyHIC are all not present
+#note "A1IND present and A1LO also present -> noViolation"
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col A1IND type=Char
+col A1LO type=Num
+---
+CDISCPILOT01 | 01-701-1015 | NORMAL | 2
+---

@@ -1,0 +1,34 @@
+Core:
+  Id: "CDISC-CG0641"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the AGETXT variable is present in the Demographics\
+  \ (DM) dataset."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    var_exists("AGETXT")
+Outcome:
+  Message: "AGETXT is present in the Demographics (DM) dataset."
+  Output_Variables:
+  - "AGETXT"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "AGETXT"
+  Rule: "AGETXT not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0641"
+        Version: "1"
+      Version: "2.0"

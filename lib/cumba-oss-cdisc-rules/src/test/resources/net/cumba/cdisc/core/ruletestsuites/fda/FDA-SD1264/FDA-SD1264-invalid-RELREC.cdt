@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1264 expect=violation domain=RELREC
+#note "Row 1 is a dataset-level relationship (USUBJID and IDVARVAL both empty) yet names a --SEQ variable in IDVAR, which only has meaning within a subject -> fires. Rows 2/3 are the legitimate shapes."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVAR=AESEQ
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE |     | AESEQ   |   | ONE  | R01
+S1 | CM |     | CMGRPID |   | MANY | R01
+S1 | AE | 001 | AESEQ   | 1 |      | R02

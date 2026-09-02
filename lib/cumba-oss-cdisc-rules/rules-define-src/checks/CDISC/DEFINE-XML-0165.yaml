@@ -1,0 +1,24 @@
+Rule_Id: "DEFINE-XML-0165"
+Sheet_Rule_Identifier: "165"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "CodeList element must contain either one or more EnumeratedItem elements, one or more CodeListItem elements or one ExternalCodelist element."
+# One sheet row, three rules (the XSD's exclusive content choice): this rule
+# covers the EMPTY CodeList — for a CodeList with neither CodeListItem nor
+# ExternalCodeList children the guard passes and at least one EnumeratedItem is
+# required, so it fires exactly when all three content forms are absent. The
+# mixed-content legs are DEFINE-XML-0165-B/-C; the "one ExternalCodelist"
+# upper bound is sheet id 250.
+Message: "CodeList must contain either one or more EnumeratedItem elements, one or more CodeListItem elements or one ExternalCodelist element."
+Check:
+  kind: "exists"
+  target: "EnumeratedItem"
+  when:
+    all:
+    - path: "CodeListItem"
+      exists: false
+    - path: "ExternalCodeList"
+      exists: false

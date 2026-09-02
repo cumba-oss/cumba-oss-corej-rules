@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0253.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a RELREC record that represents a domain-to-domain\
+  \ relationship (RELTYPE is populated) also populates USUBJID, POOLID, or IDVARVAL\
+  \ - which must all be empty for a domain-to-domain relationship - or carries a RELTYPE\
+  \ other than \"ONE\" or \"MANY\"."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "RELREC"
+Requirements:
+  Variables:
+    All:
+    - "RELTYPE"
+Check:
+  expression: >-
+    not empty(RELTYPE) and (not empty(USUBJID) or not empty(POOLID) or not empty(IDVARVAL) or
+    RELTYPE not in ["ONE", "MANY"])
+Outcome:
+  Message: "A RELREC record with RELTYPE populated (a domain-to-domain relationship)\
+    \ also populates USUBJID, POOLID, or IDVARVAL, which must be empty, or carries\
+    \ a RELTYPE that is not 'ONE' or 'MANY'."
+  Output_Variables:
+  - "POOLID"
+  - "IDVARVAL"
+  - "RELTYPE"
+Source:
+  Class: "REL"
+  Domain: "RELREC"
+  Variable: "RELTYPE, USUBJID, POOLID, IDVARVAL"
+  Plain_Text_Explanation: "If a record is part of a domain-to-domain relationship,\
+    \ the variables USUBJID, POOLID, and IDVARVAL are null and the variable RELTYPE\
+    \ is populated with \"ONE\" or \"MANY\"."
+  Condition: "Record is part of a domain-to-domain relationship"
+  Rule: "USUBJID, POOLID, and IDVARVAL are null AND (RELTYPE = \"ONE\" OR RELTYPE\
+    \ = \"MANY\")"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253.1"
+        Version: "1"
+      Version: "5.0"

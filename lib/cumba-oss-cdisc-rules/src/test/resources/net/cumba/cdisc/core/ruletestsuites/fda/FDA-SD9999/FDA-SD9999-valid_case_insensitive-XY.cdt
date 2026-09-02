@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD9999 expect=noViolation domain=XY
+#note "Boundary: the Define-XML class is spelled 'Findings' (mixed case); the containment check is case-insensitive, so the custom dataset still counts as based on a general observation class -> no violation."
+#library standard=sdtmig version=3-4
+#library custom-domain XY
+#define dataset-class XY Findings
+dataset XY label="Custom Dataset"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XYSEQ   type=Num  label="Sequence Number"
+col XYTERM  type=Char label="Reported Term"
+---
+S1 | XY | 001 | 1 | SOMETHING

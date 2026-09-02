@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0331 expect=noViolation domain=ADLBC
+#note "CHGCAT1N is not declared -- data that WOULD fire under a degraded key. This rule's guard is not empty(CHGCATyN) -- on the KEY column -- so it is false on every row and the rule is EXECUTED and silent. Identical column-removal to PMDA-AD0327-invalid_degraded_key_no_avalcayn, opposite verdict, because the sheet conditions on the numeric variable here and on the character variable there."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col CHGCAT1  type=Char
+---
+S1 | 001 | ALB | INCREASE
+S1 | 002 | ALB | INCREASE
+S1 | 003 | ALB | RISE

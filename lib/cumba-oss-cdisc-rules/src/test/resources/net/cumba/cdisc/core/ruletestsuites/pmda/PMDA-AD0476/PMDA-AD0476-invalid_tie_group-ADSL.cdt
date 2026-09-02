@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0476 expect=violation domain=ADSL
+#note "1-vs-1 TIE in group STRATAVN=1 - no value is the unique most-common one, so EVERY non-blank row in the group is flagged. This is the batch's single pin of the D.2 tie contract."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001 STRATAV=HIGH STRATAVN=1
+#expectViolationAt row=2 USUBJID=002 STRATAV=LOW STRATAVN=1
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col STRATAV  type=Char
+col STRATAVN type=Num
+---
+S1 | 001 | HIGH | 1
+S1 | 002 | LOW  | 1
+---

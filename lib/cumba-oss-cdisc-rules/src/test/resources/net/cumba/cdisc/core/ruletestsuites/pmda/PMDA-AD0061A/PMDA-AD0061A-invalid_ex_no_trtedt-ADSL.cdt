@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0061A expect=violation domain=ADSL
+#note "ADSL deliberately has NO TRTEDT and NO TRTEDTM columns; one row. EX block is present. Shipped Check `ds_exists(\"EX\") and not var_exists(\"TRTEDT\") and not var_exists(\"TRTEDTM\")` is presence-only -> dataset-broadcast -> ONE violation at row=1, no value pin (no OV authored - R-9.2 omission, correct). The #library block is the structure-declaration carrier."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | 01-001
+---
+
+dataset EX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+col EXSTDTC type=Char
+---
+S1 | EX | 01-001 | DRUGA | 2020-01-05

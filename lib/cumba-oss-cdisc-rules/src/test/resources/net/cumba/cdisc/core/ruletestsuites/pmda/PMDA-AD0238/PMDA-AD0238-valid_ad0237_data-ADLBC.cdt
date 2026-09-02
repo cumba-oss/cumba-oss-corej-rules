@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0238 expect=noViolation domain=ADLBC
+#note "Carries PMDA-AD0237's VIOLATION data verbatim. Under AD0238's direction each TRTPG1 key (POOLA, POOLB, POOLC) has exactly one dependent -> silent on data that fires twice under AD0237. The directional discriminator for the pair."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTPG1  type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | POOLA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLB | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLC | 3

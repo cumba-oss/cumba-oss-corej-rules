@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0696 expect=noViolation domain=ADLBC
+#note "SPDEVID present -> MDBDS. Every (USUBJID,SPDEVID,PARAMCD,BASETYPE) group has exactly one ABLFL=Y record -> counts <= 1 -> silent. Verdict-identical under current and proposed rule."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col PARAMCD  type=Char
+col BASETYPE type=Char
+col ABLFL    type=Char
+col AVAL     type=Num
+---
+S1 | 001 | DEV01 | GLUC | LAST | Y | 100
+S1 | 001 | DEV01 | GLUC | LAST |   | 102
+S1 | 001 | DEV01 | ALB  | LAST | Y | 30
+S1 | 002 | DEV01 | GLUC | LAST | Y | 99

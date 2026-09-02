@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0484 expect=skipped domain=ADLBC
+#note "No column matches ^PBCHGCA(\d+)$ or ^PBCHGC(\d+)N$ (CHG and PCHG do NOT match either pattern) -> NoMatch -> not executed. This rule has no Scope gate (Domains:[ALL]), so the NoMatch skip is its only skip channel."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CHG     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.2 | 1.1
+---

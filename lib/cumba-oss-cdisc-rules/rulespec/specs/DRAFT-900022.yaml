@@ -1,0 +1,62 @@
+name: DRAFT-900022
+kind: rule
+description: |
+  GLOB-CT-001 (PLAN-coreJ-codelist-conformance Phase 2): the codelist bound to a variable
+  in the define.xml (NCI C-code) must be the codelist the CDISC Library expects for that
+  variable. VS.VSPOS is library-bound to C71148, but the define binds C99999 -> the VSPOS
+  ItemDef fires. VSLAT is a SECOND offender (library C99074, define binds C88888) so the Record
+  sensitivity is observable — under the former Dataset sensitivity only the first offending
+  ItemDef survived. VSTESTCD has no library codelist expectation, so the non_empty guard on
+  library_variable_ccode excludes it. Check raises to the cross-level comparison
+  not empty(var_ccode("LIBRARY")) and not empty(var_ccode("DEFINE")) and
+  var_ccode("DEFINE") != var_ccode("LIBRARY").
+python_source: rules-draft-sdtmig-3-4.json (DRAFT-900022)
+rule:
+  coreId: DRAFT-900022
+datasets:
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+    - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSPOS: SUPINE, VSLAT: LEFT, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+  domain_variables:
+    VS:
+    - {name: VSPOS, ordinal: '1', role: Result Qualifier, simpleDatatype: Char, label: Position of Subject During Observation, codelist: C71148}
+    - {name: VSLAT, ordinal: '2', role: Result Qualifier, simpleDatatype: Char, label: Laterality, codelist: C99074}
+    - {name: VSTESTCD, ordinal: '3', role: Topic, simpleDatatype: Char, label: Vital Signs Test Short Name}
+  codelist_terms:
+    C71148: [SUPINE, STANDING]
+    C99074: [LEFT, RIGHT]
+  codelist_extensible:
+    C71148: false
+    C99074: false
+define_xml:
+  VS:
+  - {define_variable_name: VSPOS, define_variable_ccode: C99999}
+  - {define_variable_name: VSLAT, define_variable_ccode: C88888}
+  - {define_variable_name: VSTESTCD, define_variable_ccode: C66741}
+expected_violations:
+- rule_id: DRAFT-900022
+  dataset: VS
+  row_key: {STUDYID: S1, USUBJID: '001', VSSEQ: 1}
+  status: SUCCESS
+  output_variables:
+    define_variable_ccode: C99999
+    define_variable_name: VSPOS
+    library_variable_ccode: C71148
+    variable_name: VSPOS
+- rule_id: DRAFT-900022
+  dataset: VS
+  row_key: {STUDYID: null, USUBJID: null, VSSEQ: null}
+  status: SUCCESS
+  output_variables:
+    define_variable_ccode: C88888
+    define_variable_name: VSLAT
+    library_variable_ccode: C99074
+    variable_name: VSLAT
+expected_errors: []

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1320 expect=noViolation domain=LB
+#note "row 1 has a standardised result; row 2 has no result but declares LBSTAT=NOT DONE -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | ALB | 4.2 | 4.2 |
+S1 | LB | 001 | 2 | ALT |  |  | NOT DONE

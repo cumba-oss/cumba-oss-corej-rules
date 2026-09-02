@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0393 expect=violation domain=BW
+#note "BWTEST is declared BEFORE BWTESTCD, contradicting the SDTM Model order in the sidecar, so the dataset's column order is not an ordered subset of the model's -> fires ONCE for the dataset at row 1. The `#library model-column-order` key is the DATASET NAME, not a domain code."
+#library standard=sendig-dart version=1-2
+#library model-column-order BW STUDYID DOMAIN USUBJID BWSEQ BWGRPID BWTESTCD BWTEST BWORRES BWORRESU BWSTRESC
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTEST   type=Char label="Body Weight Test Name"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | BW | 001 | 1 | Body Weight | BW | 250
+S1 | BW | 002 | 1 | Body Weight | BW | 262
+---

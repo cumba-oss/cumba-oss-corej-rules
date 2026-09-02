@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD2239 expect=violation domain=FA
+#note "Group (001,1,FEVER,2020-06-01) disagrees 1:1 (PRE vs POST) -> rows 1+2 fire. Row 3 sits in a singleton group (different VISITNUM). Row 4 sits in a singleton group (different FAOBJ=COUGH), which pins FAOBJ as a live grouping key. All four key columns are present -> verdict-identical under current and proposed rule shapes."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 FATPT=PRE
+#expectViolationAt row=2 FATPT=POST
+dataset FA class="FINDINGS ABOUT"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col FASEQ    type=Num
+col FAOBJ    type=Char
+col VISITNUM type=Num
+col FADTC    type=Char
+col FATPT    type=Char
+---
+S1 | FA | 001 | 1 | FEVER | 1 | 2020-06-01 | PRE
+S1 | FA | 001 | 2 | FEVER | 1 | 2020-06-01 | POST
+S1 | FA | 001 | 3 | FEVER | 2 | 2020-06-15 | PRE
+S1 | FA | 001 | 4 | COUGH | 1 | 2020-06-01 | POST

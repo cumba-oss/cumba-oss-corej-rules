@@ -1,0 +1,178 @@
+Core:
+  Id: "FDA-SD1378"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Element Code (ETCD) value defined in Trial Elements\
+  \ (TE) is not assigned to any Arm in the Trial Arms (TA) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Operations:
+- id: "$ta_etcd"
+  expression: "distinct(ETCD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ETCD) and ETCD not in $ta_etcd
+Outcome:
+  Message: "ETCD value not present in TA"
+  Output_Variables:
+  - "ETCD"
+  - "$ta_etcd"
+Source:
+  FDA_Validator_Rule_Message: "ETCD value not present in TA"
+  FDA_Validator_Rule_Description: "Element Code (ETCD) values defined in Trial Elements\
+    \ (TE) should be assigned for at least one Arm Code (ARMCD) in Trial Arms (Trial\
+    \ Arms)."
+  Domains: "TE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1378"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"

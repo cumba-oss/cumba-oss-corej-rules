@@ -1,0 +1,88 @@
+Core:
+  Id: "CDISC-SEND-0290"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study day for a test (and category/subcategory\
+  \ where those columns are present), a Planned Time Point Name (--TPT) maps to more\
+  \ than one Planned Time Point Number (--TPTNUM) or a --TPTNUM maps to more than\
+  \ one --TPT, so the two are not in a one-to-one relationship."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--TPT"
+    - "--TPTNUM"
+Check:
+  expression: >-
+    not empty(--TPT) and not empty(--TPTNUM) and (has_multiple_values_for(--TPTNUM, --TPT,
+    within=[--TESTCD, --DY, --CAT, --SCAT]) or has_multiple_values_for(--TPT, --TPTNUM,
+    within=[--TESTCD, --DY, --CAT, --SCAT]))
+Outcome:
+  Message: "--TPT and --TPTNUM do not have a one-to-one relationship within a study\
+    \ day for a test (--TESTCD, --DY, and --CAT/--SCAT where present)."
+  Output_Variables:
+  - "--TESTCD"
+  - "--TPT"
+  - "--TPTNUM"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "For each unique planned time point (--TPT), there must\
+    \ be a one-to-one relationship between the values of --TPT and --TPTNUM. Uniqueness\
+    \ for these time points is determined by a combination of the domain, study day,\
+    \ and, if present, category and/or subcategory (--CAT/--SCAT). Other variables,\
+    \ such as --TESTCD and --METHOD, may also be needed in some cases to define uniqueness.\
+    \ When this occurs, clarification should be provided as a comment to --TPTNUM\
+    \ in the define file."
+  Condition: "Unique planned time point occurs within a Study Day as determined by\
+    \ a combination of domain, study day, --CAT, --SCAT, --TESTCD,  --METHOD, or other\
+    \ variables as provided by the Sponsor in the define file"
+  Rule: "There must be a one-to-one relationship between the values of --TPT and --TPTNUM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND290"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND290"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND290"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND290"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND290"
+        Version: "1"
+      Version: "5.0"

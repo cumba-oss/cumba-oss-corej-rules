@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0160"
+Sheet_Rule_Identifier: "160"
+Rule_Set: "CDISC"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the Type attribute must be one of the values from the CDISC/NCI standard Origin Type codelist included in the Define-XML Controlled Terminology."
+# The sheet names the CDISC/NCI Origin Type codelist (C170449); the 2.1 spec
+# (SS4.3.2, SS5.3.12.3) publishes the same non-extensible term set inline —
+# Collected, Derived, Assigned, Protocol, Predecessor, Not Available — so the
+# rule is an inline one_of, not CT-gated. One sheet row, two rules: the sheet
+# binds this row to 2.0 and 2.1, but the two versions have different
+# non-extensible term sets, so the row is version-split (this rule: 2.1;
+# DEFINE-XML-0160-B: 2.0). Value check fires only on a present Type (presence
+# is sheet id 158).
+Message: "The value of Type [${value}] is not in the CDISC/NCI Standard Origin Type codelist (C-Code C170449) for Define-XML."
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["Collected", "Derived", "Assigned", "Protocol", "Predecessor", "Not Available"]

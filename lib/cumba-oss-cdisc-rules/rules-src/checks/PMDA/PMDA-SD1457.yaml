@@ -1,0 +1,38 @@
+Core:
+  Id: "PMDA-SD1457"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the dataset name does not conform to SAS Transport\
+  \ (XPORT) format v5 limitations: it exceeds 8 characters or contains characters\
+  \ other than uppercase letters, numbers, or underscores."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ds_name("DATA") !~ /^[A-Z0-9_]{1,8}$/
+Outcome:
+  Message: "Dataset name does not conform to SAS XPORT v5 limitations (maximum 8 characters;\
+    \ only uppercase letters, numbers, and underscores allowed)."
+  Output_Variables:
+  - "dataset_name"
+Source:
+  Message: "Invalid value for Dataset Name"
+  Description: "Dataset Name (DATASET) should follow limitations of SAS XPORT format\
+    \ v5. It should not exceed 8 characters and cannot contain characters other than\
+    \ letters in upper case, numbers, or underscores."
+  Domains: "ALL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1457"
+        Version: "1"
+      Version: "6.0"

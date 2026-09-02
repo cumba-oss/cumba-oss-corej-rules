@@ -1,0 +1,102 @@
+Core:
+  Id: "FDA-SE1126"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --TPT and --TPTNUM are populated but --TPT does\
+  \ not have the same value across records that share the same DOMAIN, --TPTNUM, --DY,\
+  \ and (if present) --CAT and --SCAT."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Check:
+  expression: >-
+    not empty(--TPT) and not empty(--TPTNUM) and is_inconsistent_across_dataset(--TPT, keys=[DOMAIN,
+    --TPTNUM, --DY, --CAT, --SCAT])
+Outcome:
+  Message: "Inconsistent value for --TPT: it is not the same across records sharing\
+    \ the same --TPTNUM, --DY, and (if present) --CAT/--SCAT."
+  Output_Variables:
+  - "DOMAIN"
+  - "--TPT"
+  - "--TPTNUM"
+  - "--DY"
+  - "--CAT"
+  - "--SCAT"
+Source:
+  FDA_Validator_Rule_Message: "Inconsistent value for --TPT within --TPTNUM, --DY,\
+    \ --CAT and/or --SCAT"
+  FDA_Validator_Rule_Description: "All values of Planned Time Point Name (--TPT) variable\
+    \ should be the same for a given value of Planned Time Point Number (--TPTNUM)\
+    \ variable. Uniqueness for these time points is determined by a combination of\
+    \ the domain, study day, and, if present, category and/or subcategory (--CAT/--SCAT)."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1126"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1126"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1126"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1126"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1126"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,70 @@
+Core:
+  Id: "FDA-SD1371"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ORRES is empty while --LOBXFL equals 'Y' and the\
+  \ record is not derived (--DRVFL is not equal to 'Y' or --DRVFL is not present)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--LOBXFL"
+Check:
+  expression: >-
+    empty(--ORRES) and --LOBXFL == "Y" and (not var_exists("--DRVFL") or --DRVFL != "Y")
+Outcome:
+  Message: "--ORRES is empty even though --LOBXFL equals 'Y' and either --DRVFL is\
+    \ not present in dataset or is not equal to 'Y'."
+  Output_Variables:
+  - "!--ORRES"
+  - "--LOBXFL"
+  - "--DRVFL"
+Source:
+  FDA_Validator_Rule_Message: "--ORRES is null when --LOBXFL = 'Y' (and --DRVFL is\
+    \ null)"
+  FDA_Validator_Rule_Description: "Result or Finding in Original Units (--ORRES) should\
+    \ be populated when Last Observation Before Exposure Flag (--LOBXFL) is set to\
+    \ 'Y', unless the record is derived (--DRVFL = 'Y')."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0553"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0553"
+        Version: "2"
+      Version: "2.0"

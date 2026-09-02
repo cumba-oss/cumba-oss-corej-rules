@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1218 expect=violation domain=TS
+#note "ADAPTED-FROM fda/FDA-SD1218/FDA-SD1218-invalid-TS.cdt. TS carries two AGEMIN records ($agemin_count = 2 > 1) -> exactly one dataset-level violation. The single TITLE record is ignored by the TSPARMCD=AGEMIN filter."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P18Y
+S1 | TS | 2 | AGEMIN | Planned Minimum Age of Subjects | P21Y
+S1 | TS | 1 | TITLE | Trial Title | A Randomized Study

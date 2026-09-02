@@ -1,0 +1,26 @@
+Rule_Id: "PMDA-DD0072"
+Sheet_Rule_Identifier: "DD0072"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, Origin is required for all SDTM, ADaM, and SEND variables. It is at the sponsors discretion whether to provide Origin at the Variable or Value Level. When Origin is provided for each Value Level item, then providing Origin on the Variable is optional. Define-XML specification represents variable Origin as def:Origin element under ItemDef element. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+Message: "Missing Origin"
+# CDISC twin 0155's covered branch: an ItemDef (referenced from a dataset) with
+# neither a def:Origin nor a def:ValueListRef. The row's second branch - a
+# ValueListRef is present but some value-level ItemDef in the list lacks its
+# Origin - is shipped separately as PMDA-DD0072-B (review-pmda-p3 W3; mirror
+# of CDISC 0155-B). Origin presence is proxied by its required Type attribute
+# (a dereferenced element-terminal path reads text, not presence), as on 0155.
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Origin/@Type"
+      exists: false
+    - path: "@ItemOID->ItemDef@OID/ValueListRef/@ValueListOID"
+      exists: false

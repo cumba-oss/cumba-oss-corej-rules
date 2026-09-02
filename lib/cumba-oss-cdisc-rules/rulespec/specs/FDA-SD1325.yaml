@@ -1,0 +1,84 @@
+name: FDA-SD1325
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P2 — the CONTROL spec for the dataset-level
+  `define_xml` shape. It pins the **delivery path** (D1) and the **D4 defaults**: the
+  object shape reaches each lane's Define provider, and the name/location a spec does
+  NOT declare are derived from the block key.
+
+  It does NOT pin D3 (the Define dataset-NAME list): deleting the name registration
+  leaves this spec green, because the rule reads only `define_dataset_label`. D3 is
+  pinned by P5b's `FDA-SD1063` / `FDA-SD0061` specs, which read the name list itself
+  through the `define_dataset_names` operation.
+
+  FDA-SD1325 is the simplest of the six group-A rules — two Check leaves, one Define
+  operand, no Operation, no library dependency — so nothing but the Define channel can
+  move the result: `non_empty(define_dataset_label) and dataset_label != define_dataset_label`
+  (native `not empty(ds_label("DEFINE")) and ds_label("DATA") != ds_label("DEFINE")`).
+
+  Fixture logic: both lanes hard-wire a spec dataset's label to its key — Java
+  `OverlayDataTable.empty(domain, domain, ...)` (FixtureLoader), Python
+  `DummyDataset({"label": domain})` (engine_adapter). There is **no spec key for a
+  submitted dataset's label**, so the disagreement can only be created from the Define
+  side: submitted label `AE` vs declared `Adverse Events` => exactly one violation.
+  Consequence worth knowing: this control proves the Define channel delivers the RIGHT
+  operand, not that the rule compares it against the right LEFT one — an engine reading
+  `dataset_name` where the rule says `dataset_label` would pass this spec silently.
+  Making it discriminating needs an optional `label:` on `SpecSchema.SpecDataset`
+  (both lanes); recorded in the plan, not built here.
+
+  Why the block is written exactly like this:
+
+  * `define_dataset_name` and `define_dataset_location` are deliberately **NOT declared**,
+    so D4's derivation is on the execution path (`AE` => name `AE`, location `ae.xpt`).
+    Declaring them would satisfy R6 but make D4 a no-op — Python's fill branches are
+    `if record.get(...) is None` and Java re-assigns the identical value — i.e. restating
+    the defaults *un-tests* the thing it looks like it is testing. Restating them
+    exercises R6's accepting half instead, which `DefineDatasetChannelTest` already covers.
+  * The location default is load-bearing on the Python lane: the fork merges the Define
+    frame onto the study frame on (`dataset_name`, `dataset_location`), and
+    `DummyDataset.filename` is `f"{domain.lower()}.xpt"`. A mismatch means the Define row
+    never joins. Since Fix #132 made that a LEFT join off a single study row, the failure is
+    SILENT — the surviving row carries `define_dataset_label: None`, `non_empty(...)` is
+    false, and the rule reports nothing while the spec looks perfectly green. (Before
+    Fix #132 the same mismatch split the outer-merged row and surfaced as
+    `dataset_label: null`, a visible artefact that could masquerade as the N-times
+    multiplication P3 existed to measure.) R6 rejects a declared mismatch for that reason,
+    and the reason got stronger rather than weaker: a silent zero is the worse failure mode.
+  * Only attributes the rule actually reads are declared. Every other `define_dataset_*`
+    key is Python-lane-only: `injectDatasetLevel` has sinks for `name`/`label`/`className`
+    alone, so a Check over any other attribute yields opposite verdicts across the lanes,
+    and an undeclared attribute that appears in `Output_Variables` renders as an absent
+    key on Java and `null` on Python.
+  * `expected_status: EXECUTED` is stated for explicitness only — both lanes default an
+    absent `expected_status` to EXECUTED, so it adds no assertion strength here. Note the
+    status channel is **blind to a dead Define channel on the Java lane**: killing the
+    channel yields EXECUTED with zero findings, not SKIPPED, because the define skip gate
+    keys on the provider being non-null. Only `expected_violations` catches that — which is
+    why "a 0/0 result means the fixture is wrong" is a hard precondition, not a slogan.
+  * Exactly ONE submitted dataset, deliberately. Multiplicity (three datasets plus a
+    Define-only key, EC-41/H5) is P3's fixture, not this one's.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1325)
+rule:
+  coreId: FDA-SD1325
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: Adverse Events
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SD1325
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      dataset_label: AE
+      define_dataset_label: Adverse Events
+expected_errors: []

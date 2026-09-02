@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD1019"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an ADSL Trial Date variable of the form TRxx...\
+  \ or APxx... (the 20 date/time forms TRxx/APxx with suffix SDT, SDTF, SDTM, STM,\
+  \ STMF, EDT, EDTF, EDTM, ETM, ETMF) has a treatment-period index 'xx' that is not\
+  \ in the range 01 to 99."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    varname() =~ /^(TR|AP)\\d\\d(SDT|SDTF|SDTM|STM|STMF|EDT|EDTF|EDTM|ETM|ETMF)$/ and varname() !~
+    /^(TR|AP)(0[1-9]|[1-9][0-9])(SDT|SDTF|SDTM|STM|STMF|EDT|EDTF|EDTM|ETM|ETMF)$/
+Outcome:
+  Message: "Illegal variable name: xx is not in [01-99] for an ADSL trial date"
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: xx is not in [01-99] for an ADSL trial date"
+  Description: "For ADSL Trial Dates xx variables of form TRxx... and APxx..., 'xx'\
+    \ must be the treatment period (01 to 99). This rule covers 20 distinct variable\
+    \ forms listed in ADSL. It's anticipated that the CDISC ADaM Validation team will\
+    \ release 20 new rules to cover this scenario."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1019"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1019"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1019"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1019"
+        Version: "1"
+      Version: "6.0"

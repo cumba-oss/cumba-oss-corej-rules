@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1084 expect=violation domain=CO
+#note "THE PMDA-vs-FDA CLASS DISCRIMINATOR: the PMDA sheet row includes SPECIAL PURPOSE; the FDA twin's does not. Row 1: both dates complete, CODY empty -> FIRES. Row 2: CODY populated -> silent. CODTC Char/Perm and CODY Num/Perm are real CO IG variables."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset CO class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col COSEQ   type=Num
+col COVAL   type=Char
+col CODTC   type=Char
+col CODY    type=Num
+---
+S1 | CO | 001 | 1 | NOTE1 | 2023-06-15 |
+S1 | CO | 001 | 2 | NOTE2 | 2023-06-15 | 15
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+---
+S1 | DM | 001 | 2023-06-01
+---

@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0055"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Permissible variable using the NY (No Yes) codelist\
+  \ holds a value other than Y, N, U, or NA."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_core("LIBRARY") == "Perm" and var_ccode("LIBRARY") == "C66742" and not empty(value()) and
+    value() not in ["Y", "N", "U", "NA"]
+Outcome:
+  Message: "A Permissible variable using the NY (No Yes) codelist is populated with\
+    \ a value other than Y, N, U, or NA."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "For Permissible variables, the NY Codelist may be extended\
+    \ to include \"U\" and \"NA\" if these values are collected.  Note that these\
+    \ terms are now included in the CDISC published Controlled Terminology Codelist.\
+    \  Also note that this rule can be superseded by rules in the CDISC notes restricting\
+    \ the use of the NY Codelist to a subset of the NY Codelist."
+  Condition: "Variable = permissible and codelist is NY"
+  Rule: "Variable = Y,N,U,or NA"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND55"
+        Version: "1"
+      Version: "5.0"

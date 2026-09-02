@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0152 expect=noViolation domain=ADLBC
+#library standard=adamig version=1-3
+#note "THIS is the fixture that pins the value_is_reference misuse for AD0152, not the -invalid- twin. Every baseline-flagged record is conformant (BASE equals AVAL where ABLFL=Y) and the ABLFL=N record is guarded out, so the rule must stay silent. Before the fix the leaf carried value_is_reference:true, which lowered to BASE != colref(AVAL); colref reads the column NAMED BY AVAL's cell content, no column is named 2.5, so colref resolved to null, Primitives.equality folds a null target to the empty string, the non_empty-guarded LHS never equals it, and the NEGATED operator fired on EVERY record passing the guards (R-5.21). This fixture yielded 2 spurious violations before the fix and 0 after. As with AD0083 the defect was a 100% FALSE POSITIVE, so it is the VALID data that exposes it."
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ABLFL   type=Char
+col AVAL    type=Num
+col BASE    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | Y | 2.5 | 2.5
+CDISCPILOT01 | 01-701-1023 | ALT | Y | 7.0 | 7.0
+CDISCPILOT01 | 01-701-1023 | ALT | N | 9.9 | 7.0
+---

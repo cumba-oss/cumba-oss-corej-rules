@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1464 expect=violation domain=EX
+#note "The row set is the is_numeric truth-table pin (function-examples.md): row 1 '500' pure numeric -> fires; row 2 '500 mg' has_alpha -> no; row 3 '.5' accepted (lone leading dot) -> fires; row 4 empty -> no; row 5 '1e5' exponent rejected by the strict scan -> no; row 6 '1.' trailing dot rejected -> no."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 EXDOSTXT=500
+#expectViolationAt row=3 EXDOSTXT=.5
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col EXSEQ    type=Num
+col EXTRT    type=Char
+col EXDOSTXT type=Char
+---
+S1 | EX | 001 | 1 | DRUGA | 500
+S1 | EX | 001 | 2 | DRUGA | 500 mg
+S1 | EX | 001 | 3 | DRUGA | .5
+S1 | EX | 001 | 4 | DRUGA |
+S1 | EX | 001 | 5 | DRUGA | 1e5
+S1 | EX | 001 | 6 | DRUGA | 1.

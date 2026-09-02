@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-AD0898 expect=skipped domain=ADAE
+#note "ASEQ, SRCSEQ and RECSEQ all match the &DOMSEQ pattern but are NOT parent references - ASEQ is ADaM own sequence and SRCSEQ names its parent in SRCDOM, not in the variable name. known_domain_only drops all three because A / SRC / REC are not library domains, so the rule is skipped rather than checking ASEQ against a dataset called A. The datasets A, SRC and REC below are loaded ON PURPOSE: without them the parent-not-loaded check would drop all three candidates anyway and this scenario would stay green with known_domain_only removed - i.e. it would pin nothing. The same masking made two unit tests vacuous before it was caught."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ    type=Char
+col SRCSEQ  type=Char
+col RECSEQ  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1 | 1
+---
+
+dataset A
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---
+
+dataset SRC
+col STUDYID type=Char
+col USUBJID type=Char
+col SRCSEQ  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---
+
+dataset REC
+col STUDYID type=Char
+col USUBJID type=Char
+col RECSEQ  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0438 expect=skipped domain=TS
+#note "FRESH, DISCRIMINATING. No TSPARMCD column declared. TSVAL is exactly the value the invalid-TS fixture reports, so the fixture is only meaningful if the rule genuinely runs and genuinely finds nothing. Predicted: the rule EXECUTES and reports NOTHING, because the derived var_exists(\"TSPARMCD\") conjunct is false. THE CONTRAST THAT MAKES THIS SCENARIO WORTH HAVING: the in-tree cdisc/CDISC-CG0287/CDISC-CG0287-skipped_no_tsparmcd-TS.cdt is the SAME missing column on the SAME domain and expects SKIPPED — because CG0287 declares Requirements.Variables.All [TSPARMCD] and CG0438 declares no Variables axis at all. expect=noViolation and expect=skipped are NOT interchangeable and this pair is the proof. If this comes back SKIPPED, CG0438 has acquired a Variables gate it does not declare — escalate. SIDECAR version=3-3. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-3
+dataset TS label="Trial Summary"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col TSSEQ   type=Num
+col TSPARM  type=Char label="Trial Summary Parameter"
+col TSVAL   type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | Planned Minimum Age of Subjects | 18YEARS

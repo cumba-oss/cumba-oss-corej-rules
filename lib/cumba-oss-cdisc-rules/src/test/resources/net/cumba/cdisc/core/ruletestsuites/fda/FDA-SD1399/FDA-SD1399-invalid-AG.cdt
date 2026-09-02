@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD1399 expect=violation domain=AG
+#note "Row 1: AGSTDTC 2020-01-04 is before DM.RFCSTDTC 2020-01-05 -> fires. Row 2: equal -> clean (rule is strictly before). Row 3: after -> clean. Row 4: AGSTDTC empty -> clean. Row 5: subject 002 whose RFCSTDTC is empty -> clean."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset AG class=INTERVENTIONS label="Procedure Agents"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGSEQ   type=Num  label="Sequence Number"
+col AGTRT   type=Char label="Reported Name of Agent"
+col AGSTDTC type=Char label="Start Date/Time of Agent"
+---
+S1 | AG | 001 | 1 | OVALBUMIN | 2020-01-04
+S1 | AG | 001 | 2 | OVALBUMIN | 2020-01-05
+S1 | AG | 001 | 3 | OVALBUMIN | 2020-01-06
+S1 | AG | 001 | 4 | OVALBUMIN |
+S1 | AG | 002 | 1 | OVALBUMIN | 2019-12-01
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2020-01-05
+S1 | DM | 002 |
+---

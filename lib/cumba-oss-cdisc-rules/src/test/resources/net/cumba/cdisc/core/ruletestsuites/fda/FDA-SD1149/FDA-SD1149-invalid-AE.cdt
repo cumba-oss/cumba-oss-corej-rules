@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1149 expect=violation domain=AE
+#note "Regression pin for the T7 Operations fix: get_dataset_filtered_variables(core=Exp) yields the Expected set from IG metadata, so the present-but-all-empty AESER fires."
+#library standard=sdtmig version=3-4
+#library-include FDA-SD1149-library.yaml
+#expectViolationCount 1
+#expectViolationAt variable_name=AESER
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+---
+S1 | AE | 001 | 1 | HEADACHE |
+S1 | AE | 001 | 2 | NAUSEA   |
+S1 | AE | 002 | 1 | FATIGUE  |

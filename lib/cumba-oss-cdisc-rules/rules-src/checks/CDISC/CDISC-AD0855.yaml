@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0855"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ACYCLE is populated and ACYCLEC is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ACYCLE"
+    - "ACYCLEC"
+Check:
+  expression: >-
+    not empty(ACYCLE) and empty(ACYCLEC)
+Outcome:
+  Message: "ACYCLE is populated, but ACYCLEC is not populated."
+  Output_Variables:
+  - "ACYCLE"
+  - "ACYCLEC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "ACYCLEC"
+  Natural_Language_Rule_Failure_Criteria: "ACYCLE is populated and ACYCLEC is not\
+    \ populated"
+  Rule_Failure_Criteria: "ACYCLEC is not populated"
+  Condition_Failure: "ACYCLE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR855"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0567 expect=violation domain=ADLBC
+# Rule:Description: CRITyFN is present and CRITyFL is not present
+#note "CRIT1FN present, CRIT1FL absent -> violation"
+#expectViolationCount 1
+#expectViolationAt CRIT1FN=Y
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1FN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Y
+---

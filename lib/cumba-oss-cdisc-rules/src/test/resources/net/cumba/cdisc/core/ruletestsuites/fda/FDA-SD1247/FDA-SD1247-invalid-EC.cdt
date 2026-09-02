@@ -1,0 +1,22 @@
+#!RuleTest
+#test FDA-SD1247 expect=violation domain=EC
+#note "H3 convergence onto PMDA-SD1247's shape (REL-0533 resolved by convergence, ruled 2026-08-19): occurred doses (ECOCCUR=Y, ECSTAT not 'NOT DONE', ECDOSTXT empty) with ECDOSE zero (row 1) and negative (row 2) fire; row 3's MISSING ECDOSE is silent under the bare comparison (FDA-SD1279's subject); ECOCCUR=N guards row 4."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ECSEQ=1
+#expectViolationAt row=2 ECSEQ=2
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECOCCUR  type=Char label="Occurrence"
+col ECDOSE   type=Num  label="Dose"
+col ECDOSTXT type=Char label="Dose Description"
+col ECSTAT   type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0  | |
+S1 | EC | 001 | 2 | DRUG A | Y | -1 | |
+S1 | EC | 001 | 3 | DRUG A | Y | .  | |
+S1 | EC | 001 | 4 | DRUG A | N | 0  | |

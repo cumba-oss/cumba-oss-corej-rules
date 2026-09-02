@@ -1,0 +1,23 @@
+Rule_Id: "DEFINE-XML-0131"
+Sheet_Rule_Identifier: "131"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The dataset class needs to be provided when the file is used for submission."
+Message: "ItemGroupDef/def:Class is missing."
+# Review finding (docs/review-batch-a.md WARN 2): the 2.1 spec (pp. 17, 79) exempts
+# def:IsNonStandard datasets from the def:Class requirement; the sheet's Rule column
+# does not carry the carve-out. Guard narrowed to avoid false positives on legitimately
+# Class-less non-standard datasets in Submission files.
+Check:
+  kind: "exists"
+  target: "Class"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - not:
+        path: "@IsNonStandard"
+        equals: "Yes"

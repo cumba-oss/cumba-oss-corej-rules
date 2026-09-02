@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-AD0613 expect=violation domain=ADLBC
+#note "Multi-phase driver arithmetic pin. Row 1: w=1, PHETM 50400 == ADSL.PH1ETM 50400 -> silent. Row 2: w=2, PHETM 50460 != ADSL.PH2ETM 50400 -> fires. Join keys [USUBJID]: BOTH primary rows bind the same single ADSL row (1:1 per row - two primary rows, one child row, one binding each)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 APHASEN=2 PHETM=50460
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHETM    type=Num
+---
+S1 | 01-701-1015 | ALB  | 30 | 1 | 50400
+S1 | 01-701-1015 | ALB2 | 31 | 2 | 50460
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1ETM  type=Num
+col PH2ETM  type=Num
+---
+S1 | 01-701-1015 | 50400 | 50400

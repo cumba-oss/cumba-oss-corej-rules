@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0032"
+Sheet_Rule_Identifier: "DD0032"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "ct"
+Plain_Text_Rule: "NCI Code is required for each Codelist Term that is defined in CDISC Controlled Terminology. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element. NCI Code is represented as Name attribute on Alias element when Context attribute is \"nci:ExtCodeID\"."
+# CT-gated (P5), EnumeratedItem leg (-B: CodeListItem): a term "defined in
+# CDISC Controlled Terminology" is one whose CodedValue is a submission value
+# of the CT codelist resolved via the parent CodeList's nci:ExtCodeID alias;
+# such an item must carry its own nci:ExtCodeID Alias. Extension terms
+# (CodedValue not in CT) and unresolvable codelists are out of reach.
+# Twins: CDISC 98/99 (reclassified as library-gaps there).
+Message: "Missing NCI Code for Term ${value} in Codelist"
+Check:
+  kind: "nci_alias_required"
+  level: "term"

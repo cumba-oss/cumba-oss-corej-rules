@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SD2003 expect=noViolation domain=DM
+#note "Regression pin for the W4 exclusion fix: the four SDTMIG null-arm descriptions ('Screen Failure', 'Not Assigned', 'Not Treated', 'Unplanned Treatment') are excluded, so these conformant subjects do not fire."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-001 | Screen Failure | Screen Failure      | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-002 | Not Assigned   | Not Assigned        | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-003 | Placebo        | Not Treated         | ASSIGNED, NOT TREATED
+CDISCPILOT01 | DM | 01-004 | Placebo        | Unplanned Treatment | UNPLANNED TREATMENT
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | PBO   | Placebo | 1 | TRT
+CDISCPILOT01 | TA | XANHI | XanHigh | 1 | TRT
+---

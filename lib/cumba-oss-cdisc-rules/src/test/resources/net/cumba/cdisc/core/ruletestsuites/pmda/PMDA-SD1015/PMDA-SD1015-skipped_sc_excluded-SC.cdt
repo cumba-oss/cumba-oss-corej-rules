@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1015 expect=skipped domain=SC
+#note "SC is FINDINGS (in Classes.Include) and carries EPOCH, so ONLY the Domains.Exclude [CO, DM, SC] rejects. Twin discriminator: FDA-SD1015 (Exclude [TA] only) would RUN on SC. TA block kept so the skip is attributable to Scope alone."
+#library standard=sdtmig version=3-4
+dataset SC class=FINDINGS label="Subject Characteristics"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col SCSEQ    type=Num
+col SCTESTCD type=Char
+col EPOCH    type=Char
+---
+S1 | SC | 001 | 1 | HEIGHT | SCREENING
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char
+col EPOCH   type=Char
+---
+S1 | TA | A | Drug A | 1 | SCRN | SCREENING
+S1 | TA | A | Drug A | 2 | TRT  | TREATMENT
+---

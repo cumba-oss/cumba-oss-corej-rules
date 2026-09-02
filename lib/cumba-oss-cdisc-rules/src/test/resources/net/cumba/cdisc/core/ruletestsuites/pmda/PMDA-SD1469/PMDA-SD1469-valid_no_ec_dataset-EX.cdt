@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1469 expect=skipped domain=EX
+#note "Plan B phase 4c: the rule declares Requirements.Datasets [EC] instead of an authored ds_exists(\"EC\") conjunct, so a run without EC is UNANSWERABLE, not answered-false. RuleRunner checks the requirement at the Requirements gate, BEFORE AbsentDatasetSkip.decide, and the verdict moves noViolation -> skipped. That status move is the whole of 4c's finding-movement budget: zero finding rows move (this scenario reported none before)."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXSEQ   type=Num
+col EXTRT   type=Char
+col EXVAMTU type=Char
+---
+S1 | EX | 001 | 1 | DRUGA | mL

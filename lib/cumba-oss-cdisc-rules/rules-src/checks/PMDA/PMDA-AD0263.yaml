@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-AD0263"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Imputation Flag (*DTF) variable is populated\
+  \ for a record but its corresponding Date (*DT) variable is missing on that record;\
+  \ a *DT value flagged as imputed by a populated *DTF must itself have a value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*DTF) and empty(*DT)
+Outcome:
+  Message: "*DTF is populated, but *DT is not populated."
+  Output_Variables:
+  - "*DTF"
+  - "*DT"
+Source:
+  Message: "*DTF is populated, but *DT is not populated"
+  Description: "If a Date (*DT) variable is indicated to be imputed by population\
+    \ of an Imputation Flag (*DTF) variable value, that Date (*DT) variable must have\
+    \ a value."
+  Domains: "ADSL, BDS, OCCDS, ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0263"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0263"
+        Version: "1"
+      Version: "6.0"

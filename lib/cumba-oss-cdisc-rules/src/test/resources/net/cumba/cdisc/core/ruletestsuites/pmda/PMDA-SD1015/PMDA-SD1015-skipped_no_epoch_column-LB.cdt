@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1015 expect=skipped domain=LB
+#note "No EPOCH column -> Requirements.Variables.All [EPOCH] rejects (auditable skip; adapts the FDA twin's only skip fixture). TA-ENTIRELY-ABSENT is the recorded carve-out (PMDA-SD1112 = bare not ds_exists(\"TA\") ships in the same packages -> production SKIP via Fix #222, harness would fire) - no fixture."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | LB | 001 | 1 | ALB | 40
+S1 | LB | 001 | 2 | ALT | 22
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char
+col EPOCH   type=Char
+---
+S1 | TA | A | Drug A | 1 | SCRN | SCREENING
+S1 | TA | A | Drug A | 2 | TRT  | TREATMENT
+---

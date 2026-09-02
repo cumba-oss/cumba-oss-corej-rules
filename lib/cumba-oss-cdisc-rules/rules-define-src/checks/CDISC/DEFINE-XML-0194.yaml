@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0194"
+Sheet_Rule_Identifier: "194"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: "Rank"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute Rank must be provided for the CodeListItem element when there is at least one Rank attribute value provided for the same CodeList."
+# Same guard shape as DEFINE-XML-0183, CodeListItem leg.
+Message: "Attribute Rank is missing for a CodeListItem element in a CodeList which has attribute Rank provided for another CodeListItem."
+Check:
+  kind: "exists"
+  target: "@Rank"
+  when:
+    path: "../CodeListItem/@Rank"
+    exists: true

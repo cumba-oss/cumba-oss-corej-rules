@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0124"
+Sheet_Rule_Identifier: "DD0124"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Requires: "library"
+Plain_Text_Rule: "Variables defined in a Standard with a Controlled Terminology requirement must have a codelist. Define-XML defines codelists using the CodeList element and references to those using CodeListRef elements."
+# Library-gated; 2.1-only per the sheet. "Has a CT requirement" is the
+# LibraryProvider's variableCodelistCCode answering non-empty for the variable
+# (any standard the provider knows - the sheet says "a Standard", so no
+# SDTMIG/SENDIG family filter here); the finding is the dereferenced ItemDef
+# carrying no CodeListRef child. Variables the library does not know are out
+# of reach.
+Message: "Expected Codelist is missing [${value}]"
+Check:
+  kind: "library_codelist_ref_required"

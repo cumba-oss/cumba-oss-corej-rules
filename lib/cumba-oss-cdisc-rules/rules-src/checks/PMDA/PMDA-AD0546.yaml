@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0546"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Percent Chg from Baseline Category y (N) (PCHGCAyN)\
+  \ variable is present in a dataset but its corresponding Percent Chg from Baseline\
+  \ Category y (PCHGCATy) variable is not present in that dataset. The numeric category\
+  \ variable must always be accompanied by its character category counterpart."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("PCHGCAyN") and not var_exists("PCHGCATy")
+Outcome:
+  Message: "PCHGCAyN is present and PCHGCATy is not present."
+  Output_Variables:
+  - "PCHGCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "PCHGCAyN is present and PCHGCATy is not present"
+  Description: "If Percent Chg from Baseline Category y (N) (PCHGCAyN) variable is\
+    \ used in a dataset, Percent Chg from Baseline Category y (PCHGCATy) variable\
+    \ must also be present in that dataset."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0546"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0546"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0546"
+        Version: "1"
+      Version: "6.0"

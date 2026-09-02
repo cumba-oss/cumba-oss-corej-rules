@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD0071 expect=violation domain=DM
+#note "Row 2 pairs ARMCD=A1 with the wrong ARM text (TA has A1/Placebo) and row 3 uses ARMCD=A9 unknown to TA -> the ARMCD/ARM combination does not match any TA entry. Row 1 matches and must not fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-1016
+#expectViolationAt row=3 USUBJID=01-701-1017
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A1 | Placebo
+CDISCPILOT01 | DM | 01-701-1016 | A1 | Wrong Arm Label
+CDISCPILOT01 | DM | 01-701-1017 | A9 | Mystery Arm
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | A1 | Placebo   | 1 | SCRN | Screening
+CDISCPILOT01 | TA | A2 | Drug 10mg | 1 | SCRN | Screening
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD0022 expect=skipped domain=LB
+#note "FRESH - the batch's Classes.Include reject pin (Include [INTERVENTIONS, EVENTS]). LB is class=FINDINGS, not included; the row is violating-shaped (no start-timepoint, no --OCCUR, no --STAT column: every branch true) to prove ONLY the class exclusion silences (Fix #41 strict-on-null: class= tokens are load-bearing)."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | ALB

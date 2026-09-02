@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0846"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when FORMN is populated and FORM is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "FORM"
+    - "FORMN"
+Check:
+  expression: >-
+    not empty(FORMN) and empty(FORM)
+Outcome:
+  Message: "FORMN is populated, but FORM is not populated."
+  Output_Variables:
+  - "FORM"
+  - "FORMN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "FORM"
+  Natural_Language_Rule_Failure_Criteria: "FORMN is populated and FORM is not populated"
+  Rule_Failure_Criteria: "FORM is not populated"
+  Condition_Failure: "FORMN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR846"
+        Version: "1"
+      Version: "5.0"

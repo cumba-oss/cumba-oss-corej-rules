@@ -1,0 +1,58 @@
+name: PMDA-SD0061
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the FIRST executable coverage of ANY kind for
+  `PMDA-SD0061`. Unlike its FDA twin the PMDA rule has **no `.cdt` scenarios and no other
+  executable coverage anywhere in the tree**, so this spec is the only thing that runs it.
+
+  `PMDA-SD0061` and `FDA-SD0061` are byte-identical in every executable field (Scope, the three
+  Operations, Check, Outcome, Sensitivity `Study`, Rule_Type `Dataset Metadata Check`); only the
+  Core.Id, the Description's provenance and the Authorities differ. The fixture is deliberately
+  identical to `FDA-SD0061`'s so a divergence between the two specs can only mean the corpus
+  entries have drifted apart.
+
+  Fixture: the study ships AE and VS; the Define declares four datasets — AE and VS plus the
+  Define-only ZZ (dataset-level shape) and YY (variable-level shape). `$missing_datasets` is
+  `[YY, ZZ]`; one violation on both lanes, byte-identical, no baseline entry.
+
+  For the full rationale — D5's Define-only key, why the two Define-only keys carry DIFFERENT
+  block shapes (D3 registers every key before the shape branch; restricting it to shape B turns
+  the result into `[ZZ]`), the D3 inventory hazard this expectation guards (leaking the block's
+  keys into `$study_datasets` un-fires the rule), why `[YY, ZZ]` is harness-canonical sorted
+  order rather than either engine's iteration order, how a `Sensitivity: Study` finding is
+  attributed differently on each lane and why that is invisible here, and why only the
+  sink-backed `define_dataset_label` is declared — see the sibling `FDA-SD0061.yaml`. It is not
+  repeated here so the two cannot drift out of step.
+python_source: rules-pmda-sdtmig-3-4.json (PMDA-SD0061)
+rule:
+  coreId: PMDA-SD0061
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+  ZZ:
+    define_dataset_label: ZZ
+  YY:
+    - {define_variable_name: YYTESTCD}
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: PMDA-SD0061
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $missing_datasets: '[YY, ZZ]'
+expected_errors: []

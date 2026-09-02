@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1235 expect=skipped domain=DM
+#note "FRESH. Scope.Domains.Include is [DU]; a DM primary is rejected by the domain axis. No SPDEVID column, so a lost domain gate would make the rule fire rather than fall silent -- the skip is a real assertion."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col AGE     type=Num  label="Age"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 56

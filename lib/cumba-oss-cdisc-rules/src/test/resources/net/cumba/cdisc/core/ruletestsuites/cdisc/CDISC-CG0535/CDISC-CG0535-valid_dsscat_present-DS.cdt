@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0535 expect=noViolation domain=DS
+#note "Same three rows as violation_with_epoch-DS.cdt but WITH a populated DSSCAT column: not var_exists(\"DSSCAT\") is false, isolating the presence conjunct. Mirrors twin fixture CORE-000212-valid-DS.cdt."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col DSSCAT   type=Char label="Subcategory for Disposition Event"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY PARTICIPATION | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY TREATMENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1023 | 3 | DISPOSITION EVENT | STUDY PARTICIPATION | SCREENING
+---

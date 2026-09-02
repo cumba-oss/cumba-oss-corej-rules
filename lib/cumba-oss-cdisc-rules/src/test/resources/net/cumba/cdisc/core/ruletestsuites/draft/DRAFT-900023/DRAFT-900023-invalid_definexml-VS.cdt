@@ -1,0 +1,16 @@
+#!RuleTest
+#test DRAFT-900023 expect=violation domain=VS
+#note "Production-faithful variant of the invalid case via a real Define-XML sidecar (model on fda/FDA-CT2004/FDA-CT2004-define.xml). PREDICTED RED (D9, engine defect): the rule EXECUTES (both providers present, no skip) but is predicted to fire 0 times, because DefineXmlMetadataProvider.toProviderKeys drops the 'codelist_extended_values' key OdmDefineXMLProvider emits, so var_codelist_extended_values(\"DEFINE\") resolves empty and 'not empty(...)' is false -- the harness fails with its expected-violation-but-rule-did-not-fire assertion. Passing red in exactly that shape is the pass condition for this scenario; any other red shape (skip, parse error, wrong count) goes back to stage R."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 codelist_extensible=false
+#define-xml DRAFT-900023-define.xml
+#expectViolationCount 1
+#expectViolationAt variable_name=VSPOS define_variable_name=VSPOS
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

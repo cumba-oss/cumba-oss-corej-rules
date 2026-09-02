@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0831"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DVIDN is populated and DVID is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "DVIDN"
+    - "DVID"
+Check:
+  expression: >-
+    not empty(DVIDN) and empty(DVID)
+Outcome:
+  Message: "DVIDN is populated, but DVID is not populated."
+  Output_Variables:
+  - "DVID"
+  - "DVIDN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "DVID"
+  Natural_Language_Rule_Failure_Criteria: "DVIDN is populated and DVID is not populated"
+  Rule_Failure_Criteria: "DVID is not populated"
+  Condition_Failure: "DVIDN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR831"
+        Version: "1"
+      Version: "5.0"

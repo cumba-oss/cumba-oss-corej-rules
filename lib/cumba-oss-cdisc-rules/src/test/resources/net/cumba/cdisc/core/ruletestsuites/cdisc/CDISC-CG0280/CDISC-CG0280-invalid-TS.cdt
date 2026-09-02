@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0280 expect=violation domain=TS
+#note "D-TA-7c converged shape: row 1 is exactly 0 (outside the sheet's (0,1] range), row 2 is above it, and row 3 is not a number at all (the numeric-format guard the convergence added — under the previous check a non-numeric TSVAL slipped through the numeric comparison unreported) -> three findings."
+#library standard=sdtmig version=3-3
+#expectViolationCount 3
+#expectViolationAt row=1 TSPARMCD=RANDQT TSVAL=0
+#expectViolationAt row=2 TSPARMCD=RANDQT TSVAL=1.5
+#expectViolationAt row=3 TSPARMCD=RANDQT TSVAL="ONE HALF"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | RANDQT  | Randomization Quotient     | 0
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 1.5
+S1 | TS | 3 | RANDQT  | Randomization Quotient     | ONE HALF
+S1 | TS | 4 | PLANSUB | Planned Number of Subjects | 306

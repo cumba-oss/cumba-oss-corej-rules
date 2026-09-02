@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0127 expect=noViolation domain=SE
+#note "is_last_in_group DISCRIMINATOR. The point is ROW 1: its SEENDTC (2020-01-10) differs from DS.DSSTDTC (2020-01-15), but SESEQ=1 is not the subject's highest so $is_last_se is false there and the rule must not fire. Row 2 IS the last element and ends exactly on the disposition date, so it is conformant. Without the is_last_in_group conjunct row 1 would fire; that is what makes this file non-vacuous."
+#library standard=sendig version=3-0
+#expectViolationCount 0
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-01-15
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-01-15
+---

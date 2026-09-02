@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1264 expect=violation domain=RELREC
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: FRESH, DISCRIMINATING. No IDVARVAL column declared at all. Read literally against the sheet condition ('IDVARVAL = null and USUBJID = null') this row satisfies it, so the SHEET would report — coreJ does not, and that is settled doctrine, not a defect: NonEmptyGuardInliner put var_exists(\"IDVARVAL\") in front of empty(IDVARVAL) (visible in rules/rules-pmda-sdtmig-3-4.json), so the guard is false and the whole conjunction is false. This fixture is the tripwire that makes the class-E carve-out (CORE-RULES-GUARD-MATRIX §1: a plain absent column does not fire empty(X)) visible on a rule where it is arguable. If this fires, the derivation changed; escalate, do not rewrite."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID type=Char
+col RDOMAIN type=Char
+col USUBJID type=Char
+col IDVAR   type=Char
+col RELTYPE type=Char
+col RELID   type=Char
+---
+S1 | AE | | AESEQ | ONE | R01

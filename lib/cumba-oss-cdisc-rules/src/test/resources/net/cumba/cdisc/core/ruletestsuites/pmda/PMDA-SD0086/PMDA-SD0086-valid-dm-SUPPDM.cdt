@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0086 expect=noViolation domain=SUPPDM
+#note "DM branch: each QNAM appears once per subject (parent record = subject for DM); same QNAM on different subjects is allowed -> no violation. No DOMAIN column declared. ADAPTED-FROM fda/FDA-SD0086/FDA-SD0086-valid-dm-SUPPDM.cdt (verbatim)."
+#library standard=sdtmig version=3-4
+dataset SUPPDM class=RELATIONSHIP label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | DM | 001 |  |  | RACEOTH | Other race
+S1 | DM | 001 |  |  | RACESPEC | spec
+S1 | DM | 002 |  |  | RACEOTH | Other race

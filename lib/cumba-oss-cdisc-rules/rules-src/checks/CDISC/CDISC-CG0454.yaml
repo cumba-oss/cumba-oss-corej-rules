@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0454"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary Parameter Value Code (TSVALCD)\
+  \ for a PCLAS trial-summary parameter is not a valid code from NDF-RT."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$ndfrt_code_valid"
+  expression: "valid_external_dictionary_code(TSVALCD, external_dictionary_type=\"\
+    medrt\", dictionary_term_type=\"MEDRTCD\")"
+Check:
+  expression: >-
+    TSPARMCD == "PCLAS" and $ndfrt_code_valid == false
+Outcome:
+  Message: "TSVALCD is not a valid NDF-RT code for the PCLAS parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVALCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALCD"
+  Condition: "TSPARMCD = 'PCLAS'"
+  Rule: "TSVALCD is a valid code from NDF-RT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0454"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0454"
+        Version: "1"
+      Version: "2.0"

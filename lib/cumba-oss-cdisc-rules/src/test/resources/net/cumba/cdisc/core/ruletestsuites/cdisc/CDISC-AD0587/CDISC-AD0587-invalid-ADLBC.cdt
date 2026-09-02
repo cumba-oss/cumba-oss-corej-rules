@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0587 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of PBCHGCAy for a given value of PBCHG and y, where y is a single-digit integer [1-9]
+#note "PBCHG=K1 maps to two distinct PBCHGCA1 values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PBCHGCA1 type=Char
+col PBCHG type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | A1 | K1
+CDISCPILOT01 | 01-701-1023 | ALB | A2 | K1
+---

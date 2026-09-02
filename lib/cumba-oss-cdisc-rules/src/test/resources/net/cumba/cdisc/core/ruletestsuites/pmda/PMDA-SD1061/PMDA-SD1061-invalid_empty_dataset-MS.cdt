@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1061 expect=violation domain=MS
+#note "FRESH, 0-row: a single MS dataset block with ZERO DATA ROWS and no MB block. ds_exists is a member of BroadcastFold.EXISTS_CALLS (expr/eval/BroadcastFold.java:280-281), so a ds_exists-only tree folds to a dataset-level constant above the 0-row synthetic-table branch, exactly like the var_exists case. The dataset is still DECLARED, so it is still in the study inventory. Predicted VIOLATION, count 1. No Output_Variables to project, so no #expectViolationAt line. DISCRIMINATING: first 0-row fixture on the ds_exists arm -- if it does not fire exactly once, escalate to stage R rather than re-pin."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset MS class=FINDINGS label="Microbiology Susceptibility Test"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MSSEQ   type=Num  label="Sequence Number"
+col MSTESTCD type=Char label="Microbiology Susceptibility Test Short Name"
+---

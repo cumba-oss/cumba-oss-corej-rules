@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0207"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Time Point Number (VSTPTNUM) is missing\
+  \ for a Vital Signs (VS) record that is associated with a time point, evidenced\
+  \ by a populated Planned Time Point Name (VSTPT)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "VS"
+Requirements:
+  Variables:
+    All:
+    - "VSTPT"
+    - "VSTPTNUM"
+Check:
+  expression: >-
+    not empty(VSTPT) and empty(VSTPTNUM)
+Outcome:
+  Message: "VSTPTNUM is missing for a record that is associated with a time point\
+    \ (VSTPT is populated)."
+  Output_Variables:
+  - "VSTPT"
+  - "VSTPTNUM"
+Source:
+  Class: "FND"
+  Domain: "VS"
+  Variable: "VSTPTNUM"
+  Plain_Text_Explanation: "VSTPTNUM is required if time points are included within\
+    \ the domain"
+  Condition: "Record is associated with a time point"
+  Rule: "VSTPTNUM ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND207"
+        Version: "1"
+      Version: "5.0"

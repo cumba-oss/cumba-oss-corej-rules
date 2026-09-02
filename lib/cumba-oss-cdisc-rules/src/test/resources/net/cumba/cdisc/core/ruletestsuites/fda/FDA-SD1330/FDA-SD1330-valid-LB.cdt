@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1330 expect=noViolation domain=LB
+#note "Boundary: row 2 has LBDY equal to LBENDY, which the rule allows ('must be less or equal to'). Row 3 leaves LBENDY missing."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+col LBENDY   type=Num  label="Study Day of End of Observation"
+---
+S1 | LB | 001 | 1 | ALB  | 3 | 4
+S1 | LB | 001 | 2 | GLUC | 5 | 5
+S1 | LB | 001 | 3 | HGB  | 8 |

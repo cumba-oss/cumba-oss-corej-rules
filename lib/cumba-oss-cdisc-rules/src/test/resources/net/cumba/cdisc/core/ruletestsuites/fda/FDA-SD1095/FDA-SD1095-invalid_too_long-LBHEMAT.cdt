@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1095 expect=violation domain=LBHEMAT
+#note "LBHEMAT carries DOMAIN=LB, so it is a split of LB; a 7-character split dataset name exceeds the 4-character maximum -> fires (longer_than branch). Dataset-level rule: exactly one finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LBHEMAT class=FINDINGS label="Laboratory Test Results - Hematology"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | HGB

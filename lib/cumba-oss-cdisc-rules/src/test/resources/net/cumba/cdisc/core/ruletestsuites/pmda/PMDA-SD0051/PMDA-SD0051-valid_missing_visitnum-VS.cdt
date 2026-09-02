@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0051 expect=noViolation domain=VS
+#note "BOUNDARY on the OTHER axis -- group MEMBERSHIP, not target emptiness. Rows 1 and 2 have VISITNUM missing (the numeric missing marker '.') and disagree on VISIT; row 3 has a real VISITNUM alone in its group. NOTHING fires: is_inconsistent_across_dataset's shipped GroupKeyPolicy is DROP_MISSING_KEYS, so a row whose GROUPING key is blank takes no part in any group at all. This is the KEY axis (GroupKeyPolicy / keep_missings); PMDA-SD0051-valid_empty_visit-VS is the TARGET axis (include_empty / the D.2 emptiness exception) -- they are independent and must not be conflated. NEUTER CHECK: give rows 1 and 2 VISITNUM=1 and the count becomes 2."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | VS | 001 | 1 | SYSBP | . | SCREENING
+S1 | VS | 002 | 1 | SYSBP | . | BASELINE
+S1 | VS | 003 | 1 | SYSBP | 2 | WEEK 2

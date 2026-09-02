@@ -1,0 +1,30 @@
+name: CDISC-AD0416
+kind: rule
+description: |
+  Wave A4 port — T1a PlainSimple.
+  CDISC-AD0416: TRTSEQP is populated while TRTSEQPN is empty.
+  Record-data rule scoped to SUBJECT LEVEL ANALYSIS DATASET; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0416)
+rule:
+  coreId: CDISC-AD0416
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', TRTSEQP: '', TRTSEQPN: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', TRTSEQP: 'A', TRTSEQPN: ''}     # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0416
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      TRTSEQP: 'A'
+      TRTSEQPN: null
+expected_errors: []

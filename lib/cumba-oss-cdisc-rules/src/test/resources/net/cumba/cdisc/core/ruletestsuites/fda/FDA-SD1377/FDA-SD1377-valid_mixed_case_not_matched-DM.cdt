@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1377 expect=noViolation domain=DM
+#note "FLIPPED by M2-D25 (exact, case-sensitive comparison wherever the compared values come from a CT codelist). ARMNRS is bound to SDTM CT C142179 / ARMNULRS, whose submission values are upper case, so 'Screen Failure' in mixed case is itself a CT non-conformance that CT2001 owns; the retired equalsIgnoreCase(ARMNRS, \"SCREEN FAILURE\") leaf used to match it and report the missing IE record a second time. Row 1 now fails the equality and stays silent even though the subject has no IE record - that silence is exactly what this fixture pins. Row 2 is the never-matching control."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-001 |     | Screen Failure
+CDISCPILOT01 | DM | 01-002 | PBO |
+---
+
+dataset IE label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+---
+CDISCPILOT01 | IE | 01-009 | 1 | INCL01 | INCLUSION
+---

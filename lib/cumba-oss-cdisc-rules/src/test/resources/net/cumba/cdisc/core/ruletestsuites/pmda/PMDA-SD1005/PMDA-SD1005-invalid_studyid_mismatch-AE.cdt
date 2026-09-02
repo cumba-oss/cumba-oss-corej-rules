@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1005 expect=violation domain=AE
+#note "$dm_studyid = distinct over the ENTIRE DM dataset's STUDYID column = {STUDY01} (DM kept single-valued and free of blanks so the set is exact), landing as a broadcast set compared per primary row. Row 1: in $dm_studyid -> clean. Row 2: not in the set -> FIRES. Row 3: EMPTY STUDYID: the A.1 fold probes '' against {STUDY01} -> is_not_contained_by TRUE -> FIRES (fresh face)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 AESEQ=1 STUDYID=STUDY02
+#expectViolationAt row=3 AESEQ=1 STUDYID=
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+---
+STUDY01 | AE | 001 | 1 | HEADACHE
+STUDY02 | AE | 002 | 1 | NAUSEA
+        | AE | 003 | 1 | RASH
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+STUDY01 | DM | 001 | M
+STUDY01 | DM | 002 | F
+---

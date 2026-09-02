@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2254 expect=violation domain=SJ
+#note "Repro stage code GD0-6 is described both as 'Gestation Day 0 to 6' and as 'GD 0-6', so RSTAGE is not unique for a given RSTGCD. Every record of the offending code is reported."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 RSTGCD=GD0-6 RSTAGE="Gestation Day 0 to 6"
+#expectViolationAt row=2 RSTGCD=GD0-6 RSTAGE="GD 0-6"
+dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col RPHASE  type=Char label="Repro Phase"
+---
+S1 | SJ | 001 | 1 | GD0-6  | Gestation Day 0 to 6  | 2020-01-01 | GESTATION
+S1 | SJ | 002 | 1 | GD0-6  | GD 0-6                | 2020-01-01 | GESTATION
+S1 | SJ | 003 | 1 | GD7-13 | Gestation Day 7 to 13 | 2020-01-08 | GESTATION

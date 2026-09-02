@@ -1,0 +1,119 @@
+Core:
+  Id: "PMDA-SD0067"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Element Code (ETCD) is not equal to 'UNPLAN' and\
+  \ does not match a value of ETCD in the Trial Elements (TE) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+Operations:
+- id: "$te_etcd"
+  expression: "distinct(ETCD, domain=\"TE\")"
+Check:
+  expression: >-
+    ETCD != "UNPLAN" and ETCD not in $te_etcd
+Outcome:
+  Message: "ETCD is not equal to 'UNPLAN' and does not match a value of ETCD in the\
+    \ Trial Elements (TE) dataset."
+  Output_Variables:
+  - "ETCD"
+  - "$te_etcd"
+Source:
+  Message: "Invalid ETCD"
+  Description: "Element Code (ETCD) values should match entries in the Trial Elements\
+    \ (TE) dataset, except for unplanned Element (ETCD = 'UNPLAN')."
+  Domains: "SE, TA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0067"
+        Version: "1"
+      Version: "1.6"

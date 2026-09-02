@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0520"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ variable is populated while both Planned Arm Code (ARMCD) and Actual Arm Code\
+  \ (ACTARMCD) are populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(ARMCD) and not empty(ACTARMCD) and not empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is populated when both ARMCD and ACTARMCD are populated."
+  Output_Variables:
+  - "ARMCD"
+  - "ACTARMCD"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMNRS"
+  Condition: "ARMCD ^=null and ACTARMCD ^=null"
+  Rule: "ARMNRS = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0520"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0520"
+        Version: "1"
+      Version: "2.0"

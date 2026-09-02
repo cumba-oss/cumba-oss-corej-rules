@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0072"
+Sheet_Rule_Identifier: "72"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: "KeySequence"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of attribute KeySequence must be an integer number."
+# Value check fires only on a present KeySequence. Scoped to ItemGroupDef/ItemRef
+# per the sheet's XPaths column (ItemGroupDef only).
+Message: "The value of attribute KeySequence [${value}] is not an integer number for the ItemRef element."
+Check:
+  kind: "matches_regex"
+  attribute: "KeySequence"
+  format: "integer"

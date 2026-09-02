@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0698 expect=noViolation domain=ADLBC
+# Rule:Description: BASETYPE is not present, BASE is populated, and BASE is not equal to AVAL where ABLFL is equal to Y for a given value of PARAMCD for a combination of device and subject
+#note "BASE=100 vs max(AVAL where ABLFL=Y)=100 -> noViolation"
+dataset ADLBC class=MD-BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col ABLFL type=Char
+col AVAL type=Num
+col BASE type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | Y | 100 | 100
+---

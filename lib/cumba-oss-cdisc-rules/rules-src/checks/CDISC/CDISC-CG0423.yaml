@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0423"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --VAMT (Treatment Vehicle Amount) is populated but\
+  \ --TRTV (Treatment Vehicle) is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--TRTV"
+    - "--VAMT"
+Check:
+  expression: >-
+    not empty(--VAMT) and empty(--TRTV)
+Outcome:
+  Message: "--TRTV is empty when --VAMT is populated."
+  Output_Variables:
+  - "--TRTV"
+  - "--VAMT"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--TRTV"
+  Condition: "--VAMT ^= null"
+  Rule: "--TRTV ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0423"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0423"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0423"
+        Version: "1"
+      Version: "2.0"

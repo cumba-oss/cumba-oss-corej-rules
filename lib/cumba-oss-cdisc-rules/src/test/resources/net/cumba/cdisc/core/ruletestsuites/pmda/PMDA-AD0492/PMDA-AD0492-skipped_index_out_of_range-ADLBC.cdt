@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0492 expect=skipped domain=ADLBC
+#note "DISCRIMINATING. SHIFT100 DOES match ^SHIFT(\\d+)\$ - y compiles to the unbounded group (\\d+) - but PMDA-AD0492 declares _wildcards: {y: {min: 1, max: 99}}, which WildcardExpander.satisfiesFilters applies as a FILTER on the OBSERVED capture. Capture 100 is dropped, the anchor set is empty after filtering, and the result is NoMatch -> SKIPPED. If this fires, the filter is not being applied - escalate, do not change the index."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col SHIFT100 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | NORMAL to HIGH

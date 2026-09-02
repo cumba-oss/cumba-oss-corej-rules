@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=noViolation domain=DM
+#note "Every populated cell is a declared coded value of its own codelist, so the rule executes and finds nothing."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM SEX codelist=SEX codelist_extensible=false codelist_coded_values="[\"M\",\"F\",\"U\"]"
+#library variable-metadata DM SPECIES codelist=SPECIES codelist_extensible=true codelist_coded_values="[\"RAT\",\"MOUSE\"]"
+#expectViolationCount 0
+dataset DM class="SPECIAL PURPOSE" label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+---
+S1 | DM | 001 | M | RAT
+S1 | DM | 002 | F | MOUSE
+S1 | DM | 003 | U | RAT

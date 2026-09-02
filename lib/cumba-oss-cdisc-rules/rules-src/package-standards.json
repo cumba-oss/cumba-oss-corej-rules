@@ -1,0 +1,51 @@
+{
+  "_about": [
+    "Which CDISC Library standards each rule package runs against (Plan 2, R6/R9/R10).",
+    "Read by RuleCorpusGenerator at PACKAGING time and written into every rules-*.json and into",
+    "packages.json. It is DATA on purpose: before Plan 2 the ADaMIG -> SDTMIG companion pairing",
+    "lived in engine code (CompanionSdtmDefaults.ADAMIG_TO_SDTMIG), so changing a mapping needed an",
+    "engine release. R13: this pairing is a HOUSE CONVENTION - CDISC does not publish it - which is",
+    "why it belongs here. The IG -> Model link, which CDISC DOES publish, is deliberately NOT here;",
+    "it is read from the product's own _links.model.href (see the plan's Phase 3b guard).",
+    "",
+    "'{version}' expands to the package version in dash form (3.1.2 -> 3-1-2).",
+    "Ids are LIBRARY PRODUCT TOKENS, not package short names - the two are different vocabularies",
+    "and neither is derivable from the other (measured: the flat form 'sendig-dart-1-1' resolves to",
+    "nothing; the slash form 'sendig/dart-1-1' resolves). Always use the slash form.",
+    "",
+    "A standard absent from this map declares nothing, and a run selecting such a package needs an",
+    "explicit --metadata-products."
+  ],
+  "standards": {
+    "SDTMIG": {
+      "primary": ["sdtmig/{version}"]
+    },
+    "SENDIG": {
+      "primary": ["sendig/{version}"]
+    },
+    "SENDIG-AR": {
+      "primary": ["sendig/ar-{version}"]
+    },
+    "SENDIG-DART": {
+      "_note": "sendig/dart-1-2 is NOT published by CDISC - /mdr/products lists only dart-1-1, and no standards/ key exists in either cache. The three dart-1-2 packages therefore declare a product that cannot resolve, and a run selecting one fails loud unless -mp names a substitute (owner ruling Q1). DART 1.2 does exist in the RULES dictionary namespace (sendig-dart/1-2) - CDISC published its rules but not its IG metadata product.",
+      "primary": ["sendig/dart-{version}"]
+    },
+    "SENDIG-GENETOX": {
+      "primary": ["sendig/genetox-{version}"]
+    },
+    "ADaMIG": {
+      "_note": "companionByVersion is the table that used to be CompanionSdtmDefaults.ADAMIG_TO_SDTMIG. R10: a version absent here declares NO companion and its standard_domains rules SKIP loudly - there is deliberately no 'newest SDTMIG' fallback any more.",
+      "primary": ["adam/adamig-{version}"],
+      "companionByVersion": {
+        "1-0": ["sdtmig/3-1-2"],
+        "1-1": ["sdtmig/3-2"],
+        "1-2": ["sdtmig/3-3"],
+        "1-3": ["sdtmig/3-4"]
+      }
+    },
+    "TIG": {
+      "_note": "An Integrated Standard: (TIG, 1.0) names no single product, so all four legs are declared primary. R8 permits this - they share one library group ('tig'). No companion entry is needed: the SDTM leg is itself a declared product, which is what retires the isTigAdamRun special case.",
+      "primary": ["tig/{version}/adam", "tig/{version}/cdash", "tig/{version}/sdtm", "tig/{version}/send"]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-AD0870"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SEX is populated and SEXN is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(SEX) and empty(SEXN)
+Outcome:
+  Message: "SEX is populated, but SEXN is not populated."
+  Output_Variables:
+  - "SEX"
+  - "SEXN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SEXN"
+  Natural_Language_Rule_Failure_Criteria: "SEX is populated and SEXN is not populated"
+  Rule_Failure_Criteria: "SEXN is not populated"
+  Condition_Failure: "SEX is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR870"
+        Version: "1"
+      Version: "5.0"

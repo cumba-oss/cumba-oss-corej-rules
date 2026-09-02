@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0270 expect=violation domain=TS
+#note "FRESH. All rows TSPARMCD=AGEMAX / TSPARM='Planned Maximum Age of Subjects'. TSVAL: (1) P FIRES (bare designator, explicit early-out); (2) PT FIRES (same); (3) P1Y2W FIRES (the W form is an exclusive alternation branch and cannot combine with Y/M/D/T); (4) P2W SILENT (the week form alone is valid). Pins the three malformed-ISO branches of invalid_duration that no twin in the TG-0090/0150/0151 family exercises, on the member whose sheet Rule cell is the vaguest ('TSVAL conforms to ISO 8601') and therefore most needs the boundary written down. No class= (the twins declare none and Scope carries no Classes axis)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=1 TSPARMCD=AGEMAX TSVAL=P
+#expectViolationAt row=2 TSPARMCD=AGEMAX TSVAL=PT
+#expectViolationAt row=3 TSPARMCD=AGEMAX TSVAL=P1Y2W
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | P
+CDISCPILOT01 | TS | 2 | AGEMAX | Planned Maximum Age of Subjects | PT
+CDISCPILOT01 | TS | 3 | AGEMAX | Planned Maximum Age of Subjects | P1Y2W
+CDISCPILOT01 | TS | 4 | AGEMAX | Planned Maximum Age of Subjects | P2W

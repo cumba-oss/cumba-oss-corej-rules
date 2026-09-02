@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0586 expect=noViolation domain=ADLBC
+#note "PBCHG is Permissible and legitimately absent. The authored 'not empty(PBCHG)' is a NEGATED emptiness call: BroadcastFold keeps the bare empty as a broadcast TRUE on an absent column, so 'not empty' broadcasts FALSE and the whole AND collapses. The rule EXECUTES and is silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE    type=Num
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 120 | 100

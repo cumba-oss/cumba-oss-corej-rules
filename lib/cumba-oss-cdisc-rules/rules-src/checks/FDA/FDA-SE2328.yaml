@@ -1,0 +1,95 @@
+Core:
+  Id: "FDA-SE2328"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset does not contain\
+  \ a record where TSPARMCD equals 'STENDTC' (Study End Date)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$stendtc_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"STENDTC\"))"
+Check:
+  expression: >-
+    $stendtc_count == 0
+Outcome:
+  Message: "Missing STENDTC Trial Summary Parameter: a 'Study End Date' (STENDTC)\
+    \ record must be present in the Trial Summary (TS) domain."
+  Output_Variables:
+  - "$stendtc_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing STENDTC Trial Summary Parameter"
+  FDA_Validator_Rule_Description: "'Study End Date' (STENDTC) record should be populated\
+    \ in Trial Summary (TS) domain."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2328"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2328"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2328"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2328"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2328"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

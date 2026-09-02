@@ -1,0 +1,121 @@
+Core:
+  Id: "PMDA-SD1104"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Start Reference Time Point (--STTPT) is present\
+  \ in the dataset but Start Relative to Reference Time Point (--STRTPT) is not present\
+  \ in the dataset."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Check:
+  expression: >-
+    var_exists("--STTPT") and not var_exists("--STRTPT")
+Outcome:
+  Message: "--STRTPT variable is not present when --STTPT variable is present."
+  Output_Variables:
+  - "--STTPT"
+Source:
+  Message: "Missing --STRTPT variable when --STTPT variable is present"
+  Description: "Start Relative to Reference Time Point (--STRTPT) variable must be\
+    \ included into the domain when Start Relative Time Point (--STTPT) variable is\
+    \ present."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1104"
+        Version: "1"
+      Version: "1.6"

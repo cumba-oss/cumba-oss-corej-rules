@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0428"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Toxicity (--TOX) is populated but Toxicity Grade\
+  \ (--TOXGR) is empty or not present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--TOX"
+Check:
+  expression: >-
+    not empty(--TOX) and empty(--TOXGR)
+Outcome:
+  Message: "--TOXGR is empty when --TOX is populated."
+  Output_Variables:
+  - "--TOX"
+  - "--TOXGR"
+Source:
+  Class: "EVT, FND"
+  Domain: "AE, MH, CE, EG, LB, PC, PP"
+  Variable: "--TOXGR"
+  Condition: "--TOX ^= null"
+  Rule: "--TOXGR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0428"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0428"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0428"
+        Version: "1"
+      Version: "2.0"

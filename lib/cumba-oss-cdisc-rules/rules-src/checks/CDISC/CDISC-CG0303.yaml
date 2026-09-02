@@ -1,0 +1,38 @@
+Core:
+  Id: "CDISC-CG0303"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the label of a standard variable does not match\
+  \ the variable label specified for that variable in the SDTM Implementation Guide."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() == var_name("LIBRARY") and not empty(var_label("LIBRARY")) and var_label("DATA") !=
+    var_label("LIBRARY")
+Outcome:
+  Message: "The variable label does not match the variable label specified in the\
+    \ SDTMIG."
+  Output_Variables:
+  - "variable_name"
+  - "library_variable_label"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable Label = IG Label"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0303"
+        Version: "1"
+      Version: "2.0"

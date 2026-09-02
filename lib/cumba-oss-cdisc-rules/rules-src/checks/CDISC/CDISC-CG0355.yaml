@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0355"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the --DETECT variable is present in the dataset,\
+  \ since --DETECT is defined for use in non-clinical (SEND) studies and must never\
+  \ be used in the submission of SDTM-based data for human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--DETECT")
+Outcome:
+  Message: "--DETECT is present in the dataset; this variable must never be used in\
+    \ the submission of SDTM-based data for human clinical trials."
+  Output_Variables:
+  - "--DETECT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DETECT"
+  Rule: "--DETECT not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0355"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0355"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0355"
+        Version: "1"
+      Version: "2.0"

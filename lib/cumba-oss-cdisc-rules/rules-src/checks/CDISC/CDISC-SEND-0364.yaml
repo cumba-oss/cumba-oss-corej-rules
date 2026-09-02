@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-SEND-0364"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Nonclinical Pregnancy Results (PY)\
+  \ record exists for the same combination of Pregnancy Findings Test Code (PYTESTCD),\
+  \ Unique Subject Identifier (USUBJID), and Result Location (PYRESLOC); the domain\
+  \ is expected to hold one record per test per subject per finding."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "PY"
+Check:
+  expression: >-
+    not is_unique_set([PYTESTCD, USUBJID, PYRESLOC])
+Outcome:
+  Message: "More than one PY record exists for the same test (PYTESTCD), subject (USUBJID),\
+    \ and result location (PYRESLOC)."
+  Output_Variables:
+  - "PYTESTCD"
+  - "PYRESLOC"
+Source:
+  Class: "FND"
+  Domain: "PY"
+  Variable: "All"
+  Plain_Text_Explanation: "One record per test per subject per finding"
+  Rule: "One record per test per subject per finding, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND364"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND364"
+        Version: "1"
+      Version: "5.0"

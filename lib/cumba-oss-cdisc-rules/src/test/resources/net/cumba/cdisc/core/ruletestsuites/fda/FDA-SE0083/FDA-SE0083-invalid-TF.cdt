@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE0083 expect=violation domain=TF
+#note "Subject 001: TFDETECT 120 is greater than the subject's latest Disposition study day (max DSSTDY = 90) -> fires. Subject 002: TFDETECT 50 <= max DSSTDY 60 -> silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | TUMEXAM | 120
+S1 | TF | 002 | 1 | TUMEXAM | 50
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDY  type=Num  label="Study Day of Disposition"
+---
+S1 | DS | 001 | 1 | REMOVED FROM STUDY ALIVE | REMOVED FROM STUDY ALIVE | 30
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE       | TERMINAL SACRIFICE       | 90
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE       | TERMINAL SACRIFICE       | 60

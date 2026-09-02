@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2269 expect=violation domain=DS
+#note "Row 1: an INTERIM SACRIFICE (a scheduled disposition) carries DSUSCHFL='Y' -> fires. Row 2: the unscheduled MORIBUND SACRIFICE with DSUSCHFL='Y' is conformant."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DSDECOD="INTERIM SACRIFICE" DSUSCHFL=Y
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSTERM   type=Char label="Reported Term for the Disposition Event"
+col DSDECOD  type=Char label="Standardized Disposition Term"
+col DSUSCHFL type=Char label="Unscheduled Flag"
+col DSSTDTC  type=Char label="Start Date/Time of Disposition Event"
+---
+STUDY01 | DS | STUDY01-001 | 1 | Interim sacrifice  | INTERIM SACRIFICE  | Y | 2020-02-01
+STUDY01 | DS | STUDY01-002 | 1 | Moribund sacrifice | MORIBUND SACRIFICE | Y | 2020-02-11

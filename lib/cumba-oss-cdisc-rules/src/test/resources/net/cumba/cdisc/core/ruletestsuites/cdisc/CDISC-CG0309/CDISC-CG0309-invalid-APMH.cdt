@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0309 expect=violation domain=APMH
+#note "Positive control on the rule's intended AP-- population: DOMAIN is present but 2 characters, not 4, so has_not_equal_length 4 fires. Together with the -valid- twin this proves the rule executes and discriminates on APMH, which is what makes the -absent-DOMAIN-SUPPLB scenario a statement about SCOPE rather than about the fold."
+#expectViolationCount 1
+dataset APMH label="Associated Persons Medical History"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col APID     type=Char label="Associated Persons Identifier"
+col MHSEQ    type=Num  label="Sequence Number"
+col MHTERM   type=Char label="Reported Term for the Medical History"
+---
+CDISCPILOT01 | MH | AP-701-1015 | 1 | ASTHMA
+CDISCPILOT01 | MH | AP-701-1023 | 2 | ECZEMA
+---

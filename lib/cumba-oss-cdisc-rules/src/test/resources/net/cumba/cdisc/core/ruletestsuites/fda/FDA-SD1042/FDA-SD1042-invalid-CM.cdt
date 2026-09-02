@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD1042 expect=violation domain=CM
+#note "Both branches of the any-tree: row 1 is a non-occurred record with CMSTRF populated, row 2 a non-occurred record with CMENRF populated -> two violations. Row 3 occurred; row 4 is a clean non-occurred record."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMOCCUR=N CMSTRF=BEFORE
+#expectViolationAt row=2 CMOCCUR=N CMENRF=AFTER
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR type=Char label="Occurrence"
+col CMSTRF  type=Char label="Start Relative to Reference Period"
+col CMENRF  type=Char label="End Relative to Reference Period"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | N | BEFORE |
+S1 | CM | 001 | 2 | IBUPROFEN | N |        | AFTER
+S1 | CM | 001 | 3 | PARACETAM | Y | BEFORE | DURING
+S1 | CM | 001 | 4 | METFORMIN | N |        |

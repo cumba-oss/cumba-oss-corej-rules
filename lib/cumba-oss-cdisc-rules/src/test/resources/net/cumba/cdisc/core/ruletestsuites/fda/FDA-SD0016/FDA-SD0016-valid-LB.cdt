@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0016 expect=noViolation domain=LB
+#note "Every derived record (LBDRVFL='Y') carries a populated LBSTRESC; non-derived records may leave it empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALB  | 40 | Y
+S1 | LB | 001 | 2 | GLUC | 5  |
+S1 | LB | 001 | 3 | CHOL |    |

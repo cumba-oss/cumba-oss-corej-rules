@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD0071 expect=violation domain=DM
+#note "FRESH - left-join 1:many multiplicity + row-index pin. Row 1 (ARMCD=A1) matches a TA pair (SCRN/TRT) that appears TWICE -> silent (must not duplicate the finding). Row 2 (ARMCD=A9) matches no TA entry -> fires exactly once at the ORIGINAL primary row index 2 (getRealRowIndex through the left-join expansion). If count differs or the row shifts, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1016
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A1 | Placebo
+CDISCPILOT01 | DM | 01-701-1016 | A9 | Mystery Arm
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | A1 | Placebo   | 1 | SCRN | Screening
+CDISCPILOT01 | TA | A1 | Placebo   | 2 | TRT  | Treatment
+CDISCPILOT01 | TA | A2 | Drug 10mg | 1 | SCRN | Screening
+---

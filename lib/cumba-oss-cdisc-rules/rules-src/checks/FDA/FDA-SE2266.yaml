@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SE2266"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Standardized Result in Numeric Format (--STRESN)\
+  \ is less than 0 for a record that is not excluded from analysis (Exclude from Statistics\
+  \ (--EXCLFL) is not 'Y')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "BW"
+    - "FM"
+    - "FW"
+    - "LB"
+    - "OM"
+    - "PC"
+    - "PY"
+    - "RE"
+    - "VS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESN"
+Check:
+  expression: >-
+    not empty(--STRESN) and --STRESN < 0 and (not var_exists("--EXCLFL") or --EXCLFL != "Y")
+Outcome:
+  Message: "--STRESN is less than 0 for a record that is not excluded from analysis\
+    \ (--EXCLFL is not 'Y')."
+  Output_Variables:
+  - "--STRESN"
+  - "--EXCLFL"
+Source:
+  FDA_Validator_Rule_Message: "Negative value for --STRESN when --EXCLFL is not populated"
+  FDA_Validator_Rule_Description: "The value of Standardized Result in Numeric Format\
+    \ (--STRESN) cannot be less than 0 when the record is not excluded from analysis,\
+    \ i.e., Exclude from Statistics (--EXCLFL) is not 'Y'. This applies for the following\
+    \ domains in SEND: BW, FM, FW, LB, OM, PC, PY, RE, VS."
+  Domains: "BW, FW, LB, OM, PC, RE, VS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2266"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2266"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2266"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2266"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2266"
+        Version: "1"
+      Version: "1.6"

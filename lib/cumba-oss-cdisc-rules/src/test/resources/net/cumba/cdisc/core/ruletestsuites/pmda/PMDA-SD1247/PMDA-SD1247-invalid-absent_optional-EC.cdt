@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1247 expect=violation domain=EC
+#note "NO ECDOSTXT and NO ECSTAT columns (both model-level/Perm). Pins that an absent optional column satisfies its leg rather than suppressing the rule. TWO of the three optional legs are still written as the AUTHORED '(not var_exists(X) or X <op> ...)' - ECOCCUR and ECSTAT; the ECDOSTXT leg is now a bare empty(ECDOSTXT), TRUE on an absent column under absent = all-missing (EC-43), because Plan B phase 4d' deleted its redundant presence half. The verdict is unchanged."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECOCCUR type=Char label="Occurrence"
+col ECDOSE  type=Num  label="Dose"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0
+S1 | EC | 001 | 2 | DRUG A | Y | 5

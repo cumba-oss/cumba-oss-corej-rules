@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-OD0082"
+Sheet_Rule_Identifier: "OD0082"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "When Codelist contains at least one item with Term and Decoded Value (CodeListItem), then all other items must be of the same type."
+# A CodeList whose items are CodeListItem (Term + Decode) must not also carry
+# decode-less EnumeratedItem children - the two item types cannot be mixed.
+# Distinct from CDISC 199 (every CodeListItem needs a Decode): this fires on the
+# CodeList when it mixes CodeListItem and EnumeratedItem. The guarded not_exists
+# reports without a value; the offending CodeList is named by the finding xpath.
+Message: "Codelist is missing Decoded Values"
+Check:
+  kind: "not_exists"
+  target: "EnumeratedItem"
+  when:
+    path: "CodeListItem"
+    exists: true

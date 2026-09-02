@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1237 expect=skipped domain=DO
+#note "FRESH. No SPDEVID column declared. The two rows WOULD be a duplicate under the rule's own key if it ran (the absent target is dropped and the check regroups, per EC-53 / Fix #143), which is exactly what makes the skip worth asserting rather than borrowing noViolation. The rule declares Requirements.Variables.All [SPDEVID], so the engine reports SKIPPED naming the absent variable. In-tree precedent for the channel: pmda/PMDA-SD9708/PMDA-SD9708-skipped_no_ietestcd-TI.cdt."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col DOSEQ    type=Num
+col DOTESTCD type=Char
+col DOORRES  type=Char
+---
+S1 | DO | 1 | DEVTYPE | Pump
+S1 | DO | 2 | DEVTYPE | Stent

@@ -1,0 +1,22 @@
+Rule_Id: "PMDA-DD0040"
+Sheet_Rule_Identifier: "DD0040"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "KeySequence"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Key Variables must be defined for each dataset. Define-XML specification represents Key Variables as KeySequence attribute on ItemRef element. The KeySequence attribute must be provided for at least one ItemRef within each ItemGroupDef."
+Message: "Missing Key Variables value"
+# Per-dataset aggregate ("at least one ItemRef carries KeySequence") - the
+# 0124-B fire-always vehicle, exactly like CDISC twin 0070 but without that
+# twin's def:Context='Submission' gate (the PMDA row is unconditional) and for
+# both versions.
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "ItemRef/@KeySequence"
+      exists: false

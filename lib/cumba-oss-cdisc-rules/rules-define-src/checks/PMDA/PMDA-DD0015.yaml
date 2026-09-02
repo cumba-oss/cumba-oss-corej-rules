@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0015"
+Sheet_Rule_Identifier: "DD0015"
+Rule_Set: "PMDA"
+Element: "DocumentRef"
+Attribute: "leafID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Referenced Document must first be defined on Documents tab. Define-XML specification represents Documents as def:leaf elements within MetaDataVersion element."
+# Every def:DocumentRef (under MethodDef, def:CommentDef, def:Origin, the
+# def:AnnotatedCRF / def:SupplementalDoc containers, arm:Documentation, ...) must
+# point at an existing def:leaf. CDISC twin 43 (same shape).
+Message: "Referenced Document is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "leafID"
+  targetElement: "leaf"
+  targetKey: "ID"

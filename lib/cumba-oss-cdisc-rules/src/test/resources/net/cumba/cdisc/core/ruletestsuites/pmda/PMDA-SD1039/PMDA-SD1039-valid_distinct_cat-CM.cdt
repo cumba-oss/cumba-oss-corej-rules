@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1039 expect=noViolation domain=CM
+#note "Row 1: CMCAT distinct from every comparator -> clean. Row 2: CMCAT empty AND CMTRT/CMDECOD empty - the leading not empty(--CAT) gate is false, so the both-empty equalsIgnoreCase match (B.3: '' equalsIgnoreCase '' is true) is never reached -> clean. Row 2 is load-bearing: it pins the gate shielding the both-empty corner."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMDECOD  type=Char
+col CMCAT    type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN |  ACETYLSALICYLIC ACID | ANALGESICS
+S1 | CM | 001 | 2 |         |                       |
+---

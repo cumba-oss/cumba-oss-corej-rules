@@ -1,0 +1,45 @@
+Core:
+  Id: "FDA-SE2258"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RSTGCD (Repro Stage Code) is populated, is not 'UNPLAN'\
+  \ (an unplanned Repro Stage), and does not match a RSTGCD value in the Trial Repro\
+  \ Stages (TT) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+    - "TP"
+Requirements:
+  Variables:
+    All:
+    - "RSTGCD"
+Operations:
+- id: "$tt_rstgcd"
+  expression: "distinct(RSTGCD, domain=\"TT\")"
+Check:
+  expression: >-
+    not empty(RSTGCD) and RSTGCD != "UNPLAN" and RSTGCD not in $tt_rstgcd
+Outcome:
+  Message: "RSTGCD does not match an entry in the Trial Repro Stages (TT) dataset."
+  Output_Variables:
+  - "RSTGCD"
+  - "$tt_rstgcd"
+Source:
+  FDA_Validator_Rule_Message: "Invalid RSTGCD"
+  FDA_Validator_Rule_Description: "Repro Stage Code (RSTGCD) values should match entries\
+    \ in the Trial Repro Stages (TT) dataset, except for an unplanned Repro Stage\
+    \ (RSTGCD = 'UNPLAN')."
+  Domains: "SJ, TP"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2258"
+        Version: "1"
+      Version: "1.6"

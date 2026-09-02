@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-SEND-0074 expect=noViolation domain=BW
+#note "NEW with Fix #340. The conformant twin of the invalid pin: both rows precede RFSTDTC and both carry the value the SDTM algorithm gives on this side of the reference date (2019-12-20 -> -12, 2019-12-25 -> -7; no +1). A row on or after RFSTDTC is CDISC-SEND-0073's business, not this rule's, so none is included here."
+#library standard=sendig version=3-1-1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWDTC    type=Char label="Date/Time of Measurement"
+col BWDY     type=Num  label="Study Day of Measurement"
+---
+S1 | BW | 001 | 1 | BW | 2019-12-20 | -12
+S1 | BW | 001 | 2 | BW | 2019-12-25 | -7
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

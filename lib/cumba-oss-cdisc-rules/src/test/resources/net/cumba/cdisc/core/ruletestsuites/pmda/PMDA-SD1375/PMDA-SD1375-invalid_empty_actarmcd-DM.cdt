@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1375 expect=violation domain=DM
+#note "The (or null) branch of the sheet text. Row 1: RFENDTC populated, ACTARMCD empty -> fires. Row 2: RFENDTC empty -> silent."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 RFENDTC=2020-02-10
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFSTDTC  type=Char
+col RFENDTC  type=Char
+col ACTARMCD type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | | 2020-02-10 |
+CDISCPILOT01 | DM | 01-701-1023 | | |
+---

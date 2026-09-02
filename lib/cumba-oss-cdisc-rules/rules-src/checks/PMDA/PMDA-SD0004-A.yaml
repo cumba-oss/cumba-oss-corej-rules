@@ -1,0 +1,125 @@
+Core:
+  Id: "PMDA-SD0004-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Domain Abbreviation (DOMAIN) value of an Associated\
+  \ Persons dataset is not consistent with the name of the dataset (the dataset name\
+  \ does not begin with the four-character DOMAIN value)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    Exclude:
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    prefix(dataset_name, 4) != DOMAIN
+Outcome:
+  Message: "Inconsistent value for DOMAIN"
+  Output_Variables:
+  - "dataset_name"
+  - "DOMAIN"
+Source_Proposed:
+  Message: "Inconsistent value for DOMAIN"
+  Description: "The Domain Abbreviation (DOMAIN) value of an Associated Persons dataset\
+    \ is not consistent with the name of the dataset (the dataset name does not begin\
+    \ with the four-character DOMAIN value)."
+  Domains: "AP--"
+  Severity: "Warning"
+Source:
+  Message: "Inconsistent value for DOMAIN"
+  Description: "Domain Abbreviation (DOMAIN) variable should be consistent with the\
+    \ name of the dataset."
+  Domains: "ALL (-POOLDEF, -RELREC, -RELSPEC, -RELSUB, -SUPPQUAL)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0004"
+        Version: "1"
+      Version: "1.6"

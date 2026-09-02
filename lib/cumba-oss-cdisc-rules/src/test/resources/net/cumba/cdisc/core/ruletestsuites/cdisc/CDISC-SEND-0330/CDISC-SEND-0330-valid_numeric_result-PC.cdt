@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-SEND-0330 expect=noViolation domain=PC
+#note "No PCSTRESC cell is BLQ or ALQ, so the leading disjunction is false on every row and the rule is silent whatever SUPPPC contains. Pins 'outside the limit of quantitation' as the gate. Verdict-identical before and after M3-D5."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC | 001 | 1 | DRUGX | 4.1 | 4.1
+S1 | PC | 001 | 2 | DRUGX | 7.3 | 7.3
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | PC | 001 | PCSEQ | 1 | PCCMT | Comment | See protocol
+---

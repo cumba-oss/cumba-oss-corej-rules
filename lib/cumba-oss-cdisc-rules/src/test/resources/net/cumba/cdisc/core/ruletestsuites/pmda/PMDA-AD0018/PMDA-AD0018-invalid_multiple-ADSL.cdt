@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0018 expect=violation domain=ADSL
+#note "TEMPLATE fda/FDA-SD0063/FDA-SD0063-invalid_multiple-DM.cdt re-targeted onto ADaM: AGE carries 'Age in Years' instead of 'Age' and SEX carries 'Gender' instead of 'Sex'. TWO independently mislabelled variables -> TWO violations (the r2-W1 Sensitivity=Record pin; a Dataset regression would report 1)."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL AGE name=AGE label="Age" simpleDatatype=Num
+#library variable-metadata ADSL SEX name=SEX label="Sex"
+#expectViolationCount 2
+#expectViolationAt variable_name=AGE
+#expectViolationAt variable_name=SEX
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age in Years"
+col SEX     type=Char label="Gender"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | M

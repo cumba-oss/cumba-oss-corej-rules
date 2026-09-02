@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0077 expect=violation domain=ADSL
+#note "One expansion, xx=01, exactly as for AD0076. Here the KEY is TRT01PN and the DEPENDENT is TRT01P: key 0 carries {PLACEBO, PLACEBOARM} -> rows 1 and 2 both fire; key 2 is single-valued. Exactly 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 TRT01P=PLACEBO TRT01PN=0
+#expectViolationAt row=2 USUBJID=01-701-1023 TRT01P=PLACEBOARM TRT01PN=0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | PLACEBO    | 0
+CDISCPILOT01 | 01-701-1023 | PLACEBOARM | 0
+CDISCPILOT01 | 01-701-1034 | DRUGA      | 2

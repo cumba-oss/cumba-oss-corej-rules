@@ -1,0 +1,28 @@
+Rule_Id: "PMDA-DD0099"
+Sheet_Rule_Identifier: "DD0099"
+Rule_Set: "PMDA"
+Element: "AnalysisResult"
+Attribute: "AnalysisReason"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "Values for the AnalysisReason attribute are controlled by the Analysis Reason extensible codelist in ADaM CT or Define CT."
+# CT-gated. The AnalysisReason attribute on arm:AnalysisResult is not carried by
+# a CodeList, so the codelist is named explicitly by c-code. C117744 = the
+# "Analysis Reason" ARM/Define-XML CT codelist (extensible). Because the
+# codelist is extensible, a value outside it is a legal extension: the sheet
+# flags it as a Warning ("Extended value for AnalysisReason") rather than an
+# error - which is exactly term_in_ct_codelist's fire-when-not-a-submission-
+# value semantics (nonExtensibleOnly left false so extensible codelists are not
+# skipped).
+# CONFIRMED (review-pmda-residual, verified in /data2/_cdisc_lib_cache):
+# C117744 = Analysis Reason (ANLREAS), extensible; present in every Define-XML CT package
+# (2019-2025). NOTE: modern ADaM CT (2023+) DROPPED it (relocated to
+# Define-XML CT) — the production CtProvider MUST bind the Define-XML CT
+# package, not ADaM CT, or this rule silently no-ops.
+# false positive.
+Message: "Extended value for AnalysisReason [${value}]"
+Check:
+  kind: "term_in_ct_codelist"
+  attribute: "AnalysisReason"
+  cCode: "C117744"

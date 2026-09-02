@@ -1,0 +1,41 @@
+Core:
+  Id: "PMDA-AD0688"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject-Level Analysis Device Identifier (SPDEVID)\
+  \ has duplicate values for the same subject (USUBJID) within the ADDL dataset; there\
+  \ must be only one record per study for each unique combination of USUBJID and SPDEVID."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "SPDEVID"
+Check:
+  expression: >-
+    not is_unique_set([SPDEVID, USUBJID])
+Outcome:
+  Message: "There is more than one record for the same USUBJID and SPDEVID in the\
+    \ ADDL dataset."
+  Output_Variables:
+  - "SPDEVID"
+Source:
+  Message: "SPDEVID duplicate values are not allowed within a study and subject"
+  Description: "There is more than one record per study for unique values of USUBJID\
+    \ and SPDEVID in the ADDL dataset."
+  Domains: "ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0688"
+        Version: "1"
+      Version: "6.0"

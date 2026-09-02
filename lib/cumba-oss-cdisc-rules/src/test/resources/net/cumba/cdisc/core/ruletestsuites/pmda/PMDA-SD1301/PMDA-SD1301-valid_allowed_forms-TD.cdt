@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1301 expect=noViolation domain=TD
+#note "All five forms the sheet allows: the literal zero (caught by the TDSTOFF != '0' conjunct), three positive ISO 8601 durations covering the date part, the time part and a two-component date part, and an empty value (caught by the leading not empty(TDSTOFF)). Body from fda/FDA-SD1301-valid-TD.cdt."
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TDORDER  type=Num
+col TDANCVAR type=Char
+col TDSTOFF  type=Char
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | 0
+CDISCPILOT01 | TD | 2 | RSSTDTC | P80Y
+CDISCPILOT01 | TD | 3 | RSSTDTC | PT12H
+CDISCPILOT01 | TD | 4 | RSSTDTC | P1Y6M
+CDISCPILOT01 | TD | 5 | RSSTDTC |

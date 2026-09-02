@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0223"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Change from Baseline (CHG), Analysis Value (AVAL)\
+  \ and Baseline Value (BASE) are all populated but CHG does not equal AVAL minus\
+  \ BASE."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    CHG != (AVAL - BASE)
+Outcome:
+  Message: "CHG does not equal AVAL minus BASE."
+  Output_Variables:
+  - "AVAL"
+  - "BASE"
+  - "CHG"
+Source:
+  Message: "Calculation issue: CHG != AVAL - BASE"
+  Description: "When all 3 variables are populated, Change from Baseline (CHG) must\
+    \ equal Analysis Value (AVAL) minus Baseline Value (BASE)."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0223"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0223"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0223"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0223"
+        Version: "1"
+      Version: "6.0"

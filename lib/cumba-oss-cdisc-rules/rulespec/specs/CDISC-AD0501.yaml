@@ -1,0 +1,33 @@
+name: CDISC-AD0501
+kind: rule
+description: |
+  Wave A7 port — T1a PlainSimple.
+  CDISC-AD0501: On a given record, ASPER is populated and APERIOD is not populated.
+  Record-data rule scoped to BDS/OCCDS; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0501)
+rule:
+  coreId: CDISC-AD0501
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    column_types:
+      ASPER: LONG
+      APERIOD: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ASPER: null, APERIOD: null}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ASPER: 1,    APERIOD: null}   # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0501
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      APERIOD: null
+      ASPER: '1'
+expected_errors: []

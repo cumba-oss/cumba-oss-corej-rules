@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0096 expect=noViolation domain=ADLBC
+#note "*** TRIPWIRE - one of the batch's two LOAD-BEARING presence guards. TRTAN (the grouping key) absent. This rule carries NO Requirements.Variables block, so it EXECUTES; silent solely because var_exists(TRTAN) is false (no not empty(TRTAN) sibling, unlike the B sibling). Data would fire under the EC-44 whole-table regroup (TRTA={DRUGA,DRUGA,DRUGB}). A VIOLATION here is a real engine detection; a SKIPPED here would mean a Requirements.Variables block was added."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA
+CDISCPILOT01 | 01-701-1023 | GLUC | DRUGA
+CDISCPILOT01 | 01-701-1034 | GLUC | DRUGB

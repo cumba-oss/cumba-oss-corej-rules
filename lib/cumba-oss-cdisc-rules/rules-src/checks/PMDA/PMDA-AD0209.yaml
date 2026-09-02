@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0209"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the same subject (USUBJID), the Study Site\
+  \ Identifier (SITEID) in ADSL does not match the Study Site Identifier (SITEID)\
+  \ of the same subject in the SDTM DM dataset; ADaM must be traceable to SDTM."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    var_exists(DM.SITEID) and not empty(SITEID) and SITEID != DM.SITEID
+Outcome:
+  Message: "For the same USUBJID, the ADSL SITEID does not equal the DM SITEID."
+  Output_Variables:
+  - "SITEID"
+  - "DM.SITEID"
+Source:
+  Message: "For the same USUBJID, the ADSL.SITEID != DM.SITEID"
+  Description: "The same subject in ADSL and DM must have the same value for Site\
+    \ ID (SITEID). There must be traceability between ADaM and SDTM."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0209"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0053"
+Sheet_Rule_Identifier: "DD0053"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Purpose"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Purpose attribute must have a value of 'Tabulation' for SDTM and SEND data and 'Analysis' for ADaM data. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+# One sheet row, two standard-family legs (this: SDTM/SEND => 'Tabulation';
+# -B: ADaM => 'Analysis'). Version legs dispatched organically inside the
+# any-guard (DD0045 precedent): 2.0 binds the standard via the enclosing
+# MetaDataVersion's def:StandardName, 2.1 via def:StandardOID dereferenced to
+# the def:Standard whose Name begins with SDTM/SEND (CDISC twins 0251/0252's
+# encoding - AGREE on values; PMDA additionally covers 2.0).
+Message: "Invalid Purpose value"
+Check:
+  kind: "one_of"
+  attribute: "Purpose"
+  values: ["Tabulation"]
+  when:
+    any:
+    - path: "../@StandardName"
+      oneOf: ["SDTM-IG", "SEND-IG", "SEND-IG-AR", "SEND-IG-DART", "SEND-IG-GENETOX"]
+    - path: "@StandardOID->Standard@OID/@Name"
+      matchesRegex: "(SDTM|SEND).*"

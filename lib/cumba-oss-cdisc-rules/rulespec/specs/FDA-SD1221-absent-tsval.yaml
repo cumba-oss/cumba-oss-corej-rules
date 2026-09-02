@@ -1,0 +1,46 @@
+name: FDA-SD1221-absent-tsval
+kind: rule
+description: |
+  Pins the status divergence introduced by PLAN-absent-column-guard-backlog P3a (group 1:
+  "both guard halves"). TS carries a PLANSUB record but NO TSVAL column at all.
+
+  Why the rule must not fire. The shipped form is `var_exists("TSVAL") and
+  var_exists("TSPARMCD") and TSPARMCD == "PLANSUB" and not is_integer(TSVAL)` — the leading
+  `var_exists("TSVAL")` IS the guard this spec exists to pin, and was added by P3a. Before P3a that leading guard was absent, and `not
+  is_integer(TSVAL)` FIRES on every PLANSUB row of a TSVAL-less dataset — measured, both
+  lanes: Java `{0,1}` (ExprCompiler.compileNot ends in a literal flip(0,rowCount)), Python
+  `[True, True]` (since EC-38 the absent column is materialised as all-missing and
+  is_not_integer over blanks is true). Asserting "TSVAL is not an integer" when there is no
+  TSVAL column is a finding the rule never made.
+
+  The two lanes now reach "no finding" by DIFFERENT mechanisms, which is the whole point of
+  this spec. Java is gated out up front: Requirements.Variables.All names TSVAL and the fixture
+  has no such column, so Java reports SKIPPED. Python has no Requirements.Variables gate at all — it
+  reaches the Check, evaluates the `TSVAL exists` leaf to false, and EXECUTES to zero
+  findings. Violations agree; status does not.
+
+  Both halves of the guard are load-bearing and neither is redundant. Drop the Check leaf and
+  Python loses its only guard (it reads no part of Requirements.Variables) and fires again. Drop the
+  Requirements.Variables entry and Java reports a silent zero instead of an auditable SKIPPED. The
+  same shape as CDISC-AD0019-absent, but arrived at from the opposite direction: there the
+  Check guard was hoisted AWAY, here it was deliberately kept alongside a new scope entry.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1221)
+rule:
+  coreId: FDA-SD1221
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      # PLANSUB is present and in scope; TSVAL is the column the rule judges, and it is absent.
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: PLANSUB, TSPARM: Planned Number of Subjects}
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 2, TSPARMCD: TITLE, TSPARM: Trial Title}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial-design: [TS]
+# Java gates the rule out: Requirements.Variables.All TSVAL is absent from the fixture.
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

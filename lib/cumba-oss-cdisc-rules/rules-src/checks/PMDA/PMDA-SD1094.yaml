@@ -1,0 +1,138 @@
+Core:
+  Id: "PMDA-SD1094"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the populated Study Day of End of Observation (--ENDY)\
+  \ does not equal the study day computed from --ENDTC and DM.RFSTDTC: the date part\
+  \ of --ENDTC minus the date part of DM.RFSTDTC, plus one when --ENDTC is on or after\
+  \ DM.RFSTDTC, otherwise the plain difference (no day zero)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+    - "SPECIAL PURPOSE"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+    - "--ENDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$val_endy"
+  expression: "dy(--ENDTC)"
+Check:
+  expression: >-
+    not empty(--ENDY) and is_complete_date(--ENDTC) and is_complete_date(DM.RFSTDTC) and --ENDY !=
+    $val_endy
+Outcome:
+  Message: "--ENDY does not equal the study day computed from --ENDTC and DM.RFSTDTC."
+  Output_Variables:
+  - "$val_endy"
+  - "--ENDTC"
+  - "--ENDY"
+  - "DM.RFSTDTC"
+Source:
+  Message: "Incorrect value for --ENDY variable"
+  Description: "Study Day of End (--ENDY) variable value should be populated as defined\
+    \ by CDISC standards: --ENDY = (date portion of --ENDTC) - (date portion of RFSTDTC)\
+    \ +1 if --ENDTC is on or after RFSTDTC; --ENDY = (date portion of --ENDTC) - (date\
+    \ portion of RFSTDTC) if --ENDTC precedes RFSTDTC."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1094"
+        Version: "1"
+      Version: "1.6"

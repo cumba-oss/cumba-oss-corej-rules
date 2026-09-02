@@ -1,0 +1,102 @@
+Core:
+  Id: "PMDA-SD1319"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --STDTC in the Disposition (DS) or Protocol Deviations\
+  \ (DV) domains is earlier than the subject's Date/Time of Informed Consent (RFICDTC)\
+  \ in the Demographics (DM) domain."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+    - "DV"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--STDTC) and date(--STDTC) < DM.RFICDTC
+Outcome:
+  Message: "--STDTC is before RFICDTC."
+  Output_Variables:
+  - "--STDTC"
+  - "DM.RFICDTC"
+Source:
+  Message: "--STDTC is before RFICDTC"
+  Description: "All records in the Disposition (DS) and Protocol Deviations (DV) domains\
+    \ should have the Start Date/Time of Event (--STDTC) equal to or after a subject's\
+    \ Date/Time of Informed Consent (RFICDTC) in the Demographics (DM) domain."
+  Domains: "DS, DV"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"

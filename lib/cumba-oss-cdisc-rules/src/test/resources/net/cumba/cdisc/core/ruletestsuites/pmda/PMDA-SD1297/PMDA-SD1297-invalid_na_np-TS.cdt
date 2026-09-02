@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1297 expect=violation domain=TS
+#note "Regression pin: NA and NP (with synonyms) are in the ISO 21090 null-flavor list, so TSVAL='NA' / 'NP' fires. Adapted verbatim from FDA-SD1297."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 TSVAL=NA
+#expectViolationAt row=2 TSVAL=NP
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | PCLAS   | Pharmacologic Class | NA
+CDISCPILOT01 | TS | 2 | ADAPT   | Adaptive Design     | NP

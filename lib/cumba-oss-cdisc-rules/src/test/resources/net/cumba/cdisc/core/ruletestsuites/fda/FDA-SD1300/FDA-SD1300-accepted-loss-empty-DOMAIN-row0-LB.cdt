@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1300 expect=noViolation domain=LB
+#note "⚠⚠ RECORDS AN ACCEPTED DETECTION LOSS — this scenario replaces `FDA-SD1300-invalid_empty-LB.cdt`, which expected a violation and would now be red. `dataset_domain` is `OperationExecutor.unsplitNameFromData`, and its `firstRowValue` helper treats a MISSING-OR-EMPTY row-0 `DOMAIN` cell as 'no value' and FALLS BACK TO THE DATASET NAME (`OperationExecutor:719-732`). So on a two-character dataset name the answer is `LB`, length 2, and neither branch fires: after the wave-15 migration an EMPTY `DOMAIN` value is invisible to this rule, not just the rows 2..N that Fix #172 / EC-67 already recorded as lost. ⚑ This is a SEPARATE loss from the row-2..N one and it was NOT stated in `plans/PLAN-wave15-corpus-manifest.md` §2.1 — reported by wave-15 lane A. ⚠ The scenario is a REGRESSION RECORD, not an approval: if a follow-up teaches `dataset_domain` to distinguish 'empty cell' from 'no column', this must go red and be re-expected as a violation. ⚠ It is deliberately NOT masked — the class is FINDINGS so `Classes.Exclude: [RELATIONSHIP]` does not bite, `LB` is in neither `AP--` nor `APRELSUB`, and the `DOMAIN` column is present so `Requirements.Variables.All: [DOMAIN]` passes: the rule genuinely RUNS here and genuinely answers 'no violation'."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+---
+S1 |  | 001 | 1
+S1 |  | 001 | 2
+---

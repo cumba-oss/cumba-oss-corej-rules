@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0369 expect=violation domain=ADLBC
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. THE 82-RULE GENERATOR-WILDCARD POPULATION (Fix #331 finding; owner ruled 2026-08-22 that all 82 are BUCKET 1 - no rule edit - with a sample of fixtures owed by the closing lane; authored by Fix #340). These rules never carried the injected var_exists guard in rules/ (NonEmptyGuardInliner.isGeneratorWildcard excludes wildcard names), but WildcardExpander re-ran installNativeExpr on the EXPANDED rule, where the arm wrapped the now-concrete leaf - so before Fix #330 an absent primary column silenced them at runtime. With the arm retired the expanded leaf is a bare empty(X): absent = all-missing, TRUE on every row. ADTF is declared and populated on row 1 while NEITHER partner column (ADT, ADTM) is declared at all - the *DTF pattern raises the single root 'A' and both partners are synthesised absent, so empty(ADT) and empty(ADTM) are both TRUE and row 1 fires. Row 2 leaves ADTF blank and stays silent. This is the MULTI-EMPTY compounding shape (two emptiness leaves in one conjunction): before Fix #330 the two post-expansion guards ANDed together and the rule could only fire when the dataset declared all three columns."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ADTF type=Char
+---
+CDISCPILOT01 | 01-701-1015 | VAL
+CDISCPILOT01 | 01-701-1023 |
+---

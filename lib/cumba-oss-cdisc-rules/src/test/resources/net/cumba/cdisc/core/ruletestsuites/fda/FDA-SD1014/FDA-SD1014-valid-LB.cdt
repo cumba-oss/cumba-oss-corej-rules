@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1014 expect=noViolation domain=LB
+#note "Rows 1 and 2 carry TAETORD values (1, 2) that TA defines; row 3 has TAETORD missing and is therefore not applicable."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+---
+S1 | LB | 001 | 1 | ALB | 1
+S1 | LB | 001 | 2 | ALB | 2
+S1 | LB | 001 | 3 | ALB |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 2 | TRT

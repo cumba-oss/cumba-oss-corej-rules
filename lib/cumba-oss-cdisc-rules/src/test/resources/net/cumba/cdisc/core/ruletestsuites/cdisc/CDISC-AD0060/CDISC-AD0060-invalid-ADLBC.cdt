@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0060 expect=violation domain=ADLBC
+# Rule:Description: A variable with a suffix of DTM is not a numeric variable
+#note "ADTM is Char (data_type != Num) -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Char variable_name=ADTM
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

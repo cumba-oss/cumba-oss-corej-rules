@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0093"
+Sheet_Rule_Identifier: "DD0093"
+Rule_Set: "PMDA"
+Element: "AnalysisResult"
+Attribute: "ParameterOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "When ParameterOID is included in a arm:AnalysisResult, then at least one of the children arm:AnalysisDataset elements must be a BDS and the ParameterOID must reference a PARAMCD variable for that Dataset."
+# Custom (ARM cross-structure semantics beyond the declarative kinds): the
+# when-guard restricts to arm:AnalysisResults that carry a ParameterOID; the
+# custom then requires the ParameterOID to resolve to a PARAMCD ItemDef that is
+# a member (via ItemRef) of one of the result's analysed datasets - a dataset
+# containing PARAMCD being, by definition, a BDS.
+Message: "Improper use of ParameterOID"
+Check:
+  kind: "custom"
+  className: "net.cumba.cdisc.define.conformance.checks.ArmParameterOidUsageCheck"
+  when:
+    path: "@ParameterOID"
+    exists: true

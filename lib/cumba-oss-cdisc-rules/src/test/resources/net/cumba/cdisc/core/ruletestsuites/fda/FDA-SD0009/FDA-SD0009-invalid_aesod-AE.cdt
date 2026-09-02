@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SD0009 expect=violation domain=AE
+#note "D-TA-8 flip (replaces FDA-SD0009-valid-aesod-AE.cdt, which pinned the AESOD-included behaviour): AESER=Y and only AESOD=Y. The FDA sheet enumerates seven criteria without AESOD, and the ruling drops the imported CDISC-CG0042 conjunct — AESOD records a circumstance of an already-serious event (AESOD=Y implies AESER=Y, not the reverse; a legacy criterion excluded from ICH E2A/E2B), so a serious event whose only raised flag is AESOD fires 'no criterion recorded'. Intended flip, not a regression."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESER=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AESER    type=Char label="Serious Event"
+col AESCAN   type=Char label="Involves Cancer"
+col AESCONG  type=Char label="Congenital Anomaly or Birth Defect"
+col AESDISAB type=Char label="Persist or Signif Disability/Incapacity"
+col AESDTH   type=Char label="Results in Death"
+col AESHOSP  type=Char label="Requires or Prolongs Hospitalization"
+col AESLIFE  type=Char label="Is Life Threatening"
+col AESOD    type=Char label="Occurred with Overdose"
+col AESMIE   type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | OVERDOSE EVENT | Y | N | N | N | N | N | N | Y | N
+S1 | AE | 001 | 2 | SEIZURE        | Y | N | N | N | N | Y | N | N | N

@@ -1,0 +1,24 @@
+Rule_Id: "DEFINE-XML-0154"
+Sheet_Rule_Identifier: "154"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "For regulatory submissions, def:Origin metadata must be provided for all SDTM, ADaM or SEND variables."
+# review-batch-d WARN 2: the sheet's literal Rule systematically over-fires on
+# spec-conforming documents that place def:Origin at the VARIABLE level and use
+# VLM (spec p. 59 allows either-level placement). Implemented as a custom check
+# (budget 2/15): an Origin-less, ValueListRef-less ItemDef is exempt when it is
+# a value-level member (referenced by some def:ValueListDef/ItemRef) — its
+# Origin obligation is then covered by 0155/0155-B at the correct level.
+Message: "def:Origin is not found for the ItemDef element."
+Check:
+  kind: "custom"
+  className: "net.cumba.cdisc.define.conformance.checks.VariableLevelOriginCheck"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - path: "def:ValueListRef"
+      exists: false

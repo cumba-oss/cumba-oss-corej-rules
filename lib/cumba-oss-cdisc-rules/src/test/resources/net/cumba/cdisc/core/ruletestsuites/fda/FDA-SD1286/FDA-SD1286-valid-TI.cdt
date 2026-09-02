@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1286 expect=noViolation domain=TI
+#note "IETESTCD is unique within each TIVERS; INCL01 recurs across protocol versions 1.0 and 2.0, which is allowed -> no violation."
+#library standard=sdtmig version=3-4
+dataset TI class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Incl/Excl Criterion"
+col TIVERS   type=Char label="Protocol Criteria Versions"
+---
+S1 | TI | INCL01 | Age >= 18            | 1.0
+S1 | TI | EXCL01 | Pregnant             | 1.0
+S1 | TI | INCL01 | Age >= 21            | 2.0

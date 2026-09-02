@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0149"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Reason for Exclusion (--REASEX) is populated but\
+  \ the corresponding Exclusion Flag (--EXCLFL) is not \"Y\"; --REASEX must be used\
+  \ only when --EXCLFL is \"Y\"."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--REASEX"
+Check:
+  expression: >-
+    not empty(--REASEX) and (not var_exists("--EXCLFL") or --EXCLFL != "Y")
+Outcome:
+  Message: "--REASEX is populated when --EXCLFL is not \"Y\"."
+  Output_Variables:
+  - "--EXCLFL"
+  - "!--REASEX"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--REASEX"
+  Plain_Text_Explanation: "--REASEX should only be present when --EXCLFL is \"Y\""
+  Condition: "--REASEX  ^= null"
+  Rule: "--EXCLFL = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND149"
+        Version: "1"
+      Version: "5.0"

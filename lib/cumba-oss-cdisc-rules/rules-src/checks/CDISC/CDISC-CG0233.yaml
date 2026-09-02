@@ -1,0 +1,72 @@
+Core:
+  Id: "CDISC-CG0233"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the start reference time point (--STTPT) is a complete\
+  \ date earlier than the date/time of collection (--DTC) but the start relative to\
+  \ reference time point (--STRTPT) is not one of 'BEFORE', 'COINCIDENT', 'AFTER',\
+  \ or 'UNKNOWN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--STRTPT"
+    - "--STTPT"
+    - "--DTC"
+Check:
+  ERROR:
+    expression: >-
+      not empty(--STTPT) and is_complete_date(--STTPT) and not empty(--DTC) and date(--STTPT) <
+      --DTC and --STRTPT not in ["BEFORE", "COINCIDENT", "AFTER", "UNKNOWN"]
+  INFO:
+    expression: >-
+      not empty(--STTPT) and is_complete_date(--STTPT) and not empty(--DTC) and
+      date(earliest_possible(--STTPT)) < latest_possible(--DTC) and --STRTPT not in ["BEFORE",
+      "COINCIDENT", "AFTER", "UNKNOWN"]
+    Message: "--STTPT may be prior to the date of collection or assessment (partial date/time\
+      \ precision leaves the order undetermined) but --STRTPT is not in ('BEFORE', 'COINCIDENT',\
+      \ 'AFTER', 'UNKNOWN')."
+Outcome:
+  Message: "--STTPT is prior to the date of collection or assessment but --STRTPT\
+    \ is not in ('BEFORE', 'COINCIDENT', 'AFTER', 'UNKNOWN')."
+  Output_Variables:
+  - "--DTC"
+  - "--STRTPT"
+  - "--STTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STRTPT"
+  Condition: "--STTPT is prior to the date of collection or assessment."
+  Rule: "--STRTPT in ('BEFORE', 'COINCIDENT', 'AFTER', 'UNKNOWN')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0233"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0233"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0233"
+        Version: "1"
+      Version: "2.0"

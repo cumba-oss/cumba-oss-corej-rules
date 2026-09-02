@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0323 expect=violation domain=ADLBC
+# Rule:Description: Within a study, there is more than one value of APHASEN for a given value of APHASE, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=2
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col APHASEN type=Char
+col APHASE type=Char
+---
+Label A | A
+Different Label | A
+Label B | B
+---

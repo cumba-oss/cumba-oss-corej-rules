@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0251"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Trial Summary (TS) record has TSPARMCD equal to\
+  \ 'SRANDOM' and a populated Parameter Value (TSVAL) that is not 'Y' or 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Check:
+  expression: >-
+    TSPARMCD == "SRANDOM" and not empty(TSVAL) and TSVAL not in ["Y", "N"]
+Outcome:
+  Message: "TSVAL is not 'Y' or 'N' for a record where TSPARMCD is 'SRANDOM'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "SRANDOM: TSVAL value associated with this TSPARMCD should\
+    \ be either \"Y\" or \"N\"."
+  Rule: "When TSPARMCD = SRANDOM the TSVAL value is  \"Y\" OR \"N\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND251"
+        Version: "1"
+      Version: "5.0"

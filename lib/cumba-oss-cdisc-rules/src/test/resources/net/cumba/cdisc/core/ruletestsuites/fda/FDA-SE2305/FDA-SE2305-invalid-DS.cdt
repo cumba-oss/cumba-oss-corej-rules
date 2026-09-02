@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2305 expect=violation domain=DS
+#note "Row 1 has all of VISITDY, DSSTDY, DSNOMDY missing -> fires; row 2 has DSNOMDY populated -> ok."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col VISITDY type=Num  label="Planned Study Day of Visit"
+col DSSTDY  type=Num  label="Study Day of Start of Event"
+col DSNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | DS | 001 | 1 | . | . | .
+S1 | DS | 001 | 2 | . | . | 14

@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0102"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when EXTRT equals 'PLACEBO' but EXDOSE does not equal\
+  \ 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "EXTRT"
+Check:
+  expression: >-
+    EXTRT == "PLACEBO" and EXDOSE != 0
+Outcome:
+  Message: "EXDOSE does not equal 0 when EXTRT equals 'PLACEBO'."
+  Output_Variables:
+  - "EXTRT"
+  - "EXDOSE"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "EXDOSE"
+  Condition: "EXTRT = 'PLACEBO'"
+  Rule: "EXDOSE = 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0102"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0102"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0102"
+        Version: "1"
+      Version: "2.0"

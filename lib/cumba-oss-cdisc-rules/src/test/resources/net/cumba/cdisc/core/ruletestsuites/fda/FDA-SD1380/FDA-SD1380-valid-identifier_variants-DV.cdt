@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1380 expect=noViolation domain=DV
+#note "Any one of the four identifiers suffices: row 1 has only APID, row 2 only SPDEVID, row 3 only POOLID populated (USUBJID empty on all three) -> no violation."
+#library standard=sdtmig version=3-4
+dataset DV class=EVENTS label="Protocol Deviations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col APID    type=Char label="Associated Persons Identifier"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col DVSEQ   type=Num  label="Sequence Number"
+col DVTERM  type=Char label="Protocol Deviation Term"
+---
+S1 | DV |  | AP01 |      |       | 1 | Deviation A
+S1 | DV |  |      | DEV7 |       | 2 | Deviation B
+S1 | DV |  |      |      | POOL1 | 3 | Deviation C

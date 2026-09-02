@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD0007 expect=violation domain=LB
+#note "Two records of the same assessment group disagree on LBSTRESU (mg/dL vs mmol/L). A 2-row split is a tie, so BOTH records are mutually inconsistent and each is reported (Sensitivity Record since 2026-07-28)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBSCAT   type=Char label="Subcategory for Lab Test"
+col LBSPEC   type=Char label="Specimen Type"
+col LBMETHOD type=Char label="Method of Test or Examination"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | CHEMISTRY | GLUCOSE | SERUM | ENZYMATIC | mmol/L
+S1 | LB | 002 | 1 | GLUC | CHEMISTRY | GLUCOSE | SERUM | ENZYMATIC | mg/dL
+S1 | LB | 001 | 2 | ALB  | CHEMISTRY | PROTEIN | SERUM | ENZYMATIC | g/L

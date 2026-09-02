@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0029 expect=violation domain=AE
+#note "ADAPTED-FROM fda/FDA-SD0064/FDA-SD0064-invalid-AE.cdt (data verbatim, test id re-labelled; both blocks fenced). Row 2 carries USUBJID=999 which has no DM record -> fires. Row 1 (001) is in DM; row 3 has an empty USUBJID and is guarded by the non_empty leaf."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=999
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+S1 | AE | 999 | 1 | NAUSEA
+S1 | AE |     | 1 | RASH
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | M
+S1 | DM | 002 | F
+---

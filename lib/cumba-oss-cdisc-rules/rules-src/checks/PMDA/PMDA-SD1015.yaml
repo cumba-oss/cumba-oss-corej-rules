@@ -1,0 +1,126 @@
+Core:
+  Id: "PMDA-SD1015"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when EPOCH is populated but does not match any EPOCH\
+  \ value in the TA dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+    - "SC"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
+Operations:
+- id: "$ta_epoch"
+  expression: "distinct(EPOCH, domain=\"TA\")"
+Check:
+  expression: >-
+    EPOCH not in $ta_epoch and not empty(EPOCH)
+Outcome:
+  Message: "EPOCH value does not match any EPOCH value in the TA dataset."
+  Output_Variables:
+  - "EPOCH"
+  - "$ta_epoch"
+Source:
+  Message: "EPOCH is not in TA.EPOCH"
+  Description: "Epoch (EPOCH) values should match entries in the Trial Arms (TA) dataset."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS (-SC), EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1015"
+        Version: "1"
+      Version: "1.6"

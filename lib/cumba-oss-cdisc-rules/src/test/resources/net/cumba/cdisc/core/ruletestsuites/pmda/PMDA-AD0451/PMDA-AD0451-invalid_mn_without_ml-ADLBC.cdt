@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0451 expect=violation domain=ADLBC
+#note "Mirror of PMDA-AD0450. MCRIT1MN populated but MCRIT1ML empty on row 1 -> fires. Row 2 both populated -> silent. ONE expansion (y=1)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 MCRIT1MN=2
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col MCRIT1MN   type=Num
+col MCRIT1ML   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2 |
+CDISCPILOT01 | 01-701-1023 | ALT | 1 | COMPLETE
+---

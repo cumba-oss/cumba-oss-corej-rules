@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0262"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an overflow Parameter Value column (TSVAL(n+1))\
+  \ is populated but the preceding Parameter Value column (TSVALn) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    inconsistent_enumerated_columns(TSVAL)
+Outcome:
+  Message: "TSVALn is empty when TSVAL(n+1) is populated."
+  Output_Variables:
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALn"
+  Condition: "TSVAL(n+1) ^= null"
+  Rule: "TSVALn ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0262"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0262"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0262"
+        Version: "1"
+      Version: "2.0"

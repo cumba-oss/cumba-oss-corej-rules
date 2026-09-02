@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-CG0138"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SUPP-- dataset other than SUPPDM contains a Qualifier\
+  \ Variable Name (QNAM) value reserved for subject-level population flags ('COMPLT',\
+  \ 'FULLSET', 'ITT', 'PPROT', or 'SAFETY')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+    Exclude:
+    - "SUPPDM"
+Check:
+  expression: >-
+    upper(QNAM) in ["COMPLT", "FULLSET", "ITT", "PPROT", "SAFETY"]
+Outcome:
+  Message: "QNAM in a SUPP-- dataset other than SUPPDM holds a value reserved for\
+    \ subject-level population flags, which must be placed in SUPPDM."
+  Output_Variables:
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "QNAM"
+  Condition: "Population flags included in submission"
+  Rule: "Population flags in SUPPDM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0138"
+        Version: "1"
+      Version: "2.0"

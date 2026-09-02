@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0343 expect=violation domain=ADLBC
+#note "Group (GLUC, 3) holds ANRLOC {LOWNORM x1, LN x1} -- a TIE, no strict majority -- so flagInconsistentGroupMinority flags EVERY non-blank row of the group: two findings, one per row. Group (ALB, 1) holds a single value and is silent. The batch's single pin on the tie branch; every other violation fixture in this batch is a strict majority so exactly one row fires."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=GLUC ANRLO=3 ANRLOC=LOWNORM
+#expectViolationAt row=2 PARAMCD=GLUC ANRLO=3 ANRLOC=LN
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ANRLO   type=Num
+col ANRLOC  type=Char
+---
+S1 | 001 | GLUC | 5.0 | 3 | LOWNORM
+S1 | 002 | GLUC | 5.1 | 3 | LN
+S1 | 003 | ALB  | 4.0 | 1 | NORMLOW

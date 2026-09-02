@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0273-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists with TSPARMCD equal to 'HLTSUBJI'\
+  \ and TSVAL equal to 'N', but no record with TSPARMCD equal to 'TDIGRP' is present\
+  \ in TS."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$HLTSUBJI_N"
+  expression: "record_count(filter=filter(TSPARMCD=\"HLTSUBJI\", TSVAL=\"N\"))"
+- id: "$TDIGRP_N"
+  expression: "record_count(filter=filter(TSPARMCD=\"TDIGRP\"))"
+Check:
+  expression: >-
+    $HLTSUBJI_N >= 1 and $TDIGRP_N == 0
+Outcome:
+  Message: "The required TDIGRP Trial Summary Parameter is missing from TS when a\
+    \ record exists with TSPARMCD equal to 'HLTSUBJI' and TSVAL equal to 'N'."
+  Output_Variables:
+  - "$TDIGRP_N"
+Source_Proposed:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'TDIGRP' and record exists where TSPARMCD = 'HLTSUBJI' and\
+    \ TSVAL = 'N'"
+  Rule: "a record exists with TSPARMCD equal to 'HLTSUBJI' and TSVAL equal to 'N',\
+    \ but no record with TSPARMCD equal to 'TDIGRP' is present in TS"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'TDIGRP' and record exists where TSPARMCD = 'HLTSUBJI' and\
+    \ TSVAL = 'N'"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"

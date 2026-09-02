@@ -1,0 +1,35 @@
+name: CDISC-AD0663
+kind: rule
+description: |
+  Wave A8 port — T1a PlainSimple.
+  CDISC-AD0663: COHORTN is populated and COHORT is not populated (ADNCA v1.0).
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0663)
+rule:
+  coreId: CDISC-AD0663
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      COHORTN: LONG
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, COHORTN: 1, COHORT: A, NFRLT: 0.0, AFRLT: 0.0}      # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, COHORTN: 1, COHORT: '', NFRLT: 0.0, AFRLT: 0.0}     # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0663
+    dataset: ADNCA
+    row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      COHORT:
+      COHORTN: '1'
+expected_errors: []

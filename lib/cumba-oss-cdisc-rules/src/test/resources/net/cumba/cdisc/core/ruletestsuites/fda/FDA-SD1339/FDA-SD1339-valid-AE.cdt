@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1339 expect=noViolation domain=AE
+#note "EPOCH is populated on every record that carries a start date; the record without any date leaves EPOCH empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col EPOCH   type=Char label="Epoch"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | Headache | TREATMENT | 2023-06-01
+S1 | AE | 001 | 2 | Fatigue  |           |

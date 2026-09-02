@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0211 expect=noViolation domain=ADLBC
+#note "Isolates both conjuncts: 1 passes the numeric membership test, and the SAS-missing row ('.') is disarmed by the leading `not empty(ABLFN)` rather than by the membership arm. The rule executes (BDS is in scope) and stays silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ABLFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 1
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 | .
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 | 1

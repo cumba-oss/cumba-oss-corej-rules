@@ -1,0 +1,121 @@
+Core:
+  Id: "FDA-SD1339"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when EPOCH is empty or not present even though a start\
+  \ date (--STDTC) or a collection date (--DTC) is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+    - "SPECIAL PURPOSE"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+    - "SV"
+Check:
+  expression: >-
+    empty(EPOCH) and (var_exists("--STDTC") and not empty(--STDTC) or var_exists("--DTC") and not
+    empty(--DTC))
+Outcome:
+  Message: "EPOCH is empty when a start date (--STDTC) or collection date (--DTC)\
+    \ is populated."
+  Output_Variables:
+  - "EPOCH"
+  - "--STDTC"
+  - "--DTC"
+Source:
+  FDA_Validator_Rule_Message: "Missing EPOCH value, when a start or observation date\
+    \ is provided"
+  FDA_Validator_Rule_Description: "The EPOCH variable is not populated, however either\
+    \ a start date or a collection date is provided. The presence of a start date\
+    \ or collection date for a record should allow for the EPOCH variable to be populated.\
+    \ Variables requested by the relevant regulatory agency in policy documents (e.g.,\
+    \ EPOCH) should be included in the dataset and populated."
+  Domains: "SE, SM, INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB022"
+        Version: "1"
+      Version: "1.5"

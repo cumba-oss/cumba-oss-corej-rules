@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0124 expect=violation domain=ADLBC
+# Rule:Description: There is more than one value of PARCATy for a given value of PARAMCD
+#note "PARAMCD=ALB maps to 2 distinct PARCAT1 values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | CHEM
+CDISCPILOT01 | 01-701-1023 | ALB | HEMA
+---

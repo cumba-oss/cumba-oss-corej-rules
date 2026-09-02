@@ -1,0 +1,91 @@
+Core:
+  Id: "CDISC-SEND-0016"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the DOMAIN value of a non-custom domain is not a\
+  \ Domain Code published by CDISC in the SEND \"SEND Domain Abbreviation\" controlled\
+  \ terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Operations:
+- id: "$domain_is_custom"
+  expression: "domain_is_custom()"
+- id: "$domain_codes"
+  expression: "codelist_terms(codelists=[SDOMAIN], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    $domain_is_custom == false and DOMAIN not in $domain_codes
+Outcome:
+  Message: "DOMAIN is not a valid Domain Code published by CDISC in the SEND Domain\
+    \ Abbreviation controlled terminology."
+  Output_Variables:
+  - "$domain_is_custom"
+  - "DOMAIN"
+  - "$domain_codes"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "DOMAIN"
+  Plain_Text_Explanation: "The domain abbreviation must match Controlled Terminology\
+    \ and must match the domain abbreviation in the SENDIG."
+  Condition: "NOT custom domain OR SUPP OR RELREC OR POOLID"
+  Rule: "DOMAIN = valid Domain Code published by CDISC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND16"
+        Version: "1"
+      Version: "5.0"

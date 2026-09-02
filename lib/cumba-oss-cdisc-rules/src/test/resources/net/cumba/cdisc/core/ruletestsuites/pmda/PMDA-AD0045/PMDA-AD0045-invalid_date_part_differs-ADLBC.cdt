@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0045 expect=violation domain=ADLBC
+#note "Both ADT/ADTM populated, ADTM date part (2020-01-02) differs from ADT (2020-01-01) -> date_part(*DTM)!=*DT fires on row 1. Unlike AD0044 there is exactly ONE expansion: *DT does NOT match ADTM, so only {*=A} is seeded."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 ADT=2020-01-01 ADTM=2020-01-02T00:00:00
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT     type=Char
+col ADTM    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 2020-01-01 | 2020-01-02T00:00:00

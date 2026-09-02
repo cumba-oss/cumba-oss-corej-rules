@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0216"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Element (ELEMENT), Element Start\
+  \ Rule (TESTRL), Element End Rule (TEENRL), and Planned Duration of Element (TEDUR)\
+  \ is not unique across Trial Elements (TE) records; each Element must have a unique\
+  \ combination of these values."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Check:
+  expression: >-
+    not is_unique_set([ELEMENT, TESTRL, TEENRL, TEDUR])
+Outcome:
+  Message: "The combination of ELEMENT, TESTRL, TEENRL, and TEDUR is not unique across\
+    \ TE records."
+  Output_Variables:
+  - "ELEMENT"
+  - "TESTRL"
+  - "TEENRL"
+  - "TEDUR"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "ETCD, ELEMENT"
+  Plain_Text_Explanation: "No two Elements can have the same combination of values\
+    \ for ELEMENT, TESTRL, and TEENRL or TEDUR.  Additional factors beyond treatment\
+    \ and start/end rule do not distinguish separate Elements."
+  Rule: "Each record must have a unique combination of values for ELEMENT, TESTRL,\
+    \ and (TEENRL OR TEDUR)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND216"
+        Version: "1"
+      Version: "5.0"

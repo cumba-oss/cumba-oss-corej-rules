@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2257 expect=violation domain=TS
+#note "Case-mismatch pin for the D-TA-3 sensitive default (Fix #266): TSVAL 'HEADACHE' is a SNOMED term but not in the dummy dictionary's preferred case ('Headache') -> the flag-less rule fires on row 2; row 1 matches the preferred case exactly."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSPARMCD=INDIC TSVAL=HEADACHE
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | INDIC | Headache
+S01 | TS | 2 | INDIC | HEADACHE

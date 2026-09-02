@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1230 expect=noViolation domain=LB
+#note "Track B: adapted from FDA-SD1230-valid-LB.cdt. Row 1: the GLUC value-level condition declares DataType='float' and '5.5' conforms. Row 2: the PH/URINE condition declares 'text', which 'ACIDIC' conforms to. Row 3: GLUC with an empty value is excluded by the non-empty guard. Row 4: HGB matches no where-clause, so no value-level type applies."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1230-define.xml
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSPEC   type=Char label="Specimen Type"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+001 | GLUC | SERUM | 5.5
+001 | PH   | URINE | ACIDIC
+001 | GLUC | SERUM |
+001 | HGB  | BLOOD | not-a-number

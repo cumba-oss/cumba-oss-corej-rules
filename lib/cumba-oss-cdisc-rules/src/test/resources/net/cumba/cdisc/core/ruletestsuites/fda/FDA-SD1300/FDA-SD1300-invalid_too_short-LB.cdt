@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1300 expect=violation domain=LB
+#note "Second Check branch (shorter_than 2), rewritten for the wave-15 `dataset_domain` migration. Every row carries a one-character `DOMAIN` value `L`; `dataset_domain` reads the row-0 cell verbatim, so `shorter_than 2` fires and `Sensitivity: Dataset` collapses it to one dataset-level finding. ⚠ As with its `longer_than` sibling, the pre-migration shape (conformant `LB` on row 1, `L` on row 2) is no longer detectable — `unsplitNameFromData` never reads rows 2..N."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+---
+S1 | L | 001 | 1
+S1 | L | 001 | 2
+---

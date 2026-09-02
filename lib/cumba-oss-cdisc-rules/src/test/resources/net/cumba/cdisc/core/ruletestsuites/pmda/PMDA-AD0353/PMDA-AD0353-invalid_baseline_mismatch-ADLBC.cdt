@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0353 expect=violation domain=ADLBC
+#note "Positive control. Exactly ONE index pair (A1IND/B1IND) is declared, so the wildcard expansion is column-driven and yields exactly ONE expanded rule (y=1); derived Sensitivity is Record. Row 1 is the baseline record (ABLFL=Y) with both indicators populated and B1IND != A1IND, so it fires. Row 2 has equal indicators and row 3 is not the baseline record, so both stay silent. Do not add any further A<digits>IND / B<digits>IND column: each extra pair is an extra expansion and an extra aggregated violation."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 B1IND=HIGH A1IND=NORMAL ABLFL=Y
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ABLFL   type=Char
+col A1IND   type=Char
+col B1IND   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | Y | NORMAL | HIGH
+CDISCPILOT01 | 01-701-1023 | ALT | Y | NORMAL | NORMAL
+CDISCPILOT01 | 01-701-1034 | ALT | N | NORMAL | HIGH

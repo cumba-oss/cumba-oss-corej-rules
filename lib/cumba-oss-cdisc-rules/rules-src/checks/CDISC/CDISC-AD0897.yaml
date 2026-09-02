@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0897"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTA is populated and does not match any of the\
+  \ character actual treatment variable values in ADSL defined in the IG"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(TRTA) and TRTA != ADSL.TRTA and TRTA not in ADSL.TRT${*}A and TRTA not in
+    ADSL.TRTAG${*} and TRTA not in ADSL.TR${*}AG${*}
+Outcome:
+  Message: "TRTA is populated, but does not match any of the character actual treatment\
+    \ variable values in ADSL"
+  Output_Variables:
+  - "TRTA"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "TRTA"
+  Natural_Language_Rule_Failure_Criteria: "A non-missing value of TRTA is not equal\
+    \ to at least one value of the character actual treatment variables in ADSL defined\
+    \ in the IG"
+  Rule_Failure_Criteria: "TRTA is not equal to at least one value of the character\
+    \ actual treatment variables in ADSL defined in the IG"
+  Condition_Failure: "TRTA is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR897"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR897"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR897"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1461 expect=violation domain=MH
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: MECHANISM PIN - the machine guard on a Permissible column, on the MH arm of the domain scope. NO MHBDSYCD column at all. The shipped `var_exists(\"--BDSYCD\")` conjunct is FALSE on the absent column -> rule EXECUTES and reports nothing (absent != missing, EC-43/Fix #126). Predicted noViolation, NOT skipped."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset MH
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MHSEQ    type=Num
+col MHBODSYS type=Char
+---
+S1 | MH | 001 | 1 | INFECTIONS

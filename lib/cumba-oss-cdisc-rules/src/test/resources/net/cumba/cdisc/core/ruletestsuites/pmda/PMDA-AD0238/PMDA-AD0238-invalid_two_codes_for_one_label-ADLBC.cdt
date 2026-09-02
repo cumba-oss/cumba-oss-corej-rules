@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0238 expect=violation domain=ADLBC
+#note "One expansion, y=1. Here the KEY is TRTPG1 and the DEPENDENT is TRTPG1N: key POOLA carries {1, 2} -> rows 1 and 2 fire; POOLB is single-valued. Exactly 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 TRTPG1=POOLA TRTPG1N=1
+#expectViolationAt row=2 USUBJID=01-701-1023 TRTPG1=POOLA TRTPG1N=2
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTPG1  type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | POOLA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLA | 2
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLB | 3

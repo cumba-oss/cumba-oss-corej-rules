@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0228 expect=skipped domain=ADDL
+#note "DISCRIMINATING fixture for finding AD0228-F1: the base rule does NOT cover a device-level analysis dataset while its 1-1..1-3 sibling AD0228B does, since DEVICE LEVEL ANALYSIS DATASET has no supertype and [SUBJECT LEVEL ANALYSIS DATASET] alone cannot reach it. AD*-named with SPDEVID -> DEVICE LEVEL ANALYSIS DATASET, out of scope, even though the group WOULD fire."
+#library standard=adamig version=1-0
+dataset ADDL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col TRTSEQP  type=Char
+col TRTSEQPN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV1 | AB | 1
+CDISCPILOT01 | 01-701-1023 | DEV2 | AB | 2

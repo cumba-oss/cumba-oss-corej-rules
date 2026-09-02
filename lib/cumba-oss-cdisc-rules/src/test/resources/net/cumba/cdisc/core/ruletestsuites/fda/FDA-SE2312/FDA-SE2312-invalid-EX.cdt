@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SE2312 expect=violation domain=EX
+#note "The Interventions member of the scope: EX row 1 references POOLID=POOLX which POOLDEF does not define -> fires. Row 2 (POOL1) is defined."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 POOLID=POOLX
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col EXSEQ    type=Num  label="Sequence Number"
+col EXTRT    type=Char label="Name of Treatment"
+col EXDOSFRQ type=Char label="Dosing Frequency per Interval"
+col EXROUTE  type=Char label="Route of Administration"
+---
+S1 | EX |  | POOLX | 1 | DRUG A | QD | ORAL
+S1 | EX |  | POOL1 | 2 | DRUG A | QD | ORAL
+---
+
+dataset POOLDEF label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | 001
+S1 | POOL1 | 002
+---

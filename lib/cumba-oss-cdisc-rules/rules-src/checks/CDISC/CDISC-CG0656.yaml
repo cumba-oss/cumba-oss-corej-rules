@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0656"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a visit is unplanned (SVPRESP is empty) but the\
+  \ Visit Number (VISITNUM) value matches a VISITNUM value in the Trial Visits (TV)\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    empty(SVPRESP) and VISITNUM in $tv_visitnum
+Outcome:
+  Message: "VISITNUM value for an unplanned visit matches a VISITNUM value in the\
+    \ TV dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "!SVPRESP"
+  - "$tv_visitnum"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "VISITNUM"
+  Condition: "SVPRESP = null"
+  Rule: "VISITNUM not in TV.VISITNUM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0656"
+        Version: "1"
+      Version: "2.0"

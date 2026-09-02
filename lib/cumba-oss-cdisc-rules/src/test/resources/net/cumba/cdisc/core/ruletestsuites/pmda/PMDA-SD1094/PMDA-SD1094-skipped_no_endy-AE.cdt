@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1094 expect=skipped domain=AE
+#note "FRESH - the batch's Requirements.Variables driver-gate reject pin (All [--ENDTC, --ENDY]). AE carries AEENDTC but NO AEENDY column; built so ONLY the missing AEENDY rejects (class passes, domain not excluded, DM present with complete RFSTDTC) -> the rule must not execute."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01-20
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

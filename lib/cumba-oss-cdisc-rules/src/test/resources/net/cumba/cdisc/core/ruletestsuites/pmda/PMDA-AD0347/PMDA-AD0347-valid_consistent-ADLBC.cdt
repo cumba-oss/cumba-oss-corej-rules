@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0347 expect=noViolation domain=ADLBC
+#note "Row 3 carries A1LO=10, so each (PARAMCD, A1LOC) group maps to one numeric limit."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1LO    type=Num
+col A1LOC   type=Char
+---
+S1 | 001 | ALB | 10 | LOWNORMAL
+S1 | 002 | ALB | 10 | LOWNORMAL
+S1 | 003 | ALB | 10 | LOWNORMAL
+S1 | 004 | ALB | 8  | BELOWNORMAL
+S1 | 005 | ALB | 8  | BELOWNORMAL

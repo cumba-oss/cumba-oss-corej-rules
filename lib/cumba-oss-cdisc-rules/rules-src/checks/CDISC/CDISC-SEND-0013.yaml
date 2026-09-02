@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0013"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose Core designation in the SENDIG\
+  \ is Expected is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$expected_variables"
+  expression: "expected_variables()"
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$missing_expected_variables"
+  expression: "minus($expected_variables, subtract=$dataset_variables)"
+Check:
+  expression: >-
+    not contains_all($dataset_variables, $expected_variables)
+Outcome:
+  Message: "An Expected variable is not present in the dataset."
+  Output_Variables:
+  - "$missing_expected_variables"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Expected variables must always be included in the dataset\
+    \ but can be null."
+  Condition: "Variable Core Status = Expected"
+  Rule: "Variable present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND13"
+        Version: "1"
+      Version: "5.0"

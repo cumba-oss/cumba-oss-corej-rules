@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0095 expect=violation domain=SUPPTA
+#note "RDOMAIN=TA references a Trial Design domain - not a general-observation class, not DM, not SV -> fires"
+#library standard=sdtmig version=3-3
+#library dataset-class TA "TRIAL DESIGN"
+#expectViolationCount 1
+#expectViolationAt row=1 RDOMAIN=TA
+dataset SUPPTA class=RELATIONSHIP label="Supplemental Qualifiers for TA"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QVAL    type=Char label="Data Value"
+---
+S1 | TA | | ARMNOTE | Extra arm info

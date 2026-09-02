@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2273 expect=noViolation domain=TS
+#note "Exactly one TSPARMCD=STCAT record. The dataset deliberately carries TWO SDESIGN records: an unfiltered record count would be 4 > 1 and fire, so a no-violation here proves the count is filtered to TSPARMCD=STCAT."
+#library standard=sendig version=3-1-1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STCAT | Study Category | TOXICOLOGY
+S01 | TS | 2 | SDESIGN | Study Design | PARALLEL
+S01 | TS | 3 | SDESIGN | Study Design | PARALLEL
+S01 | TS | 4 | STDIR | Study Director | Jane Doe

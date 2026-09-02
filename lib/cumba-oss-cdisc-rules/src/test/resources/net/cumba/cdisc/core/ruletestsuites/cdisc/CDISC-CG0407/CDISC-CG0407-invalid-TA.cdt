@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0407 expect=violation domain=TA
+#note "TA is in the study inventory but EX is not -> the anchored presence check fires, once, on its anchor."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | A | Drug A | 1 | SCRN

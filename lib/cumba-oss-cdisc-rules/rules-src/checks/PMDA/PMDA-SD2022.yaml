@@ -1,0 +1,96 @@
+Core:
+  Id: "PMDA-SD2022"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Age Units (AGEU) is empty or not present while\
+  \ Age (AGE) is populated or Age Range (AGETXT) is populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    (not empty(AGE) or not empty(AGETXT)) and empty(AGEU)
+Outcome:
+  Message: "AGEU is empty when AGE or AGETXT is populated."
+  Output_Variables:
+  - "AGE"
+  - "AGETXT"
+  - "AGEU"
+Source:
+  Message: "Missing value for AGEU when AGE or AGETXT is populated"
+  Description: "Age Units (AGEU) variable values should be provided when Age (AGE)\
+    \ or Age Range (AGETXT) variables values are populated."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2022"
+        Version: "1"
+      Version: "1.6"

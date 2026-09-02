@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0041A expect=violation domain=ADLBC
+#note "ADT declares a format and is silent; ASTDT and AENDT do not -> TWO findings, one per offending variable. Pins per-variable granularity."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=ASTDT
+#expectViolationAt variable_name=AENDT
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT     type=Num format=DATE9.
+col ASTDT   type=Num
+col AENDT   type=Num
+---
+S1 | 001 | ALB | 22000 | 22000 | 22010
+---

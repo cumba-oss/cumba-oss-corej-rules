@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD0040"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --TESTCD is present and --TEST is present and --TEST\
+  \ does not have the same value across records with the same value of --TESTCD."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--TEST"
+Check:
+  expression: >-
+    var_exists("--TESTCD") and is_inconsistent_across_dataset(--TEST, keys=[--TESTCD])
+Outcome:
+  Message: "Inconsistent value for --TEST within --TESTCD"
+  Output_Variables:
+  - "--TESTCD"
+  - "--TEST"
+Source:
+  Message: "Inconsistent value for --TEST within --TESTCD"
+  Description: "All values of Name of Measurement, Test or Examination (--TEST) should\
+    \ be the same for a given value of Short Name of Measurement, Test or Examination\
+    \ (--TESTCD)."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0040"
+        Version: "1"
+      Version: "1.6"

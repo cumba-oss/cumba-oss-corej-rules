@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-CG0073"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Epoch (EPOCH) variable is populated for a record\
+  \ in the Disposition (DS) dataset whose Category for Disposition Event (DSCAT) equals\
+  \ 'PROTOCOL MILESTONE'; EPOCH should not be populated for protocol milestone records."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
+    - "DSCAT"
+Check:
+  expression: >-
+    DSCAT == "PROTOCOL MILESTONE" and not empty(EPOCH)
+Outcome:
+  Message: "EPOCH is populated when DSCAT equals 'PROTOCOL MILESTONE'."
+  Output_Variables:
+  - "DSCAT"
+  - "EPOCH"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "EPOCH"
+  Condition: "DSCAT = 'PROTOCOL MILESTONE'"
+  Rule: "EPOCH = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0073"
+        Version: "2"
+      Version: "2.0"

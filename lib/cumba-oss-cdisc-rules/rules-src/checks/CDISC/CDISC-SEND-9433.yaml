@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-SEND-9433"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RSTGCD is not populated"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Requirements:
+  Variables:
+    All:
+    - "RSTGCD"
+Check:
+  expression: >-
+    empty(RSTGCD)
+Outcome:
+  Message: "RSTGCD is empty"
+  Output_Variables:
+  - "RSTGCD"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "TP"
+  Variable: "RSTGCD"
+  Plain_Text_Explanation: "RSTGCD must be populated for every record."
+  Condition: ""
+  Rule: "RSTGCD ^= null"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Required variables must always be included in the dataset\
+    \ and cannot be null for any record."
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"

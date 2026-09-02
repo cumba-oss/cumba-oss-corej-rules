@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-AD0390"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when BTOXGRHN is populated and BTOXGRH is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BTOXGRHN"
+    - "BTOXGRH"
+Check:
+  expression: >-
+    not empty(BTOXGRHN) and empty(BTOXGRH)
+Outcome:
+  Message: "BTOXGRHN is populated but BTOXGRH is not populated."
+  Output_Variables:
+  - "BTOXGRH"
+  - "BTOXGRHN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BTOXGRH"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, BTOXGRHN is populated\
+    \ and BTOXGRH is not populated"
+  Rule_Failure_Criteria: "BTOXGRH is not populated"
+  Condition_Failure: "BTOXGRHN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR390"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR390"
+        Version: "2"
+      Version: "5.0"

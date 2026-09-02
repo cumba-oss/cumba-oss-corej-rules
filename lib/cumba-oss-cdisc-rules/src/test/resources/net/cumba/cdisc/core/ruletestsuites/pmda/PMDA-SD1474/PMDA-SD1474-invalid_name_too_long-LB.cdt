@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1474 expect=violation domain=LB
+#note "is_valid_name accepts 1-8 characters only, so not is_valid_name(varname()) fires for LBTOOLONGNM (11 characters) and for nothing else. One finding per offending VARIABLE; address by variable_name, never row=."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=LBTOOLONGNM
+dataset LB
+col STUDYID     type=Char
+col DOMAIN      type=Char
+col USUBJID     type=Char
+col LBSEQ       type=Num
+col LBTOOLONGNM type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | X

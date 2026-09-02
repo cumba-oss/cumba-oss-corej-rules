@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1247 expect=violation domain=EC
+#note "ECSTAT and ECDOSTXT columns not present (both Perm/model-level) and ECDOSE=0 with ECOCCUR=Y -> ECSTAT is carried by its SURVIVING authored `not var_exists(ECSTAT) or` arm and ECDOSTXT by the bare empty(ECDOSTXT) leaf, TRUE on an absent column (absent = all-missing, EC-43); Plan B phase 4d' deleted only ECDOSTXT's presence half and the verdict is unchanged"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECOCCUR type=Char label="Occurrence"
+col ECDOSE  type=Num  label="Dose"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0
+S1 | EC | 001 | 2 | DRUG A | Y | 5

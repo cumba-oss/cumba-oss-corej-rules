@@ -1,0 +1,27 @@
+Rule_Id: "PMDA-DD0102"
+Sheet_Rule_Identifier: "DD0102"
+Rule_Set: "PMDA"
+Element: "AnnotatedCRF/DocumentRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Guidance provided by regulatory agencies states that the Annotated CRF should be provided as a PDF with the file name 'acrf.pdf'."
+# Declarative after all - no custom, no folder: scoping on the AnnotatedCRF's
+# own DocumentRef turns the reference FORWARD, so the guard's deref reaches
+# the leaf's href, whose basename must be 'acrf.pdf' (path separators / and \
+# both admitted). Fire-always not_exists vehicle on the XSD-required @leafID,
+# DD0103's precedent. Lower-case verbatim per the row (and eCTD file-naming);
+# a dangling leafID is out of reach (the deref-exists guard fails - reference
+# integrity is other rows' beat). Only the NAME is checked here - the file's
+# existence on disk is DD0084's job (every def:leaf, folder-gated).
+Message: "Invalid Annotated CRF document name"
+Check:
+  kind: "not_exists"
+  target: "@leafID"
+  when:
+    all:
+    - path: "@leafID->leaf@ID/@href"
+      exists: true
+    - not:
+        path: "@leafID->leaf@ID/@href"
+        matchesRegex: '([^/\\]*[/\\])*acrf\.pdf'

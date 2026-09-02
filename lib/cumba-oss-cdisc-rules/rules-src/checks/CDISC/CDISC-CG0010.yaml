@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0010"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the variable role specified in the Define-XML does\
+  \ not match the variable role defined in the SDTMIG (for domains in the IG) or in\
+  \ the SDTM model (for custom domains)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    not empty(var_role("LIBRARY")) and not empty(var_name("DEFINE")) and var_role("DEFINE") !=
+    var_role("LIBRARY")
+Outcome:
+  Message: "The variable role specified in the Define-XML does not match the variable\
+    \ role in the SDTMIG (for domains in the IG) or in the SDTM model (for custom\
+    \ domains)."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_role"
+  - "library_variable_role"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Metadata attribute of Variable Role = IG Role for domains in IG, Metadata\
+    \ attribute of Variable Role = Model Role for custom domains"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"

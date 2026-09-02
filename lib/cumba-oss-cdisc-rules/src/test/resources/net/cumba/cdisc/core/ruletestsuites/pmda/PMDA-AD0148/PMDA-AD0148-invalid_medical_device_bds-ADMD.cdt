@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0148 expect=violation domain=ADMD
+#note "No structure key. PARAMCD makes it BASIC DATA STRUCTURE and SPDEVID refines it to MEDICAL DEVICE BASIC DATA STRUCTURE, whose structure set is [MEDICAL DEVICE BASIC DATA STRUCTURE, BASIC DATA STRUCTURE]; ScopeMatcher matches on any token, so it satisfies this rule's single-token Include [BASIC DATA STRUCTURE] through the Fix #179 is-a relation. Fractional PARAMN fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 PARAMN=2.5
+dataset ADMD
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col PARAMN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV-01 | SYSBP | 2.5

@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0696 expect=violation domain=ADLBC
+#note "No structure= declaration; detection = PARAMCD/AVAL -> BDS, + SPDEVID -> MEDICAL DEVICE BASIC DATA STRUCTURE. Group (001,DEV01,GLUC,LAST) has $ablfl_y_count=2 (rows 1+2, both ABLFL=Y) -> failing; row 3 (blank ABLFL) is a member of the same failing group but is not itself a baseline record; group (001,DEV01,ALB,LAST) count 1 -> clean. The shipped rule carries Grouping.Variables [USUBJID, SPDEVID, PARAMCD, BASETYPE], byte-matching the CDISC-AD0696 twin (Fix #277, ruling M2-D10), so the loader derives Sensitivity GROUP and ONE violation is anchored at the group's first flagged row -> count 1 at row=1. Without that block Sensitivity derived RECORD and rows 1, 2 AND 3 all fired - two on non-duplicate records and one on a record that is not a baseline at all."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 SPDEVID=DEV01 PARAMCD=GLUC BASETYPE=LAST ABLFL=Y
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col PARAMCD  type=Char
+col BASETYPE type=Char
+col ABLFL    type=Char
+col AVAL     type=Num
+---
+S1 | 001 | DEV01 | GLUC | LAST | Y | 100
+S1 | 001 | DEV01 | GLUC | LAST | Y | 105
+S1 | 001 | DEV01 | GLUC | LAST |   | 102
+S1 | 001 | DEV01 | ALB  | LAST | Y | 30

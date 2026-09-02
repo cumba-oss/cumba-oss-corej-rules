@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1371 expect=violation domain=LB
+#note "Row 1: ORRES present-but-empty, last-obs flag Y, DRVFL empty ('' != 'Y' is TRUE - exactly the sheet's '(and --DRVFL is null)') -> fires. Row 2: derived-record exception -> clean. Row 3: ORRES populated -> clean. Row 4: LOBXFL not Y -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBORRES= LBLOBXFL=Y
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBLOBXFL type=Char
+col LBDRVFL  type=Char
+---
+S1 | LB | 001 | 1 | GLUC | | Y |
+S1 | LB | 001 | 2 | ALB  | | Y | Y
+S1 | LB | 001 | 3 | CHOL | 4.9 | Y |
+S1 | LB | 001 | 4 | HDL  | | |

@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-AD0898 expect=noViolation domain=ADAE
+#note "Every ADAE.AESEQ has a matching SDTM AE record -> no violation. Differs from the invalid sibling only by the extra AE row, so the pass is not vacuous."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Char
+col AETERM  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+CDISCPILOT01 | 01-701-1015 | 2 | NAUSEA
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2
+---

@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0122"
+Sheet_Rule_Identifier: "DD0122"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The referenced CDISC standard must be defined in a def:Standard element."
+# Scoped to ItemGroupDef/@def:StandardOID - the dataset-to-standard reference
+# (CDISC twin 124). The CodeList side is the companion row DD0125 (CT standards),
+# so the two PMDA rows split by carrier and do not double-report.
+Message: "Referenced CDISC Standard is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "StandardOID"
+  targetElement: "Standard"
+  targetKey: "OID"

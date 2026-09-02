@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1002 expect=skipped domain=DM
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. FRESH, DISCRIMINATING. DELIBERATELY NO RFENDTC COLUMN. Predicted SILENT because NonEmptyGuardInliner emitted var_exists(\"RFENDTC\") into the shipped expression. Only RFENDTC got the guard - date(RFSTDTC) wraps the LEFT operand in a call and a nested operand is outside every derivation arm. That is not a hole: with RFSTDTC absent instead, 'not empty(RFSTDTC)' would be TRUE (class E - a plain absent column does not fire empty(X)) and the comparison would then answer FALSE anyway, because Primitives.dateComparison returns 'negate' when either side is missing and negate is false for '>'. Both absences are silent, by two different routes. A fire means one of those two routes changed; escalate. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SUBJID  type=Char
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-07-01

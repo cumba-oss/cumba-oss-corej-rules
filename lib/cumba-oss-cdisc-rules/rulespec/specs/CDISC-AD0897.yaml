@@ -1,0 +1,48 @@
+name: CDISC-AD0897
+kind: rule
+description: |
+  Wave C2 port — T2-MD (Match_Datasets without Operations).
+  CDISC-AD0897: TRTA (non-empty) must equal at least one of ADSL's actual-treatment
+  variables (TRTA, TRT01A..TRT10A, TRTAG1..TRTAG9). Primary domain ADLB (BDS),
+  joined to ADSL on USUBJID. Check is `all:` of non_empty + 20 not_equal_to leaves —
+  fires when TRTA is populated and matches none of the ADSL actual-treatment cells.
+python_source: rules-adamig-1-3.json (CDISC-AD0897)
+rule:
+  coreId: CDISC-AD0897
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # row 0: TRTA matches ADSL.TRT01A for subject 001 — no violation
+    - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, TRTA: 'Drug A'}
+      # row 1: TRTA non-empty and matches none of ADSL's actual-treatment cells — violation
+    - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, TRTA: 'Mystery'}
+      # row 2: TRTA empty — guard rules out, no violation
+    - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, TRTA: ''}
+      # row 3: TRTA matches ADSL.TR01AG1 (two-digit-segment period-group var) — no violation
+    - {STUDYID: S1, USUBJID: '004', PARAMCD: HGB, AVISITN: 1, TRTA: 'Drug X'}
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', TRTA: '', TRT01A: 'Drug A', TRT02A: '', TRT03A: '', TRT04A: '', TRT05A: '', TRT06A: '', TRT07A: '', TRT08A: '', TRT09A: '', TRT10A: '', TRTAG1: '', TRTAG2: '', TRTAG3: '', TRTAG4: '', TRTAG5: '', TRTAG6: '', TRTAG7: '', TRTAG8: '', TRTAG9: '', TR01AG1: ''}
+    - {STUDYID: S1, USUBJID: '002', TRTA: '', TRT01A: 'Drug A', TRT02A: 'Drug B', TRT03A: '', TRT04A: '', TRT05A: '', TRT06A: '', TRT07A: '', TRT08A: '', TRT09A: '', TRT10A: '', TRTAG1: '', TRTAG2: '', TRTAG3: '', TRTAG4: '', TRTAG5: '', TRTAG6: '', TRTAG7: '', TRTAG8: '', TRTAG9: '', TR01AG1: ''}
+    - {STUDYID: S1, USUBJID: '003', TRTA: '', TRT01A: 'Drug A', TRT02A: '', TRT03A: '', TRT04A: '', TRT05A: '', TRT06A: '', TRT07A: '', TRT08A: '', TRT09A: '', TRT10A: '', TRTAG1: '', TRTAG2: '', TRTAG3: '', TRTAG4: '', TRTAG5: '', TRTAG6: '', TRTAG7: '', TRTAG8: '', TRTAG9: '', TR01AG1: ''}
+    - {STUDYID: S1, USUBJID: '004', TRTA: '', TRT01A: '', TRT02A: '', TRT03A: '', TRT04A: '', TRT05A: '', TRT06A: '', TRT07A: '', TRT08A: '', TRT09A: '', TRT10A: '', TRTAG1: '', TRTAG2: '', TRTAG3: '', TRTAG4: '', TRTAG5: '', TRTAG6: '', TRTAG7: '', TRTAG8: '', TRTAG9: '', TR01AG1: 'Drug X'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+    subject level analysis dataset: [ADSL]
+expected_violations:
+- rule_id: CDISC-AD0897
+  dataset: ADLB
+  row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+  status: SUCCESS
+  output_variables:
+    ADSL.TRTA:
+    TRTA: Mystery
+expected_errors: []

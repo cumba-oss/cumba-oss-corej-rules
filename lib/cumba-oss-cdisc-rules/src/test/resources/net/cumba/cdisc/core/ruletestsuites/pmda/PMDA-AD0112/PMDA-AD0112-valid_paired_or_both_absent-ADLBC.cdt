@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0112 expect=noViolation domain=ADLBC
+#note "Negative control isolating both arms at once: two rows carry ARELTM and ARELTMU together and one row leaves both blank. The rule only objects to a half-populated pair, so it executes without firing."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTM  type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 4 | HOURS
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 | 8 | HOURS
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 |   |

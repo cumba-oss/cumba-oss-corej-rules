@@ -1,0 +1,23 @@
+Rule_Id: "DEFINE-XML-0159"
+Sheet_Rule_Identifier: "159"
+Rule_Set: "CDISC"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "ItemDef which has a def:Origin element with Type = 'Collected' must have a reference to a document which corresponds to AnnotatedCRF"
+# Sheet: when Type="Collected" and Source in ("Investigator","Subject"), there
+# must be a def:DocumentRef whose leafID matches def:AnnotatedCRF/def:DocumentRef
+# (spec 2.1 SS5.3.12.3 business rule). One sheet row, two rules (the 0124/0124-B
+# split precedent): this half demands the def:DocumentRef child exist at all;
+# DEFINE-XML-0159-B adds the "matches the annotated CRF" refinement.
+Message: "ItemDef with def:Origin Type = 'Collected' and Source 'Investigator' or 'Subject' does not have a def:DocumentRef reference to a document."
+Check:
+  kind: "exists"
+  target: "def:DocumentRef"
+  when:
+    all:
+    - path: "@Type"
+      equals: "Collected"
+    - path: "@Source"
+      oneOf: ["Investigator", "Subject"]

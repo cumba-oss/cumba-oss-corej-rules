@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0887 expect=violation domain=ADPK01
+#note "FIX #154 CIRCULARITY PROOF. CDISC-AD0887 checks that EVID is present, and popPK is column-detected from BDS + a NONMEM CONTROL column (EVID or MDV) + >=3 of DV/MDV/AMT/EVID/CMT -- so a dataset missing BOTH control columns cannot be detected as popPK and the rule that reports exactly that condition could never fire. That is the same circularity Fix #140 hit on the AE signature. Here the dataset carries neither EVID nor MDV, and its sponsor name ADPK01 is outside the Fix #154 name-tier prefixes (ADPPK*/ADPPT*/ADPOPPK*), so the DECLARED tier is the only thing that can put it in scope: structure=BDS subclass=POPPK, the Define-XML def:Class/def:SubClass channel. Pair with CDISC-AD0887-skipped-ADPK01-undeclared-no-control-column.cdt, which is the identical fixture without the declaration and is SKIPPED. Neuter by deleting the structure=/subclass= attributes from the dataset line: the rule is skipped and this scenario goes red."
+# The #define block is the mandatory carrier for a structure=/subclass= declaration — see
+# README-CDT.md, "ADaM structure / subclass".
+#define standard=adamig version=1-3
+#expectViolationCount 1
+dataset ADPK01 structure=BDS subclass=POPPK
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5
+---

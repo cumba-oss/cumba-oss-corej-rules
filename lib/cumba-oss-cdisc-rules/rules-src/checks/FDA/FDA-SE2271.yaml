@@ -1,0 +1,88 @@
+Core:
+  Id: "FDA-SE2271"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a terminal body weight measurement (BWTESTCD\
+  \ equal to 'TERMBW'), the Study Day Animal Weighed (BWDY) does not equal the Study\
+  \ Day of Disposition (DSSTDY) for the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "BW"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+    - "BWTESTCD"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+- id: "$max_dsstdy"
+  expression: "max(DSSTDY, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ds_usubjid and BWTESTCD == "TERMBW" and not empty(BWDY) and not empty($max_dsstdy)
+    and BWDY != $max_dsstdy
+Outcome:
+  Message: "BWDY does not equal the Study Day of Disposition (DSSTDY) for a terminal\
+    \ body weight (BWTESTCD equal to 'TERMBW') measurement."
+  Output_Variables:
+  - "BWTESTCD"
+  - "BWDY"
+  - "$max_dsstdy"
+  - "$ds_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "--DY value when BWTESTCD = 'TERMBW' does not equal\
+    \ DSSTDY value"
+  FDA_Validator_Rule_Description: "For terminal body weight measurements (BWTESTCD/BWTEST\
+    \ = 'TERMBW'/'Terminal Body Weight'), the Study Day Animal Weighed (BWDY) variable\
+    \ value should be the same as the Study Day of Disposition (DSSTDY) variable value\
+    \ in the Disposition (DS) domain."
+  Domains: "BW"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2271"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2271"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2271"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2271"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2271"
+        Version: "1"
+      Version: "1.6"

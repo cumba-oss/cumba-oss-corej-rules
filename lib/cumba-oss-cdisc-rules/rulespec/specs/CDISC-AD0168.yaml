@@ -1,0 +1,71 @@
+name: CDISC-AD0168
+kind: rule
+description: |
+  Filter-on-max parity pin. CDISC-AD0168: when BASETYPE is present and
+  BNRIND is populated, BNRIND must equal ANRIND at the baseline record
+  (ABLFL='Y') for each (USUBJID, PARAMCD, BASETYPE) group. Operation
+  `max` on ANRIND with filter ABLFL='Y'.
+
+  Group design:
+  - 201/GLUC (discriminating): post-baseline ANRIND 'NORMAL' sorts
+    strictly above the baseline ANRIND 'HIGH'; BNRIND='HIGH'
+    everywhere. A filter-ignoring engine computes $max='NORMAL' and
+    false-fires; the fixed engine honours the filter ($='HIGH') and
+    stays quiet.
+  - 202/GLUC (violation): BNRIND='LOW' on the post-baseline row
+    differs from the baseline ANRIND 'NORMAL' -> one violation on
+    that row.
+  - 203/GLUC (no baseline): no ABLFL='Y' row, so the group's $-value
+    is missing. Both engines treat populated-vs-missing as not-equal
+    (Java ScalarSemantics ""-fold == Python truth table), so the row
+    with populated BNRIND fires; the row with empty BNRIND is blocked
+    by the non_empty guard and stays quiet.
+python_source: rules-adamig-1-3.json (CDISC-AD0168)
+rule:
+  coreId: CDISC-AD0168
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # 201/GLUC — discriminating: post ANRIND sorts above baseline ANRIND, BNRIND correct.
+      - {STUDYID: S1, USUBJID: '201', PARAMCD: GLUC, AVISITN: 0, BASETYPE: LAST, ABLFL: Y, ANRIND: HIGH, BNRIND: HIGH}
+      - {STUDYID: S1, USUBJID: '201', PARAMCD: GLUC, AVISITN: 1, BASETYPE: LAST, ABLFL: '', ANRIND: NORMAL, BNRIND: HIGH}
+      # 202/GLUC — violation: BNRIND='LOW' on the post-baseline row ≠ baseline ANRIND 'NORMAL'.
+      - {STUDYID: S1, USUBJID: '202', PARAMCD: GLUC, AVISITN: 0, BASETYPE: LAST, ABLFL: Y, ANRIND: NORMAL, BNRIND: NORMAL}
+      - {STUDYID: S1, USUBJID: '202', PARAMCD: GLUC, AVISITN: 1, BASETYPE: LAST, ABLFL: '', ANRIND: LOW, BNRIND: LOW}      # bad
+      # 203/GLUC — no ABLFL='Y' row; populated BNRIND vs missing $-value → fires.
+      - {STUDYID: S1, USUBJID: '203', PARAMCD: GLUC, AVISITN: 1, BASETYPE: LAST, ABLFL: '', ANRIND: NORMAL, BNRIND: NORMAL}   # bad (no baseline)
+      # 203/GLUC — empty BNRIND blocked by the non_empty guard → quiet.
+      - {STUDYID: S1, USUBJID: '203', PARAMCD: GLUC, AVISITN: 2, BASETYPE: LAST, ABLFL: '', ANRIND: LOW, BNRIND: ''}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0168
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: GLUC, STUDYID: S1, USUBJID: '202'}
+    status: SUCCESS
+    output_variables:
+      $baseline_anrind: 'NORMAL'
+      ABLFL:
+      ANRIND: LOW
+      BASETYPE: LAST
+      BNRIND: LOW
+      PARAMCD: GLUC
+  - rule_id: CDISC-AD0168
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: GLUC, STUDYID: S1, USUBJID: '203'}
+    status: SUCCESS
+    output_variables:
+      $baseline_anrind:
+      ABLFL:
+      ANRIND: NORMAL
+      BASETYPE: LAST
+      BNRIND: NORMAL
+      PARAMCD: GLUC
+expected_errors: []

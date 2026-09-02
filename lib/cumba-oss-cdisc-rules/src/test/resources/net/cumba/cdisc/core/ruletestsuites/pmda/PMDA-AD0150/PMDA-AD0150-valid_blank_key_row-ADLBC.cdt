@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0150 expect=noViolation domain=ADLBC
+#note "Row 3 would be a wild AVAL outlier, but its AVALC key component is BLANK, so under the shipped DROP_MISSING_KEYS default its group is discarded and it can never fire - and not empty(AVALC) is false for it anyway. This is the batch's single pin of the blank-KEY disposition (contrast PMDA-AD0109B-valid_blank_target_row, which pins the blank-TARGET one, and PMDA-AD0325-invalid_blank_aperiod_group, which pins the keep_missings=true override)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1034 | GLUC | 9 |

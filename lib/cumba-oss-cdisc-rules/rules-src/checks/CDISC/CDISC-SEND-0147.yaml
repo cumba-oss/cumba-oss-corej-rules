@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0147"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Baseline Flag (--BLFL) is populated with a value\
+  \ other than \"Y\"; --BLFL must be either \"Y\" or empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--BLFL"
+Check:
+  expression: >-
+    not empty(--BLFL) and --BLFL != "Y"
+Outcome:
+  Message: "--BLFL is populated with a value other than \"Y\"."
+  Output_Variables:
+  - "--BLFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--BLFL"
+  Plain_Text_Explanation: "--BLFL value must either be \"Y\" or null"
+  Condition: "--BLFL ^= null"
+  Rule: "--BLFL = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND147"
+        Version: "1"
+      Version: "5.0"

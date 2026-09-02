@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD1005 expect=noViolation domain=AE
+#note "Every STUDYID in $dm_studyid -> silent with execution. DM-ENTIRELY-ABSENT is the recorded carve-out (PMDA-SD1020 = bare not ds_exists(\"DM\") -> production SKIP via Fix #222, harness would fire every row) - no fixture."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+---
+STUDY01 | AE | 001 | 1 | HEADACHE
+STUDY01 | AE | 002 | 1 | NAUSEA
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+STUDY01 | DM | 001 | M
+STUDY01 | DM | 002 | F
+---

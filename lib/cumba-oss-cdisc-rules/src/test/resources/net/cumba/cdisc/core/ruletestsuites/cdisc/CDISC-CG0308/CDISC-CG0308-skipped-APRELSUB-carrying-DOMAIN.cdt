@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0308 expect=skipped domain=APRELSUB
+# Rule:Description: Raise an error when the DOMAIN value length is not equal to 2.
+#note "⚠⚠ Exists because its sibling `CDISC-CG0308-skipped-APRELSUB.cdt` became MASKED. That scenario proved the `Scope.Domains.Exclude: [APRELSUB]` entry bites by relying on it being the only filter that could reject an APRELSUB dataset — true until the `dataset_domain` migration added `Requirements.Variables.All: [DOMAIN]`, which now rejects the same dataset for a second, independent reason (the real APRELSUB carries no DOMAIN variable). Two filters that reject the same input make each other untestable, so this scenario restores an unmasked pin: a NON-CONFORMANT APRELSUB that DOES carry a DOMAIN column, so the Variables guard passes and only the Domains entry is left to reject it. Remove `APRELSUB` from the Exclude list and this goes red — `AP--` has been strict AP-plus-exactly-two since Fix #160, so it does not reach an eight-character name, the rule runs, `dataset_domain` reads the row-0 cell `APRELSUB` (8 characters) and `longer_than 2` fires."
+#library standard=sdtmig version=3-2
+dataset APRELSUB label="Associated Persons Related to Subjects"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | APRELSUB | AP-001 | 01-701-1015 | FRIEND
+CDISCPILOT01 | APRELSUB | AP-002 | 01-701-1023 | SIBLING
+---

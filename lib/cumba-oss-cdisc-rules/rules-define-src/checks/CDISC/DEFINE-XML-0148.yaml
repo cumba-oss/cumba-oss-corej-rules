@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0148"
+Sheet_Rule_Identifier: "148"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:CommentOID attribute on the ItemDef element must reference an existing def:CommentDef element."
+# Value check fires only on a present def:CommentOID (conditional presence is
+# sheet id 242).
+Message: "There is no def:CommentDef with an OID attribute that matches ItemDef/@def:CommentOID [${value}]."
+Check:
+  kind: "references"
+  attribute: "CommentOID"
+  targetElement: "CommentDef"
+  targetKey: "OID"

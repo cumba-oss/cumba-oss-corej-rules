@@ -1,0 +1,43 @@
+name: CDISC-AD0752
+kind: rule
+description: |
+  Wave B5 port — T1b PlainIntermediate.
+  CDISC-AD0752: more than one value of TRTSEQP for a given value of TRTSEQPN.
+  Bare-leaf Check (single leaf at top, not wrapped) scoped to SUBJECT LEVEL
+  ANALYSIS DATASET. Uses has_multiple_values_for — Python's DataframeType
+  lacks this operator AND Python business-rules chokes on bare leaves, so
+  this spec baselines on the Python lane; expected matches Java's output.
+python_source: rules-adamig-1-3.json (CDISC-AD0752)
+rule:
+  coreId: CDISC-AD0752
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      # TRTSEQPN=1 has two distinct TRTSEQP values (A, B) -> both rows fire
+      - {STUDYID: S1, USUBJID: '001', TRTSEQP: 'A', TRTSEQPN: '1'}
+      - {STUDYID: S1, USUBJID: '002', TRTSEQP: 'B', TRTSEQPN: '1'}
+      # TRTSEQPN=2 has only one distinct TRTSEQP -> ok
+      - {STUDYID: S1, USUBJID: '003', TRTSEQP: 'C', TRTSEQPN: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0752
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      TRTSEQP: 'A'
+      TRTSEQPN: '1'
+  - rule_id: CDISC-AD0752
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      TRTSEQP: 'B'
+      TRTSEQPN: '1'
+expected_errors: []

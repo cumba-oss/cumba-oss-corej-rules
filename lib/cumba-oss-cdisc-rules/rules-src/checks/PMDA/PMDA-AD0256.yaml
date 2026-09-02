@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0256"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Unique Subject Identifier (USUBJID)\
+  \ value in an ADaM dataset does not match any USUBJID value in the ADSL dataset;\
+  \ every subject in an ADaM dataset must be present in ADSL under the same USUBJID."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "ADSL"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$adsl_usubjid"
+  expression: "distinct(USUBJID, domain=\"ADSL\")"
+Check:
+  expression: >-
+    not empty(USUBJID) and USUBJID not in $adsl_usubjid
+Outcome:
+  Message: "USUBJID value does not exist in the ADaM ADSL dataset."
+  Output_Variables:
+  - "$adsl_usubjid"
+Source:
+  Message: "USUBJID value does not exist in the ADaM ADSL domain"
+  Description: "All subjects included into ADaM datasets should be present in ADSL\
+    \ dataset and use the same Unique Subject Identifier (USUBJID)."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0256"
+        Version: "1"
+      Version: "6.0"

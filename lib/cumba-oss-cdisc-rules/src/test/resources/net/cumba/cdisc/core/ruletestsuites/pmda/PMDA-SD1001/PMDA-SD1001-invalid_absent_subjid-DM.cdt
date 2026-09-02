@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1001 expect=violation domain=DM
+#note "DISCRIMINATING -- EC-53 / Fix #143 answer (c) at fixture level. SUBJID column is absent. GroupSemantics.uniqueSetViolations drops the ABSENT TARGET and regroups on the surviving key [STUDYID]; all three rows share STUDYID=S1, so all three are duplicates of one another and ALL THREE fire. Answer (a), pre-Fix-#143 'not applicable', would report 0; answer (b), a structural flip, is not this shape's failure mode. SUBJID is an Output_Variable and is not in the dataset, so pin count only."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001
+S1 | DM | S1-002
+S1 | DM | S1-003

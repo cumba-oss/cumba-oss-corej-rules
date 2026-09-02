@@ -1,0 +1,18 @@
+#!RuleTest
+#test DRAFT-900023 expect=noViolation domain=VS
+#note "Same define as invalid (BOGUS/BOGUS2 flagged extended) but library declares both codelists codelist_extensible=true. Extending an extensible codelist is legitimate -> silent. Intent discriminator."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 codelist_extensible=true
+#library variable-metadata VS VSLAT codelist=C99074 codelist_extensible=true
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS name=VSPOS codelist_extended_values="[\"BOGUS\"]"
+#define variable-metadata VS VSLAT name=VSLAT codelist_extended_values="[\"BOGUS2\"]"
+#define variable-metadata VS VSTESTCD name=VSTESTCD codelist_extended_values="[]"
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

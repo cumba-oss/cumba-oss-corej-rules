@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD0068 expect=violation domain=IE
+#note "Row 2 IETESTCD=EXCL99 is not among the TI criteria -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 IETESTCD=EXCL99
+dataset IE class=FINDINGS label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Inclusion/Exclusion Criterion"
+---
+S1 | IE | 001 | 1 | INCL01 | Age 18 or older
+S1 | IE | 002 | 1 | EXCL99 | Undefined criterion
+---
+
+dataset TI class="TRIAL DESIGN" label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Inclusion/Exclusion Criterion"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+---
+S1 | TI | INCL01 | Age 18 or older | INCLUSION
+S1 | TI | EXCL01 | Pregnant        | EXCLUSION

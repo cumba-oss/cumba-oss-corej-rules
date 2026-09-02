@@ -1,0 +1,124 @@
+Core:
+  Id: "PMDA-SD1299"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a dataset based on the Interventions, Events or\
+  \ Findings general observation classes does not contain at least one Timing variable."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "IE"
+    - "SC"
+Operations:
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$timing_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
+    )"
+Check:
+  expression: >-
+    not shares_elements_with($dataset_variables, $timing_variables)
+Outcome:
+  Message: "No timing variables are present in the dataset."
+  Output_Variables:
+  - "$dataset_variables"
+  - "$timing_variables"
+Source:
+  Message: "No timing variables are present in dataset"
+  Description: "All domains based on the general observation classes (Interventions,\
+    \ Events, Findings) should have at least one Timing variable present."
+  Domains: "INTERVENTIONS, FINDINGS (-IE, -SC), EVENTS, FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1299"
+        Version: "1"
+      Version: "1.6"

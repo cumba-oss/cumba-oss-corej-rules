@@ -1,0 +1,98 @@
+Core:
+  Id: "PMDA-AD0252-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error for each variable in a subject-level or device-level\
+  \ analysis dataset (ADSL or ADDL) whose name is a record-level analysis variable\
+  \ name prohibited at subject or device level - either a basic-data-structure analysis\
+  \ variable name (e.g. PARAM, AVAL, BASE) or an occurrence-data-structure variable\
+  \ name (e.g. AOCCFL, TRTEMFL, ASEV)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    varname() in ["PARAM", "PARAMCD", "PARAMN", "AVAL", "AVALC", "BASE", "BASEC", "BASETYPE",
+    "ABLFL", "CHG", "PCHG", "DTYPE", "AVISIT", "AVISITN", "ATPT", "ATPTN", "ATPTREF", "AWRANGE",
+    "AWLO", "AWHI", "AWTARGET", "AWTDIFF", "AWU", "ANRLO", "ANRHI", "ANRIND", "BNRIND", "CNSR",
+    "AOCCFL", "AOCCIFL", "AOCCPFL", "AOCCPIFL", "AOCCSFL", "AOCCSIFL", "TRTEMFL", "AETRTEM", "ASEV",
+    "ASEVN", "AREL", "ARELN", "ADURN", "ADURU", "FUPFL", "PREFL"] or varname() =~
+    /^PARCAT([1-9]|[1-9][0-9])$/ or varname() =~ /^PARCAT([1-9]|[1-9][0-9])N$/ or varname() =~
+    /^AVALCAT([1-9]|[1-9][0-9])$/ or varname() =~ /^BASECAT([1-9]|[1-9][0-9])$/ or varname() =~
+    /^CHGCAT([1-9]|[1-9][0-9])$/ or varname() =~ /^PCHGCAT([1-9]|[1-9][0-9])$/ or varname() =~
+    /^A([1-9]|[1-9][0-9])LO$/ or varname() =~ /^A([1-9]|[1-9][0-9])HI$/ or varname() =~
+    /^A([1-9]|[1-9][0-9])IND$/ or varname() =~ /^SHIFT([1-9]|[1-9][0-9])$/ or varname() =~
+    /^CRIT([1-9]|[1-9][0-9])$/ or varname() =~ /^CRIT([1-9]|[1-9][0-9])FL$/ or varname() =~
+    /^CRIT([1-9]|[1-9][0-9])FN$/ or varname() =~ /^AOCC(0[1-9]|[1-9]\\d)FL$/ or varname() =~
+    /^TRTEM[1-9]FL$/ or varname() =~ /^TREM(0[1-9]|[1-9]\\d)FL$/ or varname() =~
+    /^ADECOD([1-9]|[1-9][0-9])$/ or varname() =~ /^ACAT([1-9]|[1-9][0-9])$/ or varname() =~
+    /^ATC([1-9]|[1-9][0-9])$/ or varname() =~ /^ATC([1-9]|[1-9][0-9])CD$/ or varname() =~
+    /^SMQ(0[1-9]|[1-9]\\d)NAM$/ or varname() =~ /^SMQ(0[1-9]|[1-9]\\d)CD$/ or varname() =~
+    /^SMQ(0[1-9]|[1-9]\\d)SC$/ or varname() =~ /^SMQ(0[1-9]|[1-9]\\d)SCN$/ or varname() =~
+    /^CQ(0[1-9]|[1-9]\\d)NAM$/ or varname() =~ /^SEVGR([1-9]|[1-9][0-9])$/ or varname() =~
+    /^RELGR([1-9]|[1-9][0-9])$/ or varname() =~ /^TOXGGR([1-9]|[1-9][0-9])$/ or varname() =~
+    /^.+ORG[1-9]$/
+Outcome:
+  Message: "The variable is prohibited in the subject-level analysis dataset: its\
+    \ name is a record-level analysis variable name - a basic-data-structure variable\
+    \ name such as PARAM, AVAL, BASE, CHG or CRITy, or an occurrence-data-structure\
+    \ variable name such as AOCCFL, TRTEMFL, ASEV, AREL, the SMQzz family or AOCCzzFL."
+  Output_Variables:
+  - "variable_name"
+Source_Proposed:
+  Message: "The variable is prohibited in the subject-level analysis dataset: its\
+    \ name is a record-level analysis variable name - a basic-data-structure variable\
+    \ name such as PARAM, AVAL, BASE, CHG or CRITy, or an occurrence-data-structure\
+    \ variable name such as AOCCFL, TRTEMFL, ASEV, AREL, the SMQzz family or AOCCzzFL."
+  Description: "Raise an error for each variable in a subject-level or device-level\
+    \ analysis dataset (ADSL or ADDL) whose name is a record-level analysis variable\
+    \ name prohibited at subject or device level - either a basic-data-structure analysis\
+    \ variable name (e.g. PARAM, AVAL, BASE) or an occurrence-data-structure variable\
+    \ name (e.g. AOCCFL, TRTEMFL, ASEV)."
+  Domains: "SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET"
+  Severity: "Error"
+Source:
+  Message: "Variable present in dataset is prohibited for use in ADaM"
+  Description: "Variables described in ADaM IG as inappropriate for usage must be\
+    \ not included in the dataset. i.e., for ADAE, there is no need for AVAL, AVALC\
+    \ and Parameter variables."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"

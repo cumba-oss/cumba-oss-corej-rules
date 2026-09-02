@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0718 expect=violation domain=ADSL
+# Rule:Description: There is more than one value of TRTxxP for a given value of TRTxxPN, considering only those rows on which both variables are populated
+#note "TRT01PN=0 maps to two distinct TRT01P -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | 0
+CDISCPILOT01 | 01-701-1023 | Sugar Pill | 0
+---

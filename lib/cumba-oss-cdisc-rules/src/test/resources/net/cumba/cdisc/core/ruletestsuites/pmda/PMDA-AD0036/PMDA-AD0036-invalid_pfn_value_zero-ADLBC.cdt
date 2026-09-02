@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0036 expect=violation domain=ADLBC
+#note "Row 2's 0 is POPULATED and not in [1] -> fires. The discriminating case against PMDA-AD0006B, whose allowed set for a generic *FN is [0,1]; this rule's allowed set is [1] alone."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=SAFPFN USUBJID=01-701-1023
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFPFN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 0

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0330 expect=noViolation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of BASECAyN for a given value of BASECATy, considering only those rows on which both variables are populated
+#note "within PARAMCD=ALB, each BASECAT1 value maps to a single BASECA1N value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASECA1N type=Char
+col BASECAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | low | 1
+CDISCPILOT01 | 01-701-1023 | ALB | low | 1
+---

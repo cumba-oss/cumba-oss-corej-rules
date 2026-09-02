@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0231 expect=noViolation domain=ADSL
+#note "Every TRT01P maps to exactly one TR01PG1 while a single pooled group serves three different planned treatments -- the many-to-one direction the Source explicitly allows. A rule authored with the operands reversed would fire here."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TR01PG1 type=Char
+---
+S1 | 001 | DRUGA | POOLX
+S1 | 002 | DRUGA | POOLX
+S1 | 003 | DRUGB | POOLX
+S1 | 004 | DRUGC | POOLX

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0129.1 expect=violation domain=SE
+#note "SESTDTC declared with def:Origin Type=Derived and NO MethodOID -> a not-directly-collected SESTDTC without an explaining method -> 1 violation. Green under both rules (current: declared + no method)."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0129.1-define.xml
+#expectViolationCount 1
+#expectViolationAt variable_name=SESTDTC
+dataset SE
+col STUDYID type=Char
+col USUBJID type=Char
+col ETCD    type=Char
+col SESTDTC type=Char
+---
+S1 | S1-001 | SCRN | 2020-01-01

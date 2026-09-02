@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE0038 expect=noViolation domain=LB
+#note "LBDY is -3 / 1 / 14 on the populated rows and missing on row 4 — a missing study day is not a study day of 0 and must not be reported."
+#library standard=sendig-dart version=1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+STUDY01 | LB | 001 | 1 | ALB   | -3
+STUDY01 | LB | 001 | 2 | GLUC  | 1
+STUDY01 | LB | 001 | 3 | CREAT | 14
+STUDY01 | LB | 001 | 4 | ALT   |

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0077 expect=noViolation domain=MH
+#note "EMPTY-DATASET PIN, re-noted under PLAN-zero-row-routing-rekey.md (owner rulings Q1 / Q5 / 6c-1, Fix #349 / EC-89; policy text: lib/corej-cdisc-rules/documentation/zero-row-policy.md). MH declared with its columns, zero rows. Ruled: a rule that must READ A ROW to decide has nothing to check on an empty dataset and returns EXECUTED with zero findings -- never SKIPPED, which is reserved for an absent provider or dataset. Mechanism after the fix: not empty(MHCAT) and has_same_values(MHCAT) are both column reads (evaluation domain {ROW}), so BroadcastFold cannot decide them from the metadata and the rule evaluates the REAL 0-row table, which yields no bits. (The synthetic 1-row zero-column table the engine used to substitute here is retired.) The empty MH is reported once, by CDISC-CG0408. If this fixture ever reports SKIPPED or a finding, that is a REAL detection against the ruling, not a fixture bug."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHCAT type=Char label="Category for Medical History" format=$MHCAT.
+---

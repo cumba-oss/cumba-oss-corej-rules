@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0240"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, in a BDS dataset, there is more than one value\
+  \ of TRTAGy for a given value of TRTAGyN (y is a single-digit integer [1-9])."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TRTAGy) and not empty(TRTAGyN) and has_multiple_values_for(TRTAGy, TRTAGyN)
+Outcome:
+  Message: "There is more than one value of TRTAGy for a given value of TRTAGyN, where\
+    \ y is a single-digit integer [1-9]"
+  Output_Variables:
+  - "TRTAGy"
+  - "TRTAGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTAGy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTAGy\
+    \ for a given value of TRTAGyN, where y is a single-digit integer [1-9]"
+  Rule_Failure_Criteria: "There is more than one value of TRTAGy for a given value\
+    \ of TRTAGyN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR240"
+        Version: "1"
+      Version: "5.0"

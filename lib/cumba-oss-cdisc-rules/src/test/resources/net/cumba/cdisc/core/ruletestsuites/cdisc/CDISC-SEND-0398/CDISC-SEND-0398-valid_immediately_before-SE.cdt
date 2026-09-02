@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0398 expect=noViolation domain=SE
+#library standard=sendig version=3-1-1
+#note "Element 1 ends exactly when Element 2 starts (rows 1->2, the control) and Element 2 ends the day IMMEDIATELY BEFORE Element 3 starts (rows 2->3). Row 2 is the case the sheet's own Rule cell permits ('must immediately precede or be the same as') and the case the rule's former Outcome.Message confessed it reported in error; under relation <= it must be silent."
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+STUDY01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-02
+STUDY01 | SE | 01-701-1015 | 2 | 2014-01-02 | 2014-01-09
+STUDY01 | SE | 01-701-1015 | 3 | 2014-01-10 | 2014-07-02
+---

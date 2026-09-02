@@ -1,0 +1,15 @@
+#!RuleTest
+#test DRAFT-900024 expect=noViolation domain=VS
+#note "Library declares VSPOS codelist=C99074 codelist_extensible=false codelist_coded_values=[LEFT,RIGHT] but NO codelist_coded_codes key (the loaded library terms carry no C-codes); define declares a bogus code C88888 for VSPOS. The not empty(var_codelist_coded_codes(\"LIBRARY\")) guard excludes codelists without published term codes -> silent. Encodes the guard as intent (per the rule's ExecutabilityHint)."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C99074 codelist_extensible=false codelist_coded_values="[\"LEFT\",\"RIGHT\"]"
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLOC:Qualifier
+#define variable-metadata VS VSPOS name=VSPOS codelist_coded_codes="[\"C88888\"]"
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLOC    type=Char
+---
+001 | SYSBP | SUPINE | ARM
+---

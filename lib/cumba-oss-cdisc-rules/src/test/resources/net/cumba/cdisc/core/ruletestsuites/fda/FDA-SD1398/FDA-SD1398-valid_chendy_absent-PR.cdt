@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD1398 expect=skipped domain=PR
+#note "Absent-vs-empty boundary: the PRCHENDY column is absent from the dataset altogether, so Requirements.Variables.All gates the rule to a SKIP -> no violation (parity with the Python KeyError-skip)."
+#library standard=sendig version=ar-1-0
+dataset PR class=INTERVENTIONS label="Procedures"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PRSEQ    type=Num  label="Sequence Number"
+col PRTRT    type=Char label="Name of Procedure"
+col PRENDTC  type=Char label="End Date/Time of Procedure"
+---
+S1 | PR | 001 | 1 | BIOPSY | 2020-01-12
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2020-01-05
+---

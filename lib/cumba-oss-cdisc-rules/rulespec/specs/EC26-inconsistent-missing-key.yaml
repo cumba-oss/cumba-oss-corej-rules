@@ -1,0 +1,52 @@
+name: EC26-inconsistent-missing-key
+kind: check_operator
+description: |
+  Missing-grouping-key parity (EC-26, Fix #122; operator-examples.md D.2).
+  is_inconsistent_across_dataset DROPS a group whose key is genuinely missing:
+  the two rows with no LBTESTCD cell at all carry distinct non-blank units
+  (mg/L vs g/dL) but neither groups nor fires — Java's GroupSemantics.partition
+  excludes missing-key groups (the isBlockKeyMissing contract), and the fork
+  Python now pre-filters NaN/None grouping keys the same way (Fix #122; the
+  upstream engine instead folds them into a live "_NaN_" sentinel group that
+  would flag both rows as a tie).
+
+  ⭐⭐ RE-BASELINED by W32-E3 (owner ruling, 2026-08-12). This spec used to end:
+  'Contrast: "" is a REAL grouping key in both engines, so the two ""-key rows
+  with the same distinct units tie and BOTH fire.' That was true and is now
+  false BY RULING: Blankness.MISSING_ONLY is retired, so "" is blank wherever a
+  MissingValue is, and the ""-key group is DROPPED exactly as the missing-key
+  group already was. ⇒ expected_violations is now EMPTY.
+
+  ⚑ The fixture is deliberately UNCHANGED: it still carries a missing-key pair,
+  a ""-key pair and a populated pair, so it still discriminates. What changed is
+  that the first two now behave identically — which is the whole point of the
+  ruling. The populated ALB group is consistent and quiet, as before.
+
+  ⚠ coreJ now DIVERGES from the fork here (java-only-accepted, per the Java-first
+  direction of 2026-08-03). No baseline entry is added: the fork is being retired
+  and W37-B2 freezes the existing python-lane entries as historical.
+python_notes: |
+  Aligned since Fix #122 (fork-side pre-filter of NaN/None grouping keys,
+  mirroring the fork's own has_multiple_values_for dropna=True convention).
+  Both lanes emit exactly the two ""-key rows. No baseline entry.
+python_source: core-engine-update-status.md § Fix #122 (EC-26)
+check:
+  name: LBSTRESU
+  operator: is_inconsistent_across_dataset
+  value:
+  - LBTESTCD
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', LBSEQ: 1, LBSTRESU: 'mg/L'}                    # no LBTESTCD cell → missing key → group dropped, no fire
+    - {STUDYID: S1, USUBJID: '001', LBSEQ: 2, LBSTRESU: 'g/dL'}                    # no LBTESTCD cell → missing key → group dropped, no fire
+    - {STUDYID: S1, USUBJID: '002', LBSEQ: 1, LBTESTCD: '', LBSTRESU: 'mg/L'}      # W32-E3: ""-key group now DROPPED, no fire (was: tie → fires)
+    - {STUDYID: S1, USUBJID: '002', LBSEQ: 2, LBTESTCD: '', LBSTRESU: 'g/dL'}      # W32-E3: ""-key group now DROPPED, no fire
+    - {STUDYID: S1, USUBJID: '003', LBSEQ: 1, LBTESTCD: 'ALB', LBSTRESU: 'x'}      # ALB → {x} consistent → no fire
+    - {STUDYID: S1, USUBJID: '003', LBSEQ: 2, LBTESTCD: 'ALB', LBSTRESU: 'x'}      # ALB consistent → no fire
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations: []
+expected_errors: []

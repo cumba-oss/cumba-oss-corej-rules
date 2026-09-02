@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-AD0714"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable ending in GRyN has more than one value\
+  \ for a given value of the variable with the same root ending in GRy, considering\
+  \ only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*GRyN) and not empty(*GRy) and has_multiple_values_for(*GRyN, *GRy)
+Outcome:
+  Message: "The variable ending in GRyN has more than one value for the corresponding\
+    \ GRy variable's value, among rows where both are populated"
+  Output_Variables:
+  - "*GRy"
+  - "*GRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of a variable\
+    \ which has a suffix of GRyN for a given value of a variable with the same root\
+    \ name and suffix of GRy, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of a variable which has a suffix\
+    \ of GRyN for a given value of a variable with the same root name and suffix of\
+    \ GRy"
+  Condition_Failure: "Considering only those rows on which both *GRyN and *GRy are\
+    \ populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR714"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR714"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR714"
+        Version: "1"
+      Version: "5.0"

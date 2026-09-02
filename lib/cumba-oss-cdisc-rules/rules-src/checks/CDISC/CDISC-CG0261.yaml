@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0261"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the overflow Parameter Value column (TSVAL1) is\
+  \ populated but the Parameter Value (TSVAL) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVAL1"
+Check:
+  expression: >-
+    not empty(TSVAL1) and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty when TSVAL1 is populated."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVAL1"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSVAL1 ^= null"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0261"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0261"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0261"
+        Version: "1"
+      Version: "2.0"

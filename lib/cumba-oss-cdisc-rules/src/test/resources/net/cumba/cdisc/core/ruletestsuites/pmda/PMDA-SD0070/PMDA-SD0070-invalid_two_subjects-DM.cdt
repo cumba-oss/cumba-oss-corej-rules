@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD0070 expect=violation domain=DM
+#note "Two treated subjects (001, 002) have no EX record. Sensitivity is Group over USUBJID, so each subject must yield its own finding -> exactly two violations, not one collapsed dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=002
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | A | Drug A | A | Drug A
+S1 | DM | 002 | B | Drug B | B | Drug B
+S1 | DM | 003 | A | Drug A | A | Drug A
+---
+
+dataset EX label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+---
+S1 | EX | 003 | 1 | DRUG A
+---

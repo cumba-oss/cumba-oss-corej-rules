@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1282 expect=violation domain=PC
+#note "PCTPTREF is present while PCELTM, PCTPTNUM and PCTPT are all absent -> the anchor has nothing to anchor -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUGA | DOSE ADMINISTRATION
+---

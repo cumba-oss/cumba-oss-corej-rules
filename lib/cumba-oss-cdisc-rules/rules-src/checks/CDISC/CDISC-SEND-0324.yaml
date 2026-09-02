@@ -1,0 +1,74 @@
+Core:
+  Id: "CDISC-SEND-0324"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pharmacokinetic Concentrations (PC) result is\
+  \ quantifiably outside the limit of quantitation - PCORRES below PCLLOQ, or above\
+  \ PCULOQ where provided - but PCSTRESC does not carry the matching 'BLQ' or 'ALQ'\
+  \ token."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Out-of-range detection is only possible for numerically comparable results:\
+    \ a textual PCORRES (e.g. a literal 'BLQ') or a missing limit skips the row, so\
+    \ token omissions on non-numeric results are not reported. The above-limit branch\
+    \ requires the model-permissible PCULOQ (SDTM model 1.4+), which no SENDIG version\
+    \ enumerates in PC; without it only the below-limit half runs. Token comparison\
+    \ is exact ('BLQ'/'ALQ' per controlled terminology)."
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCORRES"
+    - "PCSTRESC"
+Check:
+  expression: >-
+    var_exists("PCLLOQ") and PCORRES < PCLLOQ and PCSTRESC != "BLQ" or var_exists("PCULOQ") and
+    PCORRES > PCULOQ and PCSTRESC != "ALQ"
+Outcome:
+  Message: "PCORRES is outside the limit of quantitation but PCSTRESC does not carry\
+    \ the matching 'BLQ'/'ALQ' token."
+  Output_Variables:
+  - "PCSTRESC"
+  - "PCORRES"
+  - "PCLLOQ"
+  - "PCULOQ"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCSTRESC"
+  Plain_Text_Explanation: "For results outside the Limit of Quantitation PCSTRESC\
+    \ should be populated with \"BLQ\" for results below the limit or PCSTRESC should\
+    \ be populated with \"ALQ\" for results above the limit."
+  Condition: "Result is outside the Limit of Quantification"
+  Rule: "PCSTRESC = \"BLQ\" or PCSTRESC = \"ALQ\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"

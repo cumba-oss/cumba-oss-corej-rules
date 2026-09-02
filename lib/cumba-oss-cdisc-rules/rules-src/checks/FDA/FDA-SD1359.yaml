@@ -1,0 +1,74 @@
+Core:
+  Id: "FDA-SD1359"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ variable is empty while the Planned Arm Code (ARMCD) or the Description of Planned\
+  \ Arm (ARM) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    (empty(ARMCD) or empty(ARM)) and empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is not populated, when ARMCD or ARM is empty."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+  - "ARMNRS"
+Source:
+  FDA_Validator_Rule_Message: "ARMNRS is not populated when ARMCD/ARM are not provided"
+  FDA_Validator_Rule_Description: "When Planned Arm Code (ARMCD)/Description of Planned\
+    \ Arm (ARM) are not populated, the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+    \ variable must be populated with the reason ARMCD/ARM are null."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1359"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1359"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0517"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0519"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0517"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0519"
+        Version: "1"
+      Version: "2.0"

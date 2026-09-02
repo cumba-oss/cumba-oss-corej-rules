@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0281B expect=noViolation domain=ADAE
+#note "AESEVN not declared at all. not empty(AESEVN) folds to broadcast FALSE on the absent column (BroadcastFold), and the operator's own absent-column fast path also returns an empty BitSet -> the rule EXECUTES and reports nothing. Pins that the second guard costs nothing (AD0281B-F2), same shape as the shipped base pmda/PMDA-AD0281/PMDA-AD0281-valid_no_aesevn_column-ADAE.cdt."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | MILD
+CDISCPILOT01 | 01-701-1034 | 2 | RASH     | SEVERE

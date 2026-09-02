@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0254"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one SUPP-- record exists for the same\
+  \ combination of related domain (RDOMAIN), subject or pool (USUBJID/POOLID), identifying\
+  \ variable and value (IDVAR/IDVARVAL), and qualifier name (QNAM); a SUPP-- dataset\
+  \ expects one record per IDVAR, IDVARVAL, and QNAM value per subject or pool per\
+  \ related domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Check:
+  expression: >-
+    not is_unique_set([RDOMAIN, USUBJID, POOLID, IDVAR, IDVARVAL, QNAM])
+Outcome:
+  Message: "More than one SUPP-- record exists for the same RDOMAIN, USUBJID/POOLID,\
+    \ IDVAR, IDVARVAL, and QNAM."
+  Output_Variables:
+  - "RDOMAIN"
+  - "POOLID"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "QNAM"
+Source:
+  Class: "REL"
+  Domain: "SUPP"
+  Variable: "IDVAR, IDVARVAL, RDOMAIN, USUBJID, POOLID, QNAM"
+  Plain_Text_Explanation: "One record per IDVAR, IDVARVAL, and QNAM value per subject\
+    \ (or pool) per related domain"
+  Condition: "IDVAR, IDVARVAL, RDOMAIN, and USUBJID (or POOLID) are the same"
+  Rule: "There should only be one record in a SUPP-- dataset with the same QNAM value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND254"
+        Version: "1"
+      Version: "5.0"

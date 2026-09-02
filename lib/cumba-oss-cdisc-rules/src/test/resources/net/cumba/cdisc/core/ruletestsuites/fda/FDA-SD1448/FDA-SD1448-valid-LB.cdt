@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1448 expect=noViolation domain=LB
+#note "Rows 1/2 carry numeric LBSTRESC values with a matching LBSTRESN; rows 3/4 carry non-numeric LBSTRESC values ('BLQ', 'POSITIVE') and correctly leave LBSTRESN missing."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | 40       | 40
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | -1.5     | -1.5
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREA | BLQ      |
+CDISCPILOT01 | LB | 01-701-1015 | 4 | HIV  | POSITIVE |

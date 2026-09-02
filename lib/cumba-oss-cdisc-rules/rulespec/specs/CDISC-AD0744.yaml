@@ -1,0 +1,96 @@
+name: CDISC-AD0744
+kind: rule
+description: |
+  Wave C1 port — T2-Op (Operations without Match_Datasets).
+  CDISC-AD0744: BDS — when BASETYPE is populated and BTOXGR is populated,
+  BTOXGR must equal ATOXGR at the baseline record (ABLFL='Y') for each
+  (USUBJID, PARAMCD, BASETYPE) group.
+  Uses Operation `max` on ATOXGR with filter ABLFL='Y', grouped by
+  (USUBJID, PARAMCD, BASETYPE).
+
+  The data now exercises the filter discriminatingly (the Python engine
+  honours `filter` on `max`, matching Java) via four group kinds:
+  - Subject 001: post-baseline ATOXGR ('GRADE 3') is strictly greater
+    (lexicographically) than the ABLFL='Y' row's ATOXGR ('GRADE 2')
+    while BTOXGR='GRADE 2' everywhere → no violation. An engine that
+    maxes over ALL rows (ignoring the filter) would falsely fire here —
+    this is the regression trap.
+  - Subject 002: BTOXGR ('GRADE 1') differs from the baseline ATOXGR
+    ('GRADE 3') on a post-baseline row → genuine violation.
+  - Subject 003: no ABLFL='Y' row at all but BTOXGR populated → the
+    $-operation value is MISSING for the group, and `not_equal_to`
+    against a missing value FIRES on every row whose BTOXGR is
+    populated (Python: populated-vs-null is True; Java folds the null
+    target to "") → violations on both rows. Semantically right: a
+    populated BTOXGR with no baseline record to derive it from is a
+    violation.
+  - Subject 004: no ABLFL='Y' row and BTOXGR empty → the `non_empty`
+    guard blocks the check → no violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0744)
+rule:
+  coreId: CDISC-AD0744
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, BASETYPE, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # Subject 001 HGB PRE — DISCRIMINATING: post-baseline ATOXGR='GRADE 3'
+      # exceeds the ABLFL=Y row's ATOXGR='GRADE 2'; BTOXGR='GRADE 2'
+      # everywhere → no violation (an unfiltered max would compute
+      # 'GRADE 3' and fire falsely).
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 0, ABLFL: Y, ATOXGR: GRADE 2, BTOXGR: GRADE 2}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1, ABLFL: '', ATOXGR: GRADE 3, BTOXGR: GRADE 2}
+      # Subject 002 HGB PRE — genuine violation: baseline ATOXGR='GRADE 3'
+      # but BTOXGR='GRADE 1' on the post-baseline row.
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 0, ABLFL: Y, ATOXGR: GRADE 3, BTOXGR: GRADE 3}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1, ABLFL: '', ATOXGR: GRADE 2, BTOXGR: GRADE 1}       # bad
+      # Subject 003 HGB PRE — no ABLFL=Y row but BTOXGR populated.
+      # $baseline_atoxgr is missing for the group → not_equal_to fires on
+      # BOTH rows.
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1, ABLFL: '', ATOXGR: GRADE 4, BTOXGR: GRADE 0}       # bad
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 2, ABLFL: '', ATOXGR: GRADE 1, BTOXGR: GRADE 0}       # bad
+      # Subject 004 HGB PRE — no ABLFL=Y row and BTOXGR empty → non_empty
+      # guard blocks the check → quiet.
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1, ABLFL: '', ATOXGR: GRADE 2, BTOXGR: ''}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0744
+    dataset: ADLB
+    row_key: {AVISITN: 1, BASETYPE: PRE, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $baseline_atoxgr: 'GRADE 3'
+      ABLFL:
+      ATOXGR: GRADE 2
+      BASETYPE: PRE
+      BTOXGR: GRADE 1
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0744
+    dataset: ADLB
+    row_key: {AVISITN: 1, BASETYPE: PRE, PARAMCD: HGB, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $baseline_atoxgr:
+      ABLFL:
+      ATOXGR: GRADE 4
+      BASETYPE: PRE
+      BTOXGR: GRADE 0
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0744
+    dataset: ADLB
+    row_key: {AVISITN: 2, BASETYPE: PRE, PARAMCD: HGB, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $baseline_atoxgr:
+      ABLFL:
+      ATOXGR: GRADE 1
+      BASETYPE: PRE
+      BTOXGR: GRADE 0
+      PARAMCD: HGB
+expected_errors: []

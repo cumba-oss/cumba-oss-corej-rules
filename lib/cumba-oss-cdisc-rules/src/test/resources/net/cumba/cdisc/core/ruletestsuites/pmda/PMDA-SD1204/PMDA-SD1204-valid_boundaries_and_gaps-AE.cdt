@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1204 expect=noViolation domain=AE
+#note "Row 1: boundary-equal AEENDTC -> clean. Row 2: AEENDTC before RFPENDTC -> clean. Row 3: empty AEENDTC -> clean. Row 4: subject 002 with a late AEENDTC whose RFPENDTC is empty -> saturation - the SD1203-F1 equivalence row for this rule."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEENDTC type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-06-30
+S1 | AE | 001 | 2 | NAUSEA   | 2020-03-15
+S1 | AE | 001 | 3 | FATIGUE  |
+S1 | AE | 002 | 1 | HEADACHE | 2021-01-01
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30
+S1 | DM | 002 |

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1287 expect=skipped domain=AE
+#note "No AEPTCD column at all. PMDA's Requirements.Variables.All [--PTCD, --DECOD] rejects -> SKIP. Twin discriminator: FDA-SD1287 (gates only --DECOD) would execute here and report nothing (its var_exists conjunct folds false)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDECOD type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE  | Headache
+S1 | AE | 002 | 1 | HEAD ACHE | Cephalalgia

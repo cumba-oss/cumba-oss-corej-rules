@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE0070 expect=violation domain=DM
+#note "Boundary: the EX dataset is absent from the study altogether, so the distinct operation resolves to an empty membership set and every ARMCD-populated subject fires. Documents that the sheet's qualifier 'participating in a study that includes investigational product' is not modelled by the Check; row 3 (ARMCD empty) is still guarded out."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=00A1
+#expectViolationAt row=2 USUBJID=00A2
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col SETCD   type=Char label="Set Code"
+---
+STUDY01 | DM | 00A1 | A1 | M | 1 | S1
+STUDY01 | DM | 00A2 | A2 | F | 2 | S2
+STUDY01 | DM | 00A3 | A3 | M |   | S3
+---

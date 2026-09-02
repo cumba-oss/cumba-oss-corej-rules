@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD0072"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Domain Abbreviation (RDOMAIN) is populated\
+  \ but does not represent a domain present in the study data."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "RELREC"
+    - "SUPP--"
+    - "SQ--"
+Operations:
+- id: "$study_domains"
+  expression: "study_domains()"
+Check:
+  expression: >-
+    not empty(RDOMAIN) and RDOMAIN not in $study_domains
+Outcome:
+  Message: "RDOMAIN does not represent a domain present in the study."
+  Output_Variables:
+  - "RDOMAIN"
+  - "$study_domains"
+Source:
+  Message: "Invalid RDOMAIN"
+  Description: "Related Domain Abbreviation (RDOMAIN) must have a valid value of Domains\
+    \ included in the study data."
+  Domains: "CO, RELREC, SUPPQUAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0072"
+        Version: "1"
+      Version: "1.6"

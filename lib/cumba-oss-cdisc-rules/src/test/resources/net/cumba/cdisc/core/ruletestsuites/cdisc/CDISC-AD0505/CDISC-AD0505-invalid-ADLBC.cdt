@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0505 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in DTM must contain "Datetime" in the label
+#note "ADTM label "Analysis Foo" lacks "Datetime" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Foo" variable_name=ADTM
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM type=Char label="Analysis Foo"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

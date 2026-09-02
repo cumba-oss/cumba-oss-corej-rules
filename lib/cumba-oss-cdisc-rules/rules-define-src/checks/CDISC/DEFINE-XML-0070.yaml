@@ -1,0 +1,26 @@
+Rule_Id: "DEFINE-XML-0070"
+Sheet_Rule_Identifier: "70"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "KeySequence"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "There must be at least one KeySequence attribute value in ItemGroupDef/ItemRef in the context of a submission."
+# Sheet: "count(//ItemGroupDef[@OID]/ItemRef/@KeySequence) must be >= 1 when
+# ODM/@def:Context='Submission'" — a per-ItemGroupDef aggregate the exists kind
+# cannot target ("exists ItemRef/@KeySequence" is not in the target grammar).
+# Encoded with the 0124-B fire-always vehicle: the guard states the violation
+# (Submission context, no ItemRef carries a KeySequence) and demands @OID be
+# present, so the not_exists check fires exactly once per keyless dataset.
+Message: "There must be at least one ItemRef with a KeySequence attribute in the ItemGroupDef when ODM def:Context='Submission'."
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - path: "ItemRef/@KeySequence"
+      exists: false
+    - path: "@OID"
+      exists: true

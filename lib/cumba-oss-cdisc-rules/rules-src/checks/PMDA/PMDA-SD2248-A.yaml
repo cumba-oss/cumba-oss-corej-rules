@@ -1,0 +1,123 @@
+Core:
+  Id: "PMDA-SD2248-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL does not contain at least a complete (full)\
+  \ date in ISO 8601 format for a record where TSPARMCD equals 'SENDTC' (Study End\
+  \ Date)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    TSPARMCD == "SENDTC" and not is_complete_date_part(TSVAL)
+Outcome:
+  Message: "TSVAL is an incomplete date for TSPARMCD equal to 'SENDTC' (Study End\
+    \ Date); it must be in ISO 8601 format and include at least the full date."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source_Proposed:
+  Sheet_Issue: "#106"
+  Message: "TSVAL is an incomplete date for TSPARMCD equal to 'SENDTC' (Study End\
+    \ Date); it must be in ISO 8601 format and include at least the full date."
+  Description: "TSVAL does not contain at least a complete (full) date in ISO 8601\
+    \ format for a record where TSPARMCD equals 'SENDTC' (Study End Date)."
+  Domains: "TS"
+  Severity: "Error"
+Source:
+  Message: "Invalid TSVAL value for SENDTC"
+  Description: "TSVAL variable value must be in ISO 8601 format when TSPARMCD='SENDTC'."
+  Domains: "TS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2248"
+        Version: "1"
+      Version: "1.6"

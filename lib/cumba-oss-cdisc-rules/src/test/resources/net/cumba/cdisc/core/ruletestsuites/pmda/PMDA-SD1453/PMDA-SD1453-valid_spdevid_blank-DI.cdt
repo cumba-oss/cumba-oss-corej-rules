@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1453 expect=noViolation domain=DI
+#note "FRESH, DISCRIMINATING. No class= on the dataset line — the twin declares none. The two rows share the tuple (DISEQ=1, DOMAIN=DI, SPDEVID=\"\") and — since EC-53 / Fix #143 made \"\" a REAL key component — the uniqueness leaf alone WOULD report both. They stay silent only because the author's not empty(SPDEVID) conjunct gates each row first. Pins the guard as load-bearing rather than decorative, on the one operator where the empty-key contract changed. If it fires, either the guard or the EC-53 contract moved — escalate, do not rewrite."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset DI
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Identifier Element Code"
+col DIPARM   type=Char label="Device Identifier Element Name"
+col DIVAL    type=Char label="Device Identifier Element Value"
+---
+S1 | DI |  | 1 | DEVTYPE | Device Type  | PUMP
+S1 | DI |  | 1 | MANUF   | Manufacturer | ACME

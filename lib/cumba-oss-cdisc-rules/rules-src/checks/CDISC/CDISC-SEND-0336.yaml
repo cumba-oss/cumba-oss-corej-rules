@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0336"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Cardiovascular (CV) record exists\
+  \ for the same combination of Test Short Name (CVTESTCD), Unique Subject Identifier\
+  \ (USUBJID), and timing (observation time CVDTC, nominal day CVNOMDY, planned time\
+  \ point CVTPT/CVTPTNUM, or evaluation interval CVSTINT/CVENINT/CVEVLINT); the domain\
+  \ should hold one record per test per observation time or evaluation interval per\
+  \ subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "CV"
+Check:
+  expression: >-
+    not is_unique_set([CVTESTCD, USUBJID, CVDTC, CVNOMDY, CVTPT, CVTPTNUM, CVSTINT, CVENINT,
+    CVEVLINT])
+Outcome:
+  Message: "More than one CV record exists for the same test (CVTESTCD), subject (USUBJID),\
+    \ and observation time or evaluation interval (CVDTC/CVNOMDY/CVTPT/CVTPTNUM/CVSTINT/CVENINT/CVEVLINT)."
+  Output_Variables:
+  - "CVTESTCD"
+  - "CVDTC"
+  - "CVSTINT"
+  - "CVENINT"
+Source:
+  Class: "FND"
+  Domain: "CV"
+  Variable: "ALL"
+  Plain_Text_Explanation: "cv.xpt, Cardiovascular Findings. One record per test per\
+    \ observation time or evaluation interval per subject, Tabulation."
+  Rule: "cv.xpt, Cardiovascular Findings. One record per test per observation time\
+    \ or evaluation interval per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND336"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND336"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND336"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND336"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND336"
+        Version: "1"
+      Version: "5.0"

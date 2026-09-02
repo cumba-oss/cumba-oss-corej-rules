@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-AD0650"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an On Treatment Record w Flag (ONTRTwFL) variable\
+  \ is flagged Y on a record but the overall On Treatment Record Flag (ONTRTFL) variable\
+  \ is not Y on that same record; when any ONTRTwFL is Y, ONTRTFL must also be Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ONTRTFL"
+Check:
+  expression: >-
+    varname() =~ /^ONTRT[1-9]FL$/ and value() == "Y" and ONTRTFL != "Y"
+Outcome:
+  Message: "An ONTRTwFL variable is Y but the overall ONTRTFL is not Y on the same\
+    \ record."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+  - "ONTRTFL"
+Source:
+  Message: "ONTRTwFL = Y and ONTRTFL != Y"
+  Description: "If ONTRTwFL is included, ONTRTFL is defined as the overall on-treatment\
+    \ flag. If any On Treatment Record w Flag (ONTRTwFL) variables are flagged Y,\
+    \ then the overall On Treatment Record Flag (ONTRTFL) variable should also be\
+    \ Y."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0650"
+        Version: "1"
+      Version: "6.0"

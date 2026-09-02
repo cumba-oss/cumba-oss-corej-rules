@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-AD0127"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD for a subject,\
+  \ BASE is populated and no record has ABLFL equal to Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Grouping:
+  Variables:
+  - "USUBJID"
+  - "PARAMCD"
+Operations:
+- id: "$ablfl_y_count"
+  expression: "record_count(ABLFL, group=[USUBJID, PARAMCD], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    not empty(BASE) and $ablfl_y_count == 0
+Outcome:
+  Message: "BASE is populated for this subject and PARAMCD, but no record has ABLFL\
+    \ equal to Y."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "ABLFL"
+  - "$ablfl_y_count"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "ABLFL"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject,\
+    \ BASE is populated and there is not at least one record with ABLFL equal to Y"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject there is not\
+    \ at least one record with ABLFL equal to Y"
+  Condition_Failure: "BASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR127"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR127"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR127"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR127"
+        Version: "1"
+      Version: "5.0"

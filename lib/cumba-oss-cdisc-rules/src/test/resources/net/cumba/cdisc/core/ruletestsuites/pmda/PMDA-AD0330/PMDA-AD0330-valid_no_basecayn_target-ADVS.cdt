@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0330 expect=noViolation domain=ADVS
+#note "BASECA1N is not declared. The absent column is the TARGET here, so the operator short-circuits to no violations while the guard not empty(BASECAT1) stays true: EXECUTED and silent. Mirror of AD0329's degraded-key fixture."
+#library standard=adamig version=1-3
+dataset ADVS class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASECAT1 type=Char
+---
+S1 | 001 | SYSBP | NORMAL
+S1 | 002 | SYSBP | NORMAL
+S1 | 003 | SYSBP | HIGH

@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1284 expect=violation domain=PR
+#note "PRPORTOT is present while PRLOC is absent -> Portion or Totality without a Location -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset PR class=INTERVENTIONS label="Procedures"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PRSEQ    type=Num  label="Sequence Number"
+col PRTRT    type=Char label="Reported Name of Procedure"
+col PRPORTOT type=Char label="Portion or Totality"
+---
+CDISCPILOT01 | PR | 01-701-1015 | 1 | BIOPSY | ENTIRE
+---

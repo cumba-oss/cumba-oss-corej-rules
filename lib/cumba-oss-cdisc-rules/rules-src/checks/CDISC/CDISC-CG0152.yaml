@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0152"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ELEMENT is populated and ETCD is equal to 'UNPLAN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "ELEMENT"
+    - "ETCD"
+Check:
+  expression: >-
+    ETCD == "UNPLAN" and not empty(ELEMENT)
+Outcome:
+  Message: "ELEMENT is populated when ETCD is equal to 'UNPLAN'."
+  Output_Variables:
+  - "ETCD"
+  - "ELEMENT"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "ELEMENT"
+  Condition: "ETCD = 'UNPLAN'"
+  Rule: "ELEMENT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0152"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0152"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0152"
+        Version: "1"
+      Version: "2.0"

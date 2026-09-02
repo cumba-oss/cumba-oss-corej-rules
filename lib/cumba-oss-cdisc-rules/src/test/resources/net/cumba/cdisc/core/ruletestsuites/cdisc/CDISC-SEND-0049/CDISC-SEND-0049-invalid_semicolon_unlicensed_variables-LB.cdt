@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=violation domain=LB
+#note "O-8 (Fix #339): the semicolon carve-out is an ALLOW-LIST (--LAT, --DIR, --PORTOT, MISTRESC, TFSTRESC, EGSTRESC), not SEND57.1's literal ALL. Every value here is a semicolon-joined pair of LAWFUL terms of the variable's own codelist - exactly the shape the Fix #329 carve-out silenced on all 178 pairs - on three unlicensed classes: a flag (LBBLFL = Y;N, codelist NY), a unit (LBORRESU = g/L;mg/dL, codelist UNIT) and a test code (LBTESTCD = ALT;AST, codelist LBTESTCD). All three report. Row 2 is the licensed discriminator in the same dataset: LBLAT = LEFT;RIGHT stays silent, so a scenario with four findings has lost the allow-list and one with fewer than three has widened it. Sheet issue #152."
+#library standard=sendig version=3-1-1
+#library variable-metadata LB LBBLFL codelist=NY codelist_extensible=false codelist_coded_values="[\"Y\",\"N\"]"
+#library variable-metadata LB LBORRESU codelist=UNIT codelist_extensible=true codelist_coded_values="[\"g/L\",\"mg/dL\",\"mmol/L\"]"
+#library variable-metadata LB LBTESTCD codelist=LBTESTCD codelist_extensible=true codelist_coded_values="[\"ALT\",\"AST\",\"GLUC\"]"
+#library variable-metadata LB LBLAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#expectViolationCount 3
+#expectViolationAt variable_name=LBBLFL variable_value=Y;N
+#expectViolationAt variable_name=LBORRESU variable_value=g/L;mg/dL
+#expectViolationAt variable_name=LBTESTCD variable_value=ALT;AST
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRESU type=Char label="Original Units"
+col LBBLFL   type=Char label="Baseline Flag"
+col LBLAT    type=Char label="Laterality"
+---
+S1 | LB | 001 | 1 | ALT;AST | g/L;mg/dL | Y;N | LEFT
+S1 | LB | 001 | 2 | GLUC    | mmol/L    | Y   | LEFT;RIGHT

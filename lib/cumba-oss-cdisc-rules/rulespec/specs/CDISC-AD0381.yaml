@@ -1,0 +1,44 @@
+name: CDISC-AD0381
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0381: Within a parameter, there is more than one value of BTOXGR for a given value of BTOXGRN.
+  Bare-leaf Check (`has_multiple_values_for` with `within: PARAMCD`) scoped to BASIC DATA STRUCTURE.
+  Two rows share PARAMCD=HGB and BTOXGRN='1' but have distinct BTOXGR; both fire. A third row has unique BTOXGRN.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0381)
+rule:
+  coreId: CDISC-AD0381
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, BTOXGR: MILD, BTOXGRN: '1'}           # bad
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, BTOXGR: MODERATE, BTOXGRN: '1'}       # bad (distinct BTOXGR for same BTOXGRN within PARAMCD)
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, BTOXGR: SEVERE, BTOXGRN: '2'}         # ok  (unique BTOXGRN)
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0381
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      BTOXGR: MILD
+      BTOXGRN: '1'
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0381
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      BTOXGR: MODERATE
+      BTOXGRN: '1'
+      PARAMCD: HGB
+expected_errors: []

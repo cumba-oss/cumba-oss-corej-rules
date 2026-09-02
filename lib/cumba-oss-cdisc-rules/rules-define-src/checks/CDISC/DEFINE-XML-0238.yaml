@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0238"
+Sheet_Rule_Identifier: "238"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute OrderNumber must be provided for the ItemRef element when there is at least one OrderNumber attribute value provided for the same parent def:ValueListDef or def:ItemGroupDef."
+# All-or-none per parent: the guard asks whether ANY sibling ItemRef (self
+# included) carries an OrderNumber — an ItemRef that has one passes the exists
+# check trivially, so only the have-nots in a mixed parent fire. Scoped to bare
+# ItemRef: the rule text names both ItemGroupDef and def:ValueListDef parents.
+Message: "Attribute OrderNumber is missing for element ItemRef. The OrderNumber attribute must be provided for all or none of the ItemRef elements in the parent element."
+Check:
+  kind: "exists"
+  target: "@OrderNumber"
+  when:
+    path: "../ItemRef/@OrderNumber"
+    exists: true

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1463 expect=noViolation domain=AE
+#note "Row 1: codes equal -- no fire. Row 2: BDSYCD missing -- no fire. Row 3: SOCCD missing -- no fire."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEDECOD  type=Char
+col AEBDSYCD type=Num
+col AESOCCD  type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | 10029205 | 10029205
+S1 | AE | 001 | 2 | NAUSEA   |          | 10029205
+S1 | AE | 001 | 3 | RASH     | 10029205 |

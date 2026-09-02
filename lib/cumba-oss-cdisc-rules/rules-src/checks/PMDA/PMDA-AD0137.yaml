@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0137"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Criterion Flag (CRITyFL) is populated\
+  \ but its corresponding parent Analysis Criterion (CRITy) is empty; whenever CRITyFL\
+  \ is populated the Analysis Criterion text CRITy must also be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(CRITyFL) and empty(CRITy)
+Outcome:
+  Message: "CRITyFL is populated, but CRITy is not populated"
+  Output_Variables:
+  - "CRITy"
+  - "CRITyFL"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "CRITyFL is populated, but CRITy is not populated"
+  Description: "When CRITyFL (Analysis Criterion Flag) is populated, it's corresponding\
+    \ parent Analysis Criterion y must be populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0137"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0137"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0137"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0137"
+        Version: "1"
+      Version: "6.0"

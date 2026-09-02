@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1125 expect=noViolation domain=VS
+#note "THE B-TARGETING DISCRIMINATOR: the absent target takes the O(1) fast path - the rule EXECUTES and reports noViolation. (The FDA twin's Requirements.Variables [--ELTM, --TPT] would SKIP this dataset; PMDA has no Variables gate.)"
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VISITNUM type=Num
+col VSTPTREF type=Char
+col VSTPT    type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | POST1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | POST1H

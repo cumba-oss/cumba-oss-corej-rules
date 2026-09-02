@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0134B expect=violation domain=ADLBC
+#note "Row 1 has a present-but-BLANK A1HI, so the empty(AyHI) disjunct fires; row 2 is fully populated. This is the disjunct AD0133B's fixtures do NOT isolate -- there the blank case was pinned on AVAL. A1HI not pinned: it is blank on the firing row."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 AVAL=2.5 R2A1HI=1.25
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col A1HI     type=Num
+col R2A1HI   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 |  | 1.25
+CDISCPILOT01 | 01-701-1023 | ALT | 2.5 | 2.0 | 1.25

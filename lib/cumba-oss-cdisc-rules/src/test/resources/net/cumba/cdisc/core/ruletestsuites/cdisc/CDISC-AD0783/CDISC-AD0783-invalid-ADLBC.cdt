@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0783 expect=violation domain=ADLBC
+# Rule:Description: There is more than one value of ATOXGR for a given value of ATOXGRN, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ATOXGR type=Char
+col ATOXGRN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Grade 1 | 1
+CDISCPILOT01 | 01-701-1015 | Mild | 1
+CDISCPILOT01 | 01-701-1015 | Grade 2 | 2
+---

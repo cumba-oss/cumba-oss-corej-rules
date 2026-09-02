@@ -1,0 +1,52 @@
+Core:
+  Id: "FDA-SE2280-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pharmacokinetic Concentrations (PC) record carries\
+  \ a Planned Elapsed Time from Time Point Reference (PCELTM) but PCDTC (specimen\
+  \ collection) or PCRFTDTC (reference point) is populated with a date only (no ISO-8601\
+  \ time component)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Check:
+  expression: >-
+    not empty(PCELTM) and (not empty(PCDTC) and var_exists("PCDTC") and PCDTC !~ /.*T[0-9]/ or not
+    empty(PCRFTDTC) and var_exists("PCRFTDTC") and PCRFTDTC !~ /.*T[0-9]/)
+Outcome:
+  Message: "PC record has PCELTM populated (time-concentration profile) but PCDTC\
+    \ and/or PCRFTDTC carries a date only (no time component); PCELTM is not meaningful\
+    \ without sub-day timing."
+  Output_Variables:
+  - "PCDTC"
+  - "PCELTM"
+  - "PCRFTDTC"
+Source_Proposed:
+  FDA_Validator_Rule_Message: "PC record has PCELTM populated (time-concentration\
+    \ profile) but PCDTC and/or PCRFTDTC carries a date only (no time component);\
+    \ PCELTM is not meaningful without sub-day timing."
+  FDA_Validator_Rule_Description: "A Pharmacokinetic Concentrations (PC) record carries\
+    \ a Planned Elapsed Time from Time Point Reference (PCELTM) but PCDTC (specimen\
+    \ collection) or PCRFTDTC (reference point) is populated with a date only (no\
+    \ ISO-8601 time component)."
+  Domains: "PC"
+Source:
+  FDA_Validator_Rule_Message: "PCELTM is not 'PT0H' for pre-dose sampling"
+  FDA_Validator_Rule_Description: "Specimen concentrations (e.g., plasma) used to\
+    \ calculate a time concentration profile with a pre-dose sample should have Planned\
+    \ Elapsed Time from Time Point Ref (PCELTM) populated with 'PT0H'. A negative\
+    \ elapsed time would lead to an incorrect area under the curve."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2280"
+        Version: "1"
+      Version: "1.6"

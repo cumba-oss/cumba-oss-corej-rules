@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1212 expect=violation domain=FA
+#note "FRESH - the batch's FINDINGS ABOUT positive face + '--' FA-prefix resolution pin. Row 1: numeric FASTRESC=10 vs FASTRESN=12, unequal -> FIRES. Row 2: non-numeric FASTRESC=MODERATE -> silent. The '--' leaves resolve via the FA dataset prefix (FASTRESC/FASTRESN); class=\"FINDINGS ABOUT\" (quoted, two words) is load-bearing. If SKIPPED comes back, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FASTRESC=10 FASTRESN=12
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAOBJ    type=Char label="Object of the Observation"
+col FASTRESC type=Char label="Character Result/Finding in Std Format"
+col FASTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | FA | 001 | 1 | OCCUR | HEADACHE | 10 | 12
+S1 | FA | 001 | 2 | SEV   | HEADACHE | MODERATE | 1

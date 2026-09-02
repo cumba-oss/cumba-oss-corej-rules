@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0198"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Reference Point (PPRFTDTC) in the\
+  \ Pharmacokinetics Parameters (PP) domain does not equal the Date/Time of Reference\
+  \ Point (PCRFTDTC) of a related Pharmacokinetics Concentrations (PC) record."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Match_Datasets:
+- Name: "RELREC"
+  Wildcard: "PC"
+Check:
+  expression: >-
+    not empty(PPRFTDTC) and not empty(RELREC.PCRFTDTC) and PPRFTDTC != RELREC.PCRFTDTC
+Outcome:
+  Message: "PPRFTDTC does not equal PCRFTDTC of the related Pharmacokinetics Concentrations\
+    \ (PC) record."
+  Output_Variables:
+  - "PPRFTDTC"
+  - "RELREC.PCRFTDTC"
+Source:
+  Class: "FND"
+  Domain: "PP"
+  Variable: "PPRFTDTC, PCRFTDTC"
+  Plain_Text_Explanation: "The values in PPRFTDTC should be the same as that in PCRFTDTC\
+    \ for related records."
+  Condition: "PC records are used for the calculation of parameters in PP"
+  Rule: "Value for PPRFTDTC = Value for PCRFTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND198"
+        Version: "1"
+      Version: "5.0"

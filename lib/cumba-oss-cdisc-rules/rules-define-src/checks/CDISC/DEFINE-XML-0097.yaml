@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0097"
+Sheet_Rule_Identifier: "97"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "Missing Alias for Codelist referenced by a variable that requires CDISC Controlled Terminology according to the standard."
+# Library-gated: "requires CDISC Controlled Terminology according to the
+# standard" = the LibraryProvider assigns a codelist c-code to at least one
+# ItemGroupDef/ItemRef-bound variable whose ItemDef references this CodeList
+# (the P5a adjudication: CT data alone cannot decide the trigger; the
+# CT-decidable slice ships as PMDA-DD0031). "The Alias" is the spec's codelist
+# alias, Context="nci:ExtCodeID".
+Message: "Missing CodeList Alias for a codelist referenced by a variable that requires CDISC Controlled Terminology [${value}]."
+Check:
+  kind: "library_ct_alias_required"
+  level: "codelist"

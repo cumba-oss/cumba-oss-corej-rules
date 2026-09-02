@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0060 expect=violation domain=ADLBC
+#note "Per-variable granularity pin, same contract as PMDA-AD0058-invalid_two_char_dt."
+#expectViolationCount 2
+#expectViolationAt variable_name=ASTDTM variable_data_type=Char
+#expectViolationAt variable_name=AENDTM variable_data_type=Char
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTDTM  type=Char
+col AENDTM  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | y

@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-SEND-0073 expect=violation domain=BW
+#note "NEW with the M2-P2 ruling (option (a), Fix #303), and the FIRST fixture CDISC-SEND-0073 has ever carried. The two SEND relatives were the part of M2-P2 that no ruling had reached: they are the SEND split of the same study-day rule, their Source.Rule says 'date portion of --DTC' in as many words, and they carried the same is_complete_date gate. BWDTC '2020-01-15T09' is 13 characters - a complete date with a truncated time - rejected by is_complete_date, accepted by is_complete_date_part. date(--DTC) resolves the date portion, so the >= RFSTDTC arm holds; the dy operation gives 15 and BWDY=14 fires. Row 2 is the same shape with the correct day and stays silent. The -- prefix is a SUBSTITUTION, not an expansion (M3-J.1), so on a BW primary --DTC is exactly BWDTC and the columns are spelled concretely."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWDTC    type=Char label="Date/Time of Measurement"
+col BWDY     type=Num  label="Study Day of Measurement"
+---
+S1 | BW | 001 | 1 | BW | 2020-01-15T09 | 14
+S1 | BW | 001 | 2 | BW | 2020-01-10T09 | 10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

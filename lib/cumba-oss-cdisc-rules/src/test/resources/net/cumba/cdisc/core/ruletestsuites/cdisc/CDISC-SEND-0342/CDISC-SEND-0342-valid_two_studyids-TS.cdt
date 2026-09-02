@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0342 expect=noViolation domain=TS
+#note "THE group= DISCRIMINATOR. ESCALATE on mismatch. Two rows with DIFFERENT STUDYIDs, each declaring SDESIGN once: evalRecordCountGrouped buckets by STUDYID so each group counts 1 and neither row fires. If the group list were ignored the whole-table count would be 2 and BOTH rows would fire, so honouring and ignoring it give opposite verdicts here. Two STUDYIDs in one TS is not realistic submission data; it is deliberate. The same group list is now also the Grouping block's variable (M3-D17), so this fixture pins both."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SDESIGN | Study Design | PARALLEL
+S2 | TS | 1 | SDESIGN | Study Design | PARALLEL
+---

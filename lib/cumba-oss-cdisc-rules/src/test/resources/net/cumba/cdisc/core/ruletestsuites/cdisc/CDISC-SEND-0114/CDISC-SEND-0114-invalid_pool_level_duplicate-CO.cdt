@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-SEND-0114 expect=violation domain=CO
+#note "BLANK-KEY-IDENTITY PIN. ESCALATE -- do not re-aim. Pool-level comments: USUBJID (the operator's target) and RDOMAIN/IDVAR/IDVARVAL are EMPTY on every row. is_unique_set runs under GroupKeyPolicy.FOLD_BLANK_KEYS, where a blank cell is a REAL key component typed as a KeyPart whose identity is equal for two cells of the same blank kind, so both rows' empty USUBJID cells contribute the SAME component and rows 1 and 2 are genuine duplicates. That is what makes the rule work on pool-level CO data at all; a discarding policy would silence it completely. Row 3 differs in POOLID. Keep both blank cells written the same way so they cannot land on different blank identities."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 COSEQ=1
+#expectViolationAt row=2 COSEQ=2
+dataset CO
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COSEQ    type=Num  label="Sequence Number"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+STUDY01 | CO |  |  | POOL1 |  |  | 1 | POOLCMT | 2023-02-01
+STUDY01 | CO |  |  | POOL1 |  |  | 2 | POOLCMT | 2023-02-01
+STUDY01 | CO |  |  | POOL2 |  |  | 3 | POOLCMT | 2023-02-01
+---

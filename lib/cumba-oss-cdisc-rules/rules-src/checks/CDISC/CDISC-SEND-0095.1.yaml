@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0095.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable value in a domain other than TS or CO\
+  \ is longer than 200 characters; text longer than 200 characters must be split and\
+  \ the overflow presented in the SUPP-- dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TS"
+    - "CO"
+Check:
+  expression: >-
+    len(value()) > 200
+Outcome:
+  Message: "A variable value is longer than 200 characters and must be split into\
+    \ the SUPP-- dataset."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL; not TS or CO"
+  Variable: "ALL"
+  Plain_Text_Explanation: "If a variable should be populated with a text string longer\
+    \ than 200 characters, the text must be split.  When splitting the text string,\
+    \ the text should be split between words to improve readability.  In domains other\
+    \ than TS and CO the text should be split by storing the portion of the text string\
+    \ longer than 200 characters and presented in the SUPP-- dataset.  Within the\
+    \ SUPP-- dataset the text string will be split into additional 200 character text\
+    \ strings as needed.  The QNAM in the SUPP-- dataset will use the variable name\
+    \ with an appended sequential one-digit number, beginning with 1.  Please note\
+    \ other variable length limits may supersede this rule."
+  Condition: "Variable value length > 200 characters and domain is not TS or CO"
+  Rule: "SUPP-- contains each additional string, up to 200 characters in length, and\
+    \ QNAM = variable name with appended sequential one-digit number beginning from\
+    \ 1."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND95.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND95.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND95.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND95.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND95.1"
+        Version: "1"
+      Version: "5.0"

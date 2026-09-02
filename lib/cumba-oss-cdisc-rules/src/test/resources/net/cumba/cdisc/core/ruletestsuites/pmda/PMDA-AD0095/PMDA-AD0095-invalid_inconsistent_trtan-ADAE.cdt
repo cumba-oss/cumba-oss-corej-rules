@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0095 expect=violation domain=ADAE
+#note "AEDECOD would suggest OCCDS, which is irrelevant: this rule's Scope is Domains.Include: [ALL], so it runs on ANY dataset carrying TRTA/TRTAN. Group DRUGA holds TRTAN {1,1,2}; minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 TRTA=DRUGA TRTAN=2
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col TRTA    type=Char
+col TRTAN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | NAUSEA   | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | RASH     | DRUGA | 2

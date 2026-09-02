@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1096 expect=noViolation domain=AE
+#note "ADAPTED-FROM fda/FDA-SD1096/FDA-SD1096-valid-AE.cdt (verbatim). AETERM of 199 characters stays below the 200-character truncation threshold; 'Headache' is a normal value; an empty AETERM has length 0. None at exactly 200."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+S1 | AE | 001 | 2 | Headache
+S1 | AE | 001 | 3 |

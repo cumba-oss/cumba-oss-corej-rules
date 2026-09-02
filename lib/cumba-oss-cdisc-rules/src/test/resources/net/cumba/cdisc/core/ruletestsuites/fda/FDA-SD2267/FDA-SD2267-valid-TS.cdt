@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2267 expect=noViolation domain=TS
+#note "All TDIGRP rows carry a valid dummy-SNOMED term in its preferred case (Headache, Nausea) - the flag-less rule compares case-sensitively per the D-TA-3 default (Fix #266). The blank-TSVAL TDIGRP row does not fire (completeness is another rule's concern) and the non-SNOMED value on the AGEMAX row is outside the TDIGRP condition."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | TDIGRP | Headache
+S01 | TS | 2 | TDIGRP | Nausea
+S01 | TS | 3 | TDIGRP |
+S01 | TS | 4 | AGEMAX | NOTASNOMEDTERM

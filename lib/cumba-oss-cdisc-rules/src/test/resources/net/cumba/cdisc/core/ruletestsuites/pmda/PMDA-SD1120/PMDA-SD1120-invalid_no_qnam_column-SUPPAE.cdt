@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1120 expect=violation domain=SUPPAE
+#note "FRESH, DISCRIMINATING. No QNAM column. Pins that the two derived guards are INDEPENDENT: var_exists(\"QNAM\") kills the first disjunct outright while var_exists(\"QLABEL\") leaves the second one live, so the rule still reports what it can see. Output_Variables names QNAM and the column is absent -- that is fine (fda/FDA-SD2021/FDA-SD2021-invalid-noagetxt-DM.cdt is the landed green precedent for an absent OV column), and the location pin deliberately uses QLABEL, not QNAM. Contrast PMDA-SD2006-skipped_no_qnam-SUPPAE, which SKIPS on the same missing column because that rule declares Requirements.Variables.All [QNAM]; PMDA-SD1120 declares none."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 QLABEL="Investigator Comment"
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | Treatment Emergent Flag | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | Investigator Comment    | Ongoing at study end

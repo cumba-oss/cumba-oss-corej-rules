@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0018 expect=noViolation domain=ADSL
+#note "FRESH - pins the three sponsor-replaceable-text exclusions (not contains(var_label(\"LIBRARY\"), \"*\"), \"...\", \"{\"). All three dataset labels differ from their Library labels, so without the three contains exclusions this fixture would report 3 violations; with them it reports 0."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL TRT01P name=TRT01P label="Planned Treatment for Period 01*"
+#library variable-metadata ADSL SITEGR1 name=SITEGR1 label="Pooled Site Group ... Code"
+#library variable-metadata ADSL DCDECOD name=DCDECOD label="Standardized Disposition Term {sponsor text}"
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col TRT01P  type=Char label="Planned Treatment Period 1"
+col SITEGR1 type=Char label="Pooled Site Group 1"
+col DCDECOD type=Char label="Discontinuation Reason"
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | GROUP1 | COMPLETED

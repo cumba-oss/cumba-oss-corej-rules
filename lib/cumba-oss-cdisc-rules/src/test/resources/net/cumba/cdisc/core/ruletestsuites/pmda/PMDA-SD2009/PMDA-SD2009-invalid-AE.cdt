@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2009 expect=violation domain=AE
+#note "AELLTCD 1234567 is not a Lowest Level Term code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid LLT code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AELLTCD=1234567
+dataset AE
+col USUBJID type=Char
+col AEDECOD type=Char
+col AELLTCD type=Num
+---
+001 | Headache | 10019211
+001 | Nausea   | 1234567

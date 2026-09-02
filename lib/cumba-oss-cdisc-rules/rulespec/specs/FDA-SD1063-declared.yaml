@@ -1,0 +1,65 @@
+name: FDA-SD1063-declared
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the NON-FIRING arm of the `FDA-SD1063` A/B, and the
+  spec-level guard for the §3.5 / D6 empty-name-list trap.
+
+  Fixture: identical to `FDA-SD1063` in every field — same two datasets, same rows, same config,
+  same rule — EXCEPT that the `define_xml` block declares BOTH submitted datasets instead of only
+  VS. The Define describes everything the study ships, so nothing is missing from it and the rule
+  reports zero on both lanes.
+
+  **Read it as one half of a controlled experiment, never on its own.** A spec whose expectation
+  is `[]` on both lanes is otherwise indistinguishable from a dead fixture — the lesson P3/P4
+  paid for. Here the other half is `FDA-SD1063`, which is byte-identical apart from the block and
+  is green at exactly ONE violation. The single variable between them is whether AE appears in
+  the Define's dataset-NAME list, so this spec's zero is a measured "the name list contains AE",
+  not an absence of evidence.
+
+  **What it guards, and why that matters more than the count.** §3.5 of the plan describes the
+  one input shape that produces a silently WRONG verdict rather than a skip: a `define_xml` block
+  that leaves `getDatasetNames()` empty. Declaring any JSON-object block makes the provider
+  non-null (`SpecRunner.java:465-468`), which opens `RuleRunner`'s define skip gate
+  (`:554-568`); and `DEFINE_DATASET_NAMES` has NO empty-to-`LIBRARY_NOT_AVAILABLE` demotion,
+  unlike its immediate neighbour `DEFINE_KEY_VARIABLES` (`OperationExecutor.java:1193-1201`) — it
+  returns the list verbatim (`:1192`). An empty list therefore makes Java report EXECUTED with
+  `$define_datasets = []`, and `ds_name("DATA") not in []` fires on EVERY dataset.
+
+  Mutation-measured, not argued: with the Define name list forced to `[]`, this spec goes 0 -> 1
+  on the Python lane (a violation on AE carrying `dataset_name: AE`) — RED. Its sibling
+  `FDA-SD1063` stays green at 1 under the same mutation, which is exactly why the sibling cannot
+  be the guard. On the Java lane the same branch is demonstrated live rather than mutated: the
+  sibling's `define_xml: {VS}` is a name list without AE, and Java reports 1 for AE on it, so
+  Java's verdict provably tracks AE's membership of the key set.
+
+  Note the primary-bucket filter is doing no work here: BOTH submitted datasets are declared, so
+  no dataset in the study has a defect at all. This is not a case where a real finding is being
+  hidden by the harness keeping only the primary domain's bucket.
+
+  Attribute choice, D4 and the status channel: identical to `FDA-SD1063`'s, see that spec's
+  rationale. In particular `define_dataset_name` / `define_dataset_location` are left to D4's
+  derivation, and only sink-backed `define_dataset_label` is declared, since the rule reads the
+  KEY SET rather than any dataset attribute.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1063)
+rule:
+  coreId: FDA-SD1063
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

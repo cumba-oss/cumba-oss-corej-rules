@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0395 expect=violation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of ATOXGRL for a given value of ATOXGRLN, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=2
+dataset ADLBC
+col PARAMCD type=Char
+col ATOXGRL type=Char
+col ATOXGRLN type=Char
+---
+HEIGHT | Label A | A
+HEIGHT | Different Label | A
+HEIGHT | Label B | B
+---

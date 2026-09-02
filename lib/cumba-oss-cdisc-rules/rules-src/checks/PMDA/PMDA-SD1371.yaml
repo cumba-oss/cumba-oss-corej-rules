@@ -1,0 +1,75 @@
+Core:
+  Id: "PMDA-SD1371"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ORRES is empty while --LOBXFL equals 'Y' and the\
+  \ record is not derived (--DRVFL is not equal to 'Y' or --DRVFL is not present)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "DD"
+    - "IE"
+    - "SC"
+Requirements:
+  Variables:
+    All:
+    - "--LOBXFL"
+Check:
+  expression: >-
+    empty(--ORRES) and --LOBXFL == "Y" and (not var_exists("--DRVFL") or --DRVFL != "Y")
+Outcome:
+  Message: "--ORRES is empty even though --LOBXFL equals 'Y' and either --DRVFL is\
+    \ not present in dataset or is not equal to 'Y'."
+  Output_Variables:
+  - "!--ORRES"
+  - "--LOBXFL"
+  - "--DRVFL"
+Source:
+  Message: "--ORRES is null when --LOBXFL = 'Y' (and --DRVFL is null)"
+  Description: "Result or Finding in Original Units (--ORRES) should be populated\
+    \ when Last Observation Before Exposure Flag (--LOBXFL) is set to 'Y’ unless the\
+    \ record is derived (--DRVFL = 'Y')."
+  Domains: "FINDINGS (-DD, -IE, -SC), FINDINGS ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1371"
+        Version: "1"
+      Version: "1.6"

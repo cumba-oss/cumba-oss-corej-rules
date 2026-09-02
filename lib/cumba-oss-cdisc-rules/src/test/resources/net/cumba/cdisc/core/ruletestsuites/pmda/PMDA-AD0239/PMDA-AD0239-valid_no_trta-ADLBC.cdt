@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0239 expect=noViolation domain=ADLBC
+#note "Isolates the TRTA conjunct - no TRTA and no TRTAG1 column. The expansion EXISTS (TRTPG1 seeds index 1) and TRTAG1 is indeed absent, so only var_exists(\"TRTA\") keeps the rule silent: without that conjunct this fixture would fire. Executes; not skipped."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTPG1  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | POOL1

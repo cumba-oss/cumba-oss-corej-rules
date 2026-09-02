@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD2266 expect=violation domain=TS
+#note "Boundary: TSVCDREF is present but empty on the TDIGRP record. 'must be SNOMED' is violated by an empty value just as it is by a wrong one, so the rule must fire (populated literal vs empty target => not_equal_to is true)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=TDIGRP
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Parameter Value Code Reference"
+---
+S1 | TS | 1 | TDIGRP | Diagnosis Group | ASTHMA | 195967001 |

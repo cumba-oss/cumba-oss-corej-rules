@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1242 expect=violation domain=AE
+#note "Reverse direction: AEBODSYS 'Nervous system disorders' carries two AEBDSYCD codes (10029205/99999999) while each code maps to one text. The sheet states only the AEBDSYCD->AEBODSYS direction, but is_not_unique_relationship is bidirectional in both engines and the widening is the documented accepted behaviour (MedDRA SOC code<->name is genuinely 1:1) -> fires on both rows of that body system."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AEBODSYS="Nervous system disorders"
+#expectViolationAt row=3 AEBODSYS="Nervous system disorders"
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+---
+S1 | AE | 001 | 1 | Headache | Nervous system disorders   | 10029205
+S1 | AE | 001 | 2 | Nausea   | Gastrointestinal disorders | 10017947
+S1 | AE | 002 | 1 | Migraine | Nervous system disorders   | 99999999

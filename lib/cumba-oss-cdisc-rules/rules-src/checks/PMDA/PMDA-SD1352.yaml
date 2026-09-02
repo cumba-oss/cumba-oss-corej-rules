@@ -1,0 +1,85 @@
+Core:
+  Id: "PMDA-SD1352"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an Interventions class domain contains more than\
+  \ one record for the same subject (USUBJID) with the same --TRT, --DECOD, --MOOD,\
+  \ --CAT, --SCAT, --ROUTE, --LOC, --TRTV, --STDTC, --TPT, and --TPTNUM values."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AG"
+    - "EC"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--TRT"
+Check:
+  expression: >-
+    not is_unique_set([--TRT, USUBJID, --DECOD, --MOOD, --CAT, --SCAT, --ROUTE, --LOC, --TRTV,
+    --STDTC, --TPT, --TPTNUM])
+Outcome:
+  Message: "Duplicate records in domain: more than one Intervention record exists\
+    \ for the subject with the same key values."
+  Output_Variables:
+  - "--TRT"
+  - "--DECOD"
+  - "--MOOD"
+  - "--CAT"
+  - "--SCAT"
+  - "--ROUTE"
+  - "--LOC"
+  - "--TRTV"
+  - "--STDTC"
+  - "--TPT"
+  - "--TPTNUM"
+Source:
+  Message: "Duplicate records in domain"
+  Description: "The structure of Interventions class domains should be one record\
+    \ per Intervention Episode per subject. No Interventions with the same Treatment\
+    \ (--TRT), Decoded Term (--DECOD), Mood (--MOOD), Category (--CAT), Subcategory\
+    \ (--SCAT), Route (--ROUTE), Location (--LOC) and Treatment Vehicle (--TRTV) values\
+    \ for the same Subject (USUBJID) with the same Start Date (--STDTC), Planned Time\
+    \ Point Name (--TPT), and Planned Time Point Number (--TPTNUM) are expected."
+  Domains: "AG, EC, EX"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1352"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1352"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1352"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1352"
+        Version: "1"
+      Version: "1.6"

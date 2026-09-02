@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0258 expect=noViolation domain=CO
+#note "Row 1 identifies a subject and row 2 is a fully linked record comment; neither satisfies the all-empty conjunction, so the rule executes and is silent."
+#library standard=sendig version=3-0
+#expectViolationCount 0
+dataset CO
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COSEQ    type=Num  label="Sequence Number"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO |    | 001 |  |       |   | 1 | Subject comment
+S1 | CO | BW | 001 |  | BWSEQ | 1 | 2 | Record comment
+---

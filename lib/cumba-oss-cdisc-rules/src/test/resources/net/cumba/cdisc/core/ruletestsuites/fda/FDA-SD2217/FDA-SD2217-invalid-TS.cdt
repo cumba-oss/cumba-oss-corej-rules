@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2217 expect=violation domain=TS
+#note "No TSPARMCD=OBJPRIM record anywhere in TS -> the Trial Primary Objective parameter is missing, one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE   | Trial Title | A Phase 3 Study of Drug X in Subjects With Condition Y
+S01 | TS | 2 | OBJSEC  | Trial Secondary Objective | To evaluate the safety of Drug X
+S01 | TS | 3 | TPHASE  | Trial Phase Classification | PHASE III TRIAL

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1029 expect=skipped domain=AE
+#note "FRESH. Pins the class axis: EVENTS is not in Scope.Classes.Include [FINDINGS, FINDINGS ABOUT, RELATIONSHIP, TRIAL DESIGN], so ScopeMatcher.describeClassMismatch rejects the dataset. Chosen deliberately so the fixture survives either ruling on SHEET-ISSUES-PMDA.md #48: EVENTS appears in neither the PMDA sheet cell nor the authored Scope, so AE is out of scope under both readings. The class= key is load-bearing here -- without it describeScopeMismatch falls through to the ADaM arm and the class axis is not judged at all. In-tree precedent: pmda/PMDA-SD1039/PMDA-SD1039-skipped_ti_class-TI.cdt."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Headache | HEADACHE

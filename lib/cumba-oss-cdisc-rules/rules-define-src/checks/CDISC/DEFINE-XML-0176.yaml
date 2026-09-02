@@ -1,0 +1,22 @@
+Rule_Id: "DEFINE-XML-0176"
+Sheet_Rule_Identifier: "176"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:StandardOID must be provided when the controlled terminology is drawn from a published CDISC standard."
+# The sheet's formal Rule: "@def:StandardOID must be provided when
+# Alias/@Context = 'nci:ExtCodeID' and /ODM/@Context = 'Submission'" —
+# implemented verbatim ("../../../@Context" walks CodeList -> MetaDataVersion
+# -> Study -> ODM, DEFINE-XML-0154 precedent).
+Message: "The Codelist references a NCI codelist but does not include the def:StandardOID attribute."
+Check:
+  kind: "exists"
+  target: "@StandardOID"
+  when:
+    all:
+    - path: "Alias/@Context"
+      equals: "nci:ExtCodeID"
+    - path: "../../../@Context"
+      equals: "Submission"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0110B expect=noViolation domain=ADLBC
+#note "AVISITN absent. Requirements.Variables.All [AVISIT] is satisfied, so nothing skips it; data is built so it would fire under a degraded key if the expression reached the operator. Two independent conjuncts stop it first: var_exists(AVISITN) is false, and not empty(AVISITN) over the absent column is false as well - the DOUBLE guard that differs from base rule PMDA-AD0110's single var_exists."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVISIT  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | WEEK2
+CDISCPILOT01 | 01-701-1023 | SYSBP | WEEK2
+CDISCPILOT01 | 01-701-1034 | SYSBP | WEEK02

@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0004 expect=noViolation domain=LB
+#note "EMPTY-DATASET PIN (PLAN-zero-row-routing-rekey.md, owner ruling 6c-1, Fix #349 / EC-89). LB is DECLARED with its columns (DOMAIN present) and carries ZERO rows. Before the fix this rule fired spuriously here: the engine substituted a synthetic 1-row ZERO-COLUMN table for a non-row-based rule on an empty dataset, DOMAIN folded absent on it (EC-43 / R14) and prefix(dataset_name, 2) != DOMAIN was true with nothing real behind it. The synthetic table is retired: a rule that must read a row to decide has nothing to check on an empty dataset and returns EXECUTED with zero findings (ruling Q5: never SKIPPED). The empty dataset itself is reported once, by the package's own no-records rule (FDA-SD0001), not here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1077 expect=violation domain=LB
+#note "The Findings dataset LB does not carry the regulatory-expected EPOCH variable -> fires once for the dataset (not_var_exists is a pure dataset-level presence fact, so BroadcastFold decides above the row loop)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | ALB

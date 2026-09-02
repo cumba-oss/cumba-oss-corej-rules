@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0119 expect=violation domain=CO
+#note "ZERO data rows. The verdict comes entirely from column metadata: the Check is a $-scalar dataset fact so rowBased is false, RuleRunner substitutes a synthetic 1-row table and stores one violation with the realRow=0 convention. COVAL's declared width of 100 is below min_length on a non-terminal member, so it fires. Pin the COUNT ONLY -- no #expectViolationAt line; a row or column pin here would read a table that has no rows. ESCALATE -- do not re-aim: this pins that CDISC-SEND-0119 is a metadata rule. M3-D22 moved this rule's Executability from 'Fully Executable' to 'Partially Executable - Possible Underreporting' with no Check change: column_series_metadata reads only DECLARED column lengths and never a data cell, so the sheet's Condition ('Comment value > 200 characters in length') cannot be detected on an unsplit comment. Reading the data would need a length-of-value operator the engine does not have."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset CO label="Comments"
+col STUDYID type=Char length=12 label="Study Identifier"
+col DOMAIN  type=Char length=2  label="Domain Abbreviation"
+col USUBJID type=Char length=20 label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char length=100 label="Comment"
+col COVAL1  type=Char length=200 label="Comment Part 1"
+---

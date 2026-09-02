@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0029 expect=violation domain=LB
+#note "dataset LB without the LBSTRESU column. Row 1: the bare empty(--STRESU) leaf is TRUE on the absent column (absent = all-missing, EC-43) and fires on the numeric row. Row 2: non-numeric result -> clean. Absence itself is the violation here - the deliberate contrast with SD0026's skip-on-absent (each faithful to its own sheet; FDA-aligned)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTRESC=7.2
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+---
+S1 | LB | 001 | 1 | GLUC  | 7.2
+S1 | LB | 001 | 2 | HBSAG | NEGATIVE

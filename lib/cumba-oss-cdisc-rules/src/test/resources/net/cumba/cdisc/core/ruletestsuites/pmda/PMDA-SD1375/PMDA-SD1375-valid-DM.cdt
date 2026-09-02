@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1375 expect=noViolation domain=DM
+#note "Row 1: treated subject with a reference end date. Row 2: SCRNFAIL, no RFENDTC. Row 3: NOTASSGN, no RFENDTC. Row 4: NOTTRT with NO reference end date - the state PMDA requires. Row 4 is the DELIBERATE INVERSE of the FDA twin's valid fixture row 4 (which populates RFENDTC on a NOTTRT subject)."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFSTDTC  type=Char
+col RFENDTC  type=Char
+col ACTARMCD type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-05 | 2020-06-30 | A
+CDISCPILOT01 | DM | 01-701-1023 | | | SCRNFAIL
+CDISCPILOT01 | DM | 01-701-1028 | | | NOTASSGN
+CDISCPILOT01 | DM | 01-701-1034 | 2020-01-05 | | NOTTRT
+---

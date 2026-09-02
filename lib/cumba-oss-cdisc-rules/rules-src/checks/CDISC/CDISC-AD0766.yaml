@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0766"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of TRTAGyN for a given\
+  \ value of TRTAGy, where y is an integer [1-99, not zero-padded], considering only\
+  \ rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TRTAGyN) and not empty(TRTAGy) and has_multiple_values_for(TRTAGyN, TRTAGy)
+Outcome:
+  Message: "TRTAGyN has more than one value for this TRTAGy, among rows where both\
+    \ are populated"
+  Output_Variables:
+  - "TRTAGy"
+  - "TRTAGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTAGyN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTAGyN\
+    \ for a given value of TRTAGy, where y is an integer [1-99, not zero-padded],\
+    \ considering only those rows on which both variables are populated"
+  Rule_Failure_Criteria: "There is more than one value of TRTAGyN for a given value\
+    \ of TRTAGy"
+  Condition_Failure: "On rows where TRTAGyN and TRTAGy are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR766"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR766"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR766"
+        Version: "1"
+      Version: "5.0"

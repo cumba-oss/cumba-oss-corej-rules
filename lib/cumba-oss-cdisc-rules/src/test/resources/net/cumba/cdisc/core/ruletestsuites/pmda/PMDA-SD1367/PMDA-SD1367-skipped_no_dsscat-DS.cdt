@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1367 expect=skipped domain=DS
+#note "DSSCAT is absent, so Requirements.Variables.All gates this rule to SKIPPED - it is the DSSCAT-present half of the sheet's pair (CG0536/CG0537). The sheet row CG0536 conditions the rule on DSSCAT being present, so it does not apply here. NOTE: unlike the CDISC/CORE families there is no FDA/PMDA DSSCAT-absent counterpart rule at SDTMIG 3.3/3.4, so on such a study the duplicate is NOT reported by any FDA/PMDA rule - a pre-existing coverage gap, surfaced not fixed by this plan."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | TREATMENT
+---

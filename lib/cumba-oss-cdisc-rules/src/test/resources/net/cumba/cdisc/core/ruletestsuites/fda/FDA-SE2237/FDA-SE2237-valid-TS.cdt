@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2237 expect=noViolation domain=TS
+#note "Synthetic NULLFLAV codelist terms {NA, UNKNOWN, MASKED} (real SEND CT C150810 subset). Row 1: ordinary sponsor value -> clean. Row 2: TSVAL empty (null flavor correctly carried in TSVALNF) -> guarded out by non_empty. Row 3: date value -> clean. No populated TSVAL is a NULLFLAV term."
+#library standard=sendig version=3-1-1
+#library codelist-terms NULLFLAV NA UNKNOWN MASKED
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Null Flavor"
+---
+S1 | TS | 1 | SSPONSOR | ACME LABS  |
+S1 | TS | 1 | SPLANSUB |            | NA
+S1 | TS | 1 | EXPSTDTC | 2020-01-01 |

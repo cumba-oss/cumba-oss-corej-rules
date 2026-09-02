@@ -1,0 +1,45 @@
+Core:
+  Id: "FDA-SD1404"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of First Challenge Agent Admin (RFCSTDTC)\
+  \ is populated but Date/Time of Last Challenge Agent Admin (RFCENDTC) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFCSTDTC"
+Check:
+  expression: >-
+    not empty(RFCSTDTC) and empty(RFCENDTC)
+Outcome:
+  Message: "RFCENDTC is empty when RFCSTDTC is populated."
+  Output_Variables:
+  - "RFCSTDTC"
+  - "RFCENDTC"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for RFCENDTC, when RFCSTDTC is provided"
+  FDA_Validator_Rule_Description: "Value for Date/Time of Last Challenge Agent Admin\
+    \  (RFXENDTC) variable must be populated, when Date/Time of First Challenge Agent\
+    \ Admin (RFXSTDTC) variable value is provided."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1404"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB043"
+        Version: "1"
+      Version: "1.5"

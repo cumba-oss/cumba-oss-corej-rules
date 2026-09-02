@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1318 expect=noViolation domain=DS
+#note "Gate twin: no subject has a PROTOCOL VIOLATION / PROTOCOL DEVIATION disposition, so the absent DV records are irrelevant and the rule must stay silent."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | Completed         | COMPLETED
+S1 | DS | 002 | 1 | Adverse event     | ADVERSE EVENT
+---
+
+dataset DV label="Protocol Deviations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DVSEQ   type=Num  label="Sequence Number"
+col DVTERM  type=Char label="Protocol Deviation Term"
+---
+S1 | DV | 003 | 1 | Visit outside window
+---

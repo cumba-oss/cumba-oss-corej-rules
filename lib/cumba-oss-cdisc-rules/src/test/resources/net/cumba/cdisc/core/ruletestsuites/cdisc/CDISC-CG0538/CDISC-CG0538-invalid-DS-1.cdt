@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0538 expect=violation domain=DS
+# Rule:Description: Raise an error when a subject has more than one Disposition Event record (DSCAT equals 'DISPOSITION EVENT') per Epoch (EPOCH) and more than one of those records has Subcategory for Disposition Event (DSSCAT) equal to 'STUDY PARTICIPATION'.
+#note "Baseline positive, EPOCH PRESENT. Two DISPOSITION EVENT records share one USUBJID/EPOCH group and both carry DSSCAT=STUDY PARTICIPATION, so every leaf of the all: holds: the gate record_count is 2 > 1, var_exists(DSSCAT) holds, DSSCAT equals the literal, and the uniqueness tuple (DSSCAT, USUBJID) repeats across both rows. Both rows are flagged. This scenario is insensitive to both halves of Fix #158: the EPOCH exists guard D17 removed would have passed anyway because EPOCH is populated, and the EPOCH that D16 removed from the uniqueness key was identical on both rows, so neither key discriminates here. The sensitive partners are CDISC-CG0538-invalid_no_epoch-DS-1.cdt (D17, same rows with the EPOCH column removed) and CDISC-CG0538-invalid_cross_epoch-DS-1.cdt (D16, the per-subject duplicate that spans two epochs)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 DSSEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 DSSEQ=2 USUBJID=01-701-1015
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSCAT  type=Char label="Subcategory for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY PARTICIPATION | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY PARTICIPATION | TREATMENT
+---

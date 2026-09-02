@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0322 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of TRTP, there is more than one value of TRTPGy, where y is an integer [1-99, not zero-padded]
+#note "within TRTP=DrugA, TRTPG1 takes 2 distinct values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP type=Char
+col TRTPG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | DrugA | G1
+CDISCPILOT01 | 01-701-1023 | ALB | DrugA | G2
+---

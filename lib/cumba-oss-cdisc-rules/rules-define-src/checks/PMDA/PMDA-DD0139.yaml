@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0139"
+Sheet_Rule_Identifier: "DD0139"
+Rule_Set: "PMDA"
+Element: "Standard"
+Attribute: "OID"
+Applicable_Versions: ["2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Standards that are referenced from a Dataset or Codelist should be included in Define.xml. Define-XML specification represents Standards as def:Standard elements within the def:Standards element."
+# def:StandardOID on ItemGroupDef (Dataset) and CodeList (Codelist) are the only
+# legal standard references in Define-XML 2.1 = exactly the sheet's list. The
+# sheet's %standard% placeholder becomes ${value} (the unreferenced OID).
+Message: "Standard '${value}' is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - element: "ItemGroupDef"
+    attribute: "StandardOID"
+  - element: "CodeList"
+    attribute: "StandardOID"

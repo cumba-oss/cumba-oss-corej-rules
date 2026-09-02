@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0233 expect=noViolation domain=ADSL
+#note "TR01PG1 is both the grouping key and the not empty(...) subject, so row 3 (blank TR01PG1) is excluded twice: DROP_MISSING_KEYS removes it from grouping and its own conjunct is false. The blank-key contract on a wildcard-expanded column."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1  type=Char
+col TR01PG1N type=Num
+---
+S1 | 001 | POOLA | 1
+S1 | 002 | POOLA | 1
+S1 | 003 |       | 3

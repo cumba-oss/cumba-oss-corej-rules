@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0813"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a dataset, there is more than one value\
+  \ of USUBJID for a given value of USUBJIDN, considering only those rows on which\
+  \ both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(USUBJID) and not empty(USUBJIDN) and has_multiple_values_for(USUBJID, USUBJIDN)
+Outcome:
+  Message: "There is more than one value of USUBJID for a given value of USUBJIDN\
+    \ within this dataset."
+  Output_Variables:
+  - "USUBJIDN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "USUBJID"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of USUBJID for a given value of USUBJIDN, considering only those rows\
+    \ on which both variables are populated"
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of USUBJID\
+    \ for a given value of USUBJIDN"
+  Condition_Failure: "On rows where both USUBJID and USUBJIDN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR813"
+        Version: "1"
+      Version: "5.0"

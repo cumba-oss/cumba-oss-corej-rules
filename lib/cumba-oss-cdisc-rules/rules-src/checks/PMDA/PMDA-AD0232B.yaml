@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0232B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Planned Pooled Treatment y\
+  \ for Period xx (TRxxPGy) variable does not hold a single consistent value for each\
+  \ unique value of the Planned Pooled Trt y for Period xx (N) (TRxxPGyN) variable,\
+  \ considering only records where both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRxxPGy"
+Check:
+  expression: >-
+    var_exists("TRxxPGyN") and not empty(TRxxPGy) and not empty(TRxxPGyN) and
+    is_inconsistent_across_dataset(TRxxPGy, keys=[TRxxPGyN])
+Outcome:
+  Message: "Inconsistent value for TRxxPGy"
+  Output_Variables:
+  - "TRxxPGy"
+  - "TRxxPGyN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for TRxxPGy"
+  Description: "Within a study, all Planned Pooled Treatment y for Period xx (TRxxPGy)\
+    \ variable values must be the same for each unique value of Planned Pooled Trt\
+    \ y for Period xx (N) (TRxxPGyN) variable when both variables are populated. Analogous\
+    \ rule for AD0235."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0232B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0232B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0232B"
+        Version: "1"
+      Version: "6.0"

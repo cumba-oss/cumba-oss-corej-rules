@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1030 expect=noViolation domain=CM
+#note "Pins the NEW inner-join semantics: subject 005 has CMSTRF populated and NO DM record at all. Under the removed Join_Type: left, DM.RFSTDTC was null after the merge and this rule fired with a factually wrong message; the inner join drops the row instead -- D-TA-2 (inner is the doctrine): a subject absent from DM is the referential-integrity rule's finding, not this rule's -- one root cause, one finding. The unmatched subject is reported by PMDA-SD0064. DM is present and non-empty (subject 001, RFSTDTC populated), so a rule that still left-joined WOULD fire here: this is a discriminator, not a vacuous pass."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRF  type=Char label="Start Relative to Reference Period"
+---
+S1 | CM | 005 | 1 | ASPIRIN | BEFORE
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01

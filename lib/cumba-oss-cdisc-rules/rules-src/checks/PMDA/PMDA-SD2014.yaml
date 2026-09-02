@@ -1,0 +1,106 @@
+Core:
+  Id: "PMDA-SD2014"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a Body System or Organ Class Code (--BDSYCD) value\
+  \ is not a valid System Organ Class code in the MedDRA dictionary."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--BDSYCD"
+Operations:
+- id: "$bdsycd_valid"
+  expression: "valid_external_dictionary_code(--BDSYCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOCCD\")"
+Check:
+  expression: >-
+    $bdsycd_valid == false
+Outcome:
+  Message: "Body System or Organ Class Code (--BDSYCD) is not a valid MedDRA System\
+    \ Organ Class code."
+  Output_Variables:
+  - "--BDSYCD"
+Source:
+  Message: "Value for --BDSYCD not found in MedDRA dictionary"
+  Description: "Value for Body System or Organ Class Code (--BDSYCD) variable should\
+    \ be populated using a System Organ Class Code of the MedDRA dictionary of a version\
+    \ specified in the define.xml."
+  Domains: "AE, CE, MH"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2014"
+        Version: "1"
+      Version: "1.6"

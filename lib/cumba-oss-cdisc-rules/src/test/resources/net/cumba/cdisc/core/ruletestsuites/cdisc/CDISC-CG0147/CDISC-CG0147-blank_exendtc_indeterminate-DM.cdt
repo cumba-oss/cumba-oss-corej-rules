@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0147 expect=violation domain=DM
+# Rule:Description: Raise an error when EX records are present for a subject but RFXENDTC does not equal the latest EXSTDTC or the latest EXENDTC for that subject.
+#note "$max_ex_exendtc declares missing_values: indeterminate. Subject 1015's second exposure has a BLANK EXENDTC, so the latest end date cannot be proven and the EXENDTC branch yields no value; RFXENDTC (2014-01-16) then matches neither branch -- it differs from the latest EXSTDTC (2014-01-17) -- so the rule reports. Under the default `skip` the blank would not be a candidate, the EXENDTC extreme would come out as 2014-01-16, that conjunct would be false and the rule would stay silent: this scenario is red exactly when the declaration is absent. EXSTDTC is populated on both rows, so the other extreme cannot influence the verdict."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-16
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+CDISCPILOT01 | EX | 01-701-1015 | 2014-01-02 | 2014-01-16
+CDISCPILOT01 | EX | 01-701-1015 | 2014-01-17 |
+---

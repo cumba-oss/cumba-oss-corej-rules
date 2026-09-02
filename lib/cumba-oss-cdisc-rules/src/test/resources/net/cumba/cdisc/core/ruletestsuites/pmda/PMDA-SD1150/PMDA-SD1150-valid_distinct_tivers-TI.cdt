@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1150 expect=noViolation domain=TI
+#note "THE PMDA-vs-FDA DIVERGENCE PIN. The same criterion code carries two different texts, which the FDA twin (keys=[IETESTCD]) reports - but they belong to different protocol criteria versions, and PMDA's keys=[IETESTCD, TIVERS] puts them in two singleton groups, so the rule is correctly silent. If this fires, the keys= list is not being honoured."
+#library standard=sdtmig version=3-4
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+col TIVERS   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older | 1
+S1 | TI | INCL01 | Age 21 years or older | 2

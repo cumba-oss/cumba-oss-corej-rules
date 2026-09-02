@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-CG0522"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Actual Arm Code (ACTARMCD) is empty but the Description\
+  \ of Actual Arm (ACTARM) is populated; when ACTARMCD is empty, ACTARM must also\
+  \ be empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    empty(ACTARMCD) and not empty(ACTARM)
+Outcome:
+  Message: "ACTARM is populated when ACTARMCD is empty."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ACTARM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARM"
+  Condition: "ACTARMCD = null"
+  Rule: "ACTARM = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0522"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0522"
+        Version: "1"
+      Version: "2.0"

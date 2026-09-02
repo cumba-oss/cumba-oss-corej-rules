@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0106"
+Sheet_Rule_Identifier: "106"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "Domain"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute Domain must be omitted for the ItemGroupDef element that reference the ADaM implementation guides."
+# Sheet: "@Domain must be omitted when ItemGroupDef/@def:StandardOID references
+# def:Standard with def:Standard/@Name beginning with 'ADaM'." Note not_exists'
+# deliberate presence symmetry: a present-but-blank Domain counts as omitted.
+# Presence findings carry no ${value}, so the sheet's "ItemGroupDef[@Name]"
+# placeholder cannot be interpolated.
+Message: "Attribute Domain is provided for an ItemGroupDef that references the ADaM implementation guide."
+Check:
+  kind: "not_exists"
+  target: "@Domain"
+  when:
+    path: "@StandardOID->Standard@OID/@Name"
+    matchesRegex: "ADaM.*"

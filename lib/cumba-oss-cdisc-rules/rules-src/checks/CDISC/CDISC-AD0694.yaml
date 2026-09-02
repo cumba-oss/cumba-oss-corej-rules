@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0694"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD for a combination\
+  \ of device and subject, there is more than one value of BASEC for a given value\
+  \ of BASE, considering only rows where both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BASEC"
+Check:
+  expression: >-
+    not empty(BASE) and not empty(BASEC) and has_multiple_values_for(BASEC, BASE, within=[USUBJID,
+    SPDEVID, PARAMCD])
+Outcome:
+  Message: "More than one value of BASEC was found for a given value of BASE within\
+    \ this PARAMCD, device, and subject combination, among the rows where both variables\
+    \ are populated."
+  Output_Variables:
+  - "BASE"
+  - "BASEC"
+Source:
+  Class: "MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASEC"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination\
+    \ of device and subject, there is more than one value of BASEC for a given value\
+    \ of BASE, considering only those rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination of device\
+    \ and subject, there is more than one value of BASEC for a given value of BASE"
+  Condition_Failure: "USUBJID and SPDEVID are present, and BASEC and BASE are both\
+    \ populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR694"
+        Version: "1"
+      Version: "5.0"

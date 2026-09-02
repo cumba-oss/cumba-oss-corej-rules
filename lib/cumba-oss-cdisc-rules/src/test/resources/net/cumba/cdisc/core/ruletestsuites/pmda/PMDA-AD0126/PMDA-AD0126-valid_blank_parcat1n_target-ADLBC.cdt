@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0126 expect=noViolation domain=ADLBC
+#note "Pins the D.2 blank-target exception: row 3's PARCAT1N cell is empty. A blank target is excluded from both the distinct-value count and the flag pass, so group VITALS holds the single distinct non-blank value {1}. The row is NOT dropped by DROP_MISSING_KEYS -- its key PARCAT1 is populated; only its target is blank."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+col PARCAT1N type=Num
+---
+S1 | 001 | SYSBP | VITALS |  1
+S1 | 002 | SYSBP | VITALS |  1
+S1 | 003 | SYSBP | VITALS |

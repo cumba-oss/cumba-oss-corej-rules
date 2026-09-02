@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2015 expect=violation domain=CE
+#note "CESOC 'Cardiac things' is not a System Organ Class of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid SOC."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CESOC="Cardiac things"
+dataset CE
+col USUBJID type=Char
+col CESOC   type=Char
+---
+001 | Nervous system disorders
+001 | Cardiac things

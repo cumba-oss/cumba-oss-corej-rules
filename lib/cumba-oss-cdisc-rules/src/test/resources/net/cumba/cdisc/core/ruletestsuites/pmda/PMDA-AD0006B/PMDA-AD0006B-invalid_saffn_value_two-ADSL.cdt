@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0006B expect=violation domain=ADSL
+#note "Melted (record x variable) check over *FN columns. Only (row 2, SAFFN) is populated and outside [0,1]; SAFFN is not matched by the ABLFN/ANLzzFN exception regex, so exactly one cell fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=SAFFN USUBJID=01-701-1023
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFN   type=Num
+col ITTFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1
+CDISCPILOT01 | 01-701-1023 | 2 | 1

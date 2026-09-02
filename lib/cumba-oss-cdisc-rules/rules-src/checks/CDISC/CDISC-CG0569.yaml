@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-CG0569"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --LOBXFL equals 'Y' but --STRESC is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESC"
+    - "--LOBXFL"
+Check:
+  expression: >-
+    --LOBXFL == "Y" and empty(--STRESC)
+Outcome:
+  Message: "--LOBXFL equals 'Y', but --STRESC is empty."
+  Output_Variables:
+  - "!--STRESC"
+  - "--LOBXFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESC"
+  Condition: "--LOBXFL = 'Y'"
+  Rule: "--STRESC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0569"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0569"
+        Version: "1"
+      Version: "2.0"

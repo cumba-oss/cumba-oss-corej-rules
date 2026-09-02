@@ -1,0 +1,25 @@
+# Production-faithful CDISC-Library metadata for the FDA-SD1078 scenarios.
+#
+# - "variables" (IG level, get_dataset_filtered_variables source) carry core:
+#   AESEV is Permissible in SDTMIG 3.4 AE (verified: api_mdr_sdtmig_3-4, AE.AESEV core=Perm).
+# - "model-variables" (SDTM Model level, get_model_filtered_variables source) carry NO core
+#   attribute, exactly like the real SDTM Model metadata (verified: api_mdr_sdtm_2-0 —
+#   class/dataset variables have name/label/role/simpleDatatype/ordinal, never core).
+standard: sdtmig
+version: "3-4"
+domains:
+  AE:
+    variables:
+      - { name: STUDYID, role: Identifier, core: Req }
+      - { name: DOMAIN,  role: Identifier, core: Req }
+      - { name: USUBJID, role: Identifier, core: Req }
+      - { name: AESEQ,   role: Identifier, core: Req }
+      - { name: AETERM,  role: Topic,      core: Req }
+      - { name: AESEV,   role: "Record Qualifier", core: Perm }
+    model-variables:
+      - { name: STUDYID, role: Identifier }
+      - { name: DOMAIN,  role: Identifier }
+      - { name: USUBJID, role: Identifier }
+      - { name: AESEQ,   role: Identifier }
+      - { name: AETERM,  role: Topic }
+      - { name: AESEV,   role: "Record Qualifier" }

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0329 expect=violation domain=TE
+#note "Row 2 leaves both TEENRL and TEDUR empty -> neither the end rule nor the planned duration of the element is given."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=TRT TEENRL= TEDUR=
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent | End of screening |
+CDISCPILOT01 | TE | TRT  | Treatment | First dose       |                  |

@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1270 expect=skipped domain=PC
+#note "Scope contract: the rule is scoped to its anchor PP, so on PC it is not evaluated at all. Until 2026-07-31 the scope was [PC, PP] and this asserted expect=noViolation -- the rule ran on PC and its guard leaf (PP exists) was false. Same verdict, one fewer execution."
+#library standard=sdtmig version=3-4
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUGA

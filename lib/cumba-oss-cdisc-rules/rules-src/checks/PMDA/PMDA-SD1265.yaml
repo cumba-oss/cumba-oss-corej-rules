@@ -1,0 +1,117 @@
+Core:
+  Id: "PMDA-SD1265"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Origin (QORIG) is equal to 'ASSIGNED', indicating\
+  \ subjective data, but the Evaluator (QEVAL) is not populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QORIG"
+Check:
+  expression: >-
+    equalsIgnoreCase(QORIG, "ASSIGNED") and empty(QEVAL)
+Outcome:
+  Message: "QEVAL is empty when QORIG equals 'ASSIGNED'."
+  Output_Variables:
+  - "QORIG"
+  - "QEVAL"
+Source:
+  Message: "QEVAL is null when QORIG equals 'ASSIGNED'"
+  Description: "For subjective data (when QORIG='ASSIGNED'), QEVAL should be populated,\
+    \ and the value should reflect the role of the person or institution assigning\
+    \ the value."
+  Domains: "SUPPQUAL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1265"
+        Version: "1"
+      Version: "1.6"

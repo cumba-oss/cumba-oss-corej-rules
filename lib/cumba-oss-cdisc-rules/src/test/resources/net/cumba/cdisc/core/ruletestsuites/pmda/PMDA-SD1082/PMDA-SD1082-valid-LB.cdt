@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1082 expect=noViolation domain=LB
+#note "Every character variable's declared length equals the longest value actually stored in it, so nothing is over-sized. LBSEQ is numeric and therefore outside the rule's data-type guard even though its declared length is larger than its data."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=4  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=3  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  | 4.1

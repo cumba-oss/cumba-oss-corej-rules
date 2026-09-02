@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-AD0181"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is not present, BASE is populated, and\
+  \ BASE does not equal AVAL where ABLFL equals Y for a given value of PARAMCD for\
+  \ a subject"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BASE"
+    - "AVAL"
+    - "ABLFL"
+Operations:
+- id: "$baseline_aval"
+  expression: "max(AVAL, group=[USUBJID, PARAMCD], filter=filter(ABLFL=\"Y\"))"
+Check:
+  expression: >-
+    not var_exists("BASETYPE") and not empty(BASE) and BASE != $baseline_aval
+Outcome:
+  Message: "BASE does not equal the AVAL value recorded where ABLFL equals Y, for\
+    \ this subject and PARAMCD"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "$baseline_aval"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASE"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is not present, BASE is populated,\
+    \ and BASE is not equal to AVAL where ABLFL is equal to Y for a given value of\
+    \ PARAMCD for a subject"
+  Rule_Failure_Criteria: "BASE is not equal to AVAL where ABLFL is equal to Y for\
+    \ a given value of PARAMCD for a subject"
+  Condition_Failure: "BASETYPE is not present and BASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR181"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR181"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR181"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR181"
+        Version: "1"
+      Version: "5.0"

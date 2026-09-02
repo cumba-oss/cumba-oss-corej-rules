@@ -1,0 +1,69 @@
+Core:
+  Id: "CDISC-AD0552"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when MCRITyMN is present and MCRITyML is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("MCRITyMN") and not var_exists("MCRITyML")
+Outcome:
+  Message: "MCRITyMN is present, but MCRITyML is not present."
+  Output_Variables:
+  - "MCRITyMN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source_Proposed:
+  Sheet_Issue: "#57,#155"
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "MCRITyMN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "MCRITyMN is present and MCRITyML is not\
+    \ present"
+  Rule_Failure_Criteria: "MCRITyML is not present"
+  Condition_Failure: "MCRITyMN is present"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "MCRITyMN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "MCRITyMN is present and MCRITyML is not\
+    \ present"
+  Rule_Failure_Criteria: "CRITyML is not present"
+  Condition_Failure: "MCRITyMN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR552"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR552"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR552"
+        Version: "2"
+      Version: "5.0"

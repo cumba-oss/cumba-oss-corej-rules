@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2287 expect=violation domain=TS
+#note "No TSPARMCD equals 'ONGOSIND' -> $ongosind_count = 0 -> fires. Dataset-broadcast: exactly ONE violation, row=1 (CORE-000742 precedent -- no value pin)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | SSTDTC | Study Start Date | 2020-01-01
+S1 | TS | 2 | TITLE  | Trial Title      | StudyX

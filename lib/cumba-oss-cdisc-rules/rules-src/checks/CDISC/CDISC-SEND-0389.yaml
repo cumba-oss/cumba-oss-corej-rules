@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-SEND-0389"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Repro Stage Code (RSTGCD) value in the Trial Repro\
+  \ Paths (TP) dataset does not match any RSTGCD value defined in the Trial Repro\
+  \ Stages (TT) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Operations:
+- id: "$tt_rstgcd"
+  expression: "distinct(RSTGCD, domain=\"TT\")"
+Check:
+  expression: >-
+    not empty(RSTGCD) and RSTGCD not in $tt_rstgcd
+Outcome:
+  Message: "RSTGCD in TP does not match any RSTGCD value in the TT dataset."
+  Output_Variables:
+  - "RSTGCD"
+  - "$tt_rstgcd"
+Source:
+  Class: "TDM"
+  Domain: "TP, TT"
+  Variable: "RSTGCD"
+  Plain_Text_Explanation: "The values of RSTGCD used in the Trial Repro Paths dataset\
+    \ must match values for the same Repro Stage in the Trial Repro Stages dataset."
+  Rule: "TP.RSTGCD = TT.RSTGCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND389"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND389"
+        Version: "1"
+      Version: "5.0"

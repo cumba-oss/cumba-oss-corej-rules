@@ -1,0 +1,23 @@
+name: FDA-SD1037-nofire
+kind: rule
+description: |
+  No-fire companion for FDA-SD1037 (numeric guard). Every LB row either has --TOX populated when
+  --TOXGR > 0, or --TOXGR is 0/empty (guarded out), so the rule never fires.
+python_source: rules-sdtmig-3-4.json (FDA-SD1037)
+rule:
+  coreId: FDA-SD1037
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTOXGR: '2', LBTOX: Grade 2}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 2, LBTOXGR: '0', LBTOX: ''}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 3, LBTOXGR: '', LBTOX: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations: []
+expected_errors: []

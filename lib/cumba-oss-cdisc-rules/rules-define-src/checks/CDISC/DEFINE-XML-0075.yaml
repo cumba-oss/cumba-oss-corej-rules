@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0075"
+Sheet_Rule_Identifier: "75"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the def:IsNonStandard attribute must be \"Yes\"."
+# Value check fires only on a present def:IsNonStandard ("Yes" is the schema's
+# only allowed value; an absent attribute simply means "standard").
+Message: "The value of def:IsNonStandard [${value}] is not \"Yes\" for the ItemRef element."
+Check:
+  kind: "one_of"
+  attribute: "IsNonStandard"
+  values: ["Yes"]

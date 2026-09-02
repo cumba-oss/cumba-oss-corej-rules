@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD1270 expect=noViolation domain=PP
+#note "PC is present in the study inventory alongside PP -> no violation."
+#library standard=sdtmig version=3-4
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | AUCALL
+---
+
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUGA
+---

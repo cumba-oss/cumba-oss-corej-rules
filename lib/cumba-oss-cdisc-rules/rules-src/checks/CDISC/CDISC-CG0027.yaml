@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0027"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SCAT is populated and its value is equal to --CAT."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "--CAT"
+Check:
+  expression: >-
+    not empty(--SCAT) and --SCAT == --CAT
+Outcome:
+  Message: "--SCAT is populated but has the same value as --CAT."
+  Output_Variables:
+  - "--CAT"
+  - "--SCAT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Condition: "--SCAT ^= null"
+  Rule: "--SCAT ^= --CAT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"

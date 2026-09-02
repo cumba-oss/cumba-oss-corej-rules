@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0502 expect=noViolation domain=DM
+#note "RELMIDS variable is present (first conjunct true) but a TM dataset also exists, so 'not ds_exists(TM)' is false, isolating the TM-present silent path."
+#library standard=sdtmig version=3-4
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RELMIDS type=Char label="Related Milestone Instance ID"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 |
+---
+
+dataset TM label="Trial Disease Milestones"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col MIDS type=Char label="Disease Milestone Instance Name"
+---
+CDISCPILOT01 | TM | MILESTONE 1
+CDISCPILOT01 | TM | MILESTONE 2
+---

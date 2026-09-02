@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0006 expect=violation domain=ADSL
+#note "ONTRTFN ends in FN, does not match ^(RFN|PFN|ABLFN|ANL\\d\\dFN)$, value populated and 2 not in [0,1] -> 1 violation. Add NO further *FN column. variable_value is deliberately NOT pinned (numeric cell; no shipped fixture pins a numeric variable_value)."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=ONTRTFN
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ONTRTFN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2

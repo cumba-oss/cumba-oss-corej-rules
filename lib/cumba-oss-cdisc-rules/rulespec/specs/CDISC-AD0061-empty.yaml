@@ -1,0 +1,42 @@
+name: CDISC-AD0061-empty
+kind: rule
+description: |
+  Empty-dataset variant of CDISC-AD0061 (Domain Presence Check, Sensitivity=Dataset):
+  EX is present and ADSL has neither TRTSDT nor TRTSDTM. The primary ADSL carries
+  ZERO rows. Java evaluates the metadata check via the synthetic 1-row table and fires;
+  Python skips empty datasets entirely (see python_notes) and emits nothing.
+  The rule was re-authored 2026-07-29 (PLAN-derive-rule-type-sensitivity §3.7) from a
+  `dataset_names` operation to `ds_exists(EX)` + two `variable_exists` operations, and —
+  consistently with its twins PMDA-AD0061 / CDISC-AD0365 — declares no Output_Variables,
+  so the violation's output_variables is empty.
+python_notes: |
+  Divergence (empty-dataset skip + Wave 2 Finding #9). The Python engine skips a
+  dataset that is empty after preprocessing ("Dataset skipped - Dataset is empty
+  after preprocessing and operations") and yields 0 violations, regardless of the
+  metadata condition. Java treats Variable Metadata Checks as row-count-independent
+  (a 0-row dataset still has column metadata) and fires. Baselined on the python lane.
+python_source: rules-adamig-1-3.json (CDISC-AD0061)
+rule:
+  coreId: CDISC-AD0061
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows: []
+  EX:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-AD0061
+    dataset: ADSL
+    row_key: {STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

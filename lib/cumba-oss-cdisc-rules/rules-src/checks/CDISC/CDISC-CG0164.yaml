@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0164"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IDVAR is populated but RDOMAIN is not present or\
+  \ is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "IDVAR"
+Check:
+  expression: >-
+    not empty(IDVAR) and empty(RDOMAIN)
+Outcome:
+  Message: "Missing RDOMAIN value, when IDVAR is populated"
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "IDVAR"
+  Condition: "RDOMAIN = null"
+  Rule: "IDVAR = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0164"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0164"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0164"
+        Version: "1"
+      Version: "2.0"

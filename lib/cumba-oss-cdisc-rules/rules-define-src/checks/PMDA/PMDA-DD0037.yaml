@@ -1,0 +1,31 @@
+Rule_Id: "PMDA-DD0037"
+Sheet_Rule_Identifier: "DD0037"
+Rule_Set: "PMDA"
+Element: "PDFPageRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "FirstPage and LastPage are required when PageRefs is not provided."
+Message: "Missing or invalid page range"
+# Two attributes demanded at once - encoded with the 0124-B fire-always vehicle:
+# the guard states the violation (no PageRefs and FirstPage or LastPage missing)
+# and anchors on the XSD-required Type attribute, so the not_exists check fires
+# exactly once per offending def:PDFPageRef. A PDFPageRef also missing Type
+# escapes (that is an XSD-pass finding, DD0003's beat). DISAGREEMENT with CDISC
+# twins 0048/0050 flagged: they additionally guard Type='PhysicalRef'; the PMDA
+# row carries no Type condition, so this rule also fires on NamedDestination
+# page references - authored from the PMDA row verbatim (full-mirror policy).
+Check:
+  kind: "not_exists"
+  target: "@Type"
+  when:
+    all:
+    - path: "@PageRefs"
+      exists: false
+    - any:
+      - path: "@FirstPage"
+        exists: false
+      - path: "@LastPage"
+        exists: false
+    - path: "@Type"
+      exists: true

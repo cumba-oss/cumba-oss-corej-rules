@@ -1,0 +1,80 @@
+Core:
+  Id: "FDA-SD1377"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject with ARMNRS equal to 'SCREEN FAILURE'\
+  \ has no record in the Inclusion/Exclusion Criteria Not Met (IE) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Operations:
+- id: "$ie_usubjid"
+  expression: "distinct(USUBJID, domain=\"IE\")"
+Check:
+  expression: >-
+    ARMNRS == "SCREEN FAILURE" and USUBJID not in $ie_usubjid
+Outcome:
+  Message: "No IE record found for the SCREEN FAILURE subject."
+  Output_Variables:
+  - "ARMNRS"
+  - "$ie_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "No records for SCREEN FAILURE subject are found in\
+    \ IE domain"
+  FDA_Validator_Rule_Description: "All subjects with Reason Arm and/or Actual Arm\
+    \ is Null (ARMNRS) equal to 'SCREEN FAILURE' should have records in the Inclusion/Exclusion\
+    \ Criteria Not Met (IE) domain."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0109"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0513"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0109"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0513"
+        Version: "1"
+      Version: "2.0"

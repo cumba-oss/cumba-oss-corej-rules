@@ -1,0 +1,102 @@
+Core:
+  Id: "FDA-SE1125"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ELTM and --TPT are populated but --ELTM does not\
+  \ have the same value across records that share the same DOMAIN, --TPT, --TPTREF,\
+  \ and (if present) --CAT and --SCAT."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Check:
+  expression: >-
+    not empty(--ELTM) and not empty(--TPT) and is_inconsistent_across_dataset(--ELTM, keys=[DOMAIN,
+    --TPT, --TPTREF, --CAT, --SCAT])
+Outcome:
+  Message: "Inconsistent value for --ELTM: it is not the same across records sharing\
+    \ the same --TPT, --TPTREF, and (if present) --CAT/--SCAT."
+  Output_Variables:
+  - "DOMAIN"
+  - "--ELTM"
+  - "--TPT"
+  - "--TPTREF"
+  - "--CAT"
+  - "--SCAT"
+Source:
+  FDA_Validator_Rule_Message: "Inconsistent value for --ELTM within --TPT, --TPTREF,\
+    \  --CAT and/or --SCAT"
+  FDA_Validator_Rule_Description: "All values of Planned Elapsed Time (--ELTM) variable\
+    \ should be the same for a given value of Planned Time Point Name (--TPT) variable,\
+    \ Time Point Reference (--TPTREF) and if present, Category and/or Subcategory\
+    \ (--CAT/--SCAT)."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1125"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1125"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1125"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1125"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1125"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"

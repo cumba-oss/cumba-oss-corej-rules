@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0017 expect=violation domain=LB
+#note "LBTEST on row 2 is 41 characters - one past the 40-character limit - so the rule fires there only; the 40-character row 1 is the passing boundary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 LBTESTCD=ALT2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+---
+S1 | LB | 001 | 1 | ALT | Alanine Aminotransferase Measured in Ser
+S1 | LB | 001 | 2 | ALT2 | Alanine Aminotransferase Measured in Seru

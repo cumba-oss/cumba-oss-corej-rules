@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0480 expect=skipped domain=ADSL
+#note "Both columns match their patterns and capture w=0, but the rule's `_wildcards: w: {min: 1, max: 9}` filter rejects 0, so every instance is dropped, the expansion set is empty and the result is NoMatch -> SKIPPED. Pins the _wildcards lower bound; data is deliberately inconsistent to prove structure alone is not the cause."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID   type=Char
+col USUBJID   type=Char
+col STRAT0V   type=Char
+col STRAT0VN  type=Num
+---
+S1 | 001 | HIGH | 1
+S1 | 002 | LOW  | 1
+---

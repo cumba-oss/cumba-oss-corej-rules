@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-OD0046"
+Sheet_Rule_Identifier: "OD0046"
+Rule_Set: "PMDA"
+Element: "ItemRef"
+Attribute: "ItemOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The value of ItemOID attribute references a non-existent ItemDef element."
+# Bare ItemRef scope covers both containers (ItemGroupDef and def:ValueListDef).
+# CDISC twin 65 (same shape). arm:AnalysisVariable/@ItemOID is DD0097's beat.
+Message: "Referenced ItemDef is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "ItemOID"
+  targetElement: "ItemDef"
+  targetKey: "OID"

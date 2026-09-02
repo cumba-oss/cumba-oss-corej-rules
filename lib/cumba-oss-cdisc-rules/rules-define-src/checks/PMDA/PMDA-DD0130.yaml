@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0130"
+Sheet_Rule_Identifier: "DD0130"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The def:IsNonStandard attribute must have a value of 'Yes'."
+# The sheet constrains the attribute wherever it appears (ItemGroupDef,
+# ItemRef, CodeList, ... in the 2.1 schema), so one wildcard-scoped rule
+# replaces the CDISC twins' per-element trio (0075/0123/0167 - AGREE on the
+# value set). 2.1-only: the attribute does not exist in Define-XML 2.0.
+Message: "Invalid def:IsNonStandard value"
+Check:
+  kind: "one_of"
+  attribute: "IsNonStandard"
+  values: ["Yes"]

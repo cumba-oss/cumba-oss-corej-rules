@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0311 expect=noViolation domain=CO
+#note "Every (COSEQ, USUBJID) tuple is unique, and COSEQ deliberately REPEATS across subjects -- which pins that USUBJID is part of the key rather than COSEQ being globally unique."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset CO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | 001 | 1 | A
+S1 | CO | 001 | 2 | B
+S1 | CO | 002 | 1 | C
+S1 | CO | 002 | 2 | D
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2337 expect=violation domain=TS
+#note "Row 2 records DOSSTDTC as '15JAN2020' (SAS date9 style), which is not ISO 8601."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=DOSSTDTC TSVAL=15JAN2020
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+SEND001 | TS | 1 | DOSENDTC | End Date Time Of Dose Interval | 2020-01-01
+SEND001 | TS | 2 | DOSSTDTC | Start Date Time Of Dose Interval | 15JAN2020

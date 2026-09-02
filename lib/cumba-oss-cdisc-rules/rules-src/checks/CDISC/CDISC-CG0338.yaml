@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0338"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SCAT is equal to the Dictionary-Derived Term (--DECOD)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "--DECOD"
+Check:
+  expression: >-
+    equalsIgnoreCase(--SCAT, --DECOD)
+Outcome:
+  Message: "--SCAT value is redundant with the dictionary-derived term (--DECOD)."
+  Output_Variables:
+  - "--DECOD"
+  - "--SCAT"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Rule: "--SCAT ^= --DECOD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0338"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0338"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0338"
+        Version: "1"
+      Version: "2.0"

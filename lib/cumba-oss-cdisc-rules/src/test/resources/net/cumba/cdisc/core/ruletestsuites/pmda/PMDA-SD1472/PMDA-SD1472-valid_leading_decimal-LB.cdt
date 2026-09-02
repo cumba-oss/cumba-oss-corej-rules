@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1472 expect=noViolation domain=LB
+#note "FLIPPED by the M2-P10 ruling (option (a), Fix #308), the mirror of PMDA-SD1470-valid_leading_decimal-LB. The shipped pattern used to require a digit before the decimal point, so a bare leading-decimal result '.5' was reported non-numeric while PMDA-SD1471 and PMDA-SD1473 - under sheet rows differing only in the range variable - accepted it. Harmonised onto spelling C, /^[><]?=? ?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$/, the quartet answers with one voice. -invalid_non_numeric_result-LB remains the positive control and is unchanged, as is -valid_numeric_forms-LB, whose row 2 pins the sheet's own '<= -1.2'."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col LBSEQ     type=Num
+col LBTESTCD  type=Char
+col LBORRES   type=Char
+col LBSTNRLO  type=Num
+---
+S1 | LB | 001 | 1 | GLUC | .5 | 0.1

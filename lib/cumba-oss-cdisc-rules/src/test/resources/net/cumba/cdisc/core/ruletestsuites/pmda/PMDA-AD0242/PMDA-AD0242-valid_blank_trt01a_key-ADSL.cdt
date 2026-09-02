@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0242 expect=noViolation domain=ADSL
+#note "TRT01A is both the grouping key and the not empty(...) subject, so row 3 (blank TRT01A) is excluded twice: DROP_MISSING_KEYS removes it from grouping and its own conjunct is false; the surviving DRUGX group holds one distinct TRT01AN."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01A  type=Char
+col TRT01AN type=Num
+---
+S1 | 001 | DRUGX |  1
+S1 | 002 | DRUGX |  1
+S1 | 003 |       |  2

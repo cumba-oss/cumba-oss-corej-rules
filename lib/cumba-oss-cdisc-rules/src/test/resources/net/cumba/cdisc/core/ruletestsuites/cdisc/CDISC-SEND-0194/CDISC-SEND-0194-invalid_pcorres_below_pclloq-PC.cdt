@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=violation domain=PC
+#note "THE SHEET-PREDICATE PIN (Fix #295 / M3-D16). Row 1's PCSTRESC is a plain numeric string, NOT the literal BLQ, so the pre-M3-D16 Check -- whose only Condition was `PCSTRESC == \"BLQ\"` -- was silent on it. The sheet's Condition cell for SEND194 is `PCORRES < PCLLOQ`, which is true here (0.04 < 0.1) and which the corpus already expresses in the same domain (CDISC-SEND-0324 ships `PCORRES < PCLLOQ` verbatim). The closure DISJOINS the sheet predicate with the existing BLQ witness rather than replacing it, so no coverage is lost when PCLLOQ is absent. Row 2 is above the limit and silent; row 3 is below the limit but its PCSTRESN is missing, which is the conformant shape."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSEQ=1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSTRESC type=Char label="Character Result/Finding in Std Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Std Units"
+---
+S1 | PC | S1-001 | 1 | DRUGX | 0.04 | 0.1 | 0.04 | 0.04
+S1 | PC | S1-002 | 2 | DRUGX | 12.4 | 0.1 | 12.4 | 12.4
+S1 | PC | S1-003 | 3 | DRUGX | 0.03 | 0.1 |      | .
+---

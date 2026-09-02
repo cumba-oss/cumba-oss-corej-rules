@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0644"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SDTM AE dataset contains the AESEV column but\
+  \ AESEV is not present in the ADAE dataset."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    var_exists(AE.AESEV) and not var_exists("AESEV")
+Outcome:
+  Message: "AE.AESEV is present but AESEV is not present"
+  Output_Variables:
+  - "AE.AESEV"
+  - "AESEV"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Subclass: "ADVERSE EVENT"
+  Variable_or_Item: "AE.AESEV"
+  Natural_Language_Rule_Failure_Criteria: "AE.AESEV is present but AESEV is not present"
+  Rule_Failure_Criteria: "AESEV is not present"
+  Condition_Failure: "AE.AESEV is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR644"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR644"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR644"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR644"
+        Version: "1"
+      Version: "5.0"

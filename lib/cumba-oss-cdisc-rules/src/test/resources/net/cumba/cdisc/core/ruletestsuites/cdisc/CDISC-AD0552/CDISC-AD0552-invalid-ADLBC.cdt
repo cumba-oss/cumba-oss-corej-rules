@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0552 expect=violation domain=ADLBC
+# Rule:Description: MCRITyMN is present and MCRITyML is not present
+#note "MCRIT1MN present, MCRIT1ML absent -> violation"
+#expectViolationCount 1
+#expectViolationAt MCRIT1MN=Y
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col MCRIT1MN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Y
+---

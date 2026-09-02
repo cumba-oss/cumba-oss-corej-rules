@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0170 expect=noViolation domain=ADTTE
+#note "Isolates the `not var_exists(\"CNSR\")` conjunct: STARTDT is present and CNSR is present too, so the second conjunct is false and the rule executes silently."
+#library standard=adamig version=1-1
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 120 | 21915 | 0
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 300 | 21915 | 1

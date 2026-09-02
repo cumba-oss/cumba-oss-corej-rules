@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0237"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Trial Set Code (SETCD) and Trial Set (SET) do not\
+  \ form a unique one-to-one pair."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "SETCD"
+    - "SET"
+Check:
+  expression: >-
+    not is_unique_relationship(SETCD, SET)
+Outcome:
+  Message: "SETCD and SET do not form a unique pair (one-to-one relationship)."
+  Output_Variables:
+  - "SETCD"
+  - "SET"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "SETCD, SET"
+  Plain_Text_Explanation: "Each SETCD/SET is a unique pair."
+  Rule: "Each SETCD/SET is a unique pair."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND237"
+        Version: "1"
+      Version: "5.0"

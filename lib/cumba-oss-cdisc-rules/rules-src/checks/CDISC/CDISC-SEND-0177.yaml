@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0177"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Test Name (MATEST) is \"Gross Pathological Examination\"\
+  \ but Specimen Material Type (MASPEC) is empty; MASPEC is required for this test."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MA"
+Requirements:
+  Variables:
+    All:
+    - "MASPEC"
+    - "MATEST"
+Check:
+  expression: >-
+    MATEST == "Gross Pathological Examination" and empty(MASPEC)
+Outcome:
+  Message: "MASPEC is empty when MATEST is \"Gross Pathological Examination\"; MASPEC\
+    \ is required."
+  Output_Variables:
+  - "MATEST"
+  - "MASPEC"
+Source:
+  Class: "FND"
+  Domain: "MA"
+  Variable: "MASPEC, MATEST"
+  Plain_Text_Explanation: "When MATEST is \"Gross Pathological Examination\" MASPEC\
+    \ is required."
+  Condition: "MATEST = \"Gross Pathological Examination\""
+  Rule: "MASPEC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND177"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-SEND-0411"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subcategory (GVSCAT) is empty in a Genetic Toxicology\
+  \ In Vivo (GV) record; GVSCAT must always be populated with the analysis intention."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "GV"
+Requirements:
+  Variables:
+    All:
+    - "GVSCAT"
+Check:
+  expression: >-
+    empty(GVSCAT)
+Outcome:
+  Message: "GVSCAT is empty; it must be populated with the analysis intention."
+  Output_Variables:
+  - "GVSCAT"
+Source:
+  Class: "FND"
+  Domain: "GV"
+  Variable: "GVSCAT"
+  Plain_Text_Explanation: "GVSCAT is always populated with the analysis intention."
+  Condition: "GVSCAT ^= null"
+  Rule: "GVSCAT is populated with the analysis intention"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND411"
+        Version: "1"
+      Version: "5.0"

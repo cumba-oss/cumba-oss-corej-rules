@@ -1,0 +1,40 @@
+name: CDISC-SEND-0274.1
+kind: rule
+description: |
+  EC-13 (P7) — CDISC-SEND-0274.1 re-authored onto the `variable_names` Operation.
+  A SUPP-- QNAM must not equal a variable name defined in another domain or the SDTM. The
+  Operation `variable_names` builds $variable_names (the union of variable names across the
+  datasets the IG standard defines, mocked via library_mocks.classes + domain_variables); the
+  Check fires when QNAM is_contained_by that union. QNAM=AESEQ collides with AE.AESEQ (fires);
+  QNAM=MYNOVEL does not (passes). Both engines read the same mock, so the lanes agree.
+  $variable_names is left out of Output_Variables (Python returns an unordered set — its
+  serialised order is not canonical; the membership check itself is order-independent).
+rule:
+  coreId: CDISC-SEND-0274.1
+datasets:
+  SUPPAE:
+    row_key: [RDOMAIN, USUBJID, QNAM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESEQ, QLABEL: collides, QVAL: bad}
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: MYNOVEL, QLABEL: novel, QVAL: ok}
+config:
+  standard: sendig
+  standard_version: '3.1'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+    events: [AE]
+  domain_variables:
+    AE:
+      - {name: STUDYID}
+      - {name: USUBJID}
+      - {name: AESEQ}
+      - {name: AETERM}
+expected_violations:
+  - rule_id: CDISC-SEND-0274.1
+    dataset: SUPPAE
+    row_key: {QNAM: AESEQ, RDOMAIN: AE, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      QNAM: AESEQ
+expected_errors: []

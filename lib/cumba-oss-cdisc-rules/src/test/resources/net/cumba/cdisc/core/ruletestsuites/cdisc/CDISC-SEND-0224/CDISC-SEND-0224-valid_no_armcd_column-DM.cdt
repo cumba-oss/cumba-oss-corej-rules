@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-SEND-0224 expect=noViolation domain=DM
+#note "ABSENT-COLUMN ASYMMETRY PIN. Requirements.Variables.All is [ARM] alone, so the variable gate is SATISFIED and the rule EXECUTES (which expect=noViolation asserts); ARMCD is absent, folds all-missing, `not empty(ARMCD)` is false on every row, and the rule reports nothing even though row 2's ARM ('Arm Z') is in no TA record. ESCALATE on mismatch: a SKIPPED means the variable gate is consulting columns the All list does not name; a VIOLATION means the absent-column fold is not the all-missing contract."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | 001 | M | Arm A
+S1 | DM | 002 | 002 | F | Arm Z
+S1 | DM | 003 | 003 | M |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | A | Arm A | 1 | SCRN | Screening
+S1 | TA | B | Arm B | 1 | SCRN | Screening
+---

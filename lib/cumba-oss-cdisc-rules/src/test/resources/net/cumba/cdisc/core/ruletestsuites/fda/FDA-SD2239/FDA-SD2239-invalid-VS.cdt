@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD2239 expect=violation domain=VS
+#note "VISITNUM and VSTPTREF absent (gates pass); VSTPTNUM 1 maps to two VSTPT names ('PRE-DOSE' vs 'PREDOSE') -> fires on both rows with that number."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSTPT=PRE-DOSE
+#expectViolationAt row=3 VSTPT=PREDOSE
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTPT    type=Char label="Planned Time Point Name"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | VS | 001 | 1 | SYSBP | PRE-DOSE  | 1
+S1 | VS | 001 | 2 | SYSBP | POST-DOSE | 2
+S1 | VS | 002 | 1 | SYSBP | PREDOSE   | 1

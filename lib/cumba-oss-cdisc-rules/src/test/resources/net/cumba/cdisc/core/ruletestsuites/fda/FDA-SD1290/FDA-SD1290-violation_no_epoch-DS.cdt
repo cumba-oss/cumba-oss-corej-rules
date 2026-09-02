@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1290 expect=violation domain=DS
+#note "EPOCH is absent, so the study never used epochs. The EPOCH exists guard was REMOVED (plan Q4): an absent column is a constant one, which cannot discriminate, so dropping it from the key is exact - the check adapts to `one DISPOSITION EVENT record per subject` and correctly flags the duplicate. Before the removal this study got silence. Pinned at 2 findings on subject 01-701-1015 and explicitly NOT on 01-701-1023. This rule is record-level, so an over-firing degradation would report 3 and `expect=violation` alone would pass on it - the count and the two row anchors are what exclude that."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col DSSCAT   type=Char label="Subcategory for Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY PARTICIPATION
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY PARTICIPATION
+CDISCPILOT01 | DS | 01-701-1023 | 3 | DISPOSITION EVENT | STUDY PARTICIPATION
+---

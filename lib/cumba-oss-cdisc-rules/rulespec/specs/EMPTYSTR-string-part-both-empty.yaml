@@ -1,0 +1,45 @@
+name: EMPTYSTR-string-part-both-empty
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category B.5).
+  does_not_equal_string_part: fires where --LHS does not equal capture-group-1 of
+  the regex over the comparator. On the both-empty row (--LHS "" and extracted
+  part ""), the honest coreJ engine treats "" == "" as equal → NO fire. Python's
+  ~equals_string_part runs _check_equality whose both-null rule returns
+  "not a match", so the negation FIRES.
+
+  RESIDUAL un-gated divergence (Phase 6): matching Python needs an OR-style gate
+  ("fire when both LHS and the extracted part are empty"), but the expression
+  language has no surface that extracts a regex capture group to a value, so no
+  converter gate was added. Baselined on the python lane.
+python_notes: |
+  Python does_not_equal_string_part == ~equals_string_part; both-empty → Python
+  fires (extra violation on the ""/"" row) while coreJ does not. Residual divergence
+  with no expression surface to gate. Accepted per the plan.
+python_source: PLAN-empty-string-membership-parity.md (B.5)
+check:
+  name: AVAL
+  operator: does_not_equal_string_part
+  value: CMP
+  regex: "^(.*)$"
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AVAL: 'ABC', CMP: 'ABC'}    # equal → no fire (both)
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AVAL: 'X', CMP: 'ABC'}      # differ → fires (both)
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AVAL: '', CMP: ''}          # both empty → coreJ no fire, Python fires
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-string-part-both-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AVAL: X
+    STUDYID: S1
+    USUBJID: '002'
+expected_errors: []

@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0078 expect=violation domain=MH
+#runLevel Info
+# Rule:Description: Raise an error when MHENDTC is populated and is the same as or later than RFSTDTC in the DM dataset.
+#note "Two-level partial-date fixture (plan C phase 5b, ruling (a) 2026-08-26). Row 1: MHENDTC=2012-07 is a month partial CERTAINLY on/after RFSTDTC=2012-06-15 (its earliest completion 2012-07-01 already is), so the verbatim ERROR leg fires. Row 2: MHENDTC=2012-06 is only POSSIBLY on/after (latest completion 2012-06-30 is, earliest 2012-06-01 is not), so under first-claim the tagged INFO leg claims it. Row 3 is certainly earlier and silent on both legs. Runs at #runLevel Info because the engine default (Warning) never evaluates an INFO level."
+#expectViolationCount 2
+#expectViolationAt row=1 severity=ERROR USUBJID=01-701-0001
+#expectViolationAt row=2 severity=INFO USUBJID=01-701-0001
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHTERM type=Char label="Reported Term for the Medical History"
+col MHENDTC type=Char label="End Date/Time of Medical History Event"
+---
+CDISCPILOT01 | MH | 01-701-0001 | 1 | HEADACHE | 2012-07
+CDISCPILOT01 | MH | 01-701-0001 | 2 | NAUSEA | 2012-06
+CDISCPILOT01 | MH | 01-701-0001 | 3 | FATIGUE | 2011-05
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-0001 | 2012-06-15
+---

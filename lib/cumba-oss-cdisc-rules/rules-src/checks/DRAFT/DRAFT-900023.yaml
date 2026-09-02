@@ -1,0 +1,40 @@
+Core:
+  Id: "DRAFT-900023"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when the define.xml flags sponsor-extended terms (ExtendedValue='Yes')\
+  \ on a codelist that is non-extensible in the CDISC Library; non-extensible codelists\
+  \ must not be extended."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Requires both a define.xml (the per-item ExtendedValue flags) and CDISC\
+    \ Library metadata (the codelist's extensibility); a run without either skips\
+    \ or under-reports. Define-XML has no codelist-level extensible attribute, so\
+    \ the check is item-based: it fires when any term is flagged ExtendedValue='Yes'\
+    \ while the library codelist is non-extensible. A sponsor extension that is NOT\
+    \ flagged is caught by the term-membership sibling (DRAFT-900021) instead."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    var_codelist_extensible("LIBRARY") == false and not
+    empty(var_codelist_extended_values("DEFINE"))
+Outcome:
+  Message: "The define.xml flags sponsor-extended terms on a codelist that is non-extensible\
+    \ in the CDISC Library."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_codelist_extended_values"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

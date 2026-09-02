@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0123"
+Sheet_Rule_Identifier: "DD0123"
+Rule_Set: "PMDA"
+Element: "ValueListDef/ItemRef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The length of a value level slice must be less than or equal to the length of the parent variable."
+# CDISC twin 0142 - AGREE (same scope, derefs, and less_or_equal op; see 0142
+# for the first-match deviation on multi-parent value lists). compare skips
+# elements where either Length is missing or non-numeric.
+Message: "Variable/Value Level Length mismatch [${value}]"
+Check:
+  kind: "compare"
+  left: "@ItemOID->ItemDef@OID/@Length"
+  right: "../@OID->ValueListRef@ValueListOID/../@Length"
+  op: "less_or_equal"

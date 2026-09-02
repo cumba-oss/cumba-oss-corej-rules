@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-CT2006 expect=noViolation domain=QS
+#note "Track B: adapted from FDA-CT2006-valid-QS.cdt. Under the value-level condition QSCAT='FUNC' the Define-XML binds QSTESTCD to a codelist whose WALK/GRIP terms decode to 'Walk Test'/'Grip Strength'; every record pairs code and decode correctly (row 3 is outside the value-level condition) -> no violation."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-CT2006-define.xml
+dataset QS class=FINDINGS label="Questionnaires"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSCAT    type=Char label="Category of Question"
+col QSTESTCD type=Char label="Question Short Name"
+col QSTEST   type=Char label="Question Name"
+---
+001 | FUNC  | WALK | Walk Test
+001 | FUNC  | GRIP | Grip Strength
+001 | OTHER | WALK | Some Other Name

@@ -1,0 +1,33 @@
+name: CDISC-AD0401
+kind: rule
+description: |
+  Wave A4 port — T1a PlainSimple.
+  CDISC-AD0401: ATOXDSCL is populated while AVAL or ATOXGRL is empty.
+  Record-data rule scoped to BASIC DATA STRUCTURE; nested all/any with empty/non_empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0401)
+rule:
+  coreId: CDISC-AD0401
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    column_types:
+      AVAL: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, ATOXDSCL: '', AVAL: 5.0, ATOXGRL: LOW}       # ok — ATOXDSCL empty
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, ATOXDSCL: desc, AVAL: null, ATOXGRL: LOW}       # bad — AVAL empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0401
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ATOXDSCL: desc
+      ATOXGRL: LOW
+      AVAL:
+expected_errors: []

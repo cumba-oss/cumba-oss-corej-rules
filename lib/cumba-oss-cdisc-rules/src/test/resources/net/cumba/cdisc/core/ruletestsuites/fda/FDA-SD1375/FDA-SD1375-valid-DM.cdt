@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1375 expect=noViolation domain=DM
+#note "Row 1: a treated subject keeps RFENDTC. Rows 2-3: screen failure / not assigned have an empty RFENDTC. Row 4 boundary: SDTMIG requires RFENDTC for all randomised subjects, so an ACTARMCD='NOTTRT' subject with a populated RFENDTC is conformant (see review finding SD1375-1)."
+#library standard=sdtmig version=3-2
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-05 | 2020-06-30 | A
+CDISCPILOT01 | DM | 01-701-1023 |            |            | SCRNFAIL
+CDISCPILOT01 | DM | 01-701-1028 |            |            | NOTASSGN
+CDISCPILOT01 | DM | 01-701-1034 | 2020-01-05 | 2020-02-10 | NOTTRT

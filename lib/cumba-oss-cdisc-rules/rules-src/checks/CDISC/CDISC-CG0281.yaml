@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0281"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the TS dataset contains exactly one record with\
+  \ TSPARMCD equal to 'TRT' (a single investigational treatment) but does not contain\
+  \ a record with TSPARMCD equal to 'RANDQT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$trt_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"TRT\"\
+    ))"
+- id: "$randqt_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"RANDQT\"\
+    ))"
+Check:
+  expression: >-
+    $trt_count == 1 and $randqt_count < 1
+Outcome:
+  Message: "A record with TSPARMCD equal to 'RANDQT' is not present when there is\
+    \ exactly one investigational treatment (a single record with TSPARMCD equal to\
+    \ 'TRT')."
+  Output_Variables:
+  - "$trt_count"
+  - "$randqt_count"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Condition: "At least one observation where TSPARMCD = TRT and there is only one\
+    \ investigational treatment"
+  Rule: "TSPARMCD = RANDQT record is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0281"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0281"
+        Version: "1"
+      Version: "2.0"

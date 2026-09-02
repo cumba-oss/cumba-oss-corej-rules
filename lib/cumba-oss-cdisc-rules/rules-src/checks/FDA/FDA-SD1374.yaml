@@ -1,0 +1,65 @@
+Core:
+  Id: "FDA-SD1374"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a DM subject who received treatment (ACTARMCD is\
+  \ populated) has no record in the Disposition (DS) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and USUBJID not in $ds_usubjid
+Outcome:
+  Message: "There are no DS records for subject who was assigned treatment."
+  Output_Variables:
+  - "ACTARMCD"
+  - "$ds_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "No Disposition record found for subject"
+  FDA_Validator_Rule_Description: "All Demographics (DM) subjects (USUBJID) should\
+    \ have at least one record in the Disposition (DS) domain with only possible exceptions\
+    \ to subjects who did not receive treatment (ACTARMCD is null)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1374"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1374"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0540"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0540"
+        Version: "1"
+      Version: "2.0"

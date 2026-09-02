@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD9999"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an ADaM dataset's structure is not one of the supported\
+  \ ADSL (Subject-Level Analysis Dataset), BDS (Basic Data Structure), or OCCDS (Occurrence\
+  \ Data Structure) structures, so the dataset is not validated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(ds_class("DEFINE")) and upper(ds_class("DEFINE")) not in
+    ["SUBJECT LEVEL ANALYSIS DATASET", "BASIC DATA STRUCTURE", "OCCURRENCE DATA STRUCTURE"]
+Outcome:
+  Message: "The dataset structure is not one of the supported ADSL, BDS, or OCCDS\
+    \ structures, so the dataset is not validated."
+  Output_Variables:
+  - "define_dataset_class"
+Source:
+  Message: "Dataset not validated"
+  Description: "Validation is defined only for ADSL, BDS, and OCCDS datasets. Other\
+    \ dataset structures are not currently supported."
+  Domains: "UNRECOGNIZED"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD9999"
+        Version: "1"
+      Version: "6.0"

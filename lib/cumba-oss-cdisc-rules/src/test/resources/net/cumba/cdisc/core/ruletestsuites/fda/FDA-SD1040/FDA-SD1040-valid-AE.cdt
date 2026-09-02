@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1040 expect=noViolation domain=AE
+#note "Every populated AESCAT is distinct from DOMAIN, AETERM and AEBODSYS; row 2 duplicates AEDECOD, which is NOT one of the compared variables; row 3 leaves AESCAT empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AECAT    type=Char label="Category for Adverse Event"
+col AESCAT   type=Char label="Subcategory for Adverse Event"
+---
+S1 | AE | 001 | 1 | Headache  | Headache  | Nervous system disorders | NEUROLOGIC | VASCULAR
+S1 | AE | 001 | 2 | Feeling sick | Nausea | Gastrointestinal disorders | GI       | Nausea
+S1 | AE | 001 | 3 | Dizziness | Dizziness | Nervous system disorders | NEUROLOGIC |

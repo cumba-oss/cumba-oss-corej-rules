@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-SEND-0292 expect=noViolation domain=PC
+#note "ESCALATE -- do not re-aim: the discriminator for the --TPTREF member of the partition. Within (DRUGX, DOSE 1) '1 HOUR' maps only to 1 and within (DRUGX, DOSE 2) only to 2. This is also the file that demonstrates the 0290/0292 subset relation: run CDISC-SEND-0290 against this same data BEFORE the M3-D21 widening and all four rows fire, because its partition was strictly coarser. Do NOT author it under 0290."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTEST   type=Char label="Pharmacokinetic Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCTPT    type=Char label="Planned Time Point Name"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 | 1 | DRUGX | Drug X | 412 | 1 HOUR | 1 | DOSE 1
+S1 | PC | 002 | 1 | DRUGX | Drug X | 388 | 1 HOUR | 1 | DOSE 1
+S1 | PC | 001 | 2 | DRUGX | Drug X | 300 | 1 HOUR | 2 | DOSE 2
+S1 | PC | 002 | 2 | DRUGX | Drug X | 290 | 1 HOUR | 2 | DOSE 2
+---

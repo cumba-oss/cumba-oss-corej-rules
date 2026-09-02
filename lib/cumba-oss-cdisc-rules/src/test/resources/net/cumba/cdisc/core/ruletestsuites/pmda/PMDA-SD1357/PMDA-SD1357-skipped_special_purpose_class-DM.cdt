@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD1357 expect=skipped domain=DM
+#note "FRESH: SPECIAL PURPOSE is not in Classes.Include [INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT] -> pre-gate skip, even though MIDSDTC is populated and MIDS is absent (the Check would otherwise fire). Pins this rule's four-token Classes.Include block. class= is mandatory: describeAdamClassMismatch refuses SDTM class tokens, so only a declared dataset_class judges this axis."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col MIDSDTC type=Char
+---
+S1 | DM | 001 | 2020-01-15

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1128 expect=violation domain=RELREC
+#note "FRESH: lowercase 'one' on row 1 is not one of the CT terms ONE/MANY -- the Check uses a case-SENSITIVE membership operator -> fires. Row 2 uses the correct uppercase term and is silent. Deliberate contrast with PMDA-SD1364's case-insensitive ARMNRS test in the same batch."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RELTYPE=one
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE type=Char label="Relationship Type"
+col RELID   type=Char label="Relationship Identifier"
+---
+S1 | AE |  | AESEQ |  | one  | R01
+S1 | CM |  | CMSEQ |  | MANY | R01

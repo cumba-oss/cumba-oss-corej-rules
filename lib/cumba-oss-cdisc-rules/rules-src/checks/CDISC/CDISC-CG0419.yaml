@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0419"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IDVAR is populated with a value ending in --SEQ\
+  \ and RELTYPE is populated, since RELTYPE characterizes relationships between datasets\
+  \ and --SEQ has meaning only within a subject within a single dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELREC"
+Check:
+  expression: >-
+    suffix(IDVAR, 3) =~ /^SEQ$/ and not empty(RELTYPE)
+Outcome:
+  Message: "RELTYPE is populated when IDVAR is populated with a --SEQ value."
+  Output_Variables:
+  - "IDVAR"
+  - "RELTYPE"
+Source:
+  Class: "SPC"
+  Domain: "RELREC"
+  Variable: "RELTYPE"
+  Condition: "IDVAR populated with a --SEQ value"
+  Rule: "RELTYPE = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0419"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0419"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0419"
+        Version: "1"
+      Version: "2.0"

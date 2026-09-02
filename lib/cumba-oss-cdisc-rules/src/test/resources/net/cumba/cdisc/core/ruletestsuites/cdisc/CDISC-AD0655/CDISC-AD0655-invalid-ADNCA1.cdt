@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0655 expect=violation domain=ADNCA1
+#note "Split-named ADaM dataset reached by the NON-COMPARTMENTAL ANALYSIS subclass. PARAMCD/AVAL give BASIC DATA STRUCTURE and the two relative-time columns NFRLT/AFRLT meet the NCA signature's two-hit threshold, so the subclass is detected from columns alone — the detector's ADNCA exact-name test was removed by Fix #140 precisely so a split name would still be reached. DOSEA is absent, so the check fires."
+# Rule:Description: Raise an error when DOSEA is not present in an ADNCA v1.0 dataset.
+#expectViolationCount 1
+dataset ADNCA1
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+col NFRLT   type=Num  label="Nom. Rel. Time from Analyte First Dose"
+col AFRLT   type=Num  label="Act. Rel. Time from Analyte First Dose"
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 | 0 | 0.5
+---

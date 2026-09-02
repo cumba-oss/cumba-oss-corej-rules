@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0312 expect=violation domain=ADAE
+#note "Pins that the membership test is CASE-SENSITIVE - no upper(...) wrapper, so a mixed-case spelling of an otherwise-allowed term IS reported. Batch's single pin of this contract (holds identically for the [Y] tests on AD0178/AD0269/AD0272)."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=SMQ01SC USUBJID=01-701-1015
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AETERM   type=Char
+col SMQ01NAM type=Char
+col SMQ01SC  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | CARDIACDISORDERS | Broad

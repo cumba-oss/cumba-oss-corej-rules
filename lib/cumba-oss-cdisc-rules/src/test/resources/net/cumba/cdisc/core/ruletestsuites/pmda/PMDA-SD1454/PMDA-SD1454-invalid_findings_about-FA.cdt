@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1454 expect=violation domain=FA
+#note "Pins the second Classes token (FINDINGS ABOUT) positively; --DRVFL/--STREFC resolve to FADRVFL/FASTREFC via the domain prefix."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FADRVFL=Y
+dataset FA class="FINDINGS ABOUT" label="Findings About"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col FASEQ    type=Num
+col FATESTCD type=Char
+col FAOBJ    type=Char
+col FADRVFL  type=Char
+col FASTREFC type=Char
+---
+S1 | FA | 001 | 1 | OCCUR | MIGRAINE | Y |

@@ -1,0 +1,121 @@
+name: FDA-SD1325-multi
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P3a — the **LIVENESS ANCHOR** for the two sibling leak
+  specs. It is NOT evidence about EC-41/H5, and must not be read as such. That framing is
+  unchanged by Fix #132: this spec's job is, and always was, to prove the fixture is live.
+
+  ⚠ This spec was GREEN on both lanes **while the fork was still emitting three findings for
+  one defect** (P3a–P3c, before Fix #132). It is deliberately insensitive to that defect: the
+  mismatching label sits on the PRIMARY dataset, and the pre-fix merged frame kept the study's
+  declaration order (pandas merge `sort=False`, Define-only rows appended), so
+  `errors_df.iloc[0]` — the row `Sensitivity: Dataset` keeps — was the primary's own row. A
+  dirty primary always won that race, so the fork's single reported finding was byte-identical
+  to coreJ's even at the height of the defect. That insensitivity is the POINT: it is what
+  makes this spec a trustworthy liveness anchor rather than a second measurement. Its whole
+  function is to prove the Java lane REPORTS on this exact 4-key fixture, so that its
+  siblings' `0` reads as "ran and found nothing" rather than "never received the Define data"
+  — and with the siblings now at 0 on BOTH lanes, that function is more load-bearing than it
+  was, not less.
+
+  (That the ordering held was an absence, not a law: upstream carries
+  `sort_values("dataset_name")` on the merged frame which this fork lacks. Moot for the fork's
+  own correctness since Fix #132 narrowed the frame to one row, but re-verify after any
+  submodule bump — a bump that reverts the narrowing brings the ordering dependence back.)
+
+  Shape: THREE submitted datasets (AE, VS, LB) plus ONE Define-only key (ZZ), which is
+  exactly the study shape that maximised the fork defect: `_get_dataset_dataframe` iterates
+  `data_service.get_datasets()` — every dataset in the study — and `build()` outer-merged that
+  with the Define frame (`dataset_metadata_define_dataset_builder.py`, `how="outer"`), where
+  `ContentMetadataDatasetBuilder` returned exactly ONE row for the dataset under evaluation.
+  `rules_engine.validate_single_rule` loops per dataset, so the same study-wide merged frame
+  was evaluated once per submitted dataset. Fix #132 narrows the study side to the dataset
+  under evaluation and merges `how="left"`; the fixture is kept at this shape because it is
+  the shape that would expose a revert.
+
+  In THIS spec the offending Define label sits on the PRIMARY (AE): submitted label `AE`
+  (both lanes hard-wire a spec dataset's label to its key — Java
+  `OverlayDataTable.empty(domain, domain, ...)`, Python `DummyDataset({"label": domain})`)
+  against a declared `Adverse Events`. So the Java lane reports exactly ONE violation, and
+  that non-zero, known count is the point of this spec: it is the precondition its two
+  siblings (`FDA-SD1325-define-only-leak`, `FDA-SD1325-sibling-leak`) depend on. Those two
+  keep this fixture byte-for-byte and only move the bad label; when they report Java 0 that
+  0 is a real "the rule ran and found nothing", not a dead Define channel. That distinction
+  cannot be made from the status channel: killing the channel on the Java lane yields
+  EXECUTED with zero findings, not SKIPPED, because the define skip gate keys on the
+  provider merely being non-null and `injectDatasetLevel`'s `putIfNonNull` then omits the
+  operand silently.
+
+  Both lanes agree here, and it is worth knowing WHY they agreed even before the fix, since
+  that is what disqualifies this spec as EC-41 evidence. FDA-SD1325 derives Sensitivity
+  `Dataset`, so the fork's `generate_targeted_error_object` emits ONE error per dataset taken
+  from `errors_df.iloc[0]` (`models/actions.py:161-169`) — the FIRST violating row of the
+  frame. Pre-fix that merge was `dataset_df.merge(define_df, how="outer")` with pandas'
+  default `sort=False`, so the frame kept the study's declaration order and appended the
+  Define-only rows; the primary is always the first declared dataset
+  (`SpecRunner.pickPrimary` / `_pick_primary_domain` fall through to the first `datasets:`
+  key for an `Include: ALL` rule). A dirty primary therefore always won that race and the
+  fork reported the primary's own row — identical to Java's — while the defect was fully
+  present underneath: the fork produced THREE findings (one per submitted dataset, all
+  carrying AE's values), and the spec channel keeps only the primary domain's bucket
+  (`engine_adapter.py`, the `primary_results` comprehension), so it saw 1 of 3. Measured
+  directly off-harness in P3c. Since Fix #132 the frame holds exactly the evaluated dataset's
+  row, so the `iloc[0]` race no longer exists and the agreement is structural rather than
+  lucky — but the spec's own expectation is unchanged, which is why it is the stable anchor.
+
+  ZZ carries `define_dataset_class` and deliberately NO `define_dataset_label`: pre-fix a
+  Define-only key had no submitted row, so its `dataset_label` cell was None, and ANY
+  non-empty label on it would satisfy
+  `non_empty(define_dataset_label) and dataset_label != define_dataset_label` and fire.
+  Declaring the class instead kept the Define-only row in the merged frame — the shape being
+  exercised — without letting it contribute a finding. Post-fix ZZ cannot enter the frame at
+  all; the key is retained because a revert of Fix #132 restores exactly that hazard, and
+  `FDA-SD1325-define-only-leak` is the sibling that would then fire. `define_dataset_class`
+  is one of the three attributes with a Java sink (`name`/`label`/`className`), so it cannot
+  introduce a lane asymmetry the way a sink-less attribute would; the Java lane never
+  evaluates ZZ anyway (`RuleRunner` runs against the primary table only).
+
+  `define_dataset_name` / `define_dataset_location` are deliberately not declared on any key,
+  so D4's derivation stays on the execution path (`AE` => name `AE`, location `ae.xpt`). The
+  location default is load-bearing on the Python lane: the fork merges on
+  (`dataset_name`, `dataset_location`) and `DummyDataset.filename` is `f"{domain.lower()}.xpt"`,
+  so a mismatch would split the merged row and masquerade as the multiplication this fixture
+  exists to measure. R6 rejects a declared mismatch for that reason.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1325)
+rule:
+  coreId: FDA-SD1325
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: ALT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: Adverse Events
+  VS:
+    define_dataset_label: VS
+  LB:
+    define_dataset_label: LB
+  ZZ:
+    define_dataset_class: EVENTS
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SD1325
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      dataset_label: AE
+      define_dataset_label: Adverse Events
+expected_errors: []

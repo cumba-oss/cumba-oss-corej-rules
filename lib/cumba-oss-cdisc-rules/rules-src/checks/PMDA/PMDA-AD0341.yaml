@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0341"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and a parameter, the Multi-Response\
+  \ Criterion y Eval (N) (MCRITyMN) variable does not have a single consistent value\
+  \ across all records sharing the same combination of Parameter Code (PARAMCD) and\
+  \ a populated Multi-Response Criterion y Evaluation (MCRITyML) value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and not empty(MCRITyML) and not empty(PARAMCD) and
+    is_inconsistent_across_dataset(MCRITyMN, keys=[PARAMCD, MCRITyML])
+Outcome:
+  Message: "Inconsistent value for MCRITyMN within a unique MCRITyML."
+  Output_Variables:
+  - "PARAMCD"
+  - "MCRITyML"
+  - "MCRITyMN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for MCRITyMN"
+  Description: "Within a Study and a Parameter, all Multi-Response Criterion y Eval\
+    \ (N) (MCRITyMN) variable values must be the same for each unique value of Multi-Response\
+    \ Criterion y Evaluation (MCRITyML) variable when the primary variable MCRITyML\
+    \ is populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0341"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0341"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0341"
+        Version: "1"
+      Version: "6.0"

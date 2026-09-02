@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD0077 expect=noViolation domain=RELREC
+#note "ADAPTED-FROM fda/FDA-SD0077/FDA-SD0077-valid_blank_idvarval-RELREC.cdt. Row 1 is a dataset-level RELREC relationship (blank IDVARVAL, blank USUBJID) -> non_empty guard silences it; row 2's record-level AESEQ=1 reference exists. RELREC has no DOMAIN column and no class=."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | AE |             | AEGRPID | | ONE  | REL1
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ   | 1 |     | REL2
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE

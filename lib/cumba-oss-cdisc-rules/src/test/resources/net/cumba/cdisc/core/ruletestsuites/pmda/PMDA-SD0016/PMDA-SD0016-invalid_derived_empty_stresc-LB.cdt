@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD0016 expect=violation domain=LB
+#note "Row 1: derived flag Y, STRESC present-but-empty -> fires. Row 2: STRESC populated -> clean. Row 3: DRVFL not 'Y' -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTRESC= LBDRVFL=Y
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBSTRESC type=Char
+col LBDRVFL  type=Char
+---
+S1 | LB | 001 | 1 | GLUC |     |     | Y
+S1 | LB | 001 | 2 | ALB  | 5.1 | 5.1 | Y
+S1 | LB | 001 | 3 | CHOL | 4.9 | 4.9 |

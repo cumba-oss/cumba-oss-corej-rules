@@ -1,0 +1,30 @@
+name: CDISC-AD0805
+kind: rule
+description: |
+  Wave A9 port — T1a PlainSimple.
+  CDISC-AD0805: SUBJTYP is populated and SUBJTYPC is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0805)
+rule:
+  coreId: CDISC-AD0805
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', SUBJTYP: '',  SUBJTYPC: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', SUBJTYP: 'X', SUBJTYPC: ''}      # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0805
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      SUBJTYP: 'X'
+      SUBJTYPC: null
+expected_errors: []

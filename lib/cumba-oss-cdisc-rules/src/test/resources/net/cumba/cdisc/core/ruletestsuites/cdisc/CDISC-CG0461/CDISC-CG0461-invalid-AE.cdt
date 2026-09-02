@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0461 expect=violation domain=AE
+# Rule:Description: Raise an error when the High Level Group Term (--HLGT) is not on the MedDRA primary system organ class hierarchy path.
+#note "EC-36 pin (twin of CDISC-CG0460): dictionary_parent '--SOC' now resolves to AESOC instead of being looked up as a literal column name. 'Headaches' sits under 'Nervous system disorders', so the 'Gastrointestinal disorders' SOC on row 1 is off-path and must fire. Both operands carry the MedDRA preferred case, so the miss is the path and not a case mismatch (C1 repair)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLGT type=Char label="High Level Group Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Headaches | Gastrointestinal disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Headaches | Nervous system disorders
+---

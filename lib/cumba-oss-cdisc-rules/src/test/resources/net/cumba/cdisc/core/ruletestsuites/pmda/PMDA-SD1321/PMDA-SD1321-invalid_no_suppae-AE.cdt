@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1321 expect=violation domain=AE
+#note "ADAPTED-FROM fda/FDA-SD1321/FDA-SD1321-invalid_no_suppae-AE.cdt verbatim. Boundary the FDA message names explicitly ('missing SUPPAE'): AE records exist and no SUPPAE dataset is submitted at all -> must fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | 001 | 1 | Headache | HEADACHE

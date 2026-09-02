@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0278"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset has no records; a dataset should have\
+  \ at least one record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$records_in_dataset"
+  expression: "record_count()"
+Check:
+  expression: >-
+    $records_in_dataset == 0
+Outcome:
+  Message: "Dataset has no records."
+  Output_Variables:
+  - "$records_in_dataset"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "Empty dataset files (i.e., files that do not contain any\
+    \ records) must not be included in a SEND dataset submission."
+  Condition: "Dataset file contains no records"
+  Rule: "Dataset must not be included in the SEND submission"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND278"
+        Version: "1"
+      Version: "5.0"

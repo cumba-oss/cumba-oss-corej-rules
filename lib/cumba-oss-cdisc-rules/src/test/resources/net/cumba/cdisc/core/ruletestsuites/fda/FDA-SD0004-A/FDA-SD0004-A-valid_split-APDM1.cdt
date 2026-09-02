@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0004-A expect=noViolation domain=APDM1
+#note "Boundary: a legitimately split AP dataset. The five-character name APDM1 does not match the strict four-character AP-- token directly, but unsplitNameFromData returns the row-0 DOMAIN value 'APDM', so the dataset is a split and the Include is satisfied by the BASE leg; only the first four characters are then compared, prefix('APDM1',4)='APDM' == DOMAIN='APDM' -> silent."
+#library standard=sdtmig version=3-4
+dataset APDM1
+col STUDYID type=Char
+col DOMAIN  type=Char
+col APID    type=Char
+col RSUBJID type=Char
+col SREL    type=Char
+---
+CDISCPILOT01 | APDM | AP-001 | 01-701-1015 | MOTHER, BIOLOGICAL

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0001 expect=violation domain=ADAE
+#note "NO ADSL block anywhere in the file - the violation. not ds_exists(ADSL) reads the study inventory, finds no ADSL, fires ONCE for the submission (Study granularity). No structure= written - this rule has no Data_Structures or Subclasses gate. Emit count alone: no Output_Variables, no location channel - do not add row= or a column pin."
+#expectViolationCount 1
+#library standard=adamig version=1-3
+dataset ADAE label="Adverse Events Analysis Dataset"
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE
+CDISCPILOT01 | 01-701-1023 | NAUSEA
+---

@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0528"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a standard ADSL population flag (COMPLT, FULLSET,\
+  \ ITT, PPROT, or SAFETY) from a previous version of the SDTMIG is present as a Qualifier\
+  \ Variable Name (QNAM) in the Supplemental Qualifiers dataset for DM."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+    - "QNAM"
+Check:
+  expression: >-
+    RDOMAIN == "DM" and QNAM in ["COMPLT", "FULLSET", "ITT", "PPROT", "SAFETY"]
+Outcome:
+  Message: "An ADSL population flag (COMPLT, FULLSET, ITT, PPROT, or SAFETY) is present\
+    \ in SUPPDM."
+  Output_Variables:
+  - "RDOMAIN"
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "QNAM"
+  Rule: "ADSL Population flags not in SUPPDM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0528"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0528"
+        Version: "1"
+      Version: "2.0"

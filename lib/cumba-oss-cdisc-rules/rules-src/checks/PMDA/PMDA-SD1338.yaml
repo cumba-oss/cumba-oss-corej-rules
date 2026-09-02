@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-SD1338"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an RSLNKGRP value in the RS domain is not present\
+  \ as a TRLNKGRP value in the TR domain for the same subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RS"
+Requirements:
+  Variables:
+    All:
+    - "RSLNKGRP"
+Operations:
+- id: "$tr_lnkgrp"
+  expression: "distinct(TRLNKGRP, domain=\"TR\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(RSLNKGRP) and RSLNKGRP not in $tr_lnkgrp
+Outcome:
+  Message: "RSLNKGRP does not match any TRLNKGRP value in the TR domain for the subject."
+  Output_Variables:
+  - "RSLNKGRP"
+  - "$tr_lnkgrp"
+Source:
+  Message: "RSLNKGRP value does not exist in TR domain"
+  Description: "A Link Group (RSLNKGRP) value for a response assessment that is referenced\
+    \ in the Disease Response (RS) domain for a subject must also be present in the\
+    \ Tumor Results (TR) domain for the appropriate measurement records for that subject."
+  Domains: "RS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1338"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1338"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1338"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1338"
+        Version: "1"
+      Version: "1.6"

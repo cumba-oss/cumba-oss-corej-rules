@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0093 expect=skipped domain=ADLBC
+#note "TRTPN (the grouping key) absent. Requirements.Variables.All [TRTP, TRTPN] gates on both -> SKIPPED. The data is deliberately inconsistent: with the key gone, is_inconsistent_across_dataset would collapse the table into one group (EC-44) and flag DRUGB, so this pins the Scope gate forestalling the coarser check; var_exists(TRTPN) never gets the chance to."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA
+CDISCPILOT01 | 01-701-1023 | GLUC | DRUGA
+CDISCPILOT01 | 01-701-1034 | GLUC | DRUGB

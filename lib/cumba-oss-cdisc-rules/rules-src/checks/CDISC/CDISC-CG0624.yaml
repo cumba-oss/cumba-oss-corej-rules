@@ -1,0 +1,34 @@
+Core:
+  Id: "CDISC-CG0624"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --RSTMOD is present in an Interventions or Findings\
+  \ class dataset, because this variable is not permitted in human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    var_exists("--RSTMOD")
+Outcome:
+  Message: "--RSTMOD is present but is not permitted in human clinical trials."
+  Output_Variables:
+  - "--RSTMOD"
+Source:
+  Class: "INT|FND"
+  Variable: "--RSTMOD"
+  Rule: "--RSTMOD not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0624"
+        Version: "1"
+      Version: "2.0"

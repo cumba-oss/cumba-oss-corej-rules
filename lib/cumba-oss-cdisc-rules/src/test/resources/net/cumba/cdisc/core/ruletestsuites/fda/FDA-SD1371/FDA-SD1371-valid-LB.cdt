@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1371 expect=noViolation domain=LB
+#note "LOBXFL=Y rows either carry LBORRES or are derived (LBDRVFL=Y); non-baseline row may stay empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | 5.2 | Y |
+S1 | LB | 001 | 2 |     |   |
+S1 | LB | 001 | 3 |     | Y | Y

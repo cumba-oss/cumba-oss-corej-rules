@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RANDDT is not present and RANDFL equals Y for at\
+  \ least one record"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Operations:
+- id: "$RANDFL_Y_COUNT"
+  expression: "record_count(RANDFL, filter=filter(RANDFL=\"Y\"))"
+Check:
+  expression: >-
+    $RANDFL_Y_COUNT > 0 and not var_exists("RANDDT")
+Outcome:
+  Message: "RANDDT is not present, but RANDFL equals Y for at least one record."
+  Output_Variables:
+  - "RANDFL"
+  - "$RANDFL_Y_COUNT"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "RANDFL"
+  Natural_Language_Rule_Failure_Criteria: "RANDDT is not present when RANDFL is equal\
+    \ to Y for at least one record"
+  Rule_Failure_Criteria: "RANDDT is not present"
+  Condition_Failure: "RANDFL is equal to Y for at least one record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR366"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR366"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR366"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR366"
+        Version: "1"
+      Version: "5.0"

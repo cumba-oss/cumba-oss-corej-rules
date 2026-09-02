@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0091"
+Sheet_Rule_Identifier: "91"
+Rule_Set: "CDISC"
+Element: "RangeCheck"
+Attribute: "ItemOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "RangeCheck must reference an existing ItemDef element."
+# Value check fires only on a present def:ItemOID (presence is sheet id 90). The
+# sheet's "within WhereClauseDef[@OID]" tail is carried by the finding's xpath.
+Message: "There is no ItemDef/@OID present that is referenced by RangeCheck/@def:ItemOID [${value}]."
+Check:
+  kind: "references"
+  attribute: "ItemOID"
+  targetElement: "ItemDef"
+  targetKey: "OID"

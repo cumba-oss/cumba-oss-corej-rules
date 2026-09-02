@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1324 expect=violation domain=DM
+#note "Adapted from tested A2 twin fda/FDA-SD1324 (TG-0365). AGE label 'Age in Years' (define 'Age') mismatches; AGEU agrees. STUDYID/USUBJID not in define -> excluded."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGE name=AGE label="Age"
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGE
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

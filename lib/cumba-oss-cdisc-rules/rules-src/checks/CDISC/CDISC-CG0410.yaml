@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0410"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a scheduled or contingent visit defined in\
+  \ the Trial Visits (TV) dataset, the value of Visit Number (VISITNUM) is not unique\
+  \ for a record within the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    VISITNUM in $tv_visitnum and not is_unique_set([VISITNUM, USUBJID])
+Outcome:
+  Message: "VISITNUM is not unique within subject for a visit defined in TV."
+  Output_Variables:
+  - "VISITNUM"
+  - "$tv_visitnum"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "VISITNUM"
+  Condition: "Scheduled or Contingent visit (exists in TV)"
+  Rule: "VISITNUM identifies unique record within subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0410"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0410"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0410"
+        Version: "2"
+      Version: "2.0"

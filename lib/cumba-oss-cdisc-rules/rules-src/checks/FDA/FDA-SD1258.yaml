@@ -1,0 +1,70 @@
+Core:
+  Id: "FDA-SD1258"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Reference Start Date/Time (RFSTDTC) is populated\
+  \ for an untreated subject, that is a subject whose Actual Arm Code (ACTARMCD) is\
+  \ empty or equal to 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(RFSTDTC) and (empty(ACTARMCD) or ACTARMCD in ["SCRNFAIL", "NOTASSGN", "NOTTRT"])
+Outcome:
+  Message: "RFSTDTC is populated for an untreated subject (ACTARMCD is empty or equal\
+    \ to 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT')."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ACTARMCD"
+Source:
+  FDA_Validator_Rule_Message: "RFSTDTC is populated for subject who did not receive\
+    \ treatment"
+  FDA_Validator_Rule_Description: "RFSTDTC must be null when actual arm indicates\
+    \ that the subject is a screen failure ('Screen Failure'), was not assigned to\
+    \ an arm ('Not Assigned'), was not treated ('NOTTRT'), or actual arm is null.\
+    \ This rule applies to studies where RFSTDTC is associated with a treatment date."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1258"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1258"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0145"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0145"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0099 expect=violation domain=ADAE
+#note "ASTDY and AENDY are real ADaM OCCDS variables (adam-occds-1-0 and 1-1, both Num), so this is a genuine offending record. The shipped Scope is Data_Structures.Include [BASIC DATA STRUCTURE, OCCURRENCE DATA STRUCTURE] (Fix #274, ruling M2-D7) - it restores the OCCDS half the rule's own sheet Domains cell names AND moves the rule off the retired Scope.Classes channel. The harness derives the structure set from the class=OCCDS declaration through ScenarioDeclaredScopeProvider.effectiveDeclaredStructure, and AEDECOD additionally makes the column heuristic say OCCDS on its own. ONE expansion, ONE violation at row 1. Under the previous Scope.Classes.Include [BASIC DATA STRUCTURE] the harness reported the dataset out of scope. CDISC-AD0099 deliberately keeps BDS - its own sheet says so."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 ASTDY=10 AENDY=5
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col ASTDY   type=Num
+col AENDY   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 10 | 5

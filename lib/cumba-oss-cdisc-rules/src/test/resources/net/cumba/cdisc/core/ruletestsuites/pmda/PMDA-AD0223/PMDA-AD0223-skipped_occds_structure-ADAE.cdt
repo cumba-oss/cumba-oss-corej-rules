@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0223 expect=skipped domain=ADAE
+#note "Data that WOULD fire if the rule ran. The AVAL column would make the heuristic say BASIC DATA STRUCTURE, but the DECLARED structure=OCCDS wins (Fix #154, carrier = the mandatory #library line), so the dataset is outside Data_Structures: [BASIC DATA STRUCTURE, MEDICAL DEVICE BASIC DATA STRUCTURE] and the rule never executes. THIS IS THE BATCH'S SINGLE GENERAL PIN on that Scope block, shared verbatim by PMDA-AD0247, PMDA-AD0582, PMDA-AD0225 and PMDA-AD0252-D - not duplicated on those rules. Worked precedent: cdisc/CDISC-AD0261-invalid-ADAE-declaration-wins-over-columns.cdt."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col AVAL    type=Num
+col BASE    type=Num
+col CHG     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 10 | 4 | 5

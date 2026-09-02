@@ -1,0 +1,49 @@
+Core:
+  Id: "FDA-SD1326"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Subject or Pool Identifier (RSUBJID) is\
+  \ populated and Related Device Identifier (RDEVID) is also populated for the same\
+  \ record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    - "APRELSUB"
+Check:
+  expression: >-
+    not empty(RSUBJID) and not empty(RDEVID)
+Outcome:
+  Message: "RDEVID is populated when RSUBJID is populated; RSUBJID and RDEVID must\
+    \ not both be populated for the same record."
+  Output_Variables:
+  - "RSUBJID"
+  - "RDEVID"
+Source:
+  FDA_Validator_Rule_Message: "RDEVID is not null when RSUBJID is populated"
+  FDA_Validator_Rule_Description: "Related Device Identifier (RDEVID) and Related\
+    \ Subject or Pool Identifier (RSUBJID) should not both be populated for the same\
+    \ record."
+  Domains: "AP--, APRELSUB"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1326"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0365"
+        Version: "1"
+      Version: "2.0"

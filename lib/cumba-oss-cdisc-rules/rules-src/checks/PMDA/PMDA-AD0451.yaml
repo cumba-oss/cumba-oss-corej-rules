@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-AD0451"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, the Multi-Response Criterion\
+  \ y Eval (N) (MCRITyMN) variable is populated but its corresponding Multi-Response\
+  \ Criterion y Evaluation (MCRITyML) variable (sharing the same y index) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(MCRITyMN) and empty(MCRITyML)
+Outcome:
+  Message: "MCRITyMN is populated, but MCRITyML is not populated."
+  Output_Variables:
+  - "MCRITyML"
+  - "MCRITyMN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "MCRITyMN is populated, but MCRITyML is not populated"
+  Description: "On a given record, if Multi-Response Criterion y Eval (N) (MCRITyMN)\
+    \ variable value is populated, then Multi-Response Criterion y Evaluation (MCRITyML)\
+    \ variable value must also be populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0451"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0451"
+        Version: "1"
+      Version: "6.0"

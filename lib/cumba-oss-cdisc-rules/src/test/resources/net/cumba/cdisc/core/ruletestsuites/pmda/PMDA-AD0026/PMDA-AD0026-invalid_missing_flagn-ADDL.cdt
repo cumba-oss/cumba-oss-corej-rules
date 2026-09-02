@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0026 expect=violation domain=ADDL
+#note "AD*-named with no BDS/OCCDS signal -> ADAM OTHER, specialised by SPDEVID to DEVICE LEVEL ANALYSIS DATASET -> second Include token, the sheet's ADDL domain."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=COMPLFN USUBJID=01-701-1015
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col COMPLFN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV1 | .
+---

@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0067"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has a Death record (SSSTRESC equals 'DEAD')\
+  \ in the Survival Status (SS) dataset but no Disposition (DS) record for that subject\
+  \ has Standardized Disposition Term (DSDECOD) equal to 'DEATH'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SS"
+Requirements:
+  Variables:
+    All:
+    - "SSSTRESC"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_death_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\", filter=filter(DSDECOD=\"DEATH\"))"
+Check:
+  expression: >-
+    SSSTRESC == "DEAD" and USUBJID not in $ds_death_usubjid
+Outcome:
+  Message: "SSSTRESC equals 'DEAD' but no Disposition record has DSDECOD equal to\
+    \ 'DEATH'."
+  Output_Variables:
+  - "SSSTRESC"
+  - "$ds_death_usubjid"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSDECOD"
+  Condition: "SS.SSSTRESC = 'DEAD'"
+  Rule: "DSDECOD = 'DEATH'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0067"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0067"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0067"
+        Version: "1"
+      Version: "2.0"

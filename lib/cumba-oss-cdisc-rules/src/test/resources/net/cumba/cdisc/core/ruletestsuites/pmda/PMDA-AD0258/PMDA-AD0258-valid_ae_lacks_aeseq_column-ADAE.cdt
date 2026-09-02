@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0258 expect=noViolation domain=ADAE
+#note "AE block WITHOUT the AESEQ column (STUDYID, DOMAIN, USUBJID only). var_exists(AE.AESEQ) resolves against AE's schema -> false -> no fire, WITH execution. Pins the authored dotted guard as load-bearing. (The AE-dataset-entirely-absent case is the batch-wide carve-out: harness would answer noViolation the same way, but production Fix #218 answers SKIPPED -- not authored.)"
+#library standard=adamig version=1-1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+---
+S1 | 001 | 1 | HEADACHE
+S1 | 001 | 2 | NAUSEA
+S2 | 001 | 1 | RASH
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+S1 | AE | 001

@@ -1,0 +1,52 @@
+Core:
+  Id: "PMDA-AD0696"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record is marked as the actual baseline\
+  \ (Analysis Baseline Flag ABLFL equals Y) for a given Sponsor Device Identifier\
+  \ (SPDEVID), Unique Subject Identifier (USUBJID), Parameter Code (PARAMCD) and Baseline\
+  \ Type (BASETYPE); only one record may be the baseline within that group."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Grouping:
+  Variables:
+  - "USUBJID"
+  - "SPDEVID"
+  - "PARAMCD"
+  - "BASETYPE"
+Operations:
+- id: "$ablfl_y_count"
+  expression: "record_count(ABLFL, group=[USUBJID, SPDEVID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(BASETYPE) and $ablfl_y_count > 1
+Outcome:
+  Message: "Multiple baseline records (ABLFL equals Y) exist for a unique SPDEVID,\
+    \ USUBJID, PARAMCD, BASETYPE group."
+  Output_Variables:
+  - "SPDEVID"
+  - "PARAMCD"
+  - "BASETYPE"
+  - "ABLFL"
+Source:
+  Message: "Multiple baseline records exist for a unique SPDEVID,USUBJID,PARAMCD,BASETYPE"
+  Description: "For a set of [Sponsor Device Identifier (SPDEVID), Subject (USUBJID),\
+    \ Parameter (PARAMCD), baseline type (BASETYPE)] only one record can be the actual\
+    \ baseline value, marked by ABLFL = Y."
+  Domains: "MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0696"
+        Version: "1"
+      Version: "6.0"

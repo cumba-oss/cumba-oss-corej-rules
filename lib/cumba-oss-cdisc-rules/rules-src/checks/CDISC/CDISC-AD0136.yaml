@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0136"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of SHIFTyN for a given value of SHIFTy."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "SHIFTy"
+    - "SHIFTyN"
+Check:
+  expression: >-
+    not empty(SHIFTyN) and not empty(SHIFTy) and has_multiple_values_for(SHIFTyN, SHIFTy,
+    within=PARAMCD)
+Outcome:
+  Message: "SHIFTyN has more than one value for this PARAMCD and SHIFTy."
+  Output_Variables:
+  - "PARAMCD"
+  - "SHIFTy"
+  - "SHIFTyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "SHIFTyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of SHIFTyN for a given value of SHIFTy"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, there is more than one\
+    \ value of SHIFTyN for a given value of SHIFTy"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR136"
+        Version: "1"
+      Version: "5.0"

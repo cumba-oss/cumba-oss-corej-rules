@@ -1,0 +1,32 @@
+#!RuleTest
+#test FDA-SD1015 expect=violation domain=VS
+#note "Scope is Domains ALL gated on the EPOCH column, so the check also reaches general-observation domains: VS row 2 carries EPOCH 'UNSCHEDULED', absent from TA."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=001 EPOCH=UNSCHEDULED
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | VS | 001 | 1 | SYSBP | 120 | TREATMENT
+CDISCPILOT01 | VS | 001 | 2 | SYSBP | 118 | UNSCHEDULED
+CDISCPILOT01 | VS | 002 | 1 | SYSBP | 130 | SCREENING
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | A | Drug A | 1 | SCRN | SCREENING
+CDISCPILOT01 | TA | A | Drug A | 2 | TRT | TREATMENT
+---

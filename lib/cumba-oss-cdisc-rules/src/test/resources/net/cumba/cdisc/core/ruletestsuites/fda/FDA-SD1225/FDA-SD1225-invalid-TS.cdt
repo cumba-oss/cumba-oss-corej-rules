@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1225 expect=violation domain=TS
+#note "TS carries two SEXPOP records ($sexpop_count = 2 > 1) -> exactly one dataset-level violation. The single TITLE record and the two-record ARMCD parameter are ignored by the TSPARMCD=SEXPOP filter."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SEXPOP | Sex of Participants | BOTH
+S1 | TS | 2 | SEXPOP | Sex of Participants | M
+S1 | TS | 1 | TITLE | Trial Title | A Randomized Study

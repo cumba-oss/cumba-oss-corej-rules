@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0227B expect=violation domain=ADDL
+#note "Name starts with AD; no BDS indicator and no TERM/TRT/DECOD suffix means the base verdict would be ADAM OTHER, but SPDEVID refines it to DEVICE LEVEL ANALYSIS DATASET. That token has no supertype, so this dataset is in scope only because Scope.Data_Structures.Include names it -- pin on the second Include token and on the sheet's Domains: ADSL, ADDL. Row 3 is the minority of group TRTSEQPN=1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQP=B-A TRTSEQPN=1
+dataset ADDL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col TRTSEQP  type=Char
+col TRTSEQPN type=Num
+---
+S1 | 001 | DEV01 | A-B | 1
+S1 | 002 | DEV01 | A-B | 1
+S1 | 003 | DEV02 | B-A | 1

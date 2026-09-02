@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0546"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Disease Milestone Instance Name (MIDS) does\
+  \ not end with a sequence number for a disease milestone that can occur multiple\
+  \ times (the matching Trial Disease Milestones (TM) record has TMRPT equal to 'Y')."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "SM"
+Requirements:
+  Variables:
+    All:
+    - "MIDSTYPE"
+    - "MIDS"
+Match_Datasets:
+- Keys:
+  - "MIDSTYPE"
+  Name: "TM"
+Operations:
+- id: "$tm_midstype"
+  expression: "distinct(MIDSTYPE, domain=\"TM\")"
+Check:
+  expression: >-
+    MIDSTYPE in $tm_midstype and TM.TMRPT == "Y" and MIDS !~ /.*[0-9]$/
+Outcome:
+  Message: "MIDS does not end with a sequence number when the corresponding TM milestone\
+    \ has TMRPT equal to 'Y'."
+  Output_Variables:
+  - "MIDSTYPE"
+  - "$tm_midstype"
+  - "TM.TMRPT"
+  - "MIDS"
+Source:
+  Class: "SPC"
+  Domain: "SM"
+  Variable: "MIDS"
+  Condition: "MIDSTYPE = TM.MIDSTYPE and TM.TMRPT = 'Y'"
+  Rule: "MIDS is suffixed with a sequence number in consistent chronological order"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0546"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0546"
+        Version: "1"
+      Version: "2.0"

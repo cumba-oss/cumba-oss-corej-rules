@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0702 expect=violation domain=ADLB
+# Rule:Description: BASETYPE is present, ByIND is populated, and ByIND is not equal to AyIND where ABLFL is equal to Y for a given value of PARAMCD and BASETYPE for a combination of device and subject
+#note "BASETYPE present, B1IND=HIGH != A1IND=LOW where ABLFL=Y -> violation"
+# Engine-gap G6 (adam-rule-engine-gaps.md) is CLOSED by Fix #152: the wildcard
+# token in Operations[].name (AyIND) is now substituted during expansion
+# (WildcardExpander.expandRule), so max(A1IND) reads a real column. Before the fix
+# this rule fired on every populated row and the valid sibling (CDISC-AD0702-valid-ADLB.cdt)
+# could not pass; it has been restored alongside this one.
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLB class=MD-BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+col B1IND type=Char
+col A1IND type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | LAST | Y | HIGH | LOW
+---

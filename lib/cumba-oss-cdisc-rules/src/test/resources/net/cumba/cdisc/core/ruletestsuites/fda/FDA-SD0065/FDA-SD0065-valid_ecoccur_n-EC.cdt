@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD0065 expect=noViolation domain=EC
+#note "EC row 1 carries ECOCCUR=N, so the SV-unknown VISITNUM=9/UNSCHEDULED combination is exempt. Row 2 matches SV."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECOCCUR  type=Char label="Occurrence"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | EC | 001 | 1 | DRUG A | N | 9 | UNSCHEDULED
+S1 | EC | 001 | 2 | DRUG A | Y | 1 | SCREENING
+---
+
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Visit"
+---
+S1 | SV | 001 | 1 | SCREENING | 2020-01-01

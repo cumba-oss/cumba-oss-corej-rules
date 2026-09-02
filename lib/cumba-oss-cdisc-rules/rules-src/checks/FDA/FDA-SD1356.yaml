@@ -1,0 +1,67 @@
+Core:
+  Id: "FDA-SD1356"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Temporal Relation to Milestone Instance (RELMIDS)\
+  \ variable is present in a dataset but the Trial Disease Milestones (TM) dataset\
+  \ is not present in the study."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$RELMIDS_EXISTS"
+  expression: "variable_exists(RELMIDS)"
+Check:
+  expression: >-
+    $RELMIDS_EXISTS == true and not ds_exists("TM")
+Outcome:
+  Message: "TM dataset is not present in the study when the RELMIDS variable is present\
+    \ in a dataset."
+  Output_Variables:
+  - "$RELMIDS_EXISTS"
+Source:
+  FDA_Validator_Rule_Message: "Missing TM dataset, when variable RELMIDS is present\
+    \ in a dataset"
+  FDA_Validator_Rule_Description: "When the Temporal Relation to Milestone Instance\
+    \ (RELMIDS) variable is used in any dataset, the Trial Disease Milestones (TM)\
+    \ dataset must be present for the study."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0502"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0502"
+        Version: "2"
+      Version: "2.0"

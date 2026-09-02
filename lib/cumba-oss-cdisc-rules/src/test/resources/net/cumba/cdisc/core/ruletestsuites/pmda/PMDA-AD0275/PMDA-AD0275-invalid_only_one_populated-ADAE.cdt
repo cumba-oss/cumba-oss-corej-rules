@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0275 expect=violation domain=ADAE
+#note "Paired-population shape on the DOSECUM / DOSECUMU pair: exactly one of the two populated is non-conformant. No structure= is needed - the Scope is Domains.Include [ALL] plus Requirements.Variables, so the gate is the presence of the pair, not an ADaM data structure. Row 1 has the cumulative dose without its unit and row 2 the unit without the dose, so both fire; row 3 carries the pair and row 4 carries neither. Record granularity -> 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 DOSECUM=350
+#expectViolationAt row=2 USUBJID=01-701-1023 DOSECUMU=mg
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col DOSECUM  type=Num
+col DOSECUMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 350 |
+CDISCPILOT01 | 01-701-1023 | NAUSEA   |     | mg
+CDISCPILOT01 | 01-701-1034 | RASH     | 700 | mg
+CDISCPILOT01 | 01-701-1045 | FEVER    |     |

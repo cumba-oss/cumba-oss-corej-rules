@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD0041 expect=violation domain=CM
+#note "This rule's gate is [--OCCUR] only (no CMSTAT column here; the same shape SKIPS sister SD0042 - the discriminating pair). Row 1: OCCUR populated, PRESP empty ('' != 'Y' TRUE, B.1) -> FIRES. Row 2: OCCUR populated, PRESP='N' != 'Y' -> FIRES. Row 3: pre-specified -> clean. Row 4: OCCUR empty -> clean. The shipped or-arm guard var_exists(--PRESP) and --PRESP != \"Y\" is machine-derived (per-branch); with CMPRESP present it is transparent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMSEQ=1
+#expectViolationAt row=2 CMSEQ=2
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMPRESP  type=Char
+col CMOCCUR  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   |   | Y
+S1 | CM | 001 | 2 | IBUPROFEN | N | Y
+S1 | CM | 001 | 3 | NAPROXEN  | Y | Y
+S1 | CM | 001 | 4 | CODEINE   |   |
+---

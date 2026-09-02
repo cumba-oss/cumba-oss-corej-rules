@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-AD0728"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of AVISIT for a given value of AVISITN, considering only records\
+  \ where both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AVISIT) and not empty(AVISITN) and has_multiple_values_for(AVISIT, AVISITN,
+    within=PARAMCD)
+Outcome:
+  Message: "Within this value of PARAMCD, more than one value of AVISIT is present\
+    \ for the same populated value of AVISITN"
+  Output_Variables:
+  - "AVISIT"
+  - "AVISITN"
+  - "PARAMCD"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "AVISIT"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of AVISIT for a given value of AVISITN, considering only\
+    \ those rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, there is more than one\
+    \ value of AVISIT for a given value of AVISITN"
+  Condition_Failure: "On rows where AVISIT and AVISITN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR728"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR728"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR728"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P4 violations fixture (2.0): one violator per 2.0-only P4 leg, using
+     the Define-XML 2.0 carriers (MetaDataVersion def:StandardName/def:StandardVersion
+     pair, @def:Class attribute). One MetaDataVersion per standard so each DD0022 leg's
+     guard sees exactly one def:StandardVersion:
+       MDV.1 - def:DefineVersion=2.0 (DD0020B-B) + def:StandardName=SDTM (DD0021)
+       MDV.2 - SDTM-IG 3.1.1 (DD0022-F); IG def:Class=RELATIONSHIPS (DD0055);
+               AESEV def:Origin Type=Collected, a 2.1-vocabulary value (DD0073-D)
+       MDV.3 - SEND-IG 4.0 (DD0022-G); LBSPEC def:Origin Type=CRF, an SDTM-vocabulary
+               value (DD0073-E)
+       MDV.4 - ADaM-IG 0.9 (DD0022-H); IG def:Class=OTHER STRUCTURE (DD0055-B)
+       MDV.5 - SEND-IG-AR 1.1 (DD0022-I)
+       MDV.6 - SEND-IG-DART 1.0 (DD0022-J)
+     No CodeList anywhere names MedDRA, so the document-scoped DD0112 fires here
+     (its counterpart fixtures carry a MedDRA codelist by design). All dual-version
+     P4 rules are satisfied - their violators live in pmda-p4-violations-21.xml. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p4-violations-20"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP4V20">
+    <GlobalVariables>
+      <StudyName>PMDAP4V20-STUDY</StudyName>
+      <StudyDescription>PMDA batch P4 violations fixture study (2.0)</StudyDescription>
+      <ProtocolName>PMDAP4V20-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Bad standard name MDV"
+                     def:DefineVersion="2.0" def:StandardName="SDTM"
+                     def:StandardVersion="3.2"/>
+    <MetaDataVersion OID="MDV.2" Name="SDTM MDV" def:DefineVersion="2.0.0"
+                     def:StandardName="SDTM-IG" def:StandardVersion="3.1.1">
+      <ItemGroupDef OID="IG.SDTM20" Name="AE" Domain="AE" Repeating="No"
+                    IsReferenceData="No" SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per event" def:Class="RELATIONSHIPS">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.AESEV20" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.AESEV20" Name="AESEV" DataType="text" Length="8"
+               SASFieldName="AESEV">
+        <Description>
+          <TranslatedText xml:lang="en">Severity/Intensity</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+    </MetaDataVersion>
+    <MetaDataVersion OID="MDV.3" Name="SEND MDV" def:DefineVersion="2.0.0"
+                     def:StandardName="SEND-IG" def:StandardVersion="4.0">
+      <ItemDef OID="IT.LBSPEC20" Name="LBSPEC" DataType="text" Length="20"
+               SASFieldName="LBSPEC">
+        <Description>
+          <TranslatedText xml:lang="en">Specimen Type</TranslatedText>
+        </Description>
+        <def:Origin Type="CRF"/>
+      </ItemDef>
+    </MetaDataVersion>
+    <MetaDataVersion OID="MDV.4" Name="ADaM MDV" def:DefineVersion="2.0.0"
+                     def:StandardName="ADaM-IG" def:StandardVersion="0.9">
+      <ItemGroupDef OID="IG.ADAM20" Name="ADSL" Repeating="No" IsReferenceData="No"
+                    SASDatasetName="ADSL" Purpose="Analysis"
+                    def:Structure="One record per subject" def:Class="OTHER STRUCTURE">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Level Analysis Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.BASE20" OrderNumber="1" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.BASE20" Name="BASE" DataType="float" Length="8"
+               SASFieldName="BASE">
+        <Description>
+          <TranslatedText xml:lang="en">Baseline Value</TranslatedText>
+        </Description>
+      </ItemDef>
+    </MetaDataVersion>
+    <MetaDataVersion OID="MDV.5" Name="SEND-AR MDV" def:DefineVersion="2.0.0"
+                     def:StandardName="SEND-IG-AR" def:StandardVersion="1.1"/>
+    <MetaDataVersion OID="MDV.6" Name="SEND-DART MDV" def:DefineVersion="2.0.0"
+                     def:StandardName="SEND-IG-DART" def:StandardVersion="1.0"/>
+  </Study>
+</ODM>

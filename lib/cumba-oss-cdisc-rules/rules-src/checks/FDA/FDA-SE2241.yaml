@@ -1,0 +1,85 @@
+Core:
+  Id: "FDA-SE2241"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of Observation (--DTC) of a live-phase\
+  \ findings record is after the start date of the subject's latest Disposition Event\
+  \ (DSSTDTC in the DS dataset); post-mortem domains (DD, MA, MI, OM, TF) are excluded."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "DD"
+    - "MA"
+    - "MI"
+    - "OM"
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "--DTC"
+Operations:
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(--DTC) and date(--DTC) > $max_ds_dsstdtc
+Outcome:
+  Message: "--DTC is after the latest Disposition (DS) start date (DSSTDTC) for the\
+    \ subject."
+  Output_Variables:
+  - "--DTC"
+  - "$max_ds_dsstdtc"
+Source:
+  FDA_Validator_Rule_Message: "--DTC is after the latest Disposition date"
+  FDA_Validator_Rule_Description: "Date/Time of Observation (--DTC) for an animal's\
+    \ live-phase findings should be less than or equal to the Start Date/Time of the\
+    \ latest Disposition Event (DSSTDTC)."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2241"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2241"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2241"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2241"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2241"
+        Version: "1"
+      Version: "1.6"

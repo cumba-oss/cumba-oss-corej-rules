@@ -1,0 +1,44 @@
+name: CDISC-AD0017
+kind: rule
+description: |
+  Wave C3 port — T3-RareRuleType: Value Check with Variable Metadata (VCVM).
+  Scope=ALL, Sensitivity=Record. Check is bare leaf
+  `{name: variable_value, operator: longer_than, value: 200}`.
+
+  The Check has `variable_value` as its only leaf (no VARIABLE-level
+  sibling such as `variable_data_type`). A guard-less `variable_value`
+  rule still means "for every in-scope variable, every row whose value
+  violates → a (variable, row) finding": executeUnified now enters the
+  per-variable loop on any `variable_value` leaf (legacy entry gate
+  `referencesVariableValue`, native value() dispatch), binds value() to
+  each column, and fires per (variable, row). On this ADLB fixture only
+  ADLONGCOL row 0 (201 chars) exceeds 200, so exactly one finding fires
+  (variable_name=ADLONGCOL). Both lanes agree.
+python_source: rules-adamig-1-3.json (CDISC-AD0017)
+rule:
+  coreId: CDISC-AD0017
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, __row_number__]
+    rows:
+      # row 0: ADLONGCOL is exactly 201 chars → fires
+      - {STUDYID: S1, USUBJID: '001', ADLONGCOL: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaax}
+      # row 1: ADLONGCOL is 5 chars → no fire
+      - {STUDYID: S1, USUBJID: '002', ADLONGCOL: short}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0017
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      variable_data_type: Char
+      variable_name: ADLONGCOL
+      variable_value: 
+        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaax
+expected_errors: []

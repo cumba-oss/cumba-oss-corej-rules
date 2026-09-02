@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0695 expect=violation domain=ADLBC
+# Rule:Description: BASETYPE is present, BASE is populated, and BASE is not equal to AVAL where ABLFL is equal to Y for a given value of PARAMCD and BASETYPE for a combination of device and subject
+#note "BASE=50 vs max(AVAL where ABLFL=Y)=100 -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=MD-BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+col AVAL type=Num
+col BASE type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | LAST | Y | 100 | 50
+---

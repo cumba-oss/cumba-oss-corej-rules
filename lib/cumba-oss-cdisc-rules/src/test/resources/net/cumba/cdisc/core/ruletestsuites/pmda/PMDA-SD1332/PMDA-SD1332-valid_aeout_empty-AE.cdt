@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1332 expect=noViolation domain=AE
+#note "Pins literal-equality semantics (operator-examples B.1: x == <literal> is FALSE for an empty or missing x). AEENDTC is populated but AEOUT carries no value, so the rule must not fire. Executes (AEOUT is declared, Requirements.Variables gate satisfied)."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEOUT   type=Char
+col AESTDTC type=Char
+col AEENDTC type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | | 2020-01-05 | 2020-01-09
+---

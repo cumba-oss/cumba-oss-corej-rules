@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0039-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of DF is populated with\
+  \ a value that is not within Controlled Terminology for DATEFL"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DF") and not empty(value()) and value() not in ["Y", "M", "D"]
+Outcome:
+  Message: "A variable with a suffix of DF has a value outside Controlled Terminology\
+    \ for DATEFL"
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source_Proposed:
+  Sheet_Issue: "#110"
+  Class: "ALL"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "*DTF"
+  Natural_Language_Rule_Failure_Criteria: "a variable with a suffix of DF is populated\
+    \ with a value that is not within Controlled Terminology for DATEFL"
+  Rule_Failure_Criteria: "Value that is not within Controlled Terminology for DATEFL"
+  Condition_Failure: "Variable with a suffix of DTF is present"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*DTF"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of DTF has a value\
+    \ that is not within Controlled Terminology for DATEFL"
+  Rule_Failure_Criteria: "Value that is not within Controlled Terminology for DATEFL"
+  Condition_Failure: "Variable with a suffix of DTF is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR39"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR39"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR39"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SE1154"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when no record with TXPARMCD equal to 'PLANFSUB' ('Planned\
+  \ Number of Female Subjects') is present for a SETCD in the Trial Sets (TX) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Grouping:
+  Variables:
+  - "SETCD"
+Operations:
+- id: "$planfsub_count"
+  expression: "record_count(SETCD, domain=\"TX\", group=[SETCD], filter=filter(TXPARMCD=\"\
+    PLANFSUB\"))"
+Check:
+  expression: >-
+    $planfsub_count == 0
+Outcome:
+  Message: "Missing PLANFSUB Trial Set Parameter: no 'Planned Number of Female Subjects'\
+    \ (PLANFSUB) record is present for this SETCD in the Trial Sets (TX) domain."
+  Output_Variables:
+  - "$planfsub_count"
+  - "SETCD"
+Source:
+  FDA_Validator_Rule_Message: "Missing PLANFSUB Trial Set Parameter within SETCD"
+  FDA_Validator_Rule_Description: "'Planned Number of Female Subjects' (PLANFSUB)\
+    \ records should be populated for each SETCD in Trial Sets (TX) domain."
+  Domains: "TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1154"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1154"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1154"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1154"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1154"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"

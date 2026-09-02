@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-CG0220"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Study Day of Start of Observation (--STDY) is\
+  \ populated and both the date portion of --STDTC and the date portion of RFSTDTC\
+  \ are complete dates, but --STDY does not equal the value computed by the SDTM study\
+  \ day algorithm (a non-zero integer)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--STDTC"
+    - "--STDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_stdy_algorithm"
+  expression: "dy(--STDTC)"
+Check:
+  expression: >-
+    not empty(--STDY) and is_complete_date(--STDTC) and is_complete_date(DM.RFSTDTC) and --STDY !=
+    $value_stdy_algorithm
+Outcome:
+  Message: "--STDY does not equal the value derived by the SDTM study day algorithm\
+    \ even though the date portions of --STDTC and RFSTDTC are complete dates and\
+    \ --STDY is populated."
+  Output_Variables:
+  - "$value_stdy_algorithm"
+  - "--STDTC"
+  - "--STDY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STDY"
+  Condition: "--STDTC and DM.RFSTDTC both contain complete values in their date portion"
+  Rule: "--STDY is properly calculated per study day algorithm"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0220"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0220"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0220"
+        Version: "1"
+      Version: "2.0"

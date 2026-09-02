@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0500 expect=noViolation domain=ADLBC
+# Rule:Description: There is a value of APHASE without a matching value in an ADSL variable APHASEw
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APHASE type=Char
+---
+CDISCPILOT01 | 01-701-1015 | TREATMENT
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col APHASE1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | TREATMENT
+---

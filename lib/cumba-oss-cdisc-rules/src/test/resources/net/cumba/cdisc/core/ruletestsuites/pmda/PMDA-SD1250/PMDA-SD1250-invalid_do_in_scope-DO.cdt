@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1250 expect=violation domain=DO
+#note "Pins the owner-applied r2 ruling (WARNING-review-scope-BCD.md line 125): the sheet's '-DO' exclusion was removed as a dead token, so a FINDINGS-class DO dataset (class= key) is IN scope and the rule FIRES - in deliberate contrast to sisters SD2270/SD1282, which retain the exclusion and SKIP the same-shaped DO dataset. This is the exactly-one flip fixture (violation -> skipped) if a later lane reverses that ruling. --TPT resolves textually to DOTPT (EC-36 prefix rule; non-IG domain, precedent: T2-K3-02's --TSTDTL)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DOTPT="ASSESSMENT 1"
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col SPDEVID  type=Char
+col DOSEQ    type=Num
+col DOTESTCD type=Char
+col DOTPT    type=Char
+---
+S1 | DO | DEV01 | 1 | DEVTYPE | ASSESSMENT 1
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2247A expect=violation domain=TS
+#note "DISCRIMINATING - pins a KNOWN, ALREADY-FILED corpus exposure (CORE-RULES-GUARD-MATRIX.md 2); do not rewrite it, and do not 'fix' the rule from here. 'not is_complete_date_part(TSVAL)' is a NEGATED single-column predicate call, which no derivation arm guards, and under the EC-43 contract an absent column is all-missing - so it fires on every row the TSPARMCD gate admits. Count 1, at row 1 only (row 2 is a different parameter). TSVAL is in Output_Variables but absent from the data, so it is omitted from the value map - pin only row=1 TSPARMCD=SSTDTC."
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=SSTDTC
+#library standard=sdtmig version=3-4
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+---
+CDISCPILOT01 | TS | 1 | SSTDTC  | Study Start Date
+CDISCPILOT01 | TS | 2 | DCUTDTC | Data Cutoff Date

@@ -1,0 +1,67 @@
+Core:
+  Id: "CDISC-AD0165"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is present, BTOXGR is populated, and BTOXGR\
+  \ does not equal ATOXGR where ABLFL equals Y for a given value of PARAMCD and BASETYPE"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BTOXGR"
+    - "ATOXGR"
+Operations:
+- id: "$baseline_atoxgr"
+  expression: "max(ATOXGR, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BTOXGR) and BTOXGR != $baseline_atoxgr
+Outcome:
+  Message: "BTOXGR does not equal the ATOXGR value recorded where ABLFL equals Y,\
+    \ for this PARAMCD and BASETYPE"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASETYPE"
+  - "BTOXGR"
+  - "$baseline_atoxgr"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BTOXGR"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is present, BTOXGR is populated,\
+    \ and BTOXGR is not equal to ATOXGR where ABLFL is equal to Y for a given value\
+    \ of PARAMCD and BASETYPE"
+  Rule_Failure_Criteria: "BTOXGR is not equal to ATOXGR where ABLFL is equal to Y\
+    \ for a given value of PARAMCD and BASETYPE"
+  Condition_Failure: "BASETYPE is present and BTOXGR is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR165"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR165"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR165"
+        Version: "1"
+      Version: "5.0"

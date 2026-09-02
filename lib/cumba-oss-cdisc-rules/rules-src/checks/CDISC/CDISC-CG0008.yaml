@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0008"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the planned elapsed time (--ELTM) is populated but\
+  \ its fixed reference point (--TPTREF) is empty; --ELTM must be empty when --TPTREF\
+  \ is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+Check:
+  expression: >-
+    empty(--TPTREF) and not empty(--ELTM)
+Outcome:
+  Message: "--ELTM is populated but --TPTREF is empty."
+  Output_Variables:
+  - "--ELTM"
+  - "--TPTREF"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ELTM"
+  Condition: "--TPTREF = null"
+  Rule: "--ELTM = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0008"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0008"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0008"
+        Version: "1"
+      Version: "2.0"

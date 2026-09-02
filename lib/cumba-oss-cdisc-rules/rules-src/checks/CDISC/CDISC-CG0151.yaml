@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0151"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Unique Subject Identifier (USUBJID) is not unique\
+  \ within the Demographics (DM) domain; USUBJID must uniquely identify a subject\
+  \ across all studies for all applications or submissions involving the product."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, DOMAIN])
+Outcome:
+  Message: "USUBJID is not unique within DM; USUBJID must uniquely identify a subject\
+    \ across the submission."
+  Output_Variables:
+  - "DOMAIN"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "USUBJID"
+  Rule: "USUBJID unique within a submission"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0151"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0151"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0151"
+        Version: "1"
+      Version: "2.0"

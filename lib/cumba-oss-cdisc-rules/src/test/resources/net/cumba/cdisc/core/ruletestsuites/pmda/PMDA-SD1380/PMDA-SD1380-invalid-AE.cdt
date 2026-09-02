@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1380 expect=violation domain=AE
+#note "Row 2 has USUBJID empty and SPDEVID empty while APID/POOLID are not in the dataset at all -> no subject/device/pool identifier is populated -> fires. Row 1 carries USUBJID."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AETERM=Nausea
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 |      | 1 | Headache
+S1 | AE |     |      | 2 | Nausea

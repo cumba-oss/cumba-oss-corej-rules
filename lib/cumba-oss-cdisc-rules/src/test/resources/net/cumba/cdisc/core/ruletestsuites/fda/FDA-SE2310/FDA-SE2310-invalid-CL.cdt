@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2310 expect=violation domain=CL
+#note "Row 2 is flagged NOT DONE yet still carries a standardized result -> fires. Row 1 is the conformant NOT DONE record."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 CLSTRESC=NORMAL CLSTAT="NOT DONE"
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLORRES  type=Char label="Result or Finding in Original Units"
+col CLSTRESC type=Char label="Standardized Result in Character Format"
+col CLSTAT   type=Char label="Completion Status"
+---
+S1 | 001 | 1 | CLSIGN |        |        | NOT DONE
+S1 | 001 | 2 | CLSIGN | NORMAL | NORMAL | NOT DONE

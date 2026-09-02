@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0118"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Value of Identifying Variable (IDVARVAL) is populated\
+  \ but Identifying Variable (IDVAR) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "IDVARVAL"
+Check:
+  expression: >-
+    not empty(IDVARVAL) and empty(IDVAR)
+Outcome:
+  Message: "IDVARVAL is populated when IDVAR is empty."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "IDVARVAL"
+  Plain_Text_Explanation: "IDVARVAL contains the value of the identifying record.\
+    \  IDVARVAL should not be populated if IDVAR is blank."
+  Condition: "IDVAR = null"
+  Rule: "IDVARVAL = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND118"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0464"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a custom domain in the Events general observation\
+  \ class does not include the topic variable --TERM."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Operations:
+- id: "$domain_is_custom"
+  expression: "domain_is_custom()"
+Check:
+  expression: >-
+    $domain_is_custom == true and not var_exists("--TERM")
+Outcome:
+  Message: "A custom Events-class domain does not include the topic variable --TERM."
+  Output_Variables:
+  - "$domain_is_custom"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--TERM"
+  Condition: "Custom domain present in study"
+  Rule: "--TERM present in custom events dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0464"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0464"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0464"
+        Version: "2"
+      Version: "2.0"

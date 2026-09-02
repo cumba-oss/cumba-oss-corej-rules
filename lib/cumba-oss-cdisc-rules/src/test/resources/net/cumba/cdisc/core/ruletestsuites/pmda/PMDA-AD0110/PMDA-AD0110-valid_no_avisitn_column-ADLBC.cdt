@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0110 expect=noViolation domain=ADLBC
+#note "AVISITN absent -> var_exists false. Without that conjunct the drop-and-regroup would flag row 3; this fixture is the proof that it is load-bearing."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col AVISIT type=Char
+---
+S1 | 001 | SYSBP | SystolicBP | WEEK2
+S1 | 002 | SYSBP | SystolicBP | WEEK2
+S1 | 003 | SYSBP | SystolicBP | WEEK02

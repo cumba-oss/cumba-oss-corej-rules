@@ -1,0 +1,27 @@
+Rule_Id: "PMDA-DD0035"
+Sheet_Rule_Identifier: "DD0035"
+Rule_Set: "PMDA"
+Element: "Origin/DocumentRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For Define-XML v2.0, the Pages field is required when Origin Type is 'CRF'. For Define-XML v2.1, the Pages field is required when Origin Type is 'Collected' and Source is 'Investigator' or 'Subject'. Define-XML specification represents Pages as def:PDFPageRef elements within def:DocumentRef element."
+Message: "Missing Pages value"
+# One rule, two version legs dispatched organically by the Origin Type vocabulary:
+# Type='CRF' only occurs in 2.0 documents, Type='Collected' (+Source) only in 2.1,
+# so the any-guard needs no explicit version switch. Scoped to Origin/DocumentRef
+# (like CDISC twin 0044): a CRF/Collected Origin with no def:DocumentRef at all is
+# out of reach (documented deviation; the absent-DocumentRef shape belongs to
+# DD0075 (P5 batch) - DD0103 is likewise DocumentRef-scoped and cannot see it).
+Check:
+  kind: "exists"
+  target: "def:PDFPageRef"
+  when:
+    any:
+    - path: "../@Type"
+      equals: "CRF"
+    - all:
+      - path: "../@Type"
+        equals: "Collected"
+      - path: "../@Source"
+        oneOf: ["Investigator", "Subject"]

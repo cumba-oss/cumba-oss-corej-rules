@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0027-A expect=noViolation domain=TI
+#note "Distinct IECAT/IESCAT values on row 1 and an empty IESCAT on row 2 (the non-empty guard keeps an unpopulated subcategory silent) -> no violation."
+#library standard=sdtmig version=3-4
+#library dataset-class TI "TRIAL DESIGN"
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+col IESCAT   type=Char label="Inclusion/Exclusion Subcategory"
+---
+S1 | TI | INCL01 | INCLUSION | KEY INCLUSION
+S1 | TI | EXCL01 | EXCLUSION |

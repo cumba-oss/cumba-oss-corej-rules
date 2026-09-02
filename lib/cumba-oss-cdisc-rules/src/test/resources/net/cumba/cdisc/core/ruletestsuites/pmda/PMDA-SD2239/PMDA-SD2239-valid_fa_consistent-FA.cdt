@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD2239 expect=noViolation domain=FA
+#note "Rows 1+2 share key (001,1,FEVER,2020-06-01), both FATPT=PRE -> consistent. Row 3 is a singleton (001,2,FEVER,2020-06-15). Rows 4+5 have FADTC blank on both -> a blank key component removes them from grouping (DROP_MISSING_KEYS), never flagged despite differing FATPT. Verdict-identical under current and proposed rule."
+#library standard=sdtmig version=3-4
+dataset FA class="FINDINGS ABOUT"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col FASEQ    type=Num
+col FAOBJ    type=Char
+col VISITNUM type=Num
+col FADTC    type=Char
+col FATPT    type=Char
+---
+S1 | FA | 001 | 1 | FEVER | 1 | 2020-06-01 | PRE
+S1 | FA | 001 | 2 | FEVER | 1 | 2020-06-01 | PRE
+S1 | FA | 001 | 3 | FEVER | 2 | 2020-06-15 | POST
+S1 | FA | 001 | 4 | COUGH | 1 |            | PRE
+S1 | FA | 001 | 5 | COUGH | 1 |            | POST

@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG0654"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Visit Occurrence (SVOCCUR) is populated\
+  \ for an unsolicited record, that is a record where Pre-specified (SVPRESP) is not\
+  \ present or is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "SVOCCUR"
+Check:
+  expression: >-
+    not empty(SVOCCUR) and (not var_exists("SVPRESP") or SVPRESP != "Y")
+Outcome:
+  Message: "SVOCCUR is populated but SVPRESP is not equal to 'Y'."
+  Output_Variables:
+  - "SVPRESP"
+  - "SVOCCUR"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "SVPRESP"
+  Condition: "SVOCCUR ^= null"
+  Rule: "SVPRESP = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0654"
+        Version: "1"
+      Version: "2.0"

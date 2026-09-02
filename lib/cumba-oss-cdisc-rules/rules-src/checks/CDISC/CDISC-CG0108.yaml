@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0108"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Treatment Vehicle (--TRTV) is empty but Treatment\
+  \ Vehicle Amount Units (--VAMTU) is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--TRTV"
+    - "--VAMTU"
+Check:
+  expression: >-
+    empty(--TRTV) and not empty(--VAMTU)
+Outcome:
+  Message: "--VAMTU is populated when --TRTV is empty."
+  Output_Variables:
+  - "--TRTV"
+  - "--VAMTU"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--VAMTU"
+  Condition: "--TRTV = null"
+  Rule: "--VAMTU = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0108"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0108"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0108"
+        Version: "2"
+      Version: "2.0"

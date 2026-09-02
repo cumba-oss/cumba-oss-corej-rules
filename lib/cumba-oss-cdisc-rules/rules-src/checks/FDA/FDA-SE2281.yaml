@@ -1,0 +1,45 @@
+Core:
+  Id: "FDA-SE2281"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a PC record does not have all of the required timing\
+  \ variables PCNOMDY, PCELTM and PCTPTREF present and populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Check:
+  expression: >-
+    empty(PCNOMDY) or empty(PCELTM) or empty(PCTPTREF)
+Outcome:
+  Message: "A required timing variable (PCNOMDY, PCELTM, or PCTPTREF) is not populated\
+    \ or not present in PC."
+  Output_Variables:
+  - "PCNOMDY"
+  - "PCELTM"
+  - "PCTPTREF"
+Source:
+  FDA_Validator_Rule_Message: "Missing values for required timing variables: --NOMDY,\
+    \ --ELTM, and --TPTREF"
+  FDA_Validator_Rule_Description: "For PC records contributing to a time concentration\
+    \ profile, PCNOMDY, PCELTM and PCTPTREF must be present and populated. These are\
+    \ the required timing variables for identification of the day on which group summaries\
+    \ (Group Means and Incidences) are calculated for pharmacokinetic concentrations."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2281"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"

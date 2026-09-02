@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0121"
+Sheet_Rule_Identifier: "DD0121"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The IsNonStandard attribute must be populated when the dataset is not standard (i.e., does not have a def:StandardOID attribute)."
+Message: "Missing IsNonStandard attribute for Dataset"
+# Exact duplicate of CDISC twin 0122.
+Check:
+  kind: "exists"
+  target: "@IsNonStandard"
+  when:
+    path: "@StandardOID"
+    exists: false

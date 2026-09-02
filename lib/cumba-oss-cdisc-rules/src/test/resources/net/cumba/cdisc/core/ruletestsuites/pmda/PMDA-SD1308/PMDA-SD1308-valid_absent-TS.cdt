@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1308 expect=noViolation domain=TS
+#note "ADAPTED-FROM cdisc/CDISC-CG0275-valid_absent-TS-1.cdt (rows verbatim + TSPARM). No CURTRT record at all: the Check is anchored on a PRESENT CURTRT record, so the absent-record case belongs to the companion rule PMDA-SD2216 ('$addon_y_count >= 1 and $curtrt_count == 0'), not this rule."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | ADDON | Added on to Existing Treatments | Y
+S01 | TS | 2 | TITLE | Trial Title                     | A Study of Drug X

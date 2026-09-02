@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0474"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STRATAV is populated and STRATAVN is missing on\
+  \ the same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(STRATAV) and empty(STRATAVN)
+Outcome:
+  Message: "STRATAV is populated but STRATAVN is missing."
+  Output_Variables:
+  - "STRATAV"
+  - "STRATAVN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "STRATAVN"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, STRATAV is populated\
+    \ and STRATAVN is not populated"
+  Rule_Failure_Criteria: "STRATAVN is not populated"
+  Condition_Failure: "STRATAV is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR474"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR474"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0049"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --DECOD and --PTCD do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--PTCD"
+    - "--DECOD"
+Check:
+  expression: >-
+    not is_unique_relationship(--PTCD, --DECOD)
+Outcome:
+  Message: "--DECOD and --PTCD do not have a one-to-one relationship."
+  Output_Variables:
+  - "--DECOD"
+  - "--PTCD"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--PTCD"
+  Rule: "--DECOD and --PTCD have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0049"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0049"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0049"
+        Version: "1"
+      Version: "2.0"

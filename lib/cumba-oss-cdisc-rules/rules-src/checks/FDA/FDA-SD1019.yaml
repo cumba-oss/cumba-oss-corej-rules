@@ -1,0 +1,116 @@
+Core:
+  Id: "FDA-SD1019"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Study Day of Visit (VISITDY) is populated\
+  \ for an unplanned visit (Description of Unplanned Visit (SVUPDES) is populated)\
+  \ in the Subject Visits (SV) domain; VISITDY should be missing for unplanned visits."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "SVUPDES"
+    - "VISITDY"
+Check:
+  expression: >-
+    not empty(SVUPDES) and not empty(VISITDY)
+Outcome:
+  Message: "VISITDY is populated for an unplanned visit (SVUPDES is populated)."
+  Output_Variables:
+  - "VISITDY"
+  - "SVUPDES"
+Source:
+  FDA_Validator_Rule_Message: "VISITDY is populated for unplanned visit"
+  FDA_Validator_Rule_Description: "Planned Study Day of Visit (VISITDY) should equal\
+    \ NULL for unplanned visits, where Description of Unplanned Visit (SVUPDES) is\
+    \ populated."
+  Domains: "SV"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1019"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1019"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1019"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1019"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1019"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0216"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0216"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0216"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0216"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0216"
+        Version: "1"
+      Version: "2.0"

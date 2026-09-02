@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-AD0110"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the character Analysis Visit (AVISIT)\
+  \ takes more than one value for the same combination of Parameter Code (PARAMCD)\
+  \ and numeric Analysis Visit (AVISITN). Only records on which PARAMCD and the primary\
+  \ variable AVISIT are populated are considered."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "AVISIT"
+Check:
+  expression: >-
+    not empty(PARAMCD) and var_exists("AVISITN") and not empty(AVISIT) and
+    is_inconsistent_across_dataset(AVISIT, keys=[PARAMCD, AVISITN])
+Outcome:
+  Message: "Inconsistent value for AVISIT"
+  Output_Variables:
+  - "AVISIT"
+  - "AVISITN"
+  - "PARAMCD"
+Source:
+  Message: "Inconsistent value for AVISIT"
+  Description: "Within a study, all AVISIT values must be the same for each unique\
+    \ value group of [PARAMCD, AVISITN] when PARAMCD and primary variable AVISIT are\
+    \ populated."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0110"
+        Version: "1"
+      Version: "6.0"

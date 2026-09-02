@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SD1336"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a TRLNKID value in the TR domain is not present\
+  \ as a TULNKID value in the TU domain for the same subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TR"
+Requirements:
+  Variables:
+    All:
+    - "TRLNKID"
+Operations:
+- id: "$tu_lnkid"
+  expression: "distinct(TULNKID, domain=\"TU\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(TRLNKID) and TRLNKID not in $tu_lnkid
+Outcome:
+  Message: "TRLNKID does not match any TULNKID value in the TU domain for the subject."
+  Output_Variables:
+  - "TRLNKID"
+  - "$tu_lnkid"
+Source:
+  FDA_Validator_Rule_Message: "TRLNKID value does not exist in TU domain"
+  FDA_Validator_Rule_Description: "A Link ID (TRLNKID) value for a tumor that is referenced\
+    \ in the Tumor Results (TR) domain for a subject must also be present in the Tumor\
+    \ Identification (TU) domain for that subject."
+  Domains: "TR"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1336"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1336"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1336"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1336"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0024"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0024"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0024"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0024"
+        Version: "1"
+      Version: "2.0"

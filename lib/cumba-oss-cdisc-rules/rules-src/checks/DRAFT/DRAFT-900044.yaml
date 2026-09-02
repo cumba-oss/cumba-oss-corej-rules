@@ -1,0 +1,56 @@
+Core:
+  Id: "DRAFT-900044"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when an ADaM variable carried over from SDTM does not keep\
+  \ a label the companion SDTM standard publishes for that variable name, and report\
+  \ informationally when the name is published with several different labels and the\
+  \ dataset matches one of them. Applies only to variables the ADaM standard itself\
+  \ does not define, and only when the companion SDTM standard publishes the name at\
+  \ all."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  ERROR:
+    expression: >-
+      not empty(library_variable_label_values) and not empty(var_label("DATA")) and
+      upper(normalize_space(var_label("DATA"))) not in library_variable_label_values
+  INFO:
+    expression: >-
+      count(library_variable_label_values) > 1 and not empty(var_label("DATA")) and
+      upper(normalize_space(var_label("DATA"))) in library_variable_label_values
+    Message: "Variable label matches one of several labels the companion SDTM standard\
+      \ publishes for this variable name; confirm the intended source domain."
+Outcome:
+  Message: "Variable label does not match any label the companion SDTM standard publishes\
+    \ for this variable name."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+  - "library_variable_label_values"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "A variable carried over from SDTM must keep\
+    \ the label published for it by the SDTM standard the ADaM data was derived from.\
+    \ Where the SDTM standard publishes more than one label for that variable name,\
+    \ matching one of them is acceptable but is reported so the intended source domain\
+    \ can be confirmed."
+  Rule_Failure_Criteria: "Variable label is not one of the labels the companion SDTM\
+    \ standard publishes for the variable name"
+  Condition_Failure: "The ADaM standard does not define the variable, and the companion\
+    \ SDTM standard publishes the variable name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+  - Name: "ADaMIG"
+    Version: "1.2"
+  - Name: "ADaMIG"
+    Version: "1.3"

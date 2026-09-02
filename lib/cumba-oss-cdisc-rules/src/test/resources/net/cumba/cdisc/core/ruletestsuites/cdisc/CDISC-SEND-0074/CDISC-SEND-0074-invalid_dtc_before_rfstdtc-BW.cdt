@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-SEND-0074 expect=violation domain=BW
+#note "NEW with Fix #340 - CDISC-SEND-0074 shipped with ZERO fixtures and Fix #303 left it that way ('remains unpinned - it is the date(--DTC) < DM.RFSTDTC half and the lane authored the >= half only. One fixture is owed'). This is the pre-reference-start branch: BWDTC 2019-12-20 precedes RFSTDTC 2020-01-01 by 12 days, so the SDTM algorithm gives BWDY = -12 (NO +1 on this side of the reference date - that is the whole difference between this rule and CDISC-SEND-0073). Row 1 declares -11 and fires; row 2 declares the correct -12 and stays silent, so the fixture cannot pass vacuously. The -- prefix is a SUBSTITUTION (M3-J.1), so on a BW primary --DTC/--DY are exactly BWDTC/BWDY."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWDTC    type=Char label="Date/Time of Measurement"
+col BWDY     type=Num  label="Study Day of Measurement"
+---
+S1 | BW | 001 | 1 | BW | 2019-12-20 | -11
+S1 | BW | 001 | 2 | BW | 2019-12-20 | -12
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

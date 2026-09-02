@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0213"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Element Code (ETCD) and Element (ELEMENT) do not\
+  \ have a one-to-one relationship in the Trial Elements (TE) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+    - "ELEMENT"
+Check:
+  expression: >-
+    not is_unique_relationship(ETCD, ELEMENT) or not is_unique_relationship(ELEMENT, ETCD)
+Outcome:
+  Message: "ETCD and ELEMENT do not have a one-to-one relationship."
+  Output_Variables:
+  - "ETCD"
+  - "ELEMENT"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "ETCD, ELEMENT"
+  Plain_Text_Explanation: "ETCD and ELEMENT have a one-to-one relationship"
+  Rule: "ETCD and ELEMENT have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND213"
+        Version: "1"
+      Version: "5.0"

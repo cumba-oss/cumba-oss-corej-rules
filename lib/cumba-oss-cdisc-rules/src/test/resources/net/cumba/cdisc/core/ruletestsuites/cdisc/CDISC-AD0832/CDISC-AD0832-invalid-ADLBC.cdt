@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0832 expect=violation domain=ADLBC
+# Rule:Description: Within a dataset, there is more than one value of DVIDN for a given value of DVID, considering only those rows on which both variables are populated.
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col DVIDN type=Char
+col DVID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | DEV01
+CDISCPILOT01 | 01-701-1023 | 2 | DEV01
+CDISCPILOT01 | 01-701-1028 | 3 | DEV02
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1063 expect=violation domain=VS
+#note "The Define-XML sidecar declares only DM; the submitted VS dataset is not described in the define, so the rule fires once for the dataset."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD1063-define.xml
+#expectViolationCount 1
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+---
+CDISCPILOT01 | VS | 01-701-1015 | SYSBP

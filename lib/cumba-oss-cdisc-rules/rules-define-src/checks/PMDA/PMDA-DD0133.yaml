@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0133"
+Sheet_Rule_Identifier: "DD0133"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The def:CommentOID attribute is required when the value of the ItemGroupDef def:HasNoData attribute is 'Yes'. A comment must be included to explain why no data are present for datasets that were planned for use in the study."
+Message: "Missing required def:CommentOID for Dataset"
+# Exact duplicate of CDISC twin 0240.
+Check:
+  kind: "exists"
+  target: "@CommentOID"
+  when:
+    path: "@HasNoData"
+    equals: "Yes"

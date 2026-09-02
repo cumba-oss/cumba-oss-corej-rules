@@ -1,0 +1,35 @@
+name: CDISC-AD0061
+kind: rule
+description: |
+  Wave D1 port - T3-VMC (Variable Metadata Check). Baselined on Python
+  lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so column-name
+  `exists`/`not_exists` leaves resolve against meta-field columns
+  (variable_name, variable_label, ...) rather than the original
+  dataset columns and yield 0 violations. Java fires correctly on the
+  column metadata; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0061)
+rule:
+  coreId: CDISC-AD0061
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+# Plan B phase 4c (owner rulings B-Q11/B-Q12): the rule's authored `ds_exists("EX")` conjunct
+# became `Requirements: {Datasets: ["EX"]}`. This spec ships ADSL and NO EX, so the requirement is
+# unmet and the rule is now SKIPPED rather than EXECUTED-with-no-violations. The violation list was
+# already empty, so ZERO finding rows move — the pin below is what makes the status half visible,
+# and it is the only rulespec change in the whole of phase 4. The sister spec
+# `CDISC-AD0061-empty.yaml` ships EX, so its requirement is met and it is untouched.
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

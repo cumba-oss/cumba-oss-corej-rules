@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1380 expect=noViolation domain=AE
+#note "EMPTY-DATASET PIN, DISCRIMINATING for BATCH-F1. Full column block declared (USUBJID and SPDEVID both PRESENT) and ZERO data rows -- the fixture is about zero ROWS, not missing columns, so BroadcastFold cannot fold a guard-residual. deriveRuleType returns RECORD_DATA (value-based) and deriveSensitivity returns RECORD, so rowBased is TRUE, the synthetic 1-row zero-column table is NOT substituted, and the row loop simply runs zero times -> 0 findings. If this fires with exactly 1 dataset-level violation instead, that resolves BATCH-F1 the other way (the synthetic-table branch was taken) and is a stage-R classification, not a fixture to rewrite."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---

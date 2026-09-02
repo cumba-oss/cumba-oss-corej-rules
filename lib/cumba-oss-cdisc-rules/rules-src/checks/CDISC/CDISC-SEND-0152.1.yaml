@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-SEND-0152.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the End Date/Time of the weight interval (BGENDTC)\
+  \ is empty for a Body Weight Gain record (BGTESTCD equals \"BWGAINA\")."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "BG"
+Requirements:
+  Variables:
+    All:
+    - "BGENDTC"
+    - "BGTESTCD"
+Check:
+  expression: >-
+    BGTESTCD == "BWGAINA" and empty(BGENDTC)
+Outcome:
+  Message: "BGENDTC is empty for a record where BGTESTCD equals \"BWGAINA\" (Average\
+    \ Body Weight Gain)."
+  Output_Variables:
+  - "BGTESTCD"
+  - "BGENDTC"
+Source:
+  Class: "FND"
+  Domain: "BG"
+  Variable: "BGENDTC"
+  Plain_Text_Explanation: "BGENDTC must be populated when BGTESTCD is representing\
+    \ Average Body Weight Gain."
+  Condition: "BGTESTCD = \"BWGAINA\""
+  Rule: "BGENDTC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND152.1"
+        Version: "1"
+      Version: "5.0"

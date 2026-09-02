@@ -1,0 +1,37 @@
+name: CDISC-AD0208
+kind: rule
+description: |
+  Wave C2 port — T2-MD (Match_Datasets without Operations).
+  CDISC-AD0208: ADSL.SUBJID must equal DM.SUBJID for the matching subject (USUBJID).
+  Class-scoped rule (SUBJECT LEVEL ANALYSIS DATASET). Bare-leaf Check (no outer
+  all/any wrapper) — Finding #26 quirk on Python's business_rules lane.
+python_source: rules-adamig-1-3.json (CDISC-AD0208)
+rule:
+  coreId: CDISC-AD0208
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', SUBJID: '001'}    # ok — matches DM.SUBJID
+      - {STUDYID: S1, USUBJID: '002', SUBJID: 'X02'}    # bad — DM.SUBJID is '002'
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', SUBJID: '001'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', SUBJID: '002'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-AD0208
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      SUBJID: X02
+      DM.SUBJID: '002'
+expected_errors: []

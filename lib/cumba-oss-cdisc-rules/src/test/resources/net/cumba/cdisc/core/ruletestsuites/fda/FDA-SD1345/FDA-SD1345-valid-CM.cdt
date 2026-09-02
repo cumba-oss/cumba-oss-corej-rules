@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1345 expect=noViolation domain=CM
+#note "All populated CMCLAS values match WHODrug ATC text terms of the dummy dictionary in their preferred case (Analgesics, Antiinflammatory and antirheumatic products) - the flag-less rule compares case-sensitively per the D-TA-3 default (Fix #266); the blank CMCLAS row does not fire -> no violation."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMCLAS  type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | Analgesics
+S01 | CM | 001 | 2 | Brufen        | Antiinflammatory and antirheumatic products
+S01 | CM | 002 | 1 | Unknown med   |

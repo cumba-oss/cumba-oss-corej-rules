@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0135"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESDTH in the AE dataset equals 'Y' but DTHFL in\
+  \ the DM dataset does not equal 'Y' for the corresponding subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "AE"
+Check:
+  expression: >-
+    var_exists(AE.AESDTH) and AE.AESDTH == "Y" and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when AESDTH in the AE dataset equals 'Y'."
+  Output_Variables:
+  - "DTHFL"
+  - "AE.AESDTH"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "DTHFL"
+  Condition: "AE.AESDTH = 'Y'"
+  Rule: "DTHFL = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"

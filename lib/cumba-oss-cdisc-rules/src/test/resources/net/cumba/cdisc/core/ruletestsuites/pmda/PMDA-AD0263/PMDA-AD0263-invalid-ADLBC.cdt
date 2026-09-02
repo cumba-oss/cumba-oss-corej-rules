@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0263 expect=violation domain=ADLBC
+#note "ASTDTF populated, the date it flags missing -> fires. One root (AST), one expansion."
+#expectViolationCount 1
+#expectViolationAt row=1 ASTDTF=D
+#library standard=adamig version=1-1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTDT   type=Num
+col ASTDTF  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT |  | D
+CDISCPILOT01 | 01-701-1023 | ALT | 21915 | D
+---

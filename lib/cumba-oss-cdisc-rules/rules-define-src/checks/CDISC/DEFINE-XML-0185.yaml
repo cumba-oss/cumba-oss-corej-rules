@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0185"
+Sheet_Rule_Identifier: "185"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute OrderNumber must be provided for the EnumeratedItem element when there is at least one OrderNumber attribute value provided for the same CodeList."
+# Same guard shape as DEFINE-XML-0183, OrderNumber leg.
+Message: "Attribute OrderNumber is missing for an EnumeratedItem element in a CodeList which has attribute OrderNumber provided for another EnumeratedItem."
+Check:
+  kind: "exists"
+  target: "@OrderNumber"
+  when:
+    path: "../EnumeratedItem/@OrderNumber"
+    exists: true

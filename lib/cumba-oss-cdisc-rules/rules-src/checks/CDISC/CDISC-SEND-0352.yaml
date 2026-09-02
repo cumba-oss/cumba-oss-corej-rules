@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-SEND-0352"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Repro Stage Code (RSTGCD) equals 'UNPLAN' but Unplanned\
+  \ Stage Description (SJUPDES) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Requirements:
+  Variables:
+    All:
+    - "SJUPDES"
+    - "RSTGCD"
+Check:
+  expression: >-
+    RSTGCD == "UNPLAN" and empty(SJUPDES)
+Outcome:
+  Message: "SJUPDES is empty for a record where RSTGCD equals 'UNPLAN'."
+  Output_Variables:
+  - "RSTGCD"
+  - "SJUPDES"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "SJUPDES"
+  Plain_Text_Explanation: "SJUPDES should only be populated if RSTGCD is \"UNPLAN\"\
+    ."
+  Condition: "RSTGCD = \"UNPLAN\""
+  Rule: "SJUPDES ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND352"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND352"
+        Version: "1"
+      Version: "5.0"

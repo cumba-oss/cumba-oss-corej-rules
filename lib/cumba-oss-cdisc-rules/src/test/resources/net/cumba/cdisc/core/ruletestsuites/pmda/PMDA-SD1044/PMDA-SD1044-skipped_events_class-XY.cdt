@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1044 expect=skipped domain=XY
+#note "The Scope.Classes.Include [FINDINGS] reject pin (no twin fixture exercises the class gate). XY is class=EVENTS, so the rule is out of scope. Declaring '#library custom-domain XY' without XYBLFL present makes the fixture discriminating: were the class gate broken, this custom-Events dataset without --BLFL would fire."
+#library standard=sdtmig version=3-2
+#library custom-domain XY
+dataset XY class=EVENTS label="Custom Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XYSEQ   type=Num  label="Sequence Number"
+col XYTERM  type=Char label="Reported Term"
+---
+S1 | XY | 001 | 1 | SOME EVENT

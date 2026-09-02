@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0241 expect=violation domain=ADLBC
+#note "Scope.Domains.Include: [ALL], so the structure is irrelevant -- PARAMCD is present only for realism. One index, one expansion (y=1). Key TRTAG1=POOLA holds TRTAG1N {1 x2, 2 x1} -> row 3 is the minority; group POOLB is silent."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRTAG1=POOLA TRTAG1N=2
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTAG1  type=Char
+col TRTAG1N type=Num
+---
+S1 | 001 | GLUC | POOLA | 1
+S1 | 002 | GLUC | POOLA | 1
+S1 | 003 | GLUC | POOLA | 2
+S1 | 004 | GLUC | POOLB | 3

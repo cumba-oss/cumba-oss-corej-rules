@@ -1,0 +1,121 @@
+Core:
+  Id: "PMDA-SD0079"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an Exposure (EX) record, other than a run-in record\
+  \ (EPOCH equals 'RUN-IN'), is present for a subject who is not assigned to an Arm\
+  \ (ARMCD equals 'NOTASSGN' or 'SCRNFAIL', or ARM is empty)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    (not var_exists("EPOCH") or EPOCH != "RUN-IN") and (DM.ARMCD == "NOTASSGN" or DM.ARMCD ==
+    "SCRNFAIL" or empty(DM.ARM))
+Outcome:
+  Message: "An Exposure (EX) record is present for a subject who is not assigned to\
+    \ an Arm."
+  Output_Variables:
+  - "EPOCH"
+  - "DM.ARMCD"
+  - "!DM.ARM"
+Source:
+  Message: "EX record is present when subject is not assigned to an arm"
+  Description: "Subjects that are not assigned to an Arm (ARMCD='NOTASSGN') or are\
+    \ screen failures (ARMCD='SCRNFAIL'), or ARM=null, should not have any Exposure\
+    \ records. Run-in records (EPOCH='RUN-IN') are excluded from firing for this validation\
+    \ rule."
+  Domains: "EX"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0079"
+        Version: "1"
+      Version: "1.6"

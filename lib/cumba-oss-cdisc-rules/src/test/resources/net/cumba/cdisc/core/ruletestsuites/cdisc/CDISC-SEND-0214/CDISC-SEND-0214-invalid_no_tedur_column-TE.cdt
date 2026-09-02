@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0214 expect=violation domain=TE
+#note "THE SCOPE-GATE PIN (Fix #297 / M3-D19). The TEDUR column is absent and row 2's TEENRL is blank, so no Element can satisfy 'at least one must be populated' there. The Check ALREADY handled this: `(empty(TEENRL) or not var_exists(\"TEENRL\")) and (empty(TEDUR) or not var_exists(\"TEDUR\"))`. But Requirements.Variables.All was [TEENRL, TEDUR], and ScopeMatcher's All leg is a CONJUNCTION evaluated BEFORE the Check, so the rule was SKIPPED and both `not var_exists` disjuncts were unreachable. The sheet rows 1091-1096 carry an EMPTY Condition cell -- no precondition that either column be present -- and all four twins (PMDA-SD0089, FDA-SD0089, CDISC-CG0328, CORE-000027) carry the same Check with NO Requirements.Variables block at all; pmda/PMDA-SD0089-invalid_tedur_absent-TE is green in tree AS A VIOLATION on this exact shape. M3-D19 drops the two All entries and leaves the Check UNCHANGED -- the disjuncts stay until the bucket-1 injector exemption lands, because removing them now would make the rule silent on absence."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=TRT TEENRL=
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+---
+S1 | TE | SCRN | Screening | Informed consent | End of screening
+S1 | TE | TRT  | Treatment | First dose       | 
+---

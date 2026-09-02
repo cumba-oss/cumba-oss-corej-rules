@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0101"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ECOCCUR equals 'N' but ECDOSE is populated and less\
+  \ than or equal to 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Requirements:
+  Variables:
+    All:
+    - "ECOCCUR"
+    - "ECDOSE"
+Check:
+  expression: >-
+    ECOCCUR == "N" and ECDOSE <= 0 and not empty(ECDOSE)
+Outcome:
+  Message: "ECDOSE is populated and not greater than 0 when ECOCCUR equals 'N'; ECDOSE\
+    \ must be missing or greater than 0."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+Source:
+  Class: "INT"
+  Domain: "EC"
+  Variable: "ECDOSE"
+  Condition: "ECOCCUR = 'N'"
+  Rule: "ECDOSE = null or > 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"

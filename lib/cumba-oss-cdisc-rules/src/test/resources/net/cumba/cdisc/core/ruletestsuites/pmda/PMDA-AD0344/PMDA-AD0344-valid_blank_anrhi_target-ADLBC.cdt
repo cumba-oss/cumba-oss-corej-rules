@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0344 expect=noViolation domain=ADLBC
+#note "ANRHI is the TARGET, so row 3's blank ANRHI is excluded from the group's distinct-value count and from the flag pass, so the (ALB, HIGH) group holds one distinct value and nothing fires."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANRHI   type=Num
+col ANRHIC  type=Char
+---
+S1 | 001 | ALB | 50 | HIGH
+S1 | 002 | ALB | 50 | HIGH
+S1 | 003 | ALB |    | HIGH

@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1094 expect=violation domain=AE
+#note "Row 1: AEENDTC 2020-01-20 vs RFSTDTC 2020-01-01 -> algorithm gives 20 but AEENDY=19 (day-zero style) -> fires. Row 2 is correct -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+col AEENDY  type=Num  label="Study Day of End of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01-20 | 19
+S1 | AE | 001 | 2 | NAUSEA   | 2020-01-22 | 22
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

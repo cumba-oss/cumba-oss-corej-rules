@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0384"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a High Level Group Term Code (--HLGTCD) value is\
+  \ not a valid High Level Group Term code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLGTCD"
+Operations:
+- id: "$hlgtcd_valid"
+  expression: "valid_external_dictionary_code(--HLGTCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"HLGTCD\")"
+Check:
+  expression: >-
+    $hlgtcd_valid == false
+Outcome:
+  Message: "High Level Group Term Code (--HLGTCD) is not a valid MedDRA High Level\
+    \ Group Term code."
+  Output_Variables:
+  - "--HLGTCD"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--HLGTCD"
+  Rule: "--HLGTCD = MedDRA high level group TERM code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0384"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0384"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0384"
+        Version: "1"
+      Version: "2.0"

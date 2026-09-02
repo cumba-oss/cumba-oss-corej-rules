@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1114C expect=violation domain=MH
+#note "FRESH: second in-scope domain pin (twins only exercise AE; the sheet DOMAINS cell is 'AE, CE, MH' and the '--' prefix must resolve MHBODSYS). MHBODSYS 'GASTROINTESTINAL DISORDERS' is a valid SOC but not in MedDRA's preferred case ('Gastrointestinal disorders') -> the case-sensitive check fires on row 2; row 1 matches exactly."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 MHBODSYS="GASTROINTESTINAL DISORDERS"
+dataset MH
+col USUBJID  type=Char
+col MHBODSYS type=Char
+---
+001 | Gastrointestinal disorders
+001 | GASTROINTESTINAL DISORDERS

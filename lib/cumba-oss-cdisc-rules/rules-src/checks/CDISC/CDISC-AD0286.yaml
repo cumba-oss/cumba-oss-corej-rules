@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0286"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of SEVGRyN for a given\
+  \ value of SEVGRy, where y is an integer [1-9, not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(SEVGRyN) and not empty(SEVGRy) and has_multiple_values_for(SEVGRyN, SEVGRy)
+Outcome:
+  Message: "SEVGRyN has more than one value for the same value of SEVGRy, where y\
+    \ is an integer [1-9, not zero-padded]."
+  Output_Variables:
+  - "SEVGRy"
+  - "SEVGRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "SEVGRyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of SEVGRyN\
+    \ for a given value of SEVGRy"
+  Rule_Failure_Criteria: "There is more than one value of SEVGRyN for a given value\
+    \ of SEVGRy"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR286"
+        Version: "1"
+      Version: "5.0"

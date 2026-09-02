@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-AD0456"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when TRTA is populated but TRTAN is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "TRTA"
+    - "TRTAN"
+Check:
+  expression: >-
+    not empty(TRTA) and empty(TRTAN)
+Outcome:
+  Message: "TRTA is populated, but TRTAN is missing"
+  Output_Variables:
+  - "TRTA"
+  - "TRTAN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "TRTAN"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TRTA is populated and\
+    \ TRTAN is not populated"
+  Rule_Failure_Criteria: "TRTAN is not populated"
+  Condition_Failure: "TRTA is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR456"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR456"
+        Version: "2"
+      Version: "5.0"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1251 expect=violation domain=EX
+#note "row 1: EXVAMTU populated while EXTRTV is empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 EXVAMTU=mL
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+col EXTRTV  type=Char label="Treatment Vehicle"
+col EXVAMT  type=Num  label="Treatment Vehicle Amount"
+col EXVAMTU type=Char label="Treatment Vehicle Amount Units"
+---
+S1 | EX | 001 | 1 | DRUG A |  | 10 | mL
+S1 | EX | 002 | 1 | DRUG A | SALINE | 10 | mL

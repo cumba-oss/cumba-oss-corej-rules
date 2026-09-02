@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0359"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DTHCAUS has more than one value for a given value\
+  \ of DTHCAUSN, considering only records where both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(DTHCAUS) and not empty(DTHCAUSN) and has_multiple_values_for(DTHCAUS, DTHCAUSN)
+Outcome:
+  Message: "DTHCAUS has more than one value for the same value of DTHCAUSN, on the\
+    \ records where both variables are populated."
+  Output_Variables:
+  - "DTHCAUS"
+  - "DTHCAUSN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "DTHCAUS"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of DTHCAUS\
+    \ for a given value of DTHCAUSN, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of DTHCAUS for a given value\
+    \ of DTHCAUSN"
+  Condition_Failure: "On rows where both DTHCAUS and DTHCAUSN are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR359"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR359"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR359"
+        Version: "1"
+      Version: "5.0"

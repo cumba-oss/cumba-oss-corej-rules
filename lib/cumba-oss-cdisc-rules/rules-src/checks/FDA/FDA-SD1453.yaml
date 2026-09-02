@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SD1453"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DISEQ is not a unique number within each SPDEVID\
+  \ per domain, including when the domain is split into multiple files."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DI"
+Requirements:
+  Variables:
+    All:
+    - "DISEQ"
+Check:
+  expression: >-
+    not empty(SPDEVID) and not is_unique_set([DISEQ, DOMAIN, SPDEVID])
+Outcome:
+  Message: "DISEQ is not a unique number within SPDEVID per domain, including when\
+    \ the domain is split into multiple files."
+  Output_Variables:
+  - "DOMAIN"
+  - "SPDEVID"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate value for --SEQ variable"
+  FDA_Validator_Rule_Description: "The value of Sequence Number (DISEQ) variable must\
+    \ be unique for each record within a domain and within each Sponsor Device Identifier\
+    \ (SPDEVID)"
+  Domains: "DI"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1453"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1453"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1453"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"

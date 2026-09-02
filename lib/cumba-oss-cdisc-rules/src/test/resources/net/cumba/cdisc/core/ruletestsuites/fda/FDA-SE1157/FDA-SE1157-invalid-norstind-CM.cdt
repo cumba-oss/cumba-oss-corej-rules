@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE1157 expect=violation domain=CM
+#note "CMRSTIND variable not present at all but CMRSTMOD is populated -> fires via the bare empty(--RSTIND) leaf, TRUE on every row of the absent column (absent = all-missing, EC-43). (Plan B phase 4d' deleted the redundant `or not var_exists(--RSTIND)` disjunct this note used to name; the verdict is unchanged.) RE-POINTED TO expect=skipped BY PLAN-retire-corpus-transforms PHASE 4 AND REVERTED 2026-08-26: that hoist's stated warrant was the Fix #330 remedy 'a presence rule reports the absence once', and NO presence rule for --RSTIND exists anywhere in the corpus -- so the SKIP left the absence entirely unreported. --RSTIND is back out of Requirements.Variables.All."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+#expectViolationAt row=1 CMSEQ=1
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMRSTMOD type=Char label="Restraint Mode"
+---
+S1 | CM | 001 | 1 | SLING
+S1 | CM | 001 | 2 |

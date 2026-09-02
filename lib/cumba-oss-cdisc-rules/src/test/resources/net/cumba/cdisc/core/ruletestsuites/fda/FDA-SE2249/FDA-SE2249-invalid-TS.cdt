@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2249 expect=violation domain=TS
+#note "Row 2 declares the general SEND 3.1.1 implementation guide for SNDIGVER in a DART submission instead of the DART 1.1 guide -> fires. Row 1 shows the same wrong value under another parameter is not this rule's concern."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=SNDIGVER
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SSTDTC   | Study Start Date                  | SEND IMPLEMENTATION GUIDE VERSION 3.1.1
+S1 | TS | 2 | SNDIGVER | SEND Implementation Guide Version | SEND IMPLEMENTATION GUIDE VERSION 3.1.1

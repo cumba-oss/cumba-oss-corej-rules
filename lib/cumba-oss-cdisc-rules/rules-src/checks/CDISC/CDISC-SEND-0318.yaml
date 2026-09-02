@@ -1,0 +1,72 @@
+Core:
+  Id: "CDISC-SEND-0318"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Nominal Study Day (--NOMDY) is populated with\
+  \ a value that is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--NOMDY"
+Check:
+  expression: >-
+    not empty(--NOMDY) and --NOMDY !~ /^-?[0-9]+$/
+Outcome:
+  Message: "--NOMDY is populated with a value that is not an integer."
+  Output_Variables:
+  - "--NOMDY"
+Source:
+  Class: "EVT, FND"
+  Domain: "ALL"
+  Variable: "--NOMDY"
+  Plain_Text_Explanation: "--NOMDY should be populated with an integer"
+  Rule: "NOMDY is an integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND318"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND318"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND318"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND318"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND318"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0179"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Inclusion/Exclusion Criterion Short Name (IETESTCD)\
+  \ value is not present among the IETESTCD values in the Trial Inclusion/Exclusion\
+  \ Criteria (TI) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "IE"
+Operations:
+- id: "$ti_ietestcd"
+  expression: "distinct(IETESTCD, domain=\"TI\")"
+Check:
+  expression: >-
+    IETESTCD not in $ti_ietestcd
+Outcome:
+  Message: "IETESTCD value is not present in the TI dataset."
+  Output_Variables:
+  - "IETESTCD"
+  - "$ti_ietestcd"
+Source:
+  Class: "FND"
+  Domain: "IE"
+  Variable: "IETESTCD"
+  Rule: "IETESTCD in TI.IETESTCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0179"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0179"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0179"
+        Version: "1"
+      Version: "2.0"

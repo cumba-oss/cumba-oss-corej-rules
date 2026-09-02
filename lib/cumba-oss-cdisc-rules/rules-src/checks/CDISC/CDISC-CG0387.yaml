@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0387"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESER is populated and its value is not 'Y' or 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESER"
+Check:
+  expression: >-
+    not empty(AESER) and AESER not in ["Y", "N"]
+Outcome:
+  Message: "AESER is populated but its value is not 'Y' or 'N'."
+  Output_Variables:
+  - "AESER"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--SER"
+  Condition: "--SER ^= null"
+  Rule: "--SER in ('Y','N')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0387"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0387"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0387"
+        Version: "1"
+      Version: "2.0"

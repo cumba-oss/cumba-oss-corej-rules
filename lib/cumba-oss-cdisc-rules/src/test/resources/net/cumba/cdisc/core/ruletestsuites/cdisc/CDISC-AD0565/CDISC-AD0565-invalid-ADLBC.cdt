@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0565 expect=violation domain=ADLBC
+# Rule:Description: BCHGCAyN is present and BCHGCATy is not present
+#note "BCHGCA1N present, BCHGCAT1 absent -> violation"
+#expectViolationCount 1
+#expectViolationAt BCHGCA1N=Y
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BCHGCA1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Y
+---

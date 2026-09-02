@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1247 expect=violation domain=EC
+#note "NO ECOCCUR, NO ECDOSTXT, NO ECSTAT. The narrowest version of the same branch contract: every branch tolerates an absent ECOCCUR via not-var_exists-or, so ECDOSE=0 on an administration record fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECDOSE  type=Num  label="Dose"
+---
+S1 | EC | 001 | 1 | DRUG A | 0
+S1 | EC | 001 | 2 | DRUG A | 5

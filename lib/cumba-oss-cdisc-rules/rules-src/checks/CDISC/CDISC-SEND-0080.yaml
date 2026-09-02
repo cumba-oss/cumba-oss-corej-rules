@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0080"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a time point (--TPT) is populated but none of the\
+  \ timing variables VISITDY, --DTC, or --DY is populated; at least one timing variable\
+  \ must be provided when time points are used."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--TPT"
+Check:
+  expression: >-
+    not empty(--TPT) and empty(VISITDY) and empty(--DTC) and empty(--DY)
+Outcome:
+  Message: "--TPT is populated but none of VISITDY, --DTC, or --DY is populated."
+  Output_Variables:
+  - "VISITDY"
+  - "--DTC"
+  - "--DY"
+  - "--TPT"
+Source:
+  Class: "INT, FND"
+  Domain: "ALL"
+  Variable: "VISITDY, --DTC, --DY"
+  Plain_Text_Explanation: "At least one timing variable (ie: VISITDY, --DTC, --DY)\
+    \ should be provided if timepoints (--TPT) are used."
+  Condition: "--TPT ^= null"
+  Rule: "VISITDY or --DTC or --DY ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND80"
+        Version: "1"
+      Version: "5.0"

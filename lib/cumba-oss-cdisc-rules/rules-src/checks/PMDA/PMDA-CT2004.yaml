@@ -1,0 +1,117 @@
+Core:
+  Id: "PMDA-CT2004"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated value is not a term in the non-extensible\
+  \ codelist bound at the value level (Define-XML ValueListDef / WhereClauseDef) for\
+  \ the value-level condition that applies to the record."
+Severity: "Reject"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(value()) and vlm_codelist_extensible(variable_name) == false and
+    vlm_has_codelist(variable_name) == true and value() not in
+    vlm_codelist_coded_values(variable_name)
+Outcome:
+  Message: "The value is not in the non-extensible value-level codelist declared in\
+    \ the Define-XML."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Variable value not found in non-extensible codelist when value-level condition\
+    \ occurs"
+  Description: "Variable must be populated with terms from its CDISC controlled terminology\
+    \ codelist when its value level condition is met. New terms cannot be added into\
+    \ non-extensible codelists."
+  Domains: "ALL"
+  Severity: "Reject"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2004"
+        Version: "1"
+      Version: "1.6"

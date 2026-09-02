@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0582 expect=noViolation domain=ADLBC
+#note "THE BASE COLUMN IS ABSENT. The arithmetic plan resolves BASE to no vector at all and returns an empty result set, so the rule executes and is silent. Pins that the arithmetic family needs no absent-column guard and that none is derived for it - the reason no guard is proposed for AD0223 / AD0582 / AD0225."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col BCHG    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 10 | 5

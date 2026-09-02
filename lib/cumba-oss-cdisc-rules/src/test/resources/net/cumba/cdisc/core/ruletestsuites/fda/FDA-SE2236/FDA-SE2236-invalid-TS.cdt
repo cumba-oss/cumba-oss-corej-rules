@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2236 expect=violation domain=TS
+#note "Two TSPARMCD=SNDCTVER records (SEND CT 2024-09-27 / SEND CT 2023-12-15) -> the 'SEND Controlled Terminology Version' parameter is reported more than once. One dataset-level finding."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | SNDCTVER | SEND Controlled Terminology Version | SEND CT 2024-09-27
+S01 | TS | 2 | SNDIGVER | SEND Implementation Guide Version | 3.1.1
+S01 | TS | 3 | SNDCTVER | SEND Controlled Terminology Version | SEND CT 2023-12-15

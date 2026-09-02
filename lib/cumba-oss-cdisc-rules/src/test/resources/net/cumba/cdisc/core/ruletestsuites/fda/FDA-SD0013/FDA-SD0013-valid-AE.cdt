@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0013 expect=noViolation domain=AE
+#note "Sheet: '--STDTC must be less or equal to --ENDTC'. Row 1 start < end, row 2 start = end (less-OR-EQUAL is conformant), row 3 has no end date and row 4 no start date -- both are outside the condition because the Check requires both to be populated."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 2020-01-05 | 2020-01-09
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA   | 2020-01-06 | 2020-01-06
+CDISCPILOT01 | AE | 01-701-1023 | 1 | RASH     | 2020-01-07 |
+CDISCPILOT01 | AE | 01-701-1023 | 2 | FATIGUE  |            | 2020-01-02

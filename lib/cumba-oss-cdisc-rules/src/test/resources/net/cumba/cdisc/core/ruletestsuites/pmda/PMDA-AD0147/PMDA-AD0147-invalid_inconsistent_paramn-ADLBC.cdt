@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0147 expect=violation domain=ADLBC
+#note "Group PARAM=Albumin holds PARAMN {1,1,2}; minority row 3 fires. RECORD granularity -> 1 violation."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 PARAM=Albumin PARAMN=2
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Albumin   | 1 | 30
+CDISCPILOT01 | 01-701-1023 | Albumin   | 1 | 31
+CDISCPILOT01 | 01-701-1034 | Albumin   | 2 | 32
+CDISCPILOT01 | 01-701-1045 | Bilirubin | 3 | 4

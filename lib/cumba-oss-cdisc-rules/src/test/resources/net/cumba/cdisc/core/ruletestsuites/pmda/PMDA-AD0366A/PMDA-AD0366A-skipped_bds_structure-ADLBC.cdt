@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0366A expect=skipped domain=ADLBC
+#note "The single row carries RANDFL=Y with a blank RANDDT - data that WOULD fire. Scope.Data_Structures (Include SUBJECT LEVEL ANALYSIS DATASET / DEVICE LEVEL ANALYSIS DATASET) skips it instead: this is a subject-level check and a BDS dataset is not its home. The declared structure=BDS wins over the column heuristic (Fix #154), carried by the mandatory #library block."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col RANDFL  type=Char
+col RANDDT  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | Y |

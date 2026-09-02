@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0283"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SEENDTC of the subject's last Subject Element\
+  \ (highest SESEQ) is after the subject disposition date (DS.DSSTDTC); the last Element\
+  \ must end on or before the disposition date."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DS"
+Operations:
+- id: "$is_last_se"
+  expression: "is_last_in_group(ordering=\"SESEQ\", group=[USUBJID], keep_missings=false)"
+Check:
+  ERROR:
+    expression: >-
+      $is_last_se == true and date(SEENDTC) > DS.DSSTDTC
+  INFO:
+    expression: >-
+      $is_last_se == true and date(latest_possible(SEENDTC)) > earliest_possible(DS.DSSTDTC)
+    Message: "SEENDTC of the last Subject Element may be later than the subject disposition\
+      \ date DS.DSSTDTC (partial date/time precision leaves the order undetermined)."
+Outcome:
+  Message: "SEENDTC of the last Subject Element is later than the subject disposition\
+    \ date DS.DSSTDTC."
+  Output_Variables:
+  - "$is_last_se"
+  - "SEENDTC"
+  - "DS.DSSTDTC"
+Source:
+  Class: "SPC, EVT"
+  Domain: "SE, DS"
+  Variable: "SEENDTC, DSSTDTC"
+  Plain_Text_Explanation: "The value of SEENDTC for the last Element must immediately\
+    \ precede or be the same as the date/time of disposition for the subject."
+  Condition: "Element is the last Element for the subject"
+  Rule: "The value of SEENDTC for the last Element must immediately precede or be\
+    \ the same as the value of DS.DSSTDTC for the subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND283"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND283"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND283"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND283"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND283"
+        Version: "1"
+      Version: "5.0"

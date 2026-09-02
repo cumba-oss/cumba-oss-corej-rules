@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0554 expect=violation domain=ADLBC
+# Rule:Description: SHIFTyN is present and SHIFTy is not present
+#note "SHIFT1N present, SHIFT1 absent -> violation"
+#expectViolationCount 1
+#expectViolationAt SHIFT1N=Y
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Y
+---

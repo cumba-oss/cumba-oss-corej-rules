@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0369"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Domain Abbreviation (RDOMAIN) is populated\
+  \ but does not represent a domain present in the study data."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "RELREC"
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Operations:
+- id: "$study_domains"
+  expression: "study_domains()"
+Check:
+  expression: >-
+    not empty(RDOMAIN) and RDOMAIN not in $study_domains
+Outcome:
+  Message: "RDOMAIN does not represent a domain present in the study."
+  Output_Variables:
+  - "RDOMAIN"
+  - "$study_domains"
+Source:
+  Class: "SPC"
+  Domain: "CO,  SUPP--, RELREC"
+  Variable: "RDOMAIN"
+  Condition: "RDOMAIN ^= null"
+  Rule: "RDOMAIN is dataset in study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0369"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0369"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0369"
+        Version: "1"
+      Version: "2.0"

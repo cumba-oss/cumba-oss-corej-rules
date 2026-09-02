@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1090 expect=violation domain=AE
+#note "FRESH, DISCRIMINATING - the Check's gate matrix plus the datetime tier of is_complete_date. Row 1: partial AESTDTC fails is_complete_date -> silent even though AESTDY=5 is wrong. Row 2: empty AESTDY -> not empty gate -> silent. Row 3: complete DATETIME (length 16 passes is_complete_date), dy computes from the date portion = 10, 9 != 10 -> fires. Row 4: correct -> clean. Row 5: subject 002's RFSTDTC is partial, is_complete_date(DM.RFSTDTC) -> silent even though AESTDY=99 is absurd. Exactly one finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 AESEQ=3
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AESTDY  type=Num  label="Study Day of Start of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01           | 5
+S1 | AE | 001 | 2 | NAUSEA   | 2020-01-10        |
+S1 | AE | 001 | 3 | RASH     | 2020-01-10T09:30  | 9
+S1 | AE | 001 | 4 | FEVER    | 2020-01-12        | 12
+S1 | AE | 002 | 1 | COUGH    | 2020-02-01        | 99
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 | 2020-01
+---

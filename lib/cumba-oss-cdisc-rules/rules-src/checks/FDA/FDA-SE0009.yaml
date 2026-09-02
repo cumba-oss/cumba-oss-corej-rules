@@ -1,0 +1,97 @@
+Core:
+  Id: "FDA-SE0009"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both Date/Time of Observation (--DTC) and Study\
+  \ Day of Observation (--DY) are not populated in a Findings-class record."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+  Domains:
+    Exclude:
+    - "PP"
+Check:
+  expression: >-
+    empty(--DTC) and empty(--DY)
+Outcome:
+  Message: "Both Date/Time of Observation (--DTC) and Study Day of Observation (--DY)\
+    \ are not populated; at least one should be populated."
+  Output_Variables:
+  - "--DTC"
+  - "--DY"
+Source:
+  FDA_Validator_Rule_Message: "Missing values for both --DTC and --DY variables"
+  FDA_Validator_Rule_Description: "Date/Time of Observation (--DTC) or Study Day of\
+    \ Observation (--DY) should be populated in the Findings observation class where\
+    \ data are usually collected at multiple study days."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB032"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB032"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB032"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB032"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB032"
+        Version: "1"
+      Version: "1.5"

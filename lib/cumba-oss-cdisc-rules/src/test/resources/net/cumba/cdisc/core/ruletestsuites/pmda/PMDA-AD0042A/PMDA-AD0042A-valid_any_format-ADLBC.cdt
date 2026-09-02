@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0042A expect=noViolation domain=ADLBC
+#note "ASTTM carries a declared format (8.) that is NOT a SAS time format. Pins the AD0042A / PMDA-AD0042 partition: AD0042A asks only whether a format is DECLARED, so any non-empty format silences it; reporting 8. as a non-time format is PMDA-AD0042's job."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTTM   type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 13.5

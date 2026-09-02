@@ -1,0 +1,67 @@
+Core:
+  Id: "PMDA-AD0239"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both Actual Treatment (TRTA) and Planned Pooled\
+  \ Treatment y (TRTPGy) are present in the dataset but Actual Pooled Treatment y\
+  \ (TRTAGy) is not present; when TRTA and TRTPGy are present, the corresponding TRTAGy\
+  \ must also be present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("TRTA") and var_exists("TRTPGy") and not var_exists("TRTAGy")
+Outcome:
+  Message: "TRTPGy and TRTA are present, but TRTAGy is not present"
+  Output_Variables:
+  - "TRTA"
+  - "TRTPGy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "TRTPGy and TRTA are present, but TRTAGy is not present"
+  Description: "If both actual treatment (TRTA) and Planned Pooled Treatment y (TRTPGy)\
+    \ are present, then Actual Pooled Treatment y (TRTAGy) variable must be present."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0239"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0239"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0239"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0239"
+        Version: "1"
+      Version: "6.0"

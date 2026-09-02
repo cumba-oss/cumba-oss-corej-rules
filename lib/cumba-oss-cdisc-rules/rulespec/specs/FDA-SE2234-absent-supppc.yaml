@@ -1,0 +1,40 @@
+name: FDA-SE2234-absent-supppc
+kind: rule
+description: |
+  EC-27 / Fix #126 pin — completes the FDA-SE2234 family (-fire/-nofire cover the
+  SUPPPC-present shapes): here SUPPPC is GENUINELY ABSENT from the study. The
+  fork's rule processor used to raise DomainNotFoundError while swapping in the
+  supp_qnam_present operation's domain and skip the rule; it degraded
+  $calcn_present to a null column (now 'false', Fix #192) and the
+  `$study_datasets shares_no_elements_with [SUPPPC]` branch fires for the BLQ
+  record. PC row 1 (PCSTRESC=BLQ) -> fires; row 2 (numeric PCSTRESC) fails the
+  is_contained_by gate -> no finding.
+  ⚠ RE-CAPTURED 2026-08-09 for `Fix #192` (Q17-a): an unresolvable operation domain now
+  publishes the operator's DECLARED `EmptyResult` instead of an unclassified null. The
+  VERDICT is unchanged — same rows, same status; only the rendered $-value moves. The fork
+  still reports "no value", so this is a filed java-only divergence, not a regression.
+python_source: rules-sendig FDA-SE2234
+rule:
+  coreId: FDA-SE2234
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCTESTCD: DRUGX, PCSTRESC: BLQ}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 2, PCTESTCD: DRUGX, PCSTRESC: '5.0'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    findings: [PC]
+expected_violations:
+  - rule_id: FDA-SE2234
+    dataset: PC
+    row_key: {PCSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $calcn_present: 'false'
+      PCSTRESC: BLQ
+      PCTESTCD: DRUGX
+expected_errors: []

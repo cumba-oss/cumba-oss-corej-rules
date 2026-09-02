@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0004 expect=violation domain=XXDM
+#note "prefix('XXDM',2)='XX' != DOMAIN='DM' -> fires once for the dataset despite two rows (dataset granularity). unsplitNameFromData returns row-0 DOMAIN 'DM', which differs from the name, so XXDM is treated as a split and the Exclude list is re-tested against base 'DM' too - DM is in no Exclude entry, so the rule runs. Body copied from the shipped green core/CORE-000598-invalid-XXDM.cdt."
+#expectViolationCount 1
+#expectViolationAt DOMAIN=DM
+#library standard=sdtmig version=3-4
+dataset XXDM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023

@@ -1,0 +1,76 @@
+Core:
+  Id: "PMDA-SD1347"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a fatal Adverse Event (AEOUT equals 'FATAL') has\
+  \ an End Date/Time of Adverse Event (AEENDTC) that is not equal to the subject's\
+  \ Date/Time of Death (DM.DTHDTC)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AEOUT"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    AEOUT == "FATAL" and not empty(AEENDTC) and not empty(DM.DTHDTC) and date(AEENDTC) != DM.DTHDTC
+Outcome:
+  Message: "AEENDTC for a fatal Adverse Event (AEOUT equals 'FATAL') is not the same\
+    \ as the subject's Date/Time of Death (DM.DTHDTC)."
+  Output_Variables:
+  - "AEOUT"
+  - "AEENDTC"
+  - "DM.DTHDTC"
+Source:
+  Message: "AEENDTC for fatal AE is not the same as DM.DTHDTC"
+  Description: "Fatal Adverse Event records (AEOUT = 'FATAL') in the Adverse Events\
+    \ (AE) domain should have End Date/Time of Adverse Event (AEENDTC) equal to subject's\
+    \ Date/Time of Death (DTHDTC) populated in the Demographics (DM) domain. Subject's\
+    \ Date/Time of Death info should be consistent across all domains."
+  Domains: "AE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1347"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1347"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1347"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1347"
+        Version: "1"
+      Version: "1.6"

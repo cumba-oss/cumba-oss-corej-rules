@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0041 expect=violation domain=ADLBC
+# Rule:Description: A numeric variable with a suffix of DT does not have a date format
+#note "ADT is numeric with non-date format 8. -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Num variable_format=8. variable_name=ADT
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+---

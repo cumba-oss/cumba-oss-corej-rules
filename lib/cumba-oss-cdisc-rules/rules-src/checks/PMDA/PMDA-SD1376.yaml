@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-SD1376"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Subject Reference End Date/Time (RFENDTC) is empty\
+  \ for a treated subject, i.e. one whose Actual Arm Code (ACTARMCD) is populated\
+  \ and not equal to 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT', unless the study is flagged\
+  \ as ongoing by a Trial Summary (TS) record where TSPARMCD equals 'ONGOSIND' and\
+  \ TSVAL equals 'Y'."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Operations:
+- id: "$ongoing_study_count"
+  expression: "record_count(domain=\"TS\", filter=filter(TSPARMCD=\"ONGOSIND\", TSVAL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in ["SCRNFAIL", "NOTASSGN", "NOTTRT"] and empty(RFENDTC)
+    and $ongoing_study_count == 0
+Outcome:
+  Message: "RFENDTC is not provided for a treated subject and the study is not flagged\
+    \ as ongoing in TS."
+  Output_Variables:
+  - "RFENDTC"
+  - "ACTARMCD"
+  - "$ongoing_study_count"
+Source:
+  Message: "RFENDTC is not provided for a treated subject"
+  Description: "Subject Reference End Date/Time (RFENDTC) should be populated for\
+    \ all treated subjects, those where Actual Arm Code (ACTARMCD) is not equal to\
+    \ 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT' (or null). If the study is ongoing, Parameter\
+    \ Value (TSVAL) for the 'ONGOSIND/Ongoing Study Indicator' parameter should be\
+    \ set to 'Y' in the Trial Summary (TS) domain."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1376"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1376"
+        Version: "1"
+      Version: "1.6"

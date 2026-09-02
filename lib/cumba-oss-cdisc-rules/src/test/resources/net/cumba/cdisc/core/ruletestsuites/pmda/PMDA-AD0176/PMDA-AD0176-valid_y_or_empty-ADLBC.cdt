@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0176 expect=noViolation domain=ADLBC
+#note "Isolates both conjuncts: Y passes the membership test, and the blank row is disarmed by the leading `not empty(ABLFL)` rather than by the membership arm. The rule executes (BDS is in scope) and stays silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ABLFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | Y
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 |
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 | Y

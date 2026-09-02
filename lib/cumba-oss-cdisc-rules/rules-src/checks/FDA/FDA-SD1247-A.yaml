@@ -1,0 +1,87 @@
+Core:
+  Id: "FDA-SD1247-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the EC dataset contains no dose information at all:\
+  \ none of the ECDOSE, ECDOSTXT, ECSTAT, and ECOCCUR variables is present in the\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Check:
+  expression: >-
+    not var_exists("ECDOSE") and not var_exists("ECDOSTXT") and not var_exists("ECSTAT") and not
+    var_exists("ECOCCUR")
+Outcome:
+  Message: "The EC dataset contains none of ECDOSE, ECDOSTXT, ECSTAT, and ECOCCUR:\
+    \ no dose information is recorded anywhere in the dataset."
+Source_Proposed:
+  FDA_Validator_Rule_Message: "The EC dataset contains none of ECDOSE, ECDOSTXT, ECSTAT,\
+    \ and ECOCCUR: no dose information is recorded anywhere in the dataset."
+  FDA_Validator_Rule_Description: "The EC dataset contains no dose information at\
+    \ all: none of the ECDOSE, ECDOSTXT, ECSTAT, and ECOCCUR variables is present\
+    \ in the dataset."
+  Domains: "EC"
+Source:
+  FDA_Validator_Rule_Message: "ECDOSE is not greater than 0 when ECOCCUR does not\
+    \ equal 'N' and ECDOSTXT is null"
+  FDA_Validator_Rule_Description: "ECDOSE must be greater than zero when ECOCCUR does\
+    \ not equal 'N' , ECSTAT does not equal 'NOT DONE', and ECDOSTXT is null. ECDOSE\
+    \ must not be set to zero (0) as an alternative method for indicating doses not\
+    \ taken, not given, or missed."
+  Domains: "EC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"

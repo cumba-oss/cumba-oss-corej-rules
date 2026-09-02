@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD0080 expect=violation domain=AE
+#note "PURPOSE-BUILT for Fix #209 / Phase 2b prerequisite B: max_date routes through OperationExecutor's DateExtreme -> IsoDateBounds.upper / isDetermined, the second of the two consumers the plan's blast radius counts, and no shipped fixture carried a masked date. Subject 001: DS carries 2023-05-01 and the masked 2023-06--, whose hull reaches 2023-06-30T23:59:59; the only DETERMINED candidate is 2023-05-01, whose own upper (2023-05-01T23:59:59) does not reach that limit, so EC-46's selection rule yields NO maximum and the date_greater_than leaf has no target -> subject 001 is SILENCED despite an AESTDTC of 2023-07-01. Subject 002 is the control: an all-determined DS gives a maximum of 2023-06-01, and AESTDTC 2023-07-01 fires. Verdict: 1 violation, on row 2. Neuter check: change 001's 2023-06-- to 2023-06-30 and the count becomes 2. UNCHANGED BY Fix #215 (Phase 3): the widened validator does not reroute this, because bound() dispatches on ScalarSemantics.isMaskedDate rather than on isValidDate's verdict. Together with CORE-000086 this is the dataset-backed half of the 114 rules / 521 entries that PLAN-partial-date-predicate-impact.md R3.4 requires not to move."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESTDTC=2023-07-01
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-07-01
+S1 | AE | 002 | 1 | NAUSEA   | 2023-07-01
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | 2023-05-01
+S1 | DS | 001 | 2 | COMPLETED  | 2023-06--
+S1 | DS | 002 | 1 | RANDOMIZED | 2023-05-01
+S1 | DS | 002 | 2 | COMPLETED  | 2023-06-01

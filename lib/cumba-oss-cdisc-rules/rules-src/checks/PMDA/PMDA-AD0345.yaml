@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0345"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the character Analysis Normal Range\
+  \ Upper Limit (C) (ANRHIC) does not have a single consistent value for each unique\
+  \ combination of Parameter Code (PARAMCD) and the numeric Analysis Normal Range\
+  \ Upper Limit (ANRHI), evaluated on rows where PARAMCD and ANRHI are populated;\
+  \ within a study each PARAMCD/ANRHI group must map to one ANRHIC value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(ANRHI) and is_inconsistent_across_dataset(ANRHIC,
+    keys=[PARAMCD, ANRHI])
+Outcome:
+  Message: "Inconsistent value for ANRHIC"
+  Output_Variables:
+  - "PARAMCD"
+  - "ANRHI"
+  - "ANRHIC"
+Source:
+  Message: "Inconsistent value for ANRHIC"
+  Description: "Within a Study and a Parameter, all Analysis Normal Range Upper Limit\
+    \ (C) (ANRHIC) variable values must be the same for each unique value of Analysis\
+    \ Normal Range Upper Limit (ANRHI) when variable ANRHI is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0345"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0345"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0345"
+        Version: "1"
+      Version: "6.0"

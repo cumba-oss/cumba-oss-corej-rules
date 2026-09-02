@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0003 expect=violation domain=LB
+#note "FRESH. Both *DTC columns are invalid on the SAME data row (LBDTC='2020-13-45', LBENDTC='2020-02-30'). Pins the per-(variable,row) granularity of RuleRunner.evaluateVariableValueNative: the count is 2, not 1, and the two violations share row=1 and differ only in variable_name. This is the shape that distinguishes a per-cell rule from a per-row one and no twin covers it."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 variable_name=LBDTC variable_value=2020-13-45
+#expectViolationAt row=1 variable_name=LBENDTC variable_value=2020-02-30
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+col LBTESTCD type=Char
+col LBDTC   type=Char label="Date/Time of Specimen Collection"
+col LBENDTC type=Char label="End Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 2020-13-45 | 2020-02-30

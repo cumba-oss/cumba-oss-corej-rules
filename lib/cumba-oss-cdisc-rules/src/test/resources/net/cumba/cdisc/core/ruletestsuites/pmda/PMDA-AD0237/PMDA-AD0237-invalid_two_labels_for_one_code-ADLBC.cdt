@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0237 expect=violation domain=ADLBC
+#note "TRTPG1 matches ^TRTPG(\\d+)$ and TRTPG1N matches ^TRTPG(\\d+)N$, both capturing y=1 (TRTPG1N does NOT match the first pattern - the $ anchor), so the seeds dedupe to ONE tuple and there is ONE expansion. KEY = TRTPG1N, DEPENDENT = TRTPG1: key 1 carries {POOLA, POOLB} -> rows 1 and 2 fire; key 3 is single-valued. Exactly 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 TRTPG1=POOLA TRTPG1N=1
+#expectViolationAt row=2 USUBJID=01-701-1023 TRTPG1=POOLB TRTPG1N=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTPG1  type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | POOLA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLB | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLC | 3

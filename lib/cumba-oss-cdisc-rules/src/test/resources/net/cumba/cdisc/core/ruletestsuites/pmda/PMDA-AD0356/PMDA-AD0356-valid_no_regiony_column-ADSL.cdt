@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0356 expect=noViolation domain=ADSL
+#note "REGION1 (the key) is absent. REGION1N seeds tuple y=1 so the expansion runs and REGION1 is synthesised absent; not empty(REGION1) is false over the absent column so the rule is silent - executing, not skipped. Were the guard missing, the absent key would drop from the partition and {1,2} would tie and flag both rows."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col REGION1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1
+CDISCPILOT01 | 01-701-1023 | 2

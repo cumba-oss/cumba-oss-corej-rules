@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0232B expect=violation domain=ADSL
+#note "Pooled code 1 carries both POOLA and POOLAA; POOLA is the strict majority so row 3 alone fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TR01PG1=POOLAA TR01PG1N=1
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1 type=Char
+col TR01PG1N type=Num
+---
+S1 | 001 | POOLA | 1
+S1 | 002 | POOLA | 1
+S1 | 003 | POOLAA | 1
+S1 | 004 | POOLB | 2
+S1 | 005 | POOLB | 2

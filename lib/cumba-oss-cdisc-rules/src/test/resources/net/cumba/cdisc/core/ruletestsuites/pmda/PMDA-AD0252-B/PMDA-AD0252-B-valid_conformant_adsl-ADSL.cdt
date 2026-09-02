@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0252-B expect=noViolation domain=ADSL
+#note "Negative control: a conformant subject-level dataset carrying NONE of the 44 concrete prohibited names and matching NONE of the 29 template-family regexes. Since Fix #270 (ruling M2-D3) the wildcard-free Check EXECUTES per variable and stays silent -> the rule's first true noViolation state (pre-#270 it could only report SKIPPED here - expand() returned empty and NoMatch dropped the rule; the recorded no-noViolation carve-out is retired for this family)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col SEX     type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 56 | M | Y
+CDISCPILOT01 | 01-701-1023 | 61 | F | Y

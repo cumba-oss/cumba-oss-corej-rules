@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0135"
+Sheet_Rule_Identifier: "DD0135"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Repeating"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The value of the Repeating attribute must be 'No' when IsReferenceData='Yes'."
+# CDISC twin 0260 - AGREE (identical guard and value).
+Message: "Repeating/IsReferenceData mismatch"
+Check:
+  kind: "one_of"
+  attribute: "Repeating"
+  values: ["No"]
+  when:
+    path: "@IsReferenceData"
+    equals: "Yes"

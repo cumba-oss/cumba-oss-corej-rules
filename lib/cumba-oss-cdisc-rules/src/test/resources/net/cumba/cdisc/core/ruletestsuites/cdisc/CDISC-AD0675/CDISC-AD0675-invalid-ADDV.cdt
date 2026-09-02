@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0675 expect=violation domain=ADDV
+# Rule:Description: On a given record, DEVGRy is populated and DEVGRyN is not populated
+#note "DEVGR1 populated, DEVGR1N empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADDV class="DEVICE LEVEL ANALYSIS DATASET"
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col DEVGR1 type=Char
+col DEVGR1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | V1 | 
+---

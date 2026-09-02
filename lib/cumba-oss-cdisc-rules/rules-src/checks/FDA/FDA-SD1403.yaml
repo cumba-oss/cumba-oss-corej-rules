@@ -1,0 +1,46 @@
+Core:
+  Id: "FDA-SD1403"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of First Challenge Agent Admin (RFCSTDTC)\
+  \ is populated and is later than Date/Time of Last Challenge Agent Admin (RFCENDTC)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFCSTDTC"
+    - "RFCENDTC"
+Check:
+  expression: >-
+    not empty(RFCSTDTC) and not empty(RFCENDTC) and date(RFCSTDTC) > RFCENDTC
+Outcome:
+  Message: "RFCSTDTC is populated and is later than RFCENDTC."
+  Output_Variables:
+  - "RFCSTDTC"
+  - "RFCENDTC"
+Source:
+  FDA_Validator_Rule_Message: "RFCSTDTC date is after RFCENDTC"
+  FDA_Validator_Rule_Description: "Date/Time of First Challenge Agent Admin (RFCSTDTC)\
+    \ variable value must be less than or equal to Date/Time of Last Challenge Agent\
+    \ Admin (RFCENDTC)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1403"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

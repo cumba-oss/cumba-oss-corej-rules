@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0348 expect=violation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of AyLOC for a given value of AyLO
+#note "within PARAMCD GLUC, A1LO=G maps to two distinct A1LOC values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1LOC type=Char
+col A1LO type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | A1 | G
+CDISCPILOT01 | 01-701-1015 | GLUC | A2 | G
+---

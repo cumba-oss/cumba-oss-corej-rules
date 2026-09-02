@@ -1,0 +1,57 @@
+Core:
+  Id: "FDA-SD1237"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record exists for the same combination\
+  \ of Sponsor Device Identifier (SPDEVID) and Device Property Short Name (DOTESTCD)\
+  \ in the Device Properties (DO) domain; there should be one record per device property."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DO"
+Requirements:
+  Variables:
+    All:
+    - "SPDEVID"
+Check:
+  expression: >-
+    not empty(DOTESTCD) and not is_unique_set([SPDEVID, DOTESTCD])
+Outcome:
+  Message: "More than one record exists for the combination of SPDEVID and DOTESTCD\
+    \ in the Device Properties (DO) domain."
+  Output_Variables:
+  - "SPDEVID"
+  - "DOTESTCD"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate records in Device Property"
+  FDA_Validator_Rule_Description: "There should be one record per device property\
+    \ defined by SPDEVID and DOTESTCD variables"
+  Domains: "DO"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1237"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1237"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1237"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD2248-A expect=violation domain=TS
+#note "Minted completeness sibling of PMDA-SD2248 (Fix #239). Row 1 carries a COMPLETE ISO date and must NOT fire -- that is the negative control, and it is the row the parent's own valid scenario also passes. Row 2 is a partial (year-month) ISO date: valid ISO 8601, so the parent PMDA-SD2248 stays silent on it, and this sibling is the ONLY rule that reports it. Row 3 is the same partial date under a different --PARMCD, which proves the parameter gate still selects."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=SENDTC TSVAL=2020-06
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | SENDTC | Study End Date | 2020-01-15
+CDISCPILOT01 | TS | 2 | SENDTC | Study End Date | 2020-06
+CDISCPILOT01 | TS | 3 | DCUTDTC | Data Cutoff Date | 2020-06

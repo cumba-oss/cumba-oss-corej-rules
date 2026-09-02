@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD1445 expect=violation domain=VS
+#note "Rows 1/2: two VSLOBXFL='Y' records for the same USUBJID + full assessment key (VSTESTCD, VSPOS; absent key columns dropped) -> both fire. Row 3: same key but VSLOBXFL blank -> clean. Row 4: different VSPOS -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSSEQ=1
+#expectViolationAt row=2 VSSEQ=2
+dataset VS class=FINDINGS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSPOS    type=Char label="Vital Signs Position of Subject"
+col VSLOBXFL type=Char label="Last Observation Before Exposure Flag"
+---
+S1 | VS | S1-001 | 1 | SYSBP | SITTING  | Y
+S1 | VS | S1-001 | 2 | SYSBP | SITTING  | Y
+S1 | VS | S1-001 | 3 | SYSBP | SITTING  |
+S1 | VS | S1-001 | 4 | SYSBP | STANDING | Y

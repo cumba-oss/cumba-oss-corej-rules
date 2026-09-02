@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1392 expect=violation domain=CM
+#note "Regression pin for the T6 fix: Requirements.Variables gates the checked --CHENDY (not --ENDTC), and the absent-CMENDTC case fires via the not_exists branch with empty DM.RFCSTDTC."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=002
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHENDY type=Num  label="End Day of Obs Rel to Challenge Agent"
+---
+S1 | CM | 002 | 1 | SALINE | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 002 |
+---

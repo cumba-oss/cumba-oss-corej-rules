@@ -1,0 +1,103 @@
+Core:
+  Id: "FDA-SD2009"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Lowest Level Term Code (--LLTCD) value is not\
+  \ a valid Lowest Level Term code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--LLTCD"
+Operations:
+- id: "$lltcd_valid"
+  expression: "valid_external_dictionary_code(--LLTCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"LLTCD\")"
+Check:
+  expression: >-
+    $lltcd_valid == false
+Outcome:
+  Message: "Lowest Level Term Code (--LLTCD) is not a valid MedDRA Lowest Level Term\
+    \ code."
+  Output_Variables:
+  - "--LLTCD"
+Source:
+  FDA_Validator_Rule_Message: "Value for --LLTCD not found in MedDRA dictionary"
+  FDA_Validator_Rule_Description: "Value for Lowest Level Term Code (--LLTCD) variable\
+    \ must be populated using a Lowest Level Term Code of the MedDRA dictionary of\
+    \ a version specified in the define.xml."
+  Domains: "AE, CE, MH"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2009"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-AD0129"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD for a subject,\
+  \ there is more than one value of BASE for a given value of BASEC."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BASE) and not empty(BASEC) and has_multiple_values_for(BASE, BASEC, within=[USUBJID,
+    PARAMCD])
+Outcome:
+  Message: "BASE has more than one value for this subject, PARAMCD, and BASEC."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "BASEC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASE"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject,\
+    \ there is more than one value of BASE for a given value of BASEC"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject, there is\
+    \ more than one value of BASE for a given value of BASEC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR129"
+        Version: "1"
+      Version: "5.0"

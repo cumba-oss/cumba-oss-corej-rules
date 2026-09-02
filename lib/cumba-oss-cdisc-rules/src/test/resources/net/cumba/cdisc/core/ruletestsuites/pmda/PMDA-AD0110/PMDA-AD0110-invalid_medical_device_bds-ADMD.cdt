@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0110 expect=violation domain=ADMD
+#note "ADMD carries SPDEVID + PARAMCD -> MEDICAL DEVICE BDS, which satisfies Include [BASIC DATA STRUCTURE] via the Fix #179 structure set."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 AVISIT=WEEK02 AVISITN=1 PARAMCD=SYSBP
+dataset ADMD
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col AVISITN type=Num
+col AVISIT type=Char
+---
+S1 | 001 | DEV01 | SYSBP | SystolicBP | 1 | WEEK2
+S1 | 002 | DEV01 | SYSBP | SystolicBP | 1 | WEEK2
+S1 | 003 | DEV02 | SYSBP | SystolicBP | 1 | WEEK02

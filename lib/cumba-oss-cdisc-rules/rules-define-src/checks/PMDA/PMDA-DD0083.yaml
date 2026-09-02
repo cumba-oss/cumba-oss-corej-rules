@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0083"
+Sheet_Rule_Identifier: "DD0083"
+Rule_Set: "PMDA"
+Element: "CommentDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The OID attribute for Comment (the Comment ID) must be unique within Define.xml. Define-XML specification represents Comments as def:CommentDef elements within MetaDataVersion element."
+# The PMDA sheet scopes this "within Define.xml" => document-wide. CDISC twin 213
+# uses sibling scope because ITS sheet row scopes per MetaDataVersion - the two
+# are equivalent for single-MDV documents; each rule follows its own sheet.
+Message: "Duplicate Comment OID [${value}]"
+Check:
+  kind: "unique_in_document"
+  attribute: "OID"

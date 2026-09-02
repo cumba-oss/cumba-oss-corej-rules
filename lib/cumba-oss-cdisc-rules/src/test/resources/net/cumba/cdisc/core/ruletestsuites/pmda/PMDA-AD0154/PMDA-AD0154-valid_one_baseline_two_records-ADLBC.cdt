@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0154 expect=noViolation domain=ADLBC
+#note "Exactly one baseline-flagged record plus one ordinary post-baseline record - the textbook-correct shape, byte-for-byte the shape of the shipped green twin cdisc/CDISC-AD0154/CDISC-AD0154-valid-ADLBC.cdt. The shipped Check asks not is_unique_set(ABLFL, keys=[USUBJID, PARAMCD, BASETYPE]), so the two rows carry the distinct tuples (Y,...) and (N,...) and nothing fires. Pins the leading-key fix (Fix #271, ruling M2-D4): with USUBJID as the name operand the question was asked about the triple (USUBJID, PARAMCD, BASETYPE), which repeats once per visit, so EVERY conformant longitudinal BDS row flagged and this reported 1 violation at row=1."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID   type=Char
+col USUBJID   type=Char
+col PARAMCD   type=Char
+col BASETYPE  type=Char
+col ABLFL     type=Char
+col AVAL      type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | 10
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | N | 12

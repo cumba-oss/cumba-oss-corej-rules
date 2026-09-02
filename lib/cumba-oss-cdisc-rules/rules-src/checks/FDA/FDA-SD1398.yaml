@@ -1,0 +1,53 @@
+Core:
+  Id: "FDA-SD1398"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Observation (--ENDTC) and Date/Time\
+  \ of First Challenge Agent Admin (RFCSTDTC) are both populated as complete dates\
+  \ but End Day of Obs Rel to Challenge Agent (--CHENDY) is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--CHENDY"
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--ENDTC) and is_complete_date(--ENDTC) and not empty(DM.RFCSTDTC) and
+    is_complete_date(DM.RFCSTDTC) and empty(--CHENDY)
+Outcome:
+  Message: "End Day of Obs Rel to Challenge Agent (--CHENDY) is missing when --ENDTC\
+    \ and RFCSTDTC are both populated complete dates."
+  Output_Variables:
+  - "--ENDTC"
+  - "DM.RFCSTDTC"
+  - "!--CHENDY"
+Source:
+  FDA_Validator_Rule_Message: "--CHENDY variable value is not populated"
+  FDA_Validator_Rule_Description: "End Day of Obs Rel to Challenge Agent (--CHENDY)\
+    \ variable value should be populated, when End Date/Time of Observation (--ENDTC)\
+    \ and Date/Time of First Challenge Agent Admin (RFCSTDTC) variables values are\
+    \ provided, and both of them include complete date parts."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1398"
+        Version: "1"
+      Version: "1.6"

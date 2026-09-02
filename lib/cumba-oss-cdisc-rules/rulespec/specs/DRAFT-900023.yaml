@@ -1,0 +1,63 @@
+name: DRAFT-900023
+kind: rule
+description: |
+  GLOB-CT-005 variant (PLAN-coreJ-codelist-conformance Phase 3): the define.xml flags
+  sponsor-extended terms (def:ExtendedValue="Yes") on a codelist that is non-extensible in
+  the CDISC Library. VS.VSPOS is library-bound to C71148 (non-extensible); the define
+  enumerates BOGUS as an extended term -> the VSPOS ItemDef fires. VSLAT is a SECOND offender
+  (C99074 non-extensible, define extends with BOGUS2) so the Record sensitivity is observable —
+  under the former Dataset sensitivity only the first offending ItemDef survived. VSTESTCD has no library
+  codelist, so var_codelist_extensible("LIBRARY") resolves null and the == false guard
+  excludes it. Check: var_codelist_extensible("LIBRARY") == false and
+  not empty(var_codelist_extended_values("DEFINE")) — exercises the list-cardinality-aware
+  empty() on the extended-values list accessor in both engines.
+python_source: rules-draft-sdtmig-3-4.json (DRAFT-900023)
+rule:
+  coreId: DRAFT-900023
+datasets:
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+    - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSPOS: SUPINE, VSLAT: LEFT, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+  domain_variables:
+    VS:
+    - {name: VSPOS, ordinal: '1', role: Result Qualifier, simpleDatatype: Char, label: Position of Subject During Observation, codelist: C71148}
+    - {name: VSLAT, ordinal: '2', role: Result Qualifier, simpleDatatype: Char, label: Laterality, codelist: C99074}
+    - {name: VSTESTCD, ordinal: '3', role: Topic, simpleDatatype: Char, label: Vital Signs Test Short Name}
+  codelist_terms:
+    C71148: [SUPINE, STANDING]
+    C99074: [LEFT, RIGHT]
+  codelist_extensible:
+    C71148: false
+    C99074: false
+define_xml:
+  VS:
+  - {define_variable_name: VSPOS, define_variable_ccode: C71148, define_variable_codelist_extended_values: [BOGUS]}
+  - {define_variable_name: VSLAT, define_variable_ccode: C99074, define_variable_codelist_extended_values: [BOGUS2]}
+  - {define_variable_name: VSTESTCD, define_variable_codelist_extended_values: []}
+expected_violations:
+- rule_id: DRAFT-900023
+  dataset: VS
+  row_key: {STUDYID: S1, USUBJID: '001', VSSEQ: 1}
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_extended_values: '[BOGUS]'
+    define_variable_name: VSPOS
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSPOS
+- rule_id: DRAFT-900023
+  dataset: VS
+  row_key: {STUDYID: null, USUBJID: null, VSSEQ: null}
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_extended_values: '[BOGUS2]'
+    define_variable_name: VSLAT
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSLAT
+expected_errors: []

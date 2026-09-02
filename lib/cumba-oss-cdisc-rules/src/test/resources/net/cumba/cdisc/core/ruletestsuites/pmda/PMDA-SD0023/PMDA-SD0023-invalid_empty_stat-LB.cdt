@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0023 expect=violation domain=LB
+#note "Boundary: the PMDA message is 'Missing value for --STAT when --REASND is provided' — row 1 has a populated LBREASND while LBSTAT is empty, so the rule must fire. Row 2 is the conformant pair."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTAT= LBREASND="Sample lost"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBREASND type=Char label="Reason Not Done"
+---
+S1 | LB | 001 | 1 | ALB  |          | Sample lost
+S1 | LB | 001 | 2 | GLUC | NOT DONE | Subject refused

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2014 expect=violation domain=CE
+#note "FRESH: second in-scope domain pin (CE; '--' resolves CEBDSYCD). CEBDSYCD 12345 is not a System Organ Class code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid SOC code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CEBDSYCD=12345
+dataset CE
+col USUBJID  type=Char
+col CEBDSYCD type=Num
+---
+001 | 10017947
+001 | 12345

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0011 expect=violation domain=DM
+#note "Row 1: ARMCD='SCRNFAIL' but ARM='Screening Failure' (not the required 'Screen Failure') -> fires. Rows 2/3 are conformant."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=SCRNFAIL ARM="Screening Failure"
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | SCRNFAIL | Screening Failure
+S1 | DM | 002 | SCRNFAIL | Screen Failure
+S1 | DM | 003 | A        | Placebo

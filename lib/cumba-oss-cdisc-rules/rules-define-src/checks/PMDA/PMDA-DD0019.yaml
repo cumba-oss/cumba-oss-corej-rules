@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0019"
+Sheet_Rule_Identifier: "DD0019"
+Rule_Set: "PMDA"
+Element: "ODM"
+Attribute: "FileType"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The FileType must have a value of 'Snapshot'."
+# CDISC twin 0008 (same single-value set, spec SS3.2 ODM FileType business rule)
+# - AGREE. Value check fires only on a present FileType (presence is XSD's beat).
+Message: "Invalid FileType value"
+Check:
+  kind: "one_of"
+  attribute: "FileType"
+  values: ["Snapshot"]

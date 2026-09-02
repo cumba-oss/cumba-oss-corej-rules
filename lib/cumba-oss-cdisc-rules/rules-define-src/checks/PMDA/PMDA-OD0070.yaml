@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-OD0070"
+Sheet_Rule_Identifier: "OD0070"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The Length attribute is required when DataType is integer, float, or text."
+Message: "Missing Length value"
+# Exact duplicate of CDISC twin 0141 (PMDA severity Warning vs CDISC default
+# Error).
+Check:
+  kind: "exists"
+  target: "@Length"
+  when:
+    path: "@DataType"
+    oneOf: ["integer", "float", "text"]

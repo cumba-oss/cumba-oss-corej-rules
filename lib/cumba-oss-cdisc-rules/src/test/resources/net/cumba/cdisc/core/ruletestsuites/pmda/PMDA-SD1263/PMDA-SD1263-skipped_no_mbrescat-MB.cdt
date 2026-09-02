@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1263 expect=skipped domain=MB
+#note "MBRESCAT (Permissible) is not in the dataset at all, so Requirements.Variables.All [MBRESCAT] gates the rule to a skip -- absent must not be treated as empty. Every other conjunct holds on the one data row (organism identified, not NO GROWTH, not GRAM STAIN), so the rule would fire if it ran."
+#library standard=sdtmig version=3-4
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test Short Name"
+col MBSTRESC type=Char label="Character Result/Finding in Std Format"
+col MBMETHOD type=Char label="Method of Test or Examination"
+---
+CDISCPILOT01 | MB | 01-701-1015 | 1 | ORGANISM | STAPHYLOCOCCUS AUREUS | CULTURE

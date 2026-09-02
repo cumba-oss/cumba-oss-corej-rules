@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0287"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of AEREL for a given\
+  \ value of AERELN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AEREL) and not empty(AERELN) and has_multiple_values_for(AEREL, AERELN)
+Outcome:
+  Message: "AEREL has more than one value for the same value of AERELN."
+  Output_Variables:
+  - "AEREL"
+  - "AERELN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AEREL"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of AEREL for\
+    \ a given value of AERELN"
+  Rule_Failure_Criteria: "There is more than one value of AEREL for a given value\
+    \ of AERELN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR287"
+        Version: "1"
+      Version: "5.0"

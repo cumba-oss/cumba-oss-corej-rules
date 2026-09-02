@@ -1,0 +1,141 @@
+Core:
+  Id: "FDA-SD1053"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Trial Arms (TA) or Trial Visits (TV) record has\
+  \ Planned Arm Code (ARMCD) equal to 'SCRNFAIL' or 'NOTASSGN', values that should\
+  \ not be present in these datasets."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Check:
+  expression: >-
+    ARMCD in ["SCRNFAIL", "NOTASSGN"]
+Outcome:
+  Message: "ARMCD value 'SCRNFAIL' or 'NOTASSGN' is present in a Trial Arms (TA) or\
+    \ Trial Visits (TV) record."
+  Output_Variables:
+  - "ARMCD"
+Source:
+  FDA_Validator_Rule_Message: "Unexpected value for ARMCD variable"
+  FDA_Validator_Rule_Description: "Records for subjects who failed a screening or\
+    \ were not assigned to study treatment (ARMCD is 'SCRNFAIL' or 'NOTASSGN') should\
+    \ not be included in the Trial Arms (TA) or Trial Visits (TV) datasets."
+  Domains: "TA, TV"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1053"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0415"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0415"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0415"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0415"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0415"
+        Version: "1"
+      Version: "2.0"

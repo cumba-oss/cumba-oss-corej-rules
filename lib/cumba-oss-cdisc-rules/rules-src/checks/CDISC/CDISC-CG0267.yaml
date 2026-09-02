@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0267"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reference Terminology (TSVCDREF) is populated\
+  \ but the Version of the Reference Terminology (TSVCDVER) is empty."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    not empty(TSVCDREF) and empty(TSVCDVER)
+Outcome:
+  Message: "TSVCDVER is empty when Reference Terminology is versioned: TSVCDVER should\
+    \ be populated when the Reference Terminology (TSVCDREF) is versioned."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVCDREF"
+  - "TSVCDVER"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDVER"
+  Condition: "Reference Terminology is versioned."
+  Rule: "TSVCDVER ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0267"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0267"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0267"
+        Version: "1"
+      Version: "2.0"

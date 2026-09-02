@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2246 expect=skipped domain=TS
+#note "TSVAL is absent from TS, so Requirements.Variables.All gates the rule to SKIPPED. Without the gate the generated form `not is_integer(TSVAL)` fires on every NARMS row, asserting a value is non-integer when no value column exists."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+---
+CDISCPILOT01 | TS | 1 | NARMS | Planned Number of Arms
+---

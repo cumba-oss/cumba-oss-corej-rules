@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0165-B"
+Sheet_Rule_Identifier: "165"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+# Companion of DEFINE-XML-0165 (one sheet row, three rules): the XSD content
+# model is an exclusive choice, so EnumeratedItem and CodeListItem children
+# must not be mixed in one CodeList (the not_exists check under a
+# violation-encoding guard is the fire-always vehicle, DEFINE-XML-0124-B
+# precedent).
+Plain_Text_Rule: "CodeList element must contain either one or more EnumeratedItem elements, one or more CodeListItem elements or one ExternalCodelist element."
+Message: "CodeList contains both EnumeratedItem and CodeListItem elements; it must contain only one of the three content forms."
+Check:
+  kind: "not_exists"
+  target: "CodeListItem"
+  when:
+    path: "EnumeratedItem"
+    exists: true

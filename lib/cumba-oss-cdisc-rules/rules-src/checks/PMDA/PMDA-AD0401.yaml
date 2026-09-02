@@ -1,0 +1,53 @@
+Core:
+  Id: "PMDA-AD0401"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, the character Analysis Toxicity\
+  \ Description Low (ATOXDSCL) is populated but the numeric Analysis Value (AVAL)\
+  \ is missing and/or the character Analysis Toxicity Grade Low (ATOXGRL) is empty;\
+  \ whenever ATOXDSCL is populated, both AVAL and ATOXGRL must also be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATOXDSCL"
+Check:
+  expression: >-
+    not empty(ATOXDSCL) and (empty(AVAL) or empty(ATOXGRL))
+Outcome:
+  Message: "ATOXDSCL is populated but AVAL and/or ATOXGRL is not populated."
+  Output_Variables:
+  - "AVAL"
+  - "ATOXGRL"
+  - "ATOXDSCL"
+Source:
+  Message: "AVAL is not populated or ATOXGRL is not populated, and ATOXDSCL is populated"
+  Description: "On a given record, if Analysis Toxicity Description Low (ATOXDSCL)\
+    \ variable value is populated, then both Analysis Value (AVAL) and the Analysis\
+    \ Toxicity Grade Low (ATOXGRL) variable values must be populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0401"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0401"
+        Version: "1"
+      Version: "6.0"

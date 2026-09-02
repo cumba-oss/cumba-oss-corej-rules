@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1125 expect=noViolation domain=VS
+#note "Pins the OPERATOR'S blank-target rule: a blank VSELTM is excluded from the distinct-value count and the flag pass (D.2 emptiness exception, includeEmpty=false), so the group stays single-valued and the blank row is never a candidate."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VISITNUM type=Num
+col VSTPTREF type=Char
+col VSTPTNUM type=Num
+col VSTPT    type=Char
+col VSELTM   type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | POST1H | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 1 | POST1H |
+S1 | VS | 003 | 1 | SYSBP | 1 | DOSE | 1 | POST1H | PT1H

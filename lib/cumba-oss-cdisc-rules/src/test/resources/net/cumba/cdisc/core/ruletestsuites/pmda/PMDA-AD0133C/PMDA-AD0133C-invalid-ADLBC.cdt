@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0133C expect=violation domain=ADLBC
+#note "A1LO is zero and R2A1LO populated -> fires. Exactly one expansion tuple (y=1)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col A1LO    type=Num
+col R2A1LO  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 0 | 3.5
+CDISCPILOT01 | 01-701-1023 | ALT | 3.5 | 2.0 | 1.75
+---

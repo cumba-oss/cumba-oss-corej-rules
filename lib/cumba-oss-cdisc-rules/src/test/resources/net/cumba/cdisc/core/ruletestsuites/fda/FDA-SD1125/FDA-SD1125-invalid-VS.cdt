@@ -1,0 +1,22 @@
+#!RuleTest
+#test FDA-SD1125 expect=violation domain=VS
+#note "D-TA-7a re-capture (aligned to PMDA-SD1125; the shared sheet names --TPT as the identity column): rows 1 and 2 share VISITNUM/--TPTREF/--TPT but disagree on the planned elapsed time (PT1H vs PT2H) -> both fire. Their --TPTNUM values ALSO differ (1 vs 2) — under the pre-ruling DOMAIN/--TPTNUM key set this pair sat in different groups and the rule was silent; the --TPT key is exactly what the ruling changed. Row 3 is a different time point name -> its own group, silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSTPT="1H POST" VSELTM=PT1H
+#expectViolationAt row=2 VSTPT="1H POST" VSELTM=PT2H
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VSTPTREF type=Char label="Time Point Reference"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+col VSTPT    type=Char label="Planned Time Point Name"
+col VSELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 2 | 1H POST | PT2H
+S1 | VS | 001 | 2 | SYSBP | 1 | DOSE | 3 | 2H POST | PT2H

@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1288 expect=violation domain=AE
+#note "The cluster's MINORITY-arm pin. The Headache group is 2x 10019211 vs 1x 10019212 - a UNIQUE most-common value exists, so ONLY the minority row (row 2) is flagged."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AEDECOD=Headache AEPTCD=10019212
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AEPTCD  type=Num  label="Preferred Term Code"
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache | 10019211
+S1 | AE | 002 | 1 | HEAD ACHE | Headache | 10019212
+S1 | AE | 003 | 1 | HEADACHE | Headache | 10019211
+S1 | AE | 004 | 1 | NAUSEA   | Nausea   | 10028813

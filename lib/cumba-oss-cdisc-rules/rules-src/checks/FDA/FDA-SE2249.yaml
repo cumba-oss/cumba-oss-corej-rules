@@ -1,0 +1,46 @@
+Core:
+  Id: "FDA-SE2249"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARMCD equals 'SNDIGVER' (SEND Implementation\
+  \ Guide Version) but TSVAL does not equal 'SEND DEVELOPMENTAL AND REPRODUCTIVE TOXICOLOGY\
+  \ IMPLEMENTATION GUIDE VERSION 1.1' in nonclinical Developmental and Reproductive\
+  \ Toxicology (DART) studies."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Check:
+  expression: >-
+    TSPARMCD == "SNDIGVER" and TSVAL !=
+    "SEND DEVELOPMENTAL AND REPRODUCTIVE TOXICOLOGY IMPLEMENTATION GUIDE VERSION 1.1"
+Outcome:
+  Message: "Invalid TSVAL value for SNDIGVER: TSVAL must equal 'SEND DEVELOPMENTAL\
+    \ AND REPRODUCTIVE TOXICOLOGY IMPLEMENTATION GUIDE VERSION 1.1' when TSPARMCD\
+    \ equals 'SNDIGVER' in DART studies."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  FDA_Validator_Rule_Message: "Invalid TSVAL value for SNDIGVER"
+  FDA_Validator_Rule_Description: "TSVAL variable value should be 'SEND DEVELOPMENTAL\
+    \ AND REPRODUCTIVE TOXICOLOGY IMPLEMENTATION GUIDE VERSION 1.1' for the SNDIGVER\
+    \ parameter in nonclinical Developmental and Reproductive Toxicology (DART) studies."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2249"
+        Version: "1"
+      Version: "1.6"

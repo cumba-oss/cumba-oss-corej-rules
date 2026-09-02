@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0282 expect=noViolation domain=PP
+#note "Row 2 is the whitespace pin: the whole cell is ONE value containing a semicolon AND an internal space, and internal whitespace in a data cell is preserved (only leading/trailing is trimmed), so both tokens are declared terms. Row 1 is the sheet's worked example and row 3 is blank. Silent throughout."
+#library standard=sendig version=3-1-1
+#library codelist-terms SPEC SERUM URINE PLASMA "WHOLE BLOOD"
+#expectViolationCount 0
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPSPEC   type=Char label="Specimen Material Type"
+---
+S1 | PP | 001 | 1 | CLR | SERUM;URINE
+S1 | PP | 002 | 2 | CLR | PLASMA;WHOLE BLOOD
+S1 | PP | 003 | 3 | CLR |
+---

@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0055"
+Sheet_Rule_Identifier: "55"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The QVAL variable in a Supplemental Qualifier dataset must have a def:ValueListRef element."
+# Sheet: 'def:ValueListRef must be provided for //ItemDef[@OID, @Name="QVAL"].'
+# The sheet's Element/XPaths columns say def:ValueListDef, but its own formal Rule
+# scopes the check to the ItemDef carrying Name="QVAL" (the element that must hold
+# the def:ValueListRef, spec §4.5.2.3) — scoped accordingly. "Supplemental Qualifier
+# dataset" membership is proxied by Name="QVAL" exactly as the sheet's Rule column
+# does (QVAL exists only in SUPP-- datasets). Presence findings carry no ${value}.
+Message: "def:ValueListRef is missing for ItemDef with Name \"QVAL\"."
+Check:
+  kind: "exists"
+  target: "def:ValueListRef"
+  when:
+    path: "@Name"
+    equals: "QVAL"

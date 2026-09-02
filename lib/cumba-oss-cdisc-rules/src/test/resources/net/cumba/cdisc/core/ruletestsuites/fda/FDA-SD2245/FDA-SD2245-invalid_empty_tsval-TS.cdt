@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2245 expect=violation domain=TS
+#note "Boundary: empty TSVAL on a DCUTDTC record. Unlike the AGEMAX/AGEMIN/LENGTH sheet rows ('... or null'), the DCUTDTC sheet text grants no null exemption -- 'TSVAL variable value must be in ISO 8601 format, when TSPARMCD=DCUTDTC' -- and the Check deliberately carries no non_empty guard, so an empty value is flagged. This scenario pins that intent; it would go green if a non_empty leaf were added."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=DCUTDTC TSVAL=
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | DCUTDTC | Data Cutoff Date |
+CDISCPILOT01 | TS | 1 | SSTDTC  | Study Start Date | 2020-01-01

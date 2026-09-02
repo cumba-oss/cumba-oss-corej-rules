@@ -1,0 +1,54 @@
+Core:
+  Id: "FDA-SD1389"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Day of Obs Relative to Exposure (--XENDY) is\
+  \ populated but the date portion of End Date/Time of Observation (--ENDTC) or of\
+  \ Date/Time of First Study Treatment (RFXSTDTC) is not a complete date, i.e. empty,\
+  \ invalid, or only partially specified, indicating the study day value was imputed."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--XENDY"
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--XENDY) and (not is_complete_date_part(--ENDTC) or not
+    is_complete_date_part(DM.RFXSTDTC))
+Outcome:
+  Message: "End Day of Obs Relative to Exposure (--XENDY) is populated but --ENDTC\
+    \ and/or RFXSTDTC is empty or an incomplete date; the value appears imputed."
+  Output_Variables:
+  - "--ENDTC"
+  - "--XENDY"
+  - "DM.RFXSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "--XENDY variable value is imputed"
+  FDA_Validator_Rule_Description: "End Day of Obs Relative to Exposure (--XENDY) variable\
+    \ value should not be imputed. It may only be populated, when both End Date/Time\
+    \ of Observation (--ENDTC) and Date/Time of First Study Treatment (RFXSTDTC) variables\
+    \ values are provided and both of them include complete date parts."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1389"
+        Version: "1"
+      Version: "1.6"

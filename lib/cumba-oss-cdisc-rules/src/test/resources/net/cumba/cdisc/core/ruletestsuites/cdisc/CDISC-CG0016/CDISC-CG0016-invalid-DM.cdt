@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0016 expect=violation domain=DM
+#note "AGE is Expected for DM in SDTMIG 3.4 (Core='Exp') but the dataset does not carry the AGE column -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#library expected-variables DM RFSTDTC RFENDTC AGE AGEU RACE
+#expectViolationCount 1
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+col RFENDTC type=Char label="Subject Reference End Date/Time"
+col AGEU    type=Char label="Age Units"
+col RACE    type=Char label="Race"
+---
+S1 | DM | S1-001 | 2024-01-01 | 2024-02-01 | YEARS | ASIAN

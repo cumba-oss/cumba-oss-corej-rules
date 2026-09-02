@@ -1,0 +1,37 @@
+Rule_Id: "PMDA-DD0103"
+Sheet_Rule_Identifier: "DD0103"
+Rule_Set: "PMDA"
+Element: "Origin/DocumentRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "A variable in Define.xml has the origin of CRF and references specific pages, however Define.xml does not contain an Annotated CRF. The Annotated CRF is represented by the def:AnnotatedCRF element within MetaDataVersion element."
+Message: "Missing referenced CRF document"
+# 0124-B fire-always vehicle anchored on the XSD-required leafID: fires once
+# per page-referencing CRF-origin DocumentRef in a MetaDataVersion without a
+# def:AnnotatedCRF (path: DocumentRef/../.. = ItemDef, ../../.. =
+# MetaDataVersion). "Origin of CRF" is Type='CRF' in 2.0 vocabulary and
+# Type='Collected' + Source in {Investigator, Subject} in 2.1 (review-pmda-p3
+# W4: bare Collected over-fired on Vendor/Sponsor page references; the 2.1 spec
+# ties the aCRF obligation to subject/investigator-collected data, matching
+# DD0035/DD0111). Related CDISC rules 0159 (DocumentRef required) and
+# 0038/0039 (AnnotatedCRF structure) check different targets - partial overlap.
+Check:
+  kind: "not_exists"
+  target: "@leafID"
+  when:
+    all:
+    - path: "@leafID"
+      exists: true
+    - path: "PDFPageRef"
+      exists: true
+    - any:
+      - path: "../@Type"
+        equals: "CRF"
+      - all:
+        - path: "../@Type"
+          equals: "Collected"
+        - path: "../@Source"
+          oneOf: ["Investigator", "Subject"]
+    - path: "../../../AnnotatedCRF"
+      exists: false

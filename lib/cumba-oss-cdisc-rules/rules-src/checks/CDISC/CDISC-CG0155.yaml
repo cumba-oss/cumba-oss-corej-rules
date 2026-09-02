@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0155"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the DOMAIN value of an Associated Persons dataset\
+  \ is not exactly 4 characters long, does not begin with 'AP', or does not end with\
+  \ a 2-character SDTM domain code published in the SDTM Domain Abbreviations controlled\
+  \ terminology."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    Exclude:
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Operations:
+- id: "$domain_codes"
+  expression: "codelist_terms(codelists=[DOMAIN], level=\"term\", returntype=\"code\"\
+    )"
+Check:
+  expression: >-
+    DOMAIN !~ /^AP..$/ or suffix(DOMAIN, 2) not in $domain_codes
+Outcome:
+  Message: "DOMAIN is not a 4-character value beginning with 'AP' and ending with\
+    \ a 2-character SDTM domain code."
+  Output_Variables:
+  - "DOMAIN"
+  - "$domain_codes"
+Source:
+  Class: "AP"
+  Domain: "NOT(APRELSUB, POOLDEF, FA)"
+  Variable: "DOMAIN"
+  Condition: "AP Core Domain"
+  Rule: "Value length = 4 characters beginning with 'AP' and ending with 2 character\
+    \ SDTM domain"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0155"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0155"
+        Version: "1"
+      Version: "2.0"

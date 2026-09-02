@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0364 expect=violation domain=ADAE
+# Rule:Description: DOSEON or DOSCUMA is present and DOSEU is not present
+#note "DOSEON present, DOSEU absent -> violation (DOSEON branch)"
+#expectViolationCount 1
+#expectViolationAt DOSEON=50
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col DOSEON type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 50
+---

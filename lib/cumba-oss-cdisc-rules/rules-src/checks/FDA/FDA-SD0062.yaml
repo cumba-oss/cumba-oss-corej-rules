@@ -1,0 +1,110 @@
+Core:
+  Id: "FDA-SD0062"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a submitted dataset was loaded from a source format\
+  \ other than SAS transport (XPORT) or text-delimited (CSV)."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Checks the authoritative 'file_format' metadata key the host loader stamps\
+    \ from the provider that actually parsed the source; the sheet accepts SAS transport\
+    \ (XPORT v5) OR text-delimited, so XPORT and CSV pass and any other loaded source\
+    \ format fires. Residual underreporting: a file with an incompatible transport\
+    \ generally fails to load and never reaches rule execution, and a host that does\
+    \ not stamp the key is excluded by the non_empty guard rather than false-firing."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$file_format"
+  expression: "extract_metadata(\"file_format\")"
+Check:
+  expression: >-
+    not empty($file_format) and $file_format not in ["XPORT", "CSV"]
+Outcome:
+  Message: "The submitted dataset was loaded from a source format other than SAS transport\
+    \ (XPORT) or text-delimited (CSV)."
+  Output_Variables:
+  - "$file_format"
+Source:
+  FDA_Validator_Rule_Message: "Incompatible data source"
+  FDA_Validator_Rule_Description: "Domain table must have a valid format (e.g., SAS\
+    \ transport (XPORT) v.5 or text-delimited)."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0062"
+        Version: "1"
+      Version: "1.6"

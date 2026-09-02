@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0112-B"
+Sheet_Rule_Identifier: "DD0112"
+Rule_Set: "PMDA"
+Element: "CodeList/ExternalCodeList"
+Attribute: "Version"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "MedDRA dictionary and version must be specified in Define.xml for regulatory submissions. Define-XML specification represents MedDRA as Dictionary and Version attributes on ExternalCodeList element within CodeList element."
+# 'and version' half of PMDA-DD0112 (see the base rule): every ExternalCodeList
+# naming the MedDRA dictionary must also carry a (non-blank) Version. The
+# Version's format is PMDA-DD0025's beat.
+Message: "Missing MedDRA definition"
+Check:
+  kind: "exists"
+  target: "@Version"
+  when:
+    path: "@Dictionary"
+    matchesRegex: "(?i)meddra"

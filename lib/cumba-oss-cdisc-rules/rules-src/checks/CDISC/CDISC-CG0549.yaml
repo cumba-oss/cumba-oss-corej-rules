@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0549"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STREFC is empty while --ORREF is populated or\
+  \ the record is derived (--DRVFL equals 'Y')."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STREFC"
+Check:
+  expression: >-
+    (var_exists("--ORREF") and not empty(--ORREF) or var_exists("--DRVFL") and --DRVFL == "Y") and
+    empty(--STREFC)
+Outcome:
+  Message: "--STREFC is empty when --ORREF is populated or --DRVFL equals 'Y'."
+  Output_Variables:
+  - "--ORREF"
+  - "!--STREFC"
+  - "--DRVFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STREFC"
+  Condition: "--ORREF ^= null or --DRVFL='Y'"
+  Rule: "--STREFC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0549"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0549"
+        Version: "1"
+      Version: "2.0"

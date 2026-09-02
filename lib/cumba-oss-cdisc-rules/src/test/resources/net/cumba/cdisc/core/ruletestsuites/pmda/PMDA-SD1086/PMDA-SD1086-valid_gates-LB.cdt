@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1086 expect=noViolation domain=LB
+#note "FRESH - one row per gate, every row silent for a DIFFERENT stated reason. Row 1: full datetime (length 16) PASSES is_complete_date, dy parses substring(0,10) -> 20, agreement, clean. Row 2: partial --DTC fails is_complete_date(--DTC), gated despite the wrong LBDY. Row 3 (subject 002): RFSTDTC partial fails is_complete_date(DM.RFSTDTC), gated. Row 4: LBDY empty -> not empty(--DY) false, gated. No truncated-time row (contested boundary CG0006-F1)."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-20T09:30 | 20
+S1 | LB | 001 | 2 | ALB | 2020-01           | 99
+S1 | LB | 002 | 1 | ALB | 2020-01-15        | 99
+S1 | LB | 001 | 3 | ALB | 2020-01-15        |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 | 2020-01
+---

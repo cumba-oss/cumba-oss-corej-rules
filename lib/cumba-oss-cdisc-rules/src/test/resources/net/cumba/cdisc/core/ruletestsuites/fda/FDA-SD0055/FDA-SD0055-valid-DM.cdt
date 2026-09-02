@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0055 expect=noViolation domain=DM
+#note "Every variable the Library describes carries the same data type in the dataset (AGE numeric, SEX/AGEU character) -> no violation."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM AGE  name=AGE  simpleDatatype=Num  label="Age"
+#library variable-metadata DM AGEU name=AGEU simpleDatatype=Char label="Age Units"
+#library variable-metadata DM SEX  name=SEX  simpleDatatype=Char label="Sex"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+---
+S1 | 001 | 56 | YEARS | M

@@ -1,0 +1,122 @@
+Core:
+  Id: "PMDA-SD1017"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, for a planned visit (SVUPDES is empty) in the\
+  \ Subject Visits (SV) domain, the Visit Number (VISITNUM) value does not match any\
+  \ VISITNUM value in the Trial Visits (TV) dataset."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+    - "TV.VISITNUM"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    not empty(VISITNUM) and empty(SVUPDES) and VISITNUM not in $tv_visitnum
+Outcome:
+  Message: "VISITNUM for a planned visit does not match any VISITNUM value in the\
+    \ TV dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "!SVUPDES"
+  - "$tv_visitnum"
+Source:
+  Message: "VISITNUM value does not match TV domain data"
+  Description: "Visit Number (VISITNUM) values should match entries in the Trial Visits\
+    \ (TV) dataset when they are planned visits (SVUPDES = null)."
+  Domains: "SV"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1017"
+        Version: "1"
+      Version: "1.6"

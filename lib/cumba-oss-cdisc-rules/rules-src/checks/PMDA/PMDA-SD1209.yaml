@@ -1,0 +1,101 @@
+Core:
+  Id: "PMDA-SD1209"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when RFXSTDTC is populated but RFXENDTC is empty. The\
+  \ date/time of last study treatment exposure must be populated when the date/time\
+  \ of first study treatment exposure is provided."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXSTDTC"
+Check:
+  expression: >-
+    not empty(RFXSTDTC) and empty(RFXENDTC)
+Outcome:
+  Message: "RFXENDTC is empty when RFXSTDTC is populated."
+  Output_Variables:
+  - "RFXSTDTC"
+  - "RFXENDTC"
+Source:
+  Message: "Missing value for RFXENDTC when RFXSTDTC is provided"
+  Description: "Value for Date/Time of Last Study Treatment (RFXENDTC) variable must\
+    \ be populated when Date/Time of First Study Treatment (RFXSTDTC) variable value\
+    \ is provided."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1209"
+        Version: "1"
+      Version: "1.6"

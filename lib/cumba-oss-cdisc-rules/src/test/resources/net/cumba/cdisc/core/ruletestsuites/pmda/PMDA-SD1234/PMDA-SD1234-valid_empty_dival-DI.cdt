@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1234 expect=noViolation domain=DI
+#note "FRESH (record-vs-value boundary, documents finding SD1234-F1). DEV1's DEVTYPE record has an empty DIVAL. The filter counts RECORDS with DIPARMCD=DEVTYPE regardless of DIVAL population -> \$devtype_count[DEV1]=1 -> silent."
+#library standard=sdtmig version=3-4
+dataset DI label="Device Identifiers"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Parameter Short Name"
+col DIPARM   type=Char label="Device Parameter"
+col DIVAL    type=Char label="Parameter Value"
+---
+S1 | DI | DEV1 | 1 | DEVTYPE | Device Type | 
+S1 | DI | DEV1 | 2 | MODEL   | Model Number | M-100
+S1 | DI | DEV2 | 1 | DEVTYPE | Device Type | CATHETER

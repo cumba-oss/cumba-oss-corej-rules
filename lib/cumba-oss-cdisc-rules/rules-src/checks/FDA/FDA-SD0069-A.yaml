@@ -1,0 +1,77 @@
+Core:
+  Id: "FDA-SD0069-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Demographics (DM) subject (USUBJID) has no record\
+  \ in the Disposition (DS) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+Check:
+  expression: >-
+    USUBJID not in $ds_usubjid
+Outcome:
+  Message: "No Disposition (DS) record found for the subject."
+  Output_Variables:
+  - "$ds_usubjid"
+Source_Proposed:
+  FDA_Validator_Rule_Message: "No Disposition (DS) record found for the subject."
+  FDA_Validator_Rule_Description: "A Demographics (DM) subject (USUBJID) has no record\
+    \ in the Disposition (DS) dataset."
+  Domains: "DM"
+Source:
+  FDA_Validator_Rule_Message: "No Disposition record found for subject"
+  FDA_Validator_Rule_Description: "All Demographics (DM) subjects (USUBJID) should\
+    \ have at least one record in the Disposition (DS) domain. The only possible exceptions\
+    \ for SDTMIG v3.2 (and earlier) are Screen Failures (ARMCD=SCRNFAIL) and Not Assigned\
+    \ Treatment (ARMCD=NOTASSGN) subjects, or subjects with ARMCD=null.  There are\
+    \ no exceptions for SEND."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0069"
+        Version: "1"
+      Version: "1.6"

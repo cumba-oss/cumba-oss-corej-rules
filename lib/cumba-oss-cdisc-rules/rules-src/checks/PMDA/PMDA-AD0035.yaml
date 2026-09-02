@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0035"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'RFN' (a record-level\
+  \ flag number) has a value other than 1 or missing."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "RFN") and not empty(value()) and value() not in [1]
+Outcome:
+  Message: "A variable whose name ends in 'RFN' has a value that is not 1 or missing."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "*RFN value is not 1 or null"
+  Description: "A variable with a suffix of RFN must have a value that is 1 or null\
+    \ (R = record level flag variable)."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0035"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0035"
+        Version: "1"
+      Version: "6.0"

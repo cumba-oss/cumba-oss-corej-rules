@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD2263 expect=violation domain=TS
+#note "Row 2: TSPARMCD=PCLAS with TSVAL=NOT A PHARM CLASS, which is not a MED-RT term in the dummy dictionary -> fires. Row 1 is a valid MED-RT term in its preferred case (the D-TA-3 sensitive default, Fix #266); row 3 has the same garbage value under AGEMAX (outside the PCLAS condition); row 4 is a blank TSVAL (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL="NOT A PHARM CLASS"
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | PCLAS  | Cyclooxygenase Inhibitors
+S01 | TS | 2 | PCLAS  | NOT A PHARM CLASS
+S01 | TS | 3 | AGEMAX | NOT A PHARM CLASS
+S01 | TS | 4 | PCLAS  |

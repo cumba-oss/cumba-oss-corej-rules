@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0169 expect=noViolation domain=ADLBC
+#note "CNSR left empty on both rows. A blank numeric cell is a genuine missing, which folds to \"\" for is_integer - so not is_integer(CNSR) is TRUE on both rows and the rule is silent ONLY because of the authored not empty(CNSR) lead. This is the pin of finding AD0169-F1: delete that lead and the rule fires on every unpopulated CNSR row in the corpus."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | OS | 100 |
+CDISCPILOT01 | 01-701-1023 | OS | 120 |

@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-AD0605 expect=violation domain=ADLBC
+#note "Row 1: driver APHASEN=1 -> ADSL.PH1SDT=23000, PHSDT 23010 != 23000 -> fires. Row 2: driver APHASEN=1 -> ADSL.PH1SDT=23000, PHSDT 23000 == 23000 -> silent. Join ADSL on Keys=[USUBJID], loader-default inner, 1:1 (ADSL unique per USUBJID). Pins avoid the ADSL.* keys deliberately (the ${*} output expansion enumerates the fixture's PH\\d+SDT columns; row+APHASEN+PHSDT identify the location independently)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 APHASEN=1 PHSDT=23010
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHSDT    type=Num
+---
+S1 | 01-701-1015 | ALB | 30 | 1 | 23010
+S1 | 01-701-1023 | ALB | 31 | 1 | 23000
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDT  type=Num
+col PH2SDT  type=Num
+---
+S1 | 01-701-1015 | 23000 | 23100
+S1 | 01-701-1023 | 23000 | 23100

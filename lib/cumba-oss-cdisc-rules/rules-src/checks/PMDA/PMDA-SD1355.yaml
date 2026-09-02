@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-SD1355"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Disease Milestone Instance Name (MIDS) variable\
+  \ is present in any dataset but the Trial Disease Milestones (TM) dataset is absent\
+  \ from the study."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$MIDS_EXISTS"
+  expression: "variable_exists(MIDS)"
+Check:
+  expression: >-
+    $MIDS_EXISTS == true and not ds_exists("TM")
+Outcome:
+  Message: "MIDS is used in a dataset while the Trial Disease Milestones (TM) dataset\
+    \ is not present in the study."
+  Output_Variables:
+  - "$MIDS_EXISTS"
+Source:
+  Message: "Missing TM dataset when variable MIDS is present in a dataset"
+  Description: "When the Disease Milestone Instance Name (MIDS) variable is used in\
+    \ any dataset, the Trial Disease Milestones (TM) dataset must be present for the\
+    \ study."
+  Domains: "TM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1355"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1355"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1355"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1355"
+        Version: "1"
+      Version: "1.6"

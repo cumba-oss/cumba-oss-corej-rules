@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0005 expect=violation domain=ADSL
+#note "ANL1FL carries ONE digit -> does NOT match ^ANL\\d\\dFL$ (the \\d\\d width is exact); exception does not apply -> fires. Pins the regex width (ANL01FL excepted, ANL1FL not)."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=ANL1FL variable_value=X
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ANL1FL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1331 expect=violation domain=CM
+#note "INTERVENTIONS class branch of Scope.Classes. CMDTC is a model-permissible Timing variable (SDTM model Interventions class) and is carried here; row 2's medication start (2020-04-02) is after the collection date (2020-04-01)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 CMDTC=2020-04-01 CMSTDTC=2020-04-02
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDTC   type=Char label="Date/Time of Collection"
+col CMSTDTC type=Char label="Start Date/Time of Medication"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN   | 2020-04-01 | 2020-03-01
+CDISCPILOT01 | CM | 01-701-1015 | 2 | IBUPROFEN | 2020-04-01 | 2020-04-02

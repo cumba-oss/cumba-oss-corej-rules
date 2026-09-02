@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-0246"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record in the Trial Summary (TS) dataset\
+  \ shares the same combination of Trial Summary Parameter Short Name (TSPARMCD) and\
+  \ Sequence Number (TSSEQ)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    not is_unique_set([TSSEQ, TSPARMCD])
+Outcome:
+  Message: "More than one TS record with the same TSPARMCD has the same TSSEQ."
+  Output_Variables:
+  - "TSPARMCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSSEQ"
+  Plain_Text_Explanation: "The TSSEQ variable is a unique identifier for each record\
+    \ and is required to identify each record as unique in cases where the same TSPARMCD\
+    \ is used within the dataset."
+  Condition: "Multiple records have the same TSPARMCD"
+  Rule: "Each of the records with the same TSPARMCD have a unique TSSEQ"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND246"
+        Version: "1"
+      Version: "5.0"

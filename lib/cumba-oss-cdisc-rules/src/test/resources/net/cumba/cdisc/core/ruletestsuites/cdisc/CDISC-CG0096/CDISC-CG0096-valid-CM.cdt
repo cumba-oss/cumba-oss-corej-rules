@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0096 expect=noViolation domain=CM
+# Rule:Description: Raise an error when the reported term (CMTRT) has a decode value in the coding dictionary but the Standardized Medication Name (CMDECOD) is not populated.
+#note "Negative twin of CDISC-CG0096-invalid-CM: every row that HAS a decode in pairs.whodrug also populates CMDECOD (rows 1-2, incl. a record reported under its own preferred name 'Paracetamol'), and the one empty CMDECOD belongs to a term with NO decode entry (row 3) -> the rule must stay quiet. Guards the pairs lookup against over-firing: a lookup that answered true for every code would flag row 3."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | ASPIRIN TABLETS | Aspirin
+S01 | CM | 001 | 2 | Paracetamol | Paracetamol
+S01 | CM | 001 | 3 | HERBAL REMEDY XYZ |
+---

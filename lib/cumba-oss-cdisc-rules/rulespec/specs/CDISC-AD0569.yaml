@@ -1,0 +1,39 @@
+name: CDISC-AD0569
+kind: rule
+description: |
+  Wave D6 port - T3-VMC Variable Metadata Check with `exists`/`not_exists`
+  leaves on literal ADaM column names. Baselined on Python lane under
+  Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `exists(LVOTFN)` checks
+  meta-field column names instead of the original dataset columns and
+  yields 0 violations. Java fires correctly on the column metadata;
+  expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0569)
+rule:
+  coreId: CDISC-AD0569
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, LVOTFN: 1}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+    medical device basic data structure: [ADLB]
+    occurrence data structure: [ADLB]
+    medical device occurrence data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0569
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      LVOTFN: '1'
+expected_errors: []

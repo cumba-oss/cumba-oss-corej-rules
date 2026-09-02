@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1015 expect=violation domain=AE
+#note "$ta_epoch = distinct over the ENTIRE TA dataset's EPOCH column = {SCREENING, TREATMENT}, landing as a broadcast set compared per primary row. No join - TA is read only through the Operation. Row 1: in $ta_epoch -> clean. Row 2: NOT in $ta_epoch -> FIRES. Row 3: empty EPOCH: not empty(EPOCH) false -> clean (the authored guard shields the A.1 empty-membership fold here, unlike SD1005)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2 EPOCH=FOLLOW-UP
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col EPOCH    type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | TREATMENT
+S1 | AE | 001 | 2 | NAUSEA   | FOLLOW-UP
+S1 | AE | 001 | 3 | RASH     |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char
+col EPOCH   type=Char
+---
+S1 | TA | A | Drug A | 1 | SCRN | SCREENING
+S1 | TA | A | Drug A | 2 | TRT  | TREATMENT
+---

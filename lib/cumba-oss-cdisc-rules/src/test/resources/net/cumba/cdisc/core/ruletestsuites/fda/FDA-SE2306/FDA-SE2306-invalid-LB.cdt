@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2306 expect=violation domain=LB
+#note "Row 1 has VISITDY, LBDY and LBNOMDY all missing -> fires; row 2 has LBDY populated -> ok."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col VISITDY type=Num  label="Planned Study Day of Visit"
+col LBDY    type=Num  label="Study Day of Specimen Collection"
+col LBNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | LB | 001 | 1 | . | . | .
+S1 | LB | 001 | 2 | . | 5 | .

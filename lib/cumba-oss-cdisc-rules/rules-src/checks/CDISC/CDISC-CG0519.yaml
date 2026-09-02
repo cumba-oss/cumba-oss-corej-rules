@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0519"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Description of Planned Arm (ARM) is empty and\
+  \ the Reason Arm and/or Actual Arm is Null (ARMNRS) variable is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    empty(ARM) and empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is not populated when ARM is empty."
+  Output_Variables:
+  - "ARM"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMNRS"
+  Condition: "ARM = null"
+  Rule: "ARMNRS^=null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0519"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0519"
+        Version: "1"
+      Version: "2.0"

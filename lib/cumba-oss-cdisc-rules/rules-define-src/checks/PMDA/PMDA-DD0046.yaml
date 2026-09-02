@@ -1,0 +1,22 @@
+Rule_Id: "PMDA-DD0046"
+Sheet_Rule_Identifier: "DD0046"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Domain"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For ADaM submission data (where def:StandardName is 'ADaM-IG'), Domain attribute is not applicable and must not be included in Define.xml."
+Message: "Invalid use of Domain attribute"
+# Mirror of PMDA-DD0045: 2.0 leg via MetaDataVersion/@def:StandardName='ADaM-IG',
+# 2.1 leg via def:StandardOID deref to an ADaM* standard (CDISC twin 0106's
+# encoding). Note not_exists' presence symmetry: a present-but-blank Domain
+# counts as omitted.
+Check:
+  kind: "not_exists"
+  target: "@Domain"
+  when:
+    any:
+    - path: "../@StandardName"
+      equals: "ADaM-IG"
+    - path: "@StandardOID->Standard@OID/@Name"
+      matchesRegex: "ADaM.*"

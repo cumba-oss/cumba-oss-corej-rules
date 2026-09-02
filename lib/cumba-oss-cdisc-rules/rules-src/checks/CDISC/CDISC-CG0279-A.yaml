@@ -1,0 +1,67 @@
+Core:
+  Id: "CDISC-CG0279-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists with TSPARMCD equal to 'STYPE' and\
+  \ TSVAL equal to 'INTERVENTIONAL' and the intervention type is one for which pharmacological\
+  \ class is applicable, but no record with TSPARMCD equal to 'PCLAS' is present in\
+  \ TS."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$STYPE_INTERVENTIONAL"
+  expression: "record_count(filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"INTERVENTIONAL\"\
+    ))"
+- id: "$INTTYPE_PHARM"
+  expression: "record_count(filter=filter(TSPARMCD=\"INTTYPE\", TSVAL=[\"DRUG\", \"\
+    BIOLOGIC\", \"VACCINE\", \"DIETARY SUPPLEMENT\", \"COMBINATION PRODUCT\"]))"
+- id: "$PCLAS_N"
+  expression: "record_count(filter=filter(TSPARMCD=\"PCLAS\"))"
+Check:
+  expression: >-
+    $STYPE_INTERVENTIONAL >= 1 and $INTTYPE_PHARM >= 1 and $PCLAS_N == 0
+Outcome:
+  Message: "The required PCLAS Trial Summary Parameter is missing from TS when a record\
+    \ exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL' and\
+    \ the intervention type is one for which pharmacological class is applicable."
+  Output_Variables:
+  - "$PCLAS_N"
+Source_Proposed:
+  Sheet_Issue: "#34"
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'PCLAS' and record exists where TSPARMCD = 'STYPE' and TSVAL\
+    \ = 'INTERVENTIONAL' and Pharmacological Class of Interventional Therapy is applicable"
+  Rule: "a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL'\
+    \ and the intervention type is one for which pharmacological class is applicable,\
+    \ but no record with TSPARMCD equal to 'PCLAS' is present in TS"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'PCLAS' and record exists where TSPARMCD = 'STYPE' and TSVAL\
+    \ = 'INTERVENTIONAL' and Pharmacological Class of Interventional Therapy is applicable"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0279"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0279"
+        Version: "1"
+      Version: "2.0"

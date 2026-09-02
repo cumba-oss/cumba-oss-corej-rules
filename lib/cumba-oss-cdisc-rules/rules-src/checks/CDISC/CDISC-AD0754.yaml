@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0754"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of TRTSEQA for a given\
+  \ value of TRTSEQAN, considering only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTSEQA) and not empty(TRTSEQAN) and has_multiple_values_for(TRTSEQA, TRTSEQAN)
+Outcome:
+  Message: "TRTSEQA has more than one value for this TRTSEQAN, among rows where both\
+    \ are populated"
+  Output_Variables:
+  - "TRTSEQA"
+  - "TRTSEQAN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTSEQA"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTSEQA\
+    \ for a given value of TRTSEQAN, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of TRTSEQA for a given value\
+    \ of TRTSEQAN"
+  Condition_Failure: "On rows where TRTSEQA and TRTSEQAN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR754"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR754"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR754"
+        Version: "1"
+      Version: "5.0"

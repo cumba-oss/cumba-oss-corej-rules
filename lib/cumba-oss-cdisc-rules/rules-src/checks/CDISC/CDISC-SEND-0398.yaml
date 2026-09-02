@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0398"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Element (SEENDTC) is not on or\
+  \ before the Start Date/Time of Element (SESTDTC) of the next Element within the\
+  \ subject; one Element must end on or immediately before the next Element starts."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The check admits any SEENDTC on or before the next Element's SESTDTC (relation\
+    \ <=), so an Element that ends strictly earlier than the day immediately before\
+    \ the next Element starts - a real time gap, which the sheet's own Rule text forbids\
+    \ - is not reported. Bounding the gap needs day arithmetic on partial ISO dates\
+    \ and is a separate question; the equality-only reading reported every conformant\
+    \ submission whose Elements end the day before the next begins."
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    not has_next_corresponding_record(SEENDTC, SESTDTC, keep_missings=false, ordering=SESEQ,
+    relation="<=", within=USUBJID)
+Outcome:
+  Message: "SEENDTC is not on or before SESTDTC of the next Element for the subject."
+  Output_Variables:
+  - "SESTDTC"
+  - "SEENDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEENDTC, SESTDTC"
+  Plain_Text_Explanation: "The value of SEENDTC for one Element must immediately precede\
+    \ or be the same as the value of SESTDTC for the next Element."
+  Condition: "Element is not the last Element for the subject"
+  Rule: "The value of SEENDTC for one Element must immediately precede or be the same\
+    \ as the value of SESTDTC for the next Element."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND398"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND398"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND398"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND398"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND398"
+        Version: "1"
+      Version: "5.0"

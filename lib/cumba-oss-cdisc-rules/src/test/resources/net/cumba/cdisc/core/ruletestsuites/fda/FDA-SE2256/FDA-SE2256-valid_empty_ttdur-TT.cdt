@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2256 expect=noViolation domain=TT
+#note "Boundary: one GD0-6 record leaves the permissible TTDUR empty while the others agree on every component. An empty component value is not a competing value, so no inconsistency is reported."
+#library standard=sendig version=dart-1-1
+dataset TT class="TRIAL DESIGN" label="Trial Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Rule for Start of Repro Stage"
+col TTENRL  type=Char label="Rule for End of Repro Stage"
+col TTDUR   type=Char label="Planned Duration of Repro Stage"
+---
+S1 | TT | GD0-6  | Gestation Day 0 to 6  | Day of mating      | Day 6 of gestation  | P7D
+S1 | TT | GD0-6  | Gestation Day 0 to 6  | Day of mating      | Day 6 of gestation  |
+S1 | TT | GD7-13 | Gestation Day 7 to 13 | Day 7 of gestation | Day 13 of gestation | P7D

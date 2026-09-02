@@ -1,0 +1,72 @@
+Core:
+  Id: "CDISC-SEND-0402"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a reproductive phase (RPHASE), the observation\
+  \ start date (--STDTC) is a complete date and the reproductive-phase start day (--RPSTDY)\
+  \ is populated but does not equal the date portion of --STDTC minus the date portion\
+  \ of the earliest phase start date (earliest SJSTDTC within the subject's RPHASE)\
+  \ plus the first-phase-day reference (RPRFDY)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "FINDINGS"
+    - "EVENTS"
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--STDTC"
+    - "--RPSTDY"
+    - "SJ.SJSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  - "RPHASE"
+  Name: "SJ"
+Operations:
+- id: "$rpref_day"
+  expression: "date_diff_days(--STDTC, domain=\"SJ\", reference=\"SJSTDTC\", offset=\"\
+    RPRFDY\", group=[USUBJID, RPHASE])"
+Check:
+  expression: >-
+    is_complete_date(--STDTC) and not empty(--RPSTDY) and --RPSTDY != $rpref_day
+Outcome:
+  Message: "--RPSTDY does not equal the reproductive-phase start day derived from\
+    \ --STDTC, the earliest SJSTDTC within the RPHASE, and RPRFDY."
+  Output_Variables:
+  - "$rpref_day"
+  - "--STDTC"
+  - "--RPSTDY"
+Source:
+  Class: "SPC, FND, EVT, INT"
+  Domain: "All"
+  Variable: "--RPSTDY"
+  Plain_Text_Explanation: "Within a repro phase, if --STDTC is populated and the earliest\
+    \ SJSTDTC within the repro phase in SJ is populated then --RPSTDY should be populated\
+    \ using the actual repro phase day of observation start algorithm"
+  Condition: "Date portion exists for --STDTC and SJSTDTC within the RPHASE and --RPSTDY\
+    \ is present"
+  Rule: "--RPSTDY=(date portion of --STDTC) - (date portion of earliest SJSTDTC) +\
+    \ RPRFDY"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND402"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND402"
+        Version: "1"
+      Version: "5.0"

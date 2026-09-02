@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0001-A expect=violation domain=APDM
+#note "Positive control: the dataset is named APDM but the record carries DOMAIN=DM; the first 4 characters of the dataset name (APDM) do not equal DOMAIN, so the rule fires once for the dataset. Paired with the -valid- twin; first fixture for this id (PLAN-zero-row-routing-rekey.md phase 2)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset APDM label="Associated Persons Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | DM | AP-001 | 01-701-1015 | MOTHER, BIOLOGICAL
+---

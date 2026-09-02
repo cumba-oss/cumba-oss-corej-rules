@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0546 expect=skipped domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), AVAL(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | 2.5`. NO column matches either `PCHGCAyN` (regex `^PCHGCA(\\d+)N$`) or `PCHGCATy` (regex `^PCHGCAT(\\d+)$`), so WildcardExpander returns NoMatch and the rule is reported NOT EXECUTED. Do NOT add any column matching either regex here - one would flip this to an executing scenario."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5

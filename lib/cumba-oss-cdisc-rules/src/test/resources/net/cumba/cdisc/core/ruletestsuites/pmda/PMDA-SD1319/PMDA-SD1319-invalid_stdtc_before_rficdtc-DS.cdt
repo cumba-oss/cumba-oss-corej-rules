@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1319 expect=violation domain=DS
+#note "Row 1: DSSTDTC 2019-12-15 strictly before RFICDTC 2020-01-01 -> fires. Row 2: DSSTDTC equal to RFICDTC -> clean (strict <)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1
+dataset DS class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSDECOD type=Char
+col DSSTDTC type=Char
+---
+S1 | DS | 001 | 1 | RANDOMIZED                | 2019-12-15
+S1 | DS | 001 | 2 | INFORMED CONSENT OBTAINED | 2020-01-01
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFICDTC  type=Char
+---
+S1 | DM | 001 | 2020-01-01

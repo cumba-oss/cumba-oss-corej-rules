@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0583 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of BCHGCATy for a given value of BCHG and y, where y is an integer [1-99, not zero-padded]
+#note "each BCHG value maps to a single BCHGCAT1 value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BCHGCAT1 type=Char
+col BCHG type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | A1 | K1
+CDISCPILOT01 | 01-701-1023 | ALB | A2 | K2
+CDISCPILOT01 | 01-701-1028 | ALB | A1 | K1
+---

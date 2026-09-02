@@ -1,0 +1,84 @@
+Core:
+  Id: "PMDA-AD0252-D"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error for each variable in a basic-data-structure (BDS) dataset\
+  \ whose name is an occurrence-data-structure variable name (e.g. AOCCFL, TRTEMFL,\
+  \ ASEV, the SMQzz family) prohibited in BDS datasets."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() in ["AOCCFL", "AOCCIFL", "AOCCPFL", "AOCCPIFL", "AOCCSFL", "AOCCSIFL", "TRTEMFL",
+    "AETRTEM", "ASEV", "ASEVN", "AREL", "ARELN", "ADURN", "ADURU", "FUPFL", "PREFL"] or varname() =~
+    /^AOCC(0[1-9]|[1-9]\\d)FL$/ or varname() =~ /^TRTEM[1-9]FL$/ or varname() =~
+    /^TREM(0[1-9]|[1-9]\\d)FL$/ or varname() =~ /^ADECOD([1-9]|[1-9][0-9])$/ or varname() =~
+    /^ACAT([1-9]|[1-9][0-9])$/ or varname() =~ /^ATC([1-9]|[1-9][0-9])$/ or varname() =~
+    /^ATC([1-9]|[1-9][0-9])CD$/ or varname() =~ /^SMQ(0[1-9]|[1-9]\\d)NAM$/ or varname() =~
+    /^SMQ(0[1-9]|[1-9]\\d)CD$/ or varname() =~ /^SMQ(0[1-9]|[1-9]\\d)SC$/ or varname() =~
+    /^SMQ(0[1-9]|[1-9]\\d)SCN$/ or varname() =~ /^CQ(0[1-9]|[1-9]\\d)NAM$/ or varname() =~
+    /^SEVGR([1-9]|[1-9][0-9])$/ or varname() =~ /^RELGR([1-9]|[1-9][0-9])$/ or varname() =~
+    /^TOXGGR([1-9]|[1-9][0-9])$/ or varname() =~ /^.+ORG[1-9]$/
+Outcome:
+  Message: "The variable is prohibited in basic-data-structure datasets: its name\
+    \ is an occurrence-data-structure variable name such as AOCCFL, AOCCzzFL, TRTEMFL,\
+    \ TREMxxFL, ASEV, AREL, ADURN, a member of the SMQzz family or of the SEVGRy/RELGRy/TOXGGRy\
+    \ families."
+  Output_Variables:
+  - "variable_name"
+Source_Proposed:
+  Message: "The variable is prohibited in basic-data-structure datasets: its name\
+    \ is an occurrence-data-structure variable name such as AOCCFL, AOCCzzFL, TRTEMFL,\
+    \ TREMxxFL, ASEV, AREL, ADURN, a member of the SMQzz family or of the SEVGRy/RELGRy/TOXGGRy\
+    \ families."
+  Description: "Raise an error for each variable in a basic-data-structure (BDS) dataset\
+    \ whose name is an occurrence-data-structure variable name (e.g. AOCCFL, TRTEMFL,\
+    \ ASEV, the SMQzz family) prohibited in BDS datasets."
+  Domains: "BASIC DATA STRUCTURE, MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Severity: "Error"
+Source:
+  Message: "Variable present in dataset is prohibited for use in ADaM"
+  Description: "Variables described in ADaM IG as inappropriate for usage must be\
+    \ not included in the dataset. i.e., for ADAE, there is no need for AVAL, AVALC\
+    \ and Parameter variables."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"

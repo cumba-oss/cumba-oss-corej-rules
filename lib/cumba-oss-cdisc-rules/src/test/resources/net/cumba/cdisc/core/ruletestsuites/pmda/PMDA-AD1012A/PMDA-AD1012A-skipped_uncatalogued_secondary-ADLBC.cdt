@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD1012A expect=skipped domain=ADLBC
+#note "ANL01FN ends in N and its primary ANL01FL is absent, but ANL01FN is NOT one of the 20 names in WildcardPairCatalogue, so it is dropped as a seed, the expansion set is empty, tryExpand returns NoMatch and the rule DOES NOT EXECUTE - expect=skipped, not noViolation (STAGE-G CRITICAL 1). This fixture is what pins `_wildcardPairCatalogue: true` doing real work: it is the only difference between this rule and the custom-pair rule PMDA-AD1012 named in its own Source. Nothing else in the column list ends in N or C."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANL01FN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 1

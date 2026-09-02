@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0407"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the study includes protocol-specified study treatment\
+  \ but the EX domain is not present in the submission."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Check:
+  expression: >-
+    ds_exists("TA") and not ds_exists("EX")
+Outcome:
+  Message: "EX is not present in study when study includes protocol-specified study\
+    \ treatment."
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "GEN"
+  Condition: "Study includes protocol-specified study treatment"
+  Rule: "EX present in study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0407"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0407"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0407"
+        Version: "1"
+      Version: "2.0"

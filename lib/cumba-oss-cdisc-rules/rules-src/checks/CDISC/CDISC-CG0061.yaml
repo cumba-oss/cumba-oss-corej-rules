@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0061"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Relative to Reference Time Point (--STRTPT)\
+  \ is populated but Start Reference Time Point (--STTPT) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--STRTPT"
+    - "--STTPT"
+Check:
+  expression: >-
+    not empty(--STRTPT) and empty(--STTPT)
+Outcome:
+  Message: "--STRTPT is populated, but --STTPT is empty."
+  Output_Variables:
+  - "--STRTPT"
+  - "--STTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STTPT"
+  Condition: "--STRTPT ^= null"
+  Rule: "--STTPT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0061"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0061"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0061"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1202 expect=noViolation domain=AE
+#note "Row 1: boundary equal -> clean. Row 2: before -> clean. Row 3: empty -> lead conjunct false -> clean. Row 4: subject 002's RFPENDTC is EMPTY -> null bounds saturate every date comparison to FALSE -> clean. Row 5: AESTDTC=2020 (year-partial) -> forall-hull: lower('2020')=Jan 1 is NOT after 2020-06-30 -> clean (the partial-date semantics pin). Subject-not-in-DM drop is pinned on SD1319, not repeated here."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESTDTC type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE  | 2020-06-30
+S1 | AE | 001 | 2 | NAUSEA    | 2020-03-15
+S1 | AE | 001 | 3 | FATIGUE   |
+S1 | AE | 002 | 1 | HEADACHE  | 2021-01-01
+S1 | AE | 001 | 4 | DIZZINESS | 2020
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30
+S1 | DM | 002 |

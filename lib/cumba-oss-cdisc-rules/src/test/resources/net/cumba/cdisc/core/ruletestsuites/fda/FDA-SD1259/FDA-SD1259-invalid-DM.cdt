@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1259 expect=violation domain=DM
+#note "SETCD on row 2 is 9 characters, one past the 8-character limit -> fires; the 8-character row 1 is the passing boundary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 SETCD=HIGHDOSES
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+---
+S1 | DM | 001 | HIGHDOSE
+S1 | DM | 002 | HIGHDOSES

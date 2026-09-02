@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0709 expect=violation domain=ADSL
+# Rule:Description: Variable label does not match the standard (Library) label for the variable.
+#note "Synthetic: AGE label 'Wrong Label' vs YAML-sidecar Library label 'Age' -> violation"
+#expectViolationCount 1
+#expectViolationAt library_variable_label=Age variable_label="Wrong Label" variable_name=AGE
+#library-include CDISC-AD0709-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE type=Num label="Wrong Label"
+---
+CDISCPILOT01 | 01-701-1015 | 56
+---

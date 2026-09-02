@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0455 expect=violation domain=ADLBC
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. THE 82-RULE GENERATOR-WILDCARD POPULATION (Fix #331 finding; owner ruled 2026-08-22 that all 82 are BUCKET 1 - no rule edit - with a sample of fixtures owed by the closing lane; authored by Fix #340). These rules never carried the injected var_exists guard in rules/ (NonEmptyGuardInliner.isGeneratorWildcard excludes wildcard names), but WildcardExpander re-ran installNativeExpr on the EXPANDED rule, where the arm wrapped the now-concrete leaf - so before Fix #330 an absent primary column silenced them at runtime. With the arm retired the expanded leaf is a bare empty(X): absent = all-missing, TRUE on every row. Here SHIFT1N is declared and populated on row 1 while the SHIFT1 COLUMN is absent entirely; the expander raises the y=1 tuple off SHIFT1N and synthesises SHIFT1. Row 1 fires; row 2 leaves SHIFT1N blank and stays silent. If this goes silent, the post-expansion guard is back -- escalate."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X
+CDISCPILOT01 | 01-701-1023 | GLUC |
+---

@@ -1,0 +1,108 @@
+Core:
+  Id: "PMDA-SD1143"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an AE record has AESMIE equal to 'Y' but no SUPPAE\
+  \ record with QNAM equal to 'AESOSP' supplies the description of the Other Medically\
+  \ Important Serious Adverse Event for that record."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "SUPPAE.QNAM"
+    - "AESMIE"
+Operations:
+- id: "$suppae_aesosp_keys"
+  expression: "distinct([USUBJID, IDVARVAL], domain=\"SUPPAE\", filter=filter(RDOMAIN=\"\
+    AE\", IDVAR=\"AESEQ\", QNAM=\"AESOSP\"))"
+Check:
+  expression: >-
+    AESMIE == "Y" and tuple(USUBJID, AESEQ) not in $suppae_aesosp_keys
+Outcome:
+  Message: "AESMIE equals 'Y', but no SUPPAE record with QNAM equal to 'AESOSP' provides\
+    \ the description for this AE record."
+  Output_Variables:
+  - "AESEQ"
+  - "AESMIE"
+  - "$suppae_aesosp_keys"
+Source:
+  Message: "No Details info for AESMIE Adverse Event in SUPPAE domain"
+  Description: "When a description of Other Medically Important Serious Adverse Events\
+    \ category is collected on a CRF, sponsors should place the description in the\
+    \ SUPPAE dataset using the standard supplemental qualifier name code AESOSP."
+  Domains: "AE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"

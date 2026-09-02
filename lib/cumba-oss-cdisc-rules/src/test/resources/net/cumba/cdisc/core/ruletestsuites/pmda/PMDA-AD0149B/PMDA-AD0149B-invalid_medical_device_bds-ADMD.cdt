@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0149B expect=violation domain=ADMD
+#note "PARAMCD/AVAL detect BASIC DATA STRUCTURE and SPDEVID refines it to MEDICAL DEVICE BASIC DATA STRUCTURE, structureSet [MD-BDS, BDS] - precedent PMDA-AD0388-invalid_medical_device_bds-ADMD.cdt. Pins the device-BDS half of the Include list. NOTE (finding AD0149B-F1): this fixture would ALSO be in scope for the 1-0 sibling PMDA-AD0149, whose Include names only BASIC DATA STRUCTURE - the MD token is redundant, and SPDEVID is not part of the key here."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 SPDEVID=DEV02 PARAMCD=GLUC AVAL=1 AVALC=HIGH
+dataset ADMD
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1023 | DEV01 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1034 | DEV02 | GLUC | 1 | HIGH

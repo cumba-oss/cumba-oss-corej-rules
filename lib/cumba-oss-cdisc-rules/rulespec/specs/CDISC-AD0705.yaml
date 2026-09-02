@@ -1,0 +1,42 @@
+name: CDISC-AD0705
+kind: rule
+description: |
+  Wave C4 port — T2-CalcOps (baseline Python lane).
+  CDISC-AD0705: PBCHG must equal ((BASE-AVAL)/AVAL)*100 on MDBDS.
+  Same check as CDISC-AD0586 but scoped to MEDICAL DEVICE BASIC DATA STRUCTURE.
+  Python's DataframeType does not implement `not_equal_to_pctchg`
+  and raises AssertionError; Java fires on the row where
+  PBCHG ≠ ((BASE-AVAL)/AVAL)*100.
+python_source: rules-adamig-1-3.json (CDISC-AD0705)
+rule:
+  coreId: CDISC-AD0705
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, SPDEVID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      AVAL: DOUBLE
+      BASE: DOUBLE
+      PBCHG: DOUBLE
+    rows:
+      # ok — PBCHG=100.0 matches ((10-5)/5)*100
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1, AVAL: 5.0, BASE: 10.0, PBCHG: 100.0}
+      # bad — PBCHG=50.0 but correct is 100.0
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1, AVAL: 5.0, BASE: 10.0, PBCHG: 50.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    medical device basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0705
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PBCHG: '50'
+      PARAMCD: 'HGB'
+      BASE: '10'
+      AVAL: '5'
+expected_errors: []

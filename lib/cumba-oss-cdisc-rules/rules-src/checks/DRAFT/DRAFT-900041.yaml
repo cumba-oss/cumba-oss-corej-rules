@@ -1,0 +1,30 @@
+Core:
+  Id: "DRAFT-900041"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when AAGE (Analysis Age) is not present while AGE is;\
+  \ AAGE is required if the analysis age is calculated differently than DM.AGE."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The engine cannot detect whether the analysis age actually differs from\
+    \ DM.AGE, so the rule fires for every subject-level dataset that carries AGE without\
+    \ AAGE, including studies where the ages are identical and AAGE is legitimately\
+    \ absent."
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not var_exists("AAGE") and var_exists("AGE")
+Outcome:
+  Message: "AAGE (Analysis Age) is not present. AAGE is required if age is calculated\
+    \ differently than DM.AGE."
+  Output_Variables:
+  - "AGE"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

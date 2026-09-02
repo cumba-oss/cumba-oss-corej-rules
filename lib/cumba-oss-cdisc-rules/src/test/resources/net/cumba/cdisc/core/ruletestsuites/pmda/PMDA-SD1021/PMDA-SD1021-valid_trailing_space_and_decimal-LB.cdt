@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1021 expect=noViolation domain=LB
+#note "The two near-misses the sheet does NOT prohibit: a TRAILING space (the regex arm is '^ ', anchored at the start only) and an EMBEDDED period that is a decimal point (the arm is '^\\.\$', a whole-value match). Both must stay silent."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | ALB  | 40.5
+CDISCPILOT01 | LB | 01-701-1015 | GLUC | "5.5 "

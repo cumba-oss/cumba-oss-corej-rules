@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0239-B"
+Sheet_Rule_Identifier: "239"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "IsReferenceData"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+# Companion of DEFINE-XML-0239 (one sheet row, two rules — the 0013/0254 split
+# precedent): the sheet demands IsReferenceData be PRESENT and "Yes" on TRIAL
+# DESIGN datasets (spec p. 25 "is included and is set to Yes"; ODM defaults an
+# absent attribute to "No"). Value-kinds fire only on present values, so 0239
+# covers the wrong-value half and this rule covers the absent half
+# (review-batch-c FAIL resolution).
+Plain_Text_Rule: "IsReferenceData attribute must be 'Yes' for Trial Design datasets."
+Message: "The IsReferenceData attribute is missing on a TRIAL DESIGN ItemGroupDef (it must be present and 'Yes')."
+Check:
+  kind: "exists"
+  target: "@IsReferenceData"
+  when:
+    path: "Class/@Name"
+    equals: "TRIAL DESIGN"

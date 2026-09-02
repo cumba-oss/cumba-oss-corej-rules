@@ -1,0 +1,32 @@
+#!RuleTest
+#test PMDA-SD1084 expect=violation domain=AE
+#note "Row 1: both dates complete, AEDY empty -> FIRES. Row 2: AEDY populated -> silent. Row 3: partial AEDTC -> silent. Row 4: subject 002's RFSTDTC partial -> silent. Row 5: subject 003's RFSTDTC empty -> silent. Inner join on USUBJID (no authored Join_Type -> normalized inner); DM unique per subject, all AE subjects present in DM -> no rows dropped."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDTC   type=Char
+col AEDY    type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE  | 2023-06-15 |
+S1 | AE | 001 | 2 | NAUSEA    | 2023-06-15 | 15
+S1 | AE | 001 | 3 | RASH      | 2023-06    |
+S1 | AE | 002 | 1 | FATIGUE   | 2023-06-15 |
+S1 | AE | 003 | 1 | DIZZINESS | 2023-06-15 |
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+---
+S1 | DM | 001 | 2023-06-01
+S1 | DM | 002 | 2023-06
+S1 | DM | 003 |
+---

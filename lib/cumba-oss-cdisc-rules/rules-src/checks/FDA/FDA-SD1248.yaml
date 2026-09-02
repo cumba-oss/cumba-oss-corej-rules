@@ -1,0 +1,86 @@
+Core:
+  Id: "FDA-SD1248"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ECOCCUR equals 'N' but ECDOSE is populated and less\
+  \ than or equal to 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Requirements:
+  Variables:
+    All:
+    - "ECOCCUR"
+    - "ECDOSE"
+Check:
+  expression: >-
+    ECOCCUR == "N" and ECDOSE <= 0 and not empty(ECDOSE)
+Outcome:
+  Message: "ECDOSE is populated and not greater than 0 when ECOCCUR equals 'N'; ECDOSE\
+    \ must be missing or greater than 0."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+Source:
+  FDA_Validator_Rule_Message: "ECDOSE is not null or greater than 0 when ECOCCUR =\
+    \ 'N'"
+  FDA_Validator_Rule_Description: "ECDOSE must either be null when ECOCCUR equals\
+    \ 'N', or ECDOSE must be greater than 0. ECDOSE would be greater than 0 (when\
+    \ ECOCCUR equals N) for records that represent specific dose amounts that are\
+    \ not taken, not given, or missed."
+  Domains: "EC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1248"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1248"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0101"
+        Version: "2"
+      Version: "2.0"

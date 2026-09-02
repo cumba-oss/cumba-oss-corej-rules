@@ -1,0 +1,135 @@
+Core:
+  Id: "FDA-SD0065"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISITNUM is populated but the USUBJID + VISIT +\
+  \ VISITNUM combination does not exist as a row in the SV domain, excluding records\
+  \ where --STAT is populated and EC records where ECOCCUR equals 'N'."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SV"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+Operations:
+- id: "$sv_visit_keys"
+  expression: "distinct([USUBJID, VISIT, VISITNUM], domain=\"SV\")"
+Check:
+  expression: >-
+    not empty(VISIT) and not empty(VISITNUM) and empty(--STAT) and (not var_exists("ECOCCUR") or
+    ECOCCUR != "N") and tuple(USUBJID, VISIT, VISITNUM) not in $sv_visit_keys
+Outcome:
+  Message: "The USUBJID/VISIT/VISITNUM combination does not match any row in the SV\
+    \ dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "!--STAT"
+  - "ECOCCUR"
+  - "$sv_visit_keys"
+Source:
+  FDA_Validator_Rule_Message: "USUBJID/VISIT/VISITNUM values do not match SV domain\
+    \ data"
+  FDA_Validator_Rule_Description: "All Unique Subject Identifier (USUBJID) + Visit\
+    \ Name (VISIT) + Visit Number (VISITNUM) combination values in data should be\
+    \ present in the Subject Visits (SV) domain. There is an exception for records,\
+    \ where Status (--STAT) variable value is populated. E.g., --STAT = 'NOT DONE'.\
+    \ Another exception is for records, where Occurrence (ECOCCUR) is 'N' in EC domain."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0065"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"

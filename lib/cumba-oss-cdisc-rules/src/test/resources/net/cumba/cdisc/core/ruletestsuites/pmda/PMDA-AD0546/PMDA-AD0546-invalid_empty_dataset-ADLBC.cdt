@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0546 expect=violation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), PCHGCA1N(Num). ZERO data rows (the metadata separator `---` immediately followed by the closing `---`). The firing shape is DECLARED: PCHGCA1N is a column, PCHGCAT1 is not. Presence is a property of the declared schema, not of the rows, so BroadcastFold decides the dataset-constant Check against the original context before the 0-row synthetic zero-column table is ever built, and datasetBroadcastResult emits exactly ONE violation at internal row 0 = reported row 1. Pin `row=1` and NO value pin - extractOutputValues yields an empty string past the end of a 0-row table. Wildcard rule at 0 rows: precedented green by pmda/PMDA-AD0133A/PMDA-AD0133A-invalid_empty_dataset-ADLBC.cdt - the expansion binds y=1 from the declared column schema."
+#expectViolationCount 1
+#expectViolationAt row=1
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PCHGCA1N type=Num
+---
+---

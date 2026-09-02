@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0552"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Multi-Response Criterion y Eval (N) (MCRITyMN)\
+  \ variable is present in a dataset but its corresponding Multi-Response Criterion\
+  \ y Evaluation (MCRITyML) variable is not present in that dataset. The numeric evaluation\
+  \ variable must always be accompanied by its character evaluation counterpart."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("MCRITyMN") and not var_exists("MCRITyML")
+Outcome:
+  Message: "MCRITyMN is present and MCRITyML is not present."
+  Output_Variables:
+  - "MCRITyMN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "MCRITyMN is present and MCRITyML is not present"
+  Description: "If Multi-Response Criterion y Eval (N) (MCRITyMN) variable is used\
+    \ in a dataset, Multi-Response Criterion y Evaluation (MCRITyML) variable must\
+    \ also be present in that dataset."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0552"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0552"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0552"
+        Version: "1"
+      Version: "6.0"

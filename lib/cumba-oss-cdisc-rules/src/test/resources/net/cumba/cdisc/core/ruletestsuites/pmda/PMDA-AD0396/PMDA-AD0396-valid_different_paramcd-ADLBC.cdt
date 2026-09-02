@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0396 expect=noViolation domain=ADLBC
+#note "Keys (GRADE1, GLUC) and (GRADE1, ALB) are two single-valued groups -> silent. Pins PARAMCD is part of the key; a keys=[ATOXGRL] slip would fire here as a TIE (count 2)."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col ATOXGRL  type=Char
+col ATOXGRLN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | GRADE1 | 1
+CDISCPILOT01 | 01-701-1023 | ALB  | GRADE1 | 2

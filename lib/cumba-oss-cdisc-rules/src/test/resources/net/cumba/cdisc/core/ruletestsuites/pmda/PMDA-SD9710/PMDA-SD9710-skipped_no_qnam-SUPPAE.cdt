@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD9710 expect=skipped domain=SUPPAE
+# Rule:Description: PMDA-SD9710 — the Required key QNAM is not populated.
+#note "QNAM is absent from SUPPAE, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(QNAM) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sdtmig version=3-4
+dataset SUPPAE
+col STUDYID type=Char
+col RDOMAIN type=Char
+col USUBJID type=Char
+col IDVAR type=Char
+col IDVARVAL type=Char
+col QLABEL type=Char
+col QVAL type=Char
+---
+S1      | AE      | S1-001  | AESEQ | 1        | Other Medically Important SAE | Y
+---

@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0058"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Relative to Reference Time Point (--ENRTPT)\
+  \ is present in the dataset but End Reference Time Point (--ENTPT) is not present\
+  \ in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--ENRTPT") and not var_exists("--ENTPT")
+Outcome:
+  Message: "--ENTPT variable is not present when --ENRTPT variable is present."
+  Output_Variables:
+  - "--ENRTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENTPT"
+  Condition: "--ENRTPT present in dataset"
+  Rule: "--ENTPT present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0058"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0058"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0058"
+        Version: "1"
+      Version: "2.0"

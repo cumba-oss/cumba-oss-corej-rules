@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.PMDA.SD1230" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="PMDA-SD1230 VLM fixture" DefineVersion="2.1.0"
+                     StandardName="SDTM-IG" StandardVersion="3.4">
+
+      <ItemGroupDef OID="IG.LB" Name="LB" Domain="LB" Repeating="Yes" Purpose="Tabulation"
+                    SASDatasetName="LB">
+        <ItemRef ItemOID="IT.LB.LBTESTCD" OrderNumber="1" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.LB.LBSPEC" OrderNumber="2" Mandatory="No" Role="Qualifier"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESC" OrderNumber="3" Mandatory="No" Role="Result Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.LB.LBTESTCD" Name="LBTESTCD" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Lab Test Code</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSPEC" Name="LBSPEC" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Specimen Type</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC" Name="LBSTRESC" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Character Result/Finding in Std Format</TranslatedText></Description>
+        <def:ValueListRef ValueListOID="VL.LB.LBSTRESC"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC.GLUC" Name="LBSTRESC_GLUC" DataType="float" Length="6">
+        <Description><TranslatedText xml:lang="en">Glucose result (numeric)</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC.PH" Name="LBSTRESC_PH" DataType="text" Length="7">
+        <Description><TranslatedText xml:lang="en">Urine pH category</TranslatedText></Description>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.LB.LBSTRESC">
+        <ItemRef ItemOID="IT.LB.LBSTRESC.GLUC" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.LB.GLUC"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.LB.LBSTRESC.PH" OrderNumber="2" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.LB.PH.URINE"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.LB.GLUC">
+        <RangeCheck Comparator="EQ" SoftHard="Soft" def:ItemOID="IT.LB.LBTESTCD">
+          <CheckValue>GLUC</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.LB.PH.URINE">
+        <RangeCheck Comparator="EQ" SoftHard="Soft" def:ItemOID="IT.LB.LBTESTCD">
+          <CheckValue>PH</CheckValue>
+        </RangeCheck>
+        <RangeCheck Comparator="EQ" SoftHard="Soft" def:ItemOID="IT.LB.LBSPEC">
+          <CheckValue>URINE</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

@@ -1,0 +1,82 @@
+# Silencing-guard ratchet baseline, TARGET-POSITION class (SilencingGuardHoistGateTest).
+# One line per src-file|Core.Id|guarded-vars, same format and same only-SHRINK contract as
+# silencing-guard-baseline.txt - but a DIFFERENT warrant. Do not merge the two files.
+#
+# 2026-08-07 (PLAN-silencing-guard-carveout-s4.md, Phase 1'): R-4.11a's
+# PYTHON_GUARD_REQUIRED_OPERATORS carve-out in SilencingGuardScan used to apply to EVERY
+# operand of is_unique_set / is_not_unique_set / is_inconsistent_across_dataset. Its warrant
+# is a COMPARATOR-position warrant - the fork drops an absent GROUPING-KEY column and
+# over-fires - so applying it operator-wide also hid every guard sitting in the operators'
+# TARGET position, where the fork does NOT over-fire:
+#   is_unique_set / is_not_unique_set : _absent_unique_set_target short-circuits to all-False
+#                                       (dataframe_operators.py:1490-1496, :1504, :1545)
+#   is_inconsistent_across_dataset    : not in ABSENT_TARGET_AWARE_OPERATORS, so
+#                                       _absent_target_as_missing (:144) substitutes an
+#                                       all-blank column and _check_inconsistency finds no
+#                                       non-blank value to disagree about - also all-False.
+#
+# Narrowing the carve-out to the comparator position made these 584 entries (154 distinct
+# Core.Ids) visible. They are ORDINARY R-4.11 BACKLOG: the guard is silencing, nothing in the
+# fork depends on it, and the gate should be expressed as Scope.Variables.Include. They are
+# recorded here rather than left as 584 fresh violations so the exposure is actionable -
+# a per-rule intent read, family by family, deleting lines as they migrate.
+#
+# ⚠ These are NOT the Python-load-bearing escape hatch. Guards still hidden by the (now
+# narrower) carve-out live in silencing-guard-carveout-grouping-key-baseline.txt and are
+# correct as authored; the class-V TS rules live in silencing-guard-baseline.txt.
+#
+# 2026-08-08 (PLAN-wave17-corpus-manifest.md, wave-17 lane A): MIGRATED. 576 of the 584 entries
+# (152 of the 154 Core.Ids) were hoisted to Scope.Variables.Include per R-4.11 and their lines
+# deleted here. Recomputed after the regen: 0 fresh hits, 576 stale, 8 surviving. The sibling
+# grouping-key baseline was unaffected (577 entries, 0 fresh / 0 stale) - the two positions are
+# genuinely independent.
+#
+# Open question of the migration - REMOVE the leaf, or carry both? REMOVE. R-4.11's text is
+# explicit ("not as a top-level exists leaf"); R-4.11a is a POSITION rule that reaches the
+# grouping-key operand only; and the guard matrix's "write it in BOTH places" blessing is scoped
+# to class-D KEY discriminators and negated class-V leaves, neither of which reaches a
+# target-position positive leaf (D-target's guard column is "None"). ⚑ Decisive: THIS FILE IS
+# SHRINK-ONLY, so under "carry both" it could never shrink at all and the instruction two
+# paragraphs up would be unsatisfiable.
+#
+# ⚠⚠ EIGHT ENTRIES DELIBERATELY REMAIN - CDISC-AD0054 and PMDA-AD0054, each in all four ADaMIG
+# packages. The both-halves shape is an OWNER-GRANTED exception, not backlog:
+# PLAN-ec43-corpus-response.md §6's Q2 escape hatch, shipped with Fix #143 / EC-53, recorded in
+# core-engine-update-status.md and in CORE-RULES-GUARD-MATRIX.md's 2026-08-04 changelog entry, and
+# pinned by CDISC-AD0054-skipped_no_usubjid-ADSL.cdt. This is the ONE keyless is_not_unique_set
+# leaf shape in the corpus: with the target absent AND no key columns the key tuple is EMPTY,
+# every row carries the same key, and the rule would report one finding per record. Reversing a
+# granted exception is an owner call, not a migration lane's; removing the leaf would in any case
+# be a no-op in Java, since the Scope entry already gates. So this is a deliberate non-migration.
+#
+# ⚠ BOTH TWINS OR NEITHER. The first pass migrated PMDA-AD0054 and skipped CDISC-AD0054, and
+# RuleEquivalenceInventory caught it: the {CDISC-AD0054, PMDA-AD0054} equivalence class - the very
+# pairing that was cited as precedent when the exception was granted ("its own PMDA twin carries
+# the guard") - broke, because the class fingerprint is Check-based. PMDA-AD0054 was reverted.
+# An exception scoped to a rule SHAPE has to be applied to every rule that has the shape.
+#
+# ⚑ WHERE THE DETECTOR'S PROOF LIVES now that this baseline is down to one rule. Neuter-and-watch
+# performed 2026-08-08 BEFORE any line was deleted: re-widening SilencingGuardScan's carve-out to
+# operator-wide reddened SilencingGuardHoistGateTest with "(584 stale)", SilencingGuardCarveOutGateTest
+# with "(584 new)", and 3 of SilencingGuardScanTest's 16 synthetic fixtures
+# (mixedUse_targetPositionDoesNotProtect, uniqueSetGuards_carveOutIsPositionAware,
+# uniqueSetGuards_carveOutHiddenVars_reportsTheGroupingKeyGuard). Those synthetic fixtures are the
+# standing proof: they do not depend on the corpus at all. SilencingGuardCorpusScan.MIN_RULES_WITH_CHECK
+# (3000) keeps the corpus walk itself from passing vacuously.
+# 2026-08-11 (wave 33): the scan moved from the deleted rules-legacy/ corpus to
+# rules-src/checks - the same authored Check surface, read directly. The first field
+# is now the rules-src path (FAMILY/CORE-nnn.yaml), not a package file, and the ~3.8x
+# IG-version package fan-out collapses to ONE line per rule (here 8 -> 2). Lossless:
+# the distinct Core.Id count already equalled the distinct id|vars count.
+# See plans/PLAN-cut-rules-legacy.md.
+# 2026-08-23 (Plan A Phase 1, Fix #352, D-8 / ruling 3): THE LAST TWO ENTRIES ARE DELETED
+# and this file is now entries-EMPTY. The target-position class it records no longer exists
+# for is_(not_)unique_set: SilencingGuardScan.POSITION_BLIND_OPERATORS retires the target vs
+# comparator distinction for the pair (the engine builds ONE key tuple; the guard matrix's
+# D-target / D-key rows collapsed to a single class D), so the AD0054 `var_exists(USUBJID)`
+# guard on the keyless `is_not_unique_set([USUBJID])` leaf is class-D REQUIRED - hidden by the
+# carve-out and recorded in silencing-guard-carveout-grouping-key-baseline.txt (2 new there,
+# 2 stale here; the corpus is untouched). is_inconsistent_across_dataset keeps its target
+# distinction, but none of its target guards are authored in the Check, so nothing lands here.
+# The file is kept (shrink-only contract, and the gate reads it) rather than deleted.
+# Before/after: 2 -> 0 entries.

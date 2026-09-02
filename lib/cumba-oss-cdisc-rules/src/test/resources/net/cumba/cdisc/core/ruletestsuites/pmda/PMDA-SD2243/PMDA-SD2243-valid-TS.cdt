@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD2243 expect=noViolation domain=TS
+#note "Both PCLAS records name an accepted code system (NDF-RT for the older version, MED-RT for the newer one); the non-PCLAS record is outside the guard, so its empty TSVCDREF is not flagged."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | PCLAS | Cyclooxygenase Inhibitors | N0000175722 | MED-RT | 2019-11-04
+CDISCPILOT01 | TS | 2 | PCLAS | Antihistamine             | N0000175503 | NDF-RT | 2018-02-05
+CDISCPILOT01 | TS | 3 | TITLE | A Study of Drug X         |             |        |

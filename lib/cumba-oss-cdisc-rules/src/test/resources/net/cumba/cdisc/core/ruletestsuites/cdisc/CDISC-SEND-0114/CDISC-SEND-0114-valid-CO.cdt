@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0114 expect=noViolation domain=CO
+#note "Every key tuple is distinct. Rows 2 and 3 each break the tie on a DIFFERENT key component -- row 2 on CODTC, row 3 on IDVARVAL and COVAL -- so a rule that dropped either from its keys list would turn this fixture red."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset CO
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COSEQ    type=Num  label="Sequence Number"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+STUDY01 | CO | BW | 001 |  | BWSEQ | 1 | 1 | SEECOMMENT | 2023-01-15
+STUDY01 | CO | BW | 001 |  | BWSEQ | 1 | 2 | SEECOMMENT | 2023-01-16
+STUDY01 | CO | BW | 001 |  | BWSEQ | 2 | 3 | OTHERCMT   | 2023-01-15
+---

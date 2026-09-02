@@ -1,0 +1,29 @@
+name: PMDA-SD1023-nofire
+kind: rule
+description: |
+  No-fire companion for PMDA-SD1023. Every scheduled (VISIT, VISITNUM) pair in VS matches a distinct
+  pair defined in TV; the one unplanned visit is excluded case-insensitively.
+python_source: rules-sdtmig-3-4.json (PMDA-SD1023)
+rule:
+  coreId: PMDA-SD1023
+datasets:
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VISIT: WEEK 2, VISITNUM: '2'}
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 2, VISIT: WEEK 3, VISITNUM: '3'}
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 3, VISIT: UNPLANNED visit, VISITNUM: '99'}
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: '2', VISIT: WEEK 2}
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: '3', VISIT: WEEK 3}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+    trial-design: [TV]
+expected_violations: []
+expected_errors: []

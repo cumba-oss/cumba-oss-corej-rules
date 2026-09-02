@@ -1,0 +1,83 @@
+Core:
+  Id: "PMDA-SD1279"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when ECDOSE is missing, ECOCCUR is not equal to 'N',\
+  \ ECSTAT is empty, and ECDOSTXT is empty or not present."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Check:
+  expression: >-
+    empty(ECDOSE) and (not var_exists("ECOCCUR") or ECOCCUR != "N") and empty(ECSTAT) and
+    empty(ECDOSTXT)
+Outcome:
+  Message: "ECDOSTXT is empty or not present when ECDOSE is missing, ECOCCUR does\
+    \ not equal 'N' and ECSTAT is empty."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+  - "ECDOSTXT"
+  - "ECSTAT"
+Source:
+  Message: "ECDOSTXT is null when ECDOSE is null and ECOCCUR does not equal 'N'"
+  Description: "Dose Description (ECDOSTXT) should be populated when Dose (ECDOSE)\
+    \ is null, ECOCCUR does not equal 'N', and ECSTAT does not equal 'NOT DONE'."
+  Domains: "EC"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1279"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,67 @@
+Core:
+  Id: "PMDA-AD0010"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Flag Character (*FL) variable has the value 'Y'\
+  \ but its corresponding Flag Numeric (*FN) variable (sharing the same name root)\
+  \ is not 1."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    *FL == "Y" and var_exists(*FN) and *FN != 1
+Outcome:
+  Message: "A Flag Character (*FL) variable is 'Y' but its corresponding Flag Numeric\
+    \ (*FN) variable is not 1."
+  Output_Variables:
+  - "*FL"
+  - "*FN"
+Source:
+  Message: "*FL = Y and *FN != 1"
+  Description: "When a Flag variable (FL) is Y, its corresponding Flag numeric variable\
+    \ (FN) must be 1."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0010"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0010"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0010"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0010"
+        Version: "1"
+      Version: "6.0"

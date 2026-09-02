@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0355"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Geographic Region y (REGIONy) does not have a single\
+  \ consistent value for each unique populated value of Geographic Region y (N) (REGIONyN)\
+  \ within the study; REGIONy and REGIONyN must hold a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(REGIONyN) and is_inconsistent_across_dataset(REGIONy, keys=[REGIONyN])
+Outcome:
+  Message: "Inconsistent value for REGION*"
+  Output_Variables:
+  - "REGIONy"
+  - "REGIONyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for REGION*"
+  Description: "Within a study, all Geographic Region y (REGIONy) variable values\
+    \ must be the same for each unique value of Geographic Region y (N) (REGIONyN)\
+    \ when variable REGIONyN is populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0355"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0355"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0355"
+        Version: "1"
+      Version: "6.0"

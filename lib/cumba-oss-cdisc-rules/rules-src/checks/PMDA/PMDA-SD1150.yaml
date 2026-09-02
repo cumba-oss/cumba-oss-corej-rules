@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-SD1150"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IETEST, IETESTCD and TIVERS are present and IETEST\
+  \ does not have the same value across records that share the same IETESTCD and TIVERS\
+  \ values."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TI"
+Requirements:
+  Variables:
+    All:
+    - "IETEST"
+Check:
+  expression: >-
+    var_exists("IETESTCD") and is_inconsistent_across_dataset(IETEST, keys=[IETESTCD, TIVERS])
+Outcome:
+  Message: "Inconsistent value for IETEST within IETESTCD and TIVERS"
+  Output_Variables:
+  - "IETESTCD"
+  - "IETEST"
+  - "TIVERS"
+Source:
+  Message: "Inconsistent value for IETEST within IETESTCD"
+  Description: "All values of Inclusion/Exclusion Criterion (IETEST) should be the\
+    \ same for a given value of Inclusion/Exclusion Criterion Short Name (IETESTCD)\
+    \ and Protocol Criteria Versions (TIVERS)."
+  Domains: "TI"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1150"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1150"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1150"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1150"
+        Version: "1"
+      Version: "1.6"

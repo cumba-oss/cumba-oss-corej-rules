@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0079"
+Sheet_Rule_Identifier: "DD0079"
+Rule_Set: "PMDA"
+Element: "CommentDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Comments that are referenced from Standards/Terminologies, Dataset, Variable, Value Level metadata, or Codelists should be included in Define.xml. Define-XML specification represents Comments as def:CommentDef elements within MetaDataVersion element."
+# The element-less referrer means ANY def:CommentOID attribute in the document
+# counts. That is the sheet's list (def:Standard, ItemGroupDef, ItemDef,
+# def:WhereClauseDef, CodeList) plus the spec's remaining legal carriers
+# (MetaDataVersion, arm:AnalysisDatasets) - a comment referenced from those is
+# not an orphan either.
+Message: "Comment ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - attribute: "CommentOID"

@@ -1,0 +1,85 @@
+name: EC67-dataset-domain-fork-cannot-resolve
+kind: rule
+description: |
+  EC-67 (register §66) / `Fix #172` — `dataset_domain` is a coreJ-only builtin, and
+  `rules-legacy/` ships it to a fork that registers no such name. This spec MEASURES what
+  the fork does with it, on the shipped rule, on CONFORMANT data.
+
+  ⚠⚠ The measured answer is the worst of the three EC-67 named: a SILENT WRONG ANSWER.
+  Not a load rejection, not an unresolved-name skip — the rule loads, is `EXECUTED`, and
+  reports a violation on a dataset that has nothing wrong with it. Measured 2026-08-07 on
+  fork `195c7172`:
+
+    Validated dataset LB. Result = [{'executionStatus': 'issue reported', 'dataset': 'LB',
+      'variables': ['dataset_domain'],
+      'message': 'DOMAIN value length is not equal to 2.',
+      'errors': [{'value': {'dataset_domain': 'Not in dataset'}, 'dataset': 'LB'}]}]
+
+  Mechanism, in the fork tree (`lib/corej-cdisc-parity/cdisc-rules-engine`):
+    1. `dataset_builder_factory.py:66` — the migration's derived `Rule_Type: Dataset Metadata
+       Check` selects `ContentMetadataDatasetBuilder`, so the frame is the one-row dataset
+       metadata table, not the data.
+    2. `services/data_services/base_data_service.py:316-329` — that table's columns are
+       dataset_size / dataset_location / dataset_name / dataset_label / record_count / is_ap /
+       ap_suffix / **domain** / file_format. There is no `dataset_domain`.
+    3. `utilities/rule_processor.py:773-836` — `is_suitable_for_validation` has no
+       target-existence arm, so the rule is NOT skipped.
+    4. `check_operators/dataframe_operators.py:176` -> `_absent_target_as_missing` (`:92-168`);
+       `:149` finds the column absent and `:159` materialises `patched["dataset_domain"] = ""`.
+       That is the house "absent column = all-missing column" contract (EC-38 / `Fix #128`) —
+       correct policy, applied to a name that is not a column at all.
+    5. `dataframe_operators.py:1092` — `shorter_than` is `~longer_than_or_equal_to`, and
+       `:1087` computes `"".str.len().ge(2)` = `0 >= 2` = False ⇒ `~False` = **True**, for the
+       single metadata row, on every dataset. The `any` fires unconditionally.
+
+  ⚠ `Requirements.Variables.All: ["DOMAIN"]` cannot save it: `models/rule.py:52-65` reads
+  Classes / Domains / Entities / Use_Case / Data_Structures / Subclasses out of `Scope` and
+  never `Variables`.
+
+  ⚠ The over-report is data-independent — it is `Sensitivity: Dataset`, one finding per
+  in-scope dataset, for every dataset that is not RELATIONSHIP-class and not `AP--`/`APRELSUB`.
+  Pre-migration the fork was CORRECT here (measured: the `Record Data` / `name: DOMAIN` shape
+  fires on the offending row and only that row), so `Fix #172` is a fork-side regression, not
+  a pre-existing fork gap.
+
+  WHY THE FIXTURE IS CONFORMANT. The harmful direction is the false positive, and a conformant
+  dataset makes coreJ's expectation exactly `[]` — no capture round-trip, no output-variable
+  canonicalisation to get wrong. (Capture mode is Python-only, and on this spec Python is the
+  wrong engine, so a captured expectation would have baked the defect in as the expectation.)
+  The spec is not vacuous on the Java lane: `expected_status: EXECUTED` is asserted, so a coreJ
+  that stopped running the rule reddens instead of passing with an empty diff.
+
+  ⚑ THERE IS A CHEAP coreJ-SIDE REMEDY, MEASURED. The fork's dataset-metadata frame already
+  carries the same fact under the name `domain` (`base_data_service.py:322`,
+  `SDTMDatasetMetadata.domain` = row 0's DOMAIN — and the fork's `unsplit_name` property,
+  `sdtm_dataset_metadata.py:57-63`, is a line-for-line analogue of coreJ's
+  `OperationExecutor.unsplitNameFromData`). Lowering `dataset_domain` -> `domain` when
+  `rules-legacy/` is assembled — the same shape as `RuleStorageAssembler.downgradePresenceOperators`
+  — makes the fork answer CORRECTLY: measured 2026-08-07, `DOMAIN=LB` gives 0 findings and
+  `DOMAIN=LBX` gives exactly one dataset-level finding with `domain: 'LBX'`.
+  ⚠ One residual survives the lowering: on a dataset with NO DOMAIN column the fork's `domain`
+  is None, so `shorter_than` fires again (measured: `value: {domain: None}`). coreJ suppresses
+  that case with `Requirements.Variables.All: ["DOMAIN"]`, which `models/rule.py:52-65` does not
+  read. So the lowering closes the general case and leaves the DOMAIN-less one. Not implemented
+  here — this lane measures; the corpus/assembler change is the owner's call.
+
+  Baselined `lane: python`, `channels: [violations]`. The `status` channel is deliberately NOT
+  baselined: if a fork rebase drops the EC-38 patch, `self.value["dataset_domain"]` raises
+  KeyError again and `rules_engine.py:464-477` maps it to SKIPPED / COLUMN_NOT_FOUND_IN_DATA —
+  measured by neutering `_absent_target_as_missing`, and that is what UPSTREAM
+  (`cdisc-org/cdisc-rules-engine` @ 4a2dbb0d, which has no such hook) does today. Leaving
+  `status` asserted makes that change red rather than silent.
+rule:
+  coreId: CDISC-CG0308
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '1001', LBSEQ: 1, LBTESTCD: ALB, LBORRES: '4.1'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '1002', LBSEQ: 1, LBTESTCD: ALB, LBORRES: '4.4'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

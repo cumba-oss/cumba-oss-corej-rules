@@ -1,0 +1,82 @@
+Core:
+  Id: "FDA-SE2274"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset contains more than\
+  \ one record where TSPARMCD equals 'SSTYP' (Study Type)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$sstyp_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"SSTYP\"))"
+Check:
+  expression: >-
+    $sstyp_count > 1
+Outcome:
+  Message: "Multiple SSTYP records: the Trial Summary (TS) domain must contain only\
+    \ one record for the 'SSTYP' (Study Type) parameter."
+  Output_Variables:
+  - "$sstyp_count"
+Source:
+  FDA_Validator_Rule_Message: "Multiple SSTYP records"
+  FDA_Validator_Rule_Description: "Trial Summary (TS) domain must contain only one\
+    \ record for the 'SSTYP' parameter."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2274"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2274"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2274"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2274"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

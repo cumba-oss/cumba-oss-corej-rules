@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1121 expect=violation domain=DM
+#note "AGETXT column is absent (it is a model-level, not IG, DM variable): the bare empty(AGETXT) leaf is TRUE on every row of the absent column (absent = all-missing, EC-43), so row 1 with AGE missing and assigned ARMCD fires. (Plan B phase 4d' deleted the redundant not var_exists(AGETXT) disjunct this note used to name; the verdict is unchanged.) Row 2: AGE populated -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | .  | A1
+S1 | DM | 002 | 42 | A1

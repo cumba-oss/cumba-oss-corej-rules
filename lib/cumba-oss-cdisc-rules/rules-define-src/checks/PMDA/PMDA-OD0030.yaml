@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-OD0030"
+Sheet_Rule_Identifier: "OD0030"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The OID attribute for ItemGroupDef element must be unique within a single MetaDataVersion."
+# ItemGroupDef elements are direct MetaDataVersion children, so the per-parent
+# sibling scope IS the sheet's per-MDV scope.
+Message: "Duplicate ItemGroupDef OID [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OID"

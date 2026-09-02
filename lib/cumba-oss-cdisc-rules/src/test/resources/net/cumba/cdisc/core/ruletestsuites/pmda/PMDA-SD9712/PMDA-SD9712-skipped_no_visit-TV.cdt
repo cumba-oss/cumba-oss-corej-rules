@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD9712 expect=skipped domain=TV
+# Rule:Description: PMDA-SD9712 — the Required key VISIT is not populated.
+#note "VISIT is absent from TV, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(VISIT) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sdtmig version=3-4
+dataset TV
+col STUDYID type=Char
+col DOMAIN type=Char
+col VISITNUM type=Char
+col ARMCD type=Char
+---
+S1      | TV     | 1        | A
+---

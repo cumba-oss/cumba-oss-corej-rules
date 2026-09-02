@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0238B expect=violation domain=ADLBC
+#note "Label POOLA carries both 1 and 3; 1 is the strict majority so row 3 alone fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTPG1=POOLA TRTPG1N=3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTPG1 type=Char
+col TRTPG1N type=Num
+---
+S1 | 001 | SYSBP | POOLA | 1
+S1 | 002 | SYSBP | POOLA | 1
+S1 | 003 | SYSBP | POOLA | 3
+S1 | 004 | SYSBP | POOLB | 2
+S1 | 005 | SYSBP | POOLB | 2

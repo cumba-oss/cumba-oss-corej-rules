@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0161"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Category for Result (CLRESCAT) duplicates the value\
+  \ of Clinical Observation Test Name (CLTEST) or Subcategory for Clinical Observation\
+  \ (CLSCAT) in the same record; CLRESCAT is for post-collection categorization and\
+  \ must not repeat a collection-time category."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CL"
+Requirements:
+  Variables:
+    All:
+    - "CLRESCAT"
+Check:
+  expression: >-
+    not empty(CLRESCAT) and (var_exists("CLTEST") and CLRESCAT == CLTEST or var_exists("CLSCAT") and
+    CLRESCAT == CLSCAT)
+Outcome:
+  Message: "CLRESCAT duplicates CLTEST or CLSCAT; CLRESCAT must not be a duplication\
+    \ of a collection-time category."
+  Output_Variables:
+  - "CLRESCAT"
+  - "CLTEST"
+  - "CLSCAT"
+Source:
+  Class: "FND"
+  Domain: "CL"
+  Variable: "CLRESCAT"
+  Plain_Text_Explanation: "CLRESCAT is used for post collection categorization of\
+    \ results and should not be a duplication of CLTEST or CLSCAT which are considered\
+    \ categories at the time of collection."
+  Rule: "CLRESCAT ^= CLTEST AND CLRESCAT ^= CLSCAT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND161"
+        Version: "1"
+      Version: "5.0"

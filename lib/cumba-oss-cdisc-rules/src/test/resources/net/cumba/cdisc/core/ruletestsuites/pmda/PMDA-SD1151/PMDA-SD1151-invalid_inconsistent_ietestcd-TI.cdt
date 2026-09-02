@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1151 expect=violation domain=TI
+#note "One criterion TEXT carries two different short names within the same TIVERS - a tie, so both rows fire."
+#expectViolationCount 2
+#expectViolationAt row=1 IETESTCD=INCL01 IETEST="Age 18 years or older" TIVERS=1
+#expectViolationAt row=2 IETESTCD=INCL02 IETEST="Age 18 years or older" TIVERS=1
+#library standard=sdtmig version=3-4
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+col TIVERS   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older | 1
+S1 | TI | INCL02 | Age 18 years or older | 1
+S1 | TI | EXCL01 | Pregnant or nursing   | 1

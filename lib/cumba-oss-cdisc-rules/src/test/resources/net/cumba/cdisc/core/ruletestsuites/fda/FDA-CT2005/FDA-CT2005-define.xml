@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.CT2005" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="FDA-CT2005 value-level codelist fixture" DefineVersion="2.1.0"
+                     StandardName="SDTM-IG" StandardVersion="3.4">
+
+      <ItemGroupDef OID="IG.LB" Name="LB" Domain="LB" Repeating="Yes" Purpose="Tabulation"
+                    SASDatasetName="LB">
+        <ItemRef ItemOID="IT.LB.LBTESTCD" OrderNumber="1" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.LB.LBSTRESC" OrderNumber="2" Mandatory="No" Role="Result Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.LB.LBTESTCD" Name="LBTESTCD" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Lab Test Code</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC" Name="LBSTRESC" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Character Result/Finding in Std Format</TranslatedText></Description>
+        <def:ValueListRef ValueListOID="VL.LB.LBSTRESC"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBSTRESC.PH" Name="LBSTRESC_PH" DataType="text" Length="10">
+        <Description><TranslatedText xml:lang="en">Urine pH category</TranslatedText></Description>
+        <CodeListRef CodeListOID="CL.PHCAT"/>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.LB.LBSTRESC">
+        <ItemRef ItemOID="IT.LB.LBSTRESC.PH" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.LB.PH"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.LB.PH">
+        <RangeCheck Comparator="EQ" SoftHard="Soft" def:ItemOID="IT.LB.LBTESTCD">
+          <CheckValue>PH</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+
+      <CodeList OID="CL.PHCAT" Name="Urine pH Category" DataType="text">
+        <CodeListItem CodedValue="ACID">
+          <Decode><TranslatedText xml:lang="en">Acidic</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="NEUTRAL">
+          <Decode><TranslatedText xml:lang="en">Neutral</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="ALKALINE">
+          <Decode><TranslatedText xml:lang="en">Alkaline</TranslatedText></Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C99901"/>
+      </CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>

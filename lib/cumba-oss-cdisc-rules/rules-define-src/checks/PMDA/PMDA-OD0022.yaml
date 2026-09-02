@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-OD0022"
+Sheet_Rule_Identifier: "OD0022"
+Rule_Set: "PMDA"
+Element: "Study"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Reject"
+Plain_Text_Rule: "The OID attribute for Study element must be unique within a related series of ODM documents."
+# A single-document validator can only check the series member it sees: two Study
+# elements with one OID inside one Define.xml is the in-document projection of the
+# sheet's series-wide requirement.
+Message: "Duplicate Study OID [${value}]"
+Check:
+  kind: "unique_in_document"
+  attribute: "OID"

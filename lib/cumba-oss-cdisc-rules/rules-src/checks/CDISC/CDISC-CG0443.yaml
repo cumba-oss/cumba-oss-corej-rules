@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0443"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Value Code (TSVALCD) for a 'CURTRT'\
+  \ trial-summary parameter is not a valid Unique Ingredient Identifier (UNII) in\
+  \ the FDA Substance Registration System (SRS)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$unii_valid"
+  expression: "valid_external_dictionary_code(TSVALCD, external_dictionary_type=\"\
+    unii\", dictionary_term_type=\"UNII\")"
+Check:
+  expression: >-
+    TSPARMCD == "CURTRT" and $unii_valid == false
+Outcome:
+  Message: "TSVALCD is not a valid FDA-SRS Unique Ingredient Identifier (UNII) for\
+    \ the 'CURTRT' parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVALCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALCD"
+  Condition: "TSPARMCD = 'CURTRT'"
+  Rule: "TSVALCD is a valid unique ingredient identifier from FDA Substance Registration\
+    \ System (SRS)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0443"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0443"
+        Version: "1"
+      Version: "2.0"

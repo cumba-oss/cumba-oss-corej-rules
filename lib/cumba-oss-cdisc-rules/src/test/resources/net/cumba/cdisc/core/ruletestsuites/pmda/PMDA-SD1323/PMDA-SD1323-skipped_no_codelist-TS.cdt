@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1323 expect=skipped domain=TS
+#note "CORPUS-WIDE PIN of the CODELIST_TERMS empty->skip channel: with no '#library codelist-terms COUNTRY ...' declared, the resolved term list is empty, OperationExecutor yields LIBRARY_NOT_AVAILABLE and the rule SKIPs (mirrors Python's MissingDataError) - otherwise 'TSVAL not in $country_terms' would flag every populated FCNTRY row. Uses the invalid body's TS dataset (FCNTRY/Germany present) so the fixture is discriminating."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | FCNTRY  | Germany
+S1 | TS | 2 | FCNTRY  | USA
+S1 | TS | 3 | FCNTRY  |
+S1 | TS | 1 | SPONSOR | ACME PHARMA

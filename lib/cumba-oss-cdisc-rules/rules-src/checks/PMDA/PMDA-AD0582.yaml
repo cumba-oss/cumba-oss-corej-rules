@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-AD0582"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a record where Change to Baseline (BCHG), Baseline\
+  \ Value (BASE) and Analysis Value (AVAL) are all populated, BCHG does not equal\
+  \ BASE minus AVAL. Records on which any of the three values is missing are not evaluated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    BCHG != (BASE - AVAL)
+Outcome:
+  Message: "BCHG does not equal BASE minus AVAL."
+  Output_Variables:
+  - "AVAL"
+  - "BASE"
+  - "BCHG"
+Source:
+  Message: "Calculation issue: BCHG != BASE - AVAL"
+  Description: "When all 3 variables are populated, Change to Baseline (BCHG) must\
+    \ equal Baseline Value (BASE) minus Analysis Value (AVAL)."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0582"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0582"
+        Version: "1"
+      Version: "6.0"

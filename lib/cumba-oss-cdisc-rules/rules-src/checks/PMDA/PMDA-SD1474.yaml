@@ -1,0 +1,39 @@
+Core:
+  Id: "PMDA-SD1474"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable name does not conform to SAS Transport\
+  \ (XPORT) format v5 limitations: it exceeds 8 characters, contains characters other\
+  \ than uppercase letters, numbers, or underscores, or starts with a number."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not is_valid_name(varname())
+Outcome:
+  Message: "Variable name does not conform to SAS XPORT v5 limitations (maximum 8\
+    \ characters; only uppercase letters, numbers, and underscores; must not start\
+    \ with a number)."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Invalid value for Variable Name"
+  Description: "Variable Name should follow limitations of SAS XPORT format v5. It\
+    \ should not exceed 8 characters and cannot contain characters other than letters\
+    \ in upper case, numbers, or underscores. It cannot start with a number."
+  Domains: "ALL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1474"
+        Version: "1"
+      Version: "6.0"

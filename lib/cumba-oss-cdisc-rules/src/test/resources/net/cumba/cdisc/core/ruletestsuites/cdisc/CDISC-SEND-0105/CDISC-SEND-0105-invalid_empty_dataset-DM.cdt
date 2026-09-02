@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0105 expect=violation domain=DM
+#note "ZERO-ROW DM: the dataset line and all seven col lines are declared and no data row follows. The Check is `$species_null == true and empty($ts_species)`, which RulePackageLoader.isBroadcastVerdictExpr accepts, so the fold happens BEFORE the row path and before the 0-row synthetic-table substitution and one violation is reported at row 1; evalVariableIsNull over a declared-but-empty column loops zero times and returns TRUE. ESCALATE if this reports 0 -- that would mean the load-time broadcast flag is not being stamped. *** version=3-0 is LOAD-BEARING. M3-D8 restricted this rule's Standards block to the single (SENDIG, 3.0) entry the sheet supports -- row 520 is SEND105's ONLY row -- so from v3.1 onward only the .1 successor ships. A scenario declaring any other package is now a hard membership red, which is why all five declare 3-0. ***"
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+col STRAIN  type=Char label="Strain/Substrain"
+---
+---
+
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | STCAT  | Study Category | CHRONIC TOX
+S1 | TS | 2 | STRAIN | Strain         | SPRAGUE-DAWLEY
+---

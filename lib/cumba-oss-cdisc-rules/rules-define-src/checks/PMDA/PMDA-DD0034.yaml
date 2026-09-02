@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0034"
+Sheet_Rule_Identifier: "DD0034"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem/Alias"
+Attribute: "Name"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "ct"
+Plain_Text_Rule: "NCI Code for Codelist Term must exist in CDISC Controlled Terminology. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element. NCI Code is represented as Name attribute on Alias element when Context attribute is \"nci:ExtCodeID\"."
+# CT-gated (P5), EnumeratedItem leg (-B: CodeListItem): the item-level
+# nci:ExtCodeID alias c-code must be among the term c-codes of the CT codelist
+# resolved via the enclosing CodeList's own alias (a term c-code is only
+# verifiable within its codelist through the CtProvider SPI); an unresolvable
+# enclosing codelist produces no finding.
+Message: "Unknown NCI Code value ${value} for Term in Codelist"
+Check:
+  kind: "nci_code_known"
+  level: "term"

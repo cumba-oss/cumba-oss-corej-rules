@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2278 expect=noViolation domain=PC
+#note "Rows 1-2: the below-limit results ('BLQ' and 'BQL') both carry PCLLOQ. Row 3: a quantified result needs no PCLLOQ."
+#library standard=sendig version=3-1-1
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Standardized Result in Character Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSPEC   type=Char label="Specimen Material Type"
+---
+STUDY01 | PC | STUDY01-001 | 1 | DRUGX | BLQ | . | 0.5 | PLASMA
+STUDY01 | PC | STUDY01-001 | 2 | DRUGX | BQL | . | 0.5 | PLASMA
+STUDY01 | PC | STUDY01-002 | 1 | DRUGX | 1.2 | 1.2 | .  | PLASMA

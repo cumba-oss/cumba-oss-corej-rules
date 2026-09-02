@@ -1,0 +1,61 @@
+Core:
+  Id: "PMDA-AD0366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Randomized Population Flag (RANDFL) variable\
+  \ is present in the dataset but the Date of Randomization (RANDDT) variable is not\
+  \ present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("RANDFL") and not var_exists("RANDDT")
+Outcome:
+  Message: "RANDDT variable is not present when the RANDFL variable is present"
+  Output_Variables:
+  - "RANDFL"
+Source:
+  Message: "Missing RANDDT variable when RANDFL variable is present"
+  Description: "Date of Randomization (RANDDT) variable should be included into dataset\
+    \ when Randomized Population Flag (RANDFL) variable is present."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0134A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Ratio to Analysis Range y Upper Limit (R2AyHI) is\
+  \ present in the dataset but Analysis Value (AVAL) and/or Analysis Range y Upper\
+  \ Limit (AyHI) is not present. Because R2AyHI equals AVAL divided by AyHI, both\
+  \ AVAL and AyHI must be present for calculation consistency."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("R2AyHI") and (not var_exists("AVAL") or not var_exists("AyHI"))
+Outcome:
+  Message: "R2AyHI is present, but AVAL and/or AyHI is not present."
+  Output_Variables:
+  - "R2AyHI"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Calculation issue: R2AyHI is present, but AVAL and/or AyHI is not present"
+  Description: "R2AyHI = AVAL / AyHI. Therefore, if R2AyHI is present, both AVAL and\
+    \ AyHI must be present for calculation consistency."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134A"
+        Version: "1"
+      Version: "6.0"

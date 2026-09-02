@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD2245 expect=noViolation domain=TS
+#note "Sheet: 'TSVAL must be in ISO 8601 format, when TSPARMCD=DCUTDTC'. Row 1 is a complete ISO date, row 2 a partial (year-month) ISO date -- both valid ISO 8601. Row 3 carries a non-ISO value under a different parameter (SSTDTC), so it is out of this rule's condition."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | DCUTDTC | Data Cutoff Date  | 2020-06-30
+CDISCPILOT01 | TS | 2 | DCUTDTC | Data Cutoff Date  | 2021-06
+CDISCPILOT01 | TS | 1 | SSTDTC  | Study Start Date  | 30JUN2020

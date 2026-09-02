@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0105 expect=noViolation domain=ADLBC
+#note "APERIOD (the grouping key) absent. Requirements.Variables.All [APERIODC] names the TARGET, which is present -> rule EXECUTES. Silenced TWICE OVER: var_exists(APERIOD) is false AND not empty(APERIOD) is broadcast false. The batch's INERT presence-guard pin - the contrast against PMDA-AD0096/PMDA-AD0106 where the presence call is the only guard."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col APERIODC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | PERIOD1
+CDISCPILOT01 | 01-701-1023 | GLUC | PERIOD1
+CDISCPILOT01 | 01-701-1034 | GLUC | PERIODONE

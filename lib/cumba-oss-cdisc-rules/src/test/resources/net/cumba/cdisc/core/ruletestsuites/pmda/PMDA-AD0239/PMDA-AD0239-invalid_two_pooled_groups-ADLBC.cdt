@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0239 expect=violation domain=ADLBC
+#note "Expansion-arithmetic pin. Two pool indices (TRTPG1, TRTPG2) seed two expansions, each missing its TRTAGy -> aggregated total 2 violations, both at reported row 1; one #expectViolationAt line per violation."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 TRTA=DRUGA TRTPG1=POOL1
+#expectViolationAt row=1 TRTA=DRUGA TRTPG2=POOL2
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+col TRTPG1  type=Char
+col TRTPG2  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA | POOL1 | POOL2

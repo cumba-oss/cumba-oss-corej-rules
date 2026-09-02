@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2232 expect=violation domain=TS
+#note "FRESH, DISCRIMINATING - dataset TS with the same 6 columns and ZERO data rows. record_count's EmptyResult is COUNT: a 0-row input yields 0, never missing; the broadcast fold sits above the synthetic-row branch and emits ONE violation at reported row=1. An empty TS genuinely lacks the SSTDTC parameter. If anything else comes back, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+---

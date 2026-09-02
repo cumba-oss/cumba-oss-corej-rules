@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=violation domain=PC
+#note "The two rows differ ONLY in the PCSTRESN cell, which is what makes this a clean discriminator: a stored numeric ZERO is not empty and fires, while a genuinely missing value does not. That is the sheet's own point -- 'PCSTRESN should be null and not populated with the value of zero (0)'."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSEQ=1 PCSTRESC=BLQ
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSTRESC type=Char label="Character Result/Finding in Std Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Std Units"
+---
+S1 | PC | S1-001 | 1 | DRUGX | 0.02 | 0.1 | BLQ | 0
+S1 | PC | S1-002 | 2 | DRUGX | 0.02 | 0.1 | BLQ | .
+---

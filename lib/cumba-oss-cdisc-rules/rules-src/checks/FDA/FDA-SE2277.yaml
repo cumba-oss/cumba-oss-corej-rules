@@ -1,0 +1,68 @@
+Core:
+  Id: "FDA-SE2277"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error for each variable whose declared length exceeds 200 characters,\
+  \ the SAS Version 5 XPORT transport-file limit."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_length("DATA") > 200
+Outcome:
+  Message: "A variable has a declared length greater than 200 characters."
+  Output_Variables:
+  - "variable_name"
+Source:
+  FDA_Validator_Rule_Message: "Variable length exceeds 200 characters"
+  FDA_Validator_Rule_Description: "Due to SAS v5 transport file limitations, variables\
+    \ cannot have a length that is greater than 200 characters.  For SEND data, this\
+    \ results in loading errors into regulatory nonclinical review tools. The SENDIG\
+    \ should be followed in how to split long character strings appropriately."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2277"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2277"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2277"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2277"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2277"
+        Version: "1"
+      Version: "1.6"

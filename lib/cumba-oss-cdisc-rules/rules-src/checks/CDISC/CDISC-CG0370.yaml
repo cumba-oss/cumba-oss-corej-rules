@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0370"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Identifying Variable (IDVAR) is populated but does\
+  \ not represent a variable present in the dataset referenced by RDOMAIN."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+Requirements:
+  Variables:
+    All:
+    - "IDVAR"
+Operations:
+- id: "$rdomain_variables"
+  expression: "distinct(IDVAR, value_is_reference=true)"
+Check:
+  expression: >-
+    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables
+Outcome:
+  Message: "IDVAR does not represent a variable present in the dataset referenced\
+    \ by RDOMAIN."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "$rdomain_variables"
+Source:
+  Class: "SPC"
+  Domain: "CO,  SUPP--, RELREC"
+  Variable: "IDVAR"
+  Condition: "IDVAR ^= null"
+  Rule: "IDVAR is variable in domain = RDOMAIN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0370"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0370"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0370"
+        Version: "1"
+      Version: "2.0"

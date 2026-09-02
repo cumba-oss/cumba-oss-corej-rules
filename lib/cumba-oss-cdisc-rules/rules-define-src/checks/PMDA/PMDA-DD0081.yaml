@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0081"
+Sheet_Rule_Identifier: "DD0081"
+Rule_Set: "PMDA"
+Element: "ValueListDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Value Level metadata that are referenced from a Variable should be included in Define.xml. Define-XML specification represents Value Level metadata as def:ValueListDef elements within MetaDataVersion element."
+# def:ValueListRef (a child of ItemDef) is the only legal reference vehicle.
+Message: "Value Level metadata ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - element: "ValueListRef"
+    attribute: "ValueListOID"

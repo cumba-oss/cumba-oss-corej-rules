@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0282 expect=skipped domain=PP
+#note "Requirements.Variables.All is the literal [PPSPEC] and the column is not declared, so ScopeMatcher rejects the dataset and the rule is NOT EXECUTED. Untouched by M3-D7. Note the rule does not ship in rules-cdisc-sendig-3-0.json (its sheet rows start at SENDIG v3.1, Release Notes 'Replaces SEND Rule 197'), so version=3-1-1 is load-bearing on all four of its scenarios."
+#library standard=sendig version=3-1-1
+#library codelist-terms SPEC SERUM URINE PLASMA "WHOLE BLOOD"
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+---
+S1 | PP | 001 | 1 | CLR
+S1 | PP | 002 | 2 | AUCALL
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1215 expect=noViolation domain=TS
+#note "FRESH, DISCRIMINATING. No class= (the twins declare none and Scope carries no Classes axis). Zero data rows. Predicted SILENT (RECORD-sensitivity value-based; BroadcastFold declines because TSPARMCD == \"AGEMAX\" is a row leaf, so the derived var_exists(\"TSPARMCD\") never decides the whole expression on its own). Escalate on a fire."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---

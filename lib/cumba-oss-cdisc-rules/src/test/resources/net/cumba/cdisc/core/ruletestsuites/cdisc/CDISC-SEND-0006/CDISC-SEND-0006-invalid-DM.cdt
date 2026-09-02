@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0006 expect=violation domain=DM
+#note "Only AGEU's label mismatches; STUDYID/USUBJID are not in the define (excluded by the applicability term); SEX label agrees."
+#library standard=sendig version=3-1-1
+#define variable-metadata DM AGEU name=AGEU label="Age Unit"
+#define variable-metadata DM SEX  name=SEX  label="Sex"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGEU
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGEU    type=Char label="Units of Age"
+col SEX     type=Char label="Sex"
+---
+S1 | S1-001 | WEEKS | M

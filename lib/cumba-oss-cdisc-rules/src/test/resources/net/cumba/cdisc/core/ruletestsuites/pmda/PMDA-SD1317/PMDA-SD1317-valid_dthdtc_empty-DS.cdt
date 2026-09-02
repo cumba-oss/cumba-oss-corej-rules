@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1317 expect=noViolation domain=DS
+#note "Regression pin for the T5 guard fix: the DM.DTHDTC non_empty guard keeps date_not_equal_to from firing against an empty death date."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | DEATH | 2020-05-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 |
+---

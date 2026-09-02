@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD1397 expect=skipped domain=CM
+#note "Absent-vs-empty boundary: the CMCHSTDY column is absent from the dataset altogether, so Requirements.Variables.All gates the rule to a SKIP -> no violation (parity with the Python KeyError-skip)."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTDTC  type=Char label="Start Date/Time of Medication"
+---
+S1 | CM | 001 | 1 | SALINE | 2020-01-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2020-01-05
+---

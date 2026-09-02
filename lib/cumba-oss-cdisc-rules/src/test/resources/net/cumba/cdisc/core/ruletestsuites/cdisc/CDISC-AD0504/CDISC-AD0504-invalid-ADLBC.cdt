@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0504 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in TM must contain "Time" in the label
+#note "ATM label "Analysis Foo" lacks "Time" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Foo" variable_name=ATM
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATM type=Char label="Analysis Foo"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

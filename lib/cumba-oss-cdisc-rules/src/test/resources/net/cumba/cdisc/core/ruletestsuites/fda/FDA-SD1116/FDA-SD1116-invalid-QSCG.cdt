@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1116 expect=violation domain=QSCG
+#note "Split family QS (QSCG + QSFT, both DOMAIN=QS): QSCAT is declared length=10 in QSCG but length=20 in QSFT -> length mismatch fires on QSCAT; all other shared variables have uniform lengths."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=QSCAT
+dataset QSCG label="Questionnaires CG"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=20 label="Unique Subject Identifier"
+col QSSEQ    type=Num  length=8  label="Sequence Number"
+col QSTESTCD type=Char length=8  label="Question Short Name"
+col QSCAT    type=Char length=10 label="Category of Question"
+col QSORRES  type=Char length=40 label="Finding in Original Units"
+---
+S1 | QS | 001 | 1 | CGI01 | CGI | 3
+---
+
+dataset QSFT label="Questionnaires FT"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=20 label="Unique Subject Identifier"
+col QSSEQ    type=Num  length=8  label="Sequence Number"
+col QSTESTCD type=Char length=8  label="Question Short Name"
+col QSCAT    type=Char length=20 label="Category of Question"
+col QSORRES  type=Char length=40 label="Finding in Original Units"
+---
+S1 | QS | 001 | 1 | FT01 | FUNCTIONAL TEST | 5

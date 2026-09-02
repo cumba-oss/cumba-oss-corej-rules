@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2020 expect=skipped domain=DM
+#note "DM deliberately carries no AGETXT column. Requirements.Variables.All is [AGETXT]; the column is absent, so the rule SKIPS. AGETXT is not an SDTMIG DM variable at all, so this is the SDTMIG-conformant, normal shape (SD2020-F1), not a corner case -- do not soften to noViolation."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+---
+S1 | DM | 001 | 45 | YEARS
+S1 | DM | 002 | 52 | YEARS

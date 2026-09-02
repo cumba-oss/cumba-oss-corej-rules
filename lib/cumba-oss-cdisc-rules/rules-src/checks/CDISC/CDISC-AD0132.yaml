@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-AD0132"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when AVAL, BASE, and R2BASE are all populated, BASE does\
+  \ not equal 0, and R2BASE does not equal AVAL divided by BASE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "R2BASE"
+    - "BASE"
+    - "AVAL"
+Check:
+  expression: >-
+    not empty(AVAL) and not empty(BASE) and BASE != 0 and not empty(R2BASE) and R2BASE != (AVAL /
+    BASE)
+Outcome:
+  Message: "R2BASE does not equal AVAL divided by BASE."
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "BASE"
+  - "R2BASE"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "R2BASE"
+  Natural_Language_Rule_Failure_Criteria: "R2BASE is not equal to AVAL divided by\
+    \ BASE"
+  Rule_Failure_Criteria: "R2BASE is not equal to AVAL divided by BASE"
+  Condition_Failure: "AVAL and BASE are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR132"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR132"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR132"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR132"
+        Version: "2"
+      Version: "5.0"

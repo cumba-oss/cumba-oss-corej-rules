@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0363"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Completion Status (ICSTAT) is 'NOT DONE' but Implantation\
+  \ Site Label (ICIMPLBL) is not the artificial label 'ALL'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "IC"
+Requirements:
+  Variables:
+    All:
+    - "ICSTAT"
+    - "ICIMPLBL"
+Check:
+  expression: >-
+    ICSTAT == "NOT DONE" and ICIMPLBL != "ALL"
+Outcome:
+  Message: "ICIMPLBL is not 'ALL' for a record where ICSTAT is 'NOT DONE'."
+  Output_Variables:
+  - "ICSTAT"
+  - "ICIMPLBL"
+Source:
+  Class: "FND"
+  Domain: "IC"
+  Variable: "ICIMPLBL"
+  Plain_Text_Explanation: "When implantion results were not evaluated for a subject\
+    \ per protocol, the artificial label, ALL, is used to represent missing results.\
+    \ ICIMPLBL is required."
+  Condition: "A single record exists for a subject in IC AND  ICSTAT = \"NOT DONE\""
+  Rule: "ICIMPLBL = \"ALL\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND363"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND363"
+        Version: "1"
+      Version: "5.0"

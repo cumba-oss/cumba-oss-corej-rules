@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1254 expect=violation domain=DM
+#note "FRESH (join FAN-OUT multiplicity pin, DISCRIMINATING - KeyMatchRowExpander builds one expanded row per (primary, matched child) pair). DM one row 001|DTHFL=N; AE TWO rows for 001, both AEOUT=FATAL. Both expanded rows satisfy the Check -> predicted count 2, both mapping to primary row 1. COUNT-ONLY pin, deliberately NO #expectViolationAt lines (duplicate-location exact-set behaviour is unverified). If it reports 1, that is a finding-dedup/first-match discovery: escalate, never edit."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | N
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+S1 | AE | 001 | 1 | CARDIAC ARREST | FATAL
+S1 | AE | 001 | 2 | SEPTIC SHOCK   | FATAL
+---

@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-SEND-0253"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a RELREC record whose IDVAR is a --SPID variable\
+  \ and whose IDVARVAL is empty does not populate RELTYPE with 'ONE' or 'MANY'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELREC"
+Requirements:
+  Variables:
+    All:
+    - "RELTYPE"
+Check:
+  expression: >-
+    suffix(IDVAR, 4) == "SPID" and empty(IDVARVAL) and RELTYPE not in ["ONE", "MANY"]
+Outcome:
+  Message: "RELTYPE is not 'ONE' or 'MANY' for a RELREC record whose IDVAR is a --SPID\
+    \ variable and whose IDVARVAL is empty."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+  - "RELTYPE"
+Source:
+  Class: "REL"
+  Domain: "RELREC"
+  Variable: "RELTYPE, IDVAR, IDVARVAL"
+  Plain_Text_Explanation: "RELTYPE is used if IDVAR is --SPID and IDVARVAL is not\
+    \ populated."
+  Condition: "IDVAR = --SPID AND IDVARVAL = null"
+  Rule: "RELTYPE = \"ONE\" OR RELTYPE = \"MANY\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND253"
+        Version: "1"
+      Version: "5.0"

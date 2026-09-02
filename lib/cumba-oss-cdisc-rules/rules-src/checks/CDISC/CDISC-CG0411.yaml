@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0411"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of RDOMAIN, IDVAR, IDVARVAL, and\
+  \ QNAM is not unique for a parent subject record in a Supplemental Qualifiers (SUPP--)\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Check:
+  expression: >-
+    RDOMAIN == "DM" and not is_unique_set([USUBJID, RDOMAIN, QNAM]) or RDOMAIN != "DM" and not
+    is_unique_set([USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM])
+Outcome:
+  Message: "RDOMAIN, IDVAR, IDVARVAL, and QNAM are not a unique combination for the\
+    \ parent subject record."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "QNAM"
+Source:
+  Class: "ALL"
+  Domain: "SUPP--"
+  Variable: "GEN"
+  Rule: "IDVAR, IDVARVAL, and QNAM a unique combination per parent subject record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0411"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0411"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0411"
+        Version: "1"
+      Version: "2.0"

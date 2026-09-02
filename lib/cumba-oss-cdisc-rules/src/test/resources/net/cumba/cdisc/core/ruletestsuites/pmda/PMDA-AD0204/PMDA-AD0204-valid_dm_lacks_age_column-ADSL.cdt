@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0204 expect=noViolation domain=ADSL
+#note "DM block WITHOUT the AGE column. var_exists(DM.AGE) resolves against DM's schema -> false -> no fire WITH execution. FAMILY guard pin (authored dotted guard is load-bearing); not mirrored on AD0205-0207."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 99
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015

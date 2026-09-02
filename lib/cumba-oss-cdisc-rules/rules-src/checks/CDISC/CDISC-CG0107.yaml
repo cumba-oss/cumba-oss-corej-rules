@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0107"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the EC domain is present and Treatment Vehicle Amount\
+  \ Units (EXVAMTU) is present in the EX dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Datasets:
+  - "EC"
+Operations:
+- id: "$exvamtu_exists"
+  expression: "variable_exists(EXVAMTU)"
+Check:
+  expression: >-
+    $exvamtu_exists == true
+Outcome:
+  Message: "EXVAMTU is present in the EX dataset when the EC domain is present."
+  Output_Variables:
+  - "$exvamtu_exists"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "EXVAMTU"
+  Condition: "EC domain is present"
+  Rule: "EXVAMTU not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0107"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0107"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0107"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1254 expect=violation domain=DM
+#note "ADAPTED-FROM fda/FDA-SD1254/FDA-SD1254-invalid-DM.cdt (verbatim; same body as the CG0134 adaptation). Subject 001: AE has AEOUT=FATAL but DM.DTHFL=N -> fires. Subject 002: FATAL with DTHFL=Y -> ok. Subject 003: AEOUT=RECOVERED/RESOLVED, DTHFL=N -> ok."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | N
+S1 | DM | 002 | Y
+S1 | DM | 003 | N
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+S1 | AE | 001 | 1 | CARDIAC ARREST | FATAL
+S1 | AE | 002 | 1 | STROKE         | FATAL
+S1 | AE | 003 | 1 | HEADACHE       | RECOVERED/RESOLVED
+---

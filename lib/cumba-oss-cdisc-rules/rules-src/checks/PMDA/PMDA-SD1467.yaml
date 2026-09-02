@@ -1,0 +1,54 @@
+Core:
+  Id: "PMDA-SD1467"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Occurrence Indicator (--OCCUR) is populated\
+  \ for a spontaneously reported event (--PRESP is empty) or for a prespecified event\
+  \ that has no response (--STAT is 'NOT DONE'). --OCCUR should not be used in these\
+  \ cases. See SDTMIG 3.4 section 4.5.7."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "EX"
+    - "AE"
+    - "DS"
+    - "DV"
+Requirements:
+  Variables:
+    All:
+    - "--OCCUR"
+Check:
+  expression: >-
+    not empty(--OCCUR) and (var_exists("--PRESP") and empty(--PRESP) or var_exists("--STAT") and
+    --STAT == "NOT DONE")
+Outcome:
+  Message: "--OCCUR is populated when --PRESP is empty or --STAT is 'NOT DONE'."
+  Output_Variables:
+  - "--PRESP"
+  - "--OCCUR"
+  - "--STAT"
+Source:
+  Message: "--OCCUR is populated when --PRESP is null or --STAT is 'NOT DONE'"
+  Description: "Occurrence Indicator (--OCCUR) variable should not be used in cases\
+    \ of spontaneously reported event occurred (--PRESP=null) and prespecified event\
+    \ which has no response (--PRESP='Y' and --STAT='NOT DONE').  See SDTMIG 3.4 section\
+    \ 4.5.7 for details."
+  Domains: "INTERVENTIONS (-EX), EVENTS (-AE, -DS, -DV)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1467"
+        Version: "1"
+      Version: "6.0"

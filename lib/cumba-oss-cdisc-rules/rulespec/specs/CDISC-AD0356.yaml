@@ -1,0 +1,51 @@
+name: CDISC-AD0356
+kind: check_operator
+description: |
+  EC-1 (has_multiple_values_for excludes empty key/dependent), modelled on
+  CDISC-AD0356 (reverse of AD0355: more than one REGIONyN for a given REGIONy).
+  Concrete instance REGION1/REGION1N. KEY = REGION1 (the `value:` operand),
+  DEPENDENT = REGION1N (the `name:` operand). REGION1='Asia' maps to two distinct
+  REGION1N {1,2} → both rows fire. REGION1='Europe' would look multi-valued only
+  via a blank-REGION1N row — post-EC-1 that row is excluded, so the populated
+  'Europe' row does NOT fire. The blank-key row is excluded too. Both engines
+  agree (parity spec, no baseline entry). Rendered as a check_operator spec
+  because the Python lane does not expand the REGIONy wildcard in the full rule.
+python_notes: |
+  Both lanes exclude empty key/dependent rows and flag the two REGION1='Asia' rows.
+python_source: rules-adamig-1-3.json (CDISC-AD0356), EC-1
+check:
+  name: REGION1N
+  operator: has_multiple_values_for
+  value: REGION1
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', REGION1: Asia, REGION1N: '1'}       # key Asia -> {1,2} fires
+    - {STUDYID: S1, USUBJID: '002', REGION1: Asia, REGION1N: '2'}       # key Asia multiple fires
+    - {STUDYID: S1, USUBJID: '003', REGION1: Europe, REGION1N: '3'}     # key Europe single, no fire
+    - {STUDYID: S1, USUBJID: '004', REGION1: Europe, REGION1N: ''}      # blank dependent excluded
+    - {STUDYID: S1, USUBJID: '005', REGION1: '', REGION1N: '4'}         # blank key excluded
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-CDISC-AD0356
+  dataset: ADSL
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    REGION1: Asia
+    REGION1N: '1'
+    STUDYID: S1
+    USUBJID: '001'
+- rule_id: AUTO-CDISC-AD0356
+  dataset: ADSL
+  row_key: {STUDYID: S1, USUBJID: '002'}
+  status: SUCCESS
+  output_variables:
+    REGION1: Asia
+    REGION1N: '2'
+    STUDYID: S1
+    USUBJID: '002'
+expected_errors: []

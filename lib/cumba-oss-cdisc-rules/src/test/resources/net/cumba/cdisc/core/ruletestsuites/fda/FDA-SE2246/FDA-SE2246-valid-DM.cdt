@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SE2246 expect=noViolation domain=DM
+#note "The Trial Repro Stages (TT) dataset is present in the study inventory alongside DM -> no violation."
+#library standard=sendig-dart version=1-1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SETCD   type=Char label="Set Code"
+---
+STUDY01 | DM | STUDY01-001 | 001 | SET1
+---
+
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Repro Stage"
+col TTSTRL  type=Char label="Planned Start Rel Repro Stage Ref Point"
+---
+STUDY01 | TT | GD0 | Gestation Day 0 | P0D
+---

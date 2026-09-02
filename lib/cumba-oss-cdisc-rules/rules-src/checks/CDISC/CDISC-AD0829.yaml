@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-AD0829"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when FLGREASC is present and FLGREAS is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("FLGREASC") and not var_exists("FLGREAS")
+Outcome:
+  Message: "FLGREASC is present, but FLGREAS is not present."
+  Output_Variables:
+  - "FLGREASC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "FLGREASC"
+  Natural_Language_Rule_Failure_Criteria: "FLGREASC is present and FLGREAS is not\
+    \ present"
+  Rule_Failure_Criteria: "FLGREAS is not present"
+  Condition_Failure: "FLGREASC is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR829"
+        Version: "1"
+      Version: "5.0"

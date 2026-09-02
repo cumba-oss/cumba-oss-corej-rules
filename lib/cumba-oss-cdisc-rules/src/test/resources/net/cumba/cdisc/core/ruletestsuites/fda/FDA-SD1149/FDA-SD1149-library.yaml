@@ -1,0 +1,27 @@
+# Production-faithful synthetic metadata for FDA-SD1149.
+#
+# The CDISC *IG* dataset variables carry the core (Req/Exp/Perm) attribute; the
+# SDTM *model* class variables do NOT (verified: zero `core` keys across every
+# api_mdr_sdtm_* model version in /data/cdisc.metadata.library-cache). The rule's
+# `get_model_filtered_variables key_name=core key_value=Exp` therefore resolves
+# against metadata that never carries core=Exp, so $expected_variables is always
+# empty in production. This sidecar models both sides faithfully so the scenario
+# encodes the intended behaviour and fails (red) under the mis-authored rule.
+standard: sdtmig
+version: "3-4"
+domains:
+  AE:
+    variables:
+      - { name: STUDYID, role: Identifier, core: Req }
+      - { name: DOMAIN,  role: Identifier, core: Req }
+      - { name: USUBJID, role: Identifier, core: Req }
+      - { name: AESEQ,   role: Identifier, core: Req }
+      - { name: AETERM,  role: Topic, core: Req }
+      - { name: AESER,   role: "Record Qualifier", core: Exp }
+    model-variables:
+      - { name: STUDYID, role: Identifier }
+      - { name: DOMAIN,  role: Identifier }
+      - { name: USUBJID, role: Identifier }
+      - { name: "--SEQ",  role: Identifier }
+      - { name: "--TERM", role: Topic }
+      - { name: "--SER",  role: "Record Qualifier" }

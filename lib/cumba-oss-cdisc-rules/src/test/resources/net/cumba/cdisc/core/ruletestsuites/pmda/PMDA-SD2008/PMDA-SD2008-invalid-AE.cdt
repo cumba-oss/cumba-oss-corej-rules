@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2008 expect=violation domain=AE
+#note "AELLT 'Cephalgia' is not a Lowest Level Term of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid LLT."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AELLT=Cephalgia
+dataset AE
+col USUBJID type=Char
+col AELLT   type=Char
+---
+001 | Headache
+001 | Cephalgia

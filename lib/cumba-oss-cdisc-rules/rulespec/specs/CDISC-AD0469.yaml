@@ -1,0 +1,40 @@
+name: CDISC-AD0469
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0469: There is more than one value of STRATARN for a given value of STRATAR.
+  Bare-leaf Check (`has_multiple_values_for`) scoped to SUBJECT LEVEL ANALYSIS DATASET.
+  Two rows share the same STRATAR value but distinct STRATARN; both fire. A third row is unique and does not fire.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0469)
+rule:
+  coreId: CDISC-AD0469
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', STRATARN: 'X', STRATAR: 'A'}   # bad
+      - {STUDYID: S1, USUBJID: '002', STRATARN: 'Y', STRATAR: 'A'}   # bad (distinct STRATARN for same STRATAR)
+      - {STUDYID: S1, USUBJID: '003', STRATARN: 'Z', STRATAR: 'B'}   # ok
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0469
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      STRATARN: 'X'
+      STRATAR: 'A'
+  - rule_id: CDISC-AD0469
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      STRATARN: 'Y'
+      STRATAR: 'A'
+expected_errors: []

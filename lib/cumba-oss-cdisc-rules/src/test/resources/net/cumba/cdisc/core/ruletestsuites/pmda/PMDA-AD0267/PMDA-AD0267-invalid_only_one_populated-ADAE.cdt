@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0267 expect=violation domain=ADAE
+#note "Paired-population shape: exactly one of ADURN / ADURU populated is non-conformant. No structure= is needed because the Scope is Domains.Include [ALL] plus Requirements.Variables - the rule is gated by the presence of the pair, not by an ADaM data structure. Row 1 has ADURN without ADURU and row 2 has ADURU without ADURN, so both fire; row 3 has the pair populated and row 4 has both blank, and neither arm of the disjunction holds there. Record granularity -> 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 ADURN=5
+#expectViolationAt row=2 USUBJID=01-701-1023 ADURU=DAYS
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col ADURN   type=Num
+col ADURU   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 5 |
+CDISCPILOT01 | 01-701-1023 | NAUSEA   |   | DAYS
+CDISCPILOT01 | 01-701-1034 | RASH     | 3 | DAYS
+CDISCPILOT01 | 01-701-1045 | FEVER    |   |

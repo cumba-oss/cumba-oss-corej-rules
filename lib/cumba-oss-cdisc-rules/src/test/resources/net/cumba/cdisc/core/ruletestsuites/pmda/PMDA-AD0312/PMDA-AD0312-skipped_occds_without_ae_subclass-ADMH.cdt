@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0312 expect=skipped domain=ADMH
+#note "DISCRIMINATING FIXTURE for finding AD0312-F2 - pinned exactly as authored, not re-aimed. No class/structure/subclass key. MHDECOD ends with DECOD -> OCCURRENCE DATA STRUCTURE (Data_Structures gate satisfied), but AdamSubclassDetector's ADVERSE EVENT branch is a literal test for a column named AEDECOD or AETERM, which this dataset lacks - no subclass is detected, so Subclasses.Include rejects it. Data would fire if the rule ran. If the decision lane drops the Subclasses block, this file flips to violation/count 1/row=1 variable_name=SMQ01SC USUBJID=01-701-1015."
+#library standard=adamig version=1-1
+dataset ADMH
+col STUDYID  type=Char
+col USUBJID  type=Char
+col MHDECOD  type=Char
+col SMQ01NAM type=Char
+col SMQ01SC  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HYPERTENSION | CARDIACDISORDERS | WIDE

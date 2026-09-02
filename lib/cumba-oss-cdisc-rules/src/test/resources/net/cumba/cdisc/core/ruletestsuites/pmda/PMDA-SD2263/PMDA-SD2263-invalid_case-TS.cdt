@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2263 expect=violation domain=TS
+#note "FRESH: D-TA-3 sensitive-DEFAULT pin on the flag-less medrt value op (the FDA twin family pins the pair op via SD2262 but has no case pin on this op). Row 2: TSVAL 'CYCLOOXYGENASE INHIBITORS' is a folded-valid MED-RT term but in the wrong case -> fires under the sensitive default. Row 1 is the exact preferred-case match."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL="CYCLOOXYGENASE INHIBITORS"
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | PCLAS | Cyclooxygenase Inhibitors
+S01 | TS | 2 | PCLAS | CYCLOOXYGENASE INHIBITORS

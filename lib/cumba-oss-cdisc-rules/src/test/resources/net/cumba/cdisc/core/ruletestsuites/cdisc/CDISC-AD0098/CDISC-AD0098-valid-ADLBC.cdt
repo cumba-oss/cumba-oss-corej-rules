@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0098 expect=noViolation domain=ADLBC
+# Rule:Description: On a given record, a variable with a suffix of SDY has a value greater than a value of a variable with the same root and a suffix of EDY, and both variables are populated
+#note "ASDY=50 not greater than AEDY=100 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDY type=Num
+col AEDY type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 50 | 100
+---

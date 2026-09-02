@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1331 expect=skipped domain=BE
+#note "BESTDTC=2020-03-15 is after BEDTC=2020-02-01 -> the row would fire; ONLY the Domains.Exclude [BE] rejects. PMDA-only exclusion (FDA-SD1331 would execute here)."
+#library standard=sdtmig version=3-4
+dataset BE class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col BESEQ    type=Num
+col BETERM   type=Char
+col BESTDTC  type=Char
+col BEDTC    type=Char
+---
+S1 | BE | 001 | 1 | BIOSPECIMEN EVENT | 2020-03-15 | 2020-02-01

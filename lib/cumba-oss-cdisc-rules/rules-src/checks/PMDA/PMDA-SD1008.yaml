@@ -1,0 +1,123 @@
+Core:
+  Id: "PMDA-SD1008"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Date/Time of Comment (CODTC) is populated for a\
+  \ comment that is related to a specific parent record or group of parent records\
+  \ (RDOMAIN, IDVAR and IDVARVAL are populated)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "CODTC"
+    - "IDVAR"
+    - "IDVARVAL"
+    - "RDOMAIN"
+Check:
+  expression: >-
+    not empty(RDOMAIN) and not empty(IDVAR) and not empty(IDVARVAL) and not empty(CODTC)
+Outcome:
+  Message: "CODTC is populated when the comment is related to a parent record (RDOMAIN,\
+    \ IDVAR and IDVARVAL are populated)."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "CODTC"
+Source:
+  Message: "CODTC is populated when comment is a child record of another domain"
+  Description: "The value of Date/Time of Comment (CODTC) should be null when comments\
+    \ are related to a specific parent record or group of parent records in a domain\
+    \ (RDOMAIN, IDVAR and IDVARVAL are populated)."
+  Domains: "CO"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1008"
+        Version: "1"
+      Version: "1.6"

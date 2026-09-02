@@ -1,0 +1,51 @@
+Core:
+  Id: "PMDA-SD1453"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DISEQ is not a unique number within each SPDEVID\
+  \ per domain, including when the domain is split into multiple files."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DI"
+Requirements:
+  Variables:
+    All:
+    - "DISEQ"
+Check:
+  expression: >-
+    not empty(SPDEVID) and not is_unique_set([DISEQ, DOMAIN, SPDEVID])
+Outcome:
+  Message: "DISEQ is not a unique number within SPDEVID per domain, including when\
+    \ the domain is split into multiple files."
+  Output_Variables:
+  - "DOMAIN"
+  - "SPDEVID"
+Source:
+  Message: "Duplicate value for --SEQ variable"
+  Description: "The value of Sequence Number (DISEQ) variable must be unique for each\
+    \ record within a domain and within each Sponsor Device Identifier (SPDEVID)"
+  Domains: "DI"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1453"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1453"
+        Version: "1"
+      Version: "1.6"

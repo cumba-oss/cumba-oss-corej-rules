@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P3 violations 2.1 fixture: one dedicated violator per P3 rule, each
+     firing exactly once; the surrounding backbone is compliant so no rule double-fires.
+       MDV.1 - main tree: IGD violators (IG.V40 keyless + per-ItemRef violators inside,
+               IG.V45/46/47/54/56/57/120/121/133), standalone ItemDef violators
+               (IT.V35/38/61/68/69/111, IT.OD70/71), CodeList violators (CL.V76/76B/
+               77E/77B/126/127/128/129/81), STD.CT2 (DD0119), MT.V57B, COM.V57C, and an
+               ARM block with per-AnalysisResult violators (DD0090/94/96/98/117); the
+               ADaM standard in def:Standards keeps DD0087 quiet here.
+       MDV.2 - no def:AnnotatedCRF: page-referencing Collected origin -> DD0103.
+       MDV.3 - SDTM-only def:Standards WITH an (internally compliant) ARM block -> DD0087. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p3-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP3V">
+    <GlobalVariables>
+      <StudyName>PMDAP3V-STUDY</StudyName>
+      <StudyDescription>PMDA batch P3 violations fixture study</StudyDescription>
+      <ProtocolName>PMDAP3V-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P3 violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+        <!-- DD0119: Type='CT' without PublishingSet -->
+        <def:Standard OID="STD.CT2" Name="CDISC/NCI" Type="CT" Version="2023-12-15"
+                      Status="Final"/>
+      </def:Standards>
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.GOOD" Name="DM" Domain="DM" Repeating="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+      </ItemGroupDef>
+      <!-- DD0040: no ItemRef in this dataset carries KeySequence; hosts the per-ItemRef
+           violators DD0042 (no MethodOID for Derived), DD0058 (label-less ItemDef),
+           DD0070 (SASFieldName-less ItemDef), DD0072 (Origin-less ItemDef), DD0134
+           (HasNoData ItemRef -> CommentOID-less ItemDef) -->
+      <ItemGroupDef OID="IG.V40" Name="ADQS" Repeating="Yes"
+                    SASDatasetName="ADQS" Purpose="Analysis"
+                    def:Structure="One record per parameter per subject"
+                    def:ArchiveLocationID="LF.ADQS" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Questionnaire Analysis</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.V42" OrderNumber="1" Mandatory="No"/>
+        <ItemRef ItemOID="IT.V58" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="IT.V70" OrderNumber="3" Mandatory="No"/>
+        <ItemRef ItemOID="IT.V72" OrderNumber="4" Mandatory="No"/>
+        <ItemRef ItemOID="IT.V134" OrderNumber="5" Mandatory="No" def:HasNoData="Yes"/>
+        <def:Class Name="BASIC DATA STRUCTURE"/>
+      </ItemGroupDef>
+      <!-- DD0045: SDTMIG-bound dataset without Domain -->
+      <ItemGroupDef OID="IG.V45" Name="AE" Repeating="Yes"
+                    SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per event"
+                    def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <!-- DD0046: ADaMIG-bound dataset WITH Domain -->
+      <ItemGroupDef OID="IG.V46" Name="ADAE" Domain="AD" Repeating="Yes"
+                    SASDatasetName="ADAE" Purpose="Analysis"
+                    def:Structure="One record per event"
+                    def:ArchiveLocationID="LF.ADAE" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events Analysis</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
+      </ItemGroupDef>
+      <!-- DD0047: no SASDatasetName -->
+      <ItemGroupDef OID="IG.V47" Name="VS" Domain="VS" Repeating="Yes"
+                    Purpose="Tabulation" def:Structure="One record per measurement"
+                    def:ArchiveLocationID="LF.VS" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Vital Signs</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <!-- DD0054: neither a def:Class child (2.1) nor a def:Class attribute (2.0) -->
+      <ItemGroupDef OID="IG.V54" Name="EG" Domain="EG" Repeating="Yes"
+                    SASDatasetName="EG" Purpose="Tabulation"
+                    def:Structure="One record per measurement"
+                    def:ArchiveLocationID="LF.EG" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">ECG Test Results</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+      </ItemGroupDef>
+      <!-- DD0056: no def:ArchiveLocationID and NOT def:HasNoData -->
+      <ItemGroupDef OID="IG.V56" Name="LB" Domain="LB" Repeating="Yes"
+                    SASDatasetName="LB" Purpose="Tabulation"
+                    def:Structure="One record per measurement"
+                    def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Laboratory Test Results</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <!-- DD0057: no Description -->
+      <ItemGroupDef OID="IG.V57" Name="MH" Domain="MH" Repeating="Yes"
+                    SASDatasetName="MH" Purpose="Tabulation"
+                    def:Structure="One record per event"
+                    def:ArchiveLocationID="LF.MH" def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <!-- DD0120: def:IsNonStandard populated although def:StandardOID is present -->
+      <ItemGroupDef OID="IG.V120" Name="PE" Domain="PE" Repeating="Yes"
+                    SASDatasetName="PE" Purpose="Tabulation"
+                    def:Structure="One record per finding"
+                    def:ArchiveLocationID="LF.PE" def:StandardOID="STD.SDTM"
+                    def:IsNonStandard="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Physical Examination</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <!-- DD0121: no def:StandardOID and no def:IsNonStandard -->
+      <ItemGroupDef OID="IG.V121" Name="XC" Repeating="Yes"
+                    SASDatasetName="XC" Purpose="Tabulation"
+                    def:Structure="One record per finding"
+                    def:ArchiveLocationID="LF.XC">
+        <Description>
+          <TranslatedText xml:lang="en">Sponsor Custom Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <!-- DD0133: def:HasNoData='Yes' without def:CommentOID (its missing
+           ArchiveLocationID is exempt via the DD0056 HasNoData carve-out) -->
+      <ItemGroupDef OID="IG.V133" Name="QS" Domain="QS" Repeating="Yes"
+                    SASDatasetName="QS" Purpose="Tabulation"
+                    def:Structure="One record per response"
+                    def:StandardOID="STD.SDTM" def:HasNoData="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Questionnaires</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Domain="SUPPAE" Repeating="Yes"
+                    SASDatasetName="SUPPAE" Purpose="Tabulation"
+                    def:Structure="One record per qualifier per record"
+                    def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Qualifiers for AE</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.QVAL" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="RELATIONSHIP"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF">
+            <def:PDFPageRef Type="PhysicalRef" PageRefs="12"/>
+            <!-- DD0037: no PageRefs, FirstPage without LastPage -->
+            <def:PDFPageRef Type="PhysicalRef" FirstPage="5"/>
+          </def:DocumentRef>
+        </def:Origin>
+      </ItemDef>
+      <!-- DD0042 (via its ItemRef in IG.V40): Origin Derived, ItemRef without MethodOID -->
+      <ItemDef OID="IT.V42" Name="CHG" DataType="float" Length="8" SignificantDigits="2"
+               SASFieldName="CHG">
+        <Description>
+          <TranslatedText xml:lang="en">Change from Baseline</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <!-- DD0058 (via its ItemRef): no Description -->
+      <ItemDef OID="IT.V58" Name="AVAL" DataType="text" Length="8" SASFieldName="AVAL">
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- DD0070 (via its ItemRef): no SASFieldName -->
+      <ItemDef OID="IT.V70" Name="PARAM" DataType="text" Length="40">
+        <Description>
+          <TranslatedText xml:lang="en">Parameter</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- DD0072 (via its ItemRef): neither def:Origin nor def:ValueListRef -->
+      <ItemDef OID="IT.V72" Name="PARAMCD" DataType="text" Length="8"
+               SASFieldName="PARAMCD">
+        <Description>
+          <TranslatedText xml:lang="en">Parameter Code</TranslatedText>
+        </Description>
+      </ItemDef>
+      <!-- DD0134 (via its HasNoData ItemRef): no def:CommentOID -->
+      <ItemDef OID="IT.V134" Name="ANL01FL" DataType="text" Length="1"
+               SASFieldName="ANL01FL">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Flag 01</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL.AESER" Name="AESER" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <def:ValueListDef OID="VL.QVAL">
+        <ItemRef ItemOID="IT.QVAL.AESER" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <!-- DD0038: Name='QVAL' without def:ValueListRef -->
+      <ItemDef OID="IT.V38" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value (unbound)</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- DD0061: Origin Predecessor without a Description/TranslatedText -->
+      <ItemDef OID="IT.V61" Name="TRTP" DataType="text" Length="20" SASFieldName="TRTP">
+        <Description>
+          <TranslatedText xml:lang="en">Planned Treatment</TranslatedText>
+        </Description>
+        <def:Origin Type="Predecessor"/>
+      </ItemDef>
+      <!-- DD0068: Length present although DataType is not integer/float/text -->
+      <ItemDef OID="IT.V68" Name="LBDTC" DataType="datetime" Length="10"
+               SASFieldName="LBDTC">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- DD0069: SignificantDigits present although DataType is not float -->
+      <ItemDef OID="IT.V69" Name="VISIT" DataType="text" Length="8" SignificantDigits="2"
+               SASFieldName="VISIT">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- OD0070: DataType integer without Length -->
+      <ItemDef OID="IT.OD70" Name="VISITNUM" DataType="integer" SASFieldName="VISITNUM">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- OD0071: DataType float without SignificantDigits -->
+      <ItemDef OID="IT.OD71" Name="AVALC" DataType="float" Length="8"
+               SASFieldName="AVALC">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <!-- DD0035: Collected/Subject origin whose DocumentRef has no def:PDFPageRef -->
+      <ItemDef OID="IT.V35" Name="AEACN" DataType="text" Length="40" SASFieldName="AEACN">
+        <Description>
+          <TranslatedText xml:lang="en">Action Taken</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Subject">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <!-- DD0111: pages provided although the origin is neither CRF nor
+           Collected+Investigator/Subject -->
+      <ItemDef OID="IT.V111" Name="AESER" DataType="text" Length="1" SASFieldName="AESER">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned">
+          <def:DocumentRef leafID="LF.ACRF">
+            <def:PDFPageRef Type="PhysicalRef" PageRefs="3"/>
+          </def:DocumentRef>
+        </def:Origin>
+      </ItemDef>
+      <CodeList OID="CL.GOOD" Name="Sex" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="M"/>
+        <EnumeratedItem CodedValue="F"/>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- DD0076: Rank on one EnumeratedItem, missing on its sibling -->
+      <CodeList OID="CL.V76" Name="Severity" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="MILD" Rank="1"/>
+        <EnumeratedItem CodedValue="SEVERE"/>
+        <Alias Context="nci:ExtCodeID" Name="C66769"/>
+      </CodeList>
+      <!-- DD0076-B: Rank on one CodeListItem, missing on its sibling -->
+      <CodeList OID="CL.V76B" Name="Outcome" DataType="text" def:StandardOID="STD.CT">
+        <CodeListItem CodedValue="REC" Rank="1">
+          <Decode>
+            <TranslatedText xml:lang="en">Recovered</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="NOTREC">
+          <Decode>
+            <TranslatedText xml:lang="en">Not Recovered</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66768"/>
+      </CodeList>
+      <!-- DD0077: OrderNumber on one EnumeratedItem, missing on its sibling -->
+      <CodeList OID="CL.V77E" Name="Frequency" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="QD" OrderNumber="1"/>
+        <EnumeratedItem CodedValue="BID"/>
+        <Alias Context="nci:ExtCodeID" Name="C71113"/>
+      </CodeList>
+      <!-- DD0077-B: OrderNumber on one CodeListItem, missing on its sibling -->
+      <CodeList OID="CL.V77B" Name="Route" DataType="text" def:StandardOID="STD.CT">
+        <CodeListItem CodedValue="ORAL" OrderNumber="1">
+          <Decode>
+            <TranslatedText xml:lang="en">Oral</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="IV">
+          <Decode>
+            <TranslatedText xml:lang="en">Intravenous</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66729"/>
+      </CodeList>
+      <!-- DD0126: def:IsNonStandard populated although def:StandardOID is present -->
+      <CodeList OID="CL.V126" Name="Units" DataType="text" def:StandardOID="STD.CT"
+                def:IsNonStandard="Yes">
+        <EnumeratedItem CodedValue="mg"/>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <!-- DD0127: NCI-code Alias on a codelist without a Terminology binding -->
+      <CodeList OID="CL.V127" Name="Sponsor Terms" DataType="text"
+                def:IsNonStandard="Yes">
+        <EnumeratedItem CodedValue="X1"/>
+        <Alias Context="nci:ExtCodeID" Name="C99999"/>
+      </CodeList>
+      <!-- DD0128: neither def:StandardOID nor def:IsNonStandard -->
+      <CodeList OID="CL.V128" Name="Sponsor Flags" DataType="text">
+        <EnumeratedItem CodedValue="Y"/>
+      </CodeList>
+      <!-- DD0129: def:StandardOID set but no nci:ExtCodeID Alias -->
+      <CodeList OID="CL.V129" Name="Race" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="ASIAN"/>
+      </CodeList>
+      <!-- OD0081: no EnumeratedItem, CodeListItem or ExternalCodeList at all -->
+      <CodeList OID="CL.V81" Name="Empty List" DataType="text" def:IsNonStandard="Yes"/>
+      <MethodDef OID="MT.GOOD" Name="Change Derivation" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">CHG = AVAL - BASE</TranslatedText>
+        </Description>
+      </MethodDef>
+      <!-- DD0057-B: MethodDef without Description -->
+      <MethodDef OID="MT.V57B" Name="Undocumented Derivation" Type="Computation"/>
+      <def:CommentDef OID="COM.GOOD">
+        <Description>
+          <TranslatedText xml:lang="en">Pooled from two analysis datasets.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <!-- DD0057-C: def:CommentDef without Description -->
+      <def:CommentDef OID="COM.V57C"/>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.GOOD" Name="Table 14-2.01">
+          <Description>
+            <TranslatedText xml:lang="en">Primary Efficacy Analysis</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.GOOD" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <Description>
+              <TranslatedText xml:lang="en">Primary analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40">
+                <arm:AnalysisVariable ItemOID="IT.V42"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+            <arm:Documentation>
+              <Description>
+                <TranslatedText xml:lang="en">See SAP section 9.2</TranslatedText>
+              </Description>
+              <def:DocumentRef leafID="LF.SAP"/>
+            </arm:Documentation>
+            <arm:ProgrammingCode Context="SAS 9.4">
+              <arm:Code>proc glm data=adqs; model chg = trtp; run;</arm:Code>
+            </arm:ProgrammingCode>
+          </arm:AnalysisResult>
+          <!-- DD0094: two analysis datasets without def:CommentOID -->
+          <arm:AnalysisResult OID="AR.V94" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Pooled analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40">
+                <arm:AnalysisVariable ItemOID="IT.V42"/>
+              </arm:AnalysisDataset>
+              <arm:AnalysisDataset ItemGroupOID="IG.GOOD"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+          <!-- DD0096: no arm:AnalysisVariable under any analysis dataset -->
+          <arm:AnalysisResult OID="AR.V96" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Variable-less analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+          <!-- DD0098: arm:Code provided but no Context on arm:ProgrammingCode -->
+          <arm:AnalysisResult OID="AR.V98" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Sensitivity analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40">
+                <arm:AnalysisVariable ItemOID="IT.V42"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+            <arm:ProgrammingCode>
+              <arm:Code>proc mixed data=adqs; run;</arm:Code>
+            </arm:ProgrammingCode>
+          </arm:AnalysisResult>
+          <!-- DD0117: arm:Documentation references a document but has no Description -->
+          <arm:AnalysisResult OID="AR.V117" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Documented analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40">
+                <arm:AnalysisVariable ItemOID="IT.V42"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+            <arm:Documentation>
+              <def:DocumentRef leafID="LF.SAP"/>
+            </arm:Documentation>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+        <!-- DD0090: ResultDisplay without a Description -->
+        <arm:ResultDisplay OID="RD.V90" Name="Table 14-2.02">
+          <arm:AnalysisResult OID="AR.RD90" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Secondary analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.V40">
+                <arm:AnalysisVariable ItemOID="IT.V42"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.SAP" xlink:href="sap.pdf">
+        <def:title>Statistical Analysis Plan</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+    <!-- DD0103: no def:AnnotatedCRF in this MetaDataVersion, but a Collected origin
+         references CRF pages -->
+    <MetaDataVersion OID="MDV.2" Name="PMDA P3 no-aCRF MDV" def:DefineVersion="2.1.0">
+      <ItemDef OID="IT.V103" Name="DSTERM" DataType="text" Length="40"
+               SASFieldName="DSTERM">
+        <Description>
+          <TranslatedText xml:lang="en">Reported Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.X">
+            <def:PDFPageRef Type="PhysicalRef" PageRefs="8"/>
+          </def:DocumentRef>
+        </def:Origin>
+      </ItemDef>
+      <def:leaf ID="LF.X" xlink:href="crf2.pdf">
+        <def:title>Second CRF</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+    <!-- DD0087: SDTM-only standards declaration with an ARM block present
+         (the block itself is internally compliant so only DD0087 fires) -->
+    <MetaDataVersion OID="MDV.3" Name="PMDA P3 SDTM+ARM MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD3.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+      </def:Standards>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.M3" Name="Table 15-1.01">
+          <Description>
+            <TranslatedText xml:lang="en">Misplaced analysis display</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.M3" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Misplaced analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.GOOD">
+                <arm:AnalysisVariable ItemOID="IT.USUBJID"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+    </MetaDataVersion>
+  </Study>
+</ODM>

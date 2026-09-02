@@ -1,0 +1,53 @@
+name: CDISC-AD0355
+kind: check_operator
+description: |
+  EC-1 (has_multiple_values_for excludes empty key/dependent), modelled on
+  CDISC-AD0355 (more than one REGIONy for a given REGIONyN, considering only
+  rows where both are populated). Concrete instance REGION1/REGION1N. KEY =
+  REGION1N (the `value:` operand), DEPENDENT = REGION1 (the `name:` operand).
+  REGION1N='1' maps to two distinct populated REGION1 {Asia,Europe} → both rows
+  fire. REGION1N='2' would look multi-valued ONLY because one row's REGION1 is
+  blank — post-EC-1 that blank-dependent row is excluded, so the populated '2'
+  row does NOT fire (populated-vs-missing must not fire). The blank-key row is
+  excluded too. Both engines agree (parity spec, no baseline entry). Rendered as
+  a check_operator spec because the Python lane does not expand the REGIONy
+  wildcard in the full rule.
+python_notes: |
+  Both lanes exclude empty key/dependent rows and flag the two REGION1N='1' rows.
+python_source: rules-adamig-1-3.json (CDISC-AD0355), EC-1
+check:
+  name: REGION1
+  operator: has_multiple_values_for
+  value: REGION1N
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', REGION1N: '1', REGION1: Asia}       # key 1 -> {Asia,Europe} fires
+    - {STUDYID: S1, USUBJID: '002', REGION1N: '1', REGION1: Europe}     # key 1 multiple fires
+    - {STUDYID: S1, USUBJID: '003', REGION1N: '2', REGION1: Africa}     # key 2 single, no fire
+    - {STUDYID: S1, USUBJID: '004', REGION1N: '2', REGION1: ''}         # blank dependent excluded
+    - {STUDYID: S1, USUBJID: '005', REGION1N: '', REGION1: Oceania}     # blank key excluded
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-CDISC-AD0355
+  dataset: ADSL
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    REGION1: Asia
+    REGION1N: '1'
+    STUDYID: S1
+    USUBJID: '001'
+- rule_id: AUTO-CDISC-AD0355
+  dataset: ADSL
+  row_key: {STUDYID: S1, USUBJID: '002'}
+  status: SUCCESS
+  output_variables:
+    REGION1: Europe
+    REGION1N: '1'
+    STUDYID: S1
+    USUBJID: '002'
+expected_errors: []

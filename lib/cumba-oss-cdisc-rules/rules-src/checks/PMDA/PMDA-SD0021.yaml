@@ -1,0 +1,130 @@
+Core:
+  Id: "PMDA-SD0021"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when no End Time-Point variable (--ENDTC, --ENRF, or\
+  \ --ENRTPT) is populated and the event/intervention is not excepted by --OCCUR equals\
+  \ 'N', a populated --STAT, or a populated --DUR."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "AG"
+    - "BE"
+    - "DE"
+    - "DS"
+    - "DT"
+    - "DV"
+    - "ML"
+Check:
+  expression: >-
+    empty(--ENDTC) and empty(--ENRF) and empty(--ENRTPT) and (not var_exists("--OCCUR") or --OCCUR
+    != "N") and empty(--STAT) and empty(--DUR)
+Outcome:
+  Message: "No End Time-Point variable (--ENDTC, --ENRF, or --ENRTPT) is populated."
+  Output_Variables:
+  - "!--ENDTC"
+  - "!--ENRF"
+  - "!--ENRTPT"
+  - "--OCCUR"
+  - "!--STAT"
+  - "!--DUR"
+Source:
+  Message: "Missing End Time-Point value"
+  Description: "One End Time-Point variable is expected to be populated when an event\
+    \ or an intervention occurred. (E.g., End Date/Time of Event or Intervention (--ENDTC),\
+    \ or End Relative to Reference Period (--ENRF), or End Relative to Reference Period\
+    \ (--ENRTPT) should not be missing, or Occurrence (--OCCUR) = 'N' or Completion\
+    \ Status (--STAT) != '') or Duration (--DUR) != '')."
+  Domains: "INTERVENTIONS (-AG, -ML), EVENTS (-BE, -DE, -DS, -DT, -DV)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0021"
+        Version: "1"
+      Version: "1.6"

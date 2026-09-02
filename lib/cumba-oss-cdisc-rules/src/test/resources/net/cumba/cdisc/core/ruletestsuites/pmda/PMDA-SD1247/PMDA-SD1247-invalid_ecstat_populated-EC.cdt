@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1247 expect=violation domain=EC
+#note "Row 1: ECSTAT=COMPLETED with a recorded ECDOSE=0 -> fires, because the ECSTAT leg is the sheet's 'ECSTAT != NOT DONE' and a populated status other than NOT DONE does not suppress; row 2's ECSTAT='NOT DONE' still suppresses."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECOCCUR  type=Char label="Occurrence"
+col ECDOSE   type=Num  label="Dose"
+col ECDOSTXT type=Char label="Dose Description"
+col ECSTAT   type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0 | | COMPLETED
+S1 | EC | 001 | 2 | DRUG A | Y | 0 | | NOT DONE

@@ -1,0 +1,64 @@
+Core:
+  Id: "FDA-SD1357"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the MIDSDTC variable is present and the MIDS variable\
+  \ is not present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Check:
+  expression: >-
+    var_exists("MIDSDTC") and not var_exists("MIDS")
+Outcome:
+  Message: "MIDSDTC variable is present when MIDS variable is not present."
+  Output_Variables:
+  - "MIDSDTC"
+Source:
+  FDA_Validator_Rule_Message: "MIDSDTC variable is present when MIDS variable is missing"
+  FDA_Validator_Rule_Description: "Disease Milestone Instance Date/Time (MIDSDTC)\
+    \ variable should not be present in the domain, when the Disease Milestone Instance\
+    \ Name (MIDS) variable is missing."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1357"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1357"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0503"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0503"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0335 expect=violation domain=ADLBC
+# Rule:Description: CRITyFL is present and CRITy is not present
+#note "CRIT1FL present, CRIT1 absent -> violation"
+#expectViolationCount 1
+#expectViolationAt CRIT1FL=X
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col CRIT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X
+---

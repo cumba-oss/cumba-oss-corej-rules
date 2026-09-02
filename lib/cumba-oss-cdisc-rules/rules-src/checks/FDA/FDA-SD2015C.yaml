@@ -1,0 +1,103 @@
+Core:
+  Id: "FDA-SD2015C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a System Organ Class (--SOC) value does not match\
+  \ the case of its MedDRA System Organ Class."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--SOC"
+Operations:
+- id: "$soc_case_valid"
+  expression: "valid_external_dictionary_value(--SOC, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOC\", case_sensitive=true)"
+Check:
+  expression: >-
+    $soc_case_valid == false
+Outcome:
+  Message: "System Organ Class (--SOC) does not match the MedDRA System Organ Class\
+    \ case."
+  Output_Variables:
+  - "--SOC"
+Source:
+  FDA_Validator_Rule_Message: "Value for --SOC is in incorrect case"
+  FDA_Validator_Rule_Description: "Case for System Organ Class (--SOC) variable must\
+    \ be sentence case using a System Organ Class of the MedDRA dictionary of a version\
+    \ specified in the define.xml (Case-sensitive)."
+  Domains: "AE, CE, MH"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2015C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2015C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2015C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2015C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2015C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"

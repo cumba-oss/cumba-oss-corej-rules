@@ -1,0 +1,90 @@
+Core:
+  Id: "CDISC-SEND-0194"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the result is below the limit of quantitation -\
+  \ the standardized character result (PCSTRESC) is 'BLQ', or the original result\
+  \ (PCORRES) is below the Lower Limit of Quantitation (PCLLOQ) - but the Numeric\
+  \ Result/Finding in Std Units (PCSTRESN) is populated; PCSTRESN should be missing\
+  \ rather than zero."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCSTRESN"
+Check:
+  expression: >-
+    (var_exists("PCSTRESC") and PCSTRESC == "BLQ" or var_exists("PCORRES") and var_exists("PCLLOQ")
+    and PCORRES < PCLLOQ) and not empty(PCSTRESN)
+Outcome:
+  Message: "PCSTRESN is populated when the result is below the limit of quantitation\
+    \ (PCSTRESC is 'BLQ', or PCORRES is below PCLLOQ); it should be missing and not\
+    \ set to zero."
+  Output_Variables:
+  - "PCSTRESC"
+  - "PCSTRESN"
+  - "PCORRES"
+  - "PCLLOQ"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCSTRESN"
+  Plain_Text_Explanation: "If the PCORRES result is less than the Lower Limit of Quantification,\
+    \ then PCSTRESN should be null and not populated with the value of zero (0)."
+  Condition: "PCORRES < PCLLOQ"
+  Rule: "PCSTRESN = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND194"
+        Version: "1"
+      Version: "5.0"

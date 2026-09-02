@@ -1,0 +1,67 @@
+name: DRAFT-900021
+kind: rule
+description: |
+  CT-004 (NRI-007 / PLAN-value-check-against-library-codelist Phase 5b): every term the
+  define.xml enumerates for a variable's non-extensible library codelist must be a published
+  library term. VS.VSPOS is bound to codelist C71148, mocked non-extensible with published
+  submission values {SUPINE, STANDING}; the define enumerates {SUPINE, BOGUS}. The check is
+  var_codelist_extensible("LIBRARY") == false and not contains_all(
+  var_codelist_coded_values("LIBRARY"), var_codelist_coded_values("DEFINE")) — source set =
+  library, required list = define (NOT the inverted is_not_contained_by form, whose both-lists
+  semantics mean "none of the define terms are in the library"). BOGUS is not published, so the
+  VSPOS ItemDef fires; VSLAT is a SECOND offender (C99074, define enumerates BOGUS2) so the
+  Record sensitivity is observable — under the former Dataset sensitivity only the first
+  offending ItemDef survived. VSTESTCD has no library codelist, so the extensible guard
+  excludes it.
+python_source: rules-draft-sdtmig-3-4.json (DRAFT-900021)
+rule:
+  coreId: DRAFT-900021
+datasets:
+  VS:
+    row_key: [variable_name]
+    rows:
+    - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSPOS: SUPINE, VSLAT: LEFT, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+  domain_variables:
+    VS:
+    - {name: VSPOS, ordinal: '1', role: Result Qualifier, simpleDatatype: Char, label: Position of Subject During Observation, codelist: C71148}
+    - {name: VSLAT, ordinal: '2', role: Result Qualifier, simpleDatatype: Char, label: Laterality, codelist: C99074}
+    - {name: VSTESTCD, ordinal: '3', role: Topic, simpleDatatype: Char, label: Vital Signs Test Short Name}
+  codelist_terms:
+    C71148: [SUPINE, STANDING]
+    C99074: [LEFT, RIGHT]
+  codelist_extensible:
+    C71148: false
+    C99074: false
+define_xml:
+  VS:
+  - {define_variable_name: VSPOS, define_variable_ccode: C71148, define_variable_codelist_coded_values: [SUPINE, BOGUS]}
+  - {define_variable_name: VSLAT, define_variable_ccode: C99074, define_variable_codelist_coded_values: [LEFT, BOGUS2]}
+  - {define_variable_name: VSTESTCD, define_variable_codelist_coded_values: [SYSBP]}
+expected_violations:
+- rule_id: DRAFT-900021
+  dataset: VS
+  row_key: {variable_name: null}
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_coded_values: '[BOGUS, SUPINE]'
+    define_variable_name: VSPOS
+    library_variable_codelist_coded_values: '["SUPINE","STANDING"]'
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSPOS
+- rule_id: DRAFT-900021
+  dataset: VS
+  row_key: {variable_name: null}
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_coded_values: '[BOGUS2, LEFT]'
+    define_variable_name: VSLAT
+    library_variable_codelist_coded_values: '["LEFT","RIGHT"]'
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSLAT
+expected_errors: []

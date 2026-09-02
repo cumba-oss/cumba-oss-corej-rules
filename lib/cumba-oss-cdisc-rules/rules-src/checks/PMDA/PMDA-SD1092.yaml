@@ -1,0 +1,132 @@
+Core:
+  Id: "PMDA-SD1092"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Study Day of End of Observation (--ENDY) is\
+  \ missing even though the date portion of --ENDTC is a complete date and the date\
+  \ portion of DM.RFSTDTC is a complete date."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+    - "--ENDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    is_complete_date(--ENDTC) and is_complete_date(DM.RFSTDTC) and empty(--ENDY)
+Outcome:
+  Message: "--ENDY is missing when --ENDTC and DM.RFSTDTC are both complete dates."
+  Output_Variables:
+  - "--ENDTC"
+  - "!--ENDY"
+  - "DM.RFSTDTC"
+Source:
+  Message: "--ENDY variable value is not populated"
+  Description: "Study Day of End (--ENDY) variable value should be populated when\
+    \ End Study Date/Time (--ENDTC) and Subject Reference Start Date/Time (RFSTDTC)\
+    \ variables values are provided, and both include complete date part."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1092"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0414"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Element Code (ETCD) is not equal to 'UNPLAN' and\
+  \ does not match a value of ETCD in the Trial Elements (TE) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+Operations:
+- id: "$te_etcd"
+  expression: "distinct(ETCD, domain=\"TE\")"
+Check:
+  expression: >-
+    ETCD != "UNPLAN" and ETCD not in $te_etcd
+Outcome:
+  Message: "ETCD is not equal to 'UNPLAN' and does not match a value of ETCD in the\
+    \ Trial Elements (TE) dataset."
+  Output_Variables:
+  - "ETCD"
+  - "$te_etcd"
+Source:
+  Class: "SPC, TDM"
+  Domain: "SE, TA"
+  Variable: "ETCD"
+  Condition: "ETCD ^= 'UNPLAN'"
+  Rule: "ETCD = TE.ETCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0414"
+        Version: "1"
+      Version: "2.0"

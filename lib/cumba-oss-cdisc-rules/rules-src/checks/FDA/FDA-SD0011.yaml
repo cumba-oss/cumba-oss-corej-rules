@@ -1,0 +1,87 @@
+Core:
+  Id: "FDA-SD0011"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Planned Arm (ARM) is not 'Screen\
+  \ Failure' while Planned Arm Code (ARMCD) equals 'SCRNFAIL', or when ARMCD is not\
+  \ 'SCRNFAIL' while ARM equals 'Screen Failure'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ARM"
+Check:
+  expression: >-
+    ARMCD == "SCRNFAIL" and ARM != "Screen Failure" or ARM == "Screen Failure" and ARMCD !=
+    "SCRNFAIL"
+Outcome:
+  Message: "ARM is not 'Screen Failure' when ARMCD equals 'SCRNFAIL', or ARMCD is\
+    \ not 'SCRNFAIL' when ARM equals 'Screen Failure'."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+Source:
+  FDA_Validator_Rule_Message: "ARM is not 'Screen Failure', when ARMCD equals 'SCRNFAIL',\
+    \ or vice versa"
+  FDA_Validator_Rule_Description: "Description of Arm (ARM) must equal 'Screen Failure',\
+    \  when Arm Code (ARMCD) is 'SCRNFAIL', and vice versa."
+  Domains: "DM, TA"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0127"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0127"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0127"
+        Version: "1"
+      Version: "2.0"

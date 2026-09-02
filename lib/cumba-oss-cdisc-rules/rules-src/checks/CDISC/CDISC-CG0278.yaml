@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0278"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'STYPE'\
+  \ and TSVAL equal to 'INTERVENTIONAL', but TSVAL is empty for the record where TSPARMCD\
+  \ equals 'INTTYPE'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$STYPE_INTERVENTIONAL"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"\
+    INTERVENTIONAL\"))"
+Check:
+  expression: >-
+    TSPARMCD == "INTTYPE" and $STYPE_INTERVENTIONAL >= 1 and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty for the INTTYPE Trial Summary Parameter when a record exists\
+    \ with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$STYPE_INTERVENTIONAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'INTTYPE' and record exists where TSPARMCD = 'STYPE' and\
+    \ TSVAL = 'INTERVENTIONAL'"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0278"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0278"
+        Version: "1"
+      Version: "2.0"

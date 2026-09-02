@@ -1,0 +1,16 @@
+# The COMPANION SDTM product a carry-over check resolves against.
+#
+# ⛔ ADSL/RFSTDTC, not ADAE/AETERM: LIBRARY-level lookups fall back from the member name to its
+# CDISC domain (Fix #373), so ADAE would resolve to AE, FIND AETERM, and the NAME-keyed lane would
+# never run -- the fixture would pass for the wrong reason. ADSL does not resolve to DM.
+#
+# ⚠ The TRAILING SPACE on the label is deliberate and load-bearing. CDISC's own published metadata
+# is not clean -- SDTMIG's CMTRT label ends in a space, the single real mismatch in the whole
+# ADaM<->SDTM name-collision set -- so the candidate lane normalises whitespace before comparing.
+# DRAFT-900044-valid-ADSL.cdt is the guard: drop the normalisation and it raises a false ERROR.
+standard: adamig
+version: "1-3"
+domains:
+  DM:
+    variable-metadata:
+      RFSTDTC: { label: "Subject Reference Start Date/Time ", simpleDatatype: Char }

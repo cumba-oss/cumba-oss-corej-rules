@@ -1,0 +1,10 @@
+#!RuleTest
+#test PMDA-AD0013 expect=skipped domain=ADMISC
+#note "ADMISC declares structure=OTHER (the shortcut for ADAM OTHER). Data that WOULD fire if the rule ran (TOOLONGNAME). The rule's Scope.Data_Structures enumerates six tokens and ADAM OTHER is not among them, although the Source Domains column ends in ADAMOTHER; the declared structure beats the columns (Fix #154, carried by the mandatory #library line) so the pre-gate reports the rule out of scope and it never executes. This is the tell for the corpus-wide ADAMOTHER convention (finding AD0013-F2 / batch note on conventions) - if the convention is ever changed, THIS fixture is the one that flips."
+#library standard=adamig version=1-3
+dataset ADMISC structure=OTHER
+col STUDYID     type=Char
+col USUBJID     type=Char
+col TOOLONGNAME type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

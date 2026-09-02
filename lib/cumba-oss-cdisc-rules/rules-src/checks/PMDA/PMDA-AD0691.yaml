@@ -1,0 +1,53 @@
+Core:
+  Id: "PMDA-AD0691"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a unique Sponsor Device Identifier (SPDEVID),\
+  \ Unique Subject Identifier (USUBJID) and Parameter Code (PARAMCD) group, Baseline\
+  \ Value (BASE) or Baseline Value Character (BASEC) is populated but no record in\
+  \ that group has Analysis Baseline Flag (ABLFL) equal to Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Grouping:
+  Variables:
+  - "USUBJID"
+  - "PARAMCD"
+  - "SPDEVID"
+Operations:
+- id: "$ablfl_y_count"
+  expression: "record_count(ABLFL, group=[SPDEVID, USUBJID, PARAMCD], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    (not empty(BASE) or not empty(BASEC)) and $ablfl_y_count == 0
+Outcome:
+  Message: "BASE or BASEC is populated for a unique SPDEVID, USUBJID, PARAMCD group,\
+    \ but no baseline record (ABLFL equal to Y) exists in that group."
+  Output_Variables:
+  - "SPDEVID"
+  - "PARAMCD"
+  - "BASE"
+  - "BASEC"
+  - "$ablfl_y_count"
+Source:
+  Message: "BASE or BASEC is populated for a unique SPDEVID,USUBJID,PARAMCD but no\
+    \ baseline record exists"
+  Description: "Within a given Subject's SPDEVID and PARAMCD, a baseline value is\
+    \ populated (either BASE or BASEC) and there is not at least one record in that\
+    \ group marked as the baseline (ABLFL = Y)."
+  Domains: "MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0691"
+        Version: "1"
+      Version: "6.0"

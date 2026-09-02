@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0206"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Vital Signs (VS) record exists for\
+  \ the same combination of subject (USUBJID), measurement (VSTESTCD), and observation\
+  \ time (VSDTC, VSTPT, VSTPTNUM, VSNOMDY); the VS domain expects one record per measurement\
+  \ per observation time per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "VS"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, VSTESTCD, VSDTC, VSTPT, VSTPTNUM, VSNOMDY])
+Outcome:
+  Message: "More than one VS record exists for the same measurement and observation\
+    \ time within a subject."
+  Output_Variables:
+  - "VSTESTCD"
+  - "VSDTC"
+  - "VSNOMDY"
+  - "VSTPT"
+  - "VSTPTNUM"
+Source:
+  Class: "FND"
+  Domain: "VS"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per measurement per observation time per subject"
+  Rule: "One record per measurement per observation time per subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND206"
+        Version: "1"
+      Version: "5.0"

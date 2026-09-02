@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1440 expect=noViolation domain=AE
+#note "Boundary: one 'HEADACHE' record is left uncoded (--DECOD empty) while the others agree. An empty --DECOD is not a competing coding, so no inconsistency is reported."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache
+S1 | AE | 002 | 1 | HEADACHE |
+S1 | AE | 003 | 1 | HEADACHE | Headache

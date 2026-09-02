@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD1301 expect=skipped domain=TD
+#note "Pins the absent-column contract: BroadcastFold keeps a bare empty(X) as a broadcast TRUE on a wholly-absent column, so the authored 'not empty(TDSTOFF)' broadcasts FALSE and kills the whole top-level AND - the rule EXECUTES and is silent. Was noViolation before the phase-4 hoist: the rule carries no Requirements.Variables gate. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TDORDER  type=Num
+col TDANCVAR type=Char
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC

@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD1234 expect=violation domain=DI
+#note "Device DEV1 has DI records but none with DIPARMCD DEVTYPE ($devtype_count = 0) -> one group-level violation. DEV2 carries a DEVTYPE record, and the trailing row with an empty SPDEVID is suppressed by the non_empty guard."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt SPDEVID=DEV1
+dataset DI label="Device Identifiers"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Parameter Short Name"
+col DIPARM   type=Char label="Device Parameter"
+col DIVAL    type=Char label="Parameter Value"
+---
+S1 | DI | DEV1 | 1 | MODEL   | Model Number     | M-100
+S1 | DI | DEV1 | 2 | MANUF   | Manufacturer     | ACME
+S1 | DI | DEV2 | 1 | DEVTYPE | Device Type      | INFUSION PUMP
+S1 | DI | DEV2 | 2 | MODEL   | Model Number     | M-200
+S1 | DI |      | 1 | MANUF   | Manufacturer     | ACME

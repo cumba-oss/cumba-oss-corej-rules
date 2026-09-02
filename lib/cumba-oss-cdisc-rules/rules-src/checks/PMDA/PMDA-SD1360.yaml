@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-SD1360"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ variable is populated while both Planned Arm Code (ARMCD) and Actual Arm Code\
+  \ (ACTARMCD) are populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(ARMNRS) and not empty(ARMCD) and not empty(ACTARMCD)
+Outcome:
+  Message: "ARMNRS is populated when both ARMCD and ACTARMCD are populated."
+  Output_Variables:
+  - "ARMCD"
+  - "ACTARMCD"
+  - "ARMNRS"
+Source:
+  Message: "ARMNRS is populated, but ARMCD and ACTARMCD are populated"
+  Description: "The Reason Arm and/or Actual Arm is Null (ARMNRS) variable should\
+    \ only be populated when Planned Arm Code (ARMCD) and Actual Arm Code (ACTARMCD)\
+    \ are null."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1360"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1360"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1360"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1360"
+        Version: "1"
+      Version: "1.6"

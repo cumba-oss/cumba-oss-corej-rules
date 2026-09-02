@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD0064"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Unique Subject Identifier (USUBJID) value is not\
+  \ present in the Demographics (DM) dataset."
+Severity: "Reject"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "AP--"
+    - "APRELSUB"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$dm_usubjid"
+  expression: "distinct(USUBJID, domain=\"DM\")"
+Check:
+  expression: >-
+    not empty(USUBJID) and USUBJID not in $dm_usubjid
+Outcome:
+  Message: "USUBJID value is not present in the DM dataset."
+  Output_Variables:
+  - "$dm_usubjid"
+Source:
+  Message: "Subject is not present in DM domain"
+  Description: "All Subjects (USUBJID) must be present in Demographics (DM) domain."
+  Domains: "ALL (-DM, -DI, -OI, -TA, -TD, -TE, -TI, -TM, -TS, -TV)"
+  Severity: "Reject"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0064"
+        Version: "1"
+      Version: "1.6"

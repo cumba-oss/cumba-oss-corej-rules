@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0531"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RACE in DM equals 'MULTIPLE' but multiple race records\
+  \ are not present in SUPPDM for the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RACE"
+Operations:
+- id: "$suppdm_race_count"
+  expression: "record_count(QNAM, domain=\"SUPPDM\", group=[USUBJID], filter=filter(QNAM=\"\
+    RACE%\"))"
+Check:
+  expression: >-
+    RACE == "MULTIPLE" and $suppdm_race_count <= 1
+Outcome:
+  Message: "RACE in DM equals 'MULTIPLE' but multiple races are not collected in SUPPDM."
+  Output_Variables:
+  - "RACE"
+  - "$suppdm_race_count"
+Source:
+  Class: "SPC"
+  Domain: "SUPPDM"
+  Condition: "RACE = MULTIPLE"
+  Rule: "Multiple SUPPDM.QNAM records exist for the subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0531"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0531"
+        Version: "1"
+      Version: "2.0"

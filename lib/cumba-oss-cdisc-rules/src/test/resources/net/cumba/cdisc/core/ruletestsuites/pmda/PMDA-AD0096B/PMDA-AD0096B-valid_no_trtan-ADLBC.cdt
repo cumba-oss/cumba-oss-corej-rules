@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0096B expect=noViolation domain=ADLBC
+#note "TRTAN (the grouping key) absent. No Requirements.Variables block gates the rule, so it executes; not empty(TRTAN) is false on every row, which is also what stops the absent key from collapsing the table into one group and flagging DRUGB. Second half of the family-F2 discriminating set."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | DRUGA
+CDISCPILOT01 | 01-701-1023 | ALB | DRUGA
+CDISCPILOT01 | 01-701-1034 | ALB | DRUGB
+---

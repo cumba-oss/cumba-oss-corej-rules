@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0323"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Focus of Study-Specific Interest (FOCID) is\
+  \ populated with a purely numeric value; FOCID must carry semantic value (e.g. a\
+  \ bare \"1\" is not adequate)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "FOCID"
+Check:
+  expression: >-
+    not empty(FOCID) and FOCID =~ /^[0-9]+$/
+Outcome:
+  Message: "FOCID is a purely numeric value and does not carry semantic value (e.g.\
+    \ a bare 1 is not adequate)."
+  Output_Variables:
+  - "FOCID"
+Source:
+  Class: "INT, FND"
+  Domain: "ALL"
+  Variable: "FOCID"
+  Plain_Text_Explanation: "The value in FOCID should have semantic value (i.e., ‘\
+    1’ is not considered adequate). Example: ‘Injection site 1’ is acceptable."
+  Condition: "FOCID ^= null"
+  Rule: "FOCID must have semantic value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND323"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND323"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND323"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND323"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND323"
+        Version: "1"
+      Version: "5.0"

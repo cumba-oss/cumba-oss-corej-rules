@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2239 expect=violation domain=CL
+#note "Third branch of the any-tree: row 2 copies the subcategory into the result category (CLRESCAT = CLSCAT) -> fires."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 CLRESCAT=SKIN
+dataset CL label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLTEST   type=Char label="Clinical Observation Name"
+col CLCAT    type=Char label="Category for Clinical Observation"
+col CLSCAT   type=Char label="Subcategory for Clinical Observation"
+col CLRESCAT type=Char label="Result Category"
+---
+S1 | 001 | 1 | CLSIGN | Clinical Signs | CLINICAL OBSERVATION | SKIN | ERYTHEMA
+S1 | 001 | 2 | CLSIGN | Clinical Signs | CLINICAL OBSERVATION | SKIN | SKIN

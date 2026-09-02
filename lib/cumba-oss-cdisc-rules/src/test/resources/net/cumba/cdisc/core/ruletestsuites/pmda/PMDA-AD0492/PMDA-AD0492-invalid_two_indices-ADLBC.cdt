@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0492 expect=violation domain=ADLBC
+#note "EXPANSION ARITHMETIC: two captures (SHIFT1, SHIFT2) => two tuples => two expansions, each fires, and the harness AGGREGATES. Count-only, NO #expectViolationAt - both violations come from datasetBroadcastResult at internal row 0 (reported row 1), and each carries only its own expansion's Output_Variable, so a row=1 SHIFTn=... pin could also match the other expansion's violation through the matcher's documented fallback."
+#expectViolationCount 2
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT2  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | NORMAL to HIGH | HIGH to NORMAL

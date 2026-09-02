@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0210 expect=violation domain=SE
+#note "RE-POINTED skipped -> violation 2026-08-27 (owner ruling, evidence in REMOVE-34-EVIDENCE.md): SEUPDES was removed from Requirements.Variables.All because it is Permissible in this domain and NO rule anywhere reports its absence -- not a specific presence rule, and not the generic Required/Expected rules, which do not cover Permissible variables. Leaving the All entry silenced the defect with nothing else reporting it. SUPERSEDES this fixture's earlier rationale ('skips the rule rather than flagging every ETCD row'): that argued the flood case, but ETCD == "UNPLAN" still restricts the rows, so an absent SEUPDES yields a SUBSET, not every row -- and subset means unguarded under M2-D24 / the absent-column bucket classifier. The rule now reports 1 violation(s) here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | UNPLAN |

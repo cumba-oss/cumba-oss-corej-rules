@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0110"
+Sheet_Rule_Identifier: "DD0110"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The Origin for Visit Number (VISITNUM) variable should be consistent across all datasets."
+# consistent_across_document scoped to the VISITNUM ItemDefs: the first-seen
+# def:Origin Type value (document order) is canonical and every later VISITNUM
+# definition deviating from it is flagged. ItemDefs without an Origin
+# contribute nothing (missing Origin is a presence row's beat). Origin
+# consistency is read as Type-attribute consistency - the sheet's 'Origin'
+# column maps to def:Origin/@Type in both Define-XML versions.
+Message: "Inconsistent Origin for VISITNUM"
+Check:
+  kind: "consistent_across_document"
+  path: "Origin/@Type"
+  when:
+    path: "@Name"
+    equals: "VISITNUM"

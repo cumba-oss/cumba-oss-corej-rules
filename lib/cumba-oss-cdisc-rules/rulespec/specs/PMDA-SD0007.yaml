@@ -1,0 +1,47 @@
+name: PMDA-SD0007
+kind: rule
+description: |
+  EC-29 §7.3 — PMDA twin of the SD0007 family, Sensitivity: Record since the FDA
+  run-2 review. --STRESU inconsistent across records sharing the PMDA identity keys
+  (--TESTCD, --OBJ, --TSTDTL, --CAT, --SPEC, --METHOD, --MRKSTR; absent columns do
+  not participate). The two rows share LBTESTCD/LBCAT/LBSPEC/LBMETHOD but carry
+  different units (g/dL vs mg/dL) -> a 1-1 tie has no majority, so BOTH records
+  are minority rows and both fire (the 2-row tie case of the minority-row
+  contract; see FDA-SD0007-invalid_majority for the 2-vs-1 shape).
+python_source: rules-sdtmig-3-4.json (PMDA-SD0007)
+rule:
+  coreId: PMDA-SD0007
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: HGB, LBCAT: HEM, LBSPEC: BLOOD, LBMETHOD: AUTO, LBSTRESU: g/dL}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 2, LBTESTCD: HGB, LBCAT: HEM, LBSPEC: BLOOD, LBMETHOD: AUTO, LBSTRESU: mg/dL}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: PMDA-SD0007
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBCAT: HEM
+      LBMETHOD: AUTO
+      LBSPEC: BLOOD
+      LBSTRESU: g/dL
+      LBTESTCD: HGB
+  - rule_id: PMDA-SD0007
+    dataset: LB
+    row_key: {LBSEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      LBCAT: HEM
+      LBMETHOD: AUTO
+      LBSPEC: BLOOD
+      LBSTRESU: mg/dL
+      LBTESTCD: HGB
+expected_errors: []

@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0541"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Last Observation Before Exposure Flag (--LOBXFL)\
+  \ is populated and its value is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--LOBXFL"
+Check:
+  expression: >-
+    --LOBXFL != "Y" and not empty(--LOBXFL)
+Outcome:
+  Message: "--LOBXFL is populated with a value other than 'Y'."
+  Output_Variables:
+  - "--LOBXFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--LOBXFL"
+  Rule: "Value must be 'Y' or null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0541"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0541"
+        Version: "1"
+      Version: "2.0"

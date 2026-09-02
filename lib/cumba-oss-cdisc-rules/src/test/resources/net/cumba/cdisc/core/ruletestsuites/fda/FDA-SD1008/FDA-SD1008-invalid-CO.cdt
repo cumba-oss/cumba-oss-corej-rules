@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1008 expect=violation domain=CO
+#note "Row 1 is a comment on a specific parent record (IDVAR/IDVARVAL populated) yet carries a comment date -> 'The value of Date/Time of Comment (CODTC) should be NULL, when comments are related to a specific parent record ...'."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVAR=AESEQ CODTC=2020-01-15
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | AE | 01-701-1015 | 1 | AESEQ | 3 | Related to AE 3 | 2020-01-15
+CDISCPILOT01 | CO |    | 01-701-1015 | 2 |       |   | General comment | 2020-01-16

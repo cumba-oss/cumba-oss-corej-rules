@@ -1,0 +1,44 @@
+Core:
+  Id: "FDA-SE2279"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Nominal Study Day for Tabulations (PCNOMDY) has\
+  \ more than one value for a given Time Point Reference (PCTPTREF) within the same\
+  \ subject (USUBJID), or within the same pool (POOLID) for pooled records where USUBJID\
+  \ is blank; a Time Point Reference must identify a unique dose."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Check:
+  expression: >-
+    not empty(PCTPTREF) and not empty(PCNOMDY) and has_multiple_values_for(PCNOMDY, PCTPTREF,
+    keep_missings=false, within=[[USUBJID, POOLID]])
+Outcome:
+  Message: "PCNOMDY has more than one value for a given PCTPTREF within the same subject\
+    \ (USUBJID), or within the same pool (POOLID) for pooled records; a Time Point\
+    \ Reference must identify a unique dose."
+  Output_Variables:
+  - "PCNOMDY"
+  - "PCTPTREF"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate value for PCTPTREF for the same USUBJID (or\
+    \ POOLID) when PCNOMDY value is different"
+  FDA_Validator_Rule_Description: "Time Point Reference (PCTPTREF) must identify a\
+    \ unique dose. Ambiguous references such as 'Most recent dose' should be avoided;\
+    \ it is recommended that Time Point Reference (PCTPTREF) include both the Nominal\
+    \ Study Day for Tabulations (PCNOMDY) and the time point description in order\
+    \ (e.g., “Day 1, Dose 1” and “Day 1, Dose 2” for twice daily dosing)."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2279"
+        Version: "1"
+      Version: "1.6"

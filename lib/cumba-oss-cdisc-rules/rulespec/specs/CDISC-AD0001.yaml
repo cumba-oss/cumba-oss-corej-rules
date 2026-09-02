@@ -1,0 +1,36 @@
+name: CDISC-AD0001
+kind: rule
+description: |
+  Wave C3 port — T2-DatasetSens + Domain Presence Check.
+  CDISC-AD0001: fire when ADSL dataset does not exist. Rule_Type=Domain
+  Presence Check, Sensitivity=Study, Scope=ALL.
+
+  Sensitivity does not affect this spec: the harness drives
+  RuleRunner.execute directly, below both the study-result collapse and
+  the study-anchor pass, and RuleRunner treats Study and Dataset alike
+  (only Record is row-based). The study-level reporting contract is
+  pinned by the Java report-layer tests instead.
+
+  Rule-body quirk: the Check is a bare leaf `{name: "ADSL", operator:
+  "not_exists"}` (no outer all/any wrapper). On Python this would
+  trigger Finding #26 (`business_rules` KeyError: 'name'). We keep the
+  fixture rule body verbatim; to produce a deterministic 0-violations
+  baseline across both lanes, ADSL is declared. With ADSL present, the
+  DPC resolves the $-variable to true and `not_exists` is false, so no
+  violation fires on either engine.
+python_source: rules-adamig-1-3.json (CDISC-AD0001)
+rule:
+  coreId: CDISC-AD0001
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0405 expect=noViolation domain=ADLBC
+#note "One subject, two parameters, a different ATOXDSCH per parameter -- legal, because each (USUBJID, PARAMCD) group holds one distinct value. Discriminating fixture for the PARAMCD half of the key: drop PARAMCD and the four rows become one subject group with a 2-vs-2 tie and all four would fire. Deliberate complement of PMDA-AD0403-valid_different_subjects-ADLBC.cdt, which discriminates the USUBJID half."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVISITN  type=Num
+col AVAL     type=Num
+col ATOXDSCH type=Char
+---
+S1 | 001 | GLUC | 1 | 5.0 | GRADE1
+S1 | 001 | GLUC | 2 | 5.1 | GRADE1
+S1 | 001 | ALB  | 1 | 4.0 | GRADE3
+S1 | 001 | ALB  | 2 | 4.1 | GRADE3

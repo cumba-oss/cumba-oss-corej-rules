@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2345 expect=violation domain=TX
+#note "TX branch of the rule (TXPARMCD/TXVAL) plus the negative:false parameter: '-P28D' is a negative ISO 8601 duration, which the leaf rejects; the positive duration on row 1 is accepted."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TXPARMCD=RECSAC TXVAL=-P28D
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+SEND001 | TX | 1 | Control | 1 | RECSAC | Recovery Sacrifice Period | P28D
+SEND001 | TX | 2 | High    | 1 | RECSAC | Recovery Sacrifice Period | -P28D

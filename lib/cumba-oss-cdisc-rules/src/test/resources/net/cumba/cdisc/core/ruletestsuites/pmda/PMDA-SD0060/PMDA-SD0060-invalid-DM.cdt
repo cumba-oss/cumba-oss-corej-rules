@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0060 expect=violation domain=DM
+#note "Adapted from tested A2 twin fda/FDA-SD0060 (TG-0221). Define declares STUDYID/USUBJID/AGE; AGEU is submitted but undeclared -> 1 violation."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM STUDYID name=STUDYID label="Study Identifier"
+#define variable-metadata DM USUBJID name=USUBJID label="Unique Subject Identifier"
+#define variable-metadata DM AGE name=AGE label="Age"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGEU
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

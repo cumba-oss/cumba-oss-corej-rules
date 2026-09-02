@@ -1,0 +1,42 @@
+name: CDISC-AD0403
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0403: Within a subject, there is more than one value of ATOXDSCL for a given value of PARAM.
+  Bare-leaf Check (`has_multiple_values_for` with `within: USUBJID`) scoped to BASIC DATA STRUCTURE (no MDBDS).
+  Two rows share the same PARAM value but distinct ATOXDSCL; both fire. A third row is unique and does not fire.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0403)
+rule:
+  coreId: CDISC-AD0403
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB',  AVISITN: 1, ATOXDSCL: 'X', PARAM: 'Hemoglobin'}   # bad
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'GLUC', AVISITN: 1, ATOXDSCL: 'Y', PARAM: 'Hemoglobin'}   # bad (distinct ATOXDSCL for same PARAM within USUBJID)
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'ALB',  AVISITN: 1, ATOXDSCL: 'Z', PARAM: 'Albumin'}     # ok (unique PARAM)
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0403
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ATOXDSCL: 'X'
+      PARAM: 'Hemoglobin'
+  - rule_id: CDISC-AD0403
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'GLUC', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ATOXDSCL: 'Y'
+      PARAM: 'Hemoglobin'
+expected_errors: []

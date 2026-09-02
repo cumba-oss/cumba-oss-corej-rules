@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-CG0371 expect=violation domain=SUPPAE
+#note "ADAPTED-FROM fda/FDA-SD0077/FDA-SD0077-invalid-SUPPAE.cdt. SUPPAE references RDOMAIN=AE, IDVAR=AESEQ, IDVARVAL=99 but no AE record with AESEQ=99 exists for that USUBJID -> the referenced record does not exist in the target domain (multiplicity: 2-row parent, 1 child row, count 1)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | SUPPAE | AE | 01-701-1015 | AESEQ | 99 | AESOC | NERVOUS SYSTEM DISORDERS
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA

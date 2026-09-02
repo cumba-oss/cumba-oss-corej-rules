@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1271 expect=noViolation domain=TE
+#note "BOUNDARY, sheet-literal reading (PMDA row 294: the combination 'should be unique FOR EACH Element Code (ETCD)', i.e. within one ETCD). Two different ETCDs sharing the identical ELEMENT/TESTRL/TEENRL/TEDUR combination is an ETCD<->ELEMENT one-to-one defect, owned by CDISC-CG0154 (Scope SE/TA/TE) -- PMDA-SD1050, also in this batch, is sheet-scoped to SE and TA only (PMDA row 145 DOMAINS = 'SE, TA'), so on TE no PMDA rule owns the 1:1 direction. Not this rule's finding."
+#library standard=sdtmig version=3-4
+dataset TE class="TRIAL DESIGN" label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+S1 | TE | TRT1 | Treatment | Randomization | End of treatment | P28D
+S1 | TE | TRT2 | Treatment | Randomization | End of treatment | P28D
+S1 | TE | FUP  | Follow-up | End of treatment | End of study  | P14D
+---

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1114 expect=violation domain=AE
+#note "AEBODSYS 'Cardiac disorders' is not a System Organ Class in the (dummy) MedDRA dictionary -> fires on row 2; row 1 matches a SOC case-insensitively."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEBODSYS="Cardiac disorders"
+dataset AE
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col AEBODSYS type=Char
+---
+001 | Headache | nervous system disorders
+001 | Nausea   | Cardiac disorders

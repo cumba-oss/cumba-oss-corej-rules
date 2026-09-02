@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1062 expect=violation domain=AE
+#note "Boundary: an empty AESER on an overdose record is also 'not equal to Y' (populated-vs-empty truth table) -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESOD=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESOD   type=Char label="Occurred with Overdose"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE |   | Y
+CDISCPILOT01 | AE | 01-701-1023 | 1 | RASH     | N | N

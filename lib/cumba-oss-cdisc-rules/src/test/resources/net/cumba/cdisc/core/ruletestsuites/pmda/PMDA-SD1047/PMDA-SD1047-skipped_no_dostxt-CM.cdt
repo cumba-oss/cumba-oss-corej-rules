@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1047 expect=skipped domain=CM
+#note "FRESH - the batch's Requirements.Variables reject pin, and the ALL-of semantics pin for pair-scoped rules (ScopeMatcher: the All facet requires every listed variable). CM has CMDOSE but NO CMDOSTXT column -> Requirements.Variables rejects; class=INTERVENTIONS passes the Classes axis so the Variables axis is the ONLY rejecting one."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDOSE  type=Num  label="Dose per Administration"
+---
+S1 | CM | 001 | 1 | ASPIRIN | 100

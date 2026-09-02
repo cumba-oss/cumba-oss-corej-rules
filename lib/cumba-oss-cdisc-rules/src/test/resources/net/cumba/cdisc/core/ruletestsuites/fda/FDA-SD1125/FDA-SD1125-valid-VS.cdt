@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1125 expect=noViolation domain=VS
+#note "D-TA-7a re-capture: every VISITNUM/--TPTREF/--TPT time point carries one planned elapsed time; a different time point name legitimately carries a different elapsed time."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VSTPTREF type=Char label="Time Point Reference"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+col VSTPT    type=Char label="Planned Time Point Name"
+col VSELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST | PT1H
+S1 | VS | 001 | 2 | SYSBP | 1 | DOSE | 2 | 2H POST | PT2H

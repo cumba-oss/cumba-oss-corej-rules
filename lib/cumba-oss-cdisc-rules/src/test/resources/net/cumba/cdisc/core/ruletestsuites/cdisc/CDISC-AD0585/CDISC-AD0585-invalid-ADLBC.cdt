@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0585 expect=violation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of BCHGCAyN for a given value of BCHGCATy, considering only those rows on which both variables are populated
+#note "BCHGCAT1=K1 maps to two distinct BCHGCA1N values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BCHGCA1N type=Char
+col BCHGCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | A1 | K1
+CDISCPILOT01 | 01-701-1023 | ALB | A2 | K1
+---

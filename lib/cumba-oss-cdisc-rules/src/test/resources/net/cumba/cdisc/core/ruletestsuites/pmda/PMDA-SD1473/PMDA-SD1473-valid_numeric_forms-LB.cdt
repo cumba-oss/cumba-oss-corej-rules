@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1473 expect=noViolation domain=LB
+#note "LBSTNRHI populated (6.1) on every row; LBORRES takes five forms all matching ^(<|>|=|< |> |= )?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$ - the alternation allows ONE relational symbol, optionally followed by a space. Deliberately does NOT include `<= -1.2`; that value is the subject of the predicted-red scenario and must not be mixed into a green fixture."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBSTNRHI type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 12.5 | 6.1
+S1 | LB | 002 | 2 | GLUC | -3   | 6.1
+S1 | LB | 003 | 3 | GLUC | .5   | 6.1
+S1 | LB | 004 | 4 | GLUC | < 5  | 6.1
+S1 | LB | 005 | 5 | GLUC | >5   | 6.1
+---

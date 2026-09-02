@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1324 expect=violation domain=DM
+#note "As the twin's variant: AGE label 'Age in Years' (define 'Age') and AGEU label 'Units' (define 'Age Units') -> 2 findings."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGE name=AGE label="Age"
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+#expectViolationCount 2
+#expectViolationAt variable_name=AGE
+#expectViolationAt variable_name=AGEU
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

@@ -1,0 +1,33 @@
+name: CDISC-AD0402
+kind: rule
+description: |
+  Wave A4 port — T1a PlainSimple.
+  CDISC-AD0402: ATOXDSCH is populated while AVAL or ATOXGRH is empty.
+  Record-data rule scoped to BASIC DATA STRUCTURE; nested all/any with empty/non_empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0402)
+rule:
+  coreId: CDISC-AD0402
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    column_types:
+      AVAL: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, ATOXDSCH: '', AVAL: 5.0, ATOXGRH: HIGH}       # ok — ATOXDSCH empty
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, ATOXDSCH: desc, AVAL: null, ATOXGRH: HIGH}       # bad — AVAL empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0402
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ATOXDSCH: desc
+      ATOXGRH: HIGH
+      AVAL:
+expected_errors: []

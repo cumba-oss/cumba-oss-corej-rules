@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-AD0059"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a name ending in TM is not a numeric\
+  \ variable"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "TM") and var_type("DATA") != "Num"
+Outcome:
+  Message: "This variable's name ends in TM, but it is not a numeric variable"
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*TM"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of TM is not a\
+    \ numeric variable"
+  Rule_Failure_Criteria: "A variable is not a numeric variable"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR59"
+        Version: "1"
+      Version: "5.0"

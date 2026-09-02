@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0455 expect=noViolation domain=TS
+#note "The PCLAS record names MED-RT — the current successor of the retired NDF-RT (D-TA-6d) -> no violation. The NDF-RT value on the non-PCLAS row is outside the rule's condition."
+#library standard=sdtmig version=3-3
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+---
+S1 | TS | 1 | PCLAS   | Pharmacological Class of Invest. Therapy | ANTICOAGULANTS | MED-RT
+S1 | TS | 2 | AEDICT  | Adverse Event Dictionary                 | MEDDRA 27.0    | NDF-RT

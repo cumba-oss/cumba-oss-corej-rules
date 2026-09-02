@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0045"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ENTPT is populated but --ENRTPT is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENRTPT"
+    - "--ENTPT"
+Check:
+  expression: >-
+    not empty(--ENTPT) and empty(--ENRTPT)
+Outcome:
+  Message: "--ENRTPT is empty when --ENTPT is populated."
+  Output_Variables:
+  - "--ENRTPT"
+  - "--ENTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENRTPT"
+  Condition: "--ENTPT ^= null"
+  Rule: "--ENRTPT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0045"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0045"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0045"
+        Version: "1"
+      Version: "2.0"

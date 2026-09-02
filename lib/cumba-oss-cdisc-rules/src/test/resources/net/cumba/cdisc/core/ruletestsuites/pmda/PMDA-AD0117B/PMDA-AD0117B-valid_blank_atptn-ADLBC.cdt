@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0117B expect=noViolation domain=ADLBC
+#note "The ATPT spellings disagree, but the disagreeing row's key component (ATPTN) is blank, so DROP_MISSING_KEYS drops it from the partition altogether (and not empty(ATPTN) is false on it independently) - group (SYSBP, 1) is left holding only PREDOSE and nothing fires. Blank-KEY branch for the AD0110B/AD0117B pair."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+col ATPTN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | PREDOSE    | 1
+CDISCPILOT01 | 01-701-1023 | SYSBP | BEFOREDOSE |
+CDISCPILOT01 | 01-701-1034 | SYSBP | PREDOSE    | 1

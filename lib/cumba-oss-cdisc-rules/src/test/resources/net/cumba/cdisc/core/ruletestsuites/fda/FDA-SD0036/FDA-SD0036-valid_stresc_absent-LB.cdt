@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD0036 expect=skipped domain=LB
+#note "R-3 (ruled 2026-08-19, option b): the twins' Requirements.Variables gate gained --STRESC, aligning gate breadth with CDISC-SEND-0087. LBSTRESC is not present as a column, so the rule now records one auditable skip for the dataset instead of firing per populated-LBORRES row - the ruled gate-breadth alignment."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5

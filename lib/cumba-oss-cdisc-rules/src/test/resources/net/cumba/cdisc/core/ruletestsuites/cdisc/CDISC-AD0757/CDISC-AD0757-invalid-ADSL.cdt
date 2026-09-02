@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0757 expect=violation domain=ADSL
+# Rule:Description: There is more than one value of TRxxPGy for a given value of TRxxPGyN, where xx is an integer [01-99, zero-padded] and y is a single-digit integer [1-9], considering only those rows on which both variables are populated
+#note "TR01PG1N=1 maps to two distinct TR01PG1 -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1 type=Char
+col TR01PG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GROUP A | 1
+CDISCPILOT01 | 01-701-1023 | GROUP B | 1
+---

@@ -1,0 +1,118 @@
+Core:
+  Id: "FDA-SD1269"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Randomization Quotient parameter (TSPARMCD equal\
+  \ to 'RANDQT') has a populated Parameter Value (TSVAL) that is not a number greater\
+  \ than 0 and less than or equal to 1."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Check:
+  expression: >-
+    TSPARMCD == "RANDQT" and not empty(TSVAL) and (TSVAL <= 0 or TSVAL > 1 or TSVAL !~
+    /^[+-]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)$/)
+Outcome:
+  Message: "TSVAL is populated but is not a number greater than 0 and less than or\
+    \ equal to 1 when TSPARMCD equals 'RANDQT'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  FDA_Validator_Rule_Message: "TSVAL is not between 0 and 1, when TSPARMCD = 'RANDQT'"
+  FDA_Validator_Rule_Description: "For the trial summary parameter Randomization Quotient\
+    \ (TSPARMCD = 'RANDQT'), the value must always be a number between 0 and 1, with\
+    \ some cases where the ratio might be equal to 1."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1269"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"

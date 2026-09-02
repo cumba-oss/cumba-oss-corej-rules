@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1265 expect=noViolation domain=SUPPAE
+#note "Every ASSIGNED record names the role that assigned the value; the CRF-origin record on row 3 may leave QEVAL empty."
+#library standard=sdtmig version=3-4
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+col QEVAL    type=Char label="Evaluator"
+---
+S1 | AE | 001 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y | ASSIGNED | ADJUDICATION COMMITTEE
+S1 | AE | 001 | AESEQ | 2 | AETRTEM | Treatment Emergent Flag | N | Assigned | INVESTIGATOR
+S1 | AE | 001 | AESEQ | 3 | AESOSP  | Other Medically Import. | N | CRF      |

@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0175-B"
+Sheet_Rule_Identifier: "175"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "SASFormatName"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+# Companion of DEFINE-XML-0175 (one sheet row, two rules): the $-prefix leg —
+# "The SASFormatName needs to start with a '$' character when the CodeList
+# DataType is 'text'" (spec SS5.3.13 business rule). Guarded on the only legal
+# DataType spelling ("text", sheet id 174).
+Plain_Text_Rule: "The SASFormatName needs to start with a $ character in case the CodeList DataType is text."
+Message: "The SASFormatName attribute value [${value}] does not start with a '$' character although the CodeList DataType is \"text\"."
+Check:
+  kind: "matches_regex"
+  attribute: "SASFormatName"
+  pattern: '\$.*'
+  when:
+    path: "@DataType"
+    equals: "text"

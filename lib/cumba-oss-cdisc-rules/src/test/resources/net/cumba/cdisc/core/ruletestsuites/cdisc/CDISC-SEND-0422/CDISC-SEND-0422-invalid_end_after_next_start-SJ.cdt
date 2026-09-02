@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0422 expect=violation domain=SJ
+#library standard=sendig-dart version=1-2
+#note "Stage 1 ends 2020-01-20, five days AFTER stage 2 starts - the stages overlap, which no reading of the guidance permits. Exactly one finding, on the CURRENT row (the operator sets the current row's bit, never the next). Row 2 ends exactly when row 3 starts and is conformant; its silence keeps the scenario from passing by accident. Row 3 is the last stage and never fires."
+#expectViolationCount 1
+#expectViolationAt row=1 SJSEQ=1 USUBJID=R-001
+dataset SJ label="Subject Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+STUDY01 | SJ | R-001 | 1 | 2020-01-01 | 2020-01-20
+STUDY01 | SJ | R-001 | 2 | 2020-01-15 | 2020-01-25
+STUDY01 | SJ | R-001 | 3 | 2020-01-25 | 2020-02-01
+---

@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0290 expect=noViolation domain=LB
+#note "The emptiness contract. Row 3's LBTPT is blank and is excluded twice over -- by the Check's own `not empty(--TPT)` conjunct and by the operator's include_empty default of false, which drops a blank key and a blank dependent out of collectKeyToDependents. Without the exclusion, LBTPTNUM=2's blank name would make the second disjunct's key set inconsistent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBTPT    type=Char label="Planned Time Point Name"
+col LBTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | LB | 001 | 1 | ALB | Albumin | 41 | 1 HOUR | 1
+S1 | LB | 002 | 1 | ALB | Albumin | 39 | 1 HOUR | 1
+S1 | LB | 003 | 1 | ALB | Albumin | 40 |        | 2
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0014 expect=noViolation domain=DM
+#note "PROPOSED-RULE scenario (ruling 8). BRTHDTC is Permissible (library core=Perm) and IS populated; the define declares it with no comment. Proposed rule: BRTHDTC is not Expected and has data -> no violation. CURRENT rule fires on every define-declared variable without a comment regardless of core status -> predicted-red: engine reports exactly 1 violation (define_variable_name=BRTHDTC) where this scenario expects noViolation."
+#library standard=sendig version=3-0
+#library variable-metadata DM BRTHDTC core=Perm
+#define-xml CDISC-SEND-0014-perm-define.xml
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col BRTHDTC type=Char
+---
+S1 | S1-001 | 2020-01-01

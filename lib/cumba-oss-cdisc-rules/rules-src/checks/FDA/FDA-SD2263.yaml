@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SD2263"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Value (TSVAL) for a PCLAS trial-summary\
+  \ parameter is not a valid MED-RT (or legacy NDF-RT) term."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$pclas_term_valid"
+  expression: "valid_external_dictionary_value(TSVAL, external_dictionary_type=\"\
+    medrt\", dictionary_term_type=\"MEDRT\")"
+Check:
+  expression: >-
+    TSPARMCD == "PCLAS" and $pclas_term_valid == false
+Outcome:
+  Message: "TSVAL is not a valid MED-RT (or legacy NDF-RT) term for the PCLAS parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  FDA_Validator_Rule_Message: "Invalid TSVAL value for PCLAS"
+  FDA_Validator_Rule_Description: "TSVAL for PCLAS record must be a valid term from\
+    \ MED-RT or NDF-RT (Note: Any version 2018-02-05 or earlier uses NDF-RT, and any\
+    \ version after is MED-RT)."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2263"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2263"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2263"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2263"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2263"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0228B expect=violation domain=ADSL
+#note "Mirror image of AD0227B: the group is TRTSEQP and the target is TRTSEQPN. Group A-B holds {1 x2, 2 x1} -> row 3 is the minority."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQPN=2 TRTSEQP=A-B
+dataset ADSL class=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTSEQP  type=Char
+col TRTSEQPN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | A-B | 2
+S1 | 004 | B-A | 3
+S1 | 005 | B-A | 3

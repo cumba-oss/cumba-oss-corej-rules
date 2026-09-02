@@ -1,0 +1,41 @@
+Core:
+  Id: "PMDA-AD0659"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when PKSUMXFN (PK Summary Exclusion Flag (N)) is populated\
+  \ with a numeric value other than 1; the only permitted populated value is 1 (exclusion),\
+  \ with a missing value meaning inclusion."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PKSUMXFN"
+Check:
+  expression: >-
+    not empty(PKSUMXFN) and PKSUMXFN != 1
+Outcome:
+  Message: "PKSUMXFN is populated with a value other than 1."
+  Output_Variables:
+  - "PKSUMXFN"
+Source:
+  Message: "PKSUMXFN value is not 1 or null"
+  Description: "PKSUMXFN (PK Summary Exclusion Flag (N)) must be 1 or null.  It is\
+    \ a numeric flag for exclusion of a record from a PK summary: 1 = exclusion, null\
+    \ = inclusion."
+  Domains: "ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0659"
+        Version: "1"
+      Version: "6.0"

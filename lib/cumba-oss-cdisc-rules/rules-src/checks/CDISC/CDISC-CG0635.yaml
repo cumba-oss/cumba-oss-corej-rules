@@ -1,0 +1,33 @@
+Core:
+  Id: "CDISC-CG0635"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --NOMDY is present in a dataset, because this variable\
+  \ is not permitted in human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--NOMDY")
+Outcome:
+  Message: "--NOMDY is present but is not permitted in human clinical trials."
+  Output_Variables:
+  - "--NOMDY"
+Source:
+  Class: "ALL"
+  Variable: "--NOMDY"
+  Rule: "--NOMDY not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0635"
+        Version: "1"
+      Version: "2.0"

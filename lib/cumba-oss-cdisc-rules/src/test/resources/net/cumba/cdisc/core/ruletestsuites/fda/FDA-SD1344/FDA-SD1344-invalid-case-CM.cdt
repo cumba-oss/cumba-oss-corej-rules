@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1344 expect=violation domain=CM
+#note "Case-mismatch pin for the D-TA-3 sensitive default (Fix #266): CMDECOD 'ASPIRIN' is a WHODrug PT term but not in the dictionary's preferred case ('Aspirin') -> the flag-less rule fires on row 2; row 1 matches the preferred case exactly. The C1 data repair (2026-08-19) left this pin standing: whodrug.json carried only `levels` at the time, so it had no pairs/hierarchy/attributes entry to re-case, and the preferred form 'Aspirin' is unchanged. (The pairs.whodrug registry added for CDISC-CG0096 in PLAN-dictionary-seeder Phase 7b keys reported names and decodes to preferred-case PT terms, so it does not touch this pin either.)"
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CMSEQ=2 CMDECOD=ASPIRIN
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | Aspirin
+S01 | CM | 001 | 2 | Aspirin 100mg | ASPIRIN

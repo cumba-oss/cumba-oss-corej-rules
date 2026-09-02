@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-SEND-0106.1 expect=noViolation domain=DM
+#note "The TX arm, pinned independently: TS carries NO STRAIN row, TX carries TXPARMCD=STRAIN with TXVAL=WISTAR, so $ts_strain is null while $tx_strain resolves and the fourth conjunct is false. The pair with -valid_strain_in_ts-DM proves each fallback alone suffices, which is the sheet's OR."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SPECIES type=Char label="Species"
+col STRAIN  type=Char label="Strain/Substrain"
+---
+S1 | DM | 001 | RAT |
+S1 | DM | 002 | RAT | WISTAR
+---
+
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SPECIES  | RAT
+S1 | TS | 2 | SNDIGVER | SENDIG 3.1.1
+---
+
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXVAL    type=Char label="Parameter Value"
+---
+S1 | TX | G1 | 1 | STRAIN  | WISTAR
+S1 | TX | G1 | 2 | SPGRPCD | A
+---

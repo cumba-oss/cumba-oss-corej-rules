@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1079 expect=noViolation domain=VS
+#note "The dataset's column order (STUDYID DOMAIN USUBJID VSSEQ VSTESTCD VSTEST VSORRES) is an ordered subset of the SDTM Model variable order for VS -> no violation."
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSGRPID VSTESTCD VSTEST VSCAT VSPOS VSORRES VSORRESU
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120

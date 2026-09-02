@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0434"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ASPERC is populated but ASPER is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ASPERC) and empty(ASPER)
+Outcome:
+  Message: "ASPERC is populated, but ASPER is missing"
+  Output_Variables:
+  - "ASPER"
+  - "ASPERC"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ASPER"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, ASPERC is populated\
+    \ and ASPER is not populated"
+  Rule_Failure_Criteria: "ASPER is not populated"
+  Condition_Failure: "ASPERC is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR434"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR434"
+        Version: "2"
+      Version: "5.0"

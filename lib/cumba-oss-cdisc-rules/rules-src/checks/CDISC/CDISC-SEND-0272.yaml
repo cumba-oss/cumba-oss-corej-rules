@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-SEND-0272"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SEND dataset was loaded from a source format other\
+  \ than SAS transport (XPORT); SEND datasets must be submitted as SAS V5 Transport\
+  \ files."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Checks the authoritative 'file_format' metadata key the host loader stamps\
+    \ from the provider that actually parsed the source (XPORT implies V5 for the\
+    \ shipping reader), so a SEND dataset loaded from Dataset-JSON, CSV, XLSX etc.\
+    \ fires. Residual underreporting: a corrupt or non-V5 transport generally fails\
+    \ to load and never reaches rule execution, and a host that does not stamp the\
+    \ key is excluded by the non_empty guard rather than false-firing."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$file_format"
+  expression: "extract_metadata(\"file_format\")"
+Check:
+  expression: >-
+    not empty($file_format) and $file_format != "XPORT"
+Outcome:
+  Message: "The SEND dataset was loaded from a source format other than SAS transport\
+    \ (XPORT)."
+  Output_Variables:
+  - "$file_format"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "All .xpt files are in SAS V5  Transport format."
+  Rule: "All .xpt files are in SAS V5  Transport format."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND272"
+        Version: "1"
+      Version: "5.0"

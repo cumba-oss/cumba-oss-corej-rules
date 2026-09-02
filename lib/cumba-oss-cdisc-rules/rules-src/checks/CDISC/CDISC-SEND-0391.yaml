@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-SEND-0391"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Reproductive Path Code (RPATHCD) in\
+  \ DM does not exist among the Reproductive Path Code (RPATHCD) values defined in\
+  \ the Trial Repro Paths (TP) dataset."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$tp_rpathcd"
+  expression: "distinct(RPATHCD, domain=\"TP\")"
+Check:
+  expression: >-
+    not empty(RPATHCD) and RPATHCD not in $tp_rpathcd
+Outcome:
+  Message: "DM RPATHCD does not exist among the RPATHCD values in the TP dataset."
+  Output_Variables:
+  - "RPATHCD"
+  - "$tp_rpathcd"
+Source:
+  Class: "TDM, SPC"
+  Domain: "TP, DM"
+  Variable: "RPATHCD"
+  Plain_Text_Explanation: "The value for RPATHCD for a USUBJID in Demographics (DM)\
+    \ should be identical to an RPATHCD defined in the Trial Repro Paths (TP) domain."
+  Rule: "DM.RPATHCD = TP.RPATHCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND391"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND391"
+        Version: "1"
+      Version: "5.0"

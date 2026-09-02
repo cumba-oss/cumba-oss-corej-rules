@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-AD0481"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of STRATwVN for a given\
+  \ value of STRATwV, where w is a single-digit integer [1-9], considering only records\
+  \ where both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(STRATwVN) and not empty(STRATwV) and has_multiple_values_for(STRATwVN, STRATwV)
+Outcome:
+  Message: "More than one value of STRATwVN was found for the same value of STRATwV."
+  Output_Variables:
+  - "STRATwV"
+  - "STRATwVN"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "STRATwVN where w is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of STRATwVN\
+    \ for a given value of STRATwV, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of STRATwVN for a given value\
+    \ of STRATwV"
+  Condition_Failure: "On rows where both STRATwVN and STRATwV are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR481"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR481"
+        Version: "1"
+      Version: "5.0"

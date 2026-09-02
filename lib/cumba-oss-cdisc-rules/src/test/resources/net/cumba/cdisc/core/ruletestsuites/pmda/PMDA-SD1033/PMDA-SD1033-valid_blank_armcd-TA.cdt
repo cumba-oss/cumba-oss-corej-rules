@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1033 expect=noViolation domain=TA
+#note "FRESH, DISCRIMINATING. The ARMCD KEY is blank on both rows and the two ARM values conflict. Predicted SILENT: is_inconsistent_across_dataset groups under GroupKeyPolicy.DROP_MISSING_KEYS, so a row whose key component is blank is dropped with its group and never reaches the minority pass. This is the KEY axis, the mirror of valid_empty_arm's TARGET axis, and no twin covers it. If it FIRES, the grouping policy changed; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA |   | Placebo      | 1 | SCRN
+S1 | TA |   | Placebo Arm  | 2 | TRT

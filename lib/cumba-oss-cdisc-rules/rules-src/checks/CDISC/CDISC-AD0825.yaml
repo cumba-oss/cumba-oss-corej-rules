@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0825"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when FLGREAS is populated and FLGREASC is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(FLGREAS) and empty(FLGREASC)
+Outcome:
+  Message: "FLGREAS is populated, but FLGREASC is not populated."
+  Output_Variables:
+  - "FLGREAS"
+  - "FLGREASC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "FLGREASC"
+  Natural_Language_Rule_Failure_Criteria: "FLGREAS is populated and FLGREASC is not\
+    \ populated"
+  Rule_Failure_Criteria: "FLGREASC is not populated"
+  Condition_Failure: "FLGREAS is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR825"
+        Version: "1"
+      Version: "5.0"

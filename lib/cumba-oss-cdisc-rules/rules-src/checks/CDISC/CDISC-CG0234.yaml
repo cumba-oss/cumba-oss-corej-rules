@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0234"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the end reference time point (--ENTPT) is a complete\
+  \ date equal to the date/time of collection (--DTC) but the end relative to reference\
+  \ time point (--ENRTPT) is not one of 'BEFORE', 'COINCIDENT', 'ONGOING', or 'UNKNOWN'."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENRTPT"
+    - "--ENTPT"
+    - "--DTC"
+Check:
+  expression: >-
+    not empty(--ENTPT) and is_complete_date(--ENTPT) and not empty(--DTC) and date(--ENTPT) == --DTC
+    and --ENRTPT not in ["BEFORE", "COINCIDENT", "ONGOING", "UNKNOWN"]
+Outcome:
+  Message: "--ENTPT is equal to the date of collection or assessment but --ENRTPT\
+    \ is not in ('BEFORE', 'COINCIDENT', 'ONGOING', 'UNKNOWN')."
+  Output_Variables:
+  - "--DTC"
+  - "--ENRTPT"
+  - "--ENTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENRTPT"
+  Condition: "--ENTPT corresponds to the date of collection or assessment."
+  Rule: "--ENRTPT in ('BEFORE', 'COINCIDENT', 'ONGOING', 'UNKNOWN')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0234"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0234"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0234"
+        Version: "1"
+      Version: "2.0"

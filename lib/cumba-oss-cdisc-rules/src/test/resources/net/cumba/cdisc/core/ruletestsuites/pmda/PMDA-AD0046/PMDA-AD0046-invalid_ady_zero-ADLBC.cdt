@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0046 expect=violation domain=ADLBC
+#note "Melted (record x variable) value check: ends_with(varname(),\"DY\") narrows to the two candidate cells ADY and ASTDY. ADY=0 fires; ASTDY=5 does not. Exactly ONE violation; the second *DY column makes this a real assertion rather than a tautology. Pin row=1 variable_name=ADY ONLY - do NOT add variable_value=0 (numeric projected-output coercion is unverified)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=ADY
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADY     type=Num
+col ASTDY   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 0 | 5

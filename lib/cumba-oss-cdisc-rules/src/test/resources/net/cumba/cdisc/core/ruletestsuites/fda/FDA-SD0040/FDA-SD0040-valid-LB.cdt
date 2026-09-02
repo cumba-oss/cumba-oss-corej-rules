@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0040 expect=noViolation domain=LB
+#note "Every --TESTCD maps to exactly one --TEST. Two different codes legitimately carry two different names."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+---
+S1 | LB | 001 | 1 | GLUC | Glucose
+S1 | LB | 002 | 1 | GLUC | Glucose
+S1 | LB | 001 | 2 | ALB  | Albumin

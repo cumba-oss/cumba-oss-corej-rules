@@ -1,0 +1,102 @@
+Core:
+  Id: "FDA-SD1333"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Outcome of Adverse Event (AEOUT) is equal to\
+  \ 'RECOVERED/RESOLVED' but neither an End Date/Time of Adverse Event (AEENDTC) nor\
+  \ a Duration of Adverse Event (AEDUR) is provided."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AEOUT"
+Check:
+  expression: >-
+    AEOUT == "RECOVERED/RESOLVED" and empty(AEENDTC) and empty(AEDUR)
+Outcome:
+  Message: "Neither AEENDTC nor AEDUR is populated, when AEOUT is equal to RECOVERED/RESOLVED."
+  Output_Variables:
+  - "AEOUT"
+  - "AEENDTC"
+  - "AEDUR"
+Source:
+  FDA_Validator_Rule_Message: "AEOUT = RECOVERED/RESOLVED, but an end date or collected\
+    \ duration is not provided"
+  FDA_Validator_Rule_Description: "The Outcome of Adverse Event (AEOUT) variable is\
+    \ populated with the value RECOVERED/RESOLVED, however the End Date/Time of Adverse\
+    \ Event (AEENDTC) or Duration of Adverse Event (AEDUR) variables are null. If\
+    \ the adverse event has an outcome of RECOVERED/RESOLVED, it is expected that\
+    \ an end date or a collected duration be provided."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1333"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1333"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1333"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1333"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1333"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

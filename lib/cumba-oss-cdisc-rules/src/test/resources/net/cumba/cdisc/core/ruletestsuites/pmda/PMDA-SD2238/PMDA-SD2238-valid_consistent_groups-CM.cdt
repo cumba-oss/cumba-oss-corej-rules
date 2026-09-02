@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD2238 expect=noViolation domain=CM
+#note "Rows 1-2: group consistent. Row 3: different --STDTC = different group, may differ. Row 4: blank TARGET is excluded from the distinct-value count (includeEmpty=false) - not a competing value. Row 5: blank KEY component: DROP_MISSING_KEYS drops the row from grouping entirely - its divergent STTPT cannot flag anything. Rows 4 and 5 are load-bearing."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTDTC  type=Char
+col CMSTTPT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | 2020-01-15 | SCREENING
+S1 | CM | 001 | 2 | IBUPROFEN | 2020-01-15 | SCREENING
+S1 | CM | 001 | 3 | NAPROXEN  | 2020-02-01 | RANDOMIZATION
+S1 | CM | 001 | 4 | CODEINE   | 2020-01-15 |
+S1 | CM | 001 | 5 | DIAZEPAM  |            | UNSCHEDULED
+---

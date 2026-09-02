@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1472 expect=violation domain=LB
+#note "LBSTNRLO populated and LBORRES is non-numeric -> fires. Row 2 is a plain numeric result -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBORRES=POSITIVE
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col LBSEQ     type=Num
+col LBTESTCD  type=Char
+col LBORRES   type=Char
+col LBSTNRLO  type=Num
+---
+S1 | LB | 001 | 1 | GLUC | POSITIVE | 3.5
+S1 | LB | 001 | 2 | GLUC | 12       | 3.5

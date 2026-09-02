@@ -1,0 +1,33 @@
+name: CDISC-AD0051
+kind: rule
+description: |
+  Wave D1 port - T3-VMC (Variable Metadata Check). Baselined on Python
+  lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so column-name
+  `exists`/`not_exists` leaves resolve against meta-field columns
+  (variable_name, variable_label, ...) rather than the original
+  dataset columns and yield 0 violations. Java fires correctly on the
+  column metadata; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0051)
+rule:
+  coreId: CDISC-AD0051
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0051
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

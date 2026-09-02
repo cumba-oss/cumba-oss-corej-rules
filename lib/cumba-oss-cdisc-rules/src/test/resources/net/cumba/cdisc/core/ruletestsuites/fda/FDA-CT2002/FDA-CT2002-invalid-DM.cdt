@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-CT2002 expect=violation domain=DM
+#note "RACE is bound to an extensible CDISC codelist whose terms are WHITE/ASIAN. Row 2 submits 'MARTIAN', which is not a term -> fires (an extensible codelist may be extended, so the finding asks for confirmation that the value is not a duplicate, synonym or subset)."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM RACE codelist=RACE codelist_extensible=true codelist_coded_values="[\"WHITE\",\"ASIAN\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=RACE variable_value=MARTIAN
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE    type=Char label="Race"
+---
+S1 | DM | 001 | WHITE
+S1 | DM | 002 | MARTIAN
+S1 | DM | 003 |

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0229 expect=skipped domain=ADDL
+#note "ADSL-vs-ADDL pin: the base rule's Data_Structures block is one token narrower than PMDA-AD0229B's. AD-prefixed name, no BDS indicator, no column ending TERM/TRT/DECOD -> base ADAM OTHER; SPDEVID refines it to DEVICE LEVEL ANALYSIS DATASET, which under Fix #179 has no supertype and is not covered by [SUBJECT LEVEL ANALYSIS DATASET]. Data would fire if it ran; PMDA-AD0229B would run on this very fixture."
+#library standard=adamig version=1-0
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col TRTSEQA type=Char
+col TRTSEQAN type=Num
+---
+S1 | 001 | DEV01 | A-B | 1
+S1 | 002 | DEV01 | A-B | 1
+S1 | 003 | DEV02 | B-A | 1

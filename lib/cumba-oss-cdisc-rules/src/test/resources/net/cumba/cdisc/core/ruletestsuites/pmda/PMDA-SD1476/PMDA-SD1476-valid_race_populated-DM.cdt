@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1476 expect=noViolation domain=DM
+#note "Negative control: same columns as the invalid fixture, but RACE is populated on every row, so empty(RACE) is false throughout and the rule executes without firing."
+#library standard=sdtmig version=3-4
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+col RACE    type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | F | WHITE
+CDISCPILOT01 | DM | 01-701-1023 | M | ASIAN
+CDISCPILOT01 | DM | 01-701-1034 | F | WHITE

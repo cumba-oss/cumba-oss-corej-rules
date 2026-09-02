@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2270 expect=noViolation domain=MA
+#note "Boundary: DSSTDY is Permissible in SENDIG DS and is legitimately left unpopulated here (the study derives study day only in DSSTDTC). With no DSSTDY value there is no 'Study Day of Disposition' to compare against, so the intended check has nothing to assert and must stay silent -- the rule may not claim '--DY does not equal DSSTDY'. The mirror guard for --DY itself (non_empty) is already in the Check; this scenario pins the same treatment for the right-hand operand."
+#library standard=sendig version=3-1-1
+dataset MA label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASPEC   type=Char label="Specimen Material Type"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+col MADTC    type=Char label="Date/Time of Collection"
+col MADY     type=Num  label="Study Day of Collection"
+---
+S1 | MA | 001 | 1 | GROSPATH | LIVER  | ENLARGED | 2020-01-20 | 20
+S1 | MA | 001 | 2 | GROSPATH | KIDNEY | NORMAL   | 2020-01-20 | 20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20 |

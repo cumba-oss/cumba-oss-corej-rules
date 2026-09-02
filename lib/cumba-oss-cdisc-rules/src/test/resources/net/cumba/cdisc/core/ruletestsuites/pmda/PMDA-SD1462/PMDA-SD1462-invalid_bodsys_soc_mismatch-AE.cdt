@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1462 expect=violation domain=AE
+#note "Row 1: mismatch -> FIRES. Row 2: equal -> clean. Row 3: AESOC empty: 'SKIN DISORDERS' != '' is TRUE (B.1 populated-vs-empty) -> FIRES (load-bearing: an unpopulated primary SOC does not excuse a populated --BODSYS under the shipped !=)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=3 AESEQ=3
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEBODSYS type=Char
+col AESOC    type=Char
+---
+S1 | AE | 001 | 1 | PALPITATIONS | CARDIAC DISORDERS         | GASTROINTESTINAL DISORDERS
+S1 | AE | 001 | 2 | NAUSEA       | GASTROINTESTINAL DISORDERS | GASTROINTESTINAL DISORDERS
+S1 | AE | 001 | 3 | RASH         | SKIN DISORDERS             |
+---

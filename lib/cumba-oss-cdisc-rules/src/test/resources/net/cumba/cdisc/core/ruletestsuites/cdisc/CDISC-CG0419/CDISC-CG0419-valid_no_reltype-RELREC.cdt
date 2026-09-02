@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0419 expect=noViolation domain=RELREC
+#note "FRESH, DISCRIMINATING. No RELTYPE column. Both rows carry a --SEQ IDVAR, so the first conjunct is TRUE on both and only the RELTYPE leaf can silence the rule. Predicted: the rule EXECUTES (no Requirements.Variables block) and reports NOTHING, because an absent RELTYPE folds to all-missing, empty(RELTYPE) is therefore TRUE and the authored not empty(RELTYPE) conjunct is FALSE. Note precisely what this pins: the shipped expression carries NO var_exists(\"RELTYPE\") -- the derivation's arm 1 covers only a bare empty(X) and this one sits under a not -- so the silence comes from the all-missing fold (EC-38 / guard-matrix class E), not from a machine-emitted guard. Do NOT propose adding a guard."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AESEQ | 1 | R01
+S1 | CM | 001 | CMSEQ | 2 | R01

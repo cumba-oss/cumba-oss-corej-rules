@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1036 expect=violation domain=LB
+#note "Row 1: LBTOX populated with LBTOXGR empty -> fires. Row 2: both populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTOX=Hepatotoxicity LBTOXGR=
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBTOX    type=Char
+col LBTOXGR  type=Char
+---
+S1 | LB | 001 | 1 | ALT   | Hepatotoxicity |
+S1 | LB | 001 | 2 | CREAT | Nephrotoxicity | 1

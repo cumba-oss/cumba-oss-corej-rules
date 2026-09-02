@@ -1,0 +1,42 @@
+Core:
+  Id: "FDA-SE1158"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Restraint Indicator (--RSTIND) is 'Y' but Restraint\
+  \ Mode (--RSTMOD) is empty or not present. Restraint Mode should be populated when\
+  \ restraint was indicated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--RSTIND"
+Check:
+  expression: >-
+    --RSTIND == "Y" and empty(--RSTMOD)
+Outcome:
+  Message: "--RSTMOD is empty or not present when --RSTIND is 'Y'."
+  Output_Variables:
+  - "--RSTIND"
+  - "!--RSTMOD"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for --RSTMOD, when --RSTIND = 'Y'"
+  FDA_Validator_Rule_Description: "Restraint Mode (--RSTMOD) variable should be populated\
+    \ when Restraint Indicator (--RSTIND) variable is set to 'Y'."
+  Domains: "INTERVENTIONS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1158"
+        Version: "1"
+      Version: "1.6"

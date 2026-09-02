@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0048"
+Sheet_Rule_Identifier: "DD0048"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The SASDatasetName value does not conform to SAS Transport file naming rules. Allowed string pattern for SASDatasetName is '[A-Za-z_][A-Za-z0-9_]*'."
+# The sheet prints its own pattern - enforced verbatim. DISAGREEMENT with CDISC
+# twin 0109 flagged: 0109 additionally enforces upper case and the 8-character
+# XPT member cap; the PMDA row's printed pattern has neither, and the PMDA
+# wording wins for the PMDA rule set.
+Message: "Invalid SASDatasetName value"
+Check:
+  kind: "matches_regex"
+  attribute: "SASDatasetName"
+  pattern: '[A-Za-z_][A-Za-z0-9_]*'

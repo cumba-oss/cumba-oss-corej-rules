@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD0062 expect=violation domain=LB
+#note "FRESH, DISCRIMINATING - dataset LB file_format=SAS7BDAT with the same 3 columns and ZERO data rows. The Check is dataset-constant (metadata-only), so the broadcast fold decides BEFORE the zero-row substitution and emits ONE violation at reported row=1 - an empty file in a wrong format is still a wrong format. If anything else comes back, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB file_format=SAS7BDAT label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+---

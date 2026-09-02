@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-SEND-0231"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Sequence Number (TXSEQ) is not unique for a\
+  \ record within the TX dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Check:
+  expression: >-
+    not is_unique_set([TXSEQ, STUDYID])
+Outcome:
+  Message: "TXSEQ is not unique within the TX dataset."
+  Output_Variables:
+  - "STUDYID"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "TXSEQ"
+  Plain_Text_Explanation: "TXSEQ should be unique for each record within the TX dataset."
+  Rule: "TXSEQ should be unique for each record within the TX dataset."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND231"
+        Version: "1"
+      Version: "5.0"

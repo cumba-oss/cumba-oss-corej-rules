@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1324 expect=violation domain=DM
+#note "AGE label 'Age in Years' in the dataset != 'Age' declared in the Define-XML -> fires on AGE; STUDYID/USUBJID are not in the define (guard) and AGEU matches."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#define variable-metadata DM AGE name=AGE label="Age"
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

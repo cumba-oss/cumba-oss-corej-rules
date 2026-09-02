@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-AD0326"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a value of APERIOD, there is more than one\
+  \ value of ASPERC for a given value of ASPER, considering only rows on which both\
+  \ variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ASPER) and not empty(ASPERC) and has_multiple_values_for(ASPERC, ASPER,
+    keep_missings=true, within=APERIOD)
+Outcome:
+  Message: "Within this value of APERIOD, ASPERC has more than one value for the same\
+    \ value of ASPER, considering only rows on which both variables are populated."
+  Output_Variables:
+  - "APERIOD"
+  - "ASPER"
+  - "ASPERC"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ASPERC"
+  Natural_Language_Rule_Failure_Criteria: "Within a value of APERIOD, there is more\
+    \ than one value of ASPERC for a given value of ASPER, considering only those\
+    \ rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a value of APERIOD, there is more than one value\
+    \ of ASPERC for a given value of ASPER"
+  Condition_Failure: "On rows where both ASPERC and ASPER are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR326"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR326"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR326"
+        Version: "2"
+      Version: "5.0"

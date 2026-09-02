@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1445 expect=noViolation domain=VS
+#note "Every 'Y' row's tuple is unique (distinct VSTESTCD); the PULSE pair differs on the target value (Y vs blank = distinct tuples, and the blank row fails the equality conjunct)."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VSTSTDTL type=Char
+col VSLOBXFL type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | REST | Y
+S1 | VS | 001 | 2 | TEMP  | REST | Y
+S1 | VS | 001 | 3 | PULSE | REST | Y
+S1 | VS | 001 | 4 | PULSE | REST |

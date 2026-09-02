@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0077 expect=noViolation domain=ADSL
+#note "Row 2: TRT01PN BLANK. Row 2 would make key 0 multi-valued, but its KEY is blank so it is excluded from the dependency and never fires; key 0 is left with {PLACEBO} -> silent. Pins the D.13 exception on the key side for the reversed direction (AD0077's own not empty(TRT01P) conjunct does NOT cover this case - the operator does)."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | PLACEBO    | 0
+CDISCPILOT01 | 01-701-1023 | PLACEBOARM |
+CDISCPILOT01 | 01-701-1034 | DRUGA      | 2

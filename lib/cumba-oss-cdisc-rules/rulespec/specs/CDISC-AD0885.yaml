@@ -1,0 +1,44 @@
+name: CDISC-AD0885
+kind: rule
+description: |
+  Wave D9 port - T3-VMC Variable Metadata Check (bare-leaf `not_exists`).
+  BASIC DATA STRUCTURE: fires when USUBJIDN is absent. Baselined on Python
+  lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `not_exists(USUBJIDN)`
+  resolves against meta-field columns and yields 0 violations. Java fires
+  correctly; expected matches Java's dataset-level violation. Bare-leaf
+  Check may also hit the Python business_rules `KeyError: 'name'` quirk
+  documented in plan §0b.4.
+  D21: the rule is scoped by Subclasses ['POPULATION PHARMACOKINETIC ANALYSIS'],
+  not by dataset name, so the ADPPK frame must carry the NONMEM signature
+  AdamSubclassDetector keys on (a control column EVID or MDV, plus >=3 of
+  DV/MDV/AMT/EVID/CMT). Without it both engines detect no subclass and skip.
+python_source: rules-adamig-1-3.json (CDISC-AD0885)
+rule:
+  coreId: CDISC-AD0885
+datasets:
+  ADPPK:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      EVID: LONG
+      MDV: LONG
+      DV: LONG
+      AMT: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, EVID: 0, MDV: 0, DV: 12, AMT: 0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADPPK]
+expected_violations:
+  - rule_id: CDISC-AD0885
+    dataset: ADPPK
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

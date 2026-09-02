@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0013 expect=violation domain=ADSL
+#note "TWO offenders: TOOLONGNAME exceeds 8 characters and aLower does not start with an upper-case letter. The per-variable loop yields one finding per column, so this pins the granularity at 2. A lowercase column NAME parses fine in a .cdt col line (precedent cdisc/CDISC-AD0014-invalid-ADSL.cdt uses col invalid)."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=TOOLONGNAME
+#expectViolationAt variable_name=aLower
+dataset ADSL structure=ADSL
+col STUDYID     type=Char
+col USUBJID     type=Char
+col TOOLONGNAME type=Char
+col aLower      type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X | Y

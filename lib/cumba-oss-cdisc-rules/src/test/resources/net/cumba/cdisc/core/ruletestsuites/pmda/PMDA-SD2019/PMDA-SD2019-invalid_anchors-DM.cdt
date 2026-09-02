@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD2019 expect=violation domain=DM
+#note "FRESH. Four rows pin both anchors and the '+' quantifier. Row 1 (025-030) has leading zeros, which are still digits, SILENT. Row 2 (25-30-35) has a third component, FIRES ($ anchor). Row 3 (25--30) needs at least one digit before the second hyphen, FIRES. Row 4 is a QUOTED field with one leading space (' 25-30'), FIRES (^ anchor) - it MUST be written QUOTED: unquoted, CdtParser strips it to '25-30' and the row goes silent, dropping the count to 2. The twin covers only a prose form and a truncated form."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=2 AGETXT=25-30-35
+#expectViolationAt row=3 AGETXT=25--30
+#expectViolationAt row=4 AGETXT=" 25-30"
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGETXT  type=Char label="Age Range"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 025-030   | YEARS
+CDISCPILOT01 | DM | 01-701-1016 | 25-30-35  | YEARS
+CDISCPILOT01 | DM | 01-701-1017 | 25--30    | YEARS
+CDISCPILOT01 | DM | 01-701-1018 | " 25-30"  | YEARS

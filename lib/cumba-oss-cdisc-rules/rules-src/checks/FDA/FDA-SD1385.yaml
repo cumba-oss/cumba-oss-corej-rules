@@ -1,0 +1,60 @@
+Core:
+  Id: "FDA-SD1385"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Day of Obs Rel to Challenge Agent (--CHSTDY)\
+  \ is populated and both the date portion of --STDTC and the date portion of RFCSTDTC\
+  \ are complete dates, but --CHSTDY does not equal the value computed by the study\
+  \ day algorithm relative to the Date/Time of First Challenge Agent Admin (RFCSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--CHSTDY"
+    - "--STDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_chstdy_algorithm"
+  expression: "dy(--STDTC, reference=\"RFCSTDTC\")"
+Check:
+  expression: >-
+    not empty(--CHSTDY) and is_complete_date(--STDTC) and is_complete_date(DM.RFCSTDTC) and --CHSTDY
+    != $value_chstdy_algorithm
+Outcome:
+  Message: "Start Day of Obs Rel to Challenge Agent (--CHSTDY) does not equal the\
+    \ value derived by the study day algorithm against RFCSTDTC even though the date\
+    \ portions of --STDTC and RFCSTDTC are complete dates and --CHSTDY is populated."
+  Output_Variables:
+  - "$value_chstdy_algorithm"
+  - "--STDTC"
+  - "--CHSTDY"
+  - "DM.RFCSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "Incorrect value for --CHSTDY variable"
+  FDA_Validator_Rule_Description: "Start Day of Obs Rel to Challenge Agent (--CHSTDY)\
+    \ variable value should be populated as defined by CDISC standards: --CHSTDY =\
+    \ (date portion of --STDTC) - (date portion of RFCSTDTC) +1 if --STDTC is on or\
+    \ after RFCSTDTC; --CHSTDY = (date portion of --STDTC) - (date portion of RFCSTDTC)\
+    \ if --STDTC precedes RFCSTDTC."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1385"
+        Version: "1"
+      Version: "1.6"

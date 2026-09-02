@@ -1,0 +1,26 @@
+name: CDISC-AD0496
+kind: rule
+description: |
+  Wave C3 port — T3-DatasetMetaCheck (Sensitivity=Dataset).
+  CDISC-AD0496: fire when dataset_name does not match ^AD for
+  SLAD/BDS/MDBDS/OCCDS/MDOCCDS datasets. Check is a bare leaf.
+
+  Rule-body quirk: bare-leaf Check → Python Finding #26. With a
+  correctly-named ADaM dataset (ADLB), the regex matches → no
+  violation; both lanes agree on 0 violations. Both-green baseline.
+python_source: rules-adamig-1-3.json (CDISC-AD0496)
+rule:
+  coreId: CDISC-AD0496
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD0004-A expect=noViolation domain=APDM
+#note "EMPTY-DATASET PIN (PLAN-zero-row-routing-rekey.md, owner ruling 6c-1, Fix #349 / EC-89). APDM is DECLARED with its columns (DOMAIN present) and carries ZERO rows. Before the fix this rule fired spuriously here: the engine substituted a synthetic 1-row ZERO-COLUMN table for a non-row-based rule on an empty dataset, DOMAIN folded absent on it (EC-43 / R14) and prefix(dataset_name, 4) != DOMAIN was true with nothing real behind it. The synthetic table is retired: a rule that must read a row to decide has nothing to check on an empty dataset and returns EXECUTED with zero findings (ruling Q5: never SKIPPED). The empty dataset itself is reported once, by the package's own no-records rule (PMDA-SD0001), not here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset APDM label="Associated Persons Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject Identifier"
+col SREL    type=Char label="Subject Relationship"
+---

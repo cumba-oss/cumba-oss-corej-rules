@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1324 expect=violation domain=DM
+#note "Two declared variables carry a label that differs from the Define-XML (AGE and AGEU). Each variable is independently non-conformant, so the intended reporting is one finding per offending variable."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt variable_name=AGE
+#expectViolationAt variable_name=AGEU
+#define variable-metadata DM AGE name=AGE label="Age"
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Units for Age"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

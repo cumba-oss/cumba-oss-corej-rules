@@ -1,0 +1,75 @@
+Core:
+  Id: "PMDA-SD1439"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject has more than one record with Baseline\
+  \ Flag (--BLFL) equal to 'Y' for the same assessment (the same combination of --TESTCD,\
+  \ --TSTDTL, --CAT, --SCAT, --METHOD, --SPEC, --LOC, --LAT, --DIR, --POS and --OBJ)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--BLFL"
+Check:
+  expression: >-
+    --BLFL == "Y" and var_exists("--TESTCD") and not is_unique_set([--BLFL, USUBJID, --TESTCD,
+    --TSTDTL, --CAT, --SCAT, --METHOD, --SPEC, --LOC, --LAT, --DIR, --POS, --OBJ])
+Outcome:
+  Message: "Multiple BASELINE records for the same test"
+  Output_Variables:
+  - "--BLFL"
+  - "--TESTCD"
+Source:
+  Message: "Multiple BASELINE records for the same test"
+  Description: "By its definition clinical baseline flags (e.g., last non-missing\
+    \ value prior to first dose) should have only a single record for the same test\
+    \ for subject. Therefore, each subject (USUBJID) should have no more than one\
+    \ record with Baseline Flag (--BLFL) equals 'Y' for the same assessment which\
+    \ is defined by Test (--TESTCD), Test Details (--TSTDTL), Category (--CAT), Subcategory\
+    \ (--SCAT), Method (--METHOD), Specimen (--SPEC), Location (--LOC), Laterality\
+    \ (--LAT), Directionality (--DIR), Position (--POS) and Object (--OBJ) variables."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1439"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1439"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1439"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1439"
+        Version: "1"
+      Version: "1.6"

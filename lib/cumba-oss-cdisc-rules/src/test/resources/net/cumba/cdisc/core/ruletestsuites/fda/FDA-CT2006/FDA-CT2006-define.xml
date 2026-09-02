@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.FDA.CT2006" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="FDA-CT2006 VLM code/decode fixture" DefineVersion="2.1.0"
+                     StandardName="SDTM-IG" StandardVersion="3.4">
+
+      <ItemGroupDef OID="IG.QS" Name="QS" Domain="QS" Repeating="Yes" Purpose="Tabulation"
+                    SASDatasetName="QS">
+        <ItemRef ItemOID="IT.QS.QSCAT" OrderNumber="1" Mandatory="No" Role="Grouping Qualifier"/>
+        <ItemRef ItemOID="IT.QS.QSTESTCD" OrderNumber="2" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.QS.QSTEST" OrderNumber="3" Mandatory="No" Role="Synonym Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.QS.QSCAT" Name="QSCAT" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Category of Question</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.QS.QSTEST" Name="QSTEST" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">Question Name</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.QS.QSTESTCD" Name="QSTESTCD" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Question Short Name</TranslatedText></Description>
+        <def:ValueListRef ValueListOID="VL.QS.QSTESTCD"/>
+      </ItemDef>
+      <ItemDef OID="IT.QS.QSTESTCD.FUNC" Name="QSTESTCD_FUNC" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Functional test code</TranslatedText></Description>
+        <CodeListRef CodeListOID="CL.QSFUNC"/>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.QS.QSTESTCD">
+        <ItemRef ItemOID="IT.QS.QSTESTCD.FUNC" OrderNumber="1" Mandatory="Yes">
+          <def:WhereClauseRef WhereClauseOID="WC.QS.FUNC"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.QS.FUNC">
+        <RangeCheck Comparator="EQ" SoftHard="Soft" def:ItemOID="IT.QS.QSCAT">
+          <CheckValue>FUNC</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+
+      <CodeList OID="CL.QSFUNC" Name="Functional Test Code" DataType="text">
+        <CodeListItem CodedValue="WALK">
+          <Decode><TranslatedText xml:lang="en">Walk Test</TranslatedText></Decode>
+          <Alias Context="nci:ExtCodeID" Name="C201"/>
+        </CodeListItem>
+        <CodeListItem CodedValue="GRIP">
+          <Decode><TranslatedText xml:lang="en">Grip Strength</TranslatedText></Decode>
+          <Alias Context="nci:ExtCodeID" Name="C202"/>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C88888"/>
+      </CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>

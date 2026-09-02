@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD1262 expect=noViolation domain=SS
+#note "Every DEAD status assessment is on or after the subject's maximum DSSTDTC (001: max 2020-06-01; SSDTC 2020-06-01 and 2020-06-15); the ALIVE row is out of the condition even though its SSDTC precedes the DS dates."
+#library standard=sdtmig version=3-4
+dataset SS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Subject Status Result in Std Format"
+col SSDTC    type=Char label="Date/Time of Status Assessment"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD  | 2020-06-01
+S1 | SS | 001 | 2 | SURVSTAT | DEAD  | 2020-06-15
+S1 | SS | 002 | 1 | SURVSTAT | ALIVE | 2020-01-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | RANDOMIZED | 2020-05-10
+S1 | DS | 001 | 2 | DEATH      | DEATH      | 2020-06-01
+S1 | DS | 002 | 1 | RANDOMIZED | RANDOMIZED | 2020-03-01

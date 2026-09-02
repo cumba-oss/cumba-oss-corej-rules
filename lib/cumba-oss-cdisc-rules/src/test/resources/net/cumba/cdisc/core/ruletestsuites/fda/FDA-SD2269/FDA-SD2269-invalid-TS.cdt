@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD2269 expect=violation domain=TS
+#note "Row 2: TSPARMCD=TDIGRP with TSVALCD=25064002 (Headache's concept ID in the dummy SNOMED dictionary) but TSVAL=Nausea -> code and term come from different concepts -> fires. Row 1 is a correctly paired record; row 3 has the same mismatch under AGEMAX (outside the TDIGRP condition); rows 4/5 have a blank term or blank code (completeness is another rule's concern -> no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL=Nausea TSVALCD=25064002
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | TDIGRP | Headache | 25064002
+S01 | TS | 2 | TDIGRP | Nausea   | 25064002
+S01 | TS | 3 | AGEMAX | Nausea   | 25064002
+S01 | TS | 4 | TDIGRP |          | 25064002
+S01 | TS | 5 | TDIGRP | Headache |

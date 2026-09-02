@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0391"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESDTH is populated and its value is not 'Y' or\
+  \ 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESDTH"
+Check:
+  expression: >-
+    not empty(AESDTH) and AESDTH not in ["Y", "N"]
+Outcome:
+  Message: "AESDTH is populated, but its value is not 'Y' or 'N'."
+  Output_Variables:
+  - "AESDTH"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--SDTH"
+  Condition: "--SDTH ^= null"
+  Rule: "--SDTH in ('Y','N')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0391"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0391"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0391"
+        Version: "1"
+      Version: "2.0"

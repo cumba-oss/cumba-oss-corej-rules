@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0143"
+Sheet_Rule_Identifier: "143"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Length attribute must not be present for ItemDef when DataType is not in ('integer','text', 'float')."
+# The guard also passes for an ItemDef with no DataType at all (a missing
+# DataType is "not in" the list; its absence is sheet id 139's finding). Note
+# not_exists' presence symmetry: a present-but-blank Length counts as absent.
+Message: "ItemDef has a Length attribute but the DataType is not one of ('integer','text', 'float')."
+Check:
+  kind: "not_exists"
+  target: "@Length"
+  when:
+    not:
+      path: "@DataType"
+      oneOf: ["integer", "text", "float"]

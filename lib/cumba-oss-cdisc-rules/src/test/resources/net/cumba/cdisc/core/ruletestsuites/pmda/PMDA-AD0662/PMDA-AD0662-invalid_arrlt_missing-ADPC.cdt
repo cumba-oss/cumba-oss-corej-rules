@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0662 expect=violation domain=ADPC
+#note "Other or-branch: ARRLT missing -> fires. Distinguishes the PMDA OR form from the CDISC AND form."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#library standard=adamig version=1-3
+dataset ADPC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col NRRLT   type=Num
+col ARRLT   type=Num
+col TMPCTDF type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 1.0 |  | 12.5
+CDISCPILOT01 | 01-701-1023 | CONC | 1.0 | 1.1 | 9.1
+---

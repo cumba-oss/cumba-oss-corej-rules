@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-SEND-0283 expect=violation domain=SE
+# Rule:Description: Raise an error when the SEENDTC of the subject's last Subject Element (highest SESEQ) is after the subject disposition date (DS.DSSTDTC); the last Element must end on or before the disposition date.
+#note "POLARITY PIN, firing direction. The last Subject Element for subject 001 (SESEQ=2, the highest, so is_last_in_group(group=[USUBJID], ordering=SESEQ) is true) ends 2020-01-20, which is AFTER the disposition date DS.DSSTDTC=2020-01-15 -- exactly the state the rule says it reports: the Description says 'is after', the Outcome Message says 'is later than', and the Source Rule says the value 'must immediately precede or be the same as' DS.DSSTDTC. The authored operator was date_less_than_or_equal_to, which is TRUE on the conformant case and FALSE here, so the rule was inverted: it stayed silent on this dataset and reported the conforming one. Fix #158 changes it to date_greater_than. Row 1 (SESEQ=1) is not the last element, so is_last_in_group is false there and it cannot contribute -- hence exactly one finding. This fixture is RED against the date_less_than_or_equal_to form, and its partner CDISC-SEND-0283-valid_equal_dates-SE-1.cdt is RED there too in the opposite direction, so the pair pins the polarity from both sides rather than merely pinning that something fires. CAVEAT recorded deliberately, not implemented: the Source Rule says 'immediately precede', which is strictly stronger than 'precede' and would need a tolerance the engine cannot express; the rule implements 'must not be after'."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 severity=ERROR USUBJID=001 SESEQ=2
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-01-15
+---

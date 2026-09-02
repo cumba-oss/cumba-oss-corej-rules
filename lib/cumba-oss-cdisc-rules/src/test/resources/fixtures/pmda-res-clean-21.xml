@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA residual batch, non-CT clean 2.1 fixture. Every non-CT residual rule
+     executes with zero findings:
+       DD0105 - AESTDY/AEENDY Study Day vars have Origin Type='Derived';
+                AGE (non-study-day) with Collected origin is a guard decoy
+       OD0082 - CL.SEX (EnumeratedItem only) and CL.CUSTOM (CodeListItem only)
+                are each single-type
+       DD0138 - every def:StandardOID resolves to a def:Standard
+       DD0150 - ADaMIG IG paired with a CT standard PublishingSet='ADaM'
+       DD0093 - AR.GOOD's ParameterOID references PARAMCD, a member of IG.ADLB;
+                AR.NOPARAM has no ParameterOID (guard decoy) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-res-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.RES">
+    <GlobalVariables>
+      <StudyName>RES-STUDY</StudyName>
+      <StudyDescription>PMDA residual clean fixture study</StudyDescription>
+      <ProtocolName>RES-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="RES MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="ADaM"
+                      Version="2023-12-15" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.ADLB" Name="ADLB" Repeating="Yes"
+                    SASDatasetName="ADLB" Purpose="Analysis"
+                    def:Structure="One record per subject per parameter per visit"
+                    def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Dataset Lab</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.PARAMCD" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.AVAL" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AESTDY" OrderNumber="3" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AEENDY" OrderNumber="4" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AGE" OrderNumber="5" Mandatory="No"/>
+        <def:Class Name="BASIC DATA STRUCTURE"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.PARAMCD" Name="PARAMCD" DataType="text" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Parameter Code</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.AVAL" Name="AVAL" DataType="float" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESTDY" Name="AESTDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of Start of Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.AEENDY" Name="AEENDY" DataType="integer" Length="8">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of End of Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.AGE" Name="AGE" DataType="integer" Length="3">
+        <Description>
+          <TranslatedText xml:lang="en">Age</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <CodeList OID="CL.SEX" Name="Sex" DataType="text">
+        <EnumeratedItem CodedValue="M"/>
+        <EnumeratedItem CodedValue="F"/>
+      </CodeList>
+      <CodeList OID="CL.CUSTOM" Name="Sponsor Codes" DataType="text">
+        <CodeListItem CodedValue="A">
+          <Decode>
+            <TranslatedText xml:lang="en">Code A</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.1" Name="Table 14-1.01">
+          <arm:AnalysisResult OID="AR.GOOD" ParameterOID="IT.PARAMCD"
+                              AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.ADLB">
+                <arm:AnalysisVariable ItemOID="IT.AVAL"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+          <arm:AnalysisResult OID="AR.NOPARAM"
+                              AnalysisReason="DATA DRIVEN"
+                              AnalysisPurpose="SECONDARY OUTCOME MEASURE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.ADLB"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+    </MetaDataVersion>
+  </Study>
+</ODM>

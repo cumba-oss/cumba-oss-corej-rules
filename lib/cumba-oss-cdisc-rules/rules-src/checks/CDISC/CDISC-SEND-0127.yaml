@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-SEND-0127"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SEENDTC of the subject's last Subject Element\
+  \ (highest SESEQ) does not equal the subject disposition date (DS.DSSTDTC); because\
+  \ there are no time gaps between Elements, the last Element ends on the disposition\
+  \ date."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DS"
+Operations:
+- id: "$is_last_se"
+  expression: "is_last_in_group(ordering=\"SESEQ\", group=[USUBJID], keep_missings=false)"
+Check:
+  expression: >-
+    $is_last_se == true and date(SEENDTC) != DS.DSSTDTC
+Outcome:
+  Message: "SEENDTC of the last Subject Element does not equal the subject disposition\
+    \ date DS.DSSTDTC."
+  Output_Variables:
+  - "$is_last_se"
+  - "SEENDTC"
+  - "DS.DSSTDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEENDTC"
+  Plain_Text_Explanation: "Because there are no time gaps between Elements, the SEENDTC\
+    \ value for the last Element is the date of subject disposition."
+  Condition: "Element is the last Element for the subject"
+  Rule: "SEENDTC = DS.DSSTDTC of the disposition"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND127"
+        Version: "1"
+      Version: "5.0"

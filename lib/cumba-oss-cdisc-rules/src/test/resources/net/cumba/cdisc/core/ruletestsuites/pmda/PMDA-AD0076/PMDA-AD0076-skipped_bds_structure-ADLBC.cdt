@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0076 expect=skipped domain=ADLBC
+#note "Carries the SAME inconsistent data as the violation fixture (PLACEBO|0, PLACEBO|1, DRUGA|2). The declared BDS structure beats the columns, and Scope.Data_Structures: [SUBJECT LEVEL ANALYSIS DATASET] does not admit it -> the pre-gate skips the rule before any expansion happens. THIS IS THE BATCH'S SINGLE PIN on the SLAD block, shared verbatim by PMDA-AD0077 - not duplicated there."
+#library standard=adamig version=1-0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | PLACEBO | 0
+CDISCPILOT01 | 01-701-1023 | ALB | PLACEBO | 1
+CDISCPILOT01 | 01-701-1034 | ALB | DRUGA   | 2

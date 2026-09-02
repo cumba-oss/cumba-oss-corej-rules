@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0280"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reason Not Done (--REASND) is empty for a record\
+  \ whose Completion Status (--STAT) is \"NOT DONE\"."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+    - "MI"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+Check:
+  expression: >-
+    --STAT == "NOT DONE" and empty(--REASND)
+Outcome:
+  Message: "--REASND is empty for a record where --STAT is \"NOT DONE\"."
+  Output_Variables:
+  - "--STAT"
+  - "!--REASND"
+Source:
+  Class: "FND"
+  Domain: "LB, MI"
+  Variable: "--REASND"
+  Plain_Text_Explanation: "Whenever --STAT is “NOT DONE”; --REASND should provide\
+    \ the reason for not completing the evaluation as scheduled in the study plan"
+  Condition: "LBSTAT (OR MISTAT) = “NOT DONE”"
+  Rule: "--REASND ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND280"
+        Version: "1"
+      Version: "5.0"

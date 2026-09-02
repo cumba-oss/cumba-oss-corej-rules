@@ -1,0 +1,43 @@
+Core:
+  Id: "FDA-SE2262"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RPATHCD (Repro Path Code) is populated and does\
+  \ not match any RPATHCD value in the Trial Repro Paths (TP) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RPATHCD"
+Operations:
+- id: "$tp_rpathcd"
+  expression: "distinct(RPATHCD, domain=\"TP\")"
+Check:
+  expression: >-
+    not empty(RPATHCD) and RPATHCD not in $tp_rpathcd
+Outcome:
+  Message: "RPATHCD does not match any Repro Path Code (RPATHCD) value in the Trial\
+    \ Reproductive Paths (TP) dataset."
+  Output_Variables:
+  - "RPATHCD"
+  - "$tp_rpathcd"
+Source:
+  FDA_Validator_Rule_Message: "Invalid RPATHCD"
+  FDA_Validator_Rule_Description: "Repro Path Code (RPATHCD) values should match entries\
+    \ in the Trial Repro Paths (TP) dataset."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2262"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.1"

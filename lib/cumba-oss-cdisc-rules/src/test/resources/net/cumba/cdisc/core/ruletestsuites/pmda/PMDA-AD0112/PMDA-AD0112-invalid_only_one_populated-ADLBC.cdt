@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0112 expect=violation domain=ADLBC
+#note "The paired-population shape: not empty(A) and empty(B) or not empty(B) and empty(A). Row 1 has a relative time with no unit and row 2 a unit with no time, so each arm fires once; row 3 has both populated and row 4 has both blank, and neither is a violation. Record granularity -> exactly 2 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 ARELTM=4
+#expectViolationAt row=2 USUBJID=01-701-1023 ARELTMU=HOURS
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTM  type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 4 |
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 |   | HOURS
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 | 8 | HOURS
+CDISCPILOT01 | 01-701-1045 | ALT | 1.1 |   |

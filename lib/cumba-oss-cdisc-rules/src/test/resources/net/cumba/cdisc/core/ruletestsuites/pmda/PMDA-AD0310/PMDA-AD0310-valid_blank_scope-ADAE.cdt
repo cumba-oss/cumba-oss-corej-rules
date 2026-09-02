@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0310 expect=noViolation domain=ADAE
+#note "Row 1's SMQ01SC (the DEPENDENT) is blank while SMQ01SCN stays 1: key 1 left with single dependent {NARROW} -> silent. The column STAYS declared -- only the cell is blank; wildcard expansion is column-name driven."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEDECOD  type=Char
+col SMQ01SC  type=Char
+col SMQ01SCN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE |  | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | NARROW | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | BROAD | 2

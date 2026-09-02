@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0075"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the numeric Planned Treatment variable TRTxxPN is\
+  \ present in the dataset but its corresponding character Planned Treatment variable\
+  \ TRTxxP is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TRTxxPN") and not var_exists("TRTxxP")
+Outcome:
+  Message: "TRTxxPN is present, but TRTxxP is not present."
+  Output_Variables:
+  - "TRTxxPN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+Source:
+  Message: "TRTxxPN is present, but TRTxxP is not present"
+  Description: "If the Planned Treatment (TRTxxPN) numeric variable is present, there\
+    \ must be a corresponding Planned Treatment (TRTxxP) character variable."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0075"
+        Version: "1"
+      Version: "6.0"

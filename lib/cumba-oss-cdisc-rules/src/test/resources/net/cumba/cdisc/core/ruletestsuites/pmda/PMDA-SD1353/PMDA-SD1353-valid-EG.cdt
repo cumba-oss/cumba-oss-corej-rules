@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1353 expect=noViolation domain=EG
+#note "Row 1: same units, equal numeric values. Row 2: both units null but the values are equal. Row 3: units differ (ms vs sec), so unequal values are a legitimate conversion. Row 4: non-numeric original result -> regex gate rejects."
+#library standard=sdtmig version=3-4
+dataset EG class=FINDINGS label="ECG Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col EGSEQ    type=Num  label="Sequence Number"
+col EGTESTCD type=Char label="ECG Test or Examination Short Name"
+col EGORRES  type=Char label="Result or Finding in Original Units"
+col EGORRESU type=Char label="Original Units"
+col EGSTRESC type=Char label="Character Result/Finding in Std Format"
+col EGSTRESU type=Char label="Standard Units"
+---
+S1 | EG | 001 | 1 | HR     | 64     | bpm | 64   | bpm
+S1 | EG | 001 | 2 | QTMEAN | 0.42   |     | 0.42 |
+S1 | EG | 001 | 3 | QTDUR  | 420    | ms  | 0.42 | sec
+S1 | EG | 001 | 4 | RHYRAT | NORMAL |     | 0.42 |

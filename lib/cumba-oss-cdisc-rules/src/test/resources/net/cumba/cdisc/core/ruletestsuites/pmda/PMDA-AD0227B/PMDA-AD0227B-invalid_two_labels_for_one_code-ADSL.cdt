@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0227B expect=violation domain=ADSL
+#note "Group TRTSEQPN=1 holds TRTSEQP {A-B x2, B-A x1} -> row 3 is the minority. Group TRTSEQPN=2 is consistent. A dataset literally named ADSL detects SUBJECT LEVEL ANALYSIS DATASET by name alone, so no structure key is needed."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQP=B-A TRTSEQPN=1
+dataset ADSL class=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTSEQP  type=Char
+col TRTSEQPN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | B-A | 1
+S1 | 004 | B-A | 2
+S1 | 005 | B-A | 2

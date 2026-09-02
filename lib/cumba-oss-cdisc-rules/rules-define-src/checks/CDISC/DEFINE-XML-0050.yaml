@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0050"
+Sheet_Rule_Identifier: "50"
+Rule_Set: "CDISC"
+Element: "PDFPageRef"
+Attribute: "LastPage"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute LastPage must be provided for the def:PDFPageRef element when PageRefs is missing and Type is PhysicalRef."
+Message: "Attribute LastPage is missing for element def:PDFPageRef, when attribute PageRefs is missing and Type is PhysicalRef."
+Check:
+  kind: "exists"
+  target: "@LastPage"
+  when:
+    all:
+    - path: "@PageRefs"
+      exists: false
+    - path: "@Type"
+      equals: "PhysicalRef"

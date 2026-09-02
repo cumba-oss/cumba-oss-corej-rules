@@ -1,0 +1,22 @@
+name: FDA-SD1078-nofire
+kind: rule
+description: |
+  No-fire companion for FDA-SD1078 (var_is_null). The Permissible LBNRIND column is populated on at
+  least one record, so it is not empty-for-all and the rule does not fire.
+python_source: rules-sdtmig-3-4.json (FDA-SD1078)
+rule:
+  coreId: FDA-SD1078
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBORRES: '5', LBNRIND: NORMAL}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 2, LBORRES: '6', LBNRIND: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations: []
+expected_errors: []

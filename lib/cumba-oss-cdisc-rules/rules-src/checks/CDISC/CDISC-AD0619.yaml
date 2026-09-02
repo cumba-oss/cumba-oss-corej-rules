@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-AD0619"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when LVOTFL is populated and does not equal Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "LVOTFL"
+Check:
+  expression: >-
+    not empty(LVOTFL) and LVOTFL != "Y"
+Outcome:
+  Message: "LVOTFL is populated with a value other than Y."
+  Output_Variables:
+  - "LVOTFL"
+Source:
+  Class: "BASIC DATA STRUCTURE; OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "LVOTFL"
+  Natural_Language_Rule_Failure_Criteria: "LVOTFL is not equal to Y or null"
+  Rule_Failure_Criteria: "LVOTFL is not equal to Y or null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR619"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR619"
+        Version: "1"
+      Version: "5.0"

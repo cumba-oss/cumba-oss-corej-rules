@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0037"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, with the primary SOC used for analysis, the SOC\
+  \ code used for analysis (--SOCCD) is not equal to the body system or organ class\
+  \ code (--BDSYCD)."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "HO"
+Requirements:
+  Variables:
+    All:
+    - "--BDSYCD"
+    - "--SOCCD"
+Check:
+  expression: >-
+    not empty(--SOCCD) and not empty(--BDSYCD) and --SOCCD != --BDSYCD
+Outcome:
+  Message: "--SOCCD is not equal to --BDSYCD."
+  Output_Variables:
+  - "--BDSYCD"
+  - "--SOCCD"
+Source:
+  Class: "EVT"
+  Domain: "NOT(DS, DV, HO)"
+  Variable: "--BDSYCD"
+  Condition: "Primary SOC used for analysis"
+  Rule: "--SOCCD = --BDSYCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0037"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0037"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0037"
+        Version: "1"
+      Version: "2.0"

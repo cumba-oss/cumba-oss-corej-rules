@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0790 expect=noViolation domain=ADLBC
+# Rule:Description: BASETYPE is populated, ByIND is populated, and ByIND is not equal to AyIND where ABLFL is equal to Y for a given value of PARAMCD and BASETYPE for a subject, where y is an integer [1-99, not zero-padded]
+#note "Same shape as the invalid sibling with B1IND=HIGH == A1IND=HIGH on the ABLFL=Y row -> noViolation. Restored by Fix #152: until the AyIND token was expanded, max(AyIND) read an absent column and the comparison fired here too."
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+col B1IND type=Char
+col A1IND type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | HIGH | HIGH
+---

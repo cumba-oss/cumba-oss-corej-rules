@@ -1,0 +1,99 @@
+Core:
+  Id: "FDA-SE2323"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --VAL is populated with a non-numeric value for\
+  \ a record where --PARMCD equals 'PLANFSUB' (Planned Number of Female Subjects).\
+  \ Applies to the TS and TX domains (TSVAL/TSPARMCD and TXVAL/TXPARMCD)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "--PARMCD"
+Check:
+  expression: >-
+    --PARMCD == "PLANFSUB" and not empty(--VAL) and not is_numeric(--VAL)
+Outcome:
+  Message: "Invalid --VAL value for PLANFSUB: --VAL must be numeric when --PARMCD\
+    \ equals 'PLANFSUB' (Planned Number of Female Subjects)."
+  Output_Variables:
+  - "--PARMCD"
+  - "--VAL"
+Source:
+  FDA_Validator_Rule_Message: "Invalid --VAL value for PLANFSUB"
+  FDA_Validator_Rule_Description: "TSVAL/TXVAL must be numeric when TSPARMCD/TXPARMCD\
+    \ = 'PLANFSUB'."
+  Domains: "TS, TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2323"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2323"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2323"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2323"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2323"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

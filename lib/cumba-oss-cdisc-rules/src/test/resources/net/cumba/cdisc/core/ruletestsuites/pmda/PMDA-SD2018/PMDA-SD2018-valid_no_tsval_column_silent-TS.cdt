@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2018 expect=noViolation domain=TS
+#note "Gate-vs-fold discriminator. TS deliberately carries no TSVAL column. The Requirements.Variables gate is [TSVALNF], which IS present, so the rule EXECUTES. The ungated operand TSVAL is absent, so not empty(TSVAL) is FALSE and the AND short-circuits -> zero findings WITH EXECUTION, not a skip."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | AGEMAX | Planned Max Age | NA
+S1 | TS | 2 | AGEMIN | Planned Min Age | NI

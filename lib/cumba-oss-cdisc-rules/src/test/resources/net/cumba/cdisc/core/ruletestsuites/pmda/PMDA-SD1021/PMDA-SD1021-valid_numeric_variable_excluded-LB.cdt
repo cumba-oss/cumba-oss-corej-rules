@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1021 expect=noViolation domain=LB
+#note "Pins the var_type('DATA') == 'Char' guard: LBSTRESN is declared type=Num, so the melted loop skips it entirely even though a SAS numeric missing renders as the very '.' the rule prohibits in character values. Without the type guard row 1 would fire."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBSTRESN type=Num
+---
+CDISCPILOT01 | LB | 01-701-1015 | ALB  | .
+CDISCPILOT01 | LB | 01-701-1015 | GLUC | 5.5

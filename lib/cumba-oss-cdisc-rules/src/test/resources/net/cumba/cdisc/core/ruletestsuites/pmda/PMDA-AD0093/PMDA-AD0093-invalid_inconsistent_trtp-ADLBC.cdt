@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0093 expect=violation domain=ADLBC
+#note "PARAMCD is filler (no structure gate; Scope.Domains.Include [ALL]). Grouped by TRTPN=1 the target TRTP holds {DRUGA, DRUGA, DRUGB} -> minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 TRTP=DRUGB TRTPN=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP    type=Char
+col TRTPN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | DRUGB | 1

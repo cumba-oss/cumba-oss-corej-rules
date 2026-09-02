@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-CG0087"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --OCCUR is populated while --PRESP is not equal\
+  \ to 'Y' or --STAT is equal to 'NOT DONE'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--OCCUR"
+Check:
+  expression: >-
+    not empty(--OCCUR) and (not var_exists("--PRESP") or --PRESP != "Y" or var_exists("--STAT") and
+    --STAT == "NOT DONE")
+Outcome:
+  Message: "--OCCUR is populated when --PRESP is not equal to 'Y' or when --STAT is\
+    \ equal to 'NOT DONE'."
+  Output_Variables:
+  - "--PRESP"
+  - "--OCCUR"
+  - "--STAT"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(AE, DS, DV, EX)"
+  Variable: "--OCCUR"
+  Condition: "(--PRESP ^= 'Y' and --OCCUR is present in dataset) or (--STAT=NOT DONE)"
+  Rule: "--OCCUR = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0087"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0087"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0087"
+        Version: "1"
+      Version: "2.0"

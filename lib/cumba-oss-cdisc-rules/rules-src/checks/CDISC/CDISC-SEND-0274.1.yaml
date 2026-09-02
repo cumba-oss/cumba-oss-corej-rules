@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-SEND-0274.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of the Qualifier Variable Name (QNAM)\
+  \ equals a variable name defined in another domain or the SDTM model."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Operations:
+- id: "$variable_names"
+  expression: "variable_names()"
+Check:
+  expression: >-
+    QNAM in $variable_names
+Outcome:
+  Message: "QNAM equals a variable name defined in another domain or the SDTM model."
+  Output_Variables:
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "QNAM"
+  Plain_Text_Explanation: "The value in QNAM may not be the same as any variable name\
+    \ defined in another domain or the SDTM."
+  Rule: "The value in QNAM may not be the same as any variable name defined in another\
+    \ domain or the SDTM."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274.1"
+        Version: "1"
+      Version: "5.0"

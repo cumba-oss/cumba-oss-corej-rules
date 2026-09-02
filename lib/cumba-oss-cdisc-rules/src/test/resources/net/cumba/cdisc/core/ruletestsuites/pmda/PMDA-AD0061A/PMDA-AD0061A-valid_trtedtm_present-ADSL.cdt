@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0061A expect=noViolation domain=ADSL
+#note "ADSL with TRTEDTM populated (no TRTEDT) + the EX block -> the TRTEDTM disjunct alone silences -> clean. Pins that EITHER variable satisfies the sheet ('TRTEDT / Datetime (TRTEDTM)')."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTEDTM type=Num
+---
+S1 | 01-001 | 22000
+---
+
+dataset EX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+col EXSTDTC type=Char
+---
+S1 | EX | 01-001 | DRUGA | 2020-01-05

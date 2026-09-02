@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0225 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD for a subject, PCHG is populated and is not equal to ((AVAL - BASE)/BASE)*100
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col BASE type=Num
+col PCHG type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 15 | 10 | 999
+---

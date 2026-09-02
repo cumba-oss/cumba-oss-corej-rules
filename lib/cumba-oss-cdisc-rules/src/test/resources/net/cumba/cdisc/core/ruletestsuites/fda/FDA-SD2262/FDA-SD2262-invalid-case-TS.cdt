@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD2262 expect=violation domain=TS
+#note "Case-mismatch pin for the D-TA-3 sensitive default (Fix #266): the pair operation now reads the flag, and code AND decode compare against the as-authored dictionary entries. Row 2's decode 'Aspirin' mismatches the stored 'ASPIRIN' -> fires; row 1 is the exact pair."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL=Aspirin
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | TRT | ASPIRIN | R16CO5Y76E
+S01 | TS | 2 | TRT | Aspirin | R16CO5Y76E

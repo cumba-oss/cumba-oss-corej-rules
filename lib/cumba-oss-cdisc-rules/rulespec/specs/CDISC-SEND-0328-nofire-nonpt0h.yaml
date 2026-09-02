@@ -1,0 +1,23 @@
+name: CDISC-SEND-0328-nofire-nonpt0h
+kind: rule
+description: |
+  Semantics guard for CDISC-SEND-0328 (the case the old precondition form got wrong).
+  There is exactly one PCELTM="PT0H" record in the profile, plus two duplicate PT1H
+  records. Only PT0H is restricted, so the rule must NOT fire — the PCELTM=="PT0H" Check
+  conjunct excludes the PT1H duplicates, and PCELTM in the uniqueness key keeps the single
+  PT0H record unique.
+python_source: rules-sendig-3-1-1.json (CDISC-SEND-0328)
+rule:
+  coreId: CDISC-SEND-0328
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT0H}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 2, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT1H}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 3, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT1H}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+expected_violations: []
+expected_errors: []

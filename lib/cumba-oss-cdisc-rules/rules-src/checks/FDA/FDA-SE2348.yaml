@@ -1,0 +1,66 @@
+Core:
+  Id: "FDA-SE2348"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TXSEQ is not unique within the Trial Sets (TX) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Check:
+  expression: >-
+    not is_unique_set([TXSEQ, STUDYID])
+Outcome:
+  Message: "TXSEQ is not unique within the Trial Sets (TX) dataset."
+  Output_Variables:
+  - "STUDYID"
+Source:
+  FDA_Validator_Rule_Message: "Non-unique value for TXSEQ variable within TX domain"
+  FDA_Validator_Rule_Description: "Sequence Number (TXSEQ) should be unique within\
+    \ the entire Trial Sets (TX) dataset because there is no Unique Subject Identifier\
+    \ (USUBJID) variable."
+  Domains: "TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2348"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2348"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2348"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2348"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2348"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.1"

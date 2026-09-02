@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0349"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Subject Repro Stages (SJ) record exists\
+  \ for the same combination of Repro Stage Short Name (RSTGCD) and Unique Subject\
+  \ Identifier (USUBJID); the domain is expected to hold one record per actual Repro\
+  \ Stage per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Check:
+  expression: >-
+    not is_unique_set([RSTGCD, USUBJID])
+Outcome:
+  Message: "More than one SJ record exists for the same Repro Stage (RSTGCD) and subject\
+    \ (USUBJID)."
+  Output_Variables:
+  - "RSTGCD"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per actual Repro Stage per subject"
+  Rule: "One record per actual Repro Stage per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND349"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND349"
+        Version: "1"
+      Version: "5.0"

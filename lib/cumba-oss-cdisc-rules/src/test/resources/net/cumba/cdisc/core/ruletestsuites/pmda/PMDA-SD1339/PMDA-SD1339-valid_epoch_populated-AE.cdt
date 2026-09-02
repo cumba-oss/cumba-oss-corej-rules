@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1339 expect=noViolation domain=AE
+#note "Same AE shape; every dated row carries EPOCH (SCREENING/TREATMENT/FOLLOW-UP), plus one undated EPOCH-empty row (clean: no date)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESTDTC type=Char
+col EPOCH   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE  | 2020-06-01 | SCREENING
+S1 | AE | 001 | 2 | NAUSEA    | 2020-06-15 | TREATMENT
+S1 | AE | 001 | 3 | DIZZINESS | 2020-07-01 | FOLLOW-UP
+S1 | AE | 001 | 4 | RASH      |            |

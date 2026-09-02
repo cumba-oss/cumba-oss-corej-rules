@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-AD0462"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when TSEQAGy is populated and TSEQAGyN is missing on\
+  \ the same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TSEQAGy"
+    - "TSEQAGyN"
+Check:
+  expression: >-
+    not empty(TSEQAGy) and empty(TSEQAGyN)
+Outcome:
+  Message: "TSEQAGy is populated but TSEQAGyN is missing."
+  Output_Variables:
+  - "TSEQAGy"
+  - "TSEQAGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "TSEQAGyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TSEQAGy is populated\
+    \ and TSEQAGyN is not populated"
+  Rule_Failure_Criteria: "TSEQAGyN is not populated"
+  Condition_Failure: "TSEQAGy is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR462"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR462"
+        Version: "2"
+      Version: "5.0"

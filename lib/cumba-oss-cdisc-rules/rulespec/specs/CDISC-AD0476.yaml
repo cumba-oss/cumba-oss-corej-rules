@@ -1,0 +1,49 @@
+name: CDISC-AD0476
+kind: rule
+description: |
+  Wave B3 port — T1b PlainIntermediate.
+  CDISC-AD0476: more than one STRATAV for a given STRATAVN (bare leaf)
+  Record-data rule scoped to SUBJECT LEVEL ANALYSIS DATASET with bare-leaf Check.
+  Double Python gap: (1) has_multiple_values_for missing from DataframeType,
+  (2) bare leaf raises KeyError: 'name' in business_rules engine (Finding #26).
+  Baselines on the Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0476)
+rule:
+  coreId: CDISC-AD0476
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', STRATAV: 'A', STRATAVN: '1'}
+      - {STUDYID: S1, USUBJID: '002', STRATAV: 'A', STRATAVN: '1'}
+      - {STUDYID: S1, USUBJID: '003', STRATAV: 'B', STRATAVN: '1'}
+      - {STUDYID: S1, USUBJID: '004', STRATAV: 'C', STRATAVN: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0476
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      STRATAV: 'A'
+      STRATAVN: '1'
+  - rule_id: CDISC-AD0476
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      STRATAV: 'A'
+      STRATAVN: '1'
+  - rule_id: CDISC-AD0476
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      STRATAV: 'B'
+      STRATAVN: '1'
+expected_errors: []

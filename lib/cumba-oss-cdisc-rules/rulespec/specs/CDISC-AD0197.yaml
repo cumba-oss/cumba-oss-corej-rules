@@ -1,0 +1,30 @@
+name: CDISC-AD0197
+kind: rule
+description: |
+  A2 port — T1a PlainSimple. BDS: PARAMCD must be populated. Bare-leaf Check →
+  Python raises KeyError: 'name' per §0b bullet 4; baseline on Python lane.
+python_source: rules-adamig-1-3.json (CDISC-AD0197)
+rule:
+  coreId: CDISC-AD0197
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: '', AVISITN: 1}       # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0197
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PARAMCD: null
+expected_errors: []

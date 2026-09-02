@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0042"
+Sheet_Rule_Identifier: "DD0042"
+Rule_Set: "PMDA"
+Element: "ItemRef"
+Attribute: "MethodOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Method field is required when Origin is Derived. Define-XML specification represents Methods as MethodDef elements, which are referenced by MethodOID attribute within ItemRef element."
+Message: "Missing Method reference"
+# Same deref shape as CDISC twin 0073: the guard follows @ItemOID to the ItemDef
+# and matches its def:Origin Type. ItemRefs with a dangling ItemOID are out of
+# reach (that defect is a reference-integrity rule's beat, batch P2).
+Check:
+  kind: "exists"
+  target: "@MethodOID"
+  when:
+    path: "@ItemOID->ItemDef@OID/Origin/@Type"
+    equals: "Derived"

@@ -1,0 +1,53 @@
+Core:
+  Id: "FDA-SD1395"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Observation (--ENDTC) and Date/Time\
+  \ of First Study Treatment (RFXSTDTC) are both populated as complete dates but End\
+  \ Day of Obs Relative to Exposure (--XENDY) is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--XENDY"
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--ENDTC) and is_complete_date(--ENDTC) and not empty(DM.RFXSTDTC) and
+    is_complete_date(DM.RFXSTDTC) and empty(--XENDY)
+Outcome:
+  Message: "End Day of Obs Relative to Exposure (--XENDY) is missing when --ENDTC\
+    \ and RFXSTDTC are both populated complete dates."
+  Output_Variables:
+  - "--ENDTC"
+  - "DM.RFXSTDTC"
+  - "!--XENDY"
+Source:
+  FDA_Validator_Rule_Message: "--XENDY variable value is not populated"
+  FDA_Validator_Rule_Description: "End Day of Obs Relative to Exposure (--XENDY) variable\
+    \ value should be populated, when End Date/Time of Observation (--ENDTC) and Date/Time\
+    \ of First Study Treatment (RFXSTDTC) variables values are provided, and both\
+    \ of them include complete date parts."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1395"
+        Version: "1"
+      Version: "1.6"

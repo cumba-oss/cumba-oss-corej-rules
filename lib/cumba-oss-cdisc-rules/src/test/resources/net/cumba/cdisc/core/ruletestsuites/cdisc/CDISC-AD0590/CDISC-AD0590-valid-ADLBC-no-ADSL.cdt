@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-AD0590 expect=noViolation domain=ADLBC
+# Rule:Description: A variable is present with the same name as a variable present in ADSL but the variables do not have identical data types
+#note "No ADSL in the study: $adsl_data_type has no value, the not empty($adsl_data_type) gate folds false, and the rule cannot fire. Pins the absent-ADSL disposition of the cross-dataset probe."
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE type=Num label="Age"
+---
+CDISCPILOT01 | 01-701-1015 | 63
+---

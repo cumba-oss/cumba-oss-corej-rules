@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0400 expect=violation domain=ADLBC
+#note "Group (GRADE3, GLUC) holds {3, 3, 4} -> row 3 fires. Row 4's ATOXGRH key component is blank: DROP_MISSING_KEYS removes it from the partition and not empty(ATOXGRH) is false on it, so it never joins any group and never fires. Pin row 3 only."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC ATOXGRH=GRADE3 ATOXGRHN=4
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col ATOXGRH  type=Char
+col ATOXGRHN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | GRADE3 | 3
+CDISCPILOT01 | 01-701-1023 | GLUC | GRADE3 | 3
+CDISCPILOT01 | 01-701-1034 | GLUC | GRADE3 | 4
+CDISCPILOT01 | 01-701-1044 | GLUC |        | 9

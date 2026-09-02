@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0282A expect=skipped domain=ADLBC
+#note "ASEV is declared and blank on one row - data that would otherwise fire. Scope.Data_Structures (Include OCCURRENCE DATA STRUCTURE only) skips it. NOTE this rule does NOT include MEDICAL DEVICE OCCURRENCE DATA STRUCTURE, matching its sheet Domains 'OCCDS, ADAE'. The declared structure=BDS wins over the column heuristic (Fix #154), carried by the mandatory #library block."
+#library standard=adamig version=1-0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ASEV    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 |
+CDISCPILOT01 | 01-701-1023 | ALT | 14.0 | MILD

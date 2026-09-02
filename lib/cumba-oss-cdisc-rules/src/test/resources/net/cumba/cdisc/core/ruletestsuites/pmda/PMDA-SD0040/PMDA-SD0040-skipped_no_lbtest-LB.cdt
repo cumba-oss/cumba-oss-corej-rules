@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0040 expect=skipped domain=LB
+#note "R-4.11 hoist pin (wave-17 lane A). LB carries LBTESTCD but no LBTEST column at all, so Requirements.Variables.All names an absent variable and the rule reports SKIPPED before the Check runs. WHY IT IS A REPORTING FIX AND NOT A BEHAVIOUR CHANGE: the gate used to be a top-level `--TEST exists` leaf, and this same fixture then asserted expect=noViolation and PASSED - the rule executed and yielded a silent zero. Findings are 0 either way; what the hoist buys is an auditable 'skipped - variable LBTEST absent' instead of silence. Measured both ways on this fixture. THE TWO GLUC ROWS ARE THE POINT: if LBTEST existed and disagreed the rule would fire, so the non-finding is attributable to the gate and not to clean data. Note --TESTCD keeps its Check `exists` leaf - that one is the is_inconsistent_across_dataset GROUPING KEY, where R-4.11a's carve-out applies and the leaf is Python-load-bearing."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+S1 | LB | 002 | 1 | GLUC
+S1 | LB | 001 | 2 | ALB

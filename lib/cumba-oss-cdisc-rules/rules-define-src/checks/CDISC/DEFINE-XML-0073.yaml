@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0073"
+Sheet_Rule_Identifier: "73"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "MethodOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The MethodOID attribute must be provided on the  ItemRef element when the Origin Type attribute on the corresponding ItemDef element is \"Derived\"."
+# Sheet: "@MethodOID must be provided when ItemDef[@OID]/def:Origin/@Type='Derived'"
+# (spec 2.1 SS5.3.9.2: MethodOID is Required when the referenced ItemDef's def:Origin
+# Type is "Derived"). The guard dereferences @ItemOID to the ItemDef and matches
+# any of its def:Origin Type values; ItemRefs with a dangling ItemOID are out of
+# reach (that defect is sheet id 65).
+Message: "ItemRef is missing the MethodOID attribute when the referenced ItemDef variable has def:Origin Type = \"Derived\"."
+Check:
+  kind: "exists"
+  target: "@MethodOID"
+  when:
+    path: "@ItemOID->ItemDef@OID/Origin/@Type"
+    equals: "Derived"

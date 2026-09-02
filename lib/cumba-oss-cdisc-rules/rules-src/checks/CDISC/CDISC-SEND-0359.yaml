@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-SEND-0359"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Repro Phase Day timing variable (RPPLDY,\
+  \ RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY, or --RPENDY) holds a value that is not an\
+  \ integer."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    var_exists("RPPLDY") and not empty(RPPLDY) and RPPLDY !~ /^-?[0-9]+$/ or var_exists("RPPLSTDY")
+    and not empty(RPPLSTDY) and RPPLSTDY !~ /^-?[0-9]+$/ or var_exists("RPPLENDY") and not
+    empty(RPPLENDY) and RPPLENDY !~ /^-?[0-9]+$/ or var_exists("--RPDY") and not empty(--RPDY) and
+    --RPDY !~ /^-?[0-9]+$/ or var_exists("--RPSTDY") and not empty(--RPSTDY) and --RPSTDY !~
+    /^-?[0-9]+$/ or var_exists("--RPENDY") and not empty(--RPENDY) and --RPENDY !~ /^-?[0-9]+$/
+Outcome:
+  Message: "A populated Repro Phase Day timing variable (RPPLDY, RPPLSTDY, RPPLENDY,\
+    \ --RPDY, --RPSTDY, --RPENDY) is not an integer."
+  Output_Variables:
+  - "RPPLDY"
+  - "RPPLSTDY"
+  - "RPPLENDY"
+  - "--RPDY"
+  - "--RPSTDY"
+  - "--RPENDY"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "RPPLDY, RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY, --RPENDY"
+  Plain_Text_Explanation: "When populated, values for all Repro Phase Day timing variables\
+    \ are integers."
+  Condition: "Repro Phase Day timing variables (RPPLDY, RPPLSTDY, RPPLENDY, --RPDY,\
+    \ --RPSTDY, --RPENDY) ^= null"
+  Rule: "Repro Phase Day timing variables (RPPLDY, RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY,\
+    \ --RPENDY) = integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND359"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND359"
+        Version: "1"
+      Version: "5.0"

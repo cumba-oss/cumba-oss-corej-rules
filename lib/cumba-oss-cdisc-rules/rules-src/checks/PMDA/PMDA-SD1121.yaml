@@ -1,0 +1,105 @@
+Core:
+  Id: "PMDA-SD1121"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when neither Age (AGE) nor Age Range (AGETXT) is provided\
+  \ for an assigned subject: AGE is missing and AGETXT is empty or not present in\
+  \ the dataset, while Arm Code (ARMCD) is populated and is not 'SCRNFAIL' (Screen\
+  \ Failure) or 'NOTASSGN' (Not Assigned)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Check:
+  expression: >-
+    empty(AGE) and empty(AGETXT) and not empty(ARMCD) and ARMCD not in ["SCRNFAIL", "NOTASSGN"]
+Outcome:
+  Message: "Neither AGE nor AGETXT is populated for an assigned subject (AGE is missing\
+    \ and AGETXT is empty or not present, while ARMCD is populated and not equal to\
+    \ 'SCRNFAIL' or 'NOTASSGN')."
+  Output_Variables:
+  - "AGE"
+  - "AGETXT"
+  - "ARMCD"
+Source:
+  Message: "Neither AGE nor AGETXT values are populated"
+  Description: "Value for Age (AGE) or Age Range (AGETXT) variables should be populated\
+    \ for all subjects. The only exception for SDTM is for Screen Failures (ARMCD=SCRNFAIL)\
+    \ and Not Assigned (ARMCD=NOTASSGN) subjects, or subjects with ARMCD=null. There\
+    \ are no exceptions for SEND."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1121"
+        Version: "1"
+      Version: "1.6"

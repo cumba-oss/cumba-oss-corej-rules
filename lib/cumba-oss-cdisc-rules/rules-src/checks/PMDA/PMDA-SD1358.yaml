@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-SD1358"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Actual Arm Code (ACTARMCD) or Description of\
+  \ Actual Arm (ACTARM) is empty but the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    (empty(ACTARMCD) or empty(ACTARM)) and empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is not populated, when ACTARMCD or ACTARM is empty."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ACTARM"
+  - "ARMNRS"
+Source:
+  Message: "ARMNRS is not populated, when ACTARMCD or ACTARM is null"
+  Description: "When Actual Arm Code (ACTARMCD)/Description of Actual Arm (ACTARM)\
+    \ are not populated, the Reason Arm and/or Actual Arm is Null (ARMNRS) variable\
+    \ must be populated with the reason ACTARMCD/ACTARM are null."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1358"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1358"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1358"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1358"
+        Version: "1"
+      Version: "1.6"

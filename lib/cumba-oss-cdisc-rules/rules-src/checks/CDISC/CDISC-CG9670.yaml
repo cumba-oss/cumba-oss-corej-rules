@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG9670"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when USUBJID is not populated"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Check:
+  expression: >-
+    empty(USUBJID)
+Outcome:
+  Message: "USUBJID is empty"
+  Output_Variables:
+  - "USUBJID"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "SE"
+  Variable: "USUBJID"
+  Condition: ""
+  Rule: "USUBJID ^= null"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"

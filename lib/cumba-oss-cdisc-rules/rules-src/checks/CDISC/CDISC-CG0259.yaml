@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0259"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both the Parameter Value (TSVAL) and the Parameter\
+  \ Null Flavor (TSVALNF) variables are empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVALNF"
+    - "TSVAL"
+Check:
+  expression: >-
+    empty(TSVAL) and empty(TSVALNF)
+Outcome:
+  Message: "Both TSVAL and TSVALNF are empty."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALNF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALNF"
+  Condition: "TSVAL = null"
+  Rule: "TSVALNF ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0259"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0259"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0259"
+        Version: "1"
+      Version: "2.0"

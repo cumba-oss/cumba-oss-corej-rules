@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0087 expect=noViolation domain=DM
+#note "Every randomized subject (ARMCD populated and not SCRNFAIL/NOTASSGN) carries a populated RFSTDTC; the screen-failure / not-assigned / unassigned subjects may leave it empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ARMCD    type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | 2020-01-15 | A
+S1 | DM | 002 |            | SCRNFAIL
+S1 | DM | 003 |            | NOTASSGN
+S1 | DM | 004 |            |

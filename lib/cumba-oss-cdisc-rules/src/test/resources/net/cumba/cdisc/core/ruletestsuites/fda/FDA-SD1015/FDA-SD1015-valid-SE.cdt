@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD1015 expect=noViolation domain=SE
+#note "Every populated SE EPOCH is one of the TA EPOCH values; the boundary row 3 leaves EPOCH empty, and an empty EPOCH must not fire (the non_empty leaf)."
+#library standard=sdtmig version=3-4
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 001 | 1 | SCRN | SCREENING
+CDISCPILOT01 | SE | 001 | 2 | TRT | TREATMENT
+CDISCPILOT01 | SE | 002 | 1 | FUP |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | A | Drug A | 1 | SCRN | SCREENING
+CDISCPILOT01 | TA | A | Drug A | 2 | TRT | TREATMENT
+CDISCPILOT01 | TA | A | Drug A | 3 | FUP | FOLLOW-UP
+---

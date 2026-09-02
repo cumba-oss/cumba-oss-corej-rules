@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1053 expect=violation domain=TV
+#note "Second in-scope domain: a Trial Visits record carrying ARMCD='SCRNFAIL' -> fires. The arm-specific visit for arm A is conformant, and the arm-independent visit leaves ARMCD empty."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=SCRNFAIL
+dataset TV label="Trial Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col VISITNUM type=Num label="Visit Number"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | TV | 1 | SCRNFAIL
+S1 | TV | 2 | A
+S1 | TV | 3 |

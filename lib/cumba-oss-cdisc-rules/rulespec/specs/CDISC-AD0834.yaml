@@ -1,0 +1,37 @@
+name: CDISC-AD0834
+kind: rule
+description: |
+  Wave D8 port - T3-VMC Variable Metadata Check. BDS/ADLB: DVIDN exists and
+  DVID not_exists. Baselined on Python lane under Finding #9 (VMC dataset
+  projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection before evaluating the Check,
+  so `exists(DVIDN)` / `not_exists(DVID)` resolve against meta-field
+  columns and yield 0 violations. Java evaluates the leaves against the
+  original column metadata and fires correctly.
+python_source: rules-adamig-1-3.json (CDISC-AD0834)
+rule:
+  coreId: CDISC-AD0834
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      DVIDN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, DVIDN: 1}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0834
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      DVIDN: '1'
+expected_errors: []

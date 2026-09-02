@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0237"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTPGy is populated, TRTPGyN is populated, and there\
+  \ is more than one value of TRTPGy for a given value of TRTPGyN"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TRTPGy) and not empty(TRTPGyN) and has_multiple_values_for(TRTPGy, TRTPGyN)
+Outcome:
+  Message: "More than one value of TRTPGy is recorded for the same value of TRTPGyN"
+  Output_Variables:
+  - "TRTPGy"
+  - "TRTPGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTPGy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTPGy\
+    \ for a given value of TRTPGyN, where y is a single-digit integer [1-9]"
+  Rule_Failure_Criteria: "There is more than one value of TRTPGy for a given value\
+    \ of TRTPGyN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR237"
+        Version: "1"
+      Version: "5.0"

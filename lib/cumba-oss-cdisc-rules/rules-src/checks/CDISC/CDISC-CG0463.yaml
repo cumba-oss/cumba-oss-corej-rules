@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0463"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a custom domain in the Interventions general observation\
+  \ class does not include the topic variable --TRT."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Operations:
+- id: "$domain_is_custom"
+  expression: "domain_is_custom()"
+Check:
+  expression: >-
+    $domain_is_custom == true and not var_exists("--TRT")
+Outcome:
+  Message: "A custom Interventions-class domain does not include the topic variable\
+    \ --TRT."
+  Output_Variables:
+  - "$domain_is_custom"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--TRT"
+  Condition: "Custom domain present in study"
+  Rule: "--TRT present in custom interventions dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0463"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0463"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0463"
+        Version: "2"
+      Version: "2.0"

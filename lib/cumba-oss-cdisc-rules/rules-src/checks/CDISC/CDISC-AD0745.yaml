@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-AD0745"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE and BNRIND are both populated and BNRIND\
+  \ does not equal ANRIND from the record where ABLFL equals Y, for a given value\
+  \ of PARAMCD and BASETYPE, for a subject"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Operations:
+- id: "$baseline_anrind"
+  expression: "max(ANRIND, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    not empty(BASETYPE) and not empty(BNRIND) and BNRIND != $baseline_anrind
+Outcome:
+  Message: "BNRIND does not equal the baseline ANRIND from the record where ABLFL\
+    \ equals Y for this subject's PARAMCD and BASETYPE"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASETYPE"
+  - "BNRIND"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BNRIND"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is populated, BNRIND is populated,\
+    \ and BNRIND is not equal to ANRIND where ABLFL is equal to Y for a given value\
+    \ of PARAMCD and BASETYPE for a subject"
+  Rule_Failure_Criteria: "BNRIND is not equal to ANRIND where ABLFL is equal to Y\
+    \ for a given value of PARAMCD and BASETYPE"
+  Condition_Failure: "BASETYPE is populated and BNRIND is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR745"
+        Version: "1"
+      Version: "5.0"

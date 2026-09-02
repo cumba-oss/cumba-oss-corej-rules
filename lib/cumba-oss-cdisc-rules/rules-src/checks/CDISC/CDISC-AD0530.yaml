@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-AD0530"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ASEVN is present but ASEV is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ASEVN") and not var_exists("ASEV")
+Outcome:
+  Message: "ASEVN is present but ASEV is not present."
+  Output_Variables:
+  - "ASEVN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ASEVN"
+  Natural_Language_Rule_Failure_Criteria: "ASEVN is present and ASEV is not present"
+  Rule_Failure_Criteria: "ASEV is not present"
+  Condition_Failure: "ASEVN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR530"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR530"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR530"
+        Version: "2"
+      Version: "5.0"

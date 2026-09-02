@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-AD0820-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the dataset carries SITEID but no SITEIDN variable\
+  \ at all; the numeric companion must be present alongside SITEID."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "POPULATION PHARMACOKINETIC ANALYSIS"
+Check:
+  expression: >-
+    var_exists("SITEID") and not var_exists("SITEIDN")
+Outcome:
+  Message: "SITEIDN is not present in the dataset although SITEID is; the numeric\
+    \ companion SITEIDN must accompany SITEID."
+  Output_Variables:
+  - "SITEID"
+Source_Proposed:
+  Sheet_Issue: "#151"
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "SITEIDN"
+  Natural_Language_Rule_Failure_Criteria: "the dataset carries SITEID but no SITEIDN\
+    \ variable at all; the numeric companion must be present alongside SITEID"
+  Rule_Failure_Criteria: "SITEIDN is not populated"
+  Condition_Failure: "SITEID is populated"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SITEIDN"
+  Natural_Language_Rule_Failure_Criteria: "SITEID is populated and SITEIDN is not\
+    \ populated"
+  Rule_Failure_Criteria: "SITEIDN is not populated"
+  Condition_Failure: "SITEID is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR820"
+        Version: "1"
+      Version: "5.0"

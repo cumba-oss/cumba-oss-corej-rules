@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0413 expect=violation domain=ADLBC
+# Rule:Description: There is more than one value of ANLzzFN for a given value of ANLzzFL, considering only those rows on which both variables are populated
+#note "ANL01FL=G maps to two distinct ANL01FN values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ANL01FN type=Char
+col ANL01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | A1 | G
+CDISCPILOT01 | 01-701-1023 | A2 | G
+---

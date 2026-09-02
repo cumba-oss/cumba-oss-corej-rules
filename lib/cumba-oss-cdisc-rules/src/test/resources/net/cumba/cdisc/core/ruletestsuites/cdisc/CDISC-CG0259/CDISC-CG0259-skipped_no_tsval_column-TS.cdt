@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0259 expect=skipped domain=TS
+#note "THE TSVAL ALL-FACET GATE (Fix #331 bucket 2, M2-D24 / M3-D18; pin owed by review S9 and authored by Fix #340). The TS dataset deliberately declares no TSVAL column, so Requirements.Variables.All [TSVAL] rejects the dataset and the rule is SKIPPED naming TSVAL. Remove the All entry and the rule EXECUTES: since Fix #330 retired the injected var_exists guard, a bare empty(TSVAL) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so it would fire on EVERY row -- the flood the gate exists for. If this scenario EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite the pin."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | TITLE | Trial Title |
+S1 | TS | 2 | AGEMAX | Planned Max Age |
+S1 | TS | 3 | AGEMIN | Planned Min Age | NA

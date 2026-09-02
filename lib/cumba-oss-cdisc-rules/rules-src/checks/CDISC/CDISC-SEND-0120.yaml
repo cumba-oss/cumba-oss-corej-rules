@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-SEND-0120"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of Comment (CODTC) is populated for a\
+  \ comment that references a record in another domain (Identifying Variable IDVAR\
+  \ is populated)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "IDVAR"
+Check:
+  expression: >-
+    not empty(IDVAR) and not empty(CODTC)
+Outcome:
+  Message: "CODTC is populated when the comment references a parent-domain record\
+    \ (IDVAR is populated)."
+  Output_Variables:
+  - "IDVAR"
+  - "CODTC"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "CODTC"
+  Plain_Text_Explanation: "If the comment is related to a record in another domain\
+    \ (IDVAR and IDVARVAL are populated) CODTC should not be populated."
+  Condition: "IDVAR ^= null"
+  Rule: "CODTC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND120"
+        Version: "1"
+      Version: "5.0"

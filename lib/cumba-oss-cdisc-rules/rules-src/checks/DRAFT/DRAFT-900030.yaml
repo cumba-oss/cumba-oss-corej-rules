@@ -1,0 +1,29 @@
+Core:
+  Id: "DRAFT-900030"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when CHG is populated on a baseline record (ABLFL = 'Y');\
+  \ CHG should be null for baseline records."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ABLFL"
+Check:
+  expression: >-
+    ABLFL == "Y" and not empty(CHG)
+Outcome:
+  Message: "CHG is populated on a baseline record (ABLFL = 'Y'). CHG should be null\
+    \ for baseline records."
+  Output_Variables:
+  - "CHG"
+  - "ABLFL"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

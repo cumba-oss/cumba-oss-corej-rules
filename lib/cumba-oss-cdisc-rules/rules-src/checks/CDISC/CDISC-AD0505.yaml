@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0505"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable's name ends in DTM but its label does\
+  \ not contain 'Datetime'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DTM") and not contains(var_label("DATA"), "Datetime")
+Outcome:
+  Message: "The variable's name ends in DTM, but its label does not contain 'Datetime'."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+skipIfLibraryDefined: true
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*DTM"
+  Natural_Language_Rule_Failure_Criteria: "A variable ending in DTM must contain \"\
+    Datetime\" in the label"
+  Rule_Failure_Criteria: "*DTM does not contain \"Datetime\" in the label"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR505"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR505"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR505"
+        Version: "1"
+      Version: "5.0"

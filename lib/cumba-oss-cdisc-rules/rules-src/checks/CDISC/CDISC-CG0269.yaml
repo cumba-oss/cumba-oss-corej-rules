@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0269"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Added on to Existing Treatments parameter (TSPARMCD\
+  \ equal to 'ADDON') has a Parameter Value (TSVAL) that is populated with a value\
+  \ other than 'Y' or 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Check:
+  expression: >-
+    TSPARMCD == "ADDON" and not empty(TSVAL) and TSVAL not in ["Y", "N"]
+Outcome:
+  Message: "TSVAL is not 'Y' or 'N' when TSPARMCD equals 'ADDON'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'ADDON' and TSVAL ^= null"
+  Rule: "TSVAL in ('N','Y')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"

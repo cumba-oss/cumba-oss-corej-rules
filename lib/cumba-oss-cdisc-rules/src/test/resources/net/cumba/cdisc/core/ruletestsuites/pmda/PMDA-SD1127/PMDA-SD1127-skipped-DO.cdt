@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1127 expect=skipped domain=DO
+#note "Pins the wave-15 `Domains.Exclude: [DO]` entry — the translation of the `(-DO)` carve-out in this rule's own sheet scope string `CO, INTERVENTIONS, FINDINGS (-DO), EVENTS, FINDINGS ABOUT`, which wave 13 left untranslated and wave 14 translated on `PMDA-SD1125` only. ⚑ The neuter-and-watch is UNMASKED and the fixture is deliberately built so ONLY the new Exclude entry can reject it: the class is declared FINDINGS (so `Classes.Include` is satisfied), `DO` is none of the pre-existing `DM`/`SE`/`SM`/`SV` entries, all four required columns exist, and `DOTPTNUM` genuinely differs across two rows sharing `DOTPT=Baseline`, `DOTPTREF=REF1`, `VISITNUM=1`. Remove `DO` from the Exclude list and this scenario turns from `skipped` into a violation."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col DOTPTNUM type=Num  label="Planned Time Point Number"
+col DOTPTREF type=Char label="Time Point Reference"
+col DOTPT    type=Char label="Planned Time Point Name"
+---
+S1 | DO | 001 | 1 | 1 | REF1 | Baseline
+S1 | DO | 001 | 1 | 2 | REF1 | Baseline
+---

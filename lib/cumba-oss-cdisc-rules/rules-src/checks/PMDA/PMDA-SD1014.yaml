@@ -1,0 +1,126 @@
+Core:
+  Id: "PMDA-SD1014"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Order of Element within Arm (TAETORD)\
+  \ value does not match any TAETORD value in the Trial Arms (TA) dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "DM"
+    - "DO"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Operations:
+- id: "$ta_taetord"
+  expression: "distinct(TAETORD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(TAETORD) and TAETORD not in $ta_taetord
+Outcome:
+  Message: "TAETORD does not match any TAETORD value in the TA dataset."
+  Output_Variables:
+  - "TAETORD"
+  - "$ta_taetord"
+Source:
+  Message: "Invalid TAETORD"
+  Description: "Order of Element within Arm (TAETORD) values should match entries\
+    \ in the Trial Arms (TA) dataset."
+  Domains: "SPECIAL PURPOSE (-DM), INTERVENTIONS, FINDINGS (-DO), EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1014"
+        Version: "1"
+      Version: "1.6"

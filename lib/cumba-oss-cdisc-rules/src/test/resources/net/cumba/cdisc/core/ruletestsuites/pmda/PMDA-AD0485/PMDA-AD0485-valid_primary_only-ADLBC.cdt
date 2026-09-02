@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0485 expect=noViolation domain=ADLBC
+#note "COMPLEMENTARITY pin for the PBCHGC pair. PBCHGCA1 populated, PBCHGC1N empty - the record state PMDA-AD0484-invalid_primary_without_secondary flags; the AD0485 direction must stay silent."
+#expectViolationCount 0
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col PBCHGC1N   type=Num
+col PBCHGCA1   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | | DECREASED
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0133B expect=noViolation domain=ADLBC
+#note "Both operands present and populated on every row -> both disjuncts false -> executes, silent. The rule does not check the ratio is arithmetically correct -- that is base rule PMDA-AD0133's job."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col A1LO     type=Num
+col R2A1LO   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 0.5 | 5
+CDISCPILOT01 | 01-701-1023 | ALT | 3.0 | 0.5 | 6

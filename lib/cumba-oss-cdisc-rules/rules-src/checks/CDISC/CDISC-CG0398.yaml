@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG0398"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for records in the Disposition (DS) dataset where\
+  \ Category for Disposition Event (DSCAT) equals 'DISPOSITION EVENT', there is more\
+  \ than one disposition event record per subject for the same Epoch (EPOCH)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    DSCAT == "DISPOSITION EVENT" and not is_unique_set([DSCAT, USUBJID, EPOCH])
+Outcome:
+  Message: "Multiple disposition events are reported for the same EPOCH."
+  Output_Variables:
+  - "DSCAT"
+  - "EPOCH"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "GEN"
+  Condition: "DSCAT = 'DISPOSITION EVENT'"
+  Rule: "At most one record per subject per epoch"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0398"
+        Version: "2"
+      Version: "2.0"

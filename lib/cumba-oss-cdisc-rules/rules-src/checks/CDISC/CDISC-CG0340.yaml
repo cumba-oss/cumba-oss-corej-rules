@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0340"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SCAT is equal to --BODSYS."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "--BODSYS"
+Check:
+  expression: >-
+    not empty(--SCAT) and equalsIgnoreCase(--SCAT, --BODSYS)
+Outcome:
+  Message: "--SCAT is equal to --BODSYS."
+  Output_Variables:
+  - "--SCAT"
+  - "--BODSYS"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Rule: "--SCAT ^= --BODSYS"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0340"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0340"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0340"
+        Version: "1"
+      Version: "2.0"

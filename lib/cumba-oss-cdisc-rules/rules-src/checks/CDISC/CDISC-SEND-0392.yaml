@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0392"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Order of Repro Stage (TPSTGORD) is not unique\
+  \ within a Repro Path (RPATHCD)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Check:
+  expression: >-
+    not is_unique_set([TPSTGORD, RPATHCD])
+Outcome:
+  Message: "TPSTGORD is not unique within the Repro Path (RPATHCD)."
+  Output_Variables:
+  - "RPATHCD"
+  - "TPSTGORD"
+Source:
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "TPSTGORD"
+  Plain_Text_Explanation: "TPSTGORD provides the order of the planned Repro Stages\
+    \ within the Repro Path."
+  Rule: "TPSTGORD is unique within a Repro Path AND TPSTGORD is in the order in which\
+    \ the Repro Stages occur"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND392"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND392"
+        Version: "1"
+      Version: "5.0"

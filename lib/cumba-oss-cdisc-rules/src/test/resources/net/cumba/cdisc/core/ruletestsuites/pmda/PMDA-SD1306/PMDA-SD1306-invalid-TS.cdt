@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1306 expect=violation domain=TS
+#note "ADAPTED-FROM fda/FDA-SD1306/FDA-SD1306-invalid-TS.cdt (verbatim). Study population is healthy subjects (HLTSUBJI=Y), so the TDIGRP parameter value must be empty; it carries 'Diabetes' -> fires on the TDIGRP record."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=TDIGRP
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | HLTSUBJI | Healthy Subject Indicator | Y
+S1 | TS | 2 | TDIGRP   | Diagnosis Group           | Diabetes

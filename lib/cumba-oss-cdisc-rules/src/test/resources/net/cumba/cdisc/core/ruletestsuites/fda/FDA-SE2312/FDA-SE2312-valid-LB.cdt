@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SE2312 expect=noViolation domain=LB
+#note "Both populated LB.POOLID values (POOL1, POOL2) are defined in POOLDEF for the same STUDYID; the subject-level row with an empty POOLID is not flagged -> no violation."
+#library standard=sendig version=3-1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB |     | POOL1 | 1 | ALB | Albumin | 4.1
+S1 | LB |     | POOL2 | 2 | ALB | Albumin | 3.9
+S1 | LB | 001 |       | 3 | ALB | Albumin | 4.4
+---
+
+dataset POOLDEF label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | 001
+S1 | POOL1 | 002
+S1 | POOL2 | 003
+---

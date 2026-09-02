@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0029"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Unique Subject Identifier (USUBJID) value is not\
+  \ present in the Demographics (DM) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "AP--"
+    - "APRELSUB"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$dm_usubjid"
+  expression: "distinct(USUBJID, domain=\"DM\")"
+Check:
+  expression: >-
+    not empty(USUBJID) and USUBJID not in $dm_usubjid
+Outcome:
+  Message: "USUBJID value is not present in the DM dataset."
+  Output_Variables:
+  - "$dm_usubjid"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "USUBJID"
+  Condition: "Domain Not in ('AP--')"
+  Rule: "USUBJID in DM.USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0029"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0029"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0029"
+        Version: "1"
+      Version: "2.0"

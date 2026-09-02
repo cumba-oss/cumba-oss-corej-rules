@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0282A expect=violation domain=ADAE
+#note "Positive control. Rows 1 and 3 carry a blank ASEV and fire; row 2 is populated and stays silent. Record granularity -> 2 violations, so two #expectViolationAt lines (the match is an exact multiset). ASEV is Char, so the 'empty' (not missing) wording is right and the blank cell is itself the evidence the finding carries. ASEV is declared, so Requirements.Variables.All is satisfied and the rule executes."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=3 USUBJID=01-701-1034
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col ASEV    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE |
+CDISCPILOT01 | 01-701-1023 | NAUSEA | MILD
+CDISCPILOT01 | 01-701-1034 | RASH |

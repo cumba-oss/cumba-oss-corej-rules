@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0111 expect=violation domain=ADLBC
+#note "DISCRIMINATING (empty-dataset semantics, non-wildcard shape). Same header and columns, ZERO data rows. The declared schema still carries ARELTM and still lacks ARELTMU, so the dataset is exactly as non-conformant as a populated one; BroadcastFold decides the constant Check above the 0-row synthetic-table branch -> one violation at reported row 1. NO value pin (a 0-row table yields an empty extracted value). If this reports 0 violations or SKIPPED, ESCALATE to stage R."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTM  type=Num
+---

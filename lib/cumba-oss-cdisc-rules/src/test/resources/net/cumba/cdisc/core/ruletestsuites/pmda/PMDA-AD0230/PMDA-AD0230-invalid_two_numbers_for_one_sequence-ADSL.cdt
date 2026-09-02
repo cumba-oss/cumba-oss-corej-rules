@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0230 expect=violation domain=ADSL
+#note "Mirror of AD0229: key TRTSEQA, target TRTSEQAN. Group A-B holds {1 x2, 2 x1} -> row 3 is the minority."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRTSEQA=A-B TRTSEQAN=2
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSEQA type=Char
+col TRTSEQAN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | A-B | 2
+S1 | 004 | B-A | 3
+S1 | 005 | B-A | 3

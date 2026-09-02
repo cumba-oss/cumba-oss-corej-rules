@@ -1,0 +1,57 @@
+name: EMPTYSTR-equal-to-both-empty
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category B.2).
+  equal_to between two variables, both empty. The honest coreJ engine treats
+  "" == "" as a match and fires; Python's _check_equality treats two empties as
+  not-a-match and does not fire.
+
+  NOTE on the converter gate: the production CORE→native path
+  (RulePackageConverter) wraps equal_to in `AND non_empty(target)`, so converted
+  CORE rules match Python (no both-empty fire). The spec-runner Java lane evaluates
+  the legacy engine directly from the raw CORE leaf and does NOT route through
+  RulePackageConverter, so the gate is invisible here and the honest engine fires.
+  This is therefore a Java/Python divergence in the spec-runner only; baselined on
+  the python lane (expected matches the un-gated honest Java engine).
+python_notes: |
+  Python equal_to (_check_equality, dataframe_operators.py:189-234) returns
+  not-a-match for two null/empty operands → 0 violations. coreJ honest engine fires
+  the both-empty row. The production converter gate (Phase 6) reconciles converted
+  CORE rules with Python; the spec-runner does not apply that gate.
+python_source: PLAN-empty-string-membership-parity.md (B.2)
+check:
+  name: AVAL
+  operator: equal_to
+  value: BVAL
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AVAL: 'Y', BVAL: 'Y'}    # equal → fires (both engines)
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AVAL: 'Y', BVAL: 'X'}    # differ → no fire
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AVAL: '', BVAL: ''}      # both empty → coreJ fires, Python does not
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-equal-to-both-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AVAL: Y
+    BVAL: Y
+    STUDYID: S1
+    USUBJID: '001'
+- rule_id: AUTO-EMPTYSTR-equal-to-both-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AVAL:
+    BVAL:
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

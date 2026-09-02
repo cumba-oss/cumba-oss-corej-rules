@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1292 expect=violation domain=CM
+#note "row 1: CMSTTPT names a start reference time point but CMSTRTPT is empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMSTTPT=2020-01-01
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+col CMSTTPT  type=Char label="Start Reference Time Point"
+---
+S1 | CM | 001 | 1 | ASPIRIN |  | 2020-01-01
+S1 | CM | 002 | 1 | IBUPROFEN | AFTER | 2020-02-01

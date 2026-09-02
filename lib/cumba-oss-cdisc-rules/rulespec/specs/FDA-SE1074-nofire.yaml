@@ -1,0 +1,18 @@
+name: FDA-SE1074-nofire
+kind: rule
+description: |
+  No-fire companion for FDA-SE1074. The SEND DM dataset carries only variables that are
+  legitimate in SEND (no SDTM-human-only variable), so the rule does not fire.
+python_source: rules-sendig-3-1-1.json (FDA-SE1074)
+rule:
+  coreId: FDA-SE1074
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', SPECIES: RAT}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0353"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record is flagged as the analysis baseline (Analysis\
+  \ Baseline Flag ABLFL equals Y) and the Baseline Analysis Range y Indicator (ByIND)\
+  \ variable does not equal the Analysis Range y Indicator (AyIND) variable; on the\
+  \ baseline record (same range index y) ByIND must carry the same value as AyIND.\
+  \ The comparison is evaluated only where both ByIND and AyIND are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ABLFL"
+Check:
+  expression: >-
+    ABLFL == "Y" and not empty(ByIND) and not empty(AyIND) and ByIND != AyIND
+Outcome:
+  Message: "ByIND does not equal AyIND when ABLFL equals Y"
+  Output_Variables:
+  - "AyIND"
+  - "ByIND"
+  - "ABLFL"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "B*IND != AyIND when ABLFL = Y"
+  Description: "If the record is flagged as the Analysis Baseline (ABLFL = Y), then\
+    \ the value of Baseline Analysis Range y Indicator (ByIND) variable must equal\
+    \ the value of Analysis Range y Indicator (AyIND) variable."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0353"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0353"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0353"
+        Version: "1"
+      Version: "6.0"

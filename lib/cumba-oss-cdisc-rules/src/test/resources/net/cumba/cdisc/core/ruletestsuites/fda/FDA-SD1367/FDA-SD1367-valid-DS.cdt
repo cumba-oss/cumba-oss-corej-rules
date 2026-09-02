@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD1367 expect=noViolation domain=DS
+#note "Rows 1/2: same subject and DSSCAT but different EPOCH -> distinct key, clean. Rows 3/4: full duplicate (USUBJID, DSSCAT, EPOCH) but DSCAT='PROTOCOL MILESTONE', not 'DISPOSITION EVENT' -> the row filter keeps them out. Row 5: different subject -> clean."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSCAT  type=Char label="Subcategory for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | DS | S1-001 | 1 | COMPLETED  | COMPLETED  | DISPOSITION EVENT  | STUDY PARTICIPATION | TREATMENT
+S1 | DS | S1-001 | 2 | COMPLETED  | COMPLETED  | DISPOSITION EVENT  | STUDY PARTICIPATION | FOLLOW-UP
+S1 | DS | S1-001 | 3 | RANDOMIZED | RANDOMIZED | PROTOCOL MILESTONE | STUDY PARTICIPATION | TREATMENT
+S1 | DS | S1-001 | 4 | RANDOMIZED | RANDOMIZED | PROTOCOL MILESTONE | STUDY PARTICIPATION | TREATMENT
+S1 | DS | S1-002 | 5 | COMPLETED  | COMPLETED  | DISPOSITION EVENT  | STUDY PARTICIPATION | TREATMENT

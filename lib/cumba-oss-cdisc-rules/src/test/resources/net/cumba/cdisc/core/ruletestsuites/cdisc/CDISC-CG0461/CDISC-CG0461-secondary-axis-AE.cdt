@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0461 expect=violation domain=AE
+# Rule:Description: Raise an error when the High Level Group Term (--HLGT) is not on the MedDRA primary system organ class hierarchy path.
+#note "Q6b construction pin at the HLGT level (twin of CDISC-CG0460-secondary-axis-AE): the HLGT 'Central nervous system vascular disorders' is multiaxial in the notional mdhier behind the dummy - primary rows put it under SOC 'Nervous system disorders' (in the hierarchy), non-primary rows also reach SOC 'Vascular disorders' (deliberately NOT in the hierarchy, though it IS a levels.SOC term). Row 1 pairs the HLGT with the secondarily-reachable SOC and must FIRE under the primary_soc_fg='Y'-only construction; a full-closure hierarchy would keep it quiet - the discrimination the pre-existing fixtures lack. Row 2 uses the primary SOC and stays quiet."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLGT type=Char label="High Level Group Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Central nervous system vascular disorders | Vascular disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Central nervous system vascular disorders | Nervous system disorders
+---

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1470 expect=noViolation domain=LB
+#note "FLIPPED by the M2-P10 ruling (option (a), Fix #308) - the file was authored as expect=violation and named this exact flip in its own note. PMDA-SD1470 and PMDA-SD1472 have adopted PMDA-SD1471's regex, spelling C: /^[><]?=? ?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$/, byte-identical to the spelling PMDA-SD1473 took in Fix #275, so all four PMDA LB rules under sheet rows 415-418 - one sentence, one worked example '<= -1.2' - now answer the same way. C is the only one of the four corpus spellings that accepts BOTH the sheet's own worked example and an ordinary bare leading decimal. '.5' is an unambiguous number a lab system may emit and LBORRES is Char, so it is no longer reported. Row 2 (POSITIVE) is kept out of this file; the positive control is -invalid_non_numeric_result-LB, which is unchanged. ⛔ The nine CDISC/CORE LB rules do NOT move: their sheet row names no symbol run at all."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBORNRLO type=Char
+---
+S1 | LB | 001 | 1 | GLUC | .5 | 3.9

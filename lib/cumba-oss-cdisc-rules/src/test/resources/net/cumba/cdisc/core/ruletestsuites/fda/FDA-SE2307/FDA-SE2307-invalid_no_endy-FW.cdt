@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2307 expect=violation domain=FW
+#note "column-absent case on the second in-scope domain: FWENDY is not present as a column at all, so the bare empty(--ENDY) leaf is TRUE on every row (absent = all-missing, EC-43) -> the rule fires even though FWDY is populated. Plan B phase 4d' deleted the not var_exists(--ENDY) disjunct that used to spell this out; the verdict is unchanged. Verdict-only: the firing condition is a pure column-absence fact, which the engine reports once per dataset rather than per row, so no row= pin is asserted here."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset FW class=FINDINGS label="Food and Water Consumption"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FWSEQ    type=Num  label="Sequence Number"
+col FWTESTCD type=Char label="Food/Water Consumption Short Name"
+col FWDY     type=Num  label="Study Day of Start of Observation"
+---
+S1 | FW | 001 | 1 | FCONSUM | 1
+S1 | FW | 001 | 2 | FCONSUM | 8

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0035 expect=violation domain=ADLBC
+#note "Column declared Num, so value() not in [1] compares numerically. Row 2's 2 fires; row 1's 1 does not. One cell fires."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=SAFRFN USUBJID=01-701-1023
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFRFN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 2

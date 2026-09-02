@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0263"
+Sheet_Rule_Identifier: "263"
+Rule_Set: "CDISC"
+Element: "Standard"
+Attribute: "Version"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "The version identifier must match a version identifier used in the standard."
+# Library-gated (the gaps doc's "revisit if a Requires: library input is ever
+# added" row): publishedStandardVersions supplies the catalogue; a standard
+# Name the library does not know is out of reach. The sheet marks both
+# versions, but def:Standard elements exist only in 2.1 documents - in 2.0 the
+# scope is simply empty and the MetaDataVersion-attribute leg is
+# DEFINE-XML-0263-B.
+Message: "The version identifier value is not a valid value for the standard [${value}]."
+Check:
+  kind: "library_standard_version_known"

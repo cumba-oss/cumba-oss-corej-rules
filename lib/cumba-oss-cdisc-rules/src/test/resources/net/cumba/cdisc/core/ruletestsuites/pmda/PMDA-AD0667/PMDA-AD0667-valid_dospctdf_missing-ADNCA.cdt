@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0667 expect=noViolation domain=ADNCA
+#note "Isolates the leading not empty(DOSPCTDF) conjunct. Both halves empty - the rule must stay silent, since it is the DOSPCTDF value that creates the obligation. Executes (TRTA is declared, so the Requirements.Variables gate is satisfied)."
+#expectViolationCount 0
+#library standard=adamig version=1-3
+dataset ADNCA structure=BDS subclass=NCA
+col STUDYID   type=Char
+col USUBJID   type=Char
+col PARAMCD   type=Char
+col DOSPCTDF  type=Num
+col TRTA      type=Char
+---
+CDISCPILOT01 | 01-701-1015 | CONC | |
+---

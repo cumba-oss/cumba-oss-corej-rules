@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0038 expect=skipped domain=TV
+#note "FRESH. VISITDY=0 is a value the rule WOULD report — the point of the fixture is that it never gets the chance, because TRIAL DESIGN is not in Scope.Classes.Include. class=\"TRIAL DESIGN\" on the dataset line is mandatory for the class gate to be judged. In-tree precedent: pmda/PMDA-SD1039/PMDA-SD1039-skipped_ti_class-TI.cdt. Sheet-safe under the pending SD0003-F1 ruling: TRIAL DESIGN is outside SD0038's sheet cell too, so this scenario skips under both readings."
+#library standard=sdtmig version=3-4
+dataset TV class="TRIAL DESIGN" label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col ARMCD    type=Char label="Planned Arm Code"
+---
+CDISCPILOT01 | TV | 1 | SCREENING | 0 | A1

@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-OD0041"
+Sheet_Rule_Identifier: "OD0041"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Attribute: "ItemOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The ItemOID attribute for ItemRef element must be unique within a single ItemGroupDef."
+# The parent-qualified selector keeps def:ValueListDef/ItemRef out - the sheet
+# scopes to "a single ItemGroupDef" only (a duplicate ItemOID inside one
+# def:ValueListDef is not this row's beat).
+Message: "Duplicate ItemRef ItemOID [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "ItemOID"

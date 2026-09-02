@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-SEND-0366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a record whose Pregnancy Findings Test Code\
+  \ (PYTESTCD) is \"PREGSTAT\", the Result Category (PYRESCAT) is populated with a\
+  \ value that is not a term in the (PYRESCAT) controlled terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PY"
+Requirements:
+  Variables:
+    All:
+    - "PYTESTCD"
+Operations:
+- id: "$pyrescat_terms"
+  expression: "codelist_terms(codelists=[PYRESCAT], level=\"term\", returntype=\"\
+    value\")"
+Check:
+  expression: >-
+    PYTESTCD == "PREGSTAT" and not empty(PYRESCAT) and PYRESCAT not in $pyrescat_terms
+Outcome:
+  Message: "PYRESCAT is populated with a value that is not a term in the (PYRESCAT)\
+    \ controlled terminology codelist when PYTESTCD is \"PREGSTAT\"."
+  Output_Variables:
+  - "PYTESTCD"
+  - "PYRESCAT"
+  - "$pyrescat_terms"
+Source:
+  Class: "FND"
+  Domain: "PY"
+  Variable: "PYRESCAT"
+  Plain_Text_Explanation: "When the PYTESTCD is \"PREGSTAT\", PYRESCAT should be populated\
+    \ with a value in the PYRESCAT controlled terminology list."
+  Condition: "PYTESTCD = \"PREGSTAT\""
+  Rule: "PYRESCAT populated using PYRESCAT controlled list"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND366"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND366"
+        Version: "1"
+      Version: "5.0"

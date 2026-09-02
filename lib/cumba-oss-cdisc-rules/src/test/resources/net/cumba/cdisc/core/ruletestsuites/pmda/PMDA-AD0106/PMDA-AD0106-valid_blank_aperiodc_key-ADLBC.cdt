@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0106 expect=noViolation domain=ADLBC
+#note "*** The batch's ONE ISOLATED DROP_MISSING_KEYS pin. APERIODC is PRESENT (blank on every row) so var_exists(APERIODC) is TRUE, and not empty(APERIOD) is TRUE on every row - no conjunct is false here. The ONLY thing silencing the rule is GroupSemantics.partition discarding every blank-key row under DROP_MISSING_KEYS. The same APERIOD sequence fires when APERIODC is PERIOD1 (see the violation fixture)."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col APERIOD  type=Num
+col APERIODC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 |
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 |
+CDISCPILOT01 | 01-701-1034 | GLUC | 2 |

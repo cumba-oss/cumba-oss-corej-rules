@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1317 expect=violation domain=DS
+#note "Row 1: DEATH record with DSSTDTC different from DM.DTHDTC (both populated) -> fires. Row 2: DEATH with DSSTDTC equal to DTHDTC -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | DEATH | 2020-05-09
+S1 | DS | 002 | 1 | DEATH | 2020-06-01
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 | 2020-05-10
+S1 | DM | 002 | 2020-06-01
+---

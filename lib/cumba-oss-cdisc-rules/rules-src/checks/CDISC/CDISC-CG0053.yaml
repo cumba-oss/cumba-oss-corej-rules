@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0053"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --REASND is present but --PRESP is not present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "EX"
+Check:
+  expression: >-
+    not var_exists("--PRESP") and var_exists("--REASND")
+Outcome:
+  Message: "--REASND is present when --PRESP is not present."
+  Output_Variables:
+  - "--REASND"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(DS, DV, EX)"
+  Variable: "--REASND"
+  Condition: "--PRESP not present in dataset"
+  Rule: "--REASND not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0053"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0053"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0053"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0117 expect=violation domain=DM
+#note "ACTARM=XanLow on row 2 is not among the TA.ARM values -> fires. Row 1 matches TA; row 3 has an empty ACTARM and is guarded out. SDTMIG 3.2 predates ARMNRS, so this domain does not carry that column."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002 ACTARM=XanLow
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+CDISCPILOT01 | DM | 01-001 | Placebo | Placebo
+CDISCPILOT01 | DM | 01-002 | XanHigh | XanLow
+CDISCPILOT01 | DM | 01-003 |         |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | PBO   | Placebo | 1 | TRT
+CDISCPILOT01 | TA | XANHI | XanHigh | 1 | TRT
+---

@@ -1,0 +1,98 @@
+Core:
+  Id: "PMDA-SD2024"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both the Unique Subject Identifier (USUBJID) and\
+  \ the Pool Identifier (POOLID) variables are populated on the same record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "POOLID"
+Check:
+  expression: >-
+    not empty(USUBJID) and not empty(POOLID)
+Outcome:
+  Message: "Redundant values for USUBJID and POOLID"
+  Output_Variables:
+  - "POOLID"
+Source:
+  Message: "Redundant values for USUBJID and POOLID"
+  Description: "Only one of the Unique Subject Identifier (USUBJID) or Pool Identifier\
+    \ (POOLID) variables values may be populated, not both."
+  Domains: "SPECIAL PURPOSE (-DM, -SE, -SM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT, RELATIONSHIP (-DR, -POOLDEF, -RELREC)"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2024"
+        Version: "1"
+      Version: "1.6"

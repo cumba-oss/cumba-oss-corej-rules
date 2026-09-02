@@ -1,0 +1,111 @@
+Core:
+  Id: "CDISC-SEND-0049"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable that the CDISC Library binds to a controlled\
+  \ terminology codelist is populated with a value that is not a term in that codelist;\
+  \ for the laterality, directionality, portion-or-totality and the MI, TF and EG\
+  \ standardised-result variables only, a semicolon-separated combination of such\
+  \ terms is also accepted."
+Executability: "Partially Executable - Possible Overreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The semicolon tolerance is an ALLOW-LIST, deliberately narrower than SEND57.1's\
+    \ literal ALL/ALL/ALL scope (owner ruling O-8, 2026-08-22): it applies only to\
+    \ the variables the implementation guide names for combination - --LAT, --DIR,\
+    \ --PORTOT (the SEND57 row at SENDIG 3.0 names exactly these) - plus the three\
+    \ standardised-result variables MISTRESC, TFSTRESC and EGSTRESC where a combination\
+    \ is plausible. Every other codelist-bound variable is held to a single term,\
+    \ so SEX = F;M, LBBLFL = Y;N, LBTESTCD = ALT;AST or EXROUTE = ORAL;INTRAVENOUS\
+    \ report. --SPEC is excluded on purpose: its lawful combination delimiter is the\
+    \ slash (SEND56/SEND56.1, checked by CDISC-SEND-0056), so MISPEC = LIVER;KIDNEY\
+    \ reports here. Version reach: the --LAT/--DIR/--PORTOT tolerance is licensed\
+    \ at all six SEND packages (SEND57 at 3.0, SEND57.1 above); the three --STRESC\
+    \ variables are licensed by no row at SENDIG 3.0 and by SEND57.1's ALL above it,\
+    \ so at 3.0 only those three are a deliberate under-report (ruling M3-D9, question\
+    \ 3, option (i): no version predicate exists in the Check language). Sheet issues\
+    \ #127 and #152 escalate that the .1 rows over-permit at ALL, #153 that SEND56.1\
+    \ and SEND57.1 contradict each other on --SPEC, and #154 asks whether the three\
+    \ --STRESC variables are meant to be licensed; coreJ accepts them pending the\
+    \ answer. The over-reporting half is separate and deliberate: this rule carries\
+    \ no var_codelist_extensible(\"LIBRARY\") gate, so it reports a value outside\
+    \ an extensible codelist that a sponsor may lawfully have extended (finding SEND-0049-F1).\
+    \ Token matching is exact, so a combined value carrying stray whitespace, an empty\
+    \ token or a case-mismatched token still reports."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_codelist_coded_values("LIBRARY")) and not empty(value()) and value() not in
+    var_codelist_coded_values("LIBRARY") and (varname() !~
+    /^[A-Z0-9]{2}(LAT|DIR|PORTOT)$|^(MI|TF|EG)STRESC$/ or not
+    contains_all(var_codelist_coded_values("LIBRARY"), split_by(value(), ";")))
+Outcome:
+  Message: "The value is not a term in the CDISC controlled terminology codelist the\
+    \ CDISC Library defines for this variable (a semicolon-separated combination of\
+    \ terms is accepted only for --LAT, --DIR, --PORTOT, MISTRESC, TFSTRESC and EGSTRESC)."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "The SENDIG will identify when a CDISC published Controlled\
+    \ Terminology Codelist applies to a variable.  If a CDISC published Controlled\
+    \ Terminology Codelist exists it must be used."
+  Condition: "CDISC published Controlled Terminology Codelist applies to a variable"
+  Rule: "CDISC published Controlled Terminology Codelist is used"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND49"
+        Version: "1"
+      Version: "5.0"

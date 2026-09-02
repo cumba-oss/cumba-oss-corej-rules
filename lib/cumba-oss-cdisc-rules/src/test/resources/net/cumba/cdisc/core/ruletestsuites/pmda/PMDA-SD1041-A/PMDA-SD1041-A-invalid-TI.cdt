@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1041-A expect=violation domain=TI
+#note "TI companion of PMDA-SD1041 (the --CAT/--SCAT wildcard cannot resolve TI's IECAT/IESCAT). Row 1 repeats the category as the subcategory -> fires; row 2 has a distinct subcategory -> silent."
+#library standard=sdtmig version=3-4
+#library dataset-class TI "TRIAL DESIGN"
+#expectViolationCount 1
+#expectViolationAt row=1 IETESTCD=INCL01
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+col IESCAT   type=Char label="Inclusion/Exclusion Subcategory"
+---
+S1 | TI | INCL01 | INCLUSION | INCLUSION
+S1 | TI | EXCL01 | EXCLUSION | KEY EXCLUSION
+---

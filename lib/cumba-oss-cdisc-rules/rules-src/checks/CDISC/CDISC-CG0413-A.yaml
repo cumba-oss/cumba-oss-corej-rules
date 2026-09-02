@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-CG0413-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Domain Abbreviation (DOMAIN) value of an Associated\
+  \ Persons dataset is not consistent with the name of the dataset (the dataset name\
+  \ does not begin with the four-character DOMAIN value)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    Exclude:
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    prefix(dataset_name, 4) != DOMAIN
+Outcome:
+  Message: "The dataset name does not begin with the DOMAIN value."
+  Output_Variables:
+  - "dataset_name"
+  - "DOMAIN"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "AP--"
+  Variable: "DOMAIN"
+  Condition: ""
+  Rule: "the Domain Abbreviation (DOMAIN) value of an Associated Persons dataset is\
+    \ not consistent with the name of the dataset (the dataset name does not begin\
+    \ with the four-character DOMAIN value)"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "DOMAIN"
+  Rule: "Dataset name begins with DOMAIN value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"

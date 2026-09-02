@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0059 expect=violation domain=DM
+#note "Adapted from tested A2 twin fda/FDA-SD0059 (TG-0220; behaviour identical, PMDA adds define_variable_name to Output_Variables). Define: AGE integer (numeric), AGEU text, SEX text -> AGE mismatches (Char vs integer->Num)."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGE  name=AGE  simpleDatatype=integer label="Age"
+#define variable-metadata DM AGEU name=AGEU simpleDatatype=text    label="Age Units"
+#define variable-metadata DM SEX  name=SEX  simpleDatatype=text    label="Sex"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGE
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Char label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+---
+S1 | 001 | 56 | YEARS | M

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch D1 violations 2.1 fixture: each 2.1-applicable batch-D1 rule fires
+     exactly once. One dedicated violator per rule; everything else compliant so
+     nothing fires twice:
+       IG.AE ItemRefs: 71 (dup KeySequence on IT.USUBJID ref), 72 (KeySequence
+         "A"), 66 (OrderNumber "1.5"), 68 (Mandatory "Maybe"), 69 (no Mandatory),
+         75 (IsNonStandard "No"), 77 (HasNoData "No"), 79 (def:WhereClauseRef),
+         73 (no MethodOID on Derived IT.AEDUR), 74 (dangling MT.MISSING),
+         242 (HasNoData Yes but IT.AEHND has no CommentOID), 147 (IT.AENOSAS has
+         no SASFieldName), 168 (IT.AENODESC has no Description), 154+155
+         (IT.AENOORIG has neither Origin nor ValueListRef)
+       IG.KS: 70 (no KeySequence anywhere; no OrderNumbers so 238 stays silent)
+       IG.ON: 238 (mixed OrderNumber: one with, one without)
+       VL.LB / IT.LB.PH / IT.LBORRES: 142 (value Length 200 > variable Length 20)
+       Unreferenced ItemDefs (each with an otherwise-valid Origin so 154 stays
+         at one finding): 137 (no OID), 138 (no Name), 139 (no DataType),
+         140 (DataType "string"), 141 (text without Length), 143 (date with
+         Length), 144 (Length "0"), 145 (float without SignificantDigits),
+         146 (SignificantDigits "-1"), 148 (dangling COM.MISSING), 169 (two
+         Descriptions), 158 (Origin without Type), 159 (Collected/Subject
+         without DocumentRef), 159-B (DocumentRef leafID not the aCRF),
+         160 (Type "Recorded"), 161 (Source "CRO"), 243 (Origin with two
+         Descriptions)
+     DEFINE-XML-0160-B is 2.0-only and version-gated here. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-d1-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHD1V">
+    <GlobalVariables>
+      <StudyName>BATCHD1V-STUDY</StudyName>
+      <StudyDescription>Batch D1 violations fixture study</StudyDescription>
+      <ProtocolName>BATCHD1V-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch D1 violations MDV" def:DefineVersion="2.1.0">
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE" Repeating="Yes"
+                    SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per adverse event per subject"
+                    def:ArchiveLocationID="LF.AE">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="2" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.AESEQ" OrderNumber="3" Mandatory="Yes" KeySequence="A"/>
+        <ItemRef ItemOID="IT.AETERM" OrderNumber="1.5" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.AEDECOD" OrderNumber="5" Mandatory="Maybe"/>
+        <ItemRef ItemOID="IT.AESER" OrderNumber="6"/>
+        <ItemRef ItemOID="IT.AEXNS" OrderNumber="7" Mandatory="No" def:IsNonStandard="No"/>
+        <ItemRef ItemOID="IT.AESTDTC" OrderNumber="8" Mandatory="No" def:HasNoData="No"/>
+        <ItemRef ItemOID="IT.AEENDTC" OrderNumber="9" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.STRAY"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.AEDUR" OrderNumber="10" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AEDY" OrderNumber="11" Mandatory="No" MethodOID="MT.MISSING"/>
+        <ItemRef ItemOID="IT.AEHND" OrderNumber="12" Mandatory="No" def:HasNoData="Yes"/>
+        <ItemRef ItemOID="IT.AENOSAS" OrderNumber="13" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AENODESC" OrderNumber="14" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AENOORIG" OrderNumber="15" Mandatory="No"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.AE" xlink:href="ae.xpt">
+          <def:title>ae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.KS" Name="KS" Repeating="No"
+                    SASDatasetName="KS" Purpose="Tabulation"
+                    def:Structure="One record per subject">
+        <Description>
+          <TranslatedText xml:lang="en">Keyless dataset (70 violator)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ON" Name="ON" Repeating="No"
+                    SASDatasetName="ON" Purpose="Tabulation"
+                    def:Structure="One record per subject">
+        <Description>
+          <TranslatedText xml:lang="en">Mixed OrderNumber dataset (238 violator)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.USUBJID" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <def:ValueListDef OID="VL.LB">
+        <ItemRef ItemOID="IT.LB.PH" Mandatory="Yes">
+          <def:WhereClauseRef WhereClauseOID="WC.PH"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.PH"/>
+      <!-- Compliant ItemDefs backing the ItemRef-level violators. -->
+      <ItemDef OID="IT.STUDYID" Name="STUDYID" DataType="text" Length="12"
+               SASFieldName="STUDYID">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="30"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESEQ" Name="AESEQ" DataType="integer" Length="8"
+               SASFieldName="AESEQ">
+        <Description>
+          <TranslatedText xml:lang="en">Sequence Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AETERM" Name="AETERM" DataType="text" Length="200"
+               SASFieldName="AETERM">
+        <Description>
+          <TranslatedText xml:lang="en">Reported Term for the Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AEDECOD" Name="AEDECOD" DataType="text" Length="100"
+               SASFieldName="AEDECOD">
+        <Description>
+          <TranslatedText xml:lang="en">Dictionary-Derived Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESER" Name="AESER" DataType="text" Length="1"
+               SASFieldName="AESER">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AEXNS" Name="AEXNS" DataType="text" Length="10"
+               SASFieldName="AEXNS">
+        <Description>
+          <TranslatedText xml:lang="en">Non-standard variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESTDTC" Name="AESTDTC" DataType="text" Length="19"
+               SASFieldName="AESTDTC">
+        <Description>
+          <TranslatedText xml:lang="en">Start Date/Time of Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AEENDTC" Name="AEENDTC" DataType="text" Length="19"
+               SASFieldName="AEENDTC">
+        <Description>
+          <TranslatedText xml:lang="en">End Date/Time of Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AEDUR" Name="AEDUR" DataType="text" Length="20"
+               SASFieldName="AEDUR">
+        <Description>
+          <TranslatedText xml:lang="en">Duration of Adverse Event (73 violator target)</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AEDY" Name="AEDY" DataType="integer" Length="4"
+               SASFieldName="AEDY">
+        <Description>
+          <TranslatedText xml:lang="en">Study Day of Start of Adverse Event</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AEHND" Name="AEHND" DataType="text" Length="20"
+               SASFieldName="AEHND">
+        <Description>
+          <TranslatedText xml:lang="en">No-data variable without a comment (242 violator target)</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AENOSAS" Name="AENOSAS" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">Variable without SASFieldName (147 violator target)</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AENODESC" Name="AENODESC" DataType="text" Length="20"
+               SASFieldName="AENODESC">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.AENOORIG" Name="AENOORIG" DataType="text" Length="20"
+               SASFieldName="AENOORIG">
+        <Description>
+          <TranslatedText xml:lang="en">Variable without Origin (154/155 violator target)</TranslatedText>
+        </Description>
+      </ItemDef>
+      <!-- Value-level Length greater than the variable Length (142 violator). -->
+      <ItemDef OID="IT.LBORRES" Name="LBORRES" DataType="text" Length="20">
+        <def:ValueListRef ValueListOID="VL.LB"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.PH" Name="LBORRES.PH" DataType="text" Length="200">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <!-- Unreferenced ItemDef-level violators. -->
+      <ItemDef Name="NOOID" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NONAME" DataType="text" Length="20">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NODT" Name="NODT">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.BADDT" Name="BADDT" DataType="string">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NOLEN" Name="NOLEN" DataType="text">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.DATELEN" Name="DATELEN" DataType="date" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LEN0" Name="LEN0" DataType="text" Length="0">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NOSD" Name="NOSD" DataType="float" Length="8">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NEGSD" Name="NEGSD" DataType="float" Length="8"
+               SignificantDigits="-1">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.BADCOMM" Name="BADCOMM" DataType="text" Length="20"
+               def:CommentOID="COM.MISSING">
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.TWODESC" Name="TWODESC" DataType="text" Length="20">
+        <Description>
+          <TranslatedText xml:lang="en">First description</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second description</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.NOTYPE" Name="NOTYPE" DataType="text" Length="20">
+        <def:Origin Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.COLNOREF" Name="COLNOREF" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Subject"/>
+      </ItemDef>
+      <ItemDef OID="IT.COLBADREF" Name="COLBADREF" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.OTHER"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.BADTYPE" Name="BADTYPE" DataType="text" Length="20">
+        <def:Origin Type="Recorded" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.BADSRC" Name="BADSRC" DataType="text" Length="20">
+        <def:Origin Type="Collected" Source="CRO"/>
+      </ItemDef>
+      <ItemDef OID="IT.PRED2DESC" Name="PRED2DESC" DataType="text" Length="20">
+        <def:Origin Type="Predecessor">
+          <Description>
+            <TranslatedText xml:lang="en">DM.ARM</TranslatedText>
+          </Description>
+          <Description>
+            <TranslatedText xml:lang="en">DM.ACTARM</TranslatedText>
+          </Description>
+        </def:Origin>
+      </ItemDef>
+      <def:leaf ID="LF.ACRF" xlink:href="blankcrf.pdf">
+        <def:title>Annotated Case Report Form</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.OTHER" xlink:href="reviewersguide.pdf">
+        <def:title>Reviewer's Guide</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

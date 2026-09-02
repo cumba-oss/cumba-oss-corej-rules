@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0073-E"
+Sheet_Rule_Identifier: "DD0073"
+Rule_Set: "PMDA"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.0"]
+Severity: "Error"
+Plain_Text_Rule: "For Define-XML v2.0, the Origin Type attribute must have a value of 'CRF', 'Derived', 'Assigned', 'Protocol', 'eDT', or 'Predecessor' for SDTM and ADaM data and 'COLLECTED', 'DERIVED', 'OTHER', or 'NOT AVAILABLE' for SEND data. For Define-XML v2.1, the Origin Type attribute must have a value of 'Collected', 'Derived', 'Assigned', 'Protocol', or 'Predecessor' for SDTM, 'Collected', 'Derived', 'Assigned', 'Protocol', 'Other', 'Predecessor', or 'Not Available' for SEND, and 'Derived', 'Assigned', or 'Predecessor' for ADaM."
+# Define-XML 2.0 SEND leg of the PMDA-DD0073 family (see the base rule's
+# comment): in 2.0 the standard binding is the enclosing MetaDataVersion's
+# def:StandardName (Origin -> ItemDef -> MetaDataVersion).
+Message: "Invalid Origin Type value"
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["COLLECTED", "DERIVED", "OTHER", "NOT AVAILABLE"]
+  when:
+    path: "../../@StandardName"
+    oneOf: ["SEND-IG", "SEND-IG-AR", "SEND-IG-DART", "SEND-IG-GENETOX"]

@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1353 expect=violation domain=EG
+#note "CL-A A.10 (wave TA-4): the sheet's 'or are null' branch adopted from FDA-SD1353. Row 1 is a unitless measure: both results numeric, both unit variables null, standardized value differs from the original -> fires via the empty-and-empty branch (equal_to on two nulls is false, so the old shape never checked this case). Row 2 has equal units and equal values."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 EGSTRESC=0.44
+dataset EG class=FINDINGS label="ECG Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col EGSEQ    type=Num  label="Sequence Number"
+col EGTESTCD type=Char label="ECG Test or Examination Short Name"
+col EGORRES  type=Char label="Result or Finding in Original Units"
+col EGORRESU type=Char label="Original Units"
+col EGSTRESC type=Char label="Character Result/Finding in Std Format"
+col EGSTRESU type=Char label="Standard Units"
+---
+S1 | EG | 001 | 1 | QTMEAN | 0.42 |      | 0.44 |
+S1 | EG | 001 | 2 | HR     | 64   | bpm  | 64   | bpm

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0007 expect=violation domain=ADLBC
+#note "The root 'SAF' is captured from SAFFN, SAFFL is synthesised as an absent column -> one expansion, one dataset-level violation at reported row 1. SAFFN is the rule's single Output_Variable and IS present, so its value can be pinned. DO NOT add any further column ending in FN or FL - each one is another expansion."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 SAFFN=1
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1

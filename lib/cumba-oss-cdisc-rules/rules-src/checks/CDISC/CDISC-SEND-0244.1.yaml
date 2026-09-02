@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0244.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the environmental temperature unit parameter\
+  \ (TXPARMCD equals \"ENVTEMPU\") with a populated value, the value (TXVAL) is not\
+  \ \"C\" or \"F\"."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "TXPARMCD"
+    - "TXVAL"
+Check:
+  expression: >-
+    TXPARMCD == "ENVTEMPU" and not empty(TXVAL) and TXVAL not in ["C", "F"]
+Outcome:
+  Message: "TXVAL for TXPARMCD equals \"ENVTEMPU\" is populated but is not \"C\" or\
+    \ \"F\"."
+  Output_Variables:
+  - "TXPARMCD"
+  - "TXVAL"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "TXPARMCD"
+  Plain_Text_Explanation: "ENVTEMPU is the unit associated with the environmental\
+    \ temperature; only \"C\" or \"F\" is acceptable."
+  Condition: "TXPARMCD = \"ENVTEMPU\" AND TXVAL ^= null"
+  Rule: "TXVAL = \"C\" OR TXVAL = \"F\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND244.1"
+        Version: "1"
+      Version: "5.0"

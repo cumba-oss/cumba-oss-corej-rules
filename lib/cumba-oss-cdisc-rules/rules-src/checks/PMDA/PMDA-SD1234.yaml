@@ -1,0 +1,87 @@
+Core:
+  Id: "PMDA-SD1234"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Device Type (DEVTYPE) parameter record is not\
+  \ present for a device (SPDEVID) in the Device Identifiers (DI) domain; DEVTYPE\
+  \ must be populated for each medical device."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DI"
+Grouping:
+  Variables:
+  - "SPDEVID"
+Operations:
+- id: "$devtype_count"
+  expression: "record_count(domain=\"DI\", group=[SPDEVID], filter=filter(DIPARMCD=\"\
+    DEVTYPE\"))"
+Check:
+  expression: >-
+    not empty(SPDEVID) and $devtype_count < 1
+Outcome:
+  Message: "Device Type (DEVTYPE) parameter record is not present for the device (SPDEVID)\
+    \ in the Device Identifiers (DI) domain."
+  Output_Variables:
+  - "SPDEVID"
+  - "$devtype_count"
+Source:
+  Message: "Missing DEVTYPE Parameter for Device"
+  Description: "Device Type (DEVTYPE) Parameter must be populated for each Medical\
+    \ Device in the Device Identifiers (DI) domain."
+  Domains: "DI"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1234"
+        Version: "1"
+      Version: "1.6"

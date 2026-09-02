@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0014 expect=noViolation domain=DM
+#note "CORPUS-WIDE PIN of the deliberate NON-skip: REQUIRED_VARIABLES has NO empty->skip mapping (unlike GET_MODEL_COLUMN_ORDER / CODELIST_TERMS), so a provider that does not describe the domain yields an EMPTY required list and 'not contains_all(x, [])' is trivially false (an absent/empty $-list is trivially contained) -> the rule executes and reports NOTHING; it must NOT skip. Provider present, no required-variables line declared. Uses the invalid body's DM-without-SEX."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+---
+S1 | DM | S1-001 | 001 | 01

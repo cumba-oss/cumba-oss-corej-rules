@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-AD0580"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when PxxSwETF is present and TRTxxP is not present for\
+  \ the same 'xx' value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("PxxSwETF") and not var_exists("TRTxxP")
+Outcome:
+  Message: "PxxSwETF is present, but TRTxxP is not present."
+  Output_Variables:
+  - "PxxSwETF"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  w:
+    min: 1
+    max: 9
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "PxxSwETF where xx is an integer [01-99, zero-padded] and w is\
+    \ an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "PxxSwETF is present and TRTxxP is not present\
+    \ for the same \"xx\" value"
+  Rule_Failure_Criteria: "TRTxxP is not present"
+  Condition_Failure: "PxxSwETF is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR580"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR580"
+        Version: "1"
+      Version: "5.0"

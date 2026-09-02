@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0058 expect=violation domain=ADLBC
+#note "ends_with(varname(),'DT') is true for column ADT and var_type('DATA') != 'Num' is true because the .cdt declares type=Char -> one finding for that ONE variable. Pin by variable, never by row."
+#expectViolationCount 1
+#expectViolationAt variable_name=ADT variable_data_type=Char
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT     type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x

@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0482"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, the primary character variable\
+  \ Change to Baseline Category y (BCHGCATy) is populated but its corresponding secondary\
+  \ numeric variable Change to Baseline Category y (N) (BCHGCAyN) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(BCHGCATy) and empty(BCHGCAyN)
+Outcome:
+  Message: "Primary variable BCHGCATy is populated, but its secondary variable BCHGCAyN\
+    \ is not populated."
+  Output_Variables:
+  - "BCHGCATy"
+  - "BCHGCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source_Proposed:
+  Sheet_Issue: "#74"
+  Message: "Primary variable BCHGCATy is populated, but its secondary variable BCHGCAyN\
+    \ is not populated"
+  Description: "In a pair of corresponding character and numeric variables, the secondary\
+    \ variable must be populated if its primary variable is populated. Corresponding\
+    \ character and numeric values must also have a one-to-one mapping consistency\
+    \ when the primary variable is populated, which are addressed in other rules."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Source:
+  Message: "Primary variable BCHGCATy is populated, but its secondary variable BCHGCAyN\
+    \ is not populated"
+  Description: "In a pair of corresponding character and numeric variables, the primary\
+    \ or most commonly used variable must be populated if its secondary variable describing\
+    \ it is populated. Corresponding character and numeric values must also have a\
+    \ one-to-one mapping consistency when the primary variable is populated, which\
+    \ are addressed in other rules."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0482"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0482"
+        Version: "1"
+      Version: "6.0"

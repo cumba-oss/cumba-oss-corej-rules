@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1228 expect=noViolation domain=LB
+#note "Track B: adapted from FDA-SD1228-valid_no_vlm-LB.cdt. Boundary: no record meets the value-level condition (no LBTESTCD='PH'), so no value-level codelist applies and the free-text results are not checked -> no violation."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1228-define.xml
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | GLUC | 5.5
+S1 | LB | 001 | 2 | ALB  | 40

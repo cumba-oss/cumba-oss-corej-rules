@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0142 expect=violation domain=ADLBC
+#note "Within PARAM=Albumin, PARAMCD holds {ALB x2, ALBU x1} -> ALB is the strict majority and row 3 is the lone minority. PARAM=Bilirubin holds one distinct PARAMCD -> silent, proving the check is keyed per PARAM."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=ALBU PARAM=Albumin
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+S1 | 001 | ALB  | Albumin   | 40
+S1 | 002 | ALB  | Albumin   | 41
+S1 | 003 | ALBU | Albumin   | 42
+S1 | 001 | BILI | Bilirubin | 8
+S1 | 002 | BILI | Bilirubin | 9

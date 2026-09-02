@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0248.1 expect=noViolation domain=TS
+#note "Row 1 is a valid ISO 8601 date, row 2 a valid ISO 8601 duration (P14D), and row 3's blank value belongs to a parameter outside the rule's date/duration list -> no violation."
+#library standard=sendig version=3-1-1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+STUDY01 | TS | 1 | STSTDTC | Study Start Date   | 2026-01-15
+STUDY01 | TS | 2 | DOSDUR  | Duration of Dosing | P14D
+STUDY01 | TS | 3 | SPECIES | Species            |

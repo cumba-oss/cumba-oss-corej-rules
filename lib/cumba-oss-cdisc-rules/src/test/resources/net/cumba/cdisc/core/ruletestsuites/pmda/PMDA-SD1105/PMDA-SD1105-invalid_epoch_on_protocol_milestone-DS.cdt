@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1105 expect=violation domain=DS
+#note "Row 1: PROTOCOL MILESTONE record with EPOCH=SCREENING -> fires. Row 2: DISPOSITION EVENT record, outside the DSCAT guard, and a populated EPOCH there is expected. Record-level, ONE violation on row 1. Pin EPOCH, not DSCAT: 'PROTOCOL MILESTONE' contains a space."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 EPOCH=SCREENING
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSTERM  type=Char
+col DSDECOD type=Char
+col DSCAT   type=Char
+col EPOCH   type=Char
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | SCREENING
+CDISCPILOT01 | DS | 01-701-1015 | 2 | COMPLETED | COMPLETED | DISPOSITION EVENT | TREATMENT

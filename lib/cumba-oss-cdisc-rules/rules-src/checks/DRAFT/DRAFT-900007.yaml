@@ -1,0 +1,32 @@
+Core:
+  Id: "DRAFT-900007"
+  Status: "Draft"
+  Version: "1"
+Description: "When IDVAR references a --SEQ variable, IDVARVAL must be a valid integer."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "RELATIONSHIP"
+Check:
+  expression: >-
+    suffix(IDVAR, 3) == "SEQ" and not empty(IDVARVAL) and not is_integer(IDVARVAL)
+Outcome:
+  Message: "IDVAR references a --SEQ variable but IDVARVAL is not a valid integer."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "TIG"
+    Substandard: "SDTM"
+    Version: "1.0"

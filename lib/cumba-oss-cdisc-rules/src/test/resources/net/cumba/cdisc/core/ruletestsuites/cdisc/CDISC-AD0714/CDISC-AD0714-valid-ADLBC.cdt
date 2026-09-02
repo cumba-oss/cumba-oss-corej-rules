@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0714 expect=noViolation domain=ADLBC
+# Rule:Description: There is more than one value of a variable which has a suffix of GRyN for a given value of a variable with the same root name and suffix of GRy, considering only those rows on which both variables are populated
+#note "each AETOXGR1 maps to a single AETOXGR1N -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AETOXGR1 type=Char
+col AETOXGR1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | GRADE 1 | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | GRADE 2 | 2
+---

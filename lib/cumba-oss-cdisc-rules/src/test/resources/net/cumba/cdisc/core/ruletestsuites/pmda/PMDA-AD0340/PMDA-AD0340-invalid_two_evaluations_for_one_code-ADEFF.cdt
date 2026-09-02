@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0340 expect=violation domain=ADEFF
+#note "Domains.Include:[ALL] -- no structure gate applies. Target is the LABEL MCRIT1ML, key is the pair [PARAMCD, MCRIT1MN]. Group (RESP, 1) holds MCRIT1ML {CR x2, PR x1} -> row 3 is the lone minority. Row 4 shares the label but has key value 2 and stays silent. One expansion (y=1)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=RESP MCRIT1ML=PR MCRIT1MN=1
+dataset ADEFF
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col MCRIT1ML type=Char
+col MCRIT1MN type=Num
+---
+S1 | 001 | RESP | 1 | CR | 1
+S1 | 002 | RESP | 1 | CR | 1
+S1 | 003 | RESP | 2 | PR | 1
+S1 | 004 | RESP | 2 | PR | 2

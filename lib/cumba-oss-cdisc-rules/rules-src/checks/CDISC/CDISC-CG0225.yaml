@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0225"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISITDY is populated even though VISITNUM is not\
+  \ present in the Trial Visits (TV) dataset, indicating the record is for an unplanned\
+  \ visit."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+    - "VISITDY"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    VISITNUM not in $tv_visitnum and not empty(VISITDY)
+Outcome:
+  Message: "VISITDY is populated for an unplanned visit (VISITNUM is not in the TV\
+    \ dataset)."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISITDY"
+  - "$tv_visitnum"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISITDY"
+  Condition: "VISITNUM is NOT in TV.VISITNUM"
+  Rule: "VISITDY = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0225"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0225"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0225"
+        Version: "1"
+      Version: "2.0"

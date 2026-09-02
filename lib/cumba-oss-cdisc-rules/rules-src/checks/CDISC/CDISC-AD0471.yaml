@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-AD0471"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STRATwRN is populated and STRATwR is empty on the\
+  \ same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(STRATwRN) and empty(STRATwR)
+Outcome:
+  Message: "STRATwRN is populated but STRATwR is empty."
+  Output_Variables:
+  - "STRATwR"
+  - "STRATwRN"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "STRATwR where w is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, STRATwRN is populated\
+    \ and STRATwR is not populated"
+  Rule_Failure_Criteria: "STRATwR is not populated"
+  Condition_Failure: "STRATwRN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR471"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR471"
+        Version: "1"
+      Version: "5.0"

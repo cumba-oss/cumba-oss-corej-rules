@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0271"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable's data type in the dataset does not match\
+  \ the data type specified for that variable in the SENDIG library metadata."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_type("LIBRARY")) and var_type("DATA") != var_type("LIBRARY")
+Outcome:
+  Message: "The variable data type in the dataset does not match the data type specified\
+    \ in the SENDIG."
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+  - "library_variable_data_type"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "The variable type in the .xpt dataset must match the SDTM\
+    \ specified data type."
+  Rule: "The variable type in the .xpt dataset must match the SDTM specified data\
+    \ type."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND271"
+        Version: "1"
+      Version: "5.0"

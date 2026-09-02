@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-SEND-0283 expect=violation domain=SE
+#runLevel Info
+#library standard=sendig version=3-1-1
+#note "Two-level partial-date fixture (plan C phase 5b, ruling (a) 2026-08-26). Subject 001: the last element (SESEQ=2) ends 2020-02, a month partial CERTAINLY after DSSTDTC=2020-01-15, so the verbatim ERROR leg fires on row 2. Subject 002: its only (hence last) element ends 2020-01, only POSSIBLY after DSSTDTC=2020-01-15 (latest completion 2020-01-31 is after, earliest 2020-01-01 is not), so the tagged INFO leg claims row 3. Subject 003 ends certainly before its disposition date - silent. Row 1 is not the last element of subject 001 and cannot contribute. Runs at #runLevel Info because the engine default (Warning) never evaluates an INFO level."
+#expectViolationCount 2
+#expectViolationAt row=2 severity=ERROR USUBJID=001 SESEQ=2
+#expectViolationAt row=3 severity=INFO USUBJID=002 SESEQ=1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-02
+S1 | SE | 002 | 1 | TRT | 2020-01-05 | 2020-01
+S1 | SE | 003 | 1 | TRT | 2020-01-05 | 2020-01-10
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-01-15
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE | 2020-01-15
+S1 | DS | 003 | 1 | TERMINAL SACRIFICE | 2020-01-15
+---

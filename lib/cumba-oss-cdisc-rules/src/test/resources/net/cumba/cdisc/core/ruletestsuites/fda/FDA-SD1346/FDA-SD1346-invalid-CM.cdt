@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1346 expect=violation domain=CM
+#note "Row 2: CMCLASCD=X99 is not a WHODrug ATC code in the dummy dictionary -> fires. Row 1 is a valid ATC code; row 3 is blank (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CMSEQ=2 CMCLASCD=X99
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMCLASCD type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | N02
+S01 | CM | 001 | 2 | Mystery pill  | X99
+S01 | CM | 002 | 1 | Unknown med   |

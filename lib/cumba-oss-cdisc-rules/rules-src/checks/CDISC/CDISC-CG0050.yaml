@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0050"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --PTCD is populated but --DECOD is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--DECOD"
+    - "--PTCD"
+Check:
+  expression: >-
+    not empty(--PTCD) and empty(--DECOD)
+Outcome:
+  Message: "--DECOD is empty when --PTCD is populated."
+  Output_Variables:
+  - "--DECOD"
+  - "--PTCD"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--PTCD"
+  Condition: "--PTCD ^= null"
+  Rule: "--DECOD ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0050"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0050"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0050"
+        Version: "1"
+      Version: "2.0"

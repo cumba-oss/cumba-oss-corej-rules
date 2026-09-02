@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-SEND-0295"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when exactly one of the assessment-interval start (--STINT)\
+  \ and end (--ENINT) variables is populated; both must be populated together or both\
+  \ be empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STINT"
+    - "--ENINT"
+Check:
+  expression: >-
+    not empty(--STINT) and empty(--ENINT) or empty(--STINT) and not empty(--ENINT)
+Outcome:
+  Message: "Only one of --STINT and --ENINT is populated; both must be populated or\
+    \ both empty."
+  Output_Variables:
+  - "--STINT"
+  - "--ENINT"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STINT, --ENINT"
+  Plain_Text_Explanation: "Both --STINT and --ENINT must be populated if one is populated\
+    \ or both --STINT and --ENINT must be null."
+  Condition: "--STINT ^= null  OR --ENINT ^= null"
+  Rule: "--STINT ^= null  AND --ENINT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND295"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND295"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND295"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND295"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND295"
+        Version: "1"
+      Version: "5.0"

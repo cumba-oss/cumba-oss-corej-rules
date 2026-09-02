@@ -1,0 +1,31 @@
+name: EMPTYSTR-equal-length
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category A.5).
+  has_equal_length 0 fires on an empty cell — len("") = 0. Aligned: both engines
+  flag the empty row. No baseline entry.
+python_source: PLAN-empty-string-membership-parity.md (A.5)
+check:
+  name: AESER
+  operator: has_equal_length
+  value: 0
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AESER: 'AB'}    # len 2 → no fire
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AESER: ''}      # len 0 → fires
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-equal-length
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESER:
+    STUDYID: S1
+    USUBJID: '002'
+expected_errors: []

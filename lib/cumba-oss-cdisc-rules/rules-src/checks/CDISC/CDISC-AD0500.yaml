@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0500"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when APHASE is populated and its value does not match\
+  \ any of the subject's APHASEw values in ADSL."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(APHASE) and APHASE not in ADSL.APHASE${*}
+Outcome:
+  Message: "The value of APHASE does not match any APHASEw value in ADSL for this\
+    \ subject."
+  Output_Variables:
+  - "APHASE"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "APHASE"
+  Natural_Language_Rule_Failure_Criteria: "There is a value of APHASE without a matching\
+    \ value in an ADSL variable APHASEw"
+  Rule_Failure_Criteria: "The value of APHASE does not match a value in an ADSL variable\
+    \ APHASEw, where w is an integer [1-9, not zero-padded]"
+  Condition_Failure: "APHASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR500"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR500"
+        Version: "2"
+      Version: "5.0"

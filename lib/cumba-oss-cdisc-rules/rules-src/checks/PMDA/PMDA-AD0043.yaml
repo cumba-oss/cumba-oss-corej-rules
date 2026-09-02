@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0043"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'DTM' has a non-missing\
+  \ SAS display format that is not one of the valid ADaM SAS datetime formats (e.g.\
+  \ DATETIME, E8601DT, IS8601DT and the other SAS datetime formats)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DTM") and not empty(var_format("DATA")) and var_format("DATA") !~
+    /(?i)^(B8601DT|B8601DZ|DATEAMPM|DATETIME|DTDATE|DTWKDATX|DTYEAR|DTYYQC|E8601DN|E8601DT|E8601DZ|MDYAMPM|TOD|IS8601DN|IS8601DT|IS8601DZ)\\d*\\.?\\d*$/
+Outcome:
+  Message: "A variable whose name ends in 'DTM' does not have a valid ADaM SAS datetime\
+    \ format."
+  Output_Variables:
+  - "variable_name"
+  - "variable_format"
+Source:
+  Message: "*DTM does not have the ADaM required SAS Datetime format"
+  Description: "The SAS format listed in the dataset must be valid. Here is a list\
+    \ of SAS Date formats utilized in the rule algorithm: B8601DT, B8601DZ, DATEAMPM,\
+    \ DATETIME, DTDATE, DTWKDATX, DTYEAR, DTYYQC, E8601DN, E8601DT, E8601DZ, MDYAMPM,\
+    \ TOD, IS8601DN, IS8601DT, IS8601DZ."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043"
+        Version: "1"
+      Version: "6.0"

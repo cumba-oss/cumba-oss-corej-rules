@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1012 expect=violation domain=SE
+#note "FRESH - per-row multiplicity pin (no twin covers 2 fires). Row 1 matches TE. Row 2 pairs ETCD=TRT with the wrong ELEMENT -> unmatched, fires. Row 3's ETCD=FUP is absent from TE entirely -> unmatched, fires. Two null-filled join rows -> TWO findings."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 ETCD=TRT
+#expectViolationAt row=3 ETCD=FUP
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | SCRN | Screening       | 2013-12-26
+CDISCPILOT01 | SE | 01-701-1015 | 2 | TRT  | Wrong Treatment | 2014-01-02
+CDISCPILOT01 | SE | 01-701-1015 | 3 | FUP  | Follow-up       | 2014-03-01
+---
+
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening
+CDISCPILOT01 | TE | TRT  | Treatment
+---

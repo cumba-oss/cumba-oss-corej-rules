@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0005 expect=noViolation domain=ADSL
+#note "SAFRFL is a real ADaMIG period-level Safety Population Flag - exactly the `*RFL` family the sheet's Exception 1 names. The shipped Check excepts varname() !~ /^(.*RFL|.*PFL|ABLFL|ANL\\d\\dFL)$/, so the cell value X is carved out and the rule stays silent. Pins the widened Exception-1 branch (Fix #272, ruling M2-D5, owner refinement `.*RFL|.*PFL`); before it the anchored whole-name RFL|PFL alternation was a dead branch (no ADaM variable is named RFL or PFL in any IG version) and this fired once at row=1 variable_name=SAFRFL variable_value=X. Carry EXACTLY ONE *RFL column."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFRFL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

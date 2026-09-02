@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD1318 expect=noViolation domain=DS
+#note "Both subjects with a PROTOCOL VIOLATION / PROTOCOL DEVIATION disposition have a supportive DV record -> no violation."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | Protocol violation | PROTOCOL VIOLATION
+S1 | DS | 002 | 1 | Protocol deviation | PROTOCOL DEVIATION
+---
+
+dataset DV label="Protocol Deviations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DVSEQ   type=Num  label="Sequence Number"
+col DVTERM  type=Char label="Protocol Deviation Term"
+---
+S1 | DV | 001 | 1 | Prohibited medication taken
+S1 | DV | 002 | 1 | Visit outside window
+---

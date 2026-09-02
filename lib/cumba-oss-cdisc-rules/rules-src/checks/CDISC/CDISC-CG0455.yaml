@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-CG0455"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Trial Summary Parameter Short Name (TSPARMCD) equals\
+  \ 'PCLAS' but Name of the Reference Terminology (TSVCDREF) is not equal to 'MED-RT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVCDREF"
+Check:
+  expression: >-
+    TSPARMCD == "PCLAS" and TSVCDREF != "MED-RT"
+Outcome:
+  Message: "TSPARMCD equals 'PCLAS' but TSVCDREF is not equal to 'MED-RT'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVCDREF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDREF"
+  Condition: "TSPARMCD = 'PCLAS'"
+  Rule: "TSVCDREF = 'NDF-RT'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0455"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0455"
+        Version: "1"
+      Version: "2.0"

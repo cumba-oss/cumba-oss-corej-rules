@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2280 expect=violation domain=PC
+#note "Row 1 collected before reference (07:30 < 08:00) with PCELTM=PT1H -> fires; row 2 collected exactly at reference with PCELTM=-PT5M -> fires; row 3 collected after reference -> guarded out."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 PCELTM=PT1H
+#expectViolationAt row=2 PCELTM=-PT5M
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCDTC    type=Char label="Date/Time of Specimen Collection"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+S1 | PC | 001 | 1 | 2023-05-01T07:30 | PT1H  | 2023-05-01T08:00
+S1 | PC | 001 | 2 | 2023-05-01T08:00 | -PT5M | 2023-05-01T08:00
+S1 | PC | 001 | 3 | 2023-05-01T09:00 | PT1H  | 2023-05-01T08:00

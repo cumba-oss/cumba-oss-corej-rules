@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-SD1441"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --TERM is present and --HLT is present and --HLT\
+  \ does not have the same value across records with the same value of --TERM."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLT"
+Check:
+  expression: >-
+    var_exists("--TERM") and is_inconsistent_across_dataset(--HLT, keys=[--TERM])
+Outcome:
+  Message: "Inconsistent value for --HLT within --TERM"
+  Output_Variables:
+  - "--TERM"
+  - "--HLT"
+Source:
+  Message: "Inconsistent value for --HLT within --TERM"
+  Description: "MedDRA coding High Level Term (--HLT) should be consistent for the\
+    \ same collected term (--TERM)."
+  Domains: "AE, CE, MH"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1441"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1441"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1441"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1441"
+        Version: "1"
+      Version: "1.6"

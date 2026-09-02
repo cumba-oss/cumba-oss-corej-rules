@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0751 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of PCHGCATy for a given value of PCHG and y, where y is a single-digit integer [1-9]
+#note "within PARAMCD=GLUC, PCHG=25 maps to two distinct PCHGCAT1 -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PCHG type=Num
+col PCHGCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 25 | INCREASE
+CDISCPILOT01 | 01-701-1023 | GLUC | 25 | NO CHANGE
+---

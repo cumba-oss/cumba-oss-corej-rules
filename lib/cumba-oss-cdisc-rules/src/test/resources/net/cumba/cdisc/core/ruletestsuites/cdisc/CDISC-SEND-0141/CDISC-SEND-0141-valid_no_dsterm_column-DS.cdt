@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0141 expect=noViolation domain=DS
+#note "THE OTHER HALF OF THE UN-GATE (Fix #340). DSTERM was in Requirements.Variables.All before this lane, so a DS without the DSTERM column SKIPPED. The owner ruled the entry out - a Required variable's absence is the presence rule's job, not this rule's - so the rule now EXECUTES here and reports nothing: under absent = all-missing empty(DSTERM) is TRUE on every row, so the sibling not empty(DSTERM) is FALSE and the conjunction cannot hold. The silence is the ruled disposition, not an accident; the DSTERM column's absence is reported by the presence rule. If this ever SKIPS again the DSTERM All entry was restored; if it FIRES the not empty() leaf changed polarity -- escalate either way."
+#library standard=sendig version=3-1-1
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | S1-001 | 1 |
+S1 | DS | S1-002 | 2 |
+---

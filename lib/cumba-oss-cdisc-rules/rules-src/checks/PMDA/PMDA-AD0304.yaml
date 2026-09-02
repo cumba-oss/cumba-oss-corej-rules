@@ -1,0 +1,85 @@
+Core:
+  Id: "PMDA-AD0304"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when SMQzzNAM is present for a given zz index while SMQzzCD\
+  \ or SMQzzSC is not present. (Draft: this asymmetric check does not yet cover violations\
+  \ anchored on SMQzzCD or SMQzzSC being present without a sibling, or the requirement\
+  \ that all three SMQzz variables be populated, not just present.)"
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The PMDA requirement is a grouped all-or-none 'present AND populated' test\
+    \ over the three-member SMQzz sibling set the sheet names (SMQzzNAM, SMQzzCD,\
+    \ SMQzzSC) for each zz index. No single engine operator expresses symmetric all-or-none\
+    \ group existence combined with value-population over a wildcard-indexed family.\
+    \ The authored Check only anchors on SMQzzNAM presence with either sibling absent\
+    \ (via the wildcards zz expansion), so it (1) misses violations anchored on SMQzzCD\
+    \ or SMQzzSC, and (2) does not test the 'populated' (variable_value non-missing)\
+    \ component. The SMQzzSCN companion is deliberately OUT of scope: the sheet names\
+    \ three variables, and the SMQzzSC/SMQzzSCN pairing is PMDA-AD1012A's job. The\
+    \ complete requirement is effectively covered by the shipping pairwise decomposition\
+    \ CDISC-AD0304/0306/0307/0308/0309 (SMQzzNAM/SMQzzCD/SMQzzSC populated-vs-empty\
+    \ pairs); a faithful single-rule form needs a grouped-existence operator the engine\
+    \ does not expose. Left Draft pending that capability or an agreed pairwise decomposition."
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    var_exists("SMQzzNAM") and (not var_exists("SMQzzCD") or not var_exists("SMQzzSC"))
+Outcome:
+  Message: "SMQzzNAM is present for this zz index, but SMQzzCD or SMQzzSC is not present."
+  Output_Variables:
+  - "variable_name"
+wildcards:
+  zz:
+    min: 1
+    max: 99
+Source:
+  Message: "Only some of these variables are present and populated: SMQzzNAM, SMQzzCD,\
+    \ SMQzzSC"
+  Description: "If any of SMQ Name (SMQzzNAM), SMQ Code (SMQzzCD) or SMQ Scope (SMQzzSC)\
+    \ variable is populated, then all of these MedDRA SMQ variables must be populated\
+    \ together."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0304"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0304"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0304"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0304"
+        Version: "1"
+      Version: "6.0"

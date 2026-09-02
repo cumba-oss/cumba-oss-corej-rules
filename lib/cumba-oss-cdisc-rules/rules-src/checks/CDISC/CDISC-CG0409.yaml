@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0409"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STUDYID does not match the STUDYID value in the\
+  \ DM domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dm_studyid"
+  expression: "distinct(STUDYID, domain=\"DM\")"
+Check:
+  expression: >-
+    STUDYID not in $dm_studyid
+Outcome:
+  Message: "STUDYID does not match the STUDYID in the DM domain."
+  Output_Variables:
+  - "STUDYID"
+  - "$dm_studyid"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "STUDYID"
+  Rule: "STUDYID = DM.STUDYID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0409"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0409"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0409"
+        Version: "1"
+      Version: "2.0"

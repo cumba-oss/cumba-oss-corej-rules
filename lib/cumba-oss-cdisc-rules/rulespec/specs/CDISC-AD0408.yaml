@@ -1,0 +1,30 @@
+name: CDISC-AD0408
+kind: rule
+description: |
+  Wave A4 port — T1a PlainSimple.
+  CDISC-AD0408: ABLFL is populated while ABLFN is empty.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0408)
+rule:
+  coreId: CDISC-AD0408
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ABLFL: '', ABLFN: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ABLFL: 'Y', ABLFN: ''}     # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0408
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ABLFL: 'Y'
+      ABLFN: null
+expected_errors: []

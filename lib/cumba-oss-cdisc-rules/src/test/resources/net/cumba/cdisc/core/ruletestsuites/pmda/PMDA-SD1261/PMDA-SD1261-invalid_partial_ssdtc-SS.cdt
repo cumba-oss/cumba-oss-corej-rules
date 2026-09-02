@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1261 expect=violation domain=SS
+#note "FRESH - discriminating IsoDateComparison '<' hull pair (FOR-ALL: A < B iff upper(A) < lower(B)). Row 1: month-partial SSDTC 2020-04, upper hull 2020-04-30, is before DTHDTC 2020-05-10 -> FIRES. Row 2: month-partial SSDTC 2020-05, upper hull 2020-05-31, straddles DTHDTC 2020-05-10 -> silent. If either row flips, escalate: the hull FOR-ALL read is refuted."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 SSDTC=2020-04
+dataset SS class=FINDINGS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC    type=Char label="Date/Time of Assessment"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD | 2020-04
+S1 | SS | 002 | 1 | SURVSTAT | DEAD | 2020-05
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 | 2020-05-10
+S1 | DM | 002 | 2020-05-10
+---

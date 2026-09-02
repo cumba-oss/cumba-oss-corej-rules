@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1263 expect=noViolation domain=MB
+#note "Row 1 identifies an organism and gives MBRESCAT. Row 2 is a 'NO GROWTH' result and row 3 a GRAM STAIN method - both are the exclusions the sheet names, so their empty MBRESCAT is allowed. Row 4 is a different test code."
+#library standard=sdtmig version=3-4
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test Short Name"
+col MBSTRESC type=Char label="Character Result/Finding in Std Format"
+col MBRESCAT type=Char label="Result Category"
+col MBMETHOD type=Char label="Method of Test or Examination"
+---
+CDISCPILOT01 | MB | 01-701-1015 | 1 | ORGANISM | ESCHERICHIA COLI | PATHOGEN | CULTURE
+CDISCPILOT01 | MB | 01-701-1015 | 2 | ORGANISM | NO GROWTH        |          | CULTURE
+CDISCPILOT01 | MB | 01-701-1015 | 3 | ORGANISM | GRAM POSITIVE    |          | GRAM STAIN
+CDISCPILOT01 | MB | 01-701-1015 | 4 | COLONYCT | 1000             |          | CULTURE

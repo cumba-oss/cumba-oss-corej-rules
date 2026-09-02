@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2228 expect=violation domain=MI
+#note "Row 1: an abnormal MISTRESC with an empty MIRESCAT -> fires. Row 2 ('NORMAL') and row 3 (empty MISTRESC, NOT DONE) are guarded out."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MISTRESC="INFILTRATE, MONONUCLEAR CELL" MIRESCAT=
+dataset MI label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Num  label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Examination Short Name"
+col MISTRESC type=Char label="Standardized Result in Standard Format"
+col MIRESCAT type=Char label="Result Category"
+col MISTAT   type=Char label="Completion Status"
+col MISPEC   type=Char label="Specimen Material Type"
+---
+STUDY01 | MI | STUDY01-001 | 1 | MIEXAM | INFILTRATE, MONONUCLEAR CELL |  |          | LIVER
+STUDY01 | MI | STUDY01-001 | 2 | MIEXAM | NORMAL                       |  |          | KIDNEY
+STUDY01 | MI | STUDY01-002 | 1 | MIEXAM |                              |  | NOT DONE | LIVER

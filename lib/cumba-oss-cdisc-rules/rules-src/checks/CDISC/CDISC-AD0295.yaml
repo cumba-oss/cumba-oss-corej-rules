@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0295"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of ATOXGR for a given\
+  \ value of ATOXGRN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ATOXGR) and not empty(ATOXGRN) and has_multiple_values_for(ATOXGR, ATOXGRN)
+Outcome:
+  Message: "ATOXGR has more than one value for the same value of ATOXGRN."
+  Output_Variables:
+  - "ATOXGR"
+  - "ATOXGRN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ATOXGR"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of ATOXGR\
+    \ for a given value of ATOXGRN"
+  Rule_Failure_Criteria: "There is more than one value of ATOXGR for a given value\
+    \ of ATOXGRN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR295"
+        Version: "1"
+      Version: "5.0"

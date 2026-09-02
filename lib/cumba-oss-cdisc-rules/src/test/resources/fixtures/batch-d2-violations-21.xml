@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch D2 violations fixture: exactly one dedicated violator per rule; every
+     other value-level construct is compliant so each rule fires exactly once.
+       0055 - IT.SUPPAE.QVAL (Name="QVAL", no def:ValueListRef); IT.SUPPLB.QVAL is
+              the compliant QVAL decoy
+       0080 - def:WhereClauseRef without WhereClauseOID (VL.WCREF, first ItemRef)
+       0081 - def:WhereClauseRef WhereClauseOID="WC.DANGLING" (VL.WCREF, second ItemRef)
+       0082 - the OID-less def:WhereClauseDef (second WhereClauseDef, xpath index [2])
+       0083 - WC.BADCOMMENT def:CommentOID="COM.MISSING"; WC.OK carries a resolvable
+              def:CommentOID decoy
+       0085 - WC.EMPTY (no RangeCheck child)
+       0086 - WC.BADCOMP RangeCheck Comparator="EQUALS"
+       0087 - WC.NOCOMP RangeCheck without Comparator
+       0088 - WC.BADSH RangeCheck SoftHard="Firm"
+       0089 - WC.NOSH RangeCheck without SoftHard
+       0090 - WC.NOITEM RangeCheck without def:ItemOID
+       0091 - WC.BADITEM RangeCheck def:ItemOID="IT.MISSING"
+       0092 - WC.NOCV RangeCheck without CheckValue
+       0162 - IT.VS.VSORRES with two def:ValueListRef children (both resolvable)
+       0163 - IT.LB.LBORRES def:ValueListRef ValueListOID="VL.DANGLING"
+       0164 - IT.EG.EGORRES def:ValueListRef without ValueListOID
+       0235 - VL.TWODESC with two Description children
+       0236 - the OID-less def:ValueListDef (has an ItemRef so 0237 stays silent)
+       0237 - VL.NOITEMS (no ItemRef child) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-d2-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHD2V">
+    <GlobalVariables>
+      <StudyName>BATCHD2V-STUDY</StudyName>
+      <StudyDescription>Batch D2 violations fixture study</StudyDescription>
+      <ProtocolName>BATCHD2V-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch D2 violations MDV" def:DefineVersion="2.1.0">
+      <def:ValueListDef OID="VL.SUPPLB.QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Value definitions for SUPPLB QVAL</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL.LBCLSIG" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.A">
+        <ItemRef ItemOID="IT.VS.VSORRES.SYSBP" OrderNumber="1" Mandatory="Yes">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.B">
+        <ItemRef ItemOID="IT.VS.VSORRES.DIABP" OrderNumber="1" Mandatory="Yes">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.WCREF">
+        <ItemRef ItemOID="IT.WCREF.ONE" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.WCREF.TWO" OrderNumber="2" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.DANGLING"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.TWODESC">
+        <Description>
+          <TranslatedText xml:lang="en">First description</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second description</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL.LBCLSIG" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL.LBCLSIG" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.NOITEMS">
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.OK" def:CommentOID="COM.WCJOIN">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>LBCLSIG</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef>
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>NOOID</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.BADCOMMENT" def:CommentOID="COM.MISSING">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>BADCOMMENT</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.EMPTY">
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.BADCOMP">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQUALS">
+          <CheckValue>BADCOMP</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.NOCOMP">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM">
+          <CheckValue>NOCOMP</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.BADSH">
+        <RangeCheck SoftHard="Firm" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>BADSH</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.NOSH">
+        <RangeCheck def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>NOSH</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.NOITEM">
+        <RangeCheck SoftHard="Soft" Comparator="EQ">
+          <CheckValue>NOITEM</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.BADITEM">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.MISSING" Comparator="EQ">
+          <CheckValue>BADITEM</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.NOCV">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <ItemDef OID="IT.SUPPLB.QVAL" Name="QVAL" DataType="text" Length="200"
+               SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.SUPPLB.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPAE.QVAL" Name="QVAL" DataType="text" Length="200"
+               SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QNAM" Name="QNAM" DataType="text" Length="8"
+               SASFieldName="QNAM">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QVAL.LBCLSIG" Name="LBCLSIG" DataType="text" Length="1"
+               SASFieldName="LBCLSIG">
+        <Description>
+          <TranslatedText xml:lang="en">Clinically Significant</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRES" Name="VSORRES" DataType="text" Length="30"
+               SASFieldName="VSORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.A"/>
+        <def:ValueListRef ValueListOID="VL.B"/>
+      </ItemDef>
+      <ItemDef OID="IT.LB.LBORRES" Name="LBORRES" DataType="text" Length="30"
+               SASFieldName="LBORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.DANGLING"/>
+      </ItemDef>
+      <ItemDef OID="IT.EG.EGORRES" Name="EGORRES" DataType="text" Length="30"
+               SASFieldName="EGORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:ValueListRef/>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRES.SYSBP" Name="SYSBP" DataType="integer" Length="3"
+               SASFieldName="SYSBP">
+        <Description>
+          <TranslatedText xml:lang="en">Systolic Blood Pressure</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.VS.VSORRES.DIABP" Name="DIABP" DataType="integer" Length="2"
+               SASFieldName="DIABP">
+        <Description>
+          <TranslatedText xml:lang="en">Diastolic Blood Pressure</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.WCREF.ONE" Name="PARAM1" DataType="text" Length="10"
+               SASFieldName="PARAM1">
+        <Description>
+          <TranslatedText xml:lang="en">Parameter One</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.WCREF.TWO" Name="PARAM2" DataType="text" Length="10"
+               SASFieldName="PARAM2">
+        <Description>
+          <TranslatedText xml:lang="en">Parameter Two</TranslatedText>
+        </Description>
+      </ItemDef>
+      <def:CommentDef OID="COM.WCJOIN">
+        <Description>
+          <TranslatedText xml:lang="en">Join with the Demographics dataset on USUBJID.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

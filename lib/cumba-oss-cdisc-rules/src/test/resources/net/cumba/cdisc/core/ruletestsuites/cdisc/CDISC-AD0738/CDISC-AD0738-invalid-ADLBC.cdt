@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0738 expect=violation domain=ADLBC
+# Rule:Description: There is more than one value of PARAM for a given value of PARAMCD, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAM type=Char
+col PARAMCD type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Glucose (mmol/L) | GLUC
+CDISCPILOT01 | 01-701-1015 | Blood Glucose | GLUC
+CDISCPILOT01 | 01-701-1015 | Sodium (mmol/L) | SODIUM
+---

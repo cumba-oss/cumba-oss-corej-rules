@@ -1,0 +1,84 @@
+name: COALESCE-within-pooled
+kind: check_operator
+description: |
+  EC-24 coalesced within grouping key (FDA-SE2279). `within: [[USUBJID, POOLID]]`
+  is a single coalesce-group: per row the group key is the first POPULATED of
+  USUBJID/POOLID ("" counts as UNPOPULATED — the approved Q-5 deviation). Pooled
+  rows carry a blank USUBJID and identify by POOLID, so they must group per-pool,
+  NOT collapse into one "" bucket. KEY = PCTPTREF (the `value:` operand),
+  DEPENDENT = PCNOMDY (the `name:` operand): a PCTPTREF key mapping to >1 distinct
+  PCNOMDY within its coalesced group fires.
+
+  Rows PCSEQ 2/3 (pool P1, PCTPTREF=C1) map C1 -> {5,6} within P1 -> both fire.
+  PCSEQ 1 (P1, R1->{1}) and PCSEQ 4 (P2, R1->{2}) share PCTPTREF=R1 but live in
+  DIFFERENT pools, so neither fires — proving no cross-pool contamination (a flat
+  within:[USUBJID] would pool 1+4+... into one "" group and mis-fire). PCSEQ 5
+  (P2, C1->{5}) is a lone C1 in P2 -> no fire. PCSEQ 6/7 (real subject 001, blank
+  POOLID) coalesce to USUBJID=001, R1->{1,9} -> both fire, proving the singleton
+  fall-through (first populated = USUBJID) still groups correctly.
+python_notes: |
+  Both lanes coalesce USUBJID/POOLID (first populated, ""=unpopulated) and group
+  per-pool. No divergence.
+python_source: PLAN-rule-review-engine-changes.md §25 (EC-24)
+check:
+  name: PCNOMDY
+  operator: has_multiple_values_for
+  value: PCTPTREF
+  within:
+  - [USUBJID, POOLID]
+datasets:
+  PC:
+    row_key: [STUDYID, PCSEQ]
+    rows:
+    - {STUDYID: S1, PCSEQ: 1, USUBJID: '', POOLID: P1, PCTPTREF: R1, PCNOMDY: '1'}    # P1/R1 -> {1} no fire
+    - {STUDYID: S1, PCSEQ: 2, USUBJID: '', POOLID: P1, PCTPTREF: C1, PCNOMDY: '5'}    # P1/C1 -> {5,6} FIRES
+    - {STUDYID: S1, PCSEQ: 3, USUBJID: '', POOLID: P1, PCTPTREF: C1, PCNOMDY: '6'}    # P1/C1 multiple FIRES
+    - {STUDYID: S1, PCSEQ: 4, USUBJID: '', POOLID: P2, PCTPTREF: R1, PCNOMDY: '2'}    # P2/R1 -> {2} no fire (no cross-pool)
+    - {STUDYID: S1, PCSEQ: 5, USUBJID: '', POOLID: P2, PCTPTREF: C1, PCNOMDY: '5'}    # P2/C1 -> {5} no fire (no cross-pool)
+    - {STUDYID: S1, PCSEQ: 6, USUBJID: '001', POOLID: '', PCTPTREF: R1, PCNOMDY: '1'}    # 001/R1 -> {1,9} FIRES
+    - {STUDYID: S1, PCSEQ: 7, USUBJID: '001', POOLID: '', PCTPTREF: R1, PCNOMDY: '9'}    # 001/R1 multiple FIRES
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-COALESCE-within-pooled
+  dataset: PC
+  row_key: {STUDYID: S1, PCSEQ: 2}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '5'
+    PCSEQ: '2'
+    PCTPTREF: C1
+    POOLID: P1
+    STUDYID: S1
+- rule_id: AUTO-COALESCE-within-pooled
+  dataset: PC
+  row_key: {STUDYID: S1, PCSEQ: 3}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '6'
+    PCSEQ: '3'
+    PCTPTREF: C1
+    POOLID: P1
+    STUDYID: S1
+- rule_id: AUTO-COALESCE-within-pooled
+  dataset: PC
+  row_key: {STUDYID: S1, PCSEQ: 6}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '1'
+    PCSEQ: '6'
+    PCTPTREF: R1
+    POOLID:
+    STUDYID: S1
+- rule_id: AUTO-COALESCE-within-pooled
+  dataset: PC
+  row_key: {STUDYID: S1, PCSEQ: 7}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '9'
+    PCSEQ: '7'
+    PCTPTREF: R1
+    POOLID:
+    STUDYID: S1
+expected_errors: []

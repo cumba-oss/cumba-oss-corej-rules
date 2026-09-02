@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0476 expect=noViolation domain=ADSL
+#note "Row 2's blank TARGET (STRATAV) is excluded from both the distinct-value count and the flag pass (D.2 emptiness exception), so group STRATAVN=1 has a single distinct non-blank value {HIGH} and is consistent. Row 3's blank KEY (STRATAVN) drops its whole group under DROP_MISSING_KEYS. Pins both halves of the blank contract."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col STRATAV  type=Char
+col STRATAVN type=Num
+---
+S1 | 001 | HIGH |
+S1 | 002 |      | 1
+S1 | 003 | LOW  |
+---

@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-AD0704"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BCHG is populated and does not equal BASE minus\
+  \ AVAL"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BCHG) and BCHG != (BASE - AVAL)
+Outcome:
+  Message: "BCHG is populated but does not equal BASE minus AVAL"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "BASE"
+  - "BCHG"
+Source:
+  Class: "MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BCHG"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination\
+    \ of device and subject, BCHG is populated and is not equal to BASE-AVAL"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination of device\
+    \ and subject, BCHG is not equal to BASE-AVAL"
+  Condition_Failure: "USUBJID and SPDEVID are present and BCHG is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR704"
+        Version: "1"
+      Version: "5.0"

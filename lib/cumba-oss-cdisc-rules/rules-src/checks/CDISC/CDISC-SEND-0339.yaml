@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-SEND-0339"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a subject, the Date/Time of Reference Point\
+  \ (PPRFTDTC) of a Pharmacokinetics Parameters (PP) record does not equal the Date/Time\
+  \ of Reference Point (PCRFTDTC) of a Pharmacokinetics Concentrations (PC) record\
+  \ that contributed to the parameter."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Match_Datasets:
+- Name: "RELREC"
+  Wildcard: "PC"
+Check:
+  expression: >-
+    not empty(USUBJID) and not empty(PPRFTDTC) and not empty(RELREC.PCRFTDTC) and PPRFTDTC !=
+    RELREC.PCRFTDTC
+Outcome:
+  Message: "PPRFTDTC does not equal PCRFTDTC of a Pharmacokinetics Concentrations\
+    \ (PC) record contributing to the parameter for the subject."
+  Output_Variables:
+  - "PPRFTDTC"
+  - "RELREC.PCRFTDTC"
+Source:
+  Class: "FND"
+  Domain: "PP"
+  Variable: "PPRFTDTC"
+  Plain_Text_Explanation: "In studies with serial sampling (i.e., all time points\
+    \ collected from a single animal in order to construct the time-concentration\
+    \ profile), then PPRFTDTC should match PCRFTDTC."
+  Condition: "USUBJID ^= null in PP"
+  Rule: "For a given USUBJID, the PPRFTDTC for a parameter in PPTEST should match\
+    \ the PCRFTDTC for all records that contributed to that parameter"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND339"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND339"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND339"
+        Version: "1"
+      Version: "5.0"

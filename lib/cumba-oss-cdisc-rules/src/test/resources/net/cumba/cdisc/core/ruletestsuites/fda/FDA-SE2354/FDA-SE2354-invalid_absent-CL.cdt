@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2354 expect=violation domain=CL
+#note "Not-present branch: the dataset gives a reason for exclusion on row 1 but carries no CLEXCLFL column at all, so no record can have been flagged 'Y' -> fires."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 CLREASEX="Animal removed from study"
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLORRES  type=Char label="Result or Finding in Original Units"
+col CLREASEX type=Char label="Reason for Exclusion"
+---
+S1 | 001 | 1 | CLSIGN | NORMAL | Animal removed from study
+S1 | 001 | 2 | CLSIGN | NORMAL |

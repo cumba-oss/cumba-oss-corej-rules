@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0191 expect=skipped domain=MB
+#note "FRESH: a single MB dataset block with no MS block. Scope.Domains.Include is [MS], so the domain axis rejects before execution -> auditable skip. Pins the ANCHOR-ONLY scope convention: the rule is scoped to the dataset that must EXIST for the question to arise, never to the one whose absence it reports. Same mechanism as fda/FDA-SD1270/FDA-SD1270-valid_pc_only-PC.cdt."
+#library standard=sdtmig version=3-4
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MBSEQ   type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test or Finding Short Name"
+---
+S1 | MB | 001 | 1 | ORGANISM

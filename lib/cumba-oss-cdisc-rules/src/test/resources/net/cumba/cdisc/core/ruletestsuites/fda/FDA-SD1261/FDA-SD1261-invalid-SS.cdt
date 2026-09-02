@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1261 expect=violation domain=SS
+#note "Row 1: SSSTRESC='DEAD' and SSDTC before DTHDTC -> fires. Row 2: DEAD with SSDTC equal to DTHDTC -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 SSSEQ=1
+dataset SS class=FINDINGS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC    type=Char label="Date/Time of Assessment"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD | 2020-05-09
+S1 | SS | 001 | 2 | SURVSTAT | DEAD | 2020-05-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 | 2020-05-10
+---

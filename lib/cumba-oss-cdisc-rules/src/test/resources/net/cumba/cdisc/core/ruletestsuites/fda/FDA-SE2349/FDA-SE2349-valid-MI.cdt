@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2349 expect=noViolation domain=MI
+#note "MIDTHREL uses the three allowed values Y / N / U; row 4 leaves it empty, which the non_empty guard excludes."
+#library standard=sendig version=3-1-1
+dataset MI label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Num  label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Examination Short Name"
+col MISTRESC type=Char label="Standardized Result in Standard Format"
+col MIDTHREL type=Char label="Relationship to Death"
+col MISPEC   type=Char label="Specimen Material Type"
+---
+STUDY01 | MI | STUDY01-001 | 1 | MIEXAM | NECROSIS | Y | LIVER
+STUDY01 | MI | STUDY01-001 | 2 | MIEXAM | NECROSIS | N | KIDNEY
+STUDY01 | MI | STUDY01-002 | 1 | MIEXAM | NECROSIS | U | LIVER
+STUDY01 | MI | STUDY01-002 | 2 | MIEXAM | NORMAL   |   | KIDNEY

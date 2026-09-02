@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0002 expect=violation domain=LB
+#note "LBSEQ is a numeric Required variable (LB LBSEQ Num Req in SDTMIG 3.4) and is missing on row 2 -> fires; the numeric-missing boundary of the NULL check."
+#library standard=sdtmig version=3-4
+#library required-variables LB STUDYID DOMAIN USUBJID LBSEQ LBTESTCD
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=LBSEQ
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | S1-001 | 1 | GLUC
+S1 | LB | S1-001 | . | ALB

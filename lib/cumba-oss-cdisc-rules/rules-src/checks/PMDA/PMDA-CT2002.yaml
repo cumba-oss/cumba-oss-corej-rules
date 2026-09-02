@@ -1,0 +1,183 @@
+Core:
+  Id: "PMDA-CT2002"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an informational issue when a non-empty value is not a term in\
+  \ the extensible CDISC controlled terminology codelist the CDISC Library defines\
+  \ for the variable. A variable should be populated with terms from its CDISC codelist;\
+  \ because new terms may be added to an extensible codelist, a legitimately-added\
+  \ term is also flagged by this check."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_codelist_extensible("LIBRARY") == true and not empty(var_codelist_coded_values("LIBRARY"))
+    and not empty(value()) and value() not in var_codelist_coded_values("LIBRARY")
+Outcome:
+  Message: "The value is not a term in the extensible CDISC controlled terminology\
+    \ codelist the CDISC Library defines for this variable; new terms may be added\
+    \ to an extensible codelist, so confirm the value is not a duplicate, synonym\
+    \ or subset of an existing standard term."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Variable value not found in extensible codelist"
+  Description: "Variable should be populated with terms from its CDISC controlled\
+    \ terminology codelist. New terms can be added as long as they are not duplicates,\
+    \ synonyms or subsets of existing standard terms."
+  Domains: "ALL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "CT2002"
+        Version: "1"
+      Version: "1.6"

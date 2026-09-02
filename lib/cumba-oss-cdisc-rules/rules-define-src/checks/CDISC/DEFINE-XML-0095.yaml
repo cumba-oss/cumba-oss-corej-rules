@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0095"
+Sheet_Rule_Identifier: "95"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The Alias element is required for each ItemGroupDef where the Domain attribute value is not the same as the Name attribute value."
+Message: "Domain attribute is not the same as the Name attribute [${value}] but Alias is missing for the ItemGroupDef element."
+# Scoped to ItemGroupDef (the sheet's Element column names the missing child, Alias).
+# Shape: an Alias-less ItemGroupDef violates when @Name differs from @Domain — expressed
+# as compare(@Name, @Domain) guarded on the Alias child being absent. compare skips
+# elements where either side is missing, which matches the sheet's "and @Domain is
+# present" clause exactly.
+Check:
+  kind: "compare"
+  left: "@Name"
+  right: "@Domain"
+  when:
+    path: "Alias"
+    exists: false

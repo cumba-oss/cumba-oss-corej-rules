@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-AD0369"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when *DTF is populated and neither *DT nor *DTM is populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(*DTF) and empty(*DT) and empty(*DTM)
+Outcome:
+  Message: "*DTF is populated but neither *DT nor *DTM is populated."
+  Output_Variables:
+  - "*DT"
+  - "*DTM"
+  - "*DTF"
+Source:
+  Message: "*DTF is populated, but *DT or *DTM is not populated"
+  Description: "If a Date variable is indicated to be imputated by population of an\
+    \ Imputation Flag (*DTF), that Date variable (*DT) or Datetime variable (*DTM)\
+    \ must have a value."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0369"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0369"
+        Version: "1"
+      Version: "6.0"

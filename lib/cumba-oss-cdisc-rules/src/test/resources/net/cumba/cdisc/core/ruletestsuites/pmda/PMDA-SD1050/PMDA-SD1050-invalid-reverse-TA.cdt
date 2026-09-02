@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1050 expect=violation domain=TA
+#note "Reverse direction: ETCD 'TRT' maps to two ELEMENT values while every ELEMENT maps to one ETCD. PMDA-SD1050's own sheet row 145 DESCRIPTION states only the ELEMENT->ETCD direction ('Element Code (ETCD) must have a unique value for a given value of Description of Element (ELEMENT) within the domain'; the reverse is PMDA-SD1027's condition), but is_not_unique_relationship is bidirectional in both engines and the widening is the documented accepted behaviour (round-1 FDA-010 INFO) -> fires on both TRT rows."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 ETCD=TRT
+#expectViolationAt row=4 ETCD=TRT
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | A1 | Drug A  | 1 | SCRN | Screen
+S1 | TA | A1 | Drug A  | 2 | TRT  | Treatment
+S1 | TA | A2 | Placebo | 1 | SCRN | Screen
+S1 | TA | A2 | Placebo | 2 | TRT  | Treatment Phase

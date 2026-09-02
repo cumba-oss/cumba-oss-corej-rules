@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0508 expect=noViolation domain=ADLBC
+# Rule:Description: A variable ending in TMF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Time"
+#note "CDISC's own ADaMIG labels: ATMF spells Imputation in full, PHETMF / APERSTMF abbreviate to "Imput.", and TRTETMF interleaves words between "Time" and the suffix -> all accepted"
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATMF type=Char label="Analysis Time Imputation Flag"
+col PHETMF type=Char label="Phase End Time Imput. Flag"
+col APERSTMF type=Char label="Period Start Time Imput. Flag"
+col TRTETMF type=Char label="Time of Last Exposure Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x
+---

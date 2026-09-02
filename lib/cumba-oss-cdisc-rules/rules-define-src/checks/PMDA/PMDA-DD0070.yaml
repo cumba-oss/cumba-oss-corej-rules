@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0070"
+Sheet_Rule_Identifier: "DD0070"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, SASFieldName attribute is required and must be included in Define.xml and cannot be empty."
+Message: "Missing SASFieldName value"
+# Deviation (documented): scoped to dataset variables (ItemDefs referenced from
+# ItemGroupDef/ItemRef, the 0124-B fire-always vehicle) rather than every
+# ItemDef - value-level ItemDefs legitimately carry no SASFieldName, and an
+# unscoped reading would systematically over-fire (the same rationale as the
+# CDISC review carve-out on sheet id 154). DISAGREEMENT with CDISC twin 0147
+# flagged: 0147 additionally gates on Submission context + an .xpt archive
+# leaf and is 2.1-only; the PMDA row is unconditional on both versions.
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/@SASFieldName"
+      exists: false

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0143 expect=noViolation domain=ADLBC
+#note "PARAMCD left empty on both rows. An empty string is not matched by ^[A-Z_][A-Za-z0-9_]{0,7}$, so PARAMCD !~ /.../ is TRUE on both rows; the rule is silent only because the authored not empty(PARAMCD) lead kills the conjunction first - the guard-matrix residue the author owes on a negated match. AVAL keeps the dataset detecting BASIC DATA STRUCTURE even though PARAMCD is blank (detection is by column NAME, not by value)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 |  | 5.5
+CDISCPILOT01 | 01-701-1023 |  | 5.6

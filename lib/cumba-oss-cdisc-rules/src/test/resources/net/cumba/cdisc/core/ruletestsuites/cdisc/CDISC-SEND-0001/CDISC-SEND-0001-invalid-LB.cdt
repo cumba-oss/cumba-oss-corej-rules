@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0001 expect=violation domain=LB
+#note "Positive control: the dataset is named LB but the record carries DOMAIN=BW; the first 2 characters of the dataset name (LB) do not equal DOMAIN, so the rule fires once for the dataset. Paired with the -valid- twin; first fixture for this id (PLAN-zero-row-routing-rekey.md phase 2)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+CDISCPILOT01 | BW | 01-701-1015 | 1 | ALB
+---

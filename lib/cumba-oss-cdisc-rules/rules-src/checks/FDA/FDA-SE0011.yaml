@@ -1,0 +1,97 @@
+Core:
+  Id: "FDA-SE0011"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of Reference Time Point (--RFTDTC) is\
+  \ populated but Time Point Reference (--TPTREF) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--RFTDTC"
+Check:
+  expression: >-
+    not empty(--RFTDTC) and empty(--TPTREF)
+Outcome:
+  Message: "--TPTREF is empty when --RFTDTC is populated."
+  Output_Variables:
+  - "--TPTREF"
+  - "--RFTDTC"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for --TPTREF, when --RFTDTC is provided"
+  FDA_Validator_Rule_Description: "Time Point Reference (--TPTREF) variable values\
+    \ should be provided, when Date/Time of Reference Time Point (--RFTDTC) variable\
+    \ values are populated."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0011"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB037"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0011"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB037"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0011"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB037"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0011"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB037"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0011"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB037"
+        Version: "1"
+      Version: "1.5"

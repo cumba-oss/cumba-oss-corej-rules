@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2247 expect=violation domain=TS
+#note "Row 2 records the study start date as '01/15/2020' (US calendar style), which is not ISO 8601."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=SSTDTC TSVAL=01/15/2020
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | DCUTDTC | Data Cutoff Date | 2020-06-30
+CDISCPILOT01 | TS | 1 | SSTDTC  | Study Start Date | 01/15/2020

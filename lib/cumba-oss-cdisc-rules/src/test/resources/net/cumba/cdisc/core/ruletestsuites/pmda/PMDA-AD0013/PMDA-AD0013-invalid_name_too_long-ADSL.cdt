@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0013 expect=violation domain=ADSL
+#note "varname() !~ /^[A-Z][A-Za-z0-9_]{0,7}$/ fires for TOOLONGNAME only (11 characters); STUDYID and USUBJID are 7 characters and conformant. One finding per offending VARIABLE -> count 1, addressed by the projected output variable variable_name and NOT by row=."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=TOOLONGNAME
+dataset ADSL structure=ADSL
+col STUDYID     type=Char
+col USUBJID     type=Char
+col TOOLONGNAME type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

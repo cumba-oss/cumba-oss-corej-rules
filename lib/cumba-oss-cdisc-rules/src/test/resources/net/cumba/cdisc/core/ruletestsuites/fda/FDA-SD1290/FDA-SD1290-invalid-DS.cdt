@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD1290 expect=violation domain=DS
+#note "Subject 001 has two DSCAT='DISPOSITION EVENT' records in EPOCH=TREATMENT -> both rows fire; the PROTOCOL MILESTONE row in the same epoch and subject 002's single disposition event stay clean."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+#expectViolationAt row=2 EPOCH=TREATMENT
+#expectViolationAt row=3 EPOCH=TREATMENT
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | DS | 001 | 1 | RANDOMIZED    | RANDOMIZED    | PROTOCOL MILESTONE | TREATMENT
+S1 | DS | 001 | 2 | ADVERSE EVENT | ADVERSE EVENT | DISPOSITION EVENT  | TREATMENT
+S1 | DS | 001 | 3 | COMPLETED     | COMPLETED     | DISPOSITION EVENT  | TREATMENT
+S1 | DS | 002 | 1 | COMPLETED     | COMPLETED     | DISPOSITION EVENT  | TREATMENT

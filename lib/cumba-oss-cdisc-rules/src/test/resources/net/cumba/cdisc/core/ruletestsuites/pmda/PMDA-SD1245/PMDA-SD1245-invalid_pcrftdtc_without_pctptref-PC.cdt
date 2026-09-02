@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1245 expect=violation domain=PC
+#note "Shipped Check var_exists(\"--RFTDTC\") and not var_exists(\"--TPTREF\") resolves per the EC-36 prefix rule to PCRFTDTC/PCTPTREF; both leaves are dataset constants -> BroadcastFold -> exactly ONE violation reported at row=1 regardless of row count. NOT a RELREC rule."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PCRFTDTC=2020-01-15T08:00
+dataset PC class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PCSEQ    type=Num
+col PCRFTDTC type=Char
+---
+S1 | PC | 001 | 1 | 2020-01-15T08:00

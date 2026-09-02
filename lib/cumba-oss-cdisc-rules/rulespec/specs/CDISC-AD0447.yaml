@@ -1,0 +1,33 @@
+name: CDISC-AD0447
+kind: rule
+description: |
+  Wave A5 port — T1a PlainSimple.
+  CDISC-AD0447: On a given record, AVISITN is populated and AVISIT is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE (+ MD variants) and
+  OCCURRENCE DATA STRUCTURE (+ MD variants); simple non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0447)
+rule:
+  coreId: CDISC-AD0447
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, AVISIT: 'VISIT 1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, AVISIT: ''}         # bad — AVISITN populated, AVISIT empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0447
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      AVISIT: null
+      AVISITN: '1'
+expected_errors: []

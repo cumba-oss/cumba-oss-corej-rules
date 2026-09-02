@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0078"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Start Date/Time of Observation (--STDTC) variable\
+  \ is present in a Findings-class dataset; in the Findings observation class --STDTC\
+  \ is not used, because --DTC (in conjunction with --ENDTC) represents an interval\
+  \ collection."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Check:
+  expression: >-
+    var_exists("--STDTC")
+Outcome:
+  Message: "--STDTC is present in a Findings-class dataset, where it is not used."
+  Output_Variables:
+  - "--STDTC"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STDTC"
+  Plain_Text_Explanation: "--STDTC is not used for data collection (--DTC is used\
+    \ in conjunction with --ENDTC to represent an interval collection)"
+  Rule: "--STDTC is not present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND78"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1008 expect=noViolation domain=CO
+#note "The three-variable-key boundary. Row 1 leaves IDVARVAL empty, so the comment is not pinned to a specific parent record and CODTC may legitimately carry the comment's own date - the pre-alignment IDVAR-only condition fired here."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | AE | 01-701-1015 | 1 | AESEQ |  | See narrative. | 2026-02-03

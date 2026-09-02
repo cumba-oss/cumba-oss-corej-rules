@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2216 expect=noViolation domain=TS
+#note "The rule's record-vs-value boundary. ADDON=Y and a CURTRT record is present but its TSVAL is empty: the CURTRT filter matches TSPARMCD only -> $curtrt_count = 1 -> silent for THIS rule. The empty-VALUE half is PMDA-SD1308's finding (its TS scope: CURTRT rows with empty TSVAL fire per row)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE  | Trial Title | A Phase 3 Add-on Study of Drug X
+S01 | TS | 2 | ADDON  | Test Product Added to Existing Treatment | Y
+S01 | TS | 3 | CURTRT | Current Therapy or Treatment |

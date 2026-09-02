@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0887 expect=skipped domain=ADPK01
+#note "The negative half of CDISC-AD0887-invalid-ADPK01-declared-scope-no-control-column.cdt: byte-identical columns, no structure=/subclass= declaration. BDS is detected from PARAMCD/AVAL, but the popPK column signature needs a NONMEM control column (EVID or MDV) and there is none, and ADPK01 is outside the Fix #154 name-tier prefixes, so all three subclass tiers are silent and Scope.Subclasses.Include skips the rule. This is what makes the declared-scope twin non-vacuous: only the declaration distinguishes the two files."
+# Rule:Description: Raise an error when EVID is not present in an ADPPKIG v1.0 dataset.
+dataset ADPK01
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5
+---

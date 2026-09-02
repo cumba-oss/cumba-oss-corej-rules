@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0461 expect=noViolation domain=AE
+# Rule:Description: Raise an error when the High Level Group Term (--HLGT) is not on the MedDRA primary system organ class hierarchy path.
+#note "EC-36 pin, negative twin: both AESOC values are on their AEHLGT hierarchy path, so the rule must stay quiet. Child and parent carry the MedDRA preferred case, which is what the flag-less rule compares against verbatim (D-TA-3 default, Fix #266; C1 data repair)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLGT type=Char label="High Level Group Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Headaches | Nervous system disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Gastrointestinal signs and symptoms | Gastrointestinal disorders
+---

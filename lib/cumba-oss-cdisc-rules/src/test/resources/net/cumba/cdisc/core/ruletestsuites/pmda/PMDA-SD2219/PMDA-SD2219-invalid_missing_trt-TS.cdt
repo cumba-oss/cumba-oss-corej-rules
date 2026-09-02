@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2219 expect=violation domain=TS
+#note "STYPE/INTERVENTIONAL record present -> $interventional_count=1; no TRT record -> $trt_count=0 -> fires once (broadcast; internal row 0 -> row=1). STYPE kept on data row 1 so the materialised first-row values are unambiguous."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 "$interventional_count"=1 "$trt_count"=0
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | STYPE | Study Type   | INTERVENTIONAL
+S1 | TS | 2 | TITLE | Trial Title  | Some Study

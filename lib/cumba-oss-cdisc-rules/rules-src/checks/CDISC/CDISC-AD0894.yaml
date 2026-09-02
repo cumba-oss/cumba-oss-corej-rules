@@ -1,0 +1,68 @@
+Core:
+  Id: "CDISC-AD0894"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within an ADNCA v1.0 dataset and considering only\
+  \ rows on which both ACYCLE and ACYCLEC are populated, more than one value of ACYCLE\
+  \ is present for a given value of ACYCLEC."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "NON-COMPARTMENTAL ANALYSIS"
+Check:
+  expression: >-
+    not empty(ACYCLE) and not empty(ACYCLEC) and has_multiple_values_for(ACYCLE, ACYCLEC)
+Outcome:
+  Message: "There is more than one value of ACYCLE for a given value of ACYCLEC."
+  Output_Variables:
+  - "ACYCLE"
+  - "ACYCLEC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "NON-COMPARTMENTAL ANALYSIS"
+  Variable_or_Item: "ACYCLE"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, there is more than one\
+    \ value of ACYCLE for a given value of ACYCLEC, considering only those rows on\
+    \ which both variables are populated"
+  Rule_Failure_Criteria: "There is more than one value of ACYCLE for a given value\
+    \ of ACYCLEC"
+  Condition_Failure: "On rows where both ACYCLE and ACYCLEC are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR894"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR894"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR894"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR894"
+        Version: "1"
+      Version: "5.0"

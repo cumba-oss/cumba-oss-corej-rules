@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0086 expect=noViolation domain=ADLBC
+# Rule:Description: A variable is present with the same name as a variable present in ADSL but the variables do not have identical formats
+#note "TRTSDT has identical formats (DATE9.) in ADLBC and ADSL -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDT type=Num format=DATE9.
+---
+CDISCPILOT01 | 01-701-1015 | 22000
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col TRTSDT type=Num format=DATE9.
+---
+22000
+---

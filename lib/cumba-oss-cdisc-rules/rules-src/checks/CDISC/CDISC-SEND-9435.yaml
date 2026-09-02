@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-9435"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TXPARMCD is not populated"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "TXPARMCD"
+Check:
+  expression: >-
+    empty(TXPARMCD)
+Outcome:
+  Message: "TXPARMCD is empty"
+  Output_Variables:
+  - "TXPARMCD"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "TX"
+  Variable: "TXPARMCD"
+  Plain_Text_Explanation: "TXPARMCD must be populated for every record."
+  Condition: ""
+  Rule: "TXPARMCD ^= null"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Required variables must always be included in the dataset\
+    \ and cannot be null for any record."
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"

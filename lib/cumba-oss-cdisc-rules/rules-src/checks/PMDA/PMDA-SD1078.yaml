@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD1078"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a Permissible variable is present in the dataset\
+  \ but empty for all records."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$permissible_variables"
+  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Perm\"\
+    )"
+Check:
+  expression: >-
+    varname() in $permissible_variables and var_is_null(varname())
+Outcome:
+  Message: "A Permissible variable is present in the dataset but empty for all records."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Permissible variable with missing value for all records"
+  Description: "Permissible variable should not be present in domain, when the variable\
+    \ has missing value for all records in the dataset (SDTM-IG 3.1.1 - 3.2). Permissible\
+    \ variable should not be present in domain, when the variable is not present on\
+    \ study CRFs (SDTM-IG 3.3 and higher)."
+  Domains: "ALL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1078"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0070 expect=violation domain=ADSL
+# Rule:Description: A variable with a prefix of TR, containing AG with a suffix of N is present and a variable with the same root without a suffix of N is not present
+#note "TR01AG1N present but TR01AG1 absent -> violation"
+#expectViolationCount 1
+#expectViolationAt TR01AG1N=1
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01AG1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---

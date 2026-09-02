@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SE2251 expect=skipped domain=SJ
+#note "[RE-POINTED 2026-08-27, owner ruling] violation -> skipped: SJUPDES joined Requirements.Variables.All, so the PARENT now takes an auditable dataset SKIP when the column is absent, and the missing column is reported once by the sister rule FDA-SE2251-A (Sensitivity Dataset) instead of once per unplanned record. The reasoning below is still correct about the ENGINE - absent = all-missing, EC-43 - it is the reporting GRANULARITY that moved. Original note: Column-absent case: the dataset records an unplanned repro stage but carries no SJUPDES column at all, so the bare empty(SJUPDES) leaf is TRUE on every row (absent = all-missing, EC-43) and the required description cannot have been given -> fires on the UNPLAN row. Plan B phase 4d' deleted the not var_exists(SJUPDES) disjunct that used to make this a separate branch; the verdict is unchanged."
+#library standard=sendig version=dart-1-1
+dataset SJ label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+---
+S1 | 001 | 1 | UNPLAN |
+S1 | 001 | 2 | GEST   | Gestation

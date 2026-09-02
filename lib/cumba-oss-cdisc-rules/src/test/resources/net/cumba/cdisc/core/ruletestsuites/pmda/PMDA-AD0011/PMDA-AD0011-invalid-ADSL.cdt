@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0011 expect=violation domain=ADSL
+#library standard=adamig version=1-1
+#note "Positive control for the N side. SAFFN is present and 1 while SAFFL is N, so the rule fires; ITTFL=N with ITTFN=0 agrees and must not. Also pins the value_is_literal fix - before it the N compiled as a column reference and the rule was structurally dead."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+col SAFFN   type=Num
+col ITTFL   type=Char
+col ITTFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | N | 1 | N | 0
+CDISCPILOT01 | 01-701-1023 | N | 0 | N | 0
+---

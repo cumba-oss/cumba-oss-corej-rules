@@ -1,0 +1,92 @@
+Core:
+  Id: "CDISC-SEND-0241.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Trial Sets (TX) record sets the Treatment Dose\
+  \ to 'SEE PROTOCOL' (TXPARMCD is TRTDOS and TXVAL is 'SEE PROTOCOL') but the same\
+  \ Trial Set (SETCD) has no Treatment Dose Units record with TXPARMCD is TRTDOSU\
+  \ and TXVAL is 'SEE PROTOCOL'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "TXPARMCD"
+    - "TXVAL"
+Operations:
+- id: "$trtdosu_seeprot_count"
+  expression: "record_count(SETCD, domain=\"TX\", group=[SETCD], filter=filter(TXPARMCD=\"\
+    TRTDOSU\", TXVAL=\"SEE PROTOCOL\"))"
+Check:
+  expression: >-
+    TXPARMCD == "TRTDOS" and TXVAL == "SEE PROTOCOL" and $trtdosu_seeprot_count == 0
+Outcome:
+  Message: "TX has TXPARMCD='TRTDOS' with TXVAL='SEE PROTOCOL' but this Trial Set\
+    \ (SETCD) has no TXPARMCD='TRTDOSU' record with TXVAL='SEE PROTOCOL'."
+  Output_Variables:
+  - "SETCD"
+  - "TXPARMCD"
+  - "TXVAL"
+  - "$trtdosu_seeprot_count"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "TXPARMCD"
+  Plain_Text_Explanation: "IF TRTDOS = \"SEE PROTOCOL\" then TRTDOSU = \"SEE PROTOCOL\"\
+    ."
+  Condition: "TXPARMCD = \"TRTDOS\" AND TXVAL = \"SEE PROTOCOL\""
+  Rule: "TXPARMCD = \"TRTDOSU\" AND TXVAL = \"SEE PROTOCOL\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND241.1"
+        Version: "1"
+      Version: "5.0"

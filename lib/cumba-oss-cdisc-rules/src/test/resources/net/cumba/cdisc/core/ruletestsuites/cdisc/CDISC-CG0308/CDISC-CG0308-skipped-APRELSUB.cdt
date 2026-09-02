@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0308 expect=skipped domain=APRELSUB
+# Rule:Description: Raise an error when the DOMAIN value length is not equal to 2.
+#note "Proves the wave-10 `Scope.Domains.Exclude: [APRELSUB]` edit BITES, and records the over-report it removes. `APRELSUB` is a legitimate eight-character Associated Persons dataset and — per the CDISC Library (SDTMIG AP 1.0) — it has NO `DOMAIN` variable at all: its columns are STUDYID, APID, RSUBJID, RDEVID, SREL. Since Fix #160 made `AP--` strict (AP plus exactly two characters), the `Exclude: [AP--]` entry no longer reached APRELSUB, so this rule RAN here, took the EC-43 absent-column fold on DOMAIN (len(<missing>) is 0) and fired `shorter_than 2` on every row — an over-report on conformant data. The literal `APRELSUB` in the Exclude list restores the intent. ⚠⚠ SUPERSEDED 2026-08-07 — this note used to end 'Only the Domains filter can reject this dataset: the sibling `Classes.Exclude: [RELATIONSHIP]` does not match Associated Persons. Remove `APRELSUB` from the Exclude list and this scenario goes red.' That is NO LONGER TRUE. The `dataset_domain` migration (plans/PLAN-domain-expression-function.md) added `Requirements.Variables.All: [DOMAIN]`, and this fixture carries no DOMAIN column — so TWO filters now reject it independently and neither can be proved from here. This scenario is therefore a REGRESSION pin on the pair, not on the Domains entry; `CDISC-CG0308-skipped-APRELSUB-carrying-DOMAIN.cdt` is the unmasked pin for the Domains entry and `CDISC-CG0308-skipped-no-DOMAIN-column-LB.cdt` the unmasked pin for the Variables guard."
+#library standard=sdtmig version=3-2
+dataset APRELSUB label="Associated Persons Related to Subjects"
+col STUDYID type=Char label="Study Identifier"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col RDEVID  type=Char label="Related Device Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | AP-001 | 01-701-1015 |  | FRIEND
+CDISCPILOT01 | AP-002 | 01-701-1023 |  | SIBLING
+---

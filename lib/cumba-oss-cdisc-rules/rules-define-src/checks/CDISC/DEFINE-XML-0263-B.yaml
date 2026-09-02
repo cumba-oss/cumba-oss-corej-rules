@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0263-B"
+Sheet_Rule_Identifier: "263"
+Rule_Set: "CDISC"
+Element: "MetaDataVersion"
+Attribute: "StandardVersion"
+Applicable_Versions: ["2.0"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "The version identifier must match a version identifier used in the standard."
+# The 2.0 leg of DEFINE-XML-0263: 2.0 documents carry the standard as the
+# MetaDataVersion's def:StandardName/def:StandardVersion attributes (no
+# def:Standards element), so the same published-version check re-targets those
+# attributes. Providers treat the 2.0 hyphenated spellings (SDTM-IG/SEND-IG)
+# hyphen-insensitively per the SPI contract.
+Message: "The version identifier value is not a valid value for the standard [${value}]."
+Check:
+  kind: "library_standard_version_known"
+  nameAttribute: "StandardName"
+  versionAttribute: "StandardVersion"

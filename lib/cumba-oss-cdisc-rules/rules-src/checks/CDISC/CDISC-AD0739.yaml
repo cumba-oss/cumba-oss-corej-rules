@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0739"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of PARAMCD for a given\
+  \ value of PARAM, considering only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAM) and not empty(PARAMCD) and has_multiple_values_for(PARAMCD, PARAM)
+Outcome:
+  Message: "PARAMCD has more than one value for this PARAM, among rows where both\
+    \ are populated"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMCD"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "PARAMCD"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of PARAMCD\
+    \ for a given value of PARAM, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of PARAMCD for a given value\
+    \ of PARAM"
+  Condition_Failure: "On rows where PARAMCD and PARAM are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR739"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR739"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR739"
+        Version: "1"
+      Version: "5.0"

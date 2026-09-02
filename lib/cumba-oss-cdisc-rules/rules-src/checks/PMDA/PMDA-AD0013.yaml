@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0013"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable name violates the basic SAS naming format:\
+  \ it must be a maximum of 8 characters, start with an upper-case letter A-Z, and\
+  \ contain only letters, digits and underscores."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() !~ /^[A-Z][A-Za-z0-9_]{0,7}$/
+Outcome:
+  Message: "Illegal variable name: the basic naming format (max 8 characters, starts\
+    \ with a letter A-Z, only letters/numbers/underscore) is violated."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: basic format is violated"
+  Description: "A variable must be a max of 8 characters, start with a letter A-Z\
+    \ and does not contain anything other than letters, numbers, underscore (_)."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0013"
+        Version: "1"
+      Version: "6.0"

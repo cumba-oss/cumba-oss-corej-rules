@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0330 expect=noViolation domain=ADVS
+#note "Row 3's BASECAT1 (the grouping key) is blank -> row dropped from grouping; the surviving group holds one distinct code; the row's own guard is false too."
+#library standard=adamig version=1-3
+dataset ADVS class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASECAT1 type=Char
+col BASECA1N type=Num
+---
+S1 | 001 | SYSBP | NORMAL | 1
+S1 | 002 | SYSBP | NORMAL | 1
+S1 | 003 | SYSBP |        | 2

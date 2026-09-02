@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0163"
+Sheet_Rule_Identifier: "163"
+Rule_Set: "CDISC"
+Element: "ValueListRef"
+Attribute: "ValueListOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The ValueListOID attribute on the def:ValueListRef element must reference an existing def:ValueListDef element."
+# Value check fires only on a present ValueListOID (presence is sheet id 164). The
+# sheet's ItemDef[@Name] placeholder is carried by the finding's xpath.
+Message: "There is no def:ValueListDef with an OID attribute that matches ItemDef/def:ValueListRef/@ValueListOID [${value}]."
+Check:
+  kind: "references"
+  attribute: "ValueListOID"
+  targetElement: "ValueListDef"
+  targetKey: "OID"

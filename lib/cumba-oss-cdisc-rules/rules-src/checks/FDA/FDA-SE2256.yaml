@@ -1,0 +1,46 @@
+Core:
+  Id: "FDA-SE2256"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of RSTAGE (Description of Repro\
+  \ Stage), TTSTRL (Rule for Start of Repro Stage), TTENRL (Rule for End of Repro\
+  \ Stage), and TTDUR (Planned Duration of Repro Stage) is not unique for a given\
+  \ RSTGCD (Repro Stage Code); the combination should be the same for each RSTGCD."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Check:
+  expression: >-
+    not empty(RSTGCD) and (has_multiple_values_for(RSTAGE, RSTGCD) or
+    has_multiple_values_for(TTSTRL, RSTGCD) or has_multiple_values_for(TTENRL, RSTGCD) or
+    has_multiple_values_for(TTDUR, RSTGCD))
+Outcome:
+  Message: "The combination of RSTAGE, TTSTRL, TTENRL, and TTDUR is not unique for\
+    \ a given RSTGCD; the combination must be the same for each RSTGCD."
+  Output_Variables:
+  - "RSTGCD"
+  - "RSTAGE"
+  - "TTSTRL"
+  - "TTENRL"
+  - "TTDUR"
+Source:
+  FDA_Validator_Rule_Message: "The combination of RSTAGE, TTSTRL TTENRL, and TTDUR\
+    \ is not unique for each RSTGCD"
+  FDA_Validator_Rule_Description: "The combination of Description of Repro Stage (RSTAGE),\
+    \ Rule for Start of Repro Stage (TTSTRL), Rule for End of Repro Stage (TTENRL),\
+    \ and Planned Duration of Repro Stage (TTDUR) should be unique for each Repro\
+    \ Stage Code (RSTGCD)."
+  Domains: "TT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2256"
+        Version: "1"
+      Version: "1.6"

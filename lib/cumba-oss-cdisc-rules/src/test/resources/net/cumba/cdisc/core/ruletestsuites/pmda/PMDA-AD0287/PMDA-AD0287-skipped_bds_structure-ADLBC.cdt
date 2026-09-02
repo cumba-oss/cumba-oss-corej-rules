@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0287 expect=skipped domain=ADLBC
+#note "DISCRIMINATING (AD0287-F1 / board item M2-Q1): a genuine AEREL/AERELN disagreement on a declared BDS dataset. AD0287 is scoped [OCCDS]+Subclasses[ADVERSE EVENT], so the declared BDS structure beats the columns and the pre-gate skips it -- even though the SAME sheet token list (ADAE, ADAMOTHER) reaches [BDS,OCCDS] on AD0289. Pins TODAY's answer; flips if the lane widens AD0287 like AD0289."
+#library standard=adamig version=1-0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AEREL   type=Char
+col AERELN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.0 | RELATED | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | 5.1 | NOTRELATED | 1

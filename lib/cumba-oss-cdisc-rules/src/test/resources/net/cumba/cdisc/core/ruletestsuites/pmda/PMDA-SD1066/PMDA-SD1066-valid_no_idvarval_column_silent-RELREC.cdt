@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1066 expect=noViolation domain=RELREC
+#note "RELREC deliberately carries no IDVARVAL column. The rule has no Requirements.Variables gate, so it EXECUTES; the absent IDVARVAL makes empty(IDVARVAL) a broadcast TRUE, not empty(IDVARVAL) FALSE, and the AND short-circuits -> zero findings WITH EXECUTION, not a skip."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE |  | AESPID | ONE | RL1
+S1 | CM |  | CMSPID | MANY | RL1

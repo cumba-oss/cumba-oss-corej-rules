@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-SEND-0381"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Repro Phase (RPHASE) does not have the same value\
+  \ across all records that share the same Repro Stage Code (RSTGCD), i.e. a Repro\
+  \ Stage is associated with more than one Repro Phase."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Requirements:
+  Variables:
+    All:
+    - "RPHASE"
+Check:
+  expression: >-
+    var_exists("RSTGCD") and is_inconsistent_across_dataset(RPHASE, keys=[RSTGCD])
+Outcome:
+  Message: "RPHASE is not the same value across records with the same RSTGCD; a Repro\
+    \ Stage spans more than one Repro Phase."
+  Output_Variables:
+  - "RSTGCD"
+  - "RPHASE"
+Source:
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "RSTGCD, RSTAGE, RPHASE"
+  Plain_Text_Explanation: "A Repro Stage should start and end in the same RPHASE."
+  Rule: "A Repro Stage should start and end in the same RPHASE."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND381"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND381"
+        Version: "1"
+      Version: "5.0"

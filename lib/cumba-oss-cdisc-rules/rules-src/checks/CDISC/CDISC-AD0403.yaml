@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-AD0403"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a subject, there is more than one value\
+  \ of ATOXDSCL for a given value of PARAM, considering only rows on which both variables\
+  \ are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATOXDSCL"
+Check:
+  expression: >-
+    not empty(PARAM) and not empty(ATOXDSCL) and has_multiple_values_for(ATOXDSCL, PARAM,
+    within=USUBJID)
+Outcome:
+  Message: "Within a subject, there is more than one value of ATOXDSCL for a given\
+    \ value of PARAM, considering only rows on which both variables are populated."
+  Output_Variables:
+  - "PARAM"
+  - "ATOXDSCL"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "ATOXDSCL"
+  Natural_Language_Rule_Failure_Criteria: "Within a subject, there is more than one\
+    \ value of ATOXDSCL for a given value of PARAM, considering only those rows on\
+    \ which both variables are populated"
+  Rule_Failure_Criteria: "Within a subject, there is more than one value of ATOXDSCL\
+    \ for a given value of PARAM"
+  Condition_Failure: "On rows where both ATOXDSCL and PARAM are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR403"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR403"
+        Version: "1"
+      Version: "5.0"

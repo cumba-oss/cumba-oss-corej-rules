@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1125 expect=noViolation domain=VS
+#note "Pins the GROUPING-KEY policy: under GroupKeyPolicy.DROP_MISSING_KEYS a row whose VSTPT key component is blank joins no group and can never be flagged; the remaining two agree."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VISITNUM type=Num
+col VSTPTREF type=Char
+col VSTPTNUM type=Num
+col VSTPT    type=Char
+col VSELTM   type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | POST1H | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 1 | POST1H | PT1H
+S1 | VS | 003 | 1 | SYSBP | 1 | DOSE | 1 |        | PT2H

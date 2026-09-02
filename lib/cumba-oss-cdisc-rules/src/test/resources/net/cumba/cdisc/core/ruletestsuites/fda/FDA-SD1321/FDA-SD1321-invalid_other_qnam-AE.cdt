@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1321 expect=violation domain=AE
+#note "SUPPAE exists for subject 001 but carries a different qualifier (AESOSP), not the treatment-emergent flag -> the QNAM filter must still count zero and the rule must fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | 001 | 1 | Headache | HEADACHE
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Y
+---

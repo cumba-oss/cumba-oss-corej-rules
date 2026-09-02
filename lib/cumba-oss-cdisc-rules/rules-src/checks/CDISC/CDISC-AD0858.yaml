@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0858"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both ACYCLE and\
+  \ ACYCLEC are populated, more than one value of ACYCLE is present within the dataset\
+  \ for a given value of ACYCLEC."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ACYCLE) and not empty(ACYCLEC) and has_multiple_values_for(ACYCLE, ACYCLEC)
+Outcome:
+  Message: "More than one value of ACYCLE is present for this value of ACYCLEC within\
+    \ the dataset."
+  Output_Variables:
+  - "ACYCLE"
+  - "ACYCLEC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "ACYCLE"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of ACYCLE for a given value of ACYCLEC, considering only those rows on\
+    \ which both variables are populated"
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of ACYCLE\
+    \ for a given value of ACYCLEC"
+  Condition_Failure: "On rows where both ACYCLE and ACYCLEC are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR858"
+        Version: "1"
+      Version: "5.0"

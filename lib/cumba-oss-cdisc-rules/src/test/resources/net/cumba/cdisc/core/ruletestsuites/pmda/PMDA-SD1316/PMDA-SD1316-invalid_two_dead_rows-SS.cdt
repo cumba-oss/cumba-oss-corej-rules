@@ -1,0 +1,38 @@
+#!RuleTest
+#test PMDA-SD1316 expect=violation domain=SS
+#note "FRESH, DISCRIMINATING (finding multiplicity for the $-membership family, pinned once on the PMDA member). The rule authors Grouping.Variables [USUBJID] (rules-src/checks/PMDA/PMDA-SD1316.yaml), so RuleRunner routes it to executeGrouped: ONE finding per USUBJID block, anchored at the block's first flagged row. Subject 001 has TWO survival assessments both DEAD against a DS that carries only COMPLETED -> the two rows collapse to ONE finding anchored at row 1. Subject 003 is a SECOND offending subject with a single DEAD row -> its own finding at row 4. Subject 002 is a clean DEAD/DEATH control. Total 2 - one per offending subject, matching the PMDA sheet's subject-level wording ('All subjects who have Death records ... should also have death records'). This separates the three candidate shapes: 3 would mean per-record emission (grouping ignored), 1 would mean a dataset-level collapse. ESCALATE on 1 or 3 - do not edit."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001 SSSTRESC=DEAD
+#expectViolationAt row=4 USUBJID=003 SSSTRESC=DEAD
+dataset SS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSTEST   type=Char label="Subject Status"
+col SSORRES  type=Char label="Result or Finding in Original Units"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC    type=Char label="Date/Time of Assessment"
+---
+CDISCPILOT01 | SS | 001 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-03-01
+CDISCPILOT01 | SS | 001 | 2 | SURVSTAT | Survival Status | Dead | DEAD | 2020-04-01
+CDISCPILOT01 | SS | 002 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-04-01
+CDISCPILOT01 | SS | 003 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-05-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 001 | 1 | Completed study | COMPLETED | DISPOSITION EVENT | 2020-03-02
+CDISCPILOT01 | DS | 002 | 1 | Death | DEATH | DISPOSITION EVENT | 2020-04-02
+CDISCPILOT01 | DS | 003 | 1 | Completed study | COMPLETED | DISPOSITION EVENT | 2020-05-02
+---

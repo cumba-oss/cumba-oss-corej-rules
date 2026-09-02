@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0447"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when AVISITN is populated but AVISIT is empty"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AVISITN) and empty(AVISIT)
+Outcome:
+  Message: "AVISITN is populated, but AVISIT is empty"
+  Output_Variables:
+  - "AVISIT"
+  - "AVISITN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AVISIT"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, AVISITN is populated\
+    \ and AVISIT is not populated"
+  Rule_Failure_Criteria: "AVISIT is not populated"
+  Condition_Failure: "AVISITN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR447"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR447"
+        Version: "2"
+      Version: "5.0"

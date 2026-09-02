@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD2238 expect=violation domain=CM
+#note "Group (001, 2020-01-15) holds STTPT values 2x SCREENING vs 1x RANDOMIZATION: is_inconsistent_across_dataset flags the MINORITY row ONLY -> exactly 1 violation at row 3. Row 4: different USUBJID, consistent singleton group -> clean (also proves grouping is per USUBJID+--STDTC, not per --STDTC alone). The guards var_exists(USUBJID)/var_exists(--STDTC) are authored applicability terms, true here. 2v1 minority is this batch's fresh face - the 1:1 both-fire shape is already pinned green by fda/FDA-SD2238-invalid-CE (count 2)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 CMSEQ=3 CMSTTPT=RANDOMIZATION
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTDTC  type=Char
+col CMSTTPT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | 2020-01-15 | SCREENING
+S1 | CM | 001 | 2 | IBUPROFEN | 2020-01-15 | SCREENING
+S1 | CM | 001 | 3 | NAPROXEN  | 2020-01-15 | RANDOMIZATION
+S1 | CM | 002 | 1 | ASPIRIN   | 2020-01-15 | RANDOMIZATION
+---

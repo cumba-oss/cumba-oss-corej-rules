@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0847"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both FORMN and FORM\
+  \ are populated, more than one value of FORMN is present within the dataset for\
+  \ a given value of FORM."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(FORM) and not empty(FORMN) and has_multiple_values_for(FORMN, FORM)
+Outcome:
+  Message: "More than one value of FORMN is present for this value of FORM within\
+    \ the dataset."
+  Output_Variables:
+  - "FORM"
+  - "FORMN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "FORMN"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of FORMN for a given value of FORM, considering only those rows on which\
+    \ both variables are populated."
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of FORMN\
+    \ for a given value of FORM"
+  Condition_Failure: "On rows where both FORMN and FORM are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR847"
+        Version: "1"
+      Version: "5.0"

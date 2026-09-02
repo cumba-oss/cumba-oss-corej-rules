@@ -1,0 +1,42 @@
+name: CDISC-AD0738
+kind: rule
+description: |
+  Wave B4 port — T1b PlainIntermediate.
+  CDISC-AD0738: more than one PARAM for a given PARAMCD.
+  Record-data rule scoped to BASIC DATA STRUCTURE / MEDICAL DEVICE BDS.
+  Bare-leaf Check + has_multiple_values_for — Python gaps (Finding #26 + #28).
+  Baselines on Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0738)
+rule:
+  coreId: CDISC-AD0738
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, PARAM]
+    rows:
+      # PARAMCD=HGB maps to two PARAM ('Hemoglobin' and 'Haemoglobin') -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', PARAM: 'Hemoglobin'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', PARAM: 'Haemoglobin'}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'GLUC', PARAM: 'Glucose'}
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: 'GLUC', PARAM: 'Glucose'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0738
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', PARAM: 'Hemoglobin'}
+    status: SUCCESS
+    output_variables:
+      PARAM: 'Hemoglobin'
+      PARAMCD: 'HGB'
+  - rule_id: CDISC-AD0738
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', PARAM: 'Haemoglobin'}
+    status: SUCCESS
+    output_variables:
+      PARAM: 'Haemoglobin'
+      PARAMCD: 'HGB'
+expected_errors: []

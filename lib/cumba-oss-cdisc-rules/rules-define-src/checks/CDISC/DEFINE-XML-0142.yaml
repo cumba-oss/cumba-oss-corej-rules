@@ -1,0 +1,24 @@
+Rule_Id: "DEFINE-XML-0142"
+Sheet_Rule_Identifier: "142"
+Rule_Set: "CDISC"
+Element: "ValueListDef/ItemRef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "For any ItemDef element referenced by a def:ValueListDef/ItemRef, the value of attribute Length must be less than or equal to the value of attribute Length in the ItemDef element that references the value list."
+# Scoped to def:ValueListDef/ItemRef (the sheet's XPaths column): the left side
+# dereferences @ItemOID to the value-level ItemDef's Length; the right side walks
+# to the parent def:ValueListDef, dereferences its @OID to the def:ValueListRef
+# carrying it (the document-wide index keys any element by any attribute) and
+# reads the enclosing variable-level ItemDef's Length. compare skips elements
+# where either Length is missing (presence is sheet id 141) or non-numeric
+# (format is sheet id 144). Deviation (documented): first-match on both sides —
+# if several variables share one value list, only the first def:ValueListRef in
+# document order is compared (flagged for the DSL discussion; multi-parent value
+# lists are rare).
+Message: "Length for the value definition in the ItemDef element referenced from def:ValueListDef/ItemRef is greater than the Length for the variable definition that references the value list [${value}]."
+Check:
+  kind: "compare"
+  left: "@ItemOID->ItemDef@OID/@Length"
+  right: "../@OID->ValueListRef@ValueListOID/../@Length"
+  op: "less_or_equal"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0422 expect=noViolation domain=SJ
+#library standard=sendig-dart version=1-2
+#note "D-3 of EC-87: the relation must not change how missing cells compare. Row 1 SJENDTC and row 2 SJSTDTC are both empty fields, which the .cdt loader stores as MISSING (README-CDT: empty field -> null), and the KeyPart identity rule (W38-A1 / Fix #249) says same-marker missings correspond. The comparison arm short-circuits on a missing left cell and contributes nothing, so if the relation REPLACED identity instead of widening it this pair would FIRE - its silence is the D-1 disjunction under test. (A genuine empty-string cell cannot be written in .cdt; that corner is pinned in NextRecordRelationTest.) Rows 2->3 end/start on the same day and are the control."
+dataset SJ label="Subject Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+STUDY01 | SJ | R-002 | 1 | 2020-01-01 |
+STUDY01 | SJ | R-002 | 2 |            | 2020-01-19
+STUDY01 | SJ | R-002 | 3 | 2020-01-19 | 2020-02-01
+---

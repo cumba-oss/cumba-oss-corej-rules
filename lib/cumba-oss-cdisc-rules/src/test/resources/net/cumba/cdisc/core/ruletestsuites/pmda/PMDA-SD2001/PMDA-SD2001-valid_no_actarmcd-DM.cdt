@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2001 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. No ACTARMCD column. Row 2 deliberately carries a 21-character value in a DIFFERENT column (ARMCD), proving the rule is not reading the wrong column. Predicted: the rule EXECUTES (no Requirements.Variables block, so no scope axis rejects the dataset) and reports NOTHING -- an absent column folds to all-missing and a POSITIVE comparison does not fire (CORE-RULES-GUARD-MATRIX.md class V). Contrast PMDA-SD1349 / PMDA-SD2006 / PMDA-SD1027, which SKIP on an absent column because they declare Requirements.Variables.All."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARM     type=Char label="Description of Planned Arm"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | Placebo | PBO
+S1 | DM | 002 | Placebo run-in arm AB | PLACEBO-RUN-IN-ARM-AB

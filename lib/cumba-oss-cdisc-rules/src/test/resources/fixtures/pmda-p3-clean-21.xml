@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P3 (presence / conditional-presence) clean 2.1 fixture: every P3 rule
+     executes with zero findings, with guard-negative decoys proving selectivity:
+       IG.DM     - SDTMIG-bound, Domain, keys, Class child, full Description chain
+       IG.ADSL   - ADaMIG-bound, no Domain (DD0046 clean), Predecessor origin w/ text (DD0061)
+       IG.NODATA - def:HasNoData='Yes' + def:CommentOID, NO ArchiveLocationID (DD0056
+                   carve-out + DD0133 clean); its ItemRef HasNoData='Yes' resolves to an
+                   ItemDef WITH def:CommentOID (DD0134 clean)
+       IG.SUPPAE - QVAL ItemDef with def:ValueListRef (DD0038/DD0072 clean)
+       IT.DTC    - datetime WITHOUT Length (DD0068/OD0070 guard decoy)
+       IT.BASE   - float with Length + SignificantDigits (DD0069/OD0071 clean)
+       PDFPageRefs - one PageRefs form, one FirstPage+LastPage form (DD0037 clean)
+       CL.SEX/CL.RANKED - CT-bound + nci:ExtCodeID Alias (DD0126/DD0129 clean); CL.RANKED
+                   carries Rank+OrderNumber on ALL items (DD0076/DD0077 clean)
+       CL.CUSTOM - no StandardOID, IsNonStandard='Yes', no NCI Alias (DD0127/DD0128 clean)
+       ARM block - fully compliant; the document also declares an ADaM standard, so the
+                   softened DD0087 guard exempts it (mixed-standard document) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p3-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP3">
+    <GlobalVariables>
+      <StudyName>PMDAP3-STUDY</StudyName>
+      <StudyDescription>PMDA batch P3 clean fixture study</StudyDescription>
+      <ProtocolName>PMDAP3-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P3 MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+      </def:Standards>
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.AGE" OrderNumber="2" Mandatory="No" MethodOID="MT.AGE"/>
+        <ItemRef ItemOID="IT.DTC" OrderNumber="3" Mandatory="No"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No"
+                    SASDatasetName="ADSL" Purpose="Analysis"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.ADSL" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Level Analysis Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.BASE" OrderNumber="2" Mandatory="No"/>
+        <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
+        <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
+          <def:title>adsl.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.NODATA" Name="XX" Domain="XX" Repeating="Yes"
+                    SASDatasetName="XX" Purpose="Tabulation"
+                    def:Structure="One record per finding"
+                    def:StandardOID="STD.SDTM" def:HasNoData="Yes"
+                    def:CommentOID="COM.NODATA">
+        <Description>
+          <TranslatedText xml:lang="en">Planned domain without data</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.NODATAVAR" OrderNumber="1" Mandatory="No" KeySequence="1"
+                 def:HasNoData="Yes"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Domain="SUPPAE" Repeating="Yes"
+                    SASDatasetName="SUPPAE" Purpose="Tabulation"
+                    def:Structure="One record per qualifier per record"
+                    def:ArchiveLocationID="LF.SUPPAE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Qualifiers for AE</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.QVAL" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="RELATIONSHIP"/>
+        <def:leaf ID="LF.SUPPAE" xlink:href="suppae.xpt">
+          <def:title>suppae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF">
+            <def:PDFPageRef Type="PhysicalRef" PageRefs="12"/>
+            <def:PDFPageRef Type="PhysicalRef" FirstPage="5" LastPage="6"/>
+          </def:DocumentRef>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AGE" Name="AGE" DataType="integer" Length="3" SASFieldName="AGE">
+        <Description>
+          <TranslatedText xml:lang="en">Age</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.DTC" Name="DMDTC" DataType="datetime" SASFieldName="DMDTC">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.BASE" Name="BASE" DataType="float" Length="8" SignificantDigits="2"
+               SASFieldName="BASE">
+        <Description>
+          <TranslatedText xml:lang="en">Baseline Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Predecessor">
+          <Description>
+            <TranslatedText xml:lang="en">ADLB.AVAL</TranslatedText>
+          </Description>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.NODATAVAR" Name="XXORRES" DataType="text" Length="40"
+               SASFieldName="XXORRES" def:CommentOID="COM.NODATA">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding as Collected</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL.AESER" Name="AESER" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <def:ValueListDef OID="VL.QVAL">
+        <ItemRef ItemOID="IT.QVAL.AESER" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <CodeList OID="CL.SEX" Name="Sex" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="M"/>
+        <EnumeratedItem CodedValue="F"/>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <CodeList OID="CL.RANKED" Name="Severity" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="MILD" Rank="1" OrderNumber="1"/>
+        <EnumeratedItem CodedValue="SEVERE" Rank="2" OrderNumber="2"/>
+        <Alias Context="nci:ExtCodeID" Name="C66769"/>
+      </CodeList>
+      <CodeList OID="CL.CUSTOM" Name="Sponsor Codes" DataType="text"
+                def:IsNonStandard="Yes">
+        <CodeListItem CodedValue="A">
+          <Decode>
+            <TranslatedText xml:lang="en">Code A</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <MethodDef OID="MT.AGE" Name="Age Derivation" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">AGE = (RFSTDTC - BRTHDTC) / 365.25</TranslatedText>
+        </Description>
+      </MethodDef>
+      <def:CommentDef OID="COM.NODATA">
+        <Description>
+          <TranslatedText xml:lang="en">No data were collected for this planned domain.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.1" Name="Table 14-1.01">
+          <Description>
+            <TranslatedText xml:lang="en">Summary of Baseline by Treatment</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.1" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <Description>
+              <TranslatedText xml:lang="en">Primary analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.ADSL">
+                <arm:AnalysisVariable ItemOID="IT.BASE"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+            <arm:Documentation>
+              <Description>
+                <TranslatedText xml:lang="en">See SAP section 9.1</TranslatedText>
+              </Description>
+              <def:DocumentRef leafID="LF.SAP"/>
+            </arm:Documentation>
+            <arm:ProgrammingCode Context="SAS 9.4">
+              <arm:Code>proc means data=adsl; var base; run;</arm:Code>
+            </arm:ProgrammingCode>
+          </arm:AnalysisResult>
+          <arm:AnalysisResult OID="AR.2" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <Description>
+              <TranslatedText xml:lang="en">Supportive pooled analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets def:CommentOID="COM.NODATA">
+              <arm:AnalysisDataset ItemGroupOID="IG.ADSL">
+                <arm:AnalysisVariable ItemOID="IT.BASE"/>
+              </arm:AnalysisDataset>
+              <arm:AnalysisDataset ItemGroupOID="IG.DM"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.SAP" xlink:href="sap.pdf">
+        <def:title>Statistical Analysis Plan</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

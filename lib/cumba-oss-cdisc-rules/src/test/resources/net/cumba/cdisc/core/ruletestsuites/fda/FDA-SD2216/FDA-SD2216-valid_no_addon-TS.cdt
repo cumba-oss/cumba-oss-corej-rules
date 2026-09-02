@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD2216 expect=noViolation domain=TS
+#note "Condition branch: the test product is not added to an existing treatment (ADDON=N), so CURTRT is not required even though no CURTRT record exists -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE | Trial Title | A Phase 3 Monotherapy Study of Drug X
+S01 | TS | 2 | ADDON | Test Product Added to Existing Treatment | N
+S01 | TS | 3 | TTYPE | Trial Type | EFFICACY

@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1289 expect=violation domain=AE
+#note "row 1: AEPTCD populated but AEDECOD empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AEPTCD=10019211
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AEPTCD  type=Num  label="Preferred Term Code"
+---
+S1 | AE | 001 | 1 | HEADACHE |  | 10019211
+S1 | AE | 002 | 1 | NAUSEA | NAUSEA | 10028813

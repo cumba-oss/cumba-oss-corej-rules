@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0235"
+Sheet_Rule_Identifier: "235"
+Rule_Set: "CDISC"
+Element: "ValueListDef"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "No more than one /def:ValueListDef/Description may be provided."
+# 2.1 only per the sheet (def:ValueListDef gained the Description child in
+# Define-XML 2.1). The [@OID] placeholder is carried by the finding's xpath.
+Message: "Child element Description is provided more than once for def:ValueListDef."
+Check:
+  kind: "cardinality_at_most"
+  target: "Description"
+  max: 1

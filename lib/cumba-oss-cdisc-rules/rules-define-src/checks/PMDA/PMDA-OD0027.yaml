@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-OD0027"
+Sheet_Rule_Identifier: "OD0027"
+Rule_Set: "PMDA"
+Element: "MetaDataVersion"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Reject"
+Plain_Text_Rule: "The OID attribute for MetaDataVersion element must be unique within a single study."
+# MetaDataVersion elements are direct Study children, so the per-parent sibling
+# scope IS the sheet's per-study scope.
+Message: "Duplicate MetaDataVersion OID [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OID"

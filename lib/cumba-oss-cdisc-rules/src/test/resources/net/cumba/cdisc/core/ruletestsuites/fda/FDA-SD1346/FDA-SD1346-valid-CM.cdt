@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1346 expect=noViolation domain=CM
+#note "All populated CMCLASCD values are WHODrug ATC codes in the dummy dictionary (N02, M01A); the blank CMCLASCD row does not fire (completeness is another rule's concern) -> no violation."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMCLASCD type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | N02
+S01 | CM | 001 | 2 | Brufen        | M01A
+S01 | CM | 002 | 1 | Unknown med   |

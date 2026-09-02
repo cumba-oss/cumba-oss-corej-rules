@@ -1,0 +1,12 @@
+#!RuleTest
+#test DRAFT-900044 expect=violation domain=ADSL
+#note "RFSTDTC is carried over from DM: the ADaM standard does not define it on ADSL, so the NAME-keyed companion lookup runs. The companion publishes exactly one label for the name and this dataset carries a different one, so the ERROR level fires. || The carry-over operands must be populated into the EVALUATION context (RuleRunner's per-column loop, before evaluateBroadcast) -- populating them only in buildVariableMetadata, which runs after a check has already fired, leaves this scenario silent."
+#expectViolationCount 1
+#library-include DRAFT-900044-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="First Exposure Date"
+---
+CDISCPILOT01 | 01-701-1015 | 2026-01-01
+---

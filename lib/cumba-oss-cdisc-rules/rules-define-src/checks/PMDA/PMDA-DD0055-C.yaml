@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0055-C"
+Sheet_Rule_Identifier: "DD0055"
+Rule_Set: "PMDA"
+Element: "def:Class"
+Attribute: "Name"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Requires: "ct"
+Plain_Text_Rule: "For Define-XML 2.0, the Class attribute must have a value of 'SPECIAL PURPOSE', 'FINDINGS', 'FINDINGS ABOUT', 'EVENTS', 'INTERVENTIONS', 'TRIAL DESIGN', or 'RELATIONSHIP' for SDTM and SEND data and 'SUBJECT LEVEL ANALYSIS DATASET', 'BASIC DATA STRUCTURE', 'OCCURRENCE DATA STRUCTURE' (IG v1.1 and above), or 'ADAM OTHER' for ADaM data. For Define-XML 2.1, the Class attribute must have a value that is found in the GNRLOBSC (C103329) codelist in Define-CT. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+# 2.1 leg (CT-gated P5; the 2.0 one_of legs are PMDA-DD0055/-B):
+# def:Class/@Name must be a submission value of the GNRLOBSC codelist, named
+# by its fixed C-Code C103329 from the sheet (def:Class has no CodeList/alias
+# to resolve from). Twin: CDISC 132.
+Message: "Invalid Class value"
+Check:
+  kind: "term_in_ct_codelist"
+  attribute: "Name"
+  cCode: "C103329"

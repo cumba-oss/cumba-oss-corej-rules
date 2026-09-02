@@ -1,0 +1,42 @@
+Core:
+  Id: "PMDA-AD0077"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the character Planned Treatment\
+  \ TRTxxP does not hold the same value across all records sharing a given value of\
+  \ the numeric Planned Treatment TRTxxPN, considering only records on which both\
+  \ TRTxxP and TRTxxPN are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTxxP) and has_multiple_values_for(TRTxxP, TRTxxPN)
+Outcome:
+  Message: "Inconsistent value for TRTxxP"
+  Output_Variables:
+  - "TRTxxP"
+  - "TRTxxPN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for TRTxxP"
+  Description: "Within a study, all TRTxxP values must be the same for each unique\
+    \ value of TRTxxPN when the primary variable TRTxxP is populated."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0077"
+        Version: "1"
+      Version: "6.0"

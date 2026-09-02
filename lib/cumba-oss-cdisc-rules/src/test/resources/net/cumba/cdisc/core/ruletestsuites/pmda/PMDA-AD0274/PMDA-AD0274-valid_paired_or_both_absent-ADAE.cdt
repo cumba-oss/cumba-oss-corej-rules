@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0274 expect=noViolation domain=ADAE
+#note "Negative control. Both columns are declared, so the rule executes; two rows carry DOSEAEON and DOSAEONU together and one carries neither. Neither arm of the paired-population disjunction holds, so the rule stays silent."
+#library standard=adamig version=1-0
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col DOSEAEON type=Num
+col DOSAEONU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE |  50 | mg
+CDISCPILOT01 | 01-701-1023 | NAUSEA   | 100 | mg
+CDISCPILOT01 | 01-701-1034 | RASH     |     |

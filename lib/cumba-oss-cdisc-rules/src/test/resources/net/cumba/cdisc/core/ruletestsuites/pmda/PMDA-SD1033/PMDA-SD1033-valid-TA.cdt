@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1033 expect=noViolation domain=TA
+#note "Each ARMCD maps to exactly one ARM description; a second arm code legitimately carries a different description."
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | PBO | Placebo | 1 | SCRN
+S1 | TA | PBO | Placebo | 2 | TRT
+S1 | TA | ACT | Active  | 1 | SCRN

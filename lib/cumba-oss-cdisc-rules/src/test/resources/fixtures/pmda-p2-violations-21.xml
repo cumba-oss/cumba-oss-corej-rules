@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P2 violations fixture: one dedicated violator per rule, exactly one
+     finding each when evaluated as 2.1 (the four 2.1-only rules DD0122/DD0125/
+     DD0131/DD0139 are version-gated off when the same document is evaluated as 2.0).
+     Construct map:
+       OD0022  second Study with duplicate OID ST.P2V
+       OD0027  second MetaDataVersion with duplicate OID MDV.1
+       OD0030  IG.DUPOID x2 (distinct SASDatasetNames XA/XB)
+       OD0031  IT.DUPOID x2 (referenced once from IG.HOST)
+       OD0032  CL.DUPOID x2 (distinct Names)
+       DD0131  CL.NAME1/CL.NAME2 sharing Name "Duplicate Name List"
+       OD0079  CL.TERMDUP with EnumeratedItem M,M
+       OD0079-B CL.TERMDUP2 with CodeListItem A,A
+       DD0012  MDV-level def:leaf LF.DUP x2 (referenced from COM.DOC's DocumentRef)
+       DD0013  MT.DUP x2 (referenced from IG.KEY ItemRef)
+       DD0083  COM.DUP x2 (referenced from IG.SAS1)
+       DD0014  VL.DUP x2 (referenced from IT.VLDREF)
+       DD0051  IG.SAS1/IG.SAS2 sharing SASDatasetName SAME
+       DD0062  IG.SAS1 Description with two xml:lang="en" TranslatedText
+       DD0041  IG.KEY ItemRefs with KeySequence 1,1
+       OD0041  IG.ITEMDUP ItemRefs both IT.COMMON
+       OD0042  IG.ORD ItemRefs with OrderNumber 1,1
+       DD0088  RD.DUP x2   DD0089  RD.N1/RD.N2 sharing Name "Table 9"
+       DD0091  RD.HOST with AR.DUP x2
+       DD0095  AnalysisDataset -> IG.MISSING     DD0097  AnalysisVariable -> IT.MISSING
+       DD0015  MT.DOC DocumentRef -> LF.MISSING  DD0016  ItemRef MethodOID -> MT.MISSING
+       DD0017  IT.VLREF ValueListRef -> VL.MISSING
+       DD0018  IG.ARCH def:ArchiveLocationID -> LF.NOWHERE
+       DD0071  IT.CMT def:CommentOID -> COM.MISSING
+       DD0122  IG.STD def:StandardOID -> STD.MISSING
+       DD0125  CL.WRONGSTD def:StandardOID -> STD.SDTM (Type IG, not CT)
+       OD0046  IG.SAS2 ItemRef -> IT.NOWHERE     OD0048  IT.CLREF CodeListRef -> CL.MISSING
+       orphans DD0067 IT.ORPHAN / DD0078 LF.ORPHAN / DD0079 COM.ORPHAN /
+               DD0080 MT.ORPHAN / DD0081 VL.ORPHAN / DD0082 CL.ORPHAN /
+               DD0139 STD.ORPHAN
+     Everything else is referenced/unique so no rule fires twice: STD.CT is kept
+     referenced via CL.TERMDUP's def:StandardOID (Type CT, DD0125-negative). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p2-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.P2V">
+    <GlobalVariables>
+      <StudyName>PMDAP2-VIOLATIONS</StudyName>
+      <StudyDescription>PMDA batch P2 violations fixture study</StudyDescription>
+      <ProtocolName>PMDAP2-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P2 violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+        <def:Standard OID="STD.ORPHAN" Name="SENDIG" Type="IG" Version="3.1.1"
+                      Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DUPOID" Name="XA" Repeating="No" SASDatasetName="XA"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.DUPOID" Name="XB" Repeating="No" SASDatasetName="XB"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SAS1" Name="SM1" Repeating="No" SASDatasetName="SAME"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM" def:CommentOID="COM.DUP">
+        <Description>
+          <TranslatedText xml:lang="en">First dataset with shared SAS name</TranslatedText>
+          <TranslatedText xml:lang="en">Duplicate language entry</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SAS2" Name="SM2" Repeating="No" SASDatasetName="SAME"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM" def:CommentOID="COM.DOC">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"
+                 MethodOID="MT.MISSING"/>
+        <ItemRef ItemOID="IT.NOWHERE" OrderNumber="2" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.KEY" Name="KEYDS" Repeating="No" SASDatasetName="KEYDS"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.K1" OrderNumber="1" Mandatory="Yes" KeySequence="1"
+                 MethodOID="MT.DUP"/>
+        <ItemRef ItemOID="IT.K2" OrderNumber="2" Mandatory="Yes" KeySequence="1"
+                 MethodOID="MT.DOC"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ITEMDUP" Name="ITEMDUP" Repeating="No"
+                    SASDatasetName="ITEMDUP" Purpose="Tabulation"
+                    def:Structure="One record per subject" def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="2" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ORD" Name="ORDDS" Repeating="No" SASDatasetName="ORDDS"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.O1" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.O2" OrderNumber="1" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ARCH" Name="ARCHDS" Repeating="No" SASDatasetName="ARCHDS"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM" def:ArchiveLocationID="LF.NOWHERE">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.STD" Name="STDDS" Repeating="No" SASDatasetName="STDDS"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.MISSING">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.HOST" Name="HOSTDS" Repeating="No" SASDatasetName="HOSTDS"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:StandardOID="STD.SDTM">
+        <ItemRef ItemOID="IT.H1" OrderNumber="1" Mandatory="No"/>
+        <ItemRef ItemOID="IT.H2" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="IT.H3" OrderNumber="3" Mandatory="No"/>
+        <ItemRef ItemOID="IT.H4" OrderNumber="4" Mandatory="No"/>
+        <ItemRef ItemOID="IT.H5" OrderNumber="5" Mandatory="No"/>
+        <ItemRef ItemOID="IT.H6" OrderNumber="6" Mandatory="No"/>
+        <ItemRef ItemOID="IT.CLREF" OrderNumber="7" Mandatory="No"/>
+        <ItemRef ItemOID="IT.VLREF" OrderNumber="8" Mandatory="No"/>
+        <ItemRef ItemOID="IT.VLDREF" OrderNumber="9" Mandatory="No"/>
+        <ItemRef ItemOID="IT.CMT" OrderNumber="10" Mandatory="No"/>
+        <ItemRef ItemOID="IT.DUPOID" OrderNumber="11" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.COMMON" Name="COMMON" DataType="text" Length="8"/>
+      <ItemDef OID="IT.DUPOID" Name="DUPA" DataType="text" Length="8"/>
+      <ItemDef OID="IT.DUPOID" Name="DUPB" DataType="text" Length="8"/>
+      <ItemDef OID="IT.K1" Name="K1" DataType="text" Length="8"/>
+      <ItemDef OID="IT.K2" Name="K2" DataType="text" Length="8"/>
+      <ItemDef OID="IT.O1" Name="O1" DataType="text" Length="8"/>
+      <ItemDef OID="IT.O2" Name="O2" DataType="text" Length="8"/>
+      <ItemDef OID="IT.H1" Name="H1" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.DUPOID"/>
+      </ItemDef>
+      <ItemDef OID="IT.H2" Name="H2" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.NAME1"/>
+      </ItemDef>
+      <ItemDef OID="IT.H3" Name="H3" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.NAME2"/>
+      </ItemDef>
+      <ItemDef OID="IT.H4" Name="H4" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.TERMDUP"/>
+      </ItemDef>
+      <ItemDef OID="IT.H5" Name="H5" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.TERMDUP2"/>
+      </ItemDef>
+      <ItemDef OID="IT.H6" Name="H6" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.WRONGSTD"/>
+      </ItemDef>
+      <ItemDef OID="IT.CLREF" Name="CLREF" DataType="text" Length="8">
+        <CodeListRef CodeListOID="CL.MISSING"/>
+      </ItemDef>
+      <ItemDef OID="IT.VLREF" Name="VLREF" DataType="text" Length="8">
+        <def:ValueListRef ValueListOID="VL.MISSING"/>
+      </ItemDef>
+      <ItemDef OID="IT.VLDREF" Name="VLDREF" DataType="text" Length="8">
+        <def:ValueListRef ValueListOID="VL.DUP"/>
+      </ItemDef>
+      <ItemDef OID="IT.CMT" Name="CMT" DataType="text" Length="8"
+               def:CommentOID="COM.MISSING"/>
+      <ItemDef OID="IT.ORPHAN" Name="ORPHAN" DataType="text" Length="8"/>
+      <def:ValueListDef OID="VL.DUP">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.DUP">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <def:ValueListDef OID="VL.ORPHAN">
+        <ItemRef ItemOID="IT.COMMON" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <CodeList OID="CL.DUPOID" Name="Dup OID List A" DataType="text">
+        <EnumeratedItem CodedValue="Y"/>
+      </CodeList>
+      <CodeList OID="CL.DUPOID" Name="Dup OID List B" DataType="text">
+        <EnumeratedItem CodedValue="N"/>
+      </CodeList>
+      <CodeList OID="CL.NAME1" Name="Duplicate Name List" DataType="text">
+        <EnumeratedItem CodedValue="P"/>
+      </CodeList>
+      <CodeList OID="CL.NAME2" Name="Duplicate Name List" DataType="text">
+        <EnumeratedItem CodedValue="Q"/>
+      </CodeList>
+      <CodeList OID="CL.TERMDUP" Name="Term Dup Enumerated" DataType="text"
+                def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="M"/>
+        <EnumeratedItem CodedValue="M"/>
+      </CodeList>
+      <CodeList OID="CL.TERMDUP2" Name="Term Dup Decoded" DataType="text">
+        <CodeListItem CodedValue="A">
+          <Decode>
+            <TranslatedText xml:lang="en">Code A</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="A">
+          <Decode>
+            <TranslatedText xml:lang="en">Code A again</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="CL.WRONGSTD" Name="Wrong Standard Type" DataType="text"
+                def:StandardOID="STD.SDTM">
+        <EnumeratedItem CodedValue="W"/>
+      </CodeList>
+      <CodeList OID="CL.ORPHAN" Name="Orphan List" DataType="text">
+        <EnumeratedItem CodedValue="X"/>
+      </CodeList>
+      <MethodDef OID="MT.DUP" Name="Dup Method A" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">First method with the shared OID</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.DUP" Name="Dup Method B" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Second method with the shared OID</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.DOC" Name="Documented Method" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Derivation described in a missing document</TranslatedText>
+        </Description>
+        <def:DocumentRef leafID="LF.MISSING"/>
+      </MethodDef>
+      <MethodDef OID="MT.ORPHAN" Name="Orphan Method" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">No ItemRef points here</TranslatedText>
+        </Description>
+      </MethodDef>
+      <def:CommentDef OID="COM.DUP">
+        <Description>
+          <TranslatedText xml:lang="en">First comment with the shared OID</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.DUP">
+        <Description>
+          <TranslatedText xml:lang="en">Second comment with the shared OID</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.DOC">
+        <Description>
+          <TranslatedText xml:lang="en">See the duplicated document leaf</TranslatedText>
+        </Description>
+        <def:DocumentRef leafID="LF.DUP"/>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.ORPHAN">
+        <Description>
+          <TranslatedText xml:lang="en">No def:CommentOID points here</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.DUP" Name="Table 1">
+          <Description>
+            <TranslatedText xml:lang="en">First display with the shared OID</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.A1" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.MISSING"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+        <arm:ResultDisplay OID="RD.DUP" Name="Table 2">
+          <Description>
+            <TranslatedText xml:lang="en">Second display with the shared OID</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.A2" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.SAS1">
+                <arm:AnalysisVariable ItemOID="IT.MISSING"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+        <arm:ResultDisplay OID="RD.N1" Name="Table 9">
+          <Description>
+            <TranslatedText xml:lang="en">First display with the shared name</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.A3" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.KEY">
+                <arm:AnalysisVariable ItemOID="IT.K1"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+        <arm:ResultDisplay OID="RD.N2" Name="Table 9">
+          <Description>
+            <TranslatedText xml:lang="en">Second display with the shared name</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.A4" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.ORD">
+                <arm:AnalysisVariable ItemOID="IT.O1"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+        <arm:ResultDisplay OID="RD.HOST" Name="Table 5">
+          <Description>
+            <TranslatedText xml:lang="en">Display hosting the duplicate result OIDs</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.DUP" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="SUPPORTIVE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.SAS2"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+          <arm:AnalysisResult OID="AR.DUP" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="EXPLORATORY OUTCOME MEASURE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.HOST"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+      <def:leaf ID="LF.DUP" xlink:href="doc-a.pdf">
+        <def:title>First leaf with the shared ID</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.DUP" xlink:href="doc-b.pdf">
+        <def:title>Second leaf with the shared ID</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.ORPHAN" xlink:href="orphan.pdf">
+        <def:title>No DocumentRef points here</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+    <MetaDataVersion OID="MDV.1" Name="Duplicate MDV"/>
+  </Study>
+  <Study OID="ST.P2V">
+    <GlobalVariables>
+      <StudyName>PMDAP2-VIOLATIONS-DUP</StudyName>
+      <StudyDescription>Second study with the shared OID</StudyDescription>
+      <ProtocolName>PMDAP2-02</ProtocolName>
+    </GlobalVariables>
+  </Study>
+</ODM>

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1451 expect=violation domain=PP
+#note "var_exists(\"--ENINT\") and not var_exists(\"--STINT\") -> broadcast fires ONCE at row=1. SD1451 ships ONLY in rules-pmda-sdtmig-3-4.json - version=3-4 mandatory."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PPENINT=P24H
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPENINT  type=Char
+---
+S1 | PP | 001 | 1 | AUCALL | P24H
+---

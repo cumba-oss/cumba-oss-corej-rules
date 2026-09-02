@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0205"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the length of a Supplemental Qualifier (SUPP--)\
+  \ dataset name is greater than 8 characters."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+    - "SUPPAPFA--"
+Check:
+  expression: >-
+    len(dataset_name) > 8
+Outcome:
+  Message: "The length of the SUPP-- dataset name is greater than 8 characters."
+  Output_Variables:
+  - "dataset_name"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "GEN"
+  Rule: "Suppqual dataset names <= 8 characters"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0205"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0205"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0205"
+        Version: "1"
+      Version: "2.0"

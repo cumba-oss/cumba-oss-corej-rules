@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0037"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of GRyN has more than one\
+  \ value for a given value of the variable with the same root name and a suffix of\
+  \ GRy, considering only records where both variables are populated, where y is a\
+  \ single-digit integer [1-9]"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*GRyN) and not empty(*GRy) and has_multiple_values_for(*GRyN, *GRy)
+Outcome:
+  Message: "The variable with a suffix of GRyN has more than one value for the same\
+    \ value of the variable with the same root name and a suffix of GRy"
+  Output_Variables:
+  - "*GRy"
+  - "*GRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of a variable\
+    \ which has a suffix of GRyN for a given value of a variable with the same root\
+    \ name and suffix of GRy"
+  Rule_Failure_Criteria: "There is more than one value of a variable which has a suffix\
+    \ of GRyN for a given value of a variable with the same root name and suffix of\
+    \ GRy"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR37"
+        Version: "1"
+      Version: "5.0"

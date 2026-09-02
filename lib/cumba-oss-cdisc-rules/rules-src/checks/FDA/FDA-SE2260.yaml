@@ -1,0 +1,35 @@
+Core:
+  Id: "FDA-SE2260"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RPRFDY (Repro Phase Start Reference Day) is populated\
+  \ with a value other than 0 or 1 in the Trial Repro Paths (TP) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Check:
+  expression: >-
+    not empty(RPRFDY) and RPRFDY != 0 and RPRFDY != 1
+Outcome:
+  Message: "Invalid value for RPRFDY: RPRFDY is populated with a value other than\
+    \ 0 or 1."
+  Output_Variables:
+  - "RPRFDY"
+Source:
+  FDA_Validator_Rule_Message: "Invalid value for RPRFDY"
+  FDA_Validator_Rule_Description: "Repro Phase Start Reference Day (RPRFDY) must be\
+    \ 0 or 1 in the Trial Repro Paths (TP) dataset."
+  Domains: "TP"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2260"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,78 @@
+Core:
+  Id: "PMDA-SD1380"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when none of USUBJID, APID, SPDEVID, or POOLID is populated\
+  \ for a record; at least one of these subject/device/pool identifiers must be populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+    - "SPECIAL PURPOSE"
+    - "RELATIONSHIP"
+  Domains:
+    Exclude:
+    - "RELREC"
+    - "DR"
+    - "POOLDEF"
+    - "DM"
+    - "SE"
+    - "SM"
+Check:
+  expression: >-
+    empty(USUBJID) and empty(APID) and empty(SPDEVID) and empty(POOLID)
+Outcome:
+  Message: "None of USUBJID, APID, SPDEVID, or POOLID is populated."
+  Output_Variables:
+  - "APID"
+  - "SPDEVID"
+  - "POOLID"
+Source:
+  Message: "No subject identifier variables are populated"
+  Description: "At least one of the following subject identifier variables must be\
+    \ populated for each record: Unique Subject Identifier (USUBJID), Associated Persons\
+    \ Identifier (APID), Sponsor Device Identifier (SPDEVID), or Pool Identifier (POOLID)."
+  Domains: "SPECIAL PURPOSE (-DM, -SE, -SM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT, RELATIONSHIP (-DR, -POOLDEF, -RELREC)"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1380"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1380"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1380"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1380"
+        Version: "1"
+      Version: "1.6"

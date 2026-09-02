@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0185 expect=noViolation domain=LB
+#note "LBTOXGR carries the bare grade number on rows 1-3; row 4 leaves it empty, which the non-empty leaf guards out."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOXGR  type=Char label="Standard Toxicity Grade"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB   | 0
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC  | 2
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | 4
+CDISCPILOT01 | LB | 01-701-1015 | 4 | ALT   |

@@ -1,0 +1,43 @@
+name: CDISC-AD0777
+kind: rule
+description: |
+  Wave B6 port — T1b PlainIntermediate.
+  CDISC-AD0777: more than one AREL for a given ARELN (bare leaf)
+  Record-data rule scoped to OCCURRENCE DATA STRUCTURE with bare-leaf Check.
+  Double Python gap: (1) has_multiple_values_for missing from DataframeType (Finding #28),
+  (2) bare leaf raises KeyError: 'name' in business_rules engine (Finding #26).
+  Baselines on the Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0777)
+rule:
+  coreId: CDISC-AD0777
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AREL: 'RELATED', ARELN: '1'}
+      - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AREL: 'NOT RELATED', ARELN: '1'}
+      - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AREL: 'RELATED', ARELN: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0777
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AREL: 'RELATED'
+      ARELN: '1'
+  - rule_id: CDISC-AD0777
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AREL: 'NOT RELATED'
+      ARELN: '1'
+expected_errors: []

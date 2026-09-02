@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0322 expect=violation domain=ADEFF
+#note "TRTPGy expands against TRTPG1 (y=1) to a single concrete rule. Group TRTP=DrugA holds TRTPG1 {POOL1 x2, POOL2 x1} -> row 3 is the minority. Group DrugB is consistent."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTPG1=POOL2 TRTP=DrugA
+dataset ADEFF
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP    type=Char
+col TRTPG1  type=Char
+---
+S1 | 001 | DrugA | POOL1
+S1 | 002 | DrugA | POOL1
+S1 | 003 | DrugA | POOL2
+S1 | 004 | DrugB | POOLX
+S1 | 005 | DrugB | POOLX

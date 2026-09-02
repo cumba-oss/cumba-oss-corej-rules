@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-CT2002 expect=violation domain=MA
+#note "O-8 (Fix #339): the mirrored allow-list is an allow-list here too. MASPEC = LIVER;KIDNEY (two lawful SPEC terms, wrong delimiter - --SPEC combines with '/') reports, and MALAT = LEFT;SIDEWAYS reports because SIDEWAYS is no LAT term even though --LAT is licensed. MALAT = LEFT;RIGHT on row 2 is the licensed discriminator and is silent. Exactly two findings."
+#library standard=sendig version=3-1-1
+#library variable-metadata MA MALAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#library variable-metadata MA MASPEC codelist=SPEC codelist_extensible=true codelist_coded_values="[\"LIVER\",\"KIDNEY\",\"SPLEEN\"]"
+#expectViolationCount 2
+#expectViolationAt variable_name=MASPEC variable_value=LIVER;KIDNEY
+#expectViolationAt variable_name=MALAT variable_value=LEFT;SIDEWAYS
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASPEC   type=Char label="Specimen Material Type"
+col MALAT    type=Char label="Laterality"
+---
+S1 | MA | 001 | 1 | GMACROS | LIVER;KIDNEY | LEFT;SIDEWAYS
+S1 | MA | 002 | 2 | GMACROS | SPLEEN       | LEFT;RIGHT

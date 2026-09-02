@@ -1,0 +1,119 @@
+Core:
+  Id: "PMDA-SD0082"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Exposure End Date/Time (EXENDTC) is after the\
+  \ latest Disposition Event start date (the maximum DSSTDTC in the DS domain) for\
+  \ the subject."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Operations:
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(EXENDTC) and date(EXENDTC) > $max_ds_dsstdtc
+Outcome:
+  Message: "EXENDTC is after the latest Disposition start date (maximum DS.DSSTDTC)\
+    \ for the subject."
+  Output_Variables:
+  - "EXENDTC"
+  - "$max_ds_dsstdtc"
+Source:
+  Message: "Exposure end date is after the latest Disposition date"
+  Description: "End Date/Time of Treatment (EXENDTC) should be less than or equal\
+    \ to the Start Date/Time of the latest Disposition Event (DSSTDTC). Investigator\
+    \ should provide a date of study discontinuation for each subject in Disposition\
+    \ (DS) domain. If the study is ongoing, Parameter Value (TSVAL) for the 'ONGOSIND/Ongoing\
+    \ Study Indicator' parameter should be set to 'Y' in the Trial Summary (TS) domain."
+  Domains: "EX"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0082"
+        Version: "1"
+      Version: "1.6"

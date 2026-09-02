@@ -1,0 +1,43 @@
+name: CDISC-AD0822
+kind: rule
+description: |
+  Wave B6 port — T1b PlainIntermediate.
+  CDISC-AD0822: more than one SITEIDN for a given SITEID (bare leaf)
+  Record-data rule scoped to BASIC DATA STRUCTURE with bare-leaf Check.
+  Double Python gap: (1) has_multiple_values_for missing from DataframeType (Finding #28),
+  (2) bare leaf raises KeyError: 'name' in business_rules engine (Finding #26).
+  Baselines on the Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0822)
+rule:
+  coreId: CDISC-AD0822
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, SITEID: '101', SITEIDN: '1'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, SITEID: '101', SITEIDN: '2'}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVISITN: 1, SITEID: '102', SITEIDN: '3'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0822
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      SITEID: '101'
+      SITEIDN: '1'
+  - rule_id: CDISC-AD0822
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      SITEID: '101'
+      SITEIDN: '2'
+expected_errors: []

@@ -1,0 +1,51 @@
+Core:
+  Id: "PMDA-AD0282A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Severity/Intensity (ASEV) variable\
+  \ is present but empty on a record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ASEV"
+Check:
+  expression: >-
+    empty(ASEV)
+Outcome:
+  Message: "Analysis severity variable (ASEV) value is empty."
+  Output_Variables:
+  - "ASEV"
+Source:
+  Message: "Analysis severity Variable value is null"
+  Description: "For Analysis Severity/Intensity (N) (ASEVN) variables, the CDISC ADaM\
+    \ Validation Checks v1.3 explicitly require values of 1, 2, 3 while forbidding\
+    \ null values for this permissible variable. In contrast, AESEVN can be 1, 2,\
+    \ 3, or null. Since ASEVN cannot be null, the value it qualifies ASEV cannot be\
+    \ null. ASEV, if present, should apply imputation rules for missing severity of\
+    \ adverse events as specified in the SAP or metadata."
+  Domains: "OCCDS, ADAE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0282A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0282A"
+        Version: "1"
+      Version: "6.0"

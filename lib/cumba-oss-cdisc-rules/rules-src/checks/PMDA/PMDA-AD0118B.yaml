@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0118B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the planned time point number (ATPTN)\
+  \ takes more than one value for the same combination of Parameter Code (PARAMCD)\
+  \ and planned time point (ATPT). Only rows on which both ATPT and ATPTN are populated\
+  \ are considered."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATPTN"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and var_exists("ATPT") and not empty(PARAMCD) and not empty(ATPT) and not
+    empty(ATPTN) and is_inconsistent_across_dataset(ATPTN, keys=[PARAMCD, ATPT])
+Outcome:
+  Message: "Inconsistent value for ATPTN"
+  Output_Variables:
+  - "ATPT"
+  - "ATPTN"
+  - "PARAMCD"
+Source:
+  Message: "Inconsistent value for ATPTN"
+  Description: "Within a study, all ATPTN values must be the same for each unique\
+    \ value group of [PARAMCD, ATPT] when PARAMCD and primary variable ATPT are populated.\
+    \ Considering only those rows on which both variables are populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0118B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0118B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0118B"
+        Version: "1"
+      Version: "6.0"

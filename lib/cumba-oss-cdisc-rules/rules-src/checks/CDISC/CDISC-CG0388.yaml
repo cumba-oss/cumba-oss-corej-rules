@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0388"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESCAN is populated and its value is not 'Y' or\
+  \ 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESCAN"
+Check:
+  expression: >-
+    not empty(AESCAN) and AESCAN not in ["Y", "N"]
+Outcome:
+  Message: "AESCAN is populated but its value is not 'Y' or 'N'."
+  Output_Variables:
+  - "AESCAN"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--SCAN"
+  Condition: "--SCAN ^= null"
+  Rule: "--SCAN in ('Y','N')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0388"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0388"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0388"
+        Version: "1"
+      Version: "2.0"

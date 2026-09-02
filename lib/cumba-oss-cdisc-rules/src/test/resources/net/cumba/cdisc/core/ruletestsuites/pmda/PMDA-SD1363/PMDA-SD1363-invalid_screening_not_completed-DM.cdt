@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1363 expect=violation domain=DM
+#note "FLIPPED by the M2-P9 ruling (option (b) / M2-D29, Fix #307) exactly as finding SD1363-F1 pre-authored it: rename, expect=violation, count 1, row=1 ARMCD=A. Row 1 carries the fifth ARMNULRS term 'SCREENING NOT COMPLETED', added to SDTM CT codelist C142179 in the 2025-09-26 package, nearly three years after the PMDA v6.0 row was written. Such a subject was never assigned to treatment, so by the sheet's own reasoning ARMCD/ARM must be null; the shipped two-name membership list left it silent. Row 2 is a conformant control ('SCREEN FAILURE', ARMCD/ARM empty) that keeps the fixture from passing vacuously. Mirror: fda/FDA-SD1363/FDA-SD1363-invalid_screening_not_completed-DM.cdt."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=A
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col ARMNRS  type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A | Arm A | SCREENING NOT COMPLETED
+CDISCPILOT01 | DM | 01-701-1023 |   |       | SCREEN FAILURE

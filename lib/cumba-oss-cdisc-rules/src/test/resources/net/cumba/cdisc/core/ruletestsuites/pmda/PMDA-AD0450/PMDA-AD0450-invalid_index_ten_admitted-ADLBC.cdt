@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0450 expect=violation domain=ADLBC
+#note "O-3 (Fix #336): was `skipped_index_out_of_filter` pinning `_wildcards: y: {min: 1, max: 9}`. The owner ruled y = 1-99 on EVERY _wildcards entry (ADaMIG v1.1+ §3.1.1 'an integer [1-99, not zero-padded]'), so index TEN is now inside the filter, MCRIT10ML/MCRIT10MN match, and the populated ML with a missing MN fires - the same verdict PMDA-AD0339-invalid_two_digit_index already pinned for its MCRIT-family column at index 10. The filter-as-FILTER pin lives on in the sibling `skipped_index_hundred_filtered`."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID     type=Char
+col USUBJID     type=Char
+col PARAMCD     type=Char
+col MCRIT10ML   type=Char
+col MCRIT10MN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | PARTIAL |
+---
+#expectViolationCount 1

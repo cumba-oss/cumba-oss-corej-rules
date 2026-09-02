@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-SD1354"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an ARMCD value defined in the Trial Arms (TA) dataset\
+  \ is not assigned to at least one subject (USUBJID) in the Demographics (DM) dataset."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Operations:
+- id: "$dm_armcd"
+  expression: "distinct(ARMCD, domain=\"DM\")"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD not in $dm_armcd
+Outcome:
+  Message: "ARMCD value defined in TA is not present in the DM dataset."
+  Output_Variables:
+  - "ARMCD"
+  - "$dm_armcd"
+Source:
+  Message: "ARMCD value is not present in DM"
+  Description: "Arm Code (ARMCD) values defined in Trial Arms (TA) should be assigned\
+    \ to at least one subject (USUBJID) in Demographics (DM)."
+  Domains: "TA"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1354"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1354"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1354"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1354"
+        Version: "1"
+      Version: "1.6"

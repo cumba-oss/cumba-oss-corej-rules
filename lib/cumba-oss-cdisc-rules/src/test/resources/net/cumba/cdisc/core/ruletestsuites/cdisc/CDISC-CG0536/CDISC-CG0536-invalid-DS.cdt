@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0536 expect=violation domain=DS
+# Rule:Description: Trigger error when there is more than one record per subject per DSSCAT per DSCAT per EPOCH
+#note "two DISPOSITION EVENT records share USUBJID/DSSCAT/DSCAT/EPOCH (EPOCH not unique within USUBJID/DSSCAT/DSCAT). Sensitivity: Group -> one finding per offending group, anchored at its first record. (Positive control added by PLAN-absent-guard-test-hardening P3: CDISC-CG0536 previously had ONLY an expect=skipped fixture, which asserts non-execution and so proved nothing about the rule ever running. Modelled on its twin CORE-000213.)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1 USUBJID=01-701-1015
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSCAT type=Char label="Category for Disposition Event" format=$DSCAT.
+col DSSCAT type=Char label="Subcategory for Disposition Event"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY PARTICIPATION | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY PARTICIPATION | TREATMENT
+---

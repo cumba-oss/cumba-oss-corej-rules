@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0403 expect=skipped domain=ADMISC
+#note "No class= / structure= / subclass= key -- the point is that DETECTION yields ADAM OTHER. Data would be inconsistent if the rule ran. Dataset name starts with AD so the column heuristic is live, but it carries no PARAMCD/PARAM/AVAL/AVALC (BDS), no column name ending TERM/TRT/DECOD (OCCDS) and no SPDEVID, so the detected structure is ADAM OTHER, not in Scope.Data_Structures.Include -> pre-gate skip. Pins today's behaviour for the sheet's ADAMOTHER token (finding AD0403-F2); flips if the decision lane rules the convention the other way. Do NOT add PARAMCD here -- it would flip detection to BDS."
+#library standard=adamig version=1-3
+dataset ADMISC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AVISIT   type=Char
+col ATOXDSCL type=Char
+---
+S1 | 001 | WEEK1 | GRADE1
+S1 | 001 | WEEK2 | GRADE2

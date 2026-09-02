@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0206"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TAETORD is populated and ETCD is equal to 'UNPLAN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+    - "ETCD"
+Check:
+  expression: >-
+    ETCD == "UNPLAN" and not empty(TAETORD)
+Outcome:
+  Message: "TAETORD is populated when ETCD is equal to 'UNPLAN'."
+  Output_Variables:
+  - "ETCD"
+  - "TAETORD"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "TAETORD"
+  Condition: "ETCD = 'UNPLAN'"
+  Rule: "TAETORD = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0206"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0206"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0206"
+        Version: "1"
+      Version: "2.0"

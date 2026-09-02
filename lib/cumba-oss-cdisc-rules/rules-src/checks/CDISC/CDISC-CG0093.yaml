@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0093"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ELTM, --TPTNUM, --TPT, --STINT, and --ENINT are\
+  \ not present in the dataset but --TPTREF is present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not var_exists("--ELTM") and not var_exists("--TPTNUM") and not var_exists("--TPT") and not
+    var_exists("--STINT") and not var_exists("--ENINT") and var_exists("--TPTREF")
+Outcome:
+  Message: "--TPTREF is present when --ELTM, --TPTNUM, --TPT, --STINT, and --ENINT\
+    \ are not present."
+  Output_Variables:
+  - "--TPTREF"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPTREF"
+  Condition: "--ELTM, --TPTNUM, and --TPT not present in dataset"
+  Rule: "--TPTREF not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0093"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0093"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0093"
+        Version: "1"
+      Version: "2.0"

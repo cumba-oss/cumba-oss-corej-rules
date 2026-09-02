@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1294 expect=violation domain=CM
+#note "CMSTAT is present while CMPRESP is absent -> Completion Status only makes sense for pre-specified collection -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTAT   type=Char label="Completion Status"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN | NOT DONE
+---

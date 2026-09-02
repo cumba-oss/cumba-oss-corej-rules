@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-SEND-0292 expect=noViolation domain=PC
+#note "THE WIDENING DISCRIMINATOR (Fix #299 / M3-D21(iii)). Same test, same reference point, same planned time point NAME, different NUMBER -- but two different PCCAT categories. The sheet's Condition cell for SEND292 (rows 1538-1542) defines uniqueness by 'a combination of domain, --TPTREF, --CAT, --SCAT, --TESTCD', and before M3-D21 the partition was `within=[--TESTCD, --TPTREF]`, so '1 HOUR' carried two dependents inside (DRUGX, DOSE 1) and all four rows FIRED on conformant data. Widening to [--TESTCD, --TPTREF, --CAT, --SCAT] separates the two categories and the rule is silent. The grouped operator drops an absent --SCAT and regroups, which is the sheet's own 'if present'. ESCALATE if this reports 4."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTEST   type=Char label="Pharmacokinetic Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCTPT    type=Char label="Planned Time Point Name"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+col PCTPTREF type=Char label="Time Point Reference"
+col PCCAT    type=Char label="Category for Test"
+---
+S1 | PC | 001 | 1 | DRUGX | Drug X | 412 | 1 HOUR | 1 | DOSE 1 | PARENT
+S1 | PC | 002 | 1 | DRUGX | Drug X | 388 | 1 HOUR | 1 | DOSE 1 | PARENT
+S1 | PC | 001 | 2 | DRUGX | Drug X | 300 | 1 HOUR | 2 | DOSE 1 | METABOLITE
+S1 | PC | 002 | 2 | DRUGX | Drug X | 290 | 1 HOUR | 2 | DOSE 1 | METABOLITE
+---

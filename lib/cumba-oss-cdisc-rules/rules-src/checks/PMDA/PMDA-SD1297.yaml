@@ -1,0 +1,100 @@
+Core:
+  Id: "PMDA-SD1297"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL is populated with a value, or synonym of a\
+  \ value, from the ISO 21090 null flavor codelist; such values should be captured\
+  \ in TSVALNF instead of TSVAL."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    not empty(TSVAL) and upper(TSVAL) in ["NI", "NO INFORMATION", "INV", "INVALID", "OTH", "OTHER",
+    "PINF", "POSITIVE INFINITY", "NINF", "NEGATIVE INFINITY", "UNC", "UNENCODED", "DER", "DERIVED",
+    "UNK", "UNKNOWN", "ASKU", "ASKED BUT UNKNOWN", "NAV", "TEMPORARILY UNAVAILABLE", "NASK",
+    "NOT ASKED", "TRC", "TRACE", "MSK", "MASKED", "QS", "SUFFICIENT QUANTITY", "NA",
+    "NOT APPLICABLE", "NP", "NOT PRESENT"]
+Outcome:
+  Message: "TSVAL is populated with a value from the ISO 21090 null flavor codelist."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Message: "TSVAL is populated with a value from the ISO 21090 null flavor codelist"
+  Description: "TSVAL should not be populated with a value from the ISO 21090 Null\
+    \ Flavor codelist, or synonyms of the values. The TSVALNF variable should be used\
+    \ to capture these values, not TSVAL."
+  Domains: "TS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1297"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0035 expect=noViolation domain=ADLBC
+#note "1 is the only allowed populated value and the missing cell (lone . per SAS convention) is excluded by not empty(value())."
+#library standard=adamig version=1-1
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFRFN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+CDISCPILOT01 | 01-701-1023 | ALB | .

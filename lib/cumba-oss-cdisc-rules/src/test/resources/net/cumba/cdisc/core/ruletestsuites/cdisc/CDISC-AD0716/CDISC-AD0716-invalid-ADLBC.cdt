@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0716 expect=violation domain=ADLBC
+# Rule:Description: Raise an error when a variable with suffix TM (excluding SDTM ELTM variables and variables with suffix DTM) is not a numeric variable.
+#note "ASTTM has suffix TM (not DTM/ELTM) but is Char (not numeric) -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Char variable_name=ASTTM
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col ASTTM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 13:05
+---

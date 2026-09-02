@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0468"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Time Point Number (--TPTNUM) variable\
+  \ is not present in a dataset that contains the Planned Time Point Name (--TPT)\
+  \ variable."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--TPT") and not var_exists("--TPTNUM")
+Outcome:
+  Message: "--TPTNUM variable is not present when the --TPT variable is present in\
+    \ the dataset."
+  Output_Variables:
+  - "--TPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPTNUM"
+  Condition: "--TPT present in dataset"
+  Rule: "--TPTNUM present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0468"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0468"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0468"
+        Version: "1"
+      Version: "2.0"

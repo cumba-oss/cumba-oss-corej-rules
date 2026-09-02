@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1201 expect=skipped domain=CM
+#note "FRESH - the batch's Classes.Include reject pin. Two rows identical except CMSEQ (1 and 2) are VIOLATING-SHAPED under the resolved key (CMTERM present satisfies Requirements.Variables [--TERM]), but class INTERVENTIONS is not in Classes.Include [EVENTS] -> the rule must not execute. The class= token is the ONLY rejecting axis."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTERM   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTDTC  type=Char label="Start Date/Time of Medication"
+col VISITNUM type=Num  label="Visit Number"
+---
+S1 | CM | 001 | 1 | ASPIRIN | 2020-01-01 | 1
+S1 | CM | 001 | 2 | ASPIRIN | 2020-01-01 | 1

@@ -1,0 +1,94 @@
+Core:
+  Id: "PMDA-AD0221"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, a Category y (*CATy) variable does\
+  \ not take a single consistent value for each unique value of the analysis variable\
+  \ it categorizes within a PARAMCD. The categorizing pairs checked are AVALCATy for\
+  \ AVAL and AVALC, BASECATy for BASE and BASEC, CHGCATy for CHG, PCHGCATy for PCHG,\
+  \ and BCHGCATy for BCHG. A given category value may be shared across analysis values,\
+  \ but for a single analysis value within a PARAMCD the category must be the same\
+  \ on every record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and var_exists("AVAL") and var_exists("AVALCATy") and
+    is_inconsistent_across_dataset(AVALCATy, keys=[PARAMCD, AVAL]) or var_exists("PARAMCD") and
+    var_exists("AVALC") and var_exists("AVALCATy") and is_inconsistent_across_dataset(AVALCATy,
+    keys=[PARAMCD, AVALC]) or var_exists("PARAMCD") and var_exists("BASE") and
+    var_exists("BASECATy") and is_inconsistent_across_dataset(BASECATy, keys=[PARAMCD, BASE]) or
+    var_exists("PARAMCD") and var_exists("BASEC") and var_exists("BASECATy") and
+    is_inconsistent_across_dataset(BASECATy, keys=[PARAMCD, BASEC]) or var_exists("PARAMCD") and
+    var_exists("CHG") and var_exists("CHGCATy") and is_inconsistent_across_dataset(CHGCATy,
+    keys=[PARAMCD, CHG]) or var_exists("PARAMCD") and var_exists("PCHG") and var_exists("PCHGCATy")
+    and is_inconsistent_across_dataset(PCHGCATy, keys=[PARAMCD, PCHG]) or var_exists("PARAMCD") and
+    var_exists("BCHG") and var_exists("BCHGCATy") and is_inconsistent_across_dataset(BCHGCATy,
+    keys=[PARAMCD, BCHG])
+Outcome:
+  Message: "Inconsistent value for *CATy"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "AVALC"
+  - "AVALCATy"
+  - "BASE"
+  - "BASEC"
+  - "BASECATy"
+  - "CHG"
+  - "CHGCATy"
+  - "PCHG"
+  - "PCHGCATy"
+  - "BCHG"
+  - "BCHGCATy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for *CATy"
+  Description: "Within a study, all Category y (*CATy) variable values must be the\
+    \ same for each unique value of the variable it categorizes within a PARAMCD.\
+    \ [AVAL:AVALCATy], [AVALC:AVALCATy], [BASE:BASECATy], [BASEC:BASECATy], [CHG:CHGCATy],\
+    \ [PCHG:PCHGCATy], [BCHG:BCHGCATy]. A Category may be the same across values."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0221"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0221"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0221"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0221"
+        Version: "1"
+      Version: "6.0"

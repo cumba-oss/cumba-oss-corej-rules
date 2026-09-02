@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-AD0061"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SDTM Exposure (EX) dataset is present in the\
+  \ study but neither the Treatment Start Date (TRTSDT) nor the Treatment Start Datetime\
+  \ (TRTSDTM) variable is present in ADSL; when there is an investigational product\
+  \ (evidenced by EX), ADSL must carry a treatment start date/datetime."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Datasets:
+  - "EX"
+Operations:
+- id: "$TRTSDT_EXISTS"
+  expression: "variable_exists(TRTSDT)"
+- id: "$TRTSDTM_EXISTS"
+  expression: "variable_exists(TRTSDTM)"
+Check:
+  expression: >-
+    $TRTSDT_EXISTS == false and $TRTSDTM_EXISTS == false
+Outcome:
+  Message: "SDTM.EX is present, but neither ADSL TRTSDT nor TRTSDTM are present."
+Source:
+  Message: "SDTM.EX is present, but neither ADSL TRTSDT nor TRTSDTM are present"
+  Description: "The presence of SDTM.EX (Exposure) domain implies that there should\
+    \ be a Treatment Start Date (TRTSDT) / Datetime (TRTSDTM) variable present in\
+    \ the ADaM data."
+  Domains: "GLOBAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061"
+        Version: "1"
+      Version: "6.0"

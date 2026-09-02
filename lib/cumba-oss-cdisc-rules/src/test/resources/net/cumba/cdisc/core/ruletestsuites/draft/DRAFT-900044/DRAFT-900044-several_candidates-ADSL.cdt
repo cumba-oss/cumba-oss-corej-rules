@@ -1,0 +1,12 @@
+#!RuleTest
+#test DRAFT-900044 expect=violation domain=ADSL
+#note "The INFO lane: the companion publishes TWO distinct labels for NHOID and the dataset matches one, so the ERROR level is silent and INFO reports it. || ⛔ THIS IS THE SCENARIO WHOSE ABSENCE HID REVIEW FINDING R-1. The INFO level originally tested len(candidates) > 1, and len() is STRING length -- len([\"one label\"]) is 27, not 1 -- so INFO fired on EVERY carry-over variable whose label was correct. count() is the real cardinality test. Without #runLevel Info the level is filtered out before evaluation and this scenario proves nothing."
+#runLevel Info
+#expectViolationCount 1
+#library-include DRAFT-900044-multi-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col NHOID type=Char label="Non-Host Organism ID"
+---
+CDISCPILOT01 | ABC
+---

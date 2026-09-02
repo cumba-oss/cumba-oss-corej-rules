@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2288 expect=violation domain=DM
+#note "MECHANISM PIN - Q17-a with a FILTERED distinct. NO DS block at all. Absent DS -> EmptyResult empty set -> the one eligible subject (001) fires; the SCRNFAIL row (002) stays excluded, proving the guard conjuncts still gate under the absent-domain path."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 ARMCD=A01
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+---
+S1 | DM | 001 | A01
+S1 | DM | 002 | SCRNFAIL

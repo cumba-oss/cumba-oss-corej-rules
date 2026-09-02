@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0269 expect=violation domain=TS
+#note "Case boundary of the allowed-value test. Row 1: a LOWER-CASE y; the membership test is case-SENSITIVE, so 'y' is not in [\"Y\",\"N\"] and the record FIRES. Row 2: silent. Correct behaviour: the NY codelist submission values are uppercase, so a lower-case spelling is a genuine CT violation."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=ADDON TSVAL=y
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | ADDON | Added on to Existing Treatments | y
+S1 | TS | 2 | ADDON | Added on to Existing Treatments | N

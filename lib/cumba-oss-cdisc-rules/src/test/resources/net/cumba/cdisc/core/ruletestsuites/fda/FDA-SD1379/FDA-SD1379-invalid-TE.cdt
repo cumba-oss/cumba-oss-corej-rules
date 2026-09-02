@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD1379 expect=violation domain=TE
+#note "TE.ETCD=FUP is defined in TE but no subject has an SE record for it -> fires on row 3. Rows 1-2 appear in SE; row 4 has an empty ETCD and is guarded out by the non_empty leaf."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 ETCD=FUP
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent
+CDISCPILOT01 | TE | TRT  | Treatment | First dose
+CDISCPILOT01 | TE | FUP  | Follow-up | Last dose
+CDISCPILOT01 | TE |      |           | Unspecified
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-001 | 1 | SCRN | 2020-01-01
+CDISCPILOT01 | SE | 01-001 | 2 | TRT  | 2020-01-08
+---

@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0042"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'TM' (but not 'DTM')\
+  \ has a non-missing SAS display format that is not one of the valid ADaM SAS time\
+  \ formats (e.g. TIME, HHMM, E8601TM, IS8601TM and the other SAS time formats)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "TM") and not ends_with(varname(), "DTM") and varname() != "ARELTM" and
+    var_type("DATA") == "Num" and not empty(var_format("DATA")) and var_format("DATA") !~
+    /(?i)^(B8601LZ|B8601TM|B8601TZ|E8601LZ|E8601TM|E8601TZ|HHMM|HOUR|MMSS|TIME|TIMEAMPM|IS8601TM|IS8601TZ|TOD)\\d*\\.?\\d*$/
+Outcome:
+  Message: "A variable whose name ends in 'TM' does not have a valid ADaM SAS time\
+    \ format."
+  Output_Variables:
+  - "variable_name"
+  - "variable_format"
+Source:
+  Message: "*TM does not have the ADaM required SAS time format"
+  Description: "The SAS format listed in the dataset must be valid. Here is a list\
+    \ of SAS Time formats utilized in the rule algorithm: B8601LZ, B8601TM, B8601TZ,\
+    \ E8601LZ, E8601TM, E8601TZ, HHMM, HOUR, MMSS, TIME, TIMEAMPM, IS8601TM, IS8601TZ,\
+    \ TOD."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042"
+        Version: "1"
+      Version: "6.0"

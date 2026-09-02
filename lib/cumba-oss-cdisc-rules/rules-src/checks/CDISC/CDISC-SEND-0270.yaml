@@ -1,0 +1,97 @@
+Core:
+  Id: "CDISC-SEND-0270"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name matches nothing in the SDTM\
+  \ model - neither this domain's own general-observation-class table, nor the IG\
+  \ domain table, nor any other general-observation-class table - is present in the\
+  \ dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+Operations:
+- id: "$model_order"
+  expression: "get_model_column_order()"
+- id: "$library_order"
+  expression: "get_column_order_from_library()"
+- id: "$events_vars"
+  expression: "get_model_filtered_variables(model_class=\"EVENTS\")"
+- id: "$interventions_vars"
+  expression: "get_model_filtered_variables(model_class=\"INTERVENTIONS\")"
+- id: "$findings_vars"
+  expression: "get_model_filtered_variables(model_class=\"FINDINGS\")"
+- id: "$findings_about_vars"
+  expression: "get_model_filtered_variables(model_class=\"FINDINGS ABOUT\")"
+Check:
+  expression: >-
+    varname() not in $model_order and varname() not in $library_order and varname() not in
+    $events_vars and varname() not in $interventions_vars and varname() not in $findings_vars and
+    varname() not in $findings_about_vars
+Outcome:
+  Message: "A variable whose name is not part of the model for this domain is present."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "Naming and use of variables must be consistent with the\
+    \ definition of the variable in the SDTM."
+  Condition: "Variable is present in a domain."
+  Rule: "Variable Name matches SDTM v1.5 AND use is consistent with SDTM v1.5 definition"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND270.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0007"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when no controlled terminology codelist is declared in\
+  \ the Define-XML variable-level metadata for a variable that the SENDIG associates\
+  \ with controlled terminology."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    not empty(var_name("DEFINE")) and not empty(var_codelist("LIBRARY")) and
+    empty(var_codelist("DEFINE"))
+Outcome:
+  Message: "The Define-XML variable-level metadata does not declare the controlled\
+    \ terminology codelist that the SENDIG assigns to the variable."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_codelist"
+  - "library_variable_codelist"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Variable-level metadata in Define-XML document should include\
+    \ the set of Controlled Terminology for the value or the presentation format of\
+    \ the variable (Controlled Term, Codelist or Format)."
+  Rule: "Variable-level metadata in Define-XML document matches the \"Controlled Terms,\
+    \ Codelist, or Format\" in the SENDIG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND7"
+        Version: "1"
+      Version: "5.0"

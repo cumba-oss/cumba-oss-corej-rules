@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-SEND-0289"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when neither the Date/Time of Collection (--DTC) nor\
+  \ the Study Day (--DY) is populated in a Findings-class domain in which data are\
+  \ usually collected at multiple study days; at least one of --DTC or --DY must be\
+  \ populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "BW"
+    - "BG"
+    - "CL"
+    - "FW"
+    - "LB"
+    - "OM"
+    - "PM"
+    - "PC"
+    - "VS"
+    - "EG"
+    - "CV"
+    - "RE"
+Check:
+  expression: >-
+    empty(--DTC) and empty(--DY)
+Outcome:
+  Message: "Neither --DTC nor --DY is populated; at least one must be populated."
+  Output_Variables:
+  - "--DTC"
+  - "--DY"
+Source:
+  Class: "FND"
+  Domain: "BW, BG, CL, FW, LB, OM, PM, PC, VS, EG, CV, RE"
+  Variable: "--DTC, --DY"
+  Plain_Text_Explanation: "When a domain belongs to the Findings General Observation\
+    \ Class, and the domain is one in which data are usually collected at multiple\
+    \ study days, at least --DTC or --DY must be populated."
+  Rule: "--DTC OR --DY must be populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND289"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND289"
+        Version: "1"
+      Version: "5.0"

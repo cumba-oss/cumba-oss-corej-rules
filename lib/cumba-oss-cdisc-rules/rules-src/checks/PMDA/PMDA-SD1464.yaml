@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-SD1464"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Dose Description (--DOSTXT) holds a purely numeric\
+  \ value. --DOSTXT is the textual description of the quantity of an agent taken or\
+  \ absorbed at a single administration; a numeric representation of dose should instead\
+  \ be carried in Dose (--DOSE)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DOSTXT"
+Check:
+  expression: >-
+    is_numeric(--DOSTXT)
+Outcome:
+  Message: "--DOSTXT holds a numeric value; use Dose (--DOSE) for the numeric representation\
+    \ of dose."
+  Output_Variables:
+  - "--DOSTXT"
+Source:
+  Message: "--DOSTXT is numeric value"
+  Description: "Dose Description (--DOSTXT) is textual description of the quantity\
+    \ of an agent (e.g., drug, substance, radiation) taken or absorbed at a single\
+    \ administration. For numeric representation of dose, Dose (--DOSE) variable should\
+    \ be utilized."
+  Domains: "INTERVENTIONS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1464"
+        Version: "1"
+      Version: "6.0"

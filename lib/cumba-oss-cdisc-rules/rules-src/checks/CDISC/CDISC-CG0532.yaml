@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-CG0532"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ variable is empty and the Subject Reference Start Date/Time (RFSTDTC) is also\
+  \ empty, where the milestone associated with RFSTDTC is start of treatment."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    empty(ARMNRS) and empty(RFSTDTC)
+Outcome:
+  Message: "RFSTDTC is empty when ARMNRS is empty."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFSTDTC"
+  Condition: "Milestone associated with RFSTDTC is start of treatment and ARMNRS =null"
+  Rule: "RFSTDTC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0532"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0532"
+        Version: "1"
+      Version: "2.0"

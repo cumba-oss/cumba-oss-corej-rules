@@ -1,0 +1,86 @@
+Core:
+  Id: "CDISC-SEND-0050"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the codelist declared in the Define-XML document\
+  \ for a variable subject to CDISC controlled terminology does not reference the\
+  \ published controlled terminology codelist."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    not empty(var_name("DEFINE")) and not empty(var_codelist("LIBRARY")) and not
+    empty(var_codelist("DEFINE")) and empty(var_ccode("DEFINE"))
+Outcome:
+  Message: "The codelist in the Define-XML document does not reference the CDISC controlled\
+    \ terminology codelist that applies to the variable."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_codelist"
+  - "define_variable_ccode"
+  - "library_variable_codelist"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "For a variable identified in the SENDIG as being subject\
+    \ to CDISC published Controlled Terminology, the Codelist listed in the Define-XML\
+    \ document should properly reference the Controlled Terminology Codelist used."
+  Condition: "CDISC published Controlled Terminology Codelist applies to a variable"
+  Rule: "The Define-XML document should properly reference the Controlled Terminology\
+    \ Codelist used."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND50"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1269 expect=noViolation domain=TS
+#note "RESTRUCTURED for D-TA-7c (converged with CDISC-CG0280): the TSVAL=0 row this fixture used to pin as valid FLIPS to a violation under the (0,1] range and now lives in FDA-SD1269-invalid_zero-TS.cdt — an intended flip, not a regression. Remaining boundaries: 1 is the top of the permitted (0,1] range, 0.5 is a typical quotient, and the blank TSVAL on row 3 is exempt (null-exempt guard, also new with the convergence) -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | RANDQT  | Randomization Quotient     | 0.5
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 1
+S1 | TS | 3 | RANDQT  | Randomization Quotient     |
+S1 | TS | 4 | PLANSUB | Planned Number of Subjects | 306

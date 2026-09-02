@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0386"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Repro Path Code (RPATHCD) and\
+  \ Repro Stage Code (RSTGCD) is not unique, i.e. there is more than one record for\
+  \ a planned Repro Stage within a Repro Path."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Check:
+  expression: >-
+    not is_unique_set([RSTGCD, RPATHCD])
+Outcome:
+  Message: "There is more than one record for the same Repro Stage (RSTGCD) within\
+    \ the same Repro Path (RPATHCD)."
+  Output_Variables:
+  - "RPATHCD"
+  - "RSTGCD"
+Source:
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per planned Repro Stage per Repro Path"
+  Rule: "One record per planned Stage per Path, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND386"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND386"
+        Version: "1"
+      Version: "5.0"

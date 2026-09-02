@@ -1,0 +1,30 @@
+name: EMPTYSTR-invalid-date
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category A.4).
+  invalid_date fires on an empty cell — "" is not a valid ISO date. Aligned:
+  both engines flag the empty row. No baseline entry.
+python_source: PLAN-empty-string-membership-parity.md (A.4)
+check:
+  name: AESTDTC
+  operator: invalid_date
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AESTDTC: '2020-01-01'}    # valid → no fire
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AESTDTC: ''}              # empty → fires
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-invalid-date
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESTDTC:
+    STUDYID: S1
+    USUBJID: '002'
+expected_errors: []

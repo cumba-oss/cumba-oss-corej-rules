@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1280 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD1280/FDA-SD1280-invalid-LB.cdt. LBTOX is present while LBTOXGR is absent -> the Toxicity variable must not stand without its Toxicity Grade -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOX    type=Char label="Toxicity"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALT | Elevated ALT

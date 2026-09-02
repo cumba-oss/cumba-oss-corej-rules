@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1331 expect=noViolation domain=MH
+#note "Row 1: start before collection -> clean. Row 2: equal dates -> clean (boundary). Row 3: MHDTC empty -> clean."
+#library standard=sdtmig version=3-4
+dataset MH class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MHSEQ    type=Num
+col MHTERM   type=Char
+col MHSTDTC  type=Char
+col MHDTC    type=Char
+---
+S1 | MH | 001 | 1 | HYPERTENSION | 2020-01-10 | 2020-01-20
+S1 | MH | 001 | 2 | DIABETES     | 2020-02-01 | 2020-02-01
+S1 | MH | 001 | 3 | MIGRAINE     | 2020-03-01 |

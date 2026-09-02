@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-AD0815-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the dataset carries SUBJID but no SUBJIDN variable\
+  \ at all; the numeric companion must be present alongside SUBJID."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "POPULATION PHARMACOKINETIC ANALYSIS"
+Check:
+  expression: >-
+    var_exists("SUBJID") and not var_exists("SUBJIDN")
+Outcome:
+  Message: "SUBJIDN is not present in the dataset although SUBJID is; the numeric\
+    \ companion SUBJIDN must accompany SUBJID."
+  Output_Variables:
+  - "SUBJID"
+Source_Proposed:
+  Sheet_Issue: "#150"
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "SUBJIDN"
+  Natural_Language_Rule_Failure_Criteria: "the dataset carries SUBJID but no SUBJIDN\
+    \ variable at all; the numeric companion must be present alongside SUBJID"
+  Rule_Failure_Criteria: "SUBJIDN is not populated"
+  Condition_Failure: "SUBJID is populated"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SUBJIDN"
+  Natural_Language_Rule_Failure_Criteria: "SUBJID is populated and SUBJIDN is not\
+    \ populated"
+  Rule_Failure_Criteria: "SUBJIDN is not populated"
+  Condition_Failure: "SUBJID is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR815"
+        Version: "1"
+      Version: "5.0"

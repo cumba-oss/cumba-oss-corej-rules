@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0118 expect=noViolation domain=ADLBC
+#note "Three single-valued groups; row 4 reuses ATPT=PREDOSE under a different PARAMCD with a different ATPTN -> pins PARAMCD in the key."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+col ATPTN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1015 | GLUC | POSTDOSE | 2
+CDISCPILOT01 | 01-701-1023 | ALB | PREDOSE | 3

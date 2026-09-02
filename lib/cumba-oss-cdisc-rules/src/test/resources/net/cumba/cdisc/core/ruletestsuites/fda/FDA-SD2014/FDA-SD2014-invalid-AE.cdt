@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD2014 expect=violation domain=AE
+#note "AEBDSYCD 12345 is not a System Organ Class code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid SOC code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEBDSYCD=12345
+dataset AE
+col USUBJID  type=Char
+col AEBODSYS type=Char
+col AEBDSYCD type=Num
+---
+001 | Nervous system disorders | 10029205
+001 | Nervous system disorders | 12345

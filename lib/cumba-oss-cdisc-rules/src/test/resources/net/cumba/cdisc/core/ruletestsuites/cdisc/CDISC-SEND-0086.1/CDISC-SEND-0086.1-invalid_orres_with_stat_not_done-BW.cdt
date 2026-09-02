@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0086.1 expect=violation domain=BW
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. LITERAL-vs-REFERENCE PIN (Fix #285 / M3-D2). Row 1 has --STAT (BWSTAT) equal to the string NOT DONE and a populated --ORRES (BWORRES), which is the sheet's Condition '--STAT = \"NOT DONE\"' with Rule '--ORRES = null' -> FIRES. Row 2's --STAT is empty and row 3's --ORRES is empty, so both are silent. Until M3-D2 landed the Check wrote the value in BACKTICKS: ExpressionLexer.scanQuotedRef reads a backtick-quoted token as a REFERENCE, so `NOT DONE` was a COLUMN NAME and NonEmptyGuardInliner emitted var_exists(`NOT DONE`) as a TOP-LEVEL conjunct -- false on every row of every dataset, so the rule could NEVER fire in any of the six packages. DO NOT make this pass by declaring a column literally named NOT DONE; that would encode the defect as the contract."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 BWSEQ=1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWSTAT   type=Char label="Completion Status"
+---
+S1 | BW | 001 | 1 | BW | 182.4 | NOT DONE
+S1 | BW | 001 | 2 | BW | 185.1 |
+S1 | BW | 002 | 1 | BW |       | NOT DONE
+---

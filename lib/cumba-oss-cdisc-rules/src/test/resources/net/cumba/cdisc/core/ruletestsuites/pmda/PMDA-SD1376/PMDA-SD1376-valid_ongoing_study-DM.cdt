@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD1376 expect=noViolation domain=DM
+#note "Same DM rows 1-2 (ARM1/(empty), NOTTRT/(empty)); TS carries TITLE + ONGOSIND/Y rows -> count=1 -> exception silences row 1."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col ACTARMCD  type=Char
+col RFENDTC   type=Char
+---
+S1 | DM | 001 | ARM1   |
+S1 | DM | 002 | NOTTRT  |
+---
+
+dataset TS class="TRIAL DESIGN"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | TITLE    | Example Study
+S1 | TS | 2 | ONGOSIND | Y

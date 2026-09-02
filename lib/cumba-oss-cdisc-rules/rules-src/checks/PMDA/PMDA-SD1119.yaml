@@ -1,0 +1,134 @@
+Core:
+  Id: "PMDA-SD1119"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a CO record is related to another domain record\
+  \ (RDOMAIN or IDVAR is populated) but a permissible Identifier or Timing variable\
+  \ (COGRPID, COREFID, COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM,\
+  \ COELTM, COTPTREF, or CORFTDTC) is also populated; these variables may be populated\
+  \ only when the comment is not related to another domain record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Check:
+  expression: >-
+    (not empty(COGRPID) or not empty(COREFID) or not empty(COSPID) or not empty(VISIT) or not
+    empty(VISITNUM) or not empty(VISITDY) or not empty(TAETORD) or not empty(CODY) or not
+    empty(COTPT) or not empty(COTPTNUM) or not empty(COELTM) or not empty(COTPTREF) or not
+    empty(CORFTDTC)) and (not empty(RDOMAIN) or not empty(IDVAR))
+Outcome:
+  Message: "An Identifier or Timing variable is populated when the comment is related\
+    \ to another domain record (RDOMAIN or IDVAR is populated)."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "COGRPID"
+  - "COREFID"
+  - "COSPID"
+  - "VISIT"
+  - "VISITNUM"
+  - "VISITDY"
+  - "TAETORD"
+  - "CODY"
+  - "COTPT"
+  - "COTPTNUM"
+  - "COELTM"
+  - "COTPTREF"
+  - "CORFTDTC"
+Source:
+  Message: "Inappropriate usage of variables in CO domain when comment is a child\
+    \ record of another domain"
+  Description: "In the Comments (CO) domain, the following Identifier and Timing variables\
+    \ are Permissible and may be populated as appropriate when comments are not related\
+    \ to other domain records (i.e., RDOMAIN and IDVAR variable values are not populated):\
+    \ COGRPID, COREFID, COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM,\
+    \ COELTM, COTPTREF, CORFTDTC."
+  Domains: "CO"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1119"
+        Version: "1"
+      Version: "1.6"

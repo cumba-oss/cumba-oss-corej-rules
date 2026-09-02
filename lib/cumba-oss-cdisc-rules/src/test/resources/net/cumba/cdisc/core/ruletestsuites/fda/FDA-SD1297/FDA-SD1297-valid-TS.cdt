@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1297 expect=noViolation domain=TS
+#note "Real TSVAL values; the one null-flavor case is carried in TSVALNF (TSVAL empty) — exactly the shape the rule asks for."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Null Flavor"
+---
+CDISCPILOT01 | TS | 1 | TITLE   | Trial Title                | A Study of Drug X |
+CDISCPILOT01 | TS | 2 | AGEMAX  | Planned Maximum Age of Subjects | P65Y         |
+CDISCPILOT01 | TS | 3 | PCLAS   | Pharmacologic Class        |                   | NI
+CDISCPILOT01 | TS | 4 | TDIGRP  | Diagnosis Group            | Unknown origin    |

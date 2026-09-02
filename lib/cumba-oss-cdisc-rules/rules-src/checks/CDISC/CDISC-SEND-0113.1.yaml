@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0113.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Set Code (SETCD) in DM does not exist\
+  \ among the Set Code (SETCD) values defined in the Trial Sets (TX) dataset."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$tx_setcd"
+  expression: "distinct(SETCD, domain=\"TX\")"
+Check:
+  expression: >-
+    not empty(SETCD) and SETCD not in $tx_setcd
+Outcome:
+  Message: "DM SETCD does not exist among the SETCD values in the TX dataset."
+  Output_Variables:
+  - "SETCD"
+  - "$tx_setcd"
+Source:
+  Class: "SPC"
+  Domain: "DM, TX"
+  Variable: "SETCD"
+  Plain_Text_Explanation: "The value of SETCD in DM must be one of the SETCD values\
+    \ in TX."
+  Condition: "SETCD ^= null"
+  Rule: "DM.SETCD = TX.SETCD for a given TX record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND113.1"
+        Version: "1"
+      Version: "5.0"

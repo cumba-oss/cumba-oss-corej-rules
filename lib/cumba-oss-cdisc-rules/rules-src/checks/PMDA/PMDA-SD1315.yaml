@@ -1,0 +1,89 @@
+Core:
+  Id: "PMDA-SD1315"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, for a record in the Disposition (DS) dataset whose\
+  \ Category for Disposition Event (DSCAT) equals 'PROTOCOL MILESTONE', the Standardized\
+  \ Disposition Term (DSDECOD) does not contain the same value as the Reported Term\
+  \ for the Disposition Event (DSTERM)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+    - "DSDECOD"
+    - "DSTERM"
+Check:
+  expression: >-
+    DSCAT == "PROTOCOL MILESTONE" and DSDECOD != DSTERM
+Outcome:
+  Message: "DSDECOD does not equal DSTERM when DSCAT equals 'PROTOCOL MILESTONE'."
+  Output_Variables:
+  - "DSTERM"
+  - "DSDECOD"
+  - "DSCAT"
+Source:
+  Message: "DSDECOD is not the same as DSTERM when DSCAT='PROTOCOL MILESTONE'"
+  Description: "Reported Term for the Disposition Event (DSTERM) and Standardized\
+    \ Disposition Term (DSDECOD) should contain the same value when Category for Disposition\
+    \ Event (DSCAT) is 'PROTOCOL MILESTONE'."
+  Domains: "DS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1315"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1202 expect=skipped domain=AE
+#note "dataset AE without the AESTDTC column (plus the DM block). Requirements.Variables.All [--STDTC] gates -> auditable skip naming the absent variable. This is the family-consistency anchor SD1319-F1 cites (SD1202 declares the gate; SD1319 does not)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30

@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1032 expect=violation domain=DM
+#note "ADAPTED-FROM fda/FDA-SD1032/FDA-SD1032-invalid-DM.cdt (verbatim). Subject 001 has ARMCD SCRNFAIL but no IE record ($ie_record_count = 0) -> one group-level violation. 002 is a screen failure with an IE record; 003 is a normal subject without any IE record and must stay silent (the rule is confined to SCRNFAIL)."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | SCRNFAIL | Screen Failure
+S1 | DM | 002 | SCRNFAIL | Screen Failure
+S1 | DM | 003 | A        | Drug A
+---
+
+dataset IE label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IEORRES  type=Char label="I/E Criterion Original Result"
+---
+S1 | IE | 002 | 1 | INCL01 | Y
+---

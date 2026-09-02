@@ -1,0 +1,48 @@
+Core:
+  Id: "FDA-SE2251-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when at least one record has Repro Stage Code (RSTGCD)\
+  \ equal to 'UNPLAN' but the Unplanned Stage Description (SJUPDES) variable is not\
+  \ present in the dataset; the published row requires SJUPDES to be non-null under\
+  \ that condition, and an absent variable is null on every record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Operations:
+- id: "$unplanned_records"
+  expression: "record_count(filter=filter(RSTGCD=\"UNPLAN\"))"
+Check:
+  expression: >-
+    $unplanned_records >= 1 and not var_exists("SJUPDES")
+Outcome:
+  Message: "SJUPDES is not present although at least one record has RSTGCD equal to\
+    \ 'UNPLAN'."
+  Output_Variables:
+  - "$unplanned_records"
+Source_Proposed:
+  FDA_Validator_Rule_Message: "SJUPDES variable is not present, when at least one\
+    \ record has RSTGCD='UNPLAN'"
+  FDA_Validator_Rule_Description: "The Description of Repro Stage (SJUPDES) variable\
+    \ must be present in the dataset when at least one record represents an unplanned\
+    \ Repro Stage, where Repro Stage Code (RSTGCD) is equal to 'UNPLAN'."
+  Domains: "SJ"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for SJUPDES, when RSTGCD='UNPLAN'"
+  FDA_Validator_Rule_Description: "Description of Repro Stage (SJUPDES) should be\
+    \ populated, when a subject's experience for a particular period of time is represented\
+    \ as an unplanned Repro Stage, where Repro Stage Code (RSTGCD) is equal to 'UNPLAN'."
+  Domains: "SJ"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2251"
+        Version: "1"
+      Version: "1.6"

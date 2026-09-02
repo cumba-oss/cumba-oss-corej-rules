@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0133B expect=noViolation domain=ADLBC
+#note "AVAL not declared, so the bare empty(AVAL) leaf is TRUE on both rows (absent = all-missing, EC-43) -- the right-hand disjunction is true, but the rule is silent only because the leading not empty(R2A1LO) is false. Pin of the lead conjunct. Contrast PMDA-AD0133B-invalid_aval_absent, the same file with row 1's R2A1LO populated."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col A1LO     type=Num
+col R2A1LO   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 0.5 |
+CDISCPILOT01 | 01-701-1023 | ALT | 0.5 |

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1221 expect=noViolation domain=TS
+#note "The PLANSUB record carries an integer TSVAL; the TITLE record's non-numeric TSVAL is outside the TSPARMCD guard."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects | 306
+CDISCPILOT01 | TS | 1 | TITLE   | Trial Title                | A Phase 3 Study

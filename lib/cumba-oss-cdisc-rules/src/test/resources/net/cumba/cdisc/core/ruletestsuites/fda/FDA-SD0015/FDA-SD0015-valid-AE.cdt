@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0015 expect=noViolation domain=AE
+#note "Every populated AEDUR is a non-negative ISO 8601 duration; the empty one is not checked -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDUR   type=Char label="Duration of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | P3D
+S1 | AE | 001 | 2 | NAUSEA   | PT12H
+S1 | AE | 001 | 3 | RASH     | P0D
+S1 | AE | 001 | 4 | FEVER    |

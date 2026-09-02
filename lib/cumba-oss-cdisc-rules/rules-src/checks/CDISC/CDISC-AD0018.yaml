@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0018"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the label of a standard ADaM variable does not match\
+  \ the standard label defined in the ADaMIG (labels containing sponsor-replaceable\
+  \ text are excluded)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() !~ /[a-z]/ and not empty(var_label("LIBRARY")) and not contains(var_label("LIBRARY"),
+    "*") and not contains(var_label("LIBRARY"), "...") and not contains(var_label("LIBRARY"), "{")
+    and var_label("DATA") != var_label("LIBRARY")
+Outcome:
+  Message: "Labels for ADaM variables do not match the standard labels for ADaM variables\
+    \ listed in the implementation guide that cannot be modified (with the exception\
+    \ of 1) variables whose names contain indexes “y”, \"xx\", or “zz”; and (2) variable\
+    \ labels with asterisks (*) and ellipses (...) indicated for sponsor appropriate\
+    \ text)"
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+  - "library_variable_label"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "Labels for ADaM variables do not match\
+    \ the standard labels for ADaM variables listed in the implementation guide that\
+    \ cannot be modified (with the exception of 1) variables whose names contain indexes\
+    \ “y”, \"xx\", or “zz”; and (2) variable labels with asterisks (*) and ellipses\
+    \ (...) indicated for sponsor appropriate text)"
+  Rule_Failure_Criteria: "Variable label does not match the standard label"
+  Condition_Failure: "Variable name matches a standard variable defined in the ADaM-IG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR18"
+        Version: "1"
+      Version: "5.0"

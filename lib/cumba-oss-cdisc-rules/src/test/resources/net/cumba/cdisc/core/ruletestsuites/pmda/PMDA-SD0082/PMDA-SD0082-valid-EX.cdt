@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD0082 expect=noViolation domain=EX
+#note "ADAPTED-FROM fda/FDA-SD0082/FDA-SD0082-valid-EX.cdt. S1: EXENDTC before / equal to the subject's latest DSSTDTC (2023-06-01); S2: empty EXENDTC guarded; S3: no DS record -> no per-subject maximum -> no fire"
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 2023-05-20
+S1 | EX | 001 | 2 | DRUG A | 2023-06-01
+S1 | EX | 002 | 1 | DRUG A |
+S1 | EX | 003 | 1 | DRUG A | 2023-07-15
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | 2023-05-01
+S1 | DS | 001 | 2 | COMPLETED  | 2023-06-01
+S1 | DS | 002 | 1 | COMPLETED  | 2023-06-30

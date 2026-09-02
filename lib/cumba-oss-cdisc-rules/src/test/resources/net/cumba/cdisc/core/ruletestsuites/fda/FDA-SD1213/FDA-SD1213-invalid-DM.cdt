@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1213 expect=violation domain=DM
+#note "Row 1 is a treated subject (ACTARMCD populated, not SCRNFAIL/NOTTRT/NOTASSGN) whose RFSTDTC is empty -> fires. Rows 2-4 carry the three excluded actual-arm codes, row 5 has an empty ACTARMCD, row 6 is treated and populated."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ACTARMCD=A RFSTDTC=
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 |            | A
+S1 | DM | 002 |            | SCRNFAIL
+S1 | DM | 003 |            | NOTTRT
+S1 | DM | 004 |            | NOTASSGN
+S1 | DM | 005 |            |
+S1 | DM | 006 | 2020-01-15 | B

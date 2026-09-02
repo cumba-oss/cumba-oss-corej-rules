@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD0069 expect=violation domain=DM
+#note "FRESH - DISCRIMINATING distinct-on-empty pin: DS is PRESENT with ZERO rows (entirely-absent is the Fix #222 carve-out, not authored here). distinct's EmptyResult is the empty set, so row 1 (ARMCD=A, non-exempt) has USUBJID not in the empty $ds_usubjid set -> FIRES; row 2 (SCRNFAIL) is an exception -> silent. If this reports 0 violations, escalate."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 ARMCD=A
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | A        | Arm A
+S1 | DM | 002 | SCRNFAIL | Screen Failure
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+---

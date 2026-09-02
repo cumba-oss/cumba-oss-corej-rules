@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1276 expect=noViolation domain=CM
+#note "FRESH, DISCRIMINATING (finding SD1276-F2, deliberate operator choice) - bare == is case-sensitive (equalsIgnoreCase is not authored), so 'Multiple' and 'multiple' do not equal the literal 'MULTIPLE' -> no violation."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | Multiple
+CDISCPILOT01 | CM | 01-701-1015 | 2 | multiple

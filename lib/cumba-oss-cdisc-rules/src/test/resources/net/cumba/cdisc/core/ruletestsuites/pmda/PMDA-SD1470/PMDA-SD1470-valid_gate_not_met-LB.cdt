@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1470 expect=noViolation domain=LB
+#note "Row 1 has a non-numeric result but no reference-range lower limit; row 2 has the limit but no result. Pins both not empty(...) conjuncts - the rule is about limits declared for a non-continuous result, not about either variable alone."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBORNRLO type=Char
+---
+S1 | LB | 001 | 1 | GLUC | POSITIVE |
+S1 | LB | 002 | 2 | GLUC |          | 3.9
+---

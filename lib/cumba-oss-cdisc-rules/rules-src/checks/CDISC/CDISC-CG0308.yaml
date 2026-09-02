@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0308"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the DOMAIN value length is not equal to 2 characters."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Exclude:
+    - "RELATIONSHIP"
+  Domains:
+    Exclude:
+    - "AP--"
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    len(dataset_domain) > 2 or len(dataset_domain) < 2
+Outcome:
+  Message: "DOMAIN value length is not equal to 2."
+  Output_Variables:
+  - "dataset_domain"
+Source:
+  Class: "ALL"
+  Domain: "NOT(AP--, RELREC)"
+  Variable: "DOMAIN"
+  Rule: "DOMAIN value length = 2"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0308"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0308"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0308"
+        Version: "1"
+      Version: "2.0"

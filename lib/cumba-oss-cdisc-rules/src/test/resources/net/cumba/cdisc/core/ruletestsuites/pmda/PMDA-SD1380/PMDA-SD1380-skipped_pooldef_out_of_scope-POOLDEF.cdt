@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD1380 expect=skipped domain=POOLDEF
+#note "POOLID is populated on both rows deliberately, so the ONLY thing this scenario can fail on is execute-vs-skip. class=RELATIONSHIP is load-bearing: describeScopeMismatch reads dataset_class from the header, and without it the Classes.Include gate would reject the dataset for the wrong reason. The shipped Scope.Domains.Exclude is [RELREC, DR, POOLDEF, DM, SE, SM] (Fix #280, ruling M2-D13), the five domains PMDA sheet row 390 excludes ('SPECIAL PURPOSE (-DM, -SE, -SM) ... RELATIONSHIP (-DR, -POOLDEF, -RELREC)'), so POOLDEF is out of scope. With only [RELREC, DM, SE, SM] the rule ran wider than PMDA says and executed here. FDA-SD1380's byte-identical Scope is deliberately untouched - its own sheet cell is a different list and must be re-derived, not copied."
+#library standard=sdtmig version=3-4
+dataset POOLDEF class=RELATIONSHIP label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | 001
+S1 | POOL1 | 002

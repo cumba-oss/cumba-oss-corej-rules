@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1085 expect=noViolation domain=LB
+#note "Row 1: complete LBDTC and RFSTDTC with LBDY populated -> ok. Row 2: partial LBDTC but LBDY empty -> ok."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-15 | 15
+S1 | LB | 001 | 2 | ALB | 2020-06    |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

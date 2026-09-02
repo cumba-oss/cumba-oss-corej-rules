@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0056"
+Sheet_Rule_Identifier: "DD0056"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "ArchiveLocationID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, def:ArchiveLocationID attribute is required and must be included in Define.xml and cannot be empty."
+Message: "Missing def:ArchiveLocationID value"
+# Deviation (documented): a def:HasNoData='Yes' dataset (2.1) has no data file
+# to point at, and PMDA's own DD0133 explicitly contemplates such datasets in
+# submissions - requiring an ArchiveLocationID there would contradict it, so
+# the guard adopts CDISC twin 0119's HasNoData carve-out. In 2.0 documents
+# def:HasNoData does not exist and the guard is vacuous (rule unconditional).
+Check:
+  kind: "exists"
+  target: "@ArchiveLocationID"
+  when:
+    not:
+      path: "@HasNoData"
+      equals: "Yes"

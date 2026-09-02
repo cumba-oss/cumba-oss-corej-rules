@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0515 expect=noViolation domain=ADLBC
+# Rule:Description: A variable ending in EDT must contain "End Date" in the label
+#note "AEDT label contains "End Date" -> noViolation"
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AEDT type=Char label="Analysis End Date"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

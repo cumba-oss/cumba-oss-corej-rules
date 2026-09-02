@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0105.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Species (SPECIES) is not present or is empty in\
+  \ the Demographics (DM) domain and no Species trial-level parameter value is present\
+  \ in Trial Summary (TSPARMCD is SPECIES) or Trial Sets (TXPARMCD is SPECIES)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Grouping:
+  Variables:
+  - "STUDYID"
+Operations:
+- id: "$ts_species"
+  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
+    SPECIES\")"
+- id: "$tx_species"
+  expression: "ts_parameter_value(TXVAL, domain=\"TX\", key_name=\"TXPARMCD\", key_value=\"\
+    SPECIES\")"
+Check:
+  expression: >-
+    empty(SPECIES) and empty($ts_species) and empty($tx_species)
+Outcome:
+  Message: "SPECIES is not present or is empty in DM and no SPECIES parameter value\
+    \ is present in TS (TSPARMCD='SPECIES') or TX (TXPARMCD='SPECIES')."
+  Output_Variables:
+  - "SPECIES"
+  - "!$ts_species"
+  - "!$tx_species"
+Source:
+  Class: "SPC, TDM"
+  Domain: "DM,TS, TX"
+  Variable: "SPECIES"
+  Plain_Text_Explanation: "If species is not included in DM it must be included in\
+    \ TS or TX."
+  Condition: "DM.SPECIES = null"
+  Rule: "Record with TSPARMCD = \"SPECIES\" is present in TS and TSVAL ^= null for\
+    \ that record OR TXPARMCD = \"SPECIES\" is present in TX and TXVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0712 expect=violation domain=ADLBC
+# Rule:Description: A variable with a suffix of RFN has a value that is not 1, 0 or null
+#note "MYRFN=2 is non-empty and not in the allowed numeric set -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col MYRFN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 2
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SE2282 expect=noViolation domain=POOLDEF
+#note "POOL1 holds two different subjects (rows 1/2) and ANIMAL1 also appears in POOL2 (row 3) -> a subject may belong to several pools and a pool may hold several subjects; only a duplicate (USUBJID, POOLID) pair would fire."
+#library standard=sendig version=3-1-1
+dataset POOLDEF
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | ANIMAL1
+S1 | POOL1 | ANIMAL2
+S1 | POOL2 | ANIMAL1

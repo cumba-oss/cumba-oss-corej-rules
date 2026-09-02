@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0406"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of Name of Measurement, Test or Examination\
+  \ (--TEST) is more than 40 characters in length."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+  Domains:
+    Exclude:
+    - "IE"
+Check:
+  expression: >-
+    len(--TEST) > 40
+Outcome:
+  Message: "--TEST value length is greater than 40 characters."
+  Output_Variables:
+  - "--TESTCD"
+  - "--TEST"
+Source:
+  Class: "FND"
+  Domain: "NOT(IE)"
+  Variable: "--TEST"
+  Rule: "--TEST length <= 40"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0406"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0406"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0406"
+        Version: "1"
+      Version: "2.0"

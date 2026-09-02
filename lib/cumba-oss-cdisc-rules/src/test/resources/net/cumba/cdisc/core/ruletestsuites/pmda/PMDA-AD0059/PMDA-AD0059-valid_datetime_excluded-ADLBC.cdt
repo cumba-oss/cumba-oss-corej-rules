@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0059 expect=noViolation domain=ADLBC
+#note "ASTDTM ends with TM AND is Char, so it would fire without the `not ends_with(varname(), \"DTM\")` conjunct; that conjunct is what partitions the *TM population (this rule and PMDA-AD0042) from the *DTM population (PMDA-AD0043 / PMDA-AD0043A). Pins the carve-out."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTDTM  type=Char
+---
+S1 | 001 | ALB | 2020-01-15T13:30:00
+---

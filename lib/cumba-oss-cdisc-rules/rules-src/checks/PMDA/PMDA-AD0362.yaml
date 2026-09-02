@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0362"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the populated Analysis Start Datetime (ASTDTM) is\
+  \ greater than the populated Analysis End Datetime (AENDTM) on the same record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "ASTDTM"
+    - "AENDTM"
+Check:
+  expression: >-
+    not empty(ASTDTM) and not empty(AENDTM) and ASTDTM > AENDTM
+Outcome:
+  Message: "Value of ASTDTM is greater than value of AENDTM"
+  Output_Variables:
+  - "ASTDTM"
+  - "AENDTM"
+Source:
+  Message: "Value of ASTDTM is greater than value of AENDTM"
+  Description: "The value of Analysis Start Datetime (ASTDTM) variable must be less\
+    \ or equal to Analysis End Datetime (AENDTM) variable value."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0362"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0362"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0362"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0362"
+        Version: "1"
+      Version: "6.0"

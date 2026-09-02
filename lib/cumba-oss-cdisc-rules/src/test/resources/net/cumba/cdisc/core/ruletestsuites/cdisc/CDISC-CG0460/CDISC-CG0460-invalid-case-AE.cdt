@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0460 expect=violation domain=AE
+#note "Case-mismatch pin for the D-TA-3 sensitive default (Fix #266): the hierarchy operation reads the flag, and child/parent compare verbatim against the as-authored hierarchy. Since the C1 data repair that hierarchy carries the levels' preferred form ('Headaches NEC' under 'Nervous system disorders'), so row 1's upper-case AEHLT 'HEADACHES NEC' now misses the stored key -> off-path, fires; row 2 matches the as-authored entries exactly. The rule authors no case_sensitive flag, so only the preferred case satisfies it - which is also the form CDISC-CG0460's own valid twin uses."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLT type=Char label="High Level Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHES NEC | Nervous system disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Headaches NEC | Nervous system disorders
+---

@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-SEND-0131"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Exposure (EX) record exists for the\
+  \ same combination of subject or pool (USUBJID, POOLID), treatment (EXTRT), and\
+  \ dosing interval (EXSTDTC, EXENDTC); the EX domain expects one record per constant\
+  \ dosing interval per treatment per subject or pool."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, POOLID, EXTRT, EXSTDTC, EXENDTC])
+Outcome:
+  Message: "More than one EX record exists for the same treatment and dosing interval\
+    \ within a subject or pool."
+  Output_Variables:
+  - "POOLID"
+  - "EXTRT"
+  - "EXSTDTC"
+  - "EXENDTC"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per constant dosing interval per treatment per\
+    \ subject or pool"
+  Rule: "One record per constant dosing interval per treatment per subject or pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND131"
+        Version: "1"
+      Version: "5.0"

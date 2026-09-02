@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0005 expect=violation domain=ADSL
+#note "Only SAFFL ends in FL -> one candidate melted cell. SAFFL does not match ^(RFL|PFL|ABLFL|ANL\\d\\dFL)$, value X is non-empty and not in [Y,N] -> 1 violation. Add NO further *FL column."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=SAFFL variable_value=X
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

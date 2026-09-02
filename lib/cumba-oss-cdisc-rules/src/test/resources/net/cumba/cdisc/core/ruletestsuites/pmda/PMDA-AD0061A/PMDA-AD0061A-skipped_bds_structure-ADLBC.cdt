@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0061A expect=skipped domain=ADLBC
+#note "dataset ADLBC structure=BDS with PARAMCD/AVAL columns (declaration and detection agree), plus the EX block so only the structure gate can reject. Scope.Data_Structures [SUBJECT LEVEL ANALYSIS DATASET] -> skip."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+S1 | 01-001 | HEIGHT | 170
+---
+
+dataset EX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+col EXSTDTC type=Char
+---
+S1 | EX | 01-001 | DRUGA | 2020-01-05

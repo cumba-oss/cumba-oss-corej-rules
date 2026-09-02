@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0149B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, for a given Parameter Code (PARAMCD), the Analysis\
+  \ Value (C) (AVALC) takes more than one value for the same Analysis Value (AVAL),\
+  \ considering only those records on which both AVAL and AVALC are populated; AVAL\
+  \ and AVALC must hold a one-to-one mapping within a PARAMCD."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "AVAL"
+    - "AVALC"
+    - "PARAMCD"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(AVAL) and not empty(AVALC) and
+    is_inconsistent_across_dataset(AVALC, keys=[PARAMCD, AVAL])
+Outcome:
+  Message: "Inconsistent value for AVALC"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "AVALC"
+Source:
+  Message: "Inconsistent value for AVALC"
+  Description: "Within a study and a given value of PARAMCD when both AVAL and AVALC\
+    \ are populated, then all AVALC values must be the same for each unique value\
+    \ of AVAL creating a one-to-one mapping. Considering only those rows on which\
+    \ both variables are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0149B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0149B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0149B"
+        Version: "1"
+      Version: "6.0"

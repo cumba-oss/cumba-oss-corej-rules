@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1286 expect=skipped domain=TI
+#note "TIVERS (Perm) is absent. The sheet conditions this rule on TIVERS being present, so it is an applicability discriminator: since PLAN-absent-column-guard-backlog P3b the condition is ALSO declared as Requirements.Variables.All, and Java now reports an auditable SKIPPED instead of a silent zero. IETESTCD INCL01 is duplicated here precisely to prove the gate — not the data — is what stops the finding. The Check `TIVERS exists` leaf is kept because Python reads no part of Requirements.Variables."
+#library standard=sdtmig version=3-4
+dataset TI class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Incl/Excl Criterion"
+---
+S1 | TI | INCL01 | Age >= 18
+S1 | TI | INCL01 | Age >= 21

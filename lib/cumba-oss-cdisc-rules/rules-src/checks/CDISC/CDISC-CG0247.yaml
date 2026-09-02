@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0247"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TAETORD does not have a unique value for a given\
+  \ value of ARMCD within the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Check:
+  expression: >-
+    var_exists("ARMCD") and not is_unique_set([TAETORD, ARMCD])
+Outcome:
+  Message: "Non-unique value for TAETORD within ARMCD"
+  Output_Variables:
+  - "ARMCD"
+  - "TAETORD"
+Source:
+  Class: "TDM"
+  Domain: "TA"
+  Variable: "TAETORD"
+  Rule: "TAETORD is unique within an ARM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0247"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0247"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0247"
+        Version: "1"
+      Version: "2.0"

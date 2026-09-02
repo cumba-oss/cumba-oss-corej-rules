@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0110"
+Sheet_Rule_Identifier: "110"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Value of the SAS dataset name must match the ItemGroupDef name"
+Message: "The value of SASDatasetName is different from the value of Name [${value}]."
+# Case-sensitive on purpose: §5.3.11 requires the SASDatasetName to be the upper-case
+# transport file root name and the Name attribute to be the same value, so a
+# case-only difference is a genuine inconsistency (contrast rule 112, where the
+# compared file name on disk is conventionally lower case).
+Check:
+  kind: "compare"
+  left: "@SASDatasetName"
+  right: "@Name"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1029 expect=violation domain=TI
+#note "Row 2 IETEST carries U+2265, and IETEST is a ..TEST match (6 characters), so that row fires. The shipped Scope no longer carries Domains.Exclude: [TI] (Fix #283, ruling M2-D16 = SHEET-ISSUES-PMDA #48 half (a)): the PMDA sheet's own DOMAINS cell lists TI, and TI's IETESTCD/IETEST are exactly the shapes the Check's varname() regex admits, so the exclusion suppressed precisely the violations the sheet asks for. It was FDA twin-inheritance drift - while it stood, the factory reported the engine's own skip reason 'domain TI matches Scope.Domains.Exclude entry TI'. FDA-SD1029 keeps the exclusion: its own sheet cell does not name TI, so the twins are deliberately no longer byte-identical."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=IETEST
+dataset TI class="TRIAL DESIGN" label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IETEST   type=Char label="Inclusion/Exclusion Criterion"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+---
+S1 | TI | INCL01 | Age >= 18 years   | INCLUSION
+S1 | TI | INCL02 | Weight ≥ 50 kg    | INCLUSION

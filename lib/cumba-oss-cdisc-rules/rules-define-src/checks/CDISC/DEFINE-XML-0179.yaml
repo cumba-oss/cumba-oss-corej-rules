@@ -1,0 +1,22 @@
+Rule_Id: "DEFINE-XML-0179"
+Sheet_Rule_Identifier: "179"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "ct"
+Plain_Text_Rule: "For NCI/CDISC Controlled Terminology, the value of CodedValue must exactly match the CDISC Submission Value from the published Controlled Terminology."
+# CT-gated (P5): membership of the CodedValue in the CT codelist resolved via
+# the parent CodeList's nci:ExtCodeID alias. Guarded on @def:StandardOID per
+# the Rule column ("... referenced in the CodeList/@def:StandardOID").
+# Declared extensions (def:ExtendedValue="Yes") are exempt - their legality is
+# governed by sheet ids 186/187, not by submission-value matching. Twin:
+# PMDA-DD0024 (non-extensible-only variant).
+Message: "CodeList[@Name]/EnumeratedItem[@CodedValue]/@CodedValue [${value}] does not match CDISC Submission Value for CDISC Controlled Terminology with C-Code CodeList[@Name]/Alias[@Name]."
+Check:
+  kind: "term_in_ct_codelist"
+  exemptExtendedValues: true
+  when:
+    path: "../@def:StandardOID"
+    exists: true

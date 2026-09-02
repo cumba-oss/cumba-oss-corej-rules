@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0438 expect=violation domain=TS
+#note "Row 2 carries '18YEARS' spelled out for AGEMIN instead of the ISO 8601 period P18Y. No class= (the twins declare none and Scope carries no Classes axis). SIDECAR: version=3-3, NOT 3-4 -- CG0438 is retired for IG v3.4 and does not ship in rules-cdisc-sdtmig-3-4.json. ADAPTED-FROM fda/FDA-SD1217/FDA-SD1217-invalid-TS.cdt via the PMDA sibling."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=AGEMIN TSVAL=18YEARS
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | P80Y
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | 18YEARS

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0745 expect=violation domain=ADLBC
+# Rule:Description: BASETYPE is populated, BNRIND is populated, and BNRIND is not equal to ANRIND where ABLFL is equal to Y for a given value of PARAMCD and BASETYPE for a subject
+#note "BNRIND=HIGH vs max(ANRIND where ABLFL=Y)=NORMAL -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+col ANRIND type=Char
+col BNRIND type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | NORMAL | HIGH
+---

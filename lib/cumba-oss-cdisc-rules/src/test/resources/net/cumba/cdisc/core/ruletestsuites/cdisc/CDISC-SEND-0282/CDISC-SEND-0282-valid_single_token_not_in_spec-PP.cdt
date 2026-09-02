@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0282 expect=noViolation domain=PP
+#note "THE MULTIPLICITY PIN (Fix #290 / M3-D7). ONE row carrying a SINGLE token with no semicolon that is NOT a declared (SPEC) term. The sheet's Condition for SEND282 is 'Multiple specimens are used', so a single token is outside this rule and belongs to CDISC-SEND-0049, the family's general CT rule, which is Domains [ALL] and reports it. Before M3-D7 the Check had no multiplicity guard and claimed both halves, so one defect produced TWO findings from two rules whose sheet Conditions deliberately partition the space. The added `contains(PPSPEC, \";\")` conjunct is CDISC-SEND-0056's shape verbatim with ';' for '/', and CDISC-SEND-0057 carries the same guard on all three of its disjuncts."
+#library standard=sendig version=3-1-1
+#library codelist-terms SPEC SERUM URINE PLASMA "WHOLE BLOOD"
+#expectViolationCount 0
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPSPEC   type=Char label="Specimen Material Type"
+---
+S1 | PP | 001 | 1 | CLR | SPUTUM
+---

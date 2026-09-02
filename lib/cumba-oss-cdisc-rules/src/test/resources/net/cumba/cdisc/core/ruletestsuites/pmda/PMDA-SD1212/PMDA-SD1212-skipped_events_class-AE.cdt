@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1212 expect=skipped domain=AE
+#note "FRESH - the batch's Classes.Include reject pin. VIOLATING-SHAPED row: AESTRESC=5, AESTRESN=7 (synthetic columns -- the Check never runs). EVENTS is not in Scope.Classes [FINDINGS, FINDINGS ABOUT] -> the rule must not execute."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AESTRESC type=Char label="Character Result/Finding in Std Format"
+col AESTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | AE | 001 | 1 | 5 | 7

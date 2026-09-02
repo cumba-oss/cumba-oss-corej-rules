@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1068 expect=skipped domain=TE
+#note "LOAD-BEARING skip. ELEMENT is absent from TE, so Requirements.Variables.All [ELEMENT] gates the rule to SKIPPED. Same section 6.4 rationale as PMDA-SD1064-skipped_no_etcd-TE: not is_unique_set(ELEMENT) carries no keys=, so without the gate the target-drop would leave an empty key tuple and every row would fire. Cross-reference the SD1064 fixture so the pair reads as one contract."
+#library standard=sdtmig version=3-4
+dataset TE class="TRIAL DESIGN"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TE | SCRN
+S1 | TE | TRT
+S1 | TE | FUP

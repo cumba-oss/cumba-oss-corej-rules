@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-AD0397"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ATOXGRH is populated and ATOXGRHN is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATOXGRH"
+    - "ATOXGRHN"
+Check:
+  expression: >-
+    not empty(ATOXGRH) and empty(ATOXGRHN)
+Outcome:
+  Message: "ATOXGRH is populated but ATOXGRHN is not populated."
+  Output_Variables:
+  - "ATOXGRH"
+  - "ATOXGRHN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ATOXGRHN"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, ATOXGRH is populated\
+    \ and ATOXGRHN is not populated"
+  Rule_Failure_Criteria: "ATOXGRHN is not populated"
+  Condition_Failure: "ATOXGRH is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR397"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR397"
+        Version: "2"
+      Version: "5.0"

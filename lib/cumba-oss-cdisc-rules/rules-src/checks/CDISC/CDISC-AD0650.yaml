@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-AD0650"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ONTRTwFL equals 'Y' but ONTRTFL does not equal 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ONTRTFL"
+Check:
+  expression: >-
+    varname() =~ /^ONTRT[1-9]FL$/ and value() == "Y" and ONTRTFL != "Y"
+Outcome:
+  Message: "ONTRTwFL is 'Y' although ONTRTFL is not 'Y'."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+  - "ONTRTFL"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ONTRTFL"
+  Natural_Language_Rule_Failure_Criteria: "ONTRTwFL is Y but ONTRTFL is not Y"
+  Rule_Failure_Criteria: "ONTRTFL is not equal to Y"
+  Condition_Failure: "ONTRTwFL is equal to Y"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR650"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR650"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR650"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR650"
+        Version: "2"
+      Version: "5.0"

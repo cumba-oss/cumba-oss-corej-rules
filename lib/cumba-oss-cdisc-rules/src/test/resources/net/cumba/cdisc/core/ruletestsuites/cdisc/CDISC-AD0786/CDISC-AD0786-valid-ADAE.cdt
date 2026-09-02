@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0786 expect=noViolation domain=ADAE
+# Rule:Description: There is more than one value of TOXGGRyN for a given value of TOXGGRy, considering only those rows on which both variables are populated
+#note "each TOXGGR1 maps to a single TOXGGR1N -> noViolation"
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col TOXGGR1 type=Char
+col TOXGGR1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | GRADE 1 | 1
+CDISCPILOT01 | 01-701-1015 | 2 | GRADE 2 | 2
+---

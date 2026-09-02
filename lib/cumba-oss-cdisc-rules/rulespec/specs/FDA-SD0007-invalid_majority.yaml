@@ -1,0 +1,37 @@
+name: FDA-SD0007-invalid_majority
+kind: rule
+description: |
+  EC-29 §7.3 — the majority-inconsistent shape from the FDA run-2 review, pinning
+  the minority-row contract in the parity lane (previously pinned only in the .cdt
+  suite FDA-SD0007-invalid_majority-LB.cdt). Three records share the identity keys
+  (LBTESTCD/LBCAT/LBSPEC); two carry mg/dL and one g/dL. The group is NOT
+  unit-consistent and, under Sensitivity: Record, every MINORITY row reports —
+  exactly one violation on the deviating record (USUBJID 003), not on the two
+  majority rows and not one representative finding per group.
+python_source: rules-sdtmig-3-4.json (FDA-SD0007)
+rule:
+  coreId: FDA-SD0007
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: mg/dL}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: mg/dL}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '003', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: g/dL}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD0007
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      LBCAT: CHEMISTRY
+      LBSPEC: SERUM
+      LBSTRESU: g/dL
+      LBTESTCD: GLUC
+expected_errors: []

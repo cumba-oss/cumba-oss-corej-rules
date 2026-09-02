@@ -1,0 +1,27 @@
+Core:
+  Id: "DRAFT-900040"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when an ADaM dataset is not accompanied by metadata (the\
+  \ dataset is not described in the submitted Define-XML)."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Requires a define.xml; a run without one skips or under-reports. The drafted\
+    \ check (empty(dataset_metadata)) had no engine operand and was graduated to the\
+    \ define-presence idiom: a dataset with no Define-XML dataset entry has no metadata."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    empty(ds_name("DEFINE"))
+Outcome:
+  Message: "ADaM dataset does not have associated metadata. Metadata is required for\
+    \ all ADaM datasets."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-SEND-0387"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reproductive Path Code (RPATHCD) is empty in DM;\
+  \ RPATHCD must be populated in DM."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RPATHCD"
+Check:
+  expression: >-
+    empty(RPATHCD)
+Outcome:
+  Message: "RPATHCD is not populated in DM."
+  Output_Variables:
+  - "RPATHCD"
+Source:
+  Class: "TDM, SPC"
+  Domain: "TP, DM"
+  Variable: "RPATHCD"
+  Plain_Text_Explanation: "RPATHCD must be populated in DM."
+  Rule: "DM.RPATHCD ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND387"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND387"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0196 expect=skipped domain=ADSL
+#note "The sheet's Domains column for AD0196 reads 'ADSL, ADDL, BDS, ADNCA, MDBDS' but the authored Scope is BDS + MEDICAL DEVICE BDS, so an ADSL dataset is skipped. This fixture PINS that recorded, finding-neutral narrowing (AD0196-F2): PARAM/PARAMCD are BDS variables, so on a real ADSL the derived guards would have silenced the rule anyway - the only observable difference is a skip row instead of a no-violation row. structure=ADSL is the declared tier and beats the columns (Fix #154); the mandatory #library line is its carrier."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col PARAM   type=Char
+col PARAMCD type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 63 |         | ALT
+CDISCPILOT01 | 01-701-1023 | 47 | Alanine | ALT

@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD0088 expect=noViolation domain=DM
+#note "Same DM rows 1-2 as the invalid fixture. TS now carries TWO rows including ONGOSIND/Y -> $ongoing_study_count=1 -> the ongoing-study exception silences the missing RFENDTC on row 1. The filter is exact-match on both columns: TSVAL must be exactly 'Y'."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+col RFENDTC type=Char
+---
+S1 | DM | 001 | ARM1     |
+S1 | DM | 002 | SCRNFAIL |
+---
+
+dataset TS class="TRIAL DESIGN"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | TITLE    | Example Study
+S1 | TS | 2 | ONGOSIND | Y

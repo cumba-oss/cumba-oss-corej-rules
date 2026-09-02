@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD1453 expect=violation domain=DI
+#note "Rows 1/2: DISEQ=1 twice for the same SPDEVID (DEV-1) within the same DOMAIN -> both fire. Rows 3/4: DEV-2 keeps DISEQ unique -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 DIPARMCD=DEVTYPE
+#expectViolationAt row=2 DIPARMCD=MANUF
+dataset DI
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Identifier Element Code"
+col DIPARM   type=Char label="Device Identifier Element Name"
+col DIVAL    type=Char label="Device Identifier Element Value"
+---
+S1 | DI | DEV-1 | 1 | DEVTYPE | Device Type  | PUMP
+S1 | DI | DEV-1 | 1 | MANUF   | Manufacturer | ACME
+S1 | DI | DEV-2 | 1 | DEVTYPE | Device Type  | SENSOR
+S1 | DI | DEV-2 | 2 | MANUF   | Manufacturer | ACME

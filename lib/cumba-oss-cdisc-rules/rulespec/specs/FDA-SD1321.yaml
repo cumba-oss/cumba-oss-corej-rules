@@ -1,0 +1,44 @@
+name: FDA-SD1321
+kind: rule
+description: |
+  EC-27 / Fix #126 pin — the authored absent-dataset branch is reachable in both
+  lanes. FDA-SD1321: a subject with AE records must have a treatment-emergent
+  flag in SUPPAE (QNAM=AETRTEM). The SUPPAE dataset is GENUINELY ABSENT from this
+  study — exactly the cohort the FDA message names ("missing SUPPAE"): the fork
+  used to raise DomainNotFoundError on record_count(domain=SUPPAE) and skip the
+  rule; it degraded $aetrtem_count to null (now '0', Fix #192) and the
+  `$study_datasets shares_no_elements_with [SUPPAE]` branch fires for every
+  subject with AE records.
+  ⚠ RE-CAPTURED 2026-08-09 for `Fix #192` (Q17-a): an unresolvable operation domain now
+  publishes the operator's DECLARED `EmptyResult` instead of an unclassified null. The
+  VERDICT is unchanged — same rows, same status; only the rendered $-value moves. The fork
+  still reports "no value", so this is a filed java-only divergence, not a regression.
+python_source: rules-sdtmig-3-4.json (FDA-SD1321)
+rule:
+  coreId: FDA-SD1321
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AETERM: Nausea}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD1321
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $aetrtem_count: '0'
+  - rule_id: FDA-SD1321
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $aetrtem_count: '0'
+expected_errors: []

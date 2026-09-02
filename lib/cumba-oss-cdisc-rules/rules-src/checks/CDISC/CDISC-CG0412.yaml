@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0412"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Demographics (DM) subject whose Actual Arm Code\
+  \ (ACTARMCD) is not 'SCRNFAIL', 'NOTASSGN', or 'NOTTRT' has no record in the Disposition\
+  \ (DS) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+Check:
+  expression: >-
+    ACTARMCD not in ["SCRNFAIL", "NOTASSGN", "NOTTRT"] and USUBJID not in $ds_usubjid
+Outcome:
+  Message: "No Disposition (DS) record found for the subject."
+  Output_Variables:
+  - "ACTARMCD"
+  - "$ds_usubjid"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "GEN"
+  Condition: "DM.ACTARMCD not in ('SCRNFAIL', 'NOTASSGN', 'NOTTRT')"
+  Rule: "Subject records > 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0412"
+        Version: "1"
+      Version: "2.0"

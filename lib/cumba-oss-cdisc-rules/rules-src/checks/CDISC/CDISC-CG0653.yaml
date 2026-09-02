@@ -1,0 +1,38 @@
+Core:
+  Id: "CDISC-CG0653"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Visit Pre-specified (SVPRESP) is populated\
+  \ with a value that is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "SVPRESP"
+Check:
+  expression: >-
+    not empty(SVPRESP) and SVPRESP != "Y"
+Outcome:
+  Message: "SVPRESP is populated with a value other than 'Y'."
+  Output_Variables:
+  - "SVPRESP"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "SVPRESP"
+  Rule: "SVPRESP in (\"Y\", null)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0653"
+        Version: "1"
+      Version: "2.0"

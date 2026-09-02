@@ -1,0 +1,36 @@
+name: CDISC-AD0664
+kind: rule
+description: |
+  Wave A8 port — T1a PlainSimple.
+  CDISC-AD0664: COHORT is populated (ADNCA v1.0). Published rule body has a bare-leaf
+  top-level Check (no all/any/not wrapper) — Python business_rules engine raises
+  KeyError: 'name' (Finding #26, §0b bullet 4). Expected Java fires; baseline on Python lane.
+python_source: rules-adamig-1-3.json (CDISC-AD0664)
+rule:
+  coreId: CDISC-AD0664
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, COHORT: '', COHORTN: '', NFRLT: 0.0, AFRLT: 0.0}   # ok (COHORT not populated)
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, COHORT: 'A', COHORTN: '', NFRLT: 0.0, AFRLT: 0.0}  # bad (COHORT populated, COHORTN present+empty)
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVISITN: 1, COHORT: 'B', COHORTN: '2', NFRLT: 0.0, AFRLT: 0.0} # ok (COHORTN populated)
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0664
+    dataset: ADNCA
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      COHORTN: null
+      COHORT: 'A'
+expected_errors: []

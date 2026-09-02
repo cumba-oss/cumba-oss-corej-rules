@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0722 expect=noViolation domain=ADLBC
+# Rule:Description: There is more than one value of TRTP for a given value of TRTPN, considering only those rows on which both variables are populated
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP type=Char
+col TRTPN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | 0
+CDISCPILOT01 | 01-701-1023 | Xanomeline High Dose | 54
+CDISCPILOT01 | 01-701-1028 | Placebo | 0
+---

@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-AD0647-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an indexed TRTEMxxFL flag variable is present in\
+  \ the dataset but the corresponding non-indexed TRTEMFL variable is not; the indexed\
+  \ flags qualify TRTEMFL, so TRTEMFL must exist wherever they do."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() =~ /^(TREM(0[1-9]|[1-9][0-9])|TRTEM[1-9])FL$/ and not var_exists("TRTEMFL")
+Outcome:
+  Message: "An indexed flag variable is present but TRTEMFL is not."
+  Output_Variables:
+  - "variable_name"
+Source_Proposed:
+  Message: "TREMxxFL is included but TRTEMFL is not present"
+  Description: "If TREMxxFL is included, TRTEMFL is defined as the overall treatment\
+    \ emergent flag. The Treatment Emergent Analysis Flag (TRTEMFL) variable must\
+    \ therefore be present in the dataset whenever any Treatment Emergent Period xx\
+    \ Flag (TREMxxFL) variable is present."
+  Domains: "ADAE"
+  Severity: "Error"
+Source:
+  Message: "TREMxxFL = Y and TRTEMFL != Y"
+  Description: "If TREMxxFL is included, TRTEMFL is defined as the overall treatment\
+    \ emergent flag. If any Treatment Emergent Period xx Flag (TREMxxFL) variables\
+    \ are flagged Y, then the overall Treatment Emergent Analysis Flag (TRTEMFL) variable\
+    \ should also be Y."
+  Domains: "ADAE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0647"
+        Version: "1"
+      Version: "6.0"

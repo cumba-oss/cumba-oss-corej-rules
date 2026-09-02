@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0211 expect=violation domain=ADLBC
+#note "Numeric sibling of PMDA-AD0176: ABLFN, when populated, must be 1. Row 1 (0) and row 4 (2) are populated and outside the permitted set, so both fire; row 2 (1) passes and row 3 (SAS missing '.') is disarmed by the leading `not empty(ABLFN)`. ABLFN is Num, so `not in [1]` is a NUMERIC literal list and the pins compare numerically - ABLFN=0 matches the cell stored as 0.0. structure=BDS is declared so the scope verdict is deterministic, with the mandatory #library line as its carrier. Record granularity -> 2 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 ABLFN=0
+#expectViolationAt row=4 USUBJID=01-701-1045 ABLFN=2
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ABLFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 0
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 | 1
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 | .
+CDISCPILOT01 | 01-701-1045 | ALT | 1.1 | 2

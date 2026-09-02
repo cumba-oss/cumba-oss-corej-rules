@@ -1,0 +1,136 @@
+Core:
+  Id: "PMDA-SD1089"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Study Day of Start (--STDY) is populated but the\
+  \ date portion of Start Study Date/Time (--STDTC) or of Subject Reference Start\
+  \ Date/Time (RFSTDTC) in the DM dataset is not a complete date, i.e. empty, invalid,\
+  \ or only partially specified, indicating that the --STDY value was imputed rather\
+  \ than derived from two complete dates."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "--STDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--STDY) and (var_exists("--STDTC") and not is_complete_date_part(--STDTC) or not
+    is_complete_date_part(DM.RFSTDTC))
+Outcome:
+  Message: "--STDY variable value is imputed: --STDY is populated but --STDTC or RFSTDTC\
+    \ in the DM dataset is empty or does not contain a complete date part."
+  Output_Variables:
+  - "--STDY"
+  - "--STDTC"
+  - "DM.RFSTDTC"
+Source:
+  Message: "--STDY variable value is imputed"
+  Description: "Study Day of Start (--STDY) variable value should not be imputed.\
+    \ It may be only populated when both Start Study Date/Time (--STDTC) and Subject\
+    \ Reference Start Date/Time (RFSTDTC) variables values are provided, and both\
+    \ include complete date part."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1089"
+        Version: "1"
+      Version: "1.6"

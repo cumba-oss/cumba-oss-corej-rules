@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0248.1 expect=violation domain=TS
+#note "D-TA-5a (guard removed per the T4 reasoning — the sheet exempts NULL only on duration rows, never on date rows): row 1's study start date value is BLANK, which is neither a valid ISO 8601 date nor a duration -> fires (under the pre-ruling non-empty guard this row was silent). Row 2's DOSDUR value '14 DAYS' is not ISO 8601 -> fires. Row 3 is a valid ISO date -> silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 TSPARMCD=STSTDTC
+#expectViolationAt row=2 TSPARMCD=DOSDUR
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+STUDY01 | TS | 1 | STSTDTC | Study Start Date       |
+STUDY01 | TS | 2 | DOSDUR  | Duration of Dosing     | 14 DAYS
+STUDY01 | TS | 3 | EXPSTDTC | Exposure Start Date   | 2026-01-15

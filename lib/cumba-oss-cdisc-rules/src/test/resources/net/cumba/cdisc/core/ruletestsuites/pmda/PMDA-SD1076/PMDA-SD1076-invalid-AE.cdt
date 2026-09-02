@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1076 expect=violation domain=AE
+#note "AELAT is an SDTM Model Events-class variable (in the model column order) that is NOT part of the IG AE specification (not in the library column order) -> a model-permissible addition into a standard domain -> fires on AELAT only. Authored with the D-TA-7b Output_Variables alignment ($allowed_variables removed; the finding reports the variable name, matching FDA-SD1076)."
+#library standard=sdtmig version=3-4
+#library model-column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM AELAT AELOC
+#library column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM
+#expectViolationCount 1
+#expectViolationAt variable_name=AELAT
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AELAT   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | LEFT

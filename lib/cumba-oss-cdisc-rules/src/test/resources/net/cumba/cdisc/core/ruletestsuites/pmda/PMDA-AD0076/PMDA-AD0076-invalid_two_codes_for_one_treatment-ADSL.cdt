@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0076 expect=violation domain=ADSL
+#note "TRT01P matches ^TRT(\\d{2})P$ and TRT01PN matches ^TRT(\\d{2})PN$, both capturing xx=01, so the two seeds DEDUPE to ONE tuple and there is exactly ONE expansion. The KEY is TRT01P (second argument) and the DEPENDENT is TRT01PN (first): key PLACEBO carries two distinct dependents {0, 1}, so the operator flags EVERY populated row holding that key -> rows 1 AND 2. Row 3's key is single-valued. Record granularity -> exactly 2 violations. Add no further TRT<dd>P / TRT<dd>PN column: each new index is another expansion and the counts aggregate."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 TRT01P=PLACEBO TRT01PN=0
+#expectViolationAt row=2 USUBJID=01-701-1023 TRT01P=PLACEBO TRT01PN=1
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | PLACEBO | 0
+CDISCPILOT01 | 01-701-1023 | PLACEBO | 1
+CDISCPILOT01 | 01-701-1034 | DRUGA   | 2

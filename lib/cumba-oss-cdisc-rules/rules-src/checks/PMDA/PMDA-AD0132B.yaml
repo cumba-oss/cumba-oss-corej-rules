@@ -1,0 +1,72 @@
+Core:
+  Id: "PMDA-AD0132B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when any of Change from Baseline (CHG), Percent Change\
+  \ from Baseline (PCHG), or Ratio to Baseline (R2BASE) is populated, but the values\
+  \ required to derive it - Analysis Value (AVAL) and Baseline Value (BASE) - are\
+  \ not both present and populated. CHG equals AVAL minus BASE, PCHG equals (AVAL\
+  \ minus BASE) divided by BASE, times 100, and R2BASE equals AVAL divided by BASE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    (not empty(CHG) or not empty(PCHG) or not empty(R2BASE)) and (empty(AVAL) or empty(BASE))
+Outcome:
+  Message: "CHG, PCHG or R2BASE is populated, but AVAL and/or BASE are not present\
+    \ and populated."
+  Output_Variables:
+  - "AVAL"
+  - "BASE"
+  - "CHG"
+  - "PCHG"
+  - "R2BASE"
+Source:
+  Message: "Calculation issue: CHG, PCHG or R2BASE is populated, but AVAL and/or BASE\
+    \ are not present and populated"
+  Description: "If any of CHG (change), PCHG (percent change), or R2BASE (ratio of\
+    \ Analysis Value to Base) is populated, the values necessary for its calculation\
+    \ must both be present and populated. CHG = AVAL - BASE, PCHG = (AVAL - BASE)/BASE\
+    \ * 100, R2BASE = AVAL / BASE. Once this issue is resolved, there is greater potential\
+    \ for rules AD0132, AD0225, AD0223 to fire."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132B"
+        Version: "1"
+      Version: "6.0"

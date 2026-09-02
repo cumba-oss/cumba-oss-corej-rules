@@ -1,0 +1,40 @@
+Core:
+  Id: "PMDA-AD0662"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TMPCTDF (Percent Diff. Nominal vs. Actual Time)\
+  \ is populated on a record but ARRLT (Actual Rel. Time from Ref. Dose) and/or NRRLT\
+  \ (Nominal Rel. Time from Ref. Dose) is not populated; when TMPCTDF is populated,\
+  \ both ARRLT and NRRLT must be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TMPCTDF) and (empty(NRRLT) or empty(ARRLT))
+Outcome:
+  Message: "TMPCTDF is populated but ARRLT and/or NRRLT is not populated."
+  Output_Variables:
+  - "NRRLT"
+  - "ARRLT"
+  - "TMPCTDF"
+Source:
+  Message: "TMPCTDF is populated and ARRLT or NRRLT are not populated"
+  Description: "If TMPCTDF (Percent Diff. Nominal vs. Actual Time) is populated, both\
+    \ ARRLT (Actual Rel. Time from Ref. Dose) and NRRLT (Nominal Rel. Time from Ref.\
+    \ Dose) must be populated."
+  Domains: "ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0662"
+        Version: "1"
+      Version: "6.0"

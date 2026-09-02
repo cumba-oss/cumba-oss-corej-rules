@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0240"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Time Point Name (--TPT) is not consistent\
+  \ for a given Planned Time Point Number (--TPTNUM), i.e. when VISITNUM and --TPTREF\
+  \ are not present and --TPT and --TPTNUM do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--TPT"
+    - "--TPTNUM"
+Check:
+  expression: >-
+    not var_exists("VISITNUM") and not var_exists("--TPTREF") and not is_unique_relationship(--TPT,
+    --TPTNUM)
+Outcome:
+  Message: "--TPT and --TPTNUM do not have a one-to-one relationship."
+  Output_Variables:
+  - "--TPT"
+  - "--TPTNUM"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPT"
+  Condition: "VISITNUM and --TPTREF are not present in dataset"
+  Rule: "--TPT and --TPTNUM have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0240"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0240"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0240"
+        Version: "2"
+      Version: "2.0"

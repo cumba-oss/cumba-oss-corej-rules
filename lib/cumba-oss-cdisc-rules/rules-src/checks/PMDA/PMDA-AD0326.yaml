@@ -1,0 +1,60 @@
+Core:
+  Id: "PMDA-AD0326"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subperiod within Period (C) (ASPERC) variable\
+  \ does not hold a single consistent value for each unique value of the Subperiod\
+  \ within Period (ASPER) variable, evaluated over the records where the primary variable\
+  \ ASPER is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "ASPERC"
+Check:
+  expression: >-
+    var_exists("ASPER") and not empty(ASPER) and is_inconsistent_across_dataset(ASPERC,
+    keep_missings=true, keys=[APERIOD, ASPER])
+Outcome:
+  Message: "Inconsistent value for ASPERC."
+  Output_Variables:
+  - "ASPER"
+  - "ASPERC"
+Source:
+  Message: "Inconsistent value for ASPERC"
+  Description: "Within a Study and a Period, all Subperiod within Period (C) (ASPERC)\
+    \ variable values must be the same for each unique value of Subperiod within Period\
+    \ (ASPER) variable when the primary variable ASPER is populated."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0326"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0326"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0326"
+        Version: "1"
+      Version: "6.0"

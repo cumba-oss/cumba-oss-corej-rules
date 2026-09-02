@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1370 expect=skipped domain=OE
+#note "Violating-shaped data (OESTREFC populated, OESTREFN missing), so the ONLY thing this scenario can fail on is execute-vs-skip. The shipped Scope carries Domains.Exclude [MK, OE], the exclusions sheet row 380's DOMAINS cell states (Fix #279, ruling M2-D12, applied to SD1369 and SD1370 as one change), so OE is out of scope and the rule is skipped. Unencoded, the rule executed and fired 1 violation at row=1. FDA-SD1370 is deliberately untouched: its own sheet cell carries no exclusions."
+#library standard=sdtmig version=3-4
+dataset OE class=FINDINGS label="Ophthalmic Examinations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col OESEQ    type=Num  label="Sequence Number"
+col OETESTCD type=Char label="Ophthalmic Test Short Name"
+col OESTREFC type=Char label="Reference Result in Standard Format"
+col OESTREFN type=Num  label="Numeric Reference Result in Std Units"
+---
+S1 | OE | 001 | 1 | VACSCORE | 55 | .

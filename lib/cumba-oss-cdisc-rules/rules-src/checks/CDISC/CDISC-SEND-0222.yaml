@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0222"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Element Code (ETCD) in the Trial Arms (TA) dataset\
+  \ is populated but does not match any Element Code (ETCD) value in the Trial Elements\
+  \ (TE) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+Operations:
+- id: "$te_etcd"
+  expression: "distinct(ETCD, domain=\"TE\")"
+Check:
+  expression: >-
+    not empty(ETCD) and ETCD not in $te_etcd
+Outcome:
+  Message: "ETCD in TA does not match any ETCD value in the TE dataset."
+  Output_Variables:
+  - "ETCD"
+  - "$te_etcd"
+Source:
+  Class: "TDM"
+  Domain: "TA, TE"
+  Variable: "ETCD"
+  Plain_Text_Explanation: "The values of ETCD used in the Trial Arms dataset must\
+    \ match values for the same Element in the Trial Elements dataset."
+  Rule: "TA.ETCD = TE.ETCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND222"
+        Version: "1"
+      Version: "5.0"

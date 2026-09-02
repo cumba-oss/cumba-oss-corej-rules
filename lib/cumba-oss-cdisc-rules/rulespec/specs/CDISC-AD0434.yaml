@@ -1,0 +1,33 @@
+name: CDISC-AD0434
+kind: rule
+description: |
+  Wave A5 port — T1a PlainSimple.
+  CDISC-AD0434: On a given record, ASPERC is populated and ASPER is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE (+ MD variants) and
+  OCCURRENCE DATA STRUCTURE (+ MD variants); simple non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0434)
+rule:
+  coreId: CDISC-AD0434
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ASPER: '1', ASPERC: 'SUBPER1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, ASPER: '',  ASPERC: 'SUBPER1'}  # bad — ASPERC populated, ASPER empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0434
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ASPER: null
+      ASPERC: 'SUBPER1'
+expected_errors: []

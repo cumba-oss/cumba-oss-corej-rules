@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Device Identifier (RDEVID) is populated\
+  \ and Related Subject or Pool Identifier (RSUBJID) is also populated for the same\
+  \ record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    - "APRELSUB"
+Check:
+  expression: >-
+    not empty(RDEVID) and not empty(RSUBJID)
+Outcome:
+  Message: "RSUBJID is populated when RDEVID is populated; RDEVID and RSUBJID must\
+    \ not both be populated for the same record."
+  Output_Variables:
+  - "RSUBJID"
+  - "RDEVID"
+Source:
+  Class: "AP"
+  Domain: "ALL"
+  Variable: "RSUBJID"
+  Condition: "RDEVID ^= null"
+  Rule: "RSUBJID = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0366"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0366"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0366"
+        Version: "1"
+      Version: "2.0"

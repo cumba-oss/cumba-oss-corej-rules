@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0200"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Tumor Findings (TF) record exists\
+  \ for the same combination of subject (USUBJID), test (TFTESTCD), specimen (TFSPEC),\
+  \ and tumor identity (TFSPID, TFANTREG, TFLAT, TFDIR); the TF domain expects one\
+  \ record per tumor per specimen per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "TF"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, TFTESTCD, TFSPEC, TFSPID, TFANTREG, TFLAT, TFDIR])
+Outcome:
+  Message: "More than one TF record exists for the same tumor and specimen within\
+    \ a subject."
+  Output_Variables:
+  - "TFSPID"
+  - "TFTESTCD"
+  - "TFSPEC"
+  - "TFANTREG"
+  - "TFLAT"
+  - "TFDIR"
+Source:
+  Class: "FND"
+  Domain: "TF"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per tumor per specimen per subject"
+  Rule: "One record per tumor per specimen per subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND200"
+        Version: "1"
+      Version: "5.0"

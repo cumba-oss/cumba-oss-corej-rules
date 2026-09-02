@@ -1,0 +1,111 @@
+name: FDA-SD9999
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P3b — the first executable parity coverage for
+  `FDA-SD9999`, the rule EC-33 re-typed to `Dataset Metadata Check against Define XML` and
+  therefore the rule that put the fork on `DatasetMetadataDefineDatasetBuilder` in the first
+  place (EC-41/H5).
+
+  Check (three leaves): `$domain_is_custom equal_to true` AND
+  `non_empty(define_dataset_class)` AND
+  `define_dataset_class is_not_contained_by_case_insensitive [EVENTS, FINDINGS, INTERVENTIONS]`.
+
+  NO `library_mocks` block — deliberately, and this was MEASURED, not reasoned. The first
+  Check leaf gates the whole rule on the `domain_is_custom` Operation, so custom-ness must
+  hold on both lanes; what makes it hold here is the DATASET NAME, not a mock:
+
+  * Java resolves `CompositeMetadataProvider.isDomainCustom` = `mock || pickle`. XX / YY / WW /
+    ZZ are deliberately not SDTM dataset names, so the SDTMIG-3.4 offline pickle (63 known
+    names) already answers "custom" and the disjunct is satisfied without any mock.
+  * The fork has **no consumer for `domain_custom` at all** —
+    `sdtm_utilities.is_custom_domain` asks whether the name is absent from
+    `library_metadata`'s `standard_metadata` / `model_metadata` `dataset_names`, and with no
+    `classes` / `dataset_metadata` mock declared the container is empty, so every dataset is
+    custom.
+
+  An earlier revision of this spec declared `domain_custom` and asserted in bold that it was
+  MANDATORY. It is not: removing it leaves both lanes byte-identical (verified by running
+  them). It was removed rather than re-labelled, because a declaration that reads as
+  load-bearing while being inert is precisely the blindness this plan exists to remove.
+  When it WOULD matter: a spec using a REAL domain name, where the pickle says "not custom"
+  and only the mock could make Java disagree — and then the fork, which ignores the mock,
+  would diverge. Use a non-standard dataset name instead, as here.
+
+  Fixture shape mirrors `FDA-SD1325-multi` on purpose: THREE submitted datasets (XX, YY, WW)
+  plus ONE Define-only key (ZZ), the study shape that maximises EC-41. The offending class
+  sits on the PRIMARY (XX declares `TRIAL DESIGN`, which is none of the three SDTM general
+  observation classes), so the Java lane reports exactly ONE violation — the non-zero, known
+  count that `FDA-SD9999-define-only-leak` needs as its liveness anchor.
+
+  Both lanes agree here, and the agreement is a measurement, not an absence of one. Pre-Fix
+  #132 that agreement was luck rather than structure: the rule derives Sensitivity `Dataset`,
+  so the fork's `generate_targeted_error_object` emits one error per dataset from
+  `errors_df.iloc[0]` (`models/actions.py:161-169`) — the first violating row of the
+  outer-merged frame, which kept the study's declaration order (pandas `sort=False`) and
+  appended the Define-only rows. The primary is always the first declared dataset, so a dirty
+  primary always won that race and the fork reported XX's own row, while underneath it
+  evaluated the same study-wide frame once per submitted dataset and emitted THREE findings,
+  all carrying XX's class (the spec channel keeps only the primary bucket and saw 1 of 3).
+  Fix #132 narrows the frame to the evaluated dataset's single row, so there is no longer a
+  race to win and no multiplication underneath; this spec's expectation is unchanged, which is
+  what makes it a stable liveness anchor for `FDA-SD9999-define-only-leak`.
+
+  Only `define_dataset_class` is declared — the single attribute the rule reads, and one of
+  the three with a Java sink (it lands under `className`, not under the YAML spelling; copying
+  it literally would leave the operand undefined and this rule would silently stop firing on
+  the Java lane). `define_dataset_name` / `define_dataset_location` are left to D4's derivation
+  so the default stays on the execution path; the location default is load-bearing on the
+  Python lane, where the fork merges on (`dataset_name`, `dataset_location`).
+
+  **The lanes DO diverge here, and NOT for an EC-41 reason** — measured, not predicted. Both
+  lanes fire on the same dataset with the same verdict and the same status; only the finding's
+  `output_variables` differ. Java reports `$domain_is_custom: 'true'` alongside
+  `define_dataset_class`, because EC-37 / Fix #127 derives the effective Output_Variables at
+  load time and the Check's first leaf consumes the Operation. The fork consumes the authored
+  list verbatim: `RuleProcessor.extract_target_names_from_rule` short-circuits to
+  `_extract_targets_from_output_variables` whenever `output_variables` is non-empty
+  (`rule_processor.py:878-882`), and the rule declares `Output_Variables: [define_dataset_class]`,
+  so the Operation id is never projected. `expected_violations` is Java-canonical, so this spec
+  carries a `parity-diff-baseline.json` entry with `lane: python`, `channels: ["violations"]`
+  and the EC-37 fix_ref — the same shape as the pre-existing `EMPTYSTR-is-not-integer` entry,
+  and a DIFFERENT cause from its `-define-only-leak` sibling's. Nothing about the Define
+  channel or EC-41 is implicated: a single-dataset control (one custom dataset, one Define
+  key) shows the same one-key delta.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD9999)
+rule:
+  coreId: FDA-SD9999
+datasets:
+  XX:
+    row_key: [STUDYID, USUBJID, XXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: XX, USUBJID: '001', XXSEQ: 1, XXTERM: FOO}
+  YY:
+    row_key: [STUDYID, USUBJID, YYSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: YY, USUBJID: '001', YYSEQ: 1, YYTERM: BAR}
+  WW:
+    row_key: [STUDYID, USUBJID, WWSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: WW, USUBJID: '001', WWSEQ: 1, WWTERM: BAZ}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  XX:
+    define_dataset_class: TRIAL DESIGN
+  YY:
+    define_dataset_class: FINDINGS
+  WW:
+    define_dataset_class: INTERVENTIONS
+  ZZ:
+    define_dataset_class: EVENTS
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SD9999
+    dataset: XX
+    row_key: {STUDYID: S1, USUBJID: '001', XXSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $domain_is_custom: 'true'
+      define_dataset_class: TRIAL DESIGN
+expected_errors: []

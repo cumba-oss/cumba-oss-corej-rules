@@ -1,0 +1,129 @@
+Core:
+  Id: "PMDA-SD1040"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --SCAT is identical to DOMAIN, --TERM, --TESTCD,\
+  \ --TRT, --DECOD, or --BODSYS."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+Check:
+  expression: >-
+    not empty(--SCAT) and (var_exists("DOMAIN") and equalsIgnoreCase(--SCAT, DOMAIN) or
+    var_exists("--TERM") and equalsIgnoreCase(--SCAT, --TERM) or var_exists("--TESTCD") and
+    equalsIgnoreCase(--SCAT, --TESTCD) or var_exists("--TRT") and equalsIgnoreCase(--SCAT, --TRT) or
+    var_exists("--DECOD") and equalsIgnoreCase(--SCAT, --DECOD) or var_exists("--BODSYS") and
+    equalsIgnoreCase(--SCAT, --BODSYS))
+Outcome:
+  Message: "--SCAT value is redundant with other variable values."
+  Output_Variables:
+  - "--SCAT"
+  - "DOMAIN"
+  - "--TERM"
+  - "--TESTCD"
+  - "--TRT"
+  - "--DECOD"
+  - "--BODSYS"
+Source:
+  Message: "--SCAT value is redundant with other variable values"
+  Description: "Value of Subcategory (--SCAT) should not be identical to that in Domain\
+    \ Abbreviation (DOMAIN); Reported Term (--TERM); Name of Measurement, Test, or\
+    \ Examination (--TESTCD); Name of Treatment (--TRT); Standardized Coded Term (--DECOD);\
+    \ Body System or Organ Class (--BODSYS)."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT, TI"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1040"
+        Version: "1"
+      Version: "1.6"

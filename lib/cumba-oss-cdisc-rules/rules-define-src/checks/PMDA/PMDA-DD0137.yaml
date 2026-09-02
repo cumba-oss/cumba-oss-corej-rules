@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0137"
+Sheet_Rule_Identifier: "DD0137"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Requires: "library"
+Plain_Text_Rule: "The value of an English variable's description must match the one specified in the CDISC standard for an ItemDef element that represents a dataset's variable defined as following an SDTMIG or SENDIG standard."
+# Library-gated; 2.1-only per the sheet (the per-dataset standard linkage
+# @def:StandardOID this rule leans on exists only in 2.1; the shared resolver
+# still falls back to the MetaDataVersion attributes). Scoped to the ItemRef so
+# the variable inherits its dataset (parent ItemGroupDef) and standard; the
+# @ItemOID-dereferenced ItemDef supplies the variable Name and its English
+# Description. Variables the library does not know are out of reach.
+Message: "Invalid variable label value [${value}]"
+Check:
+  kind: "library_variable_label_matches"

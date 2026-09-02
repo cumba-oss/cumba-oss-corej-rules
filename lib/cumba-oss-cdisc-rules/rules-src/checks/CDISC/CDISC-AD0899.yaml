@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-AD0899"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject's RFSTDTC value in ADSL does not equal\
+  \ the RFSTDTC value for the matching subject in DM."
+Executability: "Fully Executable"
+ExecutabilityHint:
+  Category: "fully executable"
+  Detail: "AUTHORING of ADaM Conformance Rules CR899 ('an SDTM variable copied into\
+    \ ADaM must equal the corresponding SDTM value'). CR899 is generic over 'which\
+    \ variables were copied'; the engine has no Define-XML origin metadata to enumerate\
+    \ copied variables at runtime, so this rule is pinned to a representative, commonly-copied\
+    \ SDTM variable — ADSL.RFSTDTC vs DM.RFSTDTC — using the proven G2 cross-standard\
+    \ VALUE-join mechanism (cf. CDISC-AD0204). Run requirement: the SDTM DM domain\
+    \ must be co-loaded as a reference dataset; an exists(DM.RFSTDTC) guard (mirroring\
+    \ CDISC-AD0053) self-skips the compare when DM is absent so it does not fire spuriously.\
+    \ The fully-generic 'every copied variable across every SDTM source domain' form\
+    \ would require copied-variable enumeration (Define-XML origin) and is not expressible\
+    \ as one rule."
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Name: "DM"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    var_exists(DM.RFSTDTC) and RFSTDTC != DM.RFSTDTC
+Outcome:
+  Message: "The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.RFSTDTC\
+    \ is not equal to DM.RFSTDTC."
+  Output_Variables:
+  - "RFSTDTC"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "AD*.USUBJID equals --.USUBJID, AD*.--SEQ\
+    \ equals --.--SEQ, and the values of a variable with prefix -- which is present\
+    \ in both datasets are not equal"
+  Rule_Failure_Criteria: "An SDTM variable present in an ADaM dataset has a value\
+    \ that does not equal the corresponding --.--* value"
+  Condition_Failure: "USUBJID is present and there is a value of USUBJID that is a\
+    \ value of --.USUBJID and a value of --SEQ that is a value of --.--SEQ"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR899"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR899"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR899"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR899"
+        Version: "1"
+      Version: "5.0"

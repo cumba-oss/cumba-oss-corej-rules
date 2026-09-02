@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2253 expect=violation domain=TT
+#note "Row 2 leaves both TTENRL and TTDUR empty -> fires; rows 1 and 3 populate one of the two."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 RSTGCD=GESTATE TTENRL= TTDUR=
+dataset TT class="TRIAL DESIGN" label="Trial Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Rule for Start of Repro Stage"
+col TTENRL  type=Char label="Rule for End of Repro Stage"
+col TTDUR   type=Char label="Planned Duration of Repro Stage"
+---
+S1 | TT | PREMATE | Premating | Day 1 | Day of mating |
+S1 | TT | GESTATE | Gestation | GD 0  |               |
+S1 | TT | LACTATE | Lactation | LD 0  |               | P21D

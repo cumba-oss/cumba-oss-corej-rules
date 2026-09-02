@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0094"
+Sheet_Rule_Identifier: "DD0094"
+Rule_Set: "PMDA"
+Element: "AnalysisDatasets"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "def:CommentOID is required if there is more than one analysis dataset needed to create the respective result."
+Message: "Missing required def:CommentOID"
+# Inverted encoding: "CommentOID required when >1 analysis dataset" becomes
+# cardinality_at_most(AnalysisDataset, 1) guarded on the CommentOID being
+# absent - fires exactly on a multi-dataset arm:AnalysisDatasets container
+# without a comment (ARM v1.0 SS5.3.6). New (no CDISC ARM rules).
+Check:
+  kind: "cardinality_at_most"
+  target: "arm:AnalysisDataset"
+  max: 1
+  when:
+    path: "@CommentOID"
+    exists: false

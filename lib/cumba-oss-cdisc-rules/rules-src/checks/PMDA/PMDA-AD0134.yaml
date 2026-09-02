@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0134"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Ratio to Analysis Range y Upper Limit (R2AyHI),\
+  \ Analysis Value (AVAL) and Analysis Range y Upper Limit (AyHI) are all populated\
+  \ and AyHI does not equal 0, but R2AyHI does not equal AVAL / AyHI."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    AyHI != 0 and R2AyHI != (AVAL / AyHI)
+Outcome:
+  Message: "R2AyHI does not equal AVAL / AyHI."
+  Output_Variables:
+  - "AVAL"
+  - "R2AyHI"
+  - "AyHI"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Calculation issue: R2AyHI != AVAL / AyHI"
+  Description: "When all 3 variables are populated and AyHI does not equal 0, Ratio\
+    \ to AyHI (R2AyHI) must equal Analysis Value (AVAL) / Analysis Range y HI Value\
+    \ (AyHI)."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0134"
+        Version: "1"
+      Version: "6.0"

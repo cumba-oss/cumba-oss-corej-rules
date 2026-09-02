@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0001 expect=noViolation domain=XX
+#note "XX is declared a custom domain (#library custom-domain XX) so $domain_is_custom=true, and the Check's leading conjunct silences the rule even though the define's DOMAIN item carries the unpublished alias C99999 -- pins the non-custom gate."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+#library codelist-terms DOMAIN C11111
+#define-xml CDISC-CG0001-custom-define.xml
+dataset XX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+S1 | XX | 001

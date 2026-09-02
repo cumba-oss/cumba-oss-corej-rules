@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0344"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a parameter, ANRHI has more than one value\
+  \ for a given value of ANRHIC"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    has_multiple_values_for(ANRHI, ANRHIC, within=PARAMCD)
+Outcome:
+  Message: "Within this parameter, ANRHI has more than one value for the same value\
+    \ of ANRHIC."
+  Output_Variables:
+  - "PARAMCD"
+  - "ANRHI"
+  - "ANRHIC"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ANRHI"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of ANRHI for a given value of ANRHIC"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of ANRHI\
+    \ for a given value of ANRHIC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR344"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR344"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR344"
+        Version: "2"
+      Version: "5.0"

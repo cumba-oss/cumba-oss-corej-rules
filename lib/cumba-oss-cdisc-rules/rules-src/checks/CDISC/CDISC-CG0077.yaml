@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0077"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when MHCAT is populated with the same value for all records."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "MHCAT"
+Check:
+  expression: >-
+    not empty(MHCAT) and has_same_values(MHCAT)
+Outcome:
+  Message: "MHCAT is populated with the same value for all records."
+  Output_Variables:
+  - "MHCAT"
+Source:
+  Class: "EVT"
+  Domain: "MH"
+  Variable: "MHCAT"
+  Condition: "MHCAT ^= null"
+  Rule: "MHCAT ^= the same value for all records"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0077"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0077"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0077"
+        Version: "1"
+      Version: "2.0"

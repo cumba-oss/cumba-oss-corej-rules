@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1121 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. No AGETXT column, i.e. the shape in which empty(AGETXT) is TRUE on every row under absent = all-missing (EC-43); Plan B phase 4d' deleted the not var_exists(\"AGETXT\") presence disjunct this note used to name. Zero data rows. Predicted SILENT, and this is the sharpest 0-row pin in the batch: the shipped Check DOES still contain a presence call (the DERIVED var_exists(\"ARMCD\") in front of the membership test), but the expression is not pure — empty(AGE), empty(AGETXT) and not empty(ARMCD) are row leaves that fold to UNKNOWN, so BroadcastFold declines and the rule falls through to the row path, which a 0-row RECORD-sensitivity value-based rule never enters. If this FIRES, the fold is reaching a mixed expression and that is an engine-level classification — escalate, do not rewrite."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col ARMCD   type=Char
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1247 expect=skipped domain=EC
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. FRESH, DISCRIMINATING. DELIBERATELY NO ECDOSE COLUMN. Predicted SILENT, and the asymmetry is the point: the three OPTIONAL columns are absent-tolerant (ECOCCUR and ECSTAT by their authored '(not var_exists(X) or ...)' legs, ECDOSTXT by a bare empty() leaf under absent = all-missing since Plan B phase 4d' - see invalid-absent_optional), but ECDOSE - the column the rule actually measures - is guarded by a DERIVED var_exists(\"ECDOSE\") that NonEmptyGuardInliner arm 2 emitted in front of 'ECDOSE <= 0' (visible in rules/rules-pmda-sdtmig-3-4.json). No twin fixture separates the two absence behaviours. A fire means the derived guard is gone; escalate. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECOCCUR type=Char label="Occurrence"
+col ECDOSTXT type=Char label="Dose Description"
+col ECSTAT  type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | |
+S1 | EC | 001 | 2 | DRUG A | Y | |

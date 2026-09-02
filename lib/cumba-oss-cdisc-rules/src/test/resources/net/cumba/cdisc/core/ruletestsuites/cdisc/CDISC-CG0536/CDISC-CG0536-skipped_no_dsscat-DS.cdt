@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0536 expect=skipped domain=DS
+#note "DSSCAT is absent, so Requirements.Variables.All gates this rule to SKIPPED - it is the DSSCAT-present half of the sheet's pair (CG0536/CG0537). The DSSCAT-absent half covers this study, so the duplicate is still reported, by the other rule."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | TREATMENT
+---

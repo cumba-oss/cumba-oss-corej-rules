@@ -1,0 +1,70 @@
+Core:
+  Id: "FDA-SD1366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject was not assigned to treatment (ARMNRS\
+  \ indicates Screen Failure, Not Assigned or Screening Not Completed) but Subject\
+  \ Reference End Date/Time (RFENDTC) is populated; RFENDTC must be empty for such\
+  \ subjects."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    ARMNRS in ["SCREEN FAILURE", "NOT ASSIGNED", "SCREENING NOT COMPLETED"] and not empty(RFENDTC)
+Outcome:
+  Message: "RFENDTC is populated for a subject who was not assigned to treatment (ARMNRS\
+    \ indicates Screen Failure, Not Assigned or Screening Not Completed)."
+  Output_Variables:
+  - "RFENDTC"
+  - "ARMNRS"
+Source:
+  FDA_Validator_Rule_Message: "RFENDTC is populated when ARMNRS is not null"
+  FDA_Validator_Rule_Description: "Subject Reference End Date/Time (RFENDTC) should\
+    \ be null for screen failures or unassigned subjects. Therefore, when the Reason\
+    \ Arm and/or Actual Arm is Null (ARMNRS) variable is populated, RFENDTC should\
+    \ be null."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0530"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0530"
+        Version: "1"
+      Version: "2.0"

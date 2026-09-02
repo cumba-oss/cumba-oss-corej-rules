@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-AD0607 expect=noViolation domain=ADLBC
+#note "Row 1: PHSTM 43200 == ADSL.PH1STM 43200 -> silent. Row 2: PHSTM BLANK, APHASEN POPULATED -> conjunct 2 (`not empty(PHSTM)`) masks the row out; SAFE because the crash driver is APHASEN, which is populated on every row (fixture law, STAGE-G CRITICAL 2)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHSTM    type=Num
+---
+S1 | 01-701-1015 | ALB | 30 | 1 | 43200
+S1 | 01-701-1023 | ALB | 31 | 1 |
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1STM  type=Num
+---
+S1 | 01-701-1015 | 43200
+S1 | 01-701-1023 | 43200

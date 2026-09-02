@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0325"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of ELEMENT, TESTRL, TEENRL, and\
+  \ TEDUR is not unique for each ETCD."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Check:
+  expression: >-
+    not is_unique_set([ETCD, ELEMENT, TESTRL, TEENRL, TEDUR])
+Outcome:
+  Message: "The combination of ELEMENT, TESTRL, TEENRL, and TEDUR is not unique for\
+    \ each ETCD."
+  Output_Variables:
+  - "ETCD"
+  - "ELEMENT"
+  - "TESTRL"
+  - "TEENRL"
+  - "TEDUR"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "ETCD"
+  Rule: "The combination of ELEMENT, TESTRL, TEENRL, and TEDUR is unique for each\
+    \ ETCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0325"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0325"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0325"
+        Version: "2"
+      Version: "2.0"

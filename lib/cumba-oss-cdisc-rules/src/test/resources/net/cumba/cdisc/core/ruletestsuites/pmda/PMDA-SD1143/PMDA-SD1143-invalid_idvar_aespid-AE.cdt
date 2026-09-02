@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1143 expect=violation domain=AE
+#note "H1 residual, kept deliberately per the (i) disposition (sheet issue #113: the PMDA sheet is silent on the key variable; the implementation pins IDVAR='AESEQ'): row 1's description is keyed by AESPID, which the operation's IDVAR filter drops, so the record reads as undescribed and fires. Widening the filter would let a coincidental numeric AESPID value silence a genuine finding - a silent miss - so the pin stays until the sheet answers."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 AESMIE=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AESPID  type=Char label="Sponsor-Defined Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESMIE  type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | H-14 | HEADACHE | Y
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESPID | H-14 | AESOSP | Headache, prolonged, treated

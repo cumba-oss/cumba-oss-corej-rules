@@ -1,0 +1,48 @@
+Core:
+  Id: "PMDA-SD1454"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Derived Flag (--DRVFL) equals 'Y' but Reference\
+  \ Result in Standard Format (--STREFC) is empty. --STREFC should be populated for\
+  \ a derived record."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "MK"
+    - "OE"
+Requirements:
+  Variables:
+    All:
+    - "--STREFC"
+    - "--DRVFL"
+Check:
+  expression: >-
+    --DRVFL == "Y" and empty(--STREFC)
+Outcome:
+  Message: "--STREFC is empty when --DRVFL equals 'Y'."
+  Output_Variables:
+  - "!--STREFC"
+  - "--DRVFL"
+Source:
+  Message: "--STREFC is null when --DRVFL='Y'"
+  Description: "Reference Result in Standard Format (--STREFC) should be populated\
+    \ when Derived Flag (--DRVFL) equals 'Y'"
+  Domains: "FINDINGS (-MK, -OE), FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1454"
+        Version: "1"
+      Version: "6.0"

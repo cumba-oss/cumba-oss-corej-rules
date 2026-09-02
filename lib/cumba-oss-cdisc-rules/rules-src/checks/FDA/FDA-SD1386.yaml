@@ -1,0 +1,60 @@
+Core:
+  Id: "FDA-SD1386"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Day of Obs Rel to Challenge Agent (--CHENDY)\
+  \ is populated and both the date portion of --ENDTC and the date portion of RFCSTDTC\
+  \ are complete dates, but --CHENDY does not equal the value computed by the study\
+  \ day algorithm relative to the Date/Time of First Challenge Agent Admin (RFCSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--CHENDY"
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_chendy_algorithm"
+  expression: "dy(--ENDTC, reference=\"RFCSTDTC\")"
+Check:
+  expression: >-
+    not empty(--CHENDY) and is_complete_date(--ENDTC) and is_complete_date(DM.RFCSTDTC) and --CHENDY
+    != $value_chendy_algorithm
+Outcome:
+  Message: "End Day of Obs Rel to Challenge Agent (--CHENDY) does not equal the value\
+    \ derived by the study day algorithm against RFCSTDTC even though the date portions\
+    \ of --ENDTC and RFCSTDTC are complete dates and --CHENDY is populated."
+  Output_Variables:
+  - "$value_chendy_algorithm"
+  - "--ENDTC"
+  - "--CHENDY"
+  - "DM.RFCSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "Incorrect value for --CHENDY variable"
+  FDA_Validator_Rule_Description: "End Day of Obs Rel to Challenge Agent (--CHENDY)\
+    \ variable value should be populated as defined by CDISC standards: --CHENDY =\
+    \ (date portion of --ENDTC) - (date portion of RFCSTDTC) +1 if --ENDTC is on or\
+    \ after RFCSTDTC; --CHENDY = (date portion of --ENDTC) - (date portion of RFCSTDTC)\
+    \ if --ENDTC precedes RFCSTDTC."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1386"
+        Version: "1"
+      Version: "1.6"

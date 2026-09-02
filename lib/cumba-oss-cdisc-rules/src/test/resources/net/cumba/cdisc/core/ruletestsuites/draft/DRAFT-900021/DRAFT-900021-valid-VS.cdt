@@ -1,0 +1,18 @@
+#!RuleTest
+#test DRAFT-900021 expect=noViolation domain=VS
+#note "Same dataset + library lines as invalid. Define enumerates only published terms: VSPOS [SUPINE, STANDING], VSLAT [LEFT], VSTESTCD [SYSBP] -> every define term is a published library term -> no violation. Non-vacuous: identical library/universe shape as the firing scenario, only the enumerated terms differ."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 codelist_extensible=false codelist_coded_values="[\"SUPINE\",\"STANDING\"]"
+#library variable-metadata VS VSLAT codelist=C99074 codelist_extensible=false codelist_coded_values="[\"LEFT\",\"RIGHT\"]"
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS name=VSPOS codelist_coded_values="[\"SUPINE\",\"STANDING\"]"
+#define variable-metadata VS VSLAT name=VSLAT codelist_coded_values="[\"LEFT\"]"
+#define variable-metadata VS VSTESTCD name=VSTESTCD codelist_coded_values="[\"SYSBP\"]"
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

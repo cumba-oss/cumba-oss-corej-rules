@@ -1,0 +1,23 @@
+Core:
+  Id: "DRAFT-900036"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when SRCSEQ is present in a Basic Data Structure dataset\
+  \ but SRCDOM is not; SRCDOM is required when SRCSEQ exists."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("SRCSEQ") and not var_exists("SRCDOM")
+Outcome:
+  Message: "SRCSEQ is present but SRCDOM is not. SRCDOM is required when SRCSEQ exists."
+  Output_Variables:
+  - "SRCSEQ"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

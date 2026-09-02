@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1326 expect=violation domain=APRELSUB
+#note "row 1 populates RSUBJID and RDEVID on the same record -> fires."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 RSUBJID=001
+dataset APRELSUB label="Associated Persons Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col RDEVID  type=Char label="Related Device Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+S1 | APRELSUB | AP-001 | 001 | DEV-01 | FRIEND
+S1 | APRELSUB | AP-002 |  | DEV-02 | OPERATOR

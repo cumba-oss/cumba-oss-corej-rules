@@ -1,0 +1,44 @@
+name: rule_library_mocks_valid_ct_dates
+kind: rule
+description: |
+  M3 pilot: full rule that depends on library metadata via `valid_codelist_dates`.
+  Synthetic rule fires when TS.TSVCDVER is not one of the published SDTM CT package dates.
+  Demonstrates the library_mocks adapter wiring on both engines.
+rule:
+  id: pilot-valid-ct-dates
+  Core: {Id: PILOT-VALID-CT-DATES}
+  Description: TSVCDVER must be a published SDTM CT package date.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [TS]}
+  Operations:
+    - id: $valid_dates
+      operator: valid_codelist_dates
+      ct_package_types: [SDTM]
+  Check:
+    all:
+      - {name: TSVCDVER, operator: is_not_contained_by, value: $valid_dates}
+  Outcome:
+    Message: TSVCDVER is not a published SDTM CT package date.
+    Output_Variables: [STUDYID, TSSEQ, TSPARMCD, TSVCDVER]
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ, TSPARMCD]
+    rows:
+      - {STUDYID: "S1", TSSEQ: 1, TSPARMCD: "DOSE", TSVCDVER: "2023-12-13"}
+      - {STUDYID: "S1", TSSEQ: 2, TSPARMCD: "ROUTE", TSVCDVER: "2099-01-01"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+library_mocks:
+  published_ct_packages:
+    - sdtmct-2023-10-26
+    - sdtmct-2023-12-13
+expected_violations:
+  - rule_id: PILOT-VALID-CT-DATES
+    dataset: TS
+    row_key: {STUDYID: "S1", TSSEQ: 2, TSPARMCD: "ROUTE"}
+    status: SUCCESS
+    output_variables: {STUDYID: "S1", TSSEQ: "2", TSPARMCD: "ROUTE", TSVCDVER: "2099-01-01"}
+expected_errors: []

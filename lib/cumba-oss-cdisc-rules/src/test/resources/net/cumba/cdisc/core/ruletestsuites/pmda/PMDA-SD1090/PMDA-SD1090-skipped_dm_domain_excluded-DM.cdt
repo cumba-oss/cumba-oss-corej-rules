@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1090 expect=skipped domain=DM
+#note "FRESH - the batch's Domains.EXCLUDE reject pin (Exclude [CO, DM]). DM deliberately carries DMSTDTC/DMSTDY columns so the Requirements.Variables axis passes and the SPECIAL PURPOSE class is in Classes.Include - only the Domains.Exclude axis rejects. The rule must not execute."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DMSTDTC type=Char label="Start Date/Time of Observation"
+col DMSTDY  type=Num  label="Study Day of Start of Observation"
+---
+S1 | DM | 001 | 2020-01-01 | 1

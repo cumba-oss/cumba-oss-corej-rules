@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0104"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Age (AGE) or Age Text (AGETXT) is populated but\
+  \ Age Units (AGEU) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "AGEU"
+Check:
+  expression: >-
+    (not empty(AGE) or not empty(AGETXT)) and empty(AGEU)
+Outcome:
+  Message: "AGEU is empty when AGE or AGETXT is populated."
+  Output_Variables:
+  - "AGE"
+  - "AGETXT"
+  - "AGEU"
+Source:
+  Class: "SPC, TDM"
+  Domain: "DM,TS"
+  Variable: "AGEU"
+  Plain_Text_Explanation: "AGEU is the unit associated with AGE or AGETXT.  If either\
+    \ of those variables is populated, AGEU should be populated."
+  Condition: "AGE ^= null OR AGETXT^= null"
+  Rule: "AGEU ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND104"
+        Version: "1"
+      Version: "5.0"

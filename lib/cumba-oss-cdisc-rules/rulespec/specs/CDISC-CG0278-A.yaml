@@ -1,0 +1,36 @@
+name: CDISC-CG0278-A
+kind: rule
+description: |
+  Dataset-absence half of the granularity split
+  (PLAN-split-mixed-granularity-rules.md). CDISC-CG0278-A: when STYPE=INTERVENTIONAL, TS must
+  contain a INTTYPE record. No INTTYPE row exists, so $INTTYPE_N == 0 and the rule
+  fires once at dataset level.
+  Java-canonical output_variables is empty: Java does not materialise
+  $-operation Output_Variables on a dataset-level finding, where Python emits
+  their values. Pre-existing engine divergence -- see the baseline entry.
+python_source: rules-cdisc-sdtmig-3-3.json (CDISC-CG0278-A)
+rule:
+  coreId: CDISC-CG0278-A
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: STYPE, TSVAL: INTERVENTIONAL}
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 2, TSPARMCD: TITLE, TSVAL: A Study of Drug X}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0278-A
+    dataset: TS
+    row_key: {STUDYID: S1, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $INTTYPE_N: '0'
+      $STYPE_INTERVENTIONAL: '1'
+      TSPARMCD: 'STYPE'
+      TSVAL: 'INTERVENTIONAL'
+expected_errors: []

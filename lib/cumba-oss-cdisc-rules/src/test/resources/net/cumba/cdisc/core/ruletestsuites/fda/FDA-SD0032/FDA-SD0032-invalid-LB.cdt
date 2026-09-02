@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0032 expect=violation domain=LB
+#note "Row 1 carries LBTPTNUM=1 with an empty LBTPT -> 'Planned Time Point Name (--TPT) should not be NULL, when Planned Time Point Number (--TPTNUM) is populated'."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTPTNUM=1 LBTPT=
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTPT    type=Char label="Planned Time Point Name"
+col LBTPTNUM type=Num  label="Planned Time Point Number"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC |           | 1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 2 HR POST | 2

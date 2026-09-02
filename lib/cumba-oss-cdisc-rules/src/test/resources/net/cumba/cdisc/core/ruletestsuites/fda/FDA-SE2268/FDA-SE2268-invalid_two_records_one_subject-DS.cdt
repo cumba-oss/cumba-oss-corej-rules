@@ -1,0 +1,34 @@
+#!RuleTest
+#test FDA-SE2268 expect=violation domain=DS
+#note "FRESH - the SD1316-F3 DISCRIMINATING fixture. Subject 001 has TWO unscheduled-death disposition records and subject 002 has one, and DD holds neither subject: the ruled per-subject answer is 2 (anchored at each group's first flagged row, DS rows 1 and 3), a per-record reading would say 3, and a dataset-level reading would say 1. Row 4 (TERMINAL SACRIFICE) is not an unscheduled-death term -> clean, and subject 009 does have a DD record."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=3 USUBJID=002
+dataset DS class=EVENTS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSTERM   type=Char label="Reported Term for the Disposition Event"
+col DSDECOD  type=Char label="Standardized Disposition Term"
+col DSUSCHFL type=Char label="Unscheduled Flag"
+col DSSTDTC  type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | Found dead         | FOUND DEAD         | Y | 2020-02-01
+S1 | DS | 001 | 2 | Accidental death   | ACCIDENTAL DEATH   | Y | 2020-02-02
+S1 | DS | 002 | 1 | Moribund sacrifice | MORIBUND SACRIFICE | Y | 2020-02-03
+S1 | DS | 009 | 1 | Terminal sacrifice | TERMINAL SACRIFICE |   | 2020-03-01
+---
+
+dataset DD class=FINDINGS label="Death Diagnosis and Details"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DDSEQ    type=Num  label="Sequence Number"
+col DDTESTCD type=Char label="Death Diagnosis Short Name"
+col DDTEST   type=Char label="Death Diagnosis Test Name"
+col DDORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | DD | 009 | 1 | DEATHC | Cause of Death | CARDIAC FAILURE
+---

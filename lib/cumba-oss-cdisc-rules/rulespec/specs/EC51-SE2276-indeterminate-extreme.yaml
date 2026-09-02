@@ -1,0 +1,84 @@
+name: EC51-SE2276-indeterminate-extreme
+kind: rule
+description: |
+  EC-51 Half B (register §49) / `Fix #145` — `missing_values: "indeterminate"` reaching the
+  OTHER null-operand primitive. Sibling of `EC51-CG0147-indeterminate-extreme`, and it is a
+  separate spec because the consuming leaf is a different operator on a different code path:
+
+    - `CDISC-CG0147` / `CDISC-SEND-0306` consume the extreme through `not_equal_to`, which
+      answers a null operand through `Primitives.equality`;
+    - `FDA-SE2276` consumes it through `date_not_equal_to`, which answers a null operand through
+      `Primitives.dateComparison` (`negate`).
+
+    Both are listed in `RulePackageLoader.REPORTS_ON_NO_VALUE`, so both are legal consumers of
+    `indeterminate` and both FIRE — but a spec on only one of them would leave the other
+    unmeasured, and the load-time polarity rejection (§24 rejection 4) partitions operators by
+    exactly this distinction.
+
+  It is also the only one of the four migrated rules whose extreme comes from `DS.DSSTDTC`
+  rather than `EX.EXENDTC`, and the only one whose target is a `--` wildcard (`--DTC`).
+
+  WHAT DIVERGES, measured 2026-08-08 on fork `195c7172`. Subject `002` has two DS records; one
+  carries `DSSTDTC: ''`.
+
+    - coreJ resolves `max_date(DSSTDTC, domain="DS", group=[USUBJID],
+      missing_values="indeterminate")` to NO VALUE for `002`, and `date(--DTC) != <no value>`
+      fires. One violation on MA row `002`/1. ⚠ `--DTC` resolves to `MADTC` in the emitted
+      `output_variables` on BOTH lanes — this spec is not exposed to the Wave-4
+      `--`-in-Output_Variables gap.
+    - The fork drops the `missing_values` key (no arm in the `OperationParams` whitelist in
+      `utilities/rule_processor.py`), runs `skip`, removes the blank row via
+      `_drop_blank_candidates` (EC-51 Half A / `Fix #141`), and resolves the extreme over the
+      surviving populated row to `2026-02-05`. `MADTC` equals it, so the fork reports NOTHING.
+
+  ⚠ Detection divergence, not a reporting one. Baselined `lane: python`,
+  `channels: ["violations"]`. Fork repair is not scheduled under the Java-first direction of
+  2026-08-03.
+
+  Subject `001` is the control: no blank `DSSTDTC`, `MADTC` equal to the resolved extreme,
+  nothing reported on either lane. MA is used as the in-scope domain; the rule's Scope also
+  admits MI and TF, which travel the same expression.
+
+  NEUTER-AND-WATCH, 2026-08-08. Deleting the `DSSTDTC: ''` row makes the JAVA lane report
+  nothing (`- missing` on this spec's expectation), so the Java expectation is pinned on the
+  blank cell reaching the disposition and not on the rule firing generally. Rewriting subject
+  `002`'s `MADTC` from `2026-02-05` to `2026-09-09` makes the PYTHON lane report the same row
+  with `$max_ds_dsstdtc: '2026-02-05'` — so the spec is not vacuous on the fork either: it
+  observes the fork resolving the extreme the disposition was supposed to suppress, and it
+  confirms `--DTC` resolving to `MADTC` on that lane too.
+rule:
+  coreId: FDA-SE2276
+datasets:
+  MA:
+    row_key: [STUDYID, USUBJID, MASEQ]
+    column_types:
+      MASEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: MA, USUBJID: '001', MASEQ: 1, MATESTCD: GROSPATH, MADTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: MA, USUBJID: '002', MASEQ: 1, MATESTCD: GROSPATH, MADTC: '2026-02-05'}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    column_types:
+      DSSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: 'TERMINAL SACRIFICE', DSSTDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: 'TERMINAL SACRIFICE', DSSTDTC: '2026-02-05'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 2, DSDECOD: 'MORIBUND SACRIFICE', DSSTDTC: ''}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+library_mocks:
+  classes:
+    findings: [MA]
+    events: [DS]
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SE2276
+    dataset: MA
+    row_key: {STUDYID: S1, USUBJID: '002', MASEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $ds_usubjid: '[001, 002]'
+      $max_ds_dsstdtc:
+      MADTC: '2026-02-05'
+expected_errors: []

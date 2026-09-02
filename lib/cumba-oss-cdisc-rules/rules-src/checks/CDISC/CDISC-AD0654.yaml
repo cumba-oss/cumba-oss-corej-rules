@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-AD0654"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SRCSEQ is present in an ADVERSE EVENT sub-class\
+  \ OCCDS dataset (e.g., ADAE); SRCSEQ must not be used for the AE sub-class (AESEQ\
+  \ replaces SRCDOM+SRCSEQ per OCCDS v1.1)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    var_exists("SRCSEQ")
+Outcome:
+  Message: "SRCSEQ is present"
+  Output_Variables:
+  - "SRCSEQ"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Subclass: "ADVERSE EVENT"
+  Variable_or_Item: "SRCSEQ"
+  Natural_Language_Rule_Failure_Criteria: "SRCSEQ is present"
+  Rule_Failure_Criteria: "SRCSEQ is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR654"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR654"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR654"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR654"
+        Version: "1"
+      Version: "5.0"

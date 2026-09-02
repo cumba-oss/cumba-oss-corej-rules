@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1446 expect=noViolation domain=EX
+#note "ADAPTED-FROM fda/FDA-SD1446/FDA-SD1446-valid-EX.cdt, MINOR-STRENGTHENED with one fresh mechanism row. Boundaries: subject 001 EXSTDTC equals the latest DSSTDTC (2020-05-30, not after) -> silent; subject 002 EXSTDTC is empty -> the non_empty gate is false; subject 003 has no DS records -> the per-subject max resolves to nothing and the date comparison cannot fire; FRESH subject 004: EXSTDTC 2020-12-01 (late, violating-shaped) but its DS record's DSSTDTC is BLANK -> the subject's max_date input is all-blank -> $ MISSING -> silent. If 004 fires, escalate."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 2020-05-30
+S1 | EX | 002 | 1 | DRUG A |
+S1 | EX | 003 | 1 | DRUG A | 2020-07-01
+S1 | EX | 004 | 1 | DRUG A | 2020-12-01
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition"
+---
+S1 | DS | 001 | 1 | COMPLETED | COMPLETED | 2020-05-30
+S1 | DS | 002 | 1 | COMPLETED | COMPLETED | 2020-06-01
+S1 | DS | 004 | 1 | COMPLETED | COMPLETED |

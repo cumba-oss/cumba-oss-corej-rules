@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0294"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Arm Name (ARM) is populated but its value is\
+  \ not one of the Arm names (ARM) defined in the Trial Arms (TA) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Operations:
+- id: "$ta_arm"
+  expression: "distinct(ARM, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ARM) and ARM not in $ta_arm
+Outcome:
+  Message: "ARM is populated but its value is not present in TA.ARM."
+  Output_Variables:
+  - "ARM"
+  - "$ta_arm"
+Source:
+  Class: "TDM"
+  Domain: "TV"
+  Variable: "ARM"
+  Condition: "ARM ^= null"
+  Rule: "ARM in TA.ARM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0294"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0294"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0294"
+        Version: "1"
+      Version: "2.0"

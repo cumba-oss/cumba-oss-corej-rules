@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0123 expect=violation domain=ADLBC
+#note "NEW with the M2-P3 ruling (Fix #304): the {<blank>, <blank>, DERIVED} shape the dossier flagged as the surprising one, pinned rather than discovered after release. PARAMTYP is Perm, so a mostly-blank column is the common real-world shape. Under include_empty=true group GLUC carries {EMPTY:2, DERIVED:1}; maxCount 2 is held by EMPTY alone, so the MINORITY - the one record that actually declares a type - is the row flagged. That is what the operator's minority rule decides; the sheet sentence is about the PARAMETER, not about a row, and this fixture is the record of the consequence."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=GLUC
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col PARAMTYP type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC |
+CDISCPILOT01 | 01-701-1023 | GLUC |
+CDISCPILOT01 | 01-701-1034 | GLUC | DERIVED

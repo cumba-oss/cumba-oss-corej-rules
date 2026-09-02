@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1324 expect=noViolation domain=DM
+#note "AGE carries a label that differs from anything in the Define-XML, but AGE is not declared in the Define-XML at all, so the define_variable_name guard keeps the rule silent: a label mismatch can only be asserted against a declared variable."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

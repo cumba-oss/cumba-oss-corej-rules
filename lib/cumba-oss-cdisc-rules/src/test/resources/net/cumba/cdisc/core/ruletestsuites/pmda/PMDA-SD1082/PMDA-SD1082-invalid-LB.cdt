@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1082 expect=violation domain=LB
+#note "LBTESTCD is declared length 8 but the longest stored value is 'GLUC' (4 characters) -> the variable is over-sized for its actual data and fires. All other character variables are sized exactly."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=LBTESTCD
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=8  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=3  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  | 4.1

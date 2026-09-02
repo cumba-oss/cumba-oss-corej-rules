@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1358 expect=violation domain=DM
+#note "OR branch: only ACTARM is empty (row 1) resp. only ACTARMCD is empty (row 2) while ARMNRS is empty -> both fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=002
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+S1 | DM | 001 | A |             |
+S1 | DM | 002 |   | Treatment A |
+S1 | DM | 003 | B | Treatment B |

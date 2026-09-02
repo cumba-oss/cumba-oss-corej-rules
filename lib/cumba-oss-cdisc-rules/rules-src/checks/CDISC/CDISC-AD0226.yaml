@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-AD0226"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, PCHGCATy is populated,\
+  \ PCHG is populated, and there is more than one value of PCHGCATy for a given value\
+  \ of PCHG"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PCHGCATy) and not empty(PCHG) and has_multiple_values_for(PCHGCATy, PCHG,
+    within=PARAMCD)
+Outcome:
+  Message: "Within this PARAMCD, more than one value of PCHGCATy is recorded for the\
+    \ same PCHG"
+  Output_Variables:
+  - "PARAMCD"
+  - "PCHG"
+  - "PCHGCATy"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "PCHGCATy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of PCHGCATy for a given value of PCHG and y"
+  Rule_Failure_Criteria: "There is more than one value of PCHGCATy for a given value\
+    \ of PCHG"
+  Condition_Failure: "Within a given value of PARAMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR226"
+        Version: "1"
+      Version: "5.0"

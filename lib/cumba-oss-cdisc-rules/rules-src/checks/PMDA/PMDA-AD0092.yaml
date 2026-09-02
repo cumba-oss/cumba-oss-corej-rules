@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0092"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Planned Treatment (N) (TRTPN)\
+  \ does not have a single consistent value for each unique value of Planned Treatment\
+  \ (TRTP). All TRTPN values must be the same for each unique value of TRTP when the\
+  \ primary variable TRTP is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "TRTP"
+    - "TRTPN"
+Check:
+  expression: >-
+    not empty(TRTP) and is_inconsistent_across_dataset(TRTPN, keys=[TRTP])
+Outcome:
+  Message: "Inconsistent value for TRTPN: TRTPN is not the same value across records\
+    \ with the same value of TRTP."
+  Output_Variables:
+  - "TRTP"
+  - "TRTPN"
+Source:
+  Message: "Inconsistent value for TRTPN"
+  Description: "Within a study, all TRTPN values must be the same for each unique\
+    \ value of TRTP when the primary variable TRTP is populated."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0092"
+        Version: "1"
+      Version: "6.0"

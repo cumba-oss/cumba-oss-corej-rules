@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0149"
+Sheet_Rule_Identifier: "149"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "A variable defined in a standard with a Controlled Terminology requirement must have a CodeListRef element."
+# CDISC twin of PMDA-DD0124, same kind: the LibraryProvider's
+# variableCodelistCCode answering non-empty = "defined with a Controlled
+# Terminology requirement in the def:Standard referenced in the ItemGroupDef";
+# the finding is the dereferenced ItemDef carrying no CodeListRef child.
+# 2.1-only per the sheet (the per-dataset def:StandardOID linkage).
+Message: "ItemDef [${value}] requires Controlled Terminology and is missing the CodeListRef child element."
+Check:
+  kind: "library_codelist_ref_required"

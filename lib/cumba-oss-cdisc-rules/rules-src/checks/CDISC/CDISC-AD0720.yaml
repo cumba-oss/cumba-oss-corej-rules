@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-AD0720"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTP is populated but its value does not equal any\
+  \ value of the character planned treatment variables in ADSL defined in the IG."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(TRTP) and TRTP not in ADSL.TRT${*}P and TRTP not in ADSL.TRTSEQP and TRTP not in
+    ADSL.TRTPG${*} and TRTP not in ADSL.TR${*}PG${*}
+Outcome:
+  Message: "The value of TRTP was not found among the values of the character planned\
+    \ treatment variables in ADSL defined in the IG."
+  Output_Variables:
+  - "TRTP"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "TRTP"
+  Natural_Language_Rule_Failure_Criteria: "A non-missing value of TRTP is not equal\
+    \ to at least one value of the character planned treatment variables in ADSL defined\
+    \ in the IG"
+  Rule_Failure_Criteria: "Variable is not equal to at least one value of the IG-defined\
+    \ character planned treatment variables in ADSL"
+  Condition_Failure: "TRTP is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR720"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR720"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR720"
+        Version: "1"
+      Version: "5.0"

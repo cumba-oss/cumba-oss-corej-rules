@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1335 expect=violation domain=DM
+#note "Subject 2 was first treated on 2020-02-01 but only consented on 2020-02-15 -- consent after first study treatment."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 RFXSTDTC=2020-02-01 RFICDTC=2020-02-15
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFICDTC  type=Char label="Date/Time of Informed Consent"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-01-10 | 2020-01-02
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 2020-02-01 | 2020-02-15

@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0039"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, with the primary SOC used for analysis, the body\
+  \ system or organ class (--BODSYS) is not equal to the SOC (--SOC)."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "HO"
+Requirements:
+  Variables:
+    All:
+    - "--BODSYS"
+    - "--SOC"
+Check:
+  expression: >-
+    --BODSYS != --SOC
+Outcome:
+  Message: "--BODSYS is not equal to --SOC."
+  Output_Variables:
+  - "--BODSYS"
+  - "--SOC"
+Source:
+  Class: "EVT"
+  Domain: "NOT(DS, DV, HO)"
+  Variable: "--BODSYS"
+  Condition: "Primary SOC used for analysis"
+  Rule: "--BODSYS = --SOC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0039"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0039"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0039"
+        Version: "1"
+      Version: "2.0"

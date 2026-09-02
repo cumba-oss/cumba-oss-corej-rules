@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0171"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SSSTRESC is equal to 'DEAD' and SSDTC in the SS\
+  \ dataset is less than DTHDTC in the DM dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SS"
+Requirements:
+  Variables:
+    All:
+    - "SSSTRESC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    SSSTRESC == "DEAD" and date(SSDTC) < DM.DTHDTC
+Outcome:
+  Message: "SSDTC in the SS dataset is not greater than or equal to DTHDTC in the\
+    \ DM dataset, when SSSTRESC is equal to 'DEAD'."
+  Output_Variables:
+  - "SSSTRESC"
+  - "SSDTC"
+  - "DM.DTHDTC"
+Source:
+  Class: "FND"
+  Domain: "SS"
+  Variable: "SSDTC"
+  Condition: "SSSTRESC = 'DEAD'"
+  Rule: "SSDTC >= DM.DTHDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0171"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0171"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0171"
+        Version: "1"
+      Version: "2.0"

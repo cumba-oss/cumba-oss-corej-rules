@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1469 expect=noViolation domain=EX
+#note "EX block WITHOUT EXVAMTU + the EC-present block -- var_exists(\"EXVAMTU\") is false -> noViolation with execution."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXSEQ   type=Num
+col EXTRT   type=Char
+---
+S1 | EX | 001 | 1 | DRUGA
+---
+
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num
+col ECDOSE  type=Num
+col ECDOSU  type=Char
+---
+S1 | EC | 001 | 1 | 10 | mg

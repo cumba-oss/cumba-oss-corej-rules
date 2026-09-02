@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0308 expect=skipped domain=LB
+# Rule:Description: Raise an error when the DOMAIN value length is not equal to 2.
+#note "Pins the `Requirements.Variables.All: [DOMAIN]` guard added with the `dataset_domain` migration (plans/PLAN-domain-expression-function.md §2a). ⚠⚠ The guard is NOT cosmetic and it is NOT merely defensive: `dataset_domain` falls back to the raw DATASET NAME when no DOMAIN cell can be read, so on this DOMAIN-less LB dataset it would answer \"LB\" — and on a three-character or SUPP-- name it would answer a value the length check FIRES on. Measured 2026-08-07: remove the `Variables` block and this scenario reports one violation on conformant-shaped data. ⚑ This is the ONLY filter that can reject this dataset — the class is FINDINGS (so `Classes.Exclude: [RELATIONSHIP]` does not bite) and `LB` is in neither `AP--` nor `APRELSUB` — so the neuter-and-watch is unmasked."
+#library dataset-class LB FINDINGS
+dataset LB label="Laboratory Test Results (DOMAIN variable omitted)"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+CDISCPILOT01 | 01-701-1015 | ALB
+CDISCPILOT01 | 01-701-1023 | ALT
+---

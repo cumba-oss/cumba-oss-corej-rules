@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1476 expect=skipped domain=DM
+#note "FLIPPED noViolation -> skipped by Fix #331 (M2-D24 bucket 2, owner ruling 2026-08-22). RACE is absent; under Fix #330 a bare empty(RACE) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so the rule would flood -- the ruled disposition is Requirements.Variables.All [RACE], an auditable SKIP naming RACE as the reason, with the absence itself left to one presence rule. If this EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite. History, before Fix #330: RACE is not declared at all. The rule has no Requirements.Variables gate, so it EXECUTES; the machine-derived guard the loader injects (shipped form var_exists(\"RACE\") and empty(RACE)) folds FALSE first and short-circuits the AND, so the bare empty() broadcast-TRUE trap never applies. Pins the EC-43 / Fix #126 contract for this rule: an absent RACE column is a different defect, reported by a dedicated presence rule, not by this one. The guard is derived - it must not be authored into the rule."
+#library standard=sdtmig version=3-4
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | F
+CDISCPILOT01 | DM | 01-701-1023 | M

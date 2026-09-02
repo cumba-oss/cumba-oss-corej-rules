@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0086 expect=noViolation domain=SUPPAE
+#note "FRESH, DISCRIMINATING. Zero data rows, no DOMAIN column. Predicted SILENT: with no rows there are no tuples to duplicate. This fixture ALSO exercises the STAGE-G CRITICAL 2 path in its degenerate form — with no rows, unsplitNameFromData finds no row-0 RDOMAIN and falls back to the raw name 'SUPPAE', which is 6 characters and matches SUPP-- directly, so the rule still EXECUTES. That is why SUPPAE (not SUPPQUAL) is the right dataset for the empty case. DISCRIMINATING on both counts: escalate on a fire OR on a skip."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---

@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0129.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SESTDTC variable is declared in the SE Define-XML\
+  \ document with a non-collected Origin (Type) but has no derivation Method."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    varname() == "SESTDTC" and not empty(var_name("DEFINE")) and not
+    empty(var_origin_type("DEFINE")) and var_origin_type("DEFINE") not in ["Collected", "CRF"] and
+    var_has_method("DEFINE") == false
+Outcome:
+  Message: "SESTDTC has no method explaining how the Element start date/time was determined\
+    \ in the Define-XML document."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SESTDTC"
+  Plain_Text_Explanation: "If the start date/time of an Element was not collected,\
+    \ the method used to determine the Element start date/time should be explained\
+    \ in the Define-XML document."
+  Condition: "SESTDTC ^= null and was not directly collected"
+  Rule: "Method used to determine  SESTDTC is explained in the Define-XML document."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND129.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0096"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the reported term (CMTRT) has a decode value in\
+  \ the coding dictionary but the Standardized Medication Name (CMDECOD) is not populated."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "CM"
+Requirements:
+  Variables:
+    All:
+    - "CMDECOD"
+Operations:
+- id: "$cmtrt_has_decode"
+  expression: "dictionary_has_decode(CMTRT, external_dictionary_type=\"whodrug\")"
+Check:
+  expression: >-
+    $cmtrt_has_decode == true and empty(CMDECOD)
+Outcome:
+  Message: "CMDECOD is not populated although CMTRT has a decode value in the dictionary."
+  Output_Variables:
+  - "CMDECOD"
+Source:
+  Class: "INT"
+  Domain: "CM"
+  Variable: "CMDECOD"
+  Condition: "CMTRT has a decode value in the dictionary"
+  Rule: "CMDECOD ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0096"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0096"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0096"
+        Version: "1"
+      Version: "2.0"

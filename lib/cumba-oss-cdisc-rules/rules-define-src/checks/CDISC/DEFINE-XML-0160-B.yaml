@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0160-B"
+Sheet_Rule_Identifier: "160"
+Rule_Set: "CDISC"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.0"]
+Source_Type: "Schema"
+# Companion of DEFINE-XML-0160 (one sheet row, two version-gated rules): the
+# Define-XML 2.0 spec's def:Origin Type set is CRF, Derived, Assigned, Protocol,
+# eDT, Predecessor (2.0 spec SS5.3.11 def:Origin, "The list of allowable values
+# is not extensible") — disjoint from 2.1's Collected/Not Available terms, so a
+# shared list would mis-validate both versions.
+Plain_Text_Rule: "The value of the Type attribute must be one of the values from the Define-XML 2.0 Origin Type list."
+Message: "The value of Type [${value}] is not one of \"CRF\", \"Derived\", \"Assigned\", \"Protocol\", \"eDT\", \"Predecessor\" for the def:Origin element."
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["CRF", "Derived", "Assigned", "Protocol", "eDT", "Predecessor"]

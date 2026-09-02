@@ -1,0 +1,103 @@
+Core:
+  Id: "FDA-SD2008C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Lowest Level Term (--LLT) value does not match\
+  \ the case of its MedDRA Lowest Level Term."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--LLT"
+Operations:
+- id: "$llt_case_valid"
+  expression: "valid_external_dictionary_value(--LLT, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"LLT\", case_sensitive=true)"
+Check:
+  expression: >-
+    $llt_case_valid == false
+Outcome:
+  Message: "Lowest Level Term (--LLT) does not match the MedDRA Lowest Level Term\
+    \ case."
+  Output_Variables:
+  - "--LLT"
+Source:
+  FDA_Validator_Rule_Message: "Value for --LLT is in incorrect case"
+  FDA_Validator_Rule_Description: "Case for Lowest Level Term (--LLT) variable must\
+    \ be sentence case using a Lowest Level Term of the MedDRA dictionary of a version\
+    \ specified in the define.xml (Case-sensitive)."
+  Domains: "AE, CE, MH"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2008C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2008C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2008C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2008C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2008C"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0239 expect=skipped domain=ADLBC
+#note "TRTA present but no TRTPG* and no TRTAG* column. Only the two template names (TRTPGy, TRTAGy) participate in expansion; neither matches, so anyAnchor is false and the expansion list is empty -> NoMatch -> the rule does not execute. A plain BDS dataset that simply does not pool treatments is SKIPPED, not silently passed."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA | 5.4

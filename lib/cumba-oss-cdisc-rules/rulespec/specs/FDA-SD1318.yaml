@@ -1,0 +1,41 @@
+name: FDA-SD1318
+kind: rule
+description: |
+  EC-27 / Fix #126 pin — the authored absent-dataset branch is reachable in both
+  lanes. FDA-SD1318: a subject with a DS PROTOCOL VIOLATION/DEVIATION record must
+  have a supportive DV record. The DV dataset is GENUINELY ABSENT from this study:
+  the fork used to raise DomainNotFoundError on record_count(domain=DV) and skip
+  the whole rule before the Check; it degraded $dv_count to null (now '0', Fix #192) and the
+  `$study_datasets shares_no_elements_with [DV]` branch fires. Subject 001 has a
+  PROTOCOL VIOLATION -> fires; subject 002 only COMPLETED -> the first any: gate
+  fails, no finding.
+  ⚠ RE-CAPTURED 2026-08-09 for `Fix #192` (Q17-a): an unresolvable operation domain now
+  publishes the operator's DECLARED `EmptyResult` instead of an unclassified null. The
+  VERDICT is unchanged — same rows, same status; only the rendered $-value moves. The fork
+  still reports "no value", so this is a filed java-only divergence, not a regression.
+python_source: rules-sdtmig-3-4.json (FDA-SD1318)
+rule:
+  coreId: FDA-SD1318
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: PROTOCOL VIOLATION, DSTERM: PROTOCOL VIOLATION}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: COMPLETED}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: FDA-SD1318
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $ds_pd_count: '0'
+      $ds_pv_count: '1'
+      $dv_count: '0'
+      DSDECOD: PROTOCOL VIOLATION
+expected_errors: []

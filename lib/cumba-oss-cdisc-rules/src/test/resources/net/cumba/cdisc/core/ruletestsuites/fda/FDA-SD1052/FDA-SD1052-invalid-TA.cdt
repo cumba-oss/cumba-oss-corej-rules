@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1052 expect=violation domain=TA
+#note "TAETORD 1 appears twice within ARMCD A -> both duplicate records fire; ARMCD B with the same order 1 does not."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ARMCD=A TAETORD=1
+#expectViolationAt row=2 ARMCD=A TAETORD=1
+dataset TA class="TRIAL DESIGN"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 1 | TRT
+S1 | TA | B | Arm B | 1 | SCRN

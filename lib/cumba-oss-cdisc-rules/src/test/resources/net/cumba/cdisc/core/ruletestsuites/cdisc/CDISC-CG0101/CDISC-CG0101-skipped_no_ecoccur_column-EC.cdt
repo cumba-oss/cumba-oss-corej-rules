@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0101 expect=skipped domain=EC
+#note "FRESH: EC deliberately carries no ECOCCUR column. ECDOSE=0 is populated, i.e. the value half of the firing condition is present, so only Requirements.Variables.All [ECOCCUR] can reject. Predicted auditable SKIP -- ECOCCUR is core='Perm' in EC, which is exactly why the gate is authored as Requirements.Variables rather than as a Check leaf. Worked precedent: pmda/PMDA-SD1371/PMDA-SD1371-skipped_no_lobxfl_column-LB.cdt."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECPRESP type=Char label="Pre-Specified"
+col ECDOSE  type=Num  label="Dose"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0

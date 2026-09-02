@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0377 expect=violation domain=AE
+#note "CL-G.4 (wave TA-4): explicit case_sensitive: false, restoring the pre-TA-3 insensitive behaviour family-wide. Row 2's AELLT 'Cranial pain' is not a MedDRA Lowest Level Term of the (dummy) dictionary -> fires."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AELLT="Cranial pain"
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AELLT   type=Char label="Lowest Level Term"
+---
+S1 | AE | 001 | 1 | headache | Headache
+S1 | AE | 001 | 2 | head hurts | Cranial pain

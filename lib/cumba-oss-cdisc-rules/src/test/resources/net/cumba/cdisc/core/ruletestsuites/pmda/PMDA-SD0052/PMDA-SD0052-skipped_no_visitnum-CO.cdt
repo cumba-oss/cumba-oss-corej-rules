@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0052 expect=skipped domain=CO
+#note "FRESH: CO deliberately carries no VISITNUM column. The rule declares Requirements.Variables.All [VISITNUM], so a dataset without that column is SKIPPED and never executes. CO is a SPECIAL PURPOSE dataset, named in SD0052's own sheet DOMAINS cell, so the scenario skips under BOTH readings of the pending M2-Q1 / SD0003-F1 scope question."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+col VISIT   type=Char label="Visit Name"
+---
+S1 | CO | 001 | 1 | Late visit | WEEK 2
+S1 | CO | 002 | 1 | Also late  | WEEK 2

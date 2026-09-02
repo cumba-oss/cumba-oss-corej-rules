@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1271 expect=violation domain=TE
+#note "TEENRL (Perm) is absent from the dataset. Per the drop-and-regroup doctrine the absent column is dropped from the value list and the reduced combination is checked: the same ETCD repeats the ELEMENT/TESTRL/TEDUR combination -> fires on both rows. TEENRL is an Output_Variable and is not in the dataset, so pin count only."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset TE class="TRIAL DESIGN" label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+S1 | TE | TRT1 | Treatment | Randomization | P28D
+S1 | TE | TRT1 | Treatment | Randomization | P28D
+---

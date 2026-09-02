@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1332 expect=violation domain=AE
+#note "Row 1 unresolved with no end date -> silent. Row 2 unresolved but an end date is supplied -> fires. Do NOT pin AEOUT: its value contains spaces. Pin AESEQ and AEENDTC instead."
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2 AEENDTC=2020-01-09
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEOUT   type=Char
+col AESTDTC type=Char
+col AEENDTC type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | NOT RECOVERED/NOT RESOLVED | 2020-01-05 |
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NOT RECOVERED/NOT RESOLVED | 2020-01-06 | 2020-01-09
+---

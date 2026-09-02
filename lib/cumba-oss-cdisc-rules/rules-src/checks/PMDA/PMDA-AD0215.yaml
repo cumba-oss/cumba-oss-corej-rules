@@ -1,0 +1,37 @@
+Core:
+  Id: "PMDA-AD0215"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pooled Race Group variable named RACEGRy or RACEGRyN\
+  \ has an index y that is not a single digit in the range 1 to 9; y must be the pooling\
+  \ algorithm group (1 to 9)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() =~ /^RACEGR\\d+N?$/ and varname() !~ /^RACEGR[1-9]N?$/
+Outcome:
+  Message: "Illegal variable name: the y index of a RACEGRy(N) variable is not in\
+    \ [1-9]."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: y is not in [1-9] for RACEGRy(N)"
+  Description: "For RACEGRy (Pooled rRace Group), y must be the pooling algorithm\
+    \ group (1 to 9)."
+  Domains: "ADSL, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0215"
+        Version: "1"
+      Version: "6.0"

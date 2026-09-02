@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-SD9707"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IETEST is not populated."
+Severity: "Reject"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TI"
+Requirements:
+  Variables:
+    All:
+    - "IETEST"
+Check:
+  expression: >-
+    empty(IETEST)
+Outcome:
+  Message: "IETEST is empty."
+  Output_Variables:
+  - "IETEST"
+Source_Proposed:
+  Message: "Missing value for IETEST"
+  Description: "IETEST should be populated."
+  Domains: "TI"
+  Severity: "Reject"
+Source:
+  Message: "Null value in variable marked as Required"
+  Description: "Required variables (where Core attribute is 'Req') cannot be null\
+    \ for any records."
+  Domains: "ALL"
+  Severity: "Reject"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0002"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0002"
+        Version: "1"
+      Version: "1.6"

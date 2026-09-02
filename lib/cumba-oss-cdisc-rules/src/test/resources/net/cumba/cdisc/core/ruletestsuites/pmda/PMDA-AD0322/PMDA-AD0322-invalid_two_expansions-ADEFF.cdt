@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0322 expect=violation domain=ADEFF
+#note "TWO columns match ^TRTPG(\\d+)$, so the expander emits two concrete rules (y=1 and y=2) and the harness aggregates their violations. The y=1 rule fires once (row 3, TRTPG1 minority within DrugA); the y=2 rule fires once (row 6, TRTPG2 minority within DrugB). Pin on multi-expansion aggregation."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=3 TRTPG1=POOL2 TRTP=DrugA
+#expectViolationAt row=6 TRTPG2=MID TRTP=DrugB
+dataset ADEFF
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP    type=Char
+col TRTPG1  type=Char
+col TRTPG2  type=Char
+---
+S1 | 001 | DrugA | POOL1 | HIGH
+S1 | 002 | DrugA | POOL1 | HIGH
+S1 | 003 | DrugA | POOL2 | HIGH
+S1 | 004 | DrugB | POOLX | LOW
+S1 | 005 | DrugB | POOLX | LOW
+S1 | 006 | DrugB | POOLX | MID

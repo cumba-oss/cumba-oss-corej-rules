@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0329 expect=violation domain=ADVS
+#note "BASECA1N is not declared -- the valid_consistent data minus the numeric column. The absent key drops out, the group degrades to [PARAMCD], and row 3 becomes the minority. Same drop-and-regroup arm as AD0327 (guard sits on the target BASECATy)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 BASECAT1=HIGH PARAMCD=SYSBP
+dataset ADVS class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASECAT1 type=Char
+---
+S1 | 001 | SYSBP | NORMAL
+S1 | 002 | SYSBP | NORMAL
+S1 | 003 | SYSBP | HIGH

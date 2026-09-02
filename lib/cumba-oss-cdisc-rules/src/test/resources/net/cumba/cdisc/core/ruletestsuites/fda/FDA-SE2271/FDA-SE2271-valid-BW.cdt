@@ -1,0 +1,33 @@
+#!RuleTest
+#test FDA-SE2271 expect=noViolation domain=BW
+#note "Subject 001's latest disposition is study day 20. Row 1: terminal body weight with BWDY=20 equals DSSTDY -> clean. Row 2: a routine (non-TERMBW) weighing on day 7 -> outside the BWTESTCD='TERMBW' guard. Row 3: TERMBW with BWDY missing -> guarded out by non_empty. Row 4: subject 002 has no DS record -> guarded out by is_contained_by $ds_usubjid."
+#library standard=sendig version=3-1-1
+dataset BW label="Body Weights"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWTEST   type=Char label="Body Weight Test Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWDTC    type=Char label="Date/Time of Measurements"
+col BWDY     type=Num  label="Study Day of Animal Weighed"
+---
+S1 | BW | 001 | 1 | TERMBW | Terminal Body Weight | 245.1 | 2020-01-20 | 20
+S1 | BW | 001 | 2 | BW     | Body Weight          | 231.4 | 2020-01-07 | 7
+S1 | BW | 001 | 3 | TERMBW | Terminal Body Weight | 244.8 | 2020-01-20 |
+S1 | BW | 002 | 1 | TERMBW | Terminal Body Weight | 250.0 | 2020-01-20 | 12
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY  | RECOVERY           | 2020-01-05 | 5
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20 | 20

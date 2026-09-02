@@ -1,0 +1,89 @@
+Core:
+  Id: "FDA-SD1367"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one Disposition Event (DSCAT\
+  \ equals 'DISPOSITION EVENT') record per subject for the same Subcategory for Disposition\
+  \ Event (DSSCAT) and Epoch (EPOCH)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSSCAT"
+    - "EPOCH"
+    - "DSCAT"
+Grouping:
+  Variables:
+  - "USUBJID"
+  - "DSSCAT"
+  - "EPOCH"
+Check:
+  expression: >-
+    DSCAT == "DISPOSITION EVENT" and var_exists("DSSCAT") and not is_unique_set([EPOCH, USUBJID,
+    DSSCAT, DSCAT])
+Outcome:
+  Message: "Multiple disposition events for the same DSSCAT and EPOCH"
+  Output_Variables:
+  - "DSCAT"
+  - "DSSCAT"
+  - "EPOCH"
+Source:
+  FDA_Validator_Rule_Message: "Multiple disposition events for the same DSSCAT and\
+    \ EPOCH"
+  FDA_Validator_Rule_Description: "There should be at most one disposition event record\
+    \ per subject per Subcategory for Disposition Event (DSSCAT) per Epoch. If multiple\
+    \ disposition events are reported for a Subcategory for DSSCAT and EPOCH, the\
+    \ sponsor should identify a primary reason and use that to populate DSTERM and\
+    \ DSDECOD. Additional reasons should be submitted in SUPPDS."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1367"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1367"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0536"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0537"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0536"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0537"
+        Version: "1"
+      Version: "2.0"

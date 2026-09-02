@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0309 expect=skipped domain=SUPPLB
+#note "CDISC-CG0309 scopes Domains.Include:[AP--], and a SUPP-- dataset is NOT an AP dataset. This fixture previously PINNED the opposite: ScopeMatcher.firstMatchingSuppApFamilyEntry (Fix #34, mirroring Python RuleProcessor._domain_matched_ap_or_supp) let ANY family wildcard in the list match ANY SUPP/SQ/AP-family dataset, so the rule ran on SUPPLB, took the EC-43 absent-column fold on DOMAIN (len(<missing>) is 0, not 4) and reported. The family wildcard is deleted; SUPP--, SQ--, AP-- and APFA-- are four independent strict `--` tokens, so the rule is now correctly SKIPPED on SUPPLB — which is why this declares `expect=skipped` and not `expect=noViolation`: out of scope is a different fact from ran-and-found-nothing, and the harness refuses to let the two be confused. This is the executable proof of the cross-family half of the fix: restore the helper and this scenario goes red."
+dataset SUPPLB label="Supplemental Qualifiers for LB"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | LB | 01-701-1015 | LBSEQ | 1 | LBREASND | Reason Not Done | SAMPLE LOST
+CDISCPILOT01 | LB | 01-701-1023 | LBSEQ | 2 | LBREASND | Reason Not Done | SAMPLE LOST
+---

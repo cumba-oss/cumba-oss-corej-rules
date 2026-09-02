@@ -1,0 +1,87 @@
+name: FDA-SD1325-sibling-leak
+kind: rule
+description: |
+  REGRESSION GUARD for **Fix #132** (EC-41/H5), variant (ii) — one SUBMITTED dataset's defect
+  must not be reported against a DIFFERENT submitted dataset.
+
+  **Status: GREEN on both lanes since Fix #132.** Written under
+  PLAN-parity-define-dataset-channel P3a as a *measurement* of a live fork defect (Java 0 vs
+  Python 1, baselined `lane: python`), it was converted to a guard in P4 when the fix landed:
+  the fork now agrees at 0 and the `parity-diff-baseline.json` entry was retired. A `1` on the
+  Python lane from here on means Fix #132 has been reverted or regressed.
+
+  Fixture: same as `FDA-SD1325-multi` (three submitted datasets AE/VS/LB plus one Define-only
+  key ZZ, same rows, same config); the only change is that the mismatching label sits on LB —
+  a submitted, NON-primary dataset — while the primary AE is clean. ZZ carries only
+  `define_dataset_class`, so the Define-only row was present in the pre-fix merged frame but
+  could not itself fire (no `define_dataset_label` ⇒ `non_empty` is false). That is deliberate:
+  it isolates the sibling-row leak from the Define-only leak its variant-(i) sibling guards.
+
+  What it catches, and by what mechanism:
+
+  * Java: 0 violations, EXECUTED. The harness evaluates the primary table only, and
+    `injectDatasetLevel` serves AE's own Define attributes, which match. Canonical.
+  * Python, BEFORE Fix #132: 1 violation, EXECUTED, attributed to AE but carrying LB's values
+    — `dataset_label: LB`, `define_dataset_label: Laboratory Tests`. The finding was real
+    (LB's label genuinely mismatches) but filed against the wrong dataset.
+  * Python, AFTER Fix #132: 0 violations, EXECUTED. `DatasetMetadataDefineDatasetBuilder.build`
+    now narrows the study side to the dataset under evaluation before merging, so LB's row is
+    simply not in AE's frame. The narrowing is the half that matters for THIS variant — the
+    `how="outer"` → `how="left"` change alone would not have removed a sibling *submitted*
+    row, only the synthesised Define-only one.
+
+  This is the half of EC-41 that the `-define-only-leak` sibling cannot show, and the reason
+  both guards are kept. There the leaked row was synthesised by the outer merge and is
+  recognisable by its null `dataset_label`; here the leaked row is an ordinary submitted
+  dataset's row, indistinguishable in shape from a legitimate finding. A consumer reading the
+  pre-fix output would chase a label defect in AE that does not exist and — because
+  `validate_single_rule` loops per dataset over the same study-wide frame — would receive that
+  finding three times, once under each of AE, VS and LB. The spec channel keeps only the
+  primary bucket, so it saw 1 of those 3.
+
+  The face this fixture does NOT show, recorded so it is not forgotten: the same primitive also
+  SUPPRESSES findings. `Sensitivity: Dataset` keeps `errors_df.iloc[0]`, so with two dirty
+  datasets in one study the second one's genuine defect was dropped — measured during P3 with
+  AE clean and both VS and LB dirty: correct answer 2, the fork reported 3 findings all
+  carrying VS's row, with LB's defect nowhere. Mis-attribution and suppression are the same
+  bug seen from two sides.
+
+  Read together with `FDA-SD1325-multi`, and now more than ever: with both lanes at 0, an
+  expectation of `[]` proves nothing on its own. That sibling pins the identical fixture to a
+  non-zero count when the primary is the dirty one, which is what makes this spec's 0 a
+  genuine "ran and found nothing" rather than a dead Define channel — a distinction the status
+  channel cannot make, since a killed channel yields EXECUTED with zero findings, not SKIPPED.
+
+  No `parity-diff-baseline.json` entry: both lanes agree on both channels, so both are
+  asserted normally. Do not re-add one.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1325)
+rule:
+  coreId: FDA-SD1325
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: ALT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+  LB:
+    define_dataset_label: Laboratory Tests
+  ZZ:
+    define_dataset_class: EVENTS
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

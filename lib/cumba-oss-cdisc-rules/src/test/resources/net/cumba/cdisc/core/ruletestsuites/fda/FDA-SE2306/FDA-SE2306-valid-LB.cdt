@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2306 expect=noViolation domain=LB
+#note "Each record has at least one of VISITDY, LBDY (--DY), LBNOMDY (--NOMDY) populated -> no violation."
+#library standard=sendig version=3-1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col VISITDY type=Num  label="Planned Study Day of Visit"
+col LBDY    type=Num  label="Study Day of Specimen Collection"
+col LBNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | LB | 001 | 1 | 7 | . | .
+S1 | LB | 001 | 2 | . | 8 | .
+S1 | LB | 001 | 3 | . | . | 7

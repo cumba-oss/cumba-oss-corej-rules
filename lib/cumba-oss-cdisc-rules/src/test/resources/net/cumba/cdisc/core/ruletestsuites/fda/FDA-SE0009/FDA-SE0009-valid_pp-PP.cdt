@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE0009 expect=skipped domain=PP
+#note "Intent boundary: PP is a Findings domain but SENDIG 3.1.1 defines neither PPDTC nor PPDY for it -- its timing is PPNOMDY/VISITDY, which FDA covers with the separate rule FDA-SE2318. A conformant PP dataset can therefore never satisfy FDA-SE0009, so the rule must not run on PP: Scope.Domains.Exclude [PP] keeps it out of scope (the skip IS the contract under test)."
+#library standard=sendig version=3-1-1
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPNOMDY  type=Num  label="Nominal Study Day for Tabulations"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+S1 | PP | 001 | 1 | AUCALL | 8 | 2020-01-05T08:00
+S1 | PP | 001 | 2 | CMAX   | 8 | 2020-01-05T08:00

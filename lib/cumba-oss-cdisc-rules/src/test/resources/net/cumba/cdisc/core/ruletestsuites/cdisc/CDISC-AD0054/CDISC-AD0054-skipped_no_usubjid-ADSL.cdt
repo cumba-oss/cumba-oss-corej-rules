@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0054 expect=skipped domain=ADSL
+# Rule:Description: Within ADSL there is more than one record for a unique value of USUBJID
+#note "EC-53 exception guard - USUBJID is absent, so Requirements.Variables.All gates the rule to SKIPPED before the Check runs. WHY THE GUARD EXISTS: this is the ONE keyless is_not_unique_set leaf in the corpus that was unguarded, and since Fix #143 an absent target is dropped and the check regroups - with no keys left the tuple is EMPTY, every row carries the same key, and the rule would report one finding PER RECORD. THE THREE RECORDS ARE THE POINT: without the guard all three fire, so the skip is attributable to the guard and not to clean data. The authored `USUBJID exists` leaf is the other half of the guard - it is what reaches the Python lane, which reads no part of Requirements.Variables - and it is unobservable here because the scope gate short-circuits first."
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col AGE type=Num label="Age"
+col SEX type=Char label="Sex"
+---
+CDISCPILOT01 | 63 | F
+CDISCPILOT01 | 64 | M
+CDISCPILOT01 | 65 | F
+---

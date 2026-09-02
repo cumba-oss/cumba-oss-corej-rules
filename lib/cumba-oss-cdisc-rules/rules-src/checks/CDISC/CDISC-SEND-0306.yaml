@@ -1,0 +1,92 @@
+Core:
+  Id: "CDISC-SEND-0306"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Last Study Treatment (RFXENDTC)\
+  \ is populated for a subject with Exposure (EX) records but equals neither the latest\
+  \ End Date/Time of Treatment (EXENDTC) nor the latest Start Date/Time of Treatment\
+  \ (EXSTDTC) for that subject."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXENDTC"
+    - "USUBJID"
+Operations:
+- id: "$ex_subjects"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+- id: "$latest_exendtc"
+  expression: "max_date(EXENDTC, domain=\"EX\", missing_values=\"indeterminate\",\
+    \ group=[USUBJID])"
+- id: "$latest_exstdtc"
+  expression: "max_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(RFXENDTC) and USUBJID in $ex_subjects and RFXENDTC != $latest_exendtc and RFXENDTC !=
+    $latest_exstdtc
+Outcome:
+  Message: "RFXENDTC is populated but does not equal the latest EXENDTC or the latest\
+    \ EXSTDTC in the EX dataset for the subject."
+  Output_Variables:
+  - "RFXENDTC"
+  - "$latest_exendtc"
+  - "$latest_exstdtc"
+  - "$ex_subjects"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXENDTC"
+  Plain_Text_Explanation: "If RFXENDTC is populated it is equal to the latest (i.e.,\
+    \ absolute last) value of EXENDTC.  If EXENDTC is not populated RFXENDTC is equal\
+    \ to the latest (i.e., absolute last) value of EXSTDTC if EXENDTC was not collected\
+    \ or is missing."
+  Condition: "RFXENDTC ^= null"
+  Rule: "RFXENDTC value = date/time of absolute latest value of test article exposure\
+    \ (as represented in EXENDTC or EXSTDTC for that subject)."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"

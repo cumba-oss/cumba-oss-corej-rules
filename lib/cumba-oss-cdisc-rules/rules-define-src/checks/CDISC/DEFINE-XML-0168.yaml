@@ -1,0 +1,28 @@
+Rule_Id: "DEFINE-XML-0168"
+Sheet_Rule_Identifier: "168"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "Child element Description must be provided for the ItemDef element which represents a variable referenced in a dataset in the context of a submission."
+# "Referenced from ItemGroupDef/ItemRef" is a reverse join — scoped to the
+# referencing ItemRef with the 0124-B fire-always vehicle. Deviations
+# (documented): (1) Description presence is proxied by its TranslatedText child's
+# text (a dereferenced element-terminal path reads text, not presence), so a
+# Description whose TranslatedText is empty fires here alongside sheet ids 61/62;
+# (2) the sheet binds the row to 2.0+2.1 but guards on ODM/@def:Context, which
+# only exists in 2.1 — on 2.0 documents the guard never passes (sheet-faithful).
+# The finding sits on the ItemRef (its ItemOID names the ItemDef).
+Message: "Child element Description is missing for the ItemDef element referenced from ItemGroupDef when def:Context='Submission'."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "../../../../@Context"
+      equals: "Submission"
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Description/TranslatedText"
+      exists: false

@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0047"
+Sheet_Rule_Identifier: "DD0047"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, SASDatasetName attribute is required and must be included in Define.xml and cannot be empty."
+Message: "Missing SASDatasetName value"
+# Unconditional: to PMDA every validated define.xml IS regulatory submission
+# data, so "for regulatory submission data" adds no guard (unlike CDISC twin
+# 0108, which gates on the 2.1-only ODM/@def:Context='Submission').
+Check:
+  kind: "exists"
+  target: "@SASDatasetName"

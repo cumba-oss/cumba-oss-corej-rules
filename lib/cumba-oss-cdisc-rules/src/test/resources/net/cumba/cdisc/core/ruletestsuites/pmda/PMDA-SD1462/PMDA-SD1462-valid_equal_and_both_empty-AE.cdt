@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1462 expect=noViolation domain=AE
+#note "Row 1: equal -> clean. Row 2: BOTH empty: '' != '' is FALSE (coreJ both-empty match, B.1) -> clean (load-bearing corner)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEBODSYS type=Char
+col AESOC    type=Char
+---
+S1 | AE | 001 | 1 | NAUSEA  | GASTROINTESTINAL DISORDERS | GASTROINTESTINAL DISORDERS
+S1 | AE | 001 | 2 | FATIGUE |                            |
+---

@@ -1,0 +1,49 @@
+Core:
+  Id: "FDA-SD0093"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AGE is populated but AGEU is not present or empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(AGE) and empty(AGEU)
+Outcome:
+  Message: "AGEU is empty when AGE is populated."
+  Output_Variables:
+  - "AGE"
+  - "AGEU"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for AGEU, when AGE is provided"
+  FDA_Validator_Rule_Description: "Age Units (AGEU) should be provided, when Age (AGE)\
+    \ is populated."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0093"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0432"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0665"
+        Version: "2"
+      Version: "2.0"

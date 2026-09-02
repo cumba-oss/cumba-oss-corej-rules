@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-9430 expect=skipped domain=LB
+# Rule:Description: CDISC-SEND-9430 — the Required key LBTESTCD is not populated.
+#note "LBTESTCD is absent from LB, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(LBTESTCD) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sendig version=3-1-1
+dataset LB
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col LBSEQ type=Char
+col LBTEST type=Char
+---
+S1      | LB     | S1-001  | 1     | Albumin
+---

@@ -1,0 +1,67 @@
+Core:
+  Id: "PMDA-AD0084"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when TRTEDT is populated and does not equal the maximum\
+  \ value among all populated TRxxEDT variables (xx = 01 to 99, zero-padded) on the\
+  \ record."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Operations:
+- id: "$trxx_max"
+  expression: "row_max(name_pattern=\"^TR(0[1-9]|[1-9][0-9])EDT$\")"
+Check:
+  expression: >-
+    not empty(TRTEDT) and not empty($trxx_max) and TRTEDT != $trxx_max
+Outcome:
+  Message: "TRTEDT is not equal to the maximum value among the populated TRxxEDT variables\
+    \ on this record."
+  Output_Variables:
+  - "TRTEDT"
+  - "$trxx_max"
+Source:
+  Message: "TRTEDT != Maximum TRxxEDT on this record"
+  Description: "Date of Last Exposure to Treatment (TRTEDT) for this patient record\
+    \ should be equal to the max Last Treatment Date (TRxxEDT) among all Periods 01\
+    \ thru xx."
+  Domains: "ADSL, ADDL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0084"
+        Version: "1"
+      Version: "6.0"

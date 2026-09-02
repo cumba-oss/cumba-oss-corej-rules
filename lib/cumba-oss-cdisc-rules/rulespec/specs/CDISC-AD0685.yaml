@@ -1,0 +1,32 @@
+name: CDISC-AD0685
+kind: rule
+description: |
+  Wave D8 port - T3-VMC Variable Metadata Check. DEVICE LEVEL ANALYSIS
+  DATASET/ADDL: DEVSDT not_exists. Baselined on Python lane under Finding #9
+  (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `not_exists(DEVSDT)`
+  resolves against meta-field columns and yields 0 violations. Java
+  fires correctly; expected matches Java's dataset-level violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0685)
+rule:
+  coreId: CDISC-AD0685
+datasets:
+  ADDL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    device level analysis dataset: [ADDL]
+expected_violations:
+  - rule_id: CDISC-AD0685
+    dataset: ADDL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

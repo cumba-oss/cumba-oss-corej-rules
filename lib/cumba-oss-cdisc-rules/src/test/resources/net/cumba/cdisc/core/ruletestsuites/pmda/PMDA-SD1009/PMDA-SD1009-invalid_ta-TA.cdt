@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1009 expect=violation domain=TA
+#note "FRESH. Covers the THIRD in-scope domain: the twin reaches SE and TE and never TA, although TA is in Scope.Domains.Include for all three rules of this twin group. Row 1 is the 8-character boundary, silent; row 2 is 9 characters and fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=RUNINPBOX
+dataset TA label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | A1 | Drug A | 1 | RUNINPBO  | Placebo run-in
+S1 | TA | A1 | Drug A | 2 | RUNINPBOX | Placebo run-in extended

@@ -1,0 +1,27 @@
+Rule_Id: "PMDA-DD0113"
+Sheet_Rule_Identifier: "DD0113"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Variables --LLT, --LLTCD, --DECOD, --PTCD, --HLT, --HLTCD, --HLGT, --HLGTCD, --BODSYS, --BDSYCD, --SOC, and --SOCCD must reference MedDRA dictionary for regulatory submissions."
+# Scoped to ItemDefs whose Name matches a two-character domain prefix plus one
+# of the sheet's MedDRA suffixes. The multi-hop deref follows the ItemDef's
+# CodeListRef to its CodeList and reads the ExternalCodeList Dictionary; the
+# rule fires (0124-B fire-always vehicle on the guard-guaranteed @Name) when
+# that walk does not reach a MedDRA dictionary - which covers both a
+# non-MedDRA codelist and a variable with no CodeListRef at all. Deviation
+# (documented): the sheet message's '<define variable>' placeholder cannot be
+# interpolated by a presence-kind finding; the xpath names the ItemDef.
+Message: "Missing MedDRA reference on variable"
+Check:
+  kind: "not_exists"
+  target: "@Name"
+  when:
+    all:
+    - path: "@Name"
+      matchesRegex: "[A-Z]{2}(LLT|LLTCD|DECOD|PTCD|HLT|HLTCD|HLGT|HLGTCD|BODSYS|BDSYCD|SOC|SOCCD)"
+    - not:
+        path: "CodeListRef/@CodeListOID->CodeList@OID/ExternalCodeList/@Dictionary"
+        matchesRegex: "(?i)meddra"

@@ -1,0 +1,41 @@
+#!RuleTest
+#test CDISC-SEND-0105.1 expect=noViolation domain=DM
+#note "The TX arm of the sheet's OR, pinned independently: TS still has NO SPECIES parameter, TX gains TXPARMCD=SPECIES with TXVAL=RAT, $tx_species resolves and the rule is silent. The operator is named ts_parameter_value but its domain and key name are parameters; this is the in-tree pin of the TX form."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset DM label="Demographics" class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+col SPECIES type=Char label="Species"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | SET01 |     | M
+S1 | DM | 002 | SET01 | RAT | F
+---
+
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE  | Trial Title      | Study X
+S1 | TS | 2 | SSTDTC | Study Start Date | 2023-01-01
+---
+
+dataset TX label="Trial Sets" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+S1 | TX | SET01 | 1 | GRPLBL | Group Label | Control
+S1 | TX | SET01 | 2 | SPECIES | Species | RAT
+---

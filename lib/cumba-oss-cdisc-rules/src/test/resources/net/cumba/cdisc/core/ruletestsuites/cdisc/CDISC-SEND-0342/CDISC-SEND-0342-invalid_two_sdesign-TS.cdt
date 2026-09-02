@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0342 expect=violation domain=TS
+#note "THE GRANULARITY PIN (Fix #296 / M3-D17). The study declares SDESIGN twice, so record_count(group=[STUDYID], filter=TSPARMCD='SDESIGN') is 2 in group S1 and `$sdesign_count > 1` holds on both SDESIGN rows. The defect is a property of the DATASET -- the sheet's Rule is 'Only one record with TSPARMCD = SDESIGN exists' and its Condition cell is empty -- but the per-row `TSPARMCD == \"SDESIGN\"` anchor made RuleClassifier derive RECORD sensitivity, so the MINIMUM report for one violation was TWO findings. Adding Grouping.Variables [STUDYID] collapses it to ONE per study, aligning 0342 with its sibling CDISC-SEND-0250, an equally dataset-level fact about TS that derives DATASET granularity purely because its Check is $-only. Row 3 is a TITLE record: the first conjunct is false and the filter does not count it either. ESCALATE if this reports 2 -- the Grouping block is not being read."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 TSSEQ=1
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SDESIGN | Study Design | PARALLEL
+S1 | TS | 2 | SDESIGN | Study Design | CROSSOVER
+S1 | TS | 3 | TITLE   | Trial Title  | Study X
+---

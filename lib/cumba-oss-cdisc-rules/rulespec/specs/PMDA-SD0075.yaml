@@ -1,0 +1,42 @@
+name: PMDA-SD0075
+kind: rule
+description: |
+  EC-34 / Fix #126 pin — PMDA twin of FDA-SD0075 (same Check, same fixture shape).
+  IDVAR must name a variable of the dataset referenced by the row's own RDOMAIN.
+  CO row 1 (RDOMAIN=LB, IDVAR=LBSEQ) legal; CO row 2 (RDOMAIN=AE, IDVAR=LBSEQ)
+  fires — AE has no LBSEQ. Pre-fix the study-flat reference set suppressed the
+  AE-row finding in the Python lane.
+python_source: rules-sdtmig-3-4.json (PMDA-SD0075)
+rule:
+  coreId: PMDA-SD0075
+datasets:
+  CO:
+    row_key: [STUDYID, USUBJID, COSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CO, RDOMAIN: LB, USUBJID: '001', COSEQ: 1, IDVAR: LBSEQ, IDVARVAL: '1', COVAL: legit reference}
+      - {STUDYID: S1, DOMAIN: CO, RDOMAIN: AE, USUBJID: '001', COSEQ: 2, IDVAR: LBSEQ, IDVARVAL: '1', COVAL: bogus reference}
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: GLUC}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    findings: [LB]
+expected_violations:
+  - rule_id: PMDA-SD0075
+    dataset: CO
+    row_key: {COSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $rdomain_variables: '[AESEQ, AETERM, DOMAIN, STUDYID, USUBJID]'
+      IDVAR: LBSEQ
+      RDOMAIN: AE
+expected_errors: []

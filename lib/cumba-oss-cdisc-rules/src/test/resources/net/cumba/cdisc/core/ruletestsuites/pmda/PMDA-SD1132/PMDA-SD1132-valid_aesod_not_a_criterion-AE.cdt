@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1132 expect=noViolation domain=AE
+#note "FRESH. ONE row: both AESOD and AESINTV equal 'Y' while AESER=N, and the rule is SILENT because neither variable is among the seven the Check tests. Evidence, not a defect: PMDA's own sheet row 217 enumerates exactly the seven flags the rule tests, so PMDA-SD1132 is faithful to its authority. The CDISC sheet's CG0041/CG0042 Condition enumerates EIGHT (adding AESOD) and CDISC's own implementation tests a NINTH (AESINTV) - the standing, OPEN sheet issue SHEET-ISSUES-CDISC #10. This fixture makes the boundary visible in-tree so the lane can see what would change if #10 is answered 'the sheet omits a real criterion'."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESOD   type=Char label="Occurred with Overdose"
+col AESINTV type=Char label="Needs Intervention to Prevent Impairment"
+---
+S1 | AE | 001 | 1 | OVERDOSE | N | Y | Y

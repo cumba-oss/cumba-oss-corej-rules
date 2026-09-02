@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-SD1463"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Body System or Organ Class Code (--BDSYCD) is populated\
+  \ and does not equal Primary System Organ Class Code (--SOCCD) on the same record.\
+  \ When a multi-axial dictionary such as MedDRA is used, --BDSYCD should be populated\
+  \ with the primary SOC code (--SOCCD) used for analysis."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--BDSYCD"
+    - "--SOCCD"
+Check:
+  expression: >-
+    not empty(--SOCCD) and not empty(--BDSYCD) and --SOCCD != --BDSYCD
+Outcome:
+  Message: "Primary System Organ Class Code (--SOCCD) and Body System or Organ Class\
+    \ Code (--BDSYCD) do not have the same value; when a multi-axial dictionary is\
+    \ used, --BDSYCD should be populated with the primary SOC code (--SOCCD) used\
+    \ for analysis."
+  Output_Variables:
+  - "--BDSYCD"
+  - "--SOCCD"
+Source:
+  Message: "Not the same values for --SOCCD and --BDSYCD"
+  Description: "When using a multi-axial dictionary such as MedDRA, Body System or\
+    \ Organ Class Code (--BDSYCD) variable value should be populated as Primary System\
+    \ Organ Class Code (--SOCCD) used for analysis."
+  Domains: "AE, CE, MH"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1463"
+        Version: "1"
+      Version: "6.0"

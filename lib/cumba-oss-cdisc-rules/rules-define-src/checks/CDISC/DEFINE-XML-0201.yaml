@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0201"
+Sheet_Rule_Identifier: "201"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "ct"
+Plain_Text_Rule: "Attribute def:ExtendedValue must be provided for the CodeLIstItem element when the CodedValue is an extended value."
+# CodeListItem twin of DEFINE-XML-0186 (see there). The sheet's 'CodeLIstItem'
+# spelling in the message is verbatim.
+Message: "Attribute def:ExtendedValue is missing for element CodeLIstItem[@CodedValue] [${value}] in CodeList[@Name]."
+Check:
+  kind: "extended_value_marking"
+  mode: "required"
+  when:
+    path: "../@def:StandardOID"
+    exists: true

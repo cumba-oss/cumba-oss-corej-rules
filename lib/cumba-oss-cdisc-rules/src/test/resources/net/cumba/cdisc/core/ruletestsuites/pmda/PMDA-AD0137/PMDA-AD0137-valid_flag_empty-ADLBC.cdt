@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0137 expect=noViolation domain=ADLBC
+#note "Isolates the leading not empty(CRITyFL) conjunct: row 1 has BOTH halves empty (would fire if symmetric), row 2 proves an unflagged populated criterion is fine."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1   type=Char
+col CRIT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT |           |
+CDISCPILOT01 | 01-701-1023 | ALT | AGE-GT-60 |
+---

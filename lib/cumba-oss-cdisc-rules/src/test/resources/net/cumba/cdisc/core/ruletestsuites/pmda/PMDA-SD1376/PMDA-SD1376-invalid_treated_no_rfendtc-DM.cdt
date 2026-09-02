@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1376 expect=violation domain=DM
+#note "Row 1: treated subject (ACTARMCD=ARM1) with RFENDTC empty -> fires. Row 2: ACTARMCD=NOTTRT -> clean - PMDA's own sheet lists NOTTRT in the exemption and the authored list includes it (FDA-twin discriminator: FDA-SD1376 fires here, see FDA-SD1376-invalid_nottrt-DM). Row 3: SCRNFAIL -> clean. Row 4: RFENDTC populated -> clean. TS carries the single non-ONGOSIND row -> count 0. TS-absent is the carve-out, as SD0088."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ACTARMCD=ARM1 RFENDTC=
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col ACTARMCD  type=Char
+col RFENDTC   type=Char
+---
+S1 | DM | 001 | ARM1     |
+S1 | DM | 002 | NOTTRT   |
+S1 | DM | 003 | SCRNFAIL |
+S1 | DM | 004 | ARM1     | 2020-06-30
+---
+
+dataset TS class="TRIAL DESIGN"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | TITLE | Example Study

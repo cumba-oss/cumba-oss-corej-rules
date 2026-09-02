@@ -1,0 +1,122 @@
+Core:
+  Id: "PMDA-SD1114"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a Body System or Organ Class (--BODSYS) value is\
+  \ not a System Organ Class term in the MedDRA dictionary."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--BODSYS"
+Operations:
+- id: "$bodsys_valid"
+  expression: "valid_external_dictionary_value(--BODSYS, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOC\", case_sensitive=false)"
+Check:
+  expression: >-
+    $bodsys_valid == false
+Outcome:
+  Message: "Body System or Organ Class (--BODSYS) is not a MedDRA System Organ Class\
+    \ term."
+  Output_Variables:
+  - "--BODSYS"
+Source:
+  Message: "Value for --BODSYS not found in MedDRA dictionary"
+  Description: "Value for Body System or Organ Class (--BODSYS) variable must be populated\
+    \ using a System Organ Class of the MedDRA dictionary of a version specified in\
+    \ the define.xml (Case-insensitive)."
+  Domains: "AE, CE, MH"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1114"
+        Version: "1"
+      Version: "1.6"

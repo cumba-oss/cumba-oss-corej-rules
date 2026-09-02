@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1021 expect=noViolation domain=CO
+#note "CORRECTION TO THE TWIN: fda/FDA-SD1021-valid_coval_excluded-CO.cdt writes the COVAL1 period UNQUOTED, so the loader nulls it and that fixture passes because the cell is empty rather than because the exemption fired. QUOTE IT here. Both cells then carry genuinely offending values and the ONLY thing keeping the rule silent is varname() !~ /^(COVAL[0-9]*|TSVAL[0-9]*)\$/, covering both the bare base name COVAL and the numbered form COVAL1."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char
+col RDOMAIN type=Char
+col USUBJID type=Char
+col COSEQ   type=Num
+col COVAL   type=Char
+col COVAL1  type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | " subject reported dizziness" | "."

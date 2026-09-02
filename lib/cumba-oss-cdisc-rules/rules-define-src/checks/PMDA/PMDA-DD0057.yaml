@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0057"
+Sheet_Rule_Identifier: "DD0057"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, Description field is required for each Dataset, Method, and Comment and must be included in Define.xml and cannot be empty. Define-XML specification represents Description as Description/TranslatedText element within ItemGroupDef, MethodDef, or def:CommentDef element."
+Message: "Missing Description value"
+# One sheet row, three scoped elements (Dataset/Method/Comment) - split into
+# PMDA-DD0057 (ItemGroupDef) / -B (MethodDef) / -C (def:CommentDef), the
+# established 0165-B/-C convention. The sheet names Description/TranslatedText,
+# so the 0124-B fire-always vehicle checks the TranslatedText depth (an empty
+# Description element does not satisfy the row); text-blankness itself is not
+# checked (guard exists on an element path is node presence). Dataset leg.
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "Description/TranslatedText"
+      exists: false

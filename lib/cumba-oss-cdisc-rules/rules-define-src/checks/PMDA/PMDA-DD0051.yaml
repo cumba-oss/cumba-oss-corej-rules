@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0051"
+Sheet_Rule_Identifier: "DD0051"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The SASDatasetName attribute for ItemGroupDef element must be unique within a single MetaDataVersion."
+# ItemGroupDef elements are direct MetaDataVersion children, so the per-parent
+# sibling scope IS the sheet's per-MDV scope.
+Message: "Duplicate SASDatasetName [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "SASDatasetName"

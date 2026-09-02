@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=violation domain=MA
+#note "The carve-out tolerates a semicolon combination only when EVERY contributing term is a published submission value. Row 1 (LEFT;RIGHT) is lawful and stays silent - the discriminator against a rule that simply stopped looking at semicolon-bearing values - while row 2 combines the term LEFT with SIDEWAYS, which is no LAT term, and reports. Malformed delimiters are pinned separately by CDISC-SEND-0049-invalid_semicolon_malformed_delimiter-MA."
+#library standard=sendig version=3-1-1
+#library variable-metadata MA MALAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=MALAT variable_value=LEFT;SIDEWAYS
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MALAT    type=Char label="Laterality"
+---
+S1 | MA | 001 | 1 | GMACROS | LEFT;RIGHT
+S1 | MA | 002 | 2 | GMACROS | LEFT;SIDEWAYS

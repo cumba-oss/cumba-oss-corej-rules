@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0106 expect=noViolation domain=ADLBC
+#note "*** TRIPWIRE - the second of the batch's two LOAD-BEARING presence guards. APERIODC (the grouping key) absent. Requirements.Variables.All [APERIOD] names the TARGET, which is present -> rule EXECUTES. Silent solely because var_exists(APERIODC) is false (no not empty(APERIODC) sibling; that is what the 1.1+ sibling PMDA-AD0106B adds). Data would fire under the EC-44 whole-table regroup: APERIOD={1,1,2}, minority row 3. A VIOLATION here is a real engine detection."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col APERIOD type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | 2

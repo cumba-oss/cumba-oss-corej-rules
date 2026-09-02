@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE0055 expect=violation domain=BW
+#note "BWSTRESN is submitted as a character variable although the SEND IG defines it numeric -> fires on BWSTRESN. The other IG-known variables match."
+#library standard=sendig version=3-1-1
+#library variable-metadata BW BWTESTCD name=BWTESTCD simpleDatatype=Char label="Test Short Name"
+#library variable-metadata BW BWSTRESC name=BWSTRESC simpleDatatype=Char label="Standardized Result in Character Format"
+#library variable-metadata BW BWSTRESN name=BWSTRESN simpleDatatype=Num  label="Standardized Result in Numeric Format"
+#expectViolationCount 1
+#expectViolationAt variable_name=BWSTRESN
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWTESTCD type=Char label="Test Short Name"
+col BWSTRESC type=Char label="Standardized Result in Character Format"
+col BWSTRESN type=Char label="Standardized Result in Numeric Format"
+---
+S1 | 001 | BW | 250 | 250

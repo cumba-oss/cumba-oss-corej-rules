@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0304 expect=violation domain=ADAE
+#note "SMQ01NAM is declared while SMQ01CD, SMQ01SC and SMQ01SCN are all absent. One expansion (zz=01, zero-padded two digits); `var_exists(\"SMQ01NAM\")` is true and every sibling is missing, so the rule fires. Dataset granularity -> 1 violation, bare row=1 pin: the Output_Variable `variable_name` does not resolve on a record-table rule (extractOutputValues omits it), so the value map is empty and a column pin would fall back to row 1's cell. This scenario fires identically under the rule as shipped AND under the proposed AD0304-F1 form, so it is predicted green."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col SMQ01NAM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | MIGRAINE
+CDISCPILOT01 | 01-701-1023 | NAUSEA | MIGRAINE

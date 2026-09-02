@@ -1,0 +1,39 @@
+#!RuleTest
+#test CDISC-SEND-0105.1 expect=violation domain=DM
+#note "THE SHEET'S OWN CASE (Fix #289 / M3-D6). DM declares NO SPECIES COLUMN AT ALL -- literally the Plain Text of rows 521-525, 'If species is not included in DM it must be included in TS or TX' -- and neither TS nor TX carries the parameter. The absent case was blocked TWICE before M3-D6: Requirements.Variables.All [SPECIES] skipped the rule before the Check ran, and NonEmptyGuardInliner's bare-emptiness arm would have added var_exists(\"SPECIES\") on top. Dropping the scope entry removes the first block and Fix #330's retirement of the emitter's bare-emptiness arm removes the second, so the bare empty(SPECIES) leaf is TRUE on every row of an absent column (absent = all-missing, EC-43) and the rule now reports the case its own sheet row leads with. M3-D6 originally authored an explicit `not var_exists(...) or empty(...)` disjunct here; Plan B phase 4d' deleted the now-redundant presence half, leaving the verdict unchanged. One DM row, so the count is 1 under every reading."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics" class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | SET01 | M
+---
+
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE  | Trial Title      | Study X
+S1 | TS | 2 | SSTDTC | Study Start Date | 2023-01-01
+---
+
+dataset TX label="Trial Sets" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+S1 | TX | SET01 | 1 | GRPLBL | Group Label | Control
+---

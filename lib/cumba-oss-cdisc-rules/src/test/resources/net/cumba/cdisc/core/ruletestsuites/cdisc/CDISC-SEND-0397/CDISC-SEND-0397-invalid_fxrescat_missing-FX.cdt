@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0397 expect=violation domain=FX
+#note "The positive control for sheet issue #128's move (M3-D25, Fix #310): neither exemption applies. Row 1's finding is MALFORMATION (not UNREMARKABLE) and FXSTAT is blank (not NOT DONE), so both conjuncts hold and the empty FXRESCAT fires - the requirement the sheet's Rule cell (FXRESCAT ^= null) states, unchanged by the move. Row 2 is the same shape with FXRESCAT populated and stays silent, so the fixture cannot pass vacuously. Record granularity -> exactly one violation."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=1 FXSEQ=1
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+col FXSTRESC type=Char label="Character Result/Finding in Std Format"
+col FXSTAT   type=Char label="Completion Status"
+col FXRESCAT type=Char label="Result Category"
+---
+S1 | FX | 001 | 1 | FPEXAM | MALFORMATION |  | 
+S1 | FX | 002 | 2 | FPEXAM | MALFORMATION |  | SKELETAL

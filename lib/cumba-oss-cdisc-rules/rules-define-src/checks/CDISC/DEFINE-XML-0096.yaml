@@ -1,0 +1,26 @@
+Rule_Id: "DEFINE-XML-0096"
+Sheet_Rule_Identifier: "96"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Alias is Required for ItemGroupDef elements representing Supplemental Qualifier datasets in the context of a regulatory submission."
+Message: "Alias is missing for ItemGroupDef representing a Supplemental Qualifier dataset in the context of a regulatory submission."
+# The sheet's Rule column adds "multiple ItemGroupDef elements with the same value for
+# @Domain" — a cross-element count the when-grammar cannot express. A Name beginning
+# with SUPP under ODM def:Context="Submission" (sheet typo "Submisson" normalised)
+# already identifies a Supplemental Qualifier dataset; the guard is thus slightly
+# broader than the sheet's, flagged for stress-test review (review verdict:
+# acceptable — the plain-text rule and spec p. 78 carry no multiplicity clause).
+# NOTE: on 2.0 documents the rule is silently inert — def:Context is 2.1-only, so
+# the Submission guard can never hold even though Applicable_Versions covers 2.0.
+Check:
+  kind: "exists"
+  target: "Alias"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - path: "@Name"
+      matchesRegex: "SUPP.*"

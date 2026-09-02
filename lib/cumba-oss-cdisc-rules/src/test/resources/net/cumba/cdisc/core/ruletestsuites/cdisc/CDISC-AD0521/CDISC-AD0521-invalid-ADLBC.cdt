@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0521 expect=violation domain=ADLBC
+# Rule:Description: A variable which has a suffix of GRyN is present and a variable with the same root name and suffix of GRy is not present
+#note "AETOXGR1N present, AETOXGR1 not present -> violation"
+#expectViolationCount 1
+#expectViolationAt AETOXGR1N=1
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AETOXGR1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1463 expect=violation domain=CE
+#note "Pins the second Domains.Include member and the -- resolution on CE; CEBDSYCD/CESOCCD are Events-class MODEL variables (not in the CE IG spec) -- metadata-sound."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CEBDSYCD=10007541 CESOCCD=10029205
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CESEQ    type=Num
+col CEDECOD  type=Char
+col CEBDSYCD type=Num
+col CESOCCD  type=Num
+---
+S1 | CE | 001 | 1 | FLUSHING | 10007541 | 10029205

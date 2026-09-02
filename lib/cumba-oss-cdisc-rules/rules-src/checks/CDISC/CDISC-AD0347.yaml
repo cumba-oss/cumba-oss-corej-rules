@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-AD0347"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a parameter, AyLO has more than one value\
+  \ for a given value of AyLOC"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    has_multiple_values_for(AyLO, AyLOC, within=PARAMCD)
+Outcome:
+  Message: "Within this parameter, AyLO has more than one value for the same value\
+    \ of AyLOC."
+  Output_Variables:
+  - "PARAMCD"
+  - "AyLO"
+  - "AyLOC"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "AyLO where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of AyLO for a given value of AyLOC"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of AyLO\
+    \ for a given value of AyLOC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR347"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR347"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR347"
+        Version: "2"
+      Version: "5.0"

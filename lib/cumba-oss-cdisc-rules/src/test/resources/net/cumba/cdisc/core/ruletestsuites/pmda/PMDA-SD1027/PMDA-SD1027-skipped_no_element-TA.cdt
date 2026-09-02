@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1027 expect=skipped domain=TA
+#note "FRESH. ETCD is present, ELEMENT is not. Pins that Requirements.Variables.All is ALL-OF: ScopeMatcher.describeVariablesMismatch loops [ELEMENT, ETCD] and returns on the FIRST unsatisfied entry, so one missing column of the two is enough to reject the dataset. Keeping ETCD is what makes the fixture discriminating -- an any-of gate would have executed here."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A1 | Drug A | 1 | SCRN
+S1 | TA | A1 | Drug A | 2 | TRT

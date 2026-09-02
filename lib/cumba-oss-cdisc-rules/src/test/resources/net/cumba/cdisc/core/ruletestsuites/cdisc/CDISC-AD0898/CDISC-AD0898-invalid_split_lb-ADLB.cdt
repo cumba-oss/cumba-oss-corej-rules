@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-AD0898 expect=violation domain=ADLB
+#note "Fix #358 (PLAN-match-datasets-split-union.md): the parent LB ships SPLIT (LBCH/LBHE, DOMAIN=LB, no standalone LB). The expansion binds &DOM to LB (the prefix of LBSEQ); the Match_Datasets join and the Check-side dotted var_exists both resolve LB to the member UNION, so row 1 (LBSEQ=1, in LBCH) and row 2 (LBSEQ=9, in LBHE) match while row 3 (LBSEQ=7) matches NO member and fires. Before the union this rule was a silent no-op on split submissions: var_exists(`LB.LBSEQ`) resolved nothing and short-circuited to false."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+#expectViolationCount 1
+#expectViolationAt row=3 LBSEQ=7
+dataset ADLB
+col STUDYID type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+col PARAM   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | ALT
+CDISCPILOT01 | 01-701-1015 | 9 | HGB
+CDISCPILOT01 | 01-701-1015 | 7 | PH
+---
+
+dataset LBCH label="Laboratory Test Results (Chemistry)"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1
+---
+
+dataset LBHE label="Laboratory Test Results (Hematology)"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 9
+---

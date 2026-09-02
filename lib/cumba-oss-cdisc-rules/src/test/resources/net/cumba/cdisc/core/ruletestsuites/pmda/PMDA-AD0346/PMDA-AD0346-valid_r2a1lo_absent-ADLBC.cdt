@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0346 expect=noViolation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), A1LO(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | 0.5`. The mirror of scenario 1: the COMPANION A1LO is declared and the CONDITION variable R2A1LO is not, so the first conjunct `var_exists('R2A1LO')` is FALSE and the rule stays silent. This is the DISCRIMINATING direction test - it is the scenario that fails if the two operands are ever swapped. The rule still EXECUTES (expect=noViolation, not skipped) because `AyLO` matches A1LO and seeds the tuple y=1; R2A1LO is then synthesised as absent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1LO type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 0.5

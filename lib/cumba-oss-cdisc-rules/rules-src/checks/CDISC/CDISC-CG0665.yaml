@@ -1,0 +1,35 @@
+Core:
+  Id: "CDISC-CG0665"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AGE is populated but AGEU is not present or empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(AGE) and empty(AGEU)
+Outcome:
+  Message: "AGEU is empty when AGE is populated."
+  Output_Variables:
+  - "AGE"
+  - "AGEU"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "AGEU"
+  Condition: "AGE ^= null"
+  Rule: "AGEU ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0665"
+        Version: "2"
+      Version: "2.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0252-D expect=violation domain=ADLBC
+#note "ASEV and ASEVN are two names from the rule's 16-name concrete membership list and are prohibited in a BDS dataset. Since Fix #270 (ruling M2-D3) the Check tests the variable NAME (varname() in [...] plus one regex per template family, no wildcards left), routes as Variable Metadata Check / Record via evaluateMetadataNative and emits ONE finding per offending variable -> TWO violations, pinned by variable_name only (no row= pin: Violation.row carries the colIndex). Formerly the D9 PREDICTED-RED pin of finding AD0252-D-F1 - pre-#270 the wildcard-carrying Check went whole through WildcardExpander and a NoMatch dropped the rule with its concrete arms; the ruling removed that failure by construction and this scenario flipped green."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=ASEV
+#expectViolationAt variable_name=ASEVN
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ASEV    type=Char
+col ASEVN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | MILD | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | MILD | 1

@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0493"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when the value of ANLzzFL equals 'N', where zz is a zero-padded\
+  \ two-digit integer [01-99]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() =~ /^ANL(0[1-9]|[1-9][0-9])FL$/ and value() == "N"
+Outcome:
+  Message: "ANLzzFL equals 'N'."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ANLzzFL where zz is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "ANLzzFL is equal to \"N\" where zz is a\
+    \ zero-padded two-digit integer [01-99]"
+  Rule_Failure_Criteria: "ANLzzFL is equal to N"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR493"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR493"
+        Version: "2"
+      Version: "5.0"

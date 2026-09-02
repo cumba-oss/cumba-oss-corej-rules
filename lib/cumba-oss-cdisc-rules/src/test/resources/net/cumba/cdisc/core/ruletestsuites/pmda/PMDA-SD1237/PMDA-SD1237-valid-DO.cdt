@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1237 expect=noViolation domain=DO
+#note "One record per SPDEVID+DOTESTCD; same DOTESTCD on another device is allowed. Rows 4/5 duplicate (DEV2, \"\") — since EC-53 / Fix #143 an empty cell IS a real key component, so the uniqueness leaf alone would report them — but they stay silent only because the not empty(DOTESTCD) guard gates them out first. ADAPTED-FROM fda/FDA-SD1237/FDA-SD1237-valid-DO.cdt (verbatim)."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DOSEQ    type=Num  label="Sequence Number"
+col DOTESTCD type=Char label="Device Property Short Name"
+col DOORRES  type=Char label="Device Property Result"
+---
+S1 | DO | DEV1 | 1 | DEVTYPE | Pump
+S1 | DO | DEV1 | 2 | MODEL   | X-100
+S1 | DO | DEV2 | 1 | DEVTYPE | Pump
+S1 | DO | DEV2 | 2 |         | stray A
+S1 | DO | DEV2 | 3 |         | stray B

@@ -1,0 +1,42 @@
+name: CDISC-AD0700
+kind: rule
+description: |
+  Wave C4 port — T2-CalcOps (baseline Python lane).
+  CDISC-AD0700: CHG must equal AVAL - BASE on MDBDS.
+  Same check as CDISC-AD0223 but scoped to MEDICAL DEVICE BASIC DATA STRUCTURE.
+  Python's DataframeType does not implement `not_equal_to_subtract`
+  and raises AssertionError; Java fires on the row where
+  CHG ≠ AVAL - BASE.
+python_source: rules-adamig-1-3.json (CDISC-AD0700)
+rule:
+  coreId: CDISC-AD0700
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, SPDEVID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      AVAL: DOUBLE
+      BASE: DOUBLE
+      CHG: DOUBLE
+    rows:
+      # ok — CHG=5.0 matches AVAL-BASE=10-5
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1, AVAL: 10.0, BASE: 5.0, CHG: 5.0}
+      # bad — CHG=4.0 but AVAL-BASE=5.0
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1, AVAL: 10.0, BASE: 5.0, CHG: 4.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    medical device basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0700
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', SPDEVID: 'D1', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      CHG: '4'
+      PARAMCD: 'HGB'
+      BASE: '5'
+      AVAL: '10'
+expected_errors: []

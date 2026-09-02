@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0112"
+Sheet_Rule_Identifier: "112"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "SASDatasetName attribute value must match the filename identified by the file referenced by the ArchiveLocationID attribute."
+Message: "The SASDatasetName value does not match the file name for def:leaf[@ID=@def:ArchiveLocationID]/@href [${value}]."
+# Case-insensitive: the SASDatasetName is the upper-case root name while the archive
+# file on disk is conventionally lower case (dm.xpt vs DM, §5.3.11 SASDatasetName).
+Check:
+  kind: "compare"
+  left: "@SASDatasetName"
+  right: "@ArchiveLocationID->leaf@ID/@href"
+  caseInsensitive: true
+  rightTransform: "file-basename"

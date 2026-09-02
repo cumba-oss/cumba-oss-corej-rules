@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0225A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Baseline Value (BASE) equals 0 but Percent Change\
+  \ from Baseline (PCHG) is populated. Percent change cannot be computed from a zero\
+  \ baseline, so PCHG must not be populated when BASE is 0. The non-zero-baseline\
+  \ calculation is checked separately by AD0225."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BASE"
+Check:
+  expression: >-
+    BASE == 0 and not empty(PCHG)
+Outcome:
+  Message: "BASE equals 0, but PCHG is populated."
+  Output_Variables:
+  - "BASE"
+  - "PCHG"
+Source:
+  Message: "Calculation issue: BASE = 0, but PCHG is populated"
+  Description: "When Baseline (BASE) equals 0, the Percent Change from Baseline (PCHG)\
+    \ should not be populated since you cannot divide by 0. AD0225 checks the PCHG\
+    \ calculation is correct when BASE does not equal 0. AD0132B also complements\
+    \ this rule."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0225A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0225A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0225A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0225A"
+        Version: "1"
+      Version: "6.0"

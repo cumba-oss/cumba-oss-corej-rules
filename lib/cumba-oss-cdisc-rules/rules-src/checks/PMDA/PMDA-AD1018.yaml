@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD1018"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Analysis Flag variable named in the ANLzzFL /\
+  \ ANLzzFN family carries an index 'zz' that is not in [01-99]. For ANLzzFL (Analysis\
+  \ Flag zz) and ANLzzFN (Analysis Flag zz (N)), 'zz' is an index for the zzth record\
+  \ selection algorithm and must be a two-digit value in the range 01-99."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() =~ /^ANL\\d\\d(FL|FN)$/ and varname() !~ /^ANL(0[1-9]|[1-9][0-9])(FL|FN)$/
+Outcome:
+  Message: "Illegal variable name: zz is not in [01-99] for ANLzzFL/FN."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: zz is not in [01-99] for ANLzzFL/FN"
+  Description: "For Analysis Flag zz (ANLzzFL) and Analysis Flag zz (N) (ANLzzFN)\
+    \ variables, 'zz' is an index for the zzth record selection algorithm where 'zz'\
+    \ is must be in [01-99]. Similar to CDISC ADaM Validation Checks No. 299-303."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1018"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,43 @@
+name: CDISC-AD0862
+kind: rule
+description: |
+  Wave B7 port - T1b PlainIntermediate.
+  CDISC-AD0862: Within a dataset, there is more than one value of COHORTC for a given value of COHORT, considering only those rows on which both variables are populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE. Bare-leaf Check (no all/any
+  wrapper) + has_multiple_values_for - both Python gaps: business_rules
+  KeyError: 'name' (Finding #26) and DataframeType lacks has_multiple_values_for
+  (Finding #28). Baselines on Python lane; expected matches Java's per-row
+  output.
+python_source: rules-adamig-1-3.json (CDISC-AD0862)
+rule:
+  coreId: CDISC-AD0862
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: 'S1', USUBJID: '001', PARAMCD: 'HGB', COHORT: 'A', COHORTC: '0'}
+      - {STUDYID: 'S1', USUBJID: '002', PARAMCD: 'HGB', COHORT: 'A', COHORTC: '1'}
+      - {STUDYID: 'S1', USUBJID: '003', PARAMCD: 'HGB', COHORT: 'B', COHORTC: '2'}
+      - {STUDYID: 'S1', USUBJID: '004', PARAMCD: 'HGB', COHORT: 'B', COHORTC: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0862
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COHORT: 'A'
+      COHORTC: '0'
+  - rule_id: CDISC-AD0862
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COHORT: 'A'
+      COHORTC: '1'
+expected_errors: []

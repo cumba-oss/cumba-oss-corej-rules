@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-AD0396"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a parameter (PARAMCD), the numeric Analysis\
+  \ Toxicity Grade Low (N) (ATOXGRLN) does not have a single consistent value for\
+  \ a given value of the character Analysis Toxicity Grade Low (ATOXGRL), evaluated\
+  \ only on rows where both ATOXGRLN and ATOXGRL are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ATOXGRLN) and var_exists("ATOXGRL") and var_exists("PARAMCD") and not empty(ATOXGRL)
+    and not empty(PARAMCD) and is_inconsistent_across_dataset(ATOXGRLN, keys=[ATOXGRL, PARAMCD])
+Outcome:
+  Message: "ATOXGRLN has inconsistent values for the same ATOXGRL within a parameter."
+  Output_Variables:
+  - "PARAMCD"
+  - "ATOXGRL"
+  - "ATOXGRLN"
+Source:
+  Message: "Inconsistent value for ATOXGRLN within a unique PARAMCD"
+  Description: "Within a parameter, there should be only a single value of ATOXGRLN\
+    \ for a given value of ATOXGRL, considering only those rows on which both variables\
+    \ are populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0396"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0396"
+        Version: "1"
+      Version: "6.0"

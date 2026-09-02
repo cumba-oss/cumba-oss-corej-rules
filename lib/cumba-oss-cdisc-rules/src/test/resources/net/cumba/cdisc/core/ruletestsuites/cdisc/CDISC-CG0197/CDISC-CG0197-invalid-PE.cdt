@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0197 expect=violation domain=PE
+#note "CL-G.4 (wave TA-4): explicit case_sensitive: false, restoring the pre-TA-3 insensitive behaviour family-wide. Row 2's standardized result 'Cranial pain' is not a MedDRA Preferred Term of the (dummy) dictionary and differs from PEORRES -> fires. Row 1's PESTRESC equals PEORRES and is excluded by the inequality conjunct."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 PESTRESC="Cranial pain"
+dataset PE class=FINDINGS label="Physical Examination"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PESEQ    type=Num  label="Sequence Number"
+col PETESTCD type=Char label="Body System Examined Short Name"
+col PEORRES  type=Char label="Verbatim Examination Finding"
+col PESTRESC type=Char label="Examination Result in Std Format"
+---
+S1 | PE | 001 | 1 | HEAD | pain in head | pain in head
+S1 | PE | 001 | 2 | HEAD | pain in head | Cranial pain

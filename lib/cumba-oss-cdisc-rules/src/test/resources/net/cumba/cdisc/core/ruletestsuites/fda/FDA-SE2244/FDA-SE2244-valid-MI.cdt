@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2244 expect=noViolation domain=MI
+#note "Row 1 parses the modifiers out of MIORRES into MICHRON/MIDISTR/MISEV, so MISTRESC carries only the base observation; row 2 repeats MIORRES verbatim but no modifier qualifier is populated; row 3 is the allowed 'NORMAL' identity; row 4 the allowed 'UNREMARKABLE' identity -> no violation."
+#library standard=sendig version=3-1-1
+dataset MI label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Char label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Finding Short Name"
+col MIORRES  type=Char label="Result or Finding in Original Units"
+col MISTRESC type=Char label="Standardized Result in Character Format"
+col MICHRON  type=Char label="Chronicity"
+col MIDISTR  type=Char label="Distribution"
+col MISEV    type=Char label="Severity"
+---
+S1 | MI | 001 | 1 | MIEXAM | CHRONIC FOCAL MILD NECROSIS | NECROSIS     | CHRONIC | FOCAL | MILD
+S1 | MI | 001 | 2 | MIEXAM | INFILTRATE                  | INFILTRATE   |         |       |
+S1 | MI | 001 | 3 | MIEXAM | NORMAL                      | NORMAL       | CHRONIC | FOCAL | MILD
+S1 | MI | 001 | 4 | MIEXAM | UNREMARKABLE                | UNREMARKABLE | CHRONIC | FOCAL | MILD

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1243 expect=noViolation domain=AE
+#note "Each --BODSYS is coded by exactly one --BDSYCD; a second body system legitimately carries a different code."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+---
+S1 | AE | 001 | 1 | HEADACHE | Nervous system disorders | 10029205
+S1 | AE | 002 | 1 | DIZZINESS | Nervous system disorders | 10029205
+S1 | AE | 001 | 2 | NAUSEA | Gastrointestinal disorders | 10017947

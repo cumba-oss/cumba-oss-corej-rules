@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-SEND-0106 expect=violation domain=DM
+#note "Adapted from -valid_strain_in_ts-DM with ONE change: the TS STRAIN row's TSVAL is BLANK. ts_parameter_value returns the first key-matching row's TSVAL, which is missing, so it yields null and empty($ts_strain) is TRUE. Pins the sheet Rule cell verbatim -- 'Record with TSPARMCD = \"STRAIN\" is present in TS AND TSVAL ^= null for that record' -- i.e. a present-but-empty parameter does not satisfy it. *** version=3-0 is LOAD-BEARING. M3-D8 restricted this rule's Standards block to the single (SENDIG, 3.0) entry the sheet supports -- row 526 is SEND106's ONLY row -- so from v3.1 onward only the .1 successor ships. Before that fix the base co-shipped with its replacement in five packages and CONTRADICTED it: a conformant v3.1+ study declaring the strain in TX was silent under 0106.1 and reported by 0106, which has no TX operand at all. ***"
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SPECIES type=Char label="Species"
+col STRAIN  type=Char label="Strain/Substrain"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | 001 | RAT |  | M | LD | Low Dose
+S1 | DM | 002 | 002 | RAT |  | M | MD | Mid Dose
+S1 | DM | 003 | 003 | RAT |  | F | HD | High Dose
+---
+
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE   | Trial Title | 28-Day Oral Toxicity Study
+S1 | TS | 2 | SPECIES | Species     | RAT
+S1 | TS | 3 | STRAIN | Strain/Substrain |
+---

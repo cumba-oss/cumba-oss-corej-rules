@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2216 expect=violation domain=TS
+#note "The test product is added to an existing treatment (ADDON=Y) but no TSPARMCD=CURTRT record exists -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE | Trial Title | A Phase 3 Add-on Study of Drug X
+S01 | TS | 2 | ADDON | Test Product Added to Existing Treatment | Y
+S01 | TS | 3 | TTYPE | Trial Type | EFFICACY

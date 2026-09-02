@@ -1,0 +1,33 @@
+name: CDISC-AD0436
+kind: rule
+description: |
+  Wave A5 port — T1a PlainSimple.
+  CDISC-AD0436: On a given record, ATPTN is populated and ATPT is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE (+ MD variants) and
+  OCCURRENCE DATA STRUCTURE (+ MD variants); simple non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0436)
+rule:
+  coreId: CDISC-AD0436
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ATPT: 'PREDOSE', ATPTN: '1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, ATPT: '',        ATPTN: '1'}  # bad — ATPTN populated, ATPT empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0436
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ATPT: null
+      ATPTN: '1'
+expected_errors: []

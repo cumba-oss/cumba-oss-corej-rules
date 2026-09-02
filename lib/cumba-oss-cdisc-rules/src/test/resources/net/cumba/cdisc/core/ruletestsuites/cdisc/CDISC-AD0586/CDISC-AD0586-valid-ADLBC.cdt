@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0586 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD for a subject, PBCHG is populated and is not equal to ((BASE-AVAL)/AVAL)*100
+#note "BASE=120, AVAL=100 -> expected pctchg 20; PBCHG=20 -> noViolation"
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE type=Num
+col AVAL type=Num
+col PBCHG type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 120 | 100 | 20
+---

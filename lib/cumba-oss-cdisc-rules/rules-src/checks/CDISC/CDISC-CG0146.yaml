@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-CG0146"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Reference Start Date/Time (RFSTDTC)\
+  \ in the Demographics (DM) domain is not populated for a subject whose Description\
+  \ of Actual Arm (ACTARM) is a value other than 'Screen Failure', 'Not Assigned',\
+  \ or 'Not Treated'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARM"
+Check:
+  expression: >-
+    ACTARM not in ["Screen Failure", "Not Assigned", "Not Treated", "SCREEN FAILURE",
+    "NOT ASSIGNED", "NOT TREATED"] and empty(RFSTDTC)
+Outcome:
+  Message: "RFSTDTC is not populated when ACTARM is a value other than 'Screen Failure',\
+    \ 'Not Assigned', or 'Not Treated'."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ACTARM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFSTDTC"
+  Condition: "Milestone associated with RFSTDTC is start of treatment and ACTARM not\
+    \ in ('Screen Failure' 'Not Assigned' 'Not Treated')"
+  Rule: "RFSTDTC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0146"
+        Version: "1"
+      Version: "2.0"

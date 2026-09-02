@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0145"
+Sheet_Rule_Identifier: "145"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: "SignificantDigits"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "An ItemDef with the DataType attribute float must include a SignificantDigits attribute."
+# The sheet's Rule column has a "@DateType" typo; the attribute is DataType.
+Message: "ItemDef with DataType 'float' must have the SignificantDigits attribute."
+Check:
+  kind: "exists"
+  target: "@SignificantDigits"
+  when:
+    path: "@DataType"
+    equals: "float"

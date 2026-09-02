@@ -1,0 +1,115 @@
+Core:
+  Id: "PMDA-SD1202"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --STDTC is populated and is after DM.RFPENDTC (Date/Time\
+  \ of End of Participation)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+    - "DO"
+Requirements:
+  Variables:
+    All:
+    - "--STDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--STDTC) and date(--STDTC) > DM.RFPENDTC
+Outcome:
+  Message: "--STDTC is after DM.RFPENDTC (Date/Time of End of Participation)."
+  Output_Variables:
+  - "--STDTC"
+  - "DM.RFPENDTC"
+Source:
+  Message: "--STDTC date is after RFPENDTC"
+  Description: "Start Date/Time (--STDTC) variable value must be less than or equal\
+    \ to Date/Time of End of Participation (RFPENDTC). If the study is ongoing, Parameter\
+    \ Value (TSVAL) for the 'ONGOSIND/Ongoing Study Indicator' parameter should be\
+    \ set to 'Y' in the Trial Summary (TS) domain."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS (-DO), EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1202"
+        Version: "1"
+      Version: "1.6"

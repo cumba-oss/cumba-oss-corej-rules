@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0035"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of RFN is populated with\
+  \ a value that is not 1"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    ends_with(varname(), "RFN") and not empty(value()) and value() != 1
+Outcome:
+  Message: "A variable with a suffix of RFN has a value other than 1"
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "*RFN"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of RFN has a value\
+    \ that is not 1 or null"
+  Rule_Failure_Criteria: "Value is not 1 or null"
+  Condition_Failure: "Variable with a suffix of RFN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR35"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR35"
+        Version: "1"
+      Version: "5.0"

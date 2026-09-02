@@ -1,0 +1,36 @@
+name: EMPTYSTR-not-unique-relationship
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category D.12).
+  is_not_unique_relationship EXCLUDES a ""/missing key from the relationship map
+  (J1, GroupSemantics.relationshipNotUniqueViolations: `if (a.isEmpty() ||
+  b.isEmpty()) continue`), so a missing value is not a participant. Here the empty
+  ARMCD key maps to {1,2} but, being empty, is never added to the map nor flagged,
+  so coreJ emits 0 violations — matching Python (dataframe_operators.py:1232-1357,
+  which skips a ""/null key via `if key_val == "": continue` and excludes it from
+  the flagged set `v != "" and v is not None`).
+
+  J1 REVERSED the earlier D.12 "deliberate divergence" decision (coreJ used to flag
+  the ""-key rows): coreJ now aligns with Python. The genuine "code present / decode
+  empty" signal is owned by the DRAFT-9000xx coverage rules with a true message.
+python_notes: |
+  Python is_not_unique_relationship drops ""/null keys and excludes them from the
+  violation set, so the ""-key non-unique mapping yields 0 violations. Since J1 coreJ
+  matches this (empty keys excluded). Aligned — no divergence.
+python_source: PLAN-empty-string-membership-parity.md (D.12); PLAN-java-parity-defect-fixes.md (J1)
+check:
+  name: ARMCD
+  operator: is_not_unique_relationship
+  value: ARM
+datasets:
+  TA:
+    row_key: [STUDYID, ARMCD, TAETORD]
+    rows:
+      - {STUDYID: S1, ARMCD: '',  ARM: '1', TAETORD: 1}  # ""-key excluded (J1) → no fire; matches Python
+      - {STUDYID: S1, ARMCD: '',  ARM: '2', TAETORD: 2}  # ""-key excluded (J1) → no fire; matches Python
+      - {STUDYID: S1, ARMCD: 'B', ARM: '3', TAETORD: 1}  # B → {3} unique: no fire
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations: []
+expected_errors: []

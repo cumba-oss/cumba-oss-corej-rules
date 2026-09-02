@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0333"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Findings About dataset name begins with \"FA\"\
+  , is longer than two characters, and the characters following \"FA\" do not match\
+  \ the two-character code of a domain present in the study."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+    include_split_datasets: true
+Operations:
+- id: "$list_dataset_names"
+  expression: "dataset_names()"
+Check:
+  expression: >-
+    ds_name("DATA") =~ /^[A-Za-z]{2}[A-Za-z]{1,2}$/ and prefix(dataset_name, 2) == "FA" and
+    suffix(dataset_name, 2) not in $list_dataset_names
+Outcome:
+  Message: "The parent domain code in the Findings About split dataset name does not\
+    \ match a domain present in the study."
+  Output_Variables:
+  - "dataset_name"
+  - "$list_dataset_names"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Dataset split by parent domain and dataset name length > 2 and dataset\
+    \ name begins with 'FA'"
+  Rule: "The characters of the dataset name after 'FA' equal a domain that present\
+    \ in the study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0333"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0333"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0333"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1331 expect=violation domain=MH
+#note "Row 2's event start (2020-03-15) is after the collection date (2020-02-01): the event cannot start after it was recorded. Covers the EVENTS class branch."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 MHDTC=2020-02-01 MHSTDTC=2020-03-15
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHDTC   type=Char label="Date/Time of History Collection"
+col MHSTDTC type=Char label="Start Date/Time of Medical History Event"
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 | ASTHMA       | 2020-02-01 | 2019-05-01
+CDISCPILOT01 | MH | 01-701-1015 | 2 | HYPERTENSION | 2020-02-01 | 2020-03-15

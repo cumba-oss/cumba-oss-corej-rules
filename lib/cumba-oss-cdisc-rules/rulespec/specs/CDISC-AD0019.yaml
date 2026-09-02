@@ -1,0 +1,30 @@
+name: CDISC-AD0019
+kind: rule
+description: |
+  Wave A1 port — T1a PlainSimple.
+  CDISC-AD0019: COMPLFL must be 'Y' or 'N' when populated on ADSL.
+  Class-scoped rule (SUBJECT LEVEL ANALYSIS DATASET); the presence gate is Requirements.Variables.All
+  (R-4.11 migration 2026-07-24), the Check is non_empty + is_not_contained_by.
+python_source: rules-adamig-1-3.json (CDISC-AD0019)
+rule:
+  coreId: CDISC-AD0019
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', COMPLFL: Y}       # ok
+      - {STUDYID: S1, USUBJID: '002', COMPLFL: MAYBE}   # bad — not Y/N
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0019
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      COMPLFL: MAYBE
+expected_errors: []

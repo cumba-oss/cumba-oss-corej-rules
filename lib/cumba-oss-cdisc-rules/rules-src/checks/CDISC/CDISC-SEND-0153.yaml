@@ -1,0 +1,86 @@
+Core:
+  Id: "CDISC-SEND-0153"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Standard Units (BGSTRESU) does not have a single\
+  \ consistent value for a given Body Weight Gain Test Name (BGTEST) across the BG\
+  \ dataset; BGSTRESU must remain consistent throughout the study regardless of the\
+  \ value in BGORRESU."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "BG"
+Requirements:
+  Variables:
+    All:
+    - "BGSTRESU"
+Check:
+  expression: >-
+    var_exists("BGTEST") and is_inconsistent_across_dataset(BGSTRESU, keys=[BGTEST])
+Outcome:
+  Message: "BGSTRESU is not consistent for a given BGTEST across the BG dataset."
+  Output_Variables:
+  - "BGTEST"
+  - "BGSTRESU"
+Source:
+  Class: "FND"
+  Domain: "BG"
+  Variable: "BGSTRESU"
+  Plain_Text_Explanation: "For a given BGTEST, BGSTRESU should remain consistent throughout\
+    \ the course of the study regardless of the value in BGORRESU."
+  Condition: "For a given BGTEST"
+  Rule: "BGSTRESU is consistent throughout the course of the study regardless of the\
+    \ value in BGORRESU"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND153"
+        Version: "1"
+      Version: "5.0"

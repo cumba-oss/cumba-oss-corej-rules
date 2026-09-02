@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-SEND-0290 expect=noViolation domain=LB
+#note "THE WIDENING DISCRIMINATOR (Fix #299 / M3-D21(iii)). Same test, same planned time point NAME, different Planned Time Point NUMBER -- but on two DIFFERENT STUDY DAYS. The sheet's own Condition cell for SEND290 (rows 1528-1532) defines uniqueness by 'a combination of domain, study day, --CAT, --SCAT, --TESTCD', and before M3-D21 the partition was `within=[--TESTCD]` alone, so '1 HOUR' carried two dependents study-wide and all four rows FIRED on conformant data. Widening to [--TESTCD, --DY, --CAT, --SCAT] separates the two days and the rule is silent. --METHOD and 'other variables as provided by the Sponsor in the define file' stay out: they are define-declared and not encodable. ESCALATE if this reports 4."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBTPT    type=Char label="Planned Time Point Name"
+col LBTPTNUM type=Num  label="Planned Time Point Number"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | Albumin | 41 | 1 HOUR | 1 | 1
+S1 | LB | 002 | 1 | ALB | Albumin | 39 | 1 HOUR | 1 | 1
+S1 | LB | 001 | 2 | ALB | Albumin | 40 | 1 HOUR | 2 | 8
+S1 | LB | 002 | 2 | ALB | Albumin | 42 | 1 HOUR | 2 | 8
+---

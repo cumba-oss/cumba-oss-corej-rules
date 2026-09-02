@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0329 expect=violation domain=ADVS
+#note "Group (PARAMCD=SYSBP, BASECA1N=1) holds BASECAT1 {NORMAL x2, ELEVATED x1} -> row 3 is the minority."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 BASECAT1=ELEVATED BASECA1N=1 PARAMCD=SYSBP
+dataset ADVS class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASECAT1 type=Char
+col BASECA1N type=Num
+---
+S1 | 001 | SYSBP | NORMAL   | 1
+S1 | 002 | SYSBP | NORMAL   | 1
+S1 | 003 | SYSBP | ELEVATED | 1
+S1 | 004 | SYSBP | HIGH     | 2
+S1 | 005 | SYSBP | HIGH     | 2

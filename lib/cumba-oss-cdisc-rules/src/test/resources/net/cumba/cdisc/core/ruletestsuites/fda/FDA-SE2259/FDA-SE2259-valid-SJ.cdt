@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SE2259 expect=noViolation domain=SJ
+#note "Every populated SJ (RSTGCD, RSTAGE) pair is declared in TT; the UNPLAN row is exempt even though its RSTAGE text is not in TT -> no violation."
+#library standard=sendig version=dart-1-1
+dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+---
+S1 | SJ | 001 | 1 | ST1    | Premating       | 2020-01-01
+S1 | SJ | 001 | 2 | ST2    | Gestation       | 2020-02-01
+S1 | SJ | 002 | 1 | UNPLAN | Unplanned stage | 2020-03-01
+---
+
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Repro Stage Start Rule"
+---
+S1 | TT | ST1 | Premating | FIRST DOSE
+S1 | TT | ST2 | Gestation | GD 0
+---

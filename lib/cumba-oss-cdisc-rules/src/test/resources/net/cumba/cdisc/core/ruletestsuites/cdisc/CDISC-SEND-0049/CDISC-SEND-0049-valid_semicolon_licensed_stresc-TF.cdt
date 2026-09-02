@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=noViolation domain=TF
+#note "O-8 (Fix #339): the three standardised-result variables the owner added to the allow-list - MISTRESC, TFSTRESC, EGSTRESC - accept a semicolon combination of lawful terms, pending the answer to sheet issue #154. TFSTRESC = ADENOMA;CARCINOMA (both NEOPLASM terms) is silent, as is TFLAT = LEFT;RIGHT (IG-named). TFSPEC = LIVER is a single term and silent. A scenario that fires here has dropped a --STRESC variable from the allow-list (owner question #154 answered NO) or has lost the carve-out entirely."
+#library standard=sendig version=3-1-1
+#library variable-metadata TF TFSTRESC codelist=NEOPLASM codelist_extensible=true codelist_coded_values="[\"ADENOMA\",\"CARCINOMA\",\"NORMAL\"]"
+#library variable-metadata TF TFLAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#library variable-metadata TF TFSPEC codelist=SPEC codelist_extensible=true codelist_coded_values="[\"LIVER\",\"KIDNEY\",\"SPLEEN\"]"
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Short Name"
+col TFSPEC   type=Char label="Specimen Material Type"
+col TFLAT    type=Char label="Laterality"
+col TFSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | TF | 001 | 1 | TFEXAM | LIVER | LEFT;RIGHT | ADENOMA;CARCINOMA

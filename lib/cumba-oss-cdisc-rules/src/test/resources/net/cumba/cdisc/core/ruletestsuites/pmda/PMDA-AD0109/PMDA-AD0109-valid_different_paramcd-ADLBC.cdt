@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0109 expect=noViolation domain=ADLBC
+#note "The same AVISIT name carries two different AVISITN values, but the keys are the tuples (GLUC, WEEK2) and (ALB, WEEK2) - two different groups, each single-valued -> silent. Pins that PARAMCD is part of the key."
+#library standard=adamig version=1-0
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | WEEK2 | 2
+CDISCPILOT01 | 01-701-1023 | ALB  | WEEK2 | 3
+---

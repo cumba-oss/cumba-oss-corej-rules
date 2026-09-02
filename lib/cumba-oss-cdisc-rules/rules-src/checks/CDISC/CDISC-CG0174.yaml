@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0174"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a related record is present in the parent domain\
+  \ dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent\
+  \ record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FA"
+Match_Datasets:
+- Name: "RELREC"
+Check:
+  expression: >-
+    FAOBJ != RELREC.**TERM and FAOBJ != RELREC.**TRT and not equalsIgnoreCase(FAOBJ, RELREC.**DECOD)
+Outcome:
+  Message: "A related record is present in the parent domain dataset but FAOBJ does\
+    \ not equal the --TERM, --TRT or --DECOD value of the parent record."
+  Output_Variables:
+  - "FAOBJ"
+  - "RELREC.**TERM"
+  - "RELREC.**TRT"
+  - "RELREC.**DECOD"
+Source:
+  Class: "FND"
+  Domain: "FA"
+  Variable: "FAOBJ"
+  Condition: "Related record present in parent domain dataset"
+  Rule: "FAOBJ in (--TERM, --TRT, --DECOD)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0174"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0174"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0174"
+        Version: "1"
+      Version: "2.0"

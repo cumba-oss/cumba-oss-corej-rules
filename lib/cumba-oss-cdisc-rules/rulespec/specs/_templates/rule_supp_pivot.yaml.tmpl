@@ -1,0 +1,36 @@
+name: "{{name}}"
+kind: rule
+description: "{{description}}"
+rule:
+  id: "{{rule_uuid}}"
+  Core: {Id: "{{rule_core_id}}"}
+  Description: "{{rule_description}}"
+  Rule_Type: Record Data
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [{{parent_domain}}]}
+  Match_Datasets:
+    - Name: SUPP{{parent_domain}}
+      Keys: [STUDYID, USUBJID, IDVAR, IDVARVAL]
+      Child: true
+  Check:
+    all:
+      - {name: "QNAM", operator: "equal_to", value: "{{qnam_value}}"}
+  Outcome:
+    Message: "{{message}}"
+    Output_Variables: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM, QVAL]
+datasets:
+  {{parent_domain}}:
+    row_key: [STUDYID, USUBJID, "{{parent_seq_column}}"]
+    rows:
+      - {STUDYID: "S1", USUBJID: "001", {{parent_seq_column}}: 1}
+  SUPP{{parent_domain}}:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: "S1", USUBJID: "001", RDOMAIN: "{{parent_domain}}", IDVAR: "{{parent_seq_column}}", IDVARVAL: "1", QNAM: "{{qnam_value}}", QVAL: "Y"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+expected_violations: []
+expected_errors: []

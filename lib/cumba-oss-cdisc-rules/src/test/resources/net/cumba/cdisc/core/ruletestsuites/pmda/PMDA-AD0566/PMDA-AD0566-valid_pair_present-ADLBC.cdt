@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0566 expect=noViolation domain=ADLBC
+#note "Both PBCHGC1N and PBCHGCA1 declared -> second conjunct FALSE. The regexes are disjoint (PBCHGCA1 does not match ^PBCHGC(\d+)N$ because 'A' is not a digit), so still ONE expansion."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col PBCHGC1N type=Num
+col PBCHGCA1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 3.5 | 1 | INCREASE

@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG0129"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ARMCD is equal to 'SCRNFAIL' or 'NOTASSGN' but ARMCD\
+  \ does not equal ACTARMCD in the DM dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ACTARMCD"
+Check:
+  expression: >-
+    ARMCD in ["SCRNFAIL", "NOTASSGN"] and ARMCD != ACTARMCD
+Outcome:
+  Message: "ARMCD is 'SCRNFAIL' or 'NOTASSGN' but does not equal ACTARMCD."
+  Output_Variables:
+  - "ARMCD"
+  - "ACTARMCD"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMCD"
+  Condition: "ARMCD in ('SCRNFAIL', 'NOTASSGN')"
+  Rule: "ARMCD = ACTARMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0129"
+        Version: "1"
+      Version: "2.0"

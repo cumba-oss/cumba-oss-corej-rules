@@ -1,0 +1,46 @@
+name: CDISC-AD0343
+kind: rule
+description: |
+  Wave B1 port - T1b PlainIntermediate.
+  CDISC-AD0343: Within a parameter, there is more than one value of ANRLOC for a given value of ANRLO.
+  Inverse of CDISC-AD0342 - ANRLO must uniquely determine ANRLOC. Bare-leaf
+  Check at root - Python KeyError; baseline Python lane with Java expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0343)
+rule:
+  coreId: CDISC-AD0343
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN, ANRLO, ANRLOC]
+    column_types:
+      AVISITN: LONG
+      ANRLO: DOUBLE
+    rows:
+      # PARAMCD=HGB: ANRLO=12.0 maps to two distinct ANRLOC ('12 g/dL' vs 'range-a') -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ANRLO: 12.0, ANRLOC: 12 g/dL}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, ANRLO: 12.0, ANRLOC: range-a}
+      # PARAMCD=HGB: ANRLO=11.0 consistent
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, ANRLO: 11.0, ANRLOC: 11 g/dL}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0343
+    dataset: ADLB
+    row_key: {ANRLO: 12.0, ANRLOC: 12 g/dL, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ANRLO: '12'
+      ANRLOC: 12 g/dL
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0343
+    dataset: ADLB
+    row_key: {ANRLO: 12.0, ANRLOC: range-a, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ANRLO: '12'
+      ANRLOC: range-a
+      PARAMCD: HGB
+expected_errors: []

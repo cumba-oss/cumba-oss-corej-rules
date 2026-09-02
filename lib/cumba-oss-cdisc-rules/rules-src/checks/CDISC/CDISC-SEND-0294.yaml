@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0294"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the interval start (--STINT) and interval end (--ENINT)\
+  \ are both populated but the Time Point Reference (--TPTREF) anchor is empty; --STINT\
+  \ and --ENINT specify the interval relative to the --TPTREF anchor, so --TPTREF\
+  \ must be populated when both are populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STINT"
+    - "--ENINT"
+Check:
+  expression: >-
+    not empty(--STINT) and not empty(--ENINT) and empty(--TPTREF)
+Outcome:
+  Message: "--TPTREF is empty when both --STINT and --ENINT are populated."
+  Output_Variables:
+  - "--TPTREF"
+  - "--STINT"
+  - "--ENINT"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--TPTREF"
+  Plain_Text_Explanation: "--TPTREF must be populated when --STINT and --ENINT are\
+    \ populated."
+  Condition: "--STINT ^= null AND --ENINT ^= null"
+  Rule: "--TPTREF ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND294"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND294"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND294"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND294"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND294"
+        Version: "1"
+      Version: "5.0"

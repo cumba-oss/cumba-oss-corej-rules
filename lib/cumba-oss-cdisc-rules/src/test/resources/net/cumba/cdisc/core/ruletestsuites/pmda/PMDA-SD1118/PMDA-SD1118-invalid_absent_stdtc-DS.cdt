@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1118 expect=violation domain=DS
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: DISCRIMINATING: DSSTDTC is not present in the dataset at all. The AUTHORED expression would fire (nothing populated), but the shipped machine-emitted leading var_exists(\"--STDTC\") guard is false, so the rule EXECUTES and reports nothing — a silent noViolation, not a skip (no Requirements.Variables gate). If this FIRES, escalate: the shipped guard is not being injected as recorded."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSDTC   type=Char label="Date/Time of Collection"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | WITHDRAWN | WITHDRAWN |  |

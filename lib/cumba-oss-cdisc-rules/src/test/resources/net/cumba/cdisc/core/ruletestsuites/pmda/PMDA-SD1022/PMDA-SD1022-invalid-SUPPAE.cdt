@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1022 expect=violation domain=SUPPAE
+#note "Row 1 QNAM='AETRTEMFL9' is 10 characters, row 2 '1AESER' starts with a number, row 3 'aeser' is lower case - three independent breaches of the identifier contract."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=1 QNAM=AETRTEMFL9
+#expectViolationAt row=2 QNAM=1AESER
+#expectViolationAt row=3 QNAM=aeser
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEMFL9 | Treatment Emergent Flag | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | 1AESER     | Serious Event           | N
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 3 | aeser      | Serious Event           | N

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0015 expect=violation domain=AE
+#note "Row 3 carries a negative ISO 8601 duration ('-P2D') in AEDUR -> fires. Rows 1/2 are valid non-negative durations and row 4 leaves AEDUR empty."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 AEDUR=-P2D
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDUR   type=Char label="Duration of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | P3D
+S1 | AE | 001 | 2 | NAUSEA   | PT12H
+S1 | AE | 001 | 3 | RASH     | -P2D
+S1 | AE | 001 | 4 | FEVER    |

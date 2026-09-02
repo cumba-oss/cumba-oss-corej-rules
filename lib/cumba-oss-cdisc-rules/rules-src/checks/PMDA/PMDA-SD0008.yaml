@@ -1,0 +1,120 @@
+Core:
+  Id: "PMDA-SD0008"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Dictionary-Derived Term (--DECOD) value is not\
+  \ a valid term in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--DECOD"
+Operations:
+- id: "$decod_valid"
+  expression: "valid_external_dictionary_value(--DECOD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"PT\", case_sensitive=false)"
+Check:
+  expression: >-
+    $decod_valid == false
+Outcome:
+  Message: "Dictionary-Derived Term (--DECOD) is not a valid MedDRA term."
+  Output_Variables:
+  - "--DECOD"
+Source:
+  Message: "Value for --DECOD not found in MedDRA dictionary"
+  Description: "Value for the Dictionary-Derived Term (--DECOD) variable must be populated\
+    \ using a Preferred Term of the MedDRA dictionary of a version specified in the\
+    \ define.xml (Case-insensitive)."
+  Domains: "AE, CE, MH"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0008"
+        Version: "1"
+      Version: "1.6"

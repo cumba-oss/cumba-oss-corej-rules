@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-SEND-0387 expect=skipped domain=DM
+#note "THE RPATHCD ALL-FACET GATE (Fix #331 bucket 2, M2-D24 / M3-D18; pin owed by review S9 and authored by Fix #340). The DM dataset deliberately declares no RPATHCD column, so Requirements.Variables.All [RPATHCD] rejects the dataset and the rule is SKIPPED naming RPATHCD. Remove the All entry and the rule EXECUTES: since Fix #330 retired the injected var_exists guard, a bare empty(RPATHCD) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so it would fire on EVERY row -- the flood the gate exists for. If this scenario EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite the pin."
+#library standard=sendig-dart version=1-2
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SPECIES type=Char label="Species"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col SETCD   type=Char label="Set Code"
+---
+S1 | DM | S1-001 | 001 | RAT | F | HD | SET1
+S1 | DM | S1-002 | 002 | RAT | F | HD | SET1
+---
+
+dataset TP label="Trial Repro Paths"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col RPATHCD type=Char label="Reproductive Path Code"
+col RPATH   type=Char label="Reproductive Path"
+col RPRFDY  type=Num  label="Planned Repro Phase Day of First Exposure"
+---
+S1 | TP | P1 | F0 Female | 0
+---

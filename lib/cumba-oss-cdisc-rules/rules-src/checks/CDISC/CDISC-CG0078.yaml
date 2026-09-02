@@ -1,0 +1,67 @@
+Core:
+  Id: "CDISC-CG0078"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when MHENDTC is populated and is the same as or later\
+  \ than RFSTDTC in the DM dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "MHENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  ERROR:
+    expression: >-
+      not empty(MHENDTC) and date(MHENDTC) >= DM.RFSTDTC
+  INFO:
+    expression: >-
+      not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= earliest_possible(DM.RFSTDTC)
+    Message: "MHENDTC is populated and may be the same as or later than RFSTDTC in the\
+      \ DM dataset (partial date/time precision leaves the order undetermined)."
+Outcome:
+  Message: "MHENDTC is populated and is the same as or later than RFSTDTC in the DM\
+    \ dataset."
+  Output_Variables:
+  - "MHENDTC"
+  - "DM.RFSTDTC"
+Source:
+  Class: "EVT"
+  Domain: "MH"
+  Variable: "MHENDTC"
+  Condition: "MHENDTC ^= null"
+  Rule: "MHENDTC < DM.RFSTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0078"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0078"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0078"
+        Version: "1"
+      Version: "2.0"

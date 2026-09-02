@@ -1,0 +1,40 @@
+#!RuleTest
+#test CDISC-SEND-0105.1 expect=violation domain=DM
+#note "GROUPING DISCRIMINATOR for the M3-D6 granularity ruling. Same shape as -invalid_species_column_absent-DM but with TWO DM records. With SPECIES absent the first conjunct is true on EVERY DM row, so a per-record rule would report once per animal -- two findings here, and on a real multi-subject DM one per animal. Grouping.Variables [STUDYID] collapses that to ONE finding per study, anchored at the group's first flagged row. A report of 2 means the Grouping block is not being read and is a stage-R escalation, not a fixture to widen."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics" class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | SET01 | M
+S1 | DM | 002 | SET01 | F
+---
+
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE  | Trial Title      | Study X
+S1 | TS | 2 | SSTDTC | Study Start Date | 2023-01-01
+---
+
+dataset TX label="Trial Sets" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+S1 | TX | SET01 | 1 | GRPLBL | Group Label | Control
+---

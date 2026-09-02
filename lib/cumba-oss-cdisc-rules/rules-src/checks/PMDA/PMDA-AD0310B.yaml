@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-AD0310B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SMQzzSC variable is not uniquely determined\
+  \ by SMQzzSCN within the dataset: a single value of SMQzzSCN maps to more than one\
+  \ value of SMQzzSC, considering only the records on which both variables are populated.\
+  \ The PMDA validation sheet's 'inconsistent value across studies' intent is reinterpreted\
+  \ as a within-dataset unique (1-to-1) relationship check between the paired character/numeric\
+  \ variables SMQzzSC and SMQzzSCN; the cross-study scope is not evaluated."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The sheet's 'inconsistent across studies' intent is reinterpreted as a\
+    \ within-dataset unique-relationship check between the char/numeric pair SMQzzSC/SMQzzSCN\
+    \ (has_multiple_values_for); the cross-study scope is not evaluated."
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    not empty(SMQzzSC) and not empty(SMQzzSCN) and has_multiple_values_for(SMQzzSC, SMQzzSCN)
+Outcome:
+  Message: "There is more than one value of SMQzzSC for a given value of SMQzzSCN\
+    \ (within the dataset)."
+  Output_Variables:
+  - "SMQzzSC"
+  - "SMQzzSCN"
+wildcards:
+  zz:
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for SMQzzSC"
+  Description: "Across studies, all SMQ Scope (SMQzzSC ) variable values must be the\
+    \ same for each unique value of SMQ Scope (N) (SMQzzSCN) variable when both variables\
+    \ are populated. The usual mapping is BROAD=1, NARROW=2."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0310B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0310B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0310B"
+        Version: "1"
+      Version: "6.0"

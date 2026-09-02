@@ -1,0 +1,61 @@
+Core:
+  Id: "PMDA-AD0230B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Actual Sequence of Treatments\
+  \ (N) (TRTSEQAN) variable does not hold a single consistent value for each unique\
+  \ value of the Actual Sequence of Treatment (TRTSEQA) variable, considering only\
+  \ records where both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRTSEQAN"
+Check:
+  expression: >-
+    var_exists("TRTSEQA") and not empty(TRTSEQA) and not empty(TRTSEQAN) and
+    is_inconsistent_across_dataset(TRTSEQAN, keys=[TRTSEQA])
+Outcome:
+  Message: "Inconsistent value for TRTSEQAN"
+  Output_Variables:
+  - "TRTSEQA"
+  - "TRTSEQAN"
+Source:
+  Message: "Inconsistent value for TRTSEQAN"
+  Description: "Within a study, all Actual Sequence of Treatments (N) (TRTSEQAN) variable\
+    \ values must be the same for each unique value of Actual Sequence of Treatment\
+    \ (TRTSEQA) variable when both variables are populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0230B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0230B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0230B"
+        Version: "1"
+      Version: "6.0"

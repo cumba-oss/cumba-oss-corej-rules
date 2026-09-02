@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1378 expect=violation domain=TE
+#note "FRESH, DISCRIMINATING - TA PRESENT with ZERO rows. distinct's EmptyResult is SET: $ta_etcd = the EMPTY set, so the populated TE.ETCD is 'not in' it and FIRES; the blank-ETCD row stays guarded by not empty(ETCD). If this reports 0 violations, escalate (would mean an empty distinct saturates membership)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ETCD=SCRN
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent
+CDISCPILOT01 | TE |      |           | Unspecified
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---

@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0747"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of AVALCATy for a given value of AVAL, where y is an integer [1-99,\
+  \ not zero-padded], considering only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AVALCATy) and not empty(AVAL) and has_multiple_values_for(AVALCATy, AVAL,
+    within=PARAMCD)
+Outcome:
+  Message: "AVALCATy has more than one value for this AVAL within this PARAMCD, among\
+    \ rows where both are populated"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "AVALCATy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "AVALCATy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of AVALCATy for a given value of AVAL, where y is a single-digit\
+    \ integer [1-9]"
+  Rule_Failure_Criteria: "There is more than one value of AVALCATy for a given value\
+    \ of AVAL"
+  Condition_Failure: "Within a given value of PARAMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR747"
+        Version: "1"
+      Version: "5.0"

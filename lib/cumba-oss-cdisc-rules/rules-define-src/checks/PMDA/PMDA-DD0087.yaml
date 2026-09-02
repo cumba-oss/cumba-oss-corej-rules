@@ -1,0 +1,30 @@
+Rule_Id: "PMDA-DD0087"
+Sheet_Rule_Identifier: "DD0087"
+Rule_Set: "PMDA"
+Element: "MetaDataVersion"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Analysis Results Metadata was developed specifically for ADaM and therefore should not be included with SDTM or SEND defines. Analysis Results Metadata inclusion is indicated by the presence of the arm:AnalysisResultDisplays element. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+Message: "ARM metadata included in non ADaM define.xml"
+# "SDTM or SEND define" is detected per version leg (2.0:
+# MetaDataVersion/@def:StandardName; 2.1: def:Standards/def:Standard names) and
+# - a documented judgment call - a document that ALSO declares an ADaM standard
+# is exempt, so mixed-standard 2.1 documents with a legitimate ARM block do not
+# fire. No CDISC-sheet ARM rules exist in the corpus (new).
+Check:
+  kind: "not_exists"
+  target: "arm:AnalysisResultDisplays"
+  when:
+    all:
+    - any:
+      - path: "@StandardName"
+        oneOf: ["SDTM-IG", "SEND-IG"]
+      - path: "Standards/Standard/@Name"
+        matchesRegex: "(SDTM|SEND).*"
+    - not:
+        any:
+        - path: "@StandardName"
+          equals: "ADaM-IG"
+        - path: "Standards/Standard/@Name"
+          matchesRegex: "ADaM.*"

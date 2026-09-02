@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0858 expect=noViolation domain=ADLBC
+# Rule:Description: Within a dataset, there is more than one value of ACYCLE for a given value of ACYCLEC, considering only those rows on which both variables are populated
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ACYCLE type=Char
+col ACYCLEC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | CYCLE 1
+CDISCPILOT01 | 01-701-1023 | 2 | CYCLE 2
+CDISCPILOT01 | 01-701-1015 | 1 | CYCLE 1
+---

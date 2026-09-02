@@ -1,0 +1,42 @@
+Core:
+  Id: "DRAFT-900024"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when the define.xml declares an NCI C-code for a term\
+  \ of a variable's non-extensible CDISC controlled terminology codelist that is not\
+  \ a published term C-code of that codelist in the CDISC Library."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Requires both a define.xml (the per-term NCI C-code aliases) and CDISC\
+    \ Library metadata (the published term C-codes); a run without either skips or\
+    \ under-reports. Library codelists whose loaded terms carry no C-codes are excluded\
+    \ by the non_empty guard. The submission-value twin of this check is DRAFT-900021;\
+    \ this rule catches a term whose value is correct but whose declared C-code is\
+    \ not."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    var_codelist_extensible("LIBRARY") == false and not empty(var_codelist_coded_codes("LIBRARY"))
+    and not contains_all(library_variable_codelist_coded_codes,
+    define_variable_codelist_coded_codes)
+Outcome:
+  Message: "A term C-code declared in the define.xml for a non-extensible CDISC controlled\
+    \ terminology codelist is not a published term C-code of that codelist in the\
+    \ CDISC Library."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_codelist_coded_codes"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0359 expect=violation domain=ADSL
+# Rule:Description: There is more than one value of DTHCAUS for a given value of DTHCAUSN, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col DTHCAUS type=Char
+col DTHCAUSN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | A | 1
+CDISCPILOT01 | 01-701-1023 | B | 1
+---

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1152 expect=skipped domain=LB
+#note "SKIP-contract pin (stage-R reclassification, expectation error): the sidecar declares LB with NO KeySequence on any ItemRef. OperationExecutor's DEFINE_KEY_VARIABLES arm converts the empty key list to the LIBRARY_NOT_AVAILABLE sentinel (Python parity: DefineXMLNotProvidedError), and RuleRunner Phase 2a.1 (define analog, M4) then SKIPs the rule with statusMessage 'Rule skipped - Define-XML declares no key variables for DEFINE_KEY_VARIABLES'. The skip reason is not directly assertable; expect=skipped pins non-execution. The GroupSemantics keyless flood is unreachable via $define_key_variables."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1152-nokeys-define.xml
+dataset LB
+col STUDYID  type=Char
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | 001 | ALB  | 3.5
+S1 | 001 | ALB  | 3.6
+S1 | 001 | GLUC | 5.0

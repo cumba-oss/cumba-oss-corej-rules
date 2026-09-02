@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0125 expect=violation domain=ADDV
+#note "Supertype pin: a [BASIC DATA STRUCTURE]-only rule DOES cover a medical-device BDS dataset. AD-prefixed name passes the Fix #140 gate, PARAMCD gives BASIC DATA STRUCTURE, and SPDEVID refines it to MEDICAL DEVICE BASIC DATA STRUCTURE, whose structure set is [MEDICAL DEVICE BASIC DATA STRUCTURE, BASIC DATA STRUCTURE] -- so the rule's single Include token is satisfied by the supertype."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 PARCAT1=VITALSIGNS PARCAT1N=1
+dataset ADDV
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+col PARCAT1N type=Num
+---
+S1 | 001 | DEV01 | SYSBP | VITALS     | 1
+S1 | 002 | DEV01 | SYSBP | VITALS     | 1
+S1 | 003 | DEV02 | SYSBP | VITALSIGNS | 1

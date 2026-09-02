@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-AD0699"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is not present, BNRIND is populated, and\
+  \ BNRIND does not equal the ANRIND value from the record where ABLFL equals 'Y',\
+  \ for a given value of PARAMCD within a device and subject combination."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BNRIND"
+Operations:
+- id: "$baseline_anrind"
+  expression: "max(ANRIND, group=[USUBJID, PARAMCD, SPDEVID], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    not var_exists("BASETYPE") and not empty(BNRIND) and BNRIND != $baseline_anrind
+Outcome:
+  Message: "BASETYPE is not present, and BNRIND does not equal the ANRIND value recorded\
+    \ where ABLFL equals 'Y' for this PARAMCD, device, and subject combination."
+  Output_Variables:
+  - "PARAMCD"
+  - "BNRIND"
+Source:
+  Class: "MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BNRIND"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is not present, BNRIND is populated,\
+    \ and BNRIND is not equal to ANRIND where ABLFL is equal to Y for a given value\
+    \ of PARAMCD for a combination of device and subject"
+  Rule_Failure_Criteria: "BNRIND is not equal to ANRIND where ABLFL is equal to Y\
+    \ for a given value of PARAMCD for a combination of device and subject"
+  Condition_Failure: "USUBJID and SPDEVID are present, BASETYPE is not present, and\
+    \ PARAMCD and BNRIND are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR699"
+        Version: "1"
+      Version: "5.0"

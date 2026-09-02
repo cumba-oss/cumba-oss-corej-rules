@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0049 expect=violation domain=CM
+#note "Row 1 says the medication started BEFORE a reference time point but leaves CMSTTPT empty -> 'Start Reference Time Point (--STTPT) must not be NULL, when Start Relative to Reference Time Point (--STRTPT) is provided'."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMSTRTPT=BEFORE CMSTTPT=
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+col CMSTTPT  type=Char label="Start Reference Time Point"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN   | BEFORE  |
+CDISCPILOT01 | CM | 01-701-1015 | 2 | IBUPROFEN | ONGOING | 2020-01-05

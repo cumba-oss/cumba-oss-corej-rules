@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0006B expect=noViolation domain=ADLBC
+#note "DISCRIMINATING fixture for finding AD0006B-F1, pinning today's reading: ABLFN and ANL01FN are exempt from the value check by the anchored varname() !~ /^(ABLFN|ANL\\d\\dFN)$/ conjunct, so out-of-range values (2, 3) in both are never visited."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ABLFN   type=Num
+col ANL01FN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | 2 | 3
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | 1 | 1

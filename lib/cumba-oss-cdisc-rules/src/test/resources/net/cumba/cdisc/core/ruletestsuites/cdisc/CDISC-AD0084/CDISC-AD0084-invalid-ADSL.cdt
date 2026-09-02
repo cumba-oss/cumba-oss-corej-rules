@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0084 expect=violation domain=ADSL
+# Rule:Description: TRTEDT is not equal to the maximum value of all TRxxEDT variables
+#note "TR01EDT (22010) greater than TRTEDT (22000) -> TRTEDT not the max -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTEDT type=Num
+col TR01EDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 22000 | 22010
+---

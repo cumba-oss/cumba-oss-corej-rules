@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0460"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the High Level Term (--HLT) is not on the MedDRA\
+  \ primary system organ class hierarchy path."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLT"
+    - "--SOC"
+Operations:
+- id: "$hlt_on_path"
+  expression: "valid_external_dictionary_hierarchy(--HLT, external_dictionary_type=\"\
+    meddra\", dictionary_parent=\"--SOC\")"
+Check:
+  expression: >-
+    $hlt_on_path == false
+Outcome:
+  Message: "High Level Term (--HLT) is not on the MedDRA primary system organ class\
+    \ path."
+  Output_Variables:
+  - "--HLT"
+  - "--SOC"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--HLT"
+  Rule: "--HLT on path to MedDRA primary system organ class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0460"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0460"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0460"
+        Version: "1"
+      Version: "2.0"

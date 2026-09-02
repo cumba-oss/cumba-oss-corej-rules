@@ -1,0 +1,88 @@
+Core:
+  Id: "FDA-SD1236"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of Sequence Number (--SEQ) is not unique\
+  \ within a domain for a given combination of Sponsor Device Identifier (SPDEVID)\
+  \ and Unique Subject Identifier (USUBJID) values."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DX"
+    - "DO"
+    - "DU"
+    - "DE"
+    - "DT"
+Requirements:
+  Variables:
+    All:
+    - "--SEQ"
+Check:
+  expression: >-
+    not is_unique_set([--SEQ, DOMAIN, SPDEVID, USUBJID])
+Outcome:
+  Message: "--SEQ value is not unique within the domain for the combination of SPDEVID\
+    \ and USUBJID."
+  Output_Variables:
+  - "SPDEVID"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate value for --SEQ variable"
+  FDA_Validator_Rule_Description: "The value of Sequence Number (--SEQ) variable must\
+    \ be unique for each record within a domain and within each combination of Sponsor\
+    \ Device Identifier (SPDEVID) and Unique Subject Identifier (USUBJID) variables'\
+    \ values."
+  Domains: "DX, DO, DU, DE, DT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1236"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1236"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1236"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"

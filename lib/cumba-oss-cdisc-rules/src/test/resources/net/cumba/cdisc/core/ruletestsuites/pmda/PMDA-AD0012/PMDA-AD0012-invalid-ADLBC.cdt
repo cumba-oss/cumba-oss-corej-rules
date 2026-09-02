@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0012 expect=violation domain=ADLBC
+#note "ANL01FN populated, ANL01FL present but empty -> fires. Exactly one root (ANL01), one expansion."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANL01FN type=Num
+col ANL01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 1 | 
+CDISCPILOT01 | 01-701-1023 | ALT | 1 | Y
+---

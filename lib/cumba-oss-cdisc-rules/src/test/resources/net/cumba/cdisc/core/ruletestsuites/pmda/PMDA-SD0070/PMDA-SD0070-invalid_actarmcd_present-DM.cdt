@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD0070 expect=violation domain=DM
+#note "Control for PMDA-SD0070-invalid_no_actarmcd-DM: identical data and the same sdtmig-3-1-2 declaration, but DM DOES carry an ACTARMCD column. The rule fires here, which isolates the absence of the ACTARMCD column as the sole cause of the silence in the sibling scenario."
+#library standard=sdtmig version=3-1-2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | A        | Drug A         | A
+S1 | DM | 002 | SCRNFAIL | Screen Failure | SCRNFAIL
+---
+
+dataset EX label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+---
+S1 | EX | 003 | 1 | DRUG A
+---

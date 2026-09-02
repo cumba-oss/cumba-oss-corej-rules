@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0041 expect=noViolation domain=ADLBC
+# Rule:Description: A numeric variable with a suffix of DT does not have a date format
+#note "ADT has a date/datetime format (DATE9.) -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT type=Num format=DATE9.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+---

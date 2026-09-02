@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1276 expect=violation domain=CM
+#note "Row 2 lumps several concomitant medications into the placeholder 'MULTIPLE' -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 CMTRT=MULTIPLE
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN
+CDISCPILOT01 | CM | 01-701-1015 | 2 | MULTIPLE

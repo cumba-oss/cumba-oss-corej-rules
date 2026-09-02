@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0105"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Species (SPECIES) is not populated for any record\
+  \ in DM and the Trial Summary (TS) dataset does not carry the species at study level."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$species_null"
+  expression: "variable_is_null(SPECIES)"
+- id: "$ts_species"
+  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
+    SPECIES\")"
+Check:
+  expression: >-
+    $species_null == true and empty($ts_species)
+Outcome:
+  Message: "SPECIES is not populated in DM and the Trial Summary (TS) does not carry\
+    \ a species value."
+  Output_Variables:
+  - "SPECIES"
+Source:
+  Class: "SPC, TDM"
+  Domain: "DM,TS"
+  Variable: "SPECIES"
+  Plain_Text_Explanation: "If species information is not included in DM it must be\
+    \ included in TS."
+  Condition: "DM.SPECIES = null"
+  Rule: "Record with TSPARMCD = \"SPECIES\" is present in TS and TSVAL ^= null for\
+    \ that record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND105"
+        Version: "1"
+      Version: "5.0"

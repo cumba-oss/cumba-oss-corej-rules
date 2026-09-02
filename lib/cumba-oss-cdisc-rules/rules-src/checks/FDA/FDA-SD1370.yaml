@@ -1,0 +1,66 @@
+Core:
+  Id: "FDA-SD1370"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STREFC is populated but --STREFN is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--STREFC"
+    - "--STREFN"
+Check:
+  expression: >-
+    not empty(--STREFC) and empty(--STREFN)
+Outcome:
+  Message: "--STREFN is missing when --STREFC is populated."
+  Output_Variables:
+  - "--STREFC"
+  - "--STREFN"
+Source:
+  FDA_Validator_Rule_Message: "--STREFN is null when --STREFC is populated"
+  FDA_Validator_Rule_Description: "Numeric Reference Result in Std Units (--STREFN)\
+    \ should be populated when Reference Result in Standard Format (--STREFC) is populated."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0550"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0550"
+        Version: "1"
+      Version: "2.0"

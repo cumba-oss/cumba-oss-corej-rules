@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2305 expect=violation domain=DS
+#note "VISITDY and DSSTDY variables not present; DSNOMDY missing on row 1 -> fires because the bare empty() leaves on the two absent columns are TRUE on every row (absent = all-missing, EC-43; Plan B phase 4d' deleted the redundant not var_exists disjuncts this note used to name); row 2 DSNOMDY populated -> ok."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | DS | 001 | 1 | .
+S1 | DS | 001 | 2 | 14

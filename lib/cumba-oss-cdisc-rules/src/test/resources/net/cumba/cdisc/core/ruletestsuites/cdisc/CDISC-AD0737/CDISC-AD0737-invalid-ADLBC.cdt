@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0737 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of SHIFTyN for a given value of SHIFTy, considering only those rows on which both variables are populated
+#note "within PARAMCD=GLUC, SHIFT1=NORMAL TO HIGH maps to two distinct SHIFT1N -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1 type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMAL TO HIGH | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | NORMAL TO HIGH | 2
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1036 expect=noViolation domain=LB
+#note "Row 1: Hepatotoxicity with grade 2 -> clean. Row 2: Nephrotoxicity with grade 1 -> clean. Row 3: both empty -> clean."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBTOX    type=Char
+col LBTOXGR  type=Char
+---
+S1 | LB | 001 | 1 | ALT   | Hepatotoxicity | 2
+S1 | LB | 001 | 2 | CREAT | Nephrotoxicity | 1
+S1 | LB | 001 | 3 | GLUC  |                |

@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1089 expect=violation domain=AE
+#note "AESTDY is populated on every row. Row 1: AESTDTC is only partially specified (2023-06) while DM.RFSTDTC is complete -> the day value must have been imputed -> fires. Row 2: AESTDTC is complete but DM.RFSTDTC is partial -> fires. Row 3: both dates complete -> no fire. First scenario coverage for this rule (authored with the D-TA-2 Join_Type removal)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=002
+dataset AE class=EVENTS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AESTDY  type=Num  label="Study Day of Start of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-06     | 5
+S1 | AE | 002 | 1 | HEADACHE | 2023-06-25 | 5
+S1 | AE | 003 | 1 | HEADACHE | 2023-06-25 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2023-06-01
+S1 | DM | 002 | 2023-06
+S1 | DM | 003 | 2023-06-01

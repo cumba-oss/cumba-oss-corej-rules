@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD2019 expect=violation domain=DM
+#note "Row 2 AGETXT='25 to 30' and row 3 '25-' do not follow the required 'number-number' format."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 AGETXT="25 to 30"
+#expectViolationAt row=3 AGETXT=25-
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGETXT  type=Char label="Age Range"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 25-30    | YEARS
+CDISCPILOT01 | DM | 01-701-1023 | 25 to 30 | YEARS
+CDISCPILOT01 | DM | 01-701-1034 | 25-      | YEARS

@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-AD0197 expect=skipped domain=ADLBC
+# Rule:Description: PARAMCD is not populated
+#note "THE PARAMCD ALL-FACET GATE (Fix #331 bucket 2, M2-D24 / M3-D18; pin owed by review S9 and authored by Fix #340). The ADLBC dataset deliberately declares no PARAMCD column, so Requirements.Variables.All [PARAMCD] rejects the dataset and the rule is SKIPPED naming PARAMCD. Remove the All entry and the rule EXECUTES: since Fix #330 retired the injected var_exists guard, a bare empty(PARAMCD) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so it would fire on EVERY row -- the flood the gate exists for. If this scenario EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite the pin."
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 12.5
+---

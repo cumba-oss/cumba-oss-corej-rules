@@ -1,0 +1,39 @@
+Core:
+  Id: "PMDA-AD0228"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Sequence of Treatments (TRTSEQP) is\
+  \ populated and the Planned Sequence of Treatments (N) (TRTSEQPN) does not have\
+  \ the same value across all records that share the same TRTSEQP; within a study\
+  \ each TRTSEQP value must map to one TRTSEQPN value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTSEQP) and is_inconsistent_across_dataset(TRTSEQPN, keys=[TRTSEQP])
+Outcome:
+  Message: "TRTSEQPN is not the same value across all records with the same TRTSEQP."
+  Output_Variables:
+  - "TRTSEQP"
+  - "TRTSEQPN"
+Source:
+  Message: "Inconsistent value for TRTSEQPN"
+  Description: "Within a study, all Planned Sequence of Treatments (N) (TRTSEQPN)\
+    \ variable values must be the same for each unique value of Planned Sequence of\
+    \ Treatments (TRTSEQP) when the primary variable TRTSEQP is populated."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0228"
+        Version: "1"
+      Version: "6.0"

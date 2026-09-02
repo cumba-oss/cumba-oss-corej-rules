@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0072.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Study Day variable (a variable whose name ends\
+  \ in DY, e.g. --DY, --STDY, --ENDY, VISITDY) is populated with the value zero; Study\
+  \ Day values are nonzero integers because the reference date is Day 1 (there is\
+  \ no Day 0)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DY") and not empty(value()) and value() == 0
+Outcome:
+  Message: "A Study Day variable is populated with zero; Study Day values must be\
+    \ nonzero integers."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DY, --STDY, --ENDY, VISITDY"
+  Plain_Text_Explanation: "When populated, all Study Day values are nonzero integers."
+  Condition: "Study day variable (--DY, --STDY, --ENDY, VISITDY) ^= null"
+  Rule: "Study day variable (--DY, --STDY, --ENDY, VISITDY) = nonzero integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND72.1"
+        Version: "1"
+      Version: "5.0"

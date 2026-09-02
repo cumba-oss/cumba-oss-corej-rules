@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0280 expect=skipped domain=ADXX
+#note "Structure declared, SUBCLASS NOT declared. Deliberately NO AETERM and NO AEDECOD, so the ADVERSE EVENT subclass cannot be detected from the columns either. Rows carry the SAME inconsistent data as the violation fixture. Scope.Subclasses.Include requires a POSITIVELY detected subclass, and a plain OCCDS dataset with none is skipped -> the rule never executes. This is the batch's ONLY pin on the Subclasses axis and it is what distinguishes AD0280 from a plain OCCDS rule. M2-D17 / Fix #313: the PMDA sheet marks AD0280 for ADaMIG 1.0 only (1.1-1.3 belong to AD0280B), so the rule left rules-pmda-adamig-1-1.json; this fixture moved from version=1-1 to version=1-0 (same rule, same data, same expectation)."
+#library standard=adamig version=1-0
+dataset ADXX structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | MILD     | 1
+CDISCPILOT01 | 01-701-1023 | MODERATE | 1

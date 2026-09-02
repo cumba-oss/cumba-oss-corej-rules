@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0134"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AEOUT in the AE dataset equals 'FATAL' but DTHFL\
+  \ in the DM dataset does not equal 'Y' for the corresponding subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "AE"
+Check:
+  expression: >-
+    var_exists(AE.AEOUT) and AE.AEOUT == "FATAL" and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when AEOUT in the AE dataset equals 'FATAL'."
+  Output_Variables:
+  - "DTHFL"
+  - "AE.AEOUT"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "DTHFL"
+  Condition: "AE.AEOUT = 'FATAL'"
+  Rule: "DTHFL = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0134"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0134"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0134"
+        Version: "1"
+      Version: "2.0"

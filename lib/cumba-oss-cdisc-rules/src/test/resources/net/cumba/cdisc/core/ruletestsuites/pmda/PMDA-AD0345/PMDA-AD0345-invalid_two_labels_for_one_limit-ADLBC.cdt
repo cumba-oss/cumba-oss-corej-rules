@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0345 expect=violation domain=ADLBC
+#note "Mirror of AD0344: the target is the CHARACTER ANRHIC and the key is (PARAMCD, ANRHI). Group (ALB, 50) holds {HIGH x2, ELEVATED x1} -> row 3 is the minority."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 ANRHIC=ELEVATED ANRHI=50 PARAMCD=ALB
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANRHI   type=Num
+col ANRHIC  type=Char
+---
+S1 | 001 | ALB | 50 | HIGH
+S1 | 002 | ALB | 50 | HIGH
+S1 | 003 | ALB | 50 | ELEVATED
+S1 | 004 | ALB | 60 | VERYHIGH
+S1 | 005 | ALB | 60 | VERYHIGH

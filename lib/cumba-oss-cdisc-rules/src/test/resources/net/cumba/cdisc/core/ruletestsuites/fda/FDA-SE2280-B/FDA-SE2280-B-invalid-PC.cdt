@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2280-B expect=violation domain=PC
+#note "Row 2 PCELTM='-PT30M' is a negative elapsed time: the specimen is planned 30 minutes BEFORE the time-point reference. A pre-dose PK sample must be anchored at 'PT0H'."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 PCELTM=-PT30M
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+STUDY01 | PC | 001 | 1 | DRUGX | PT0H   | DOSE ADMINISTRATION
+STUDY01 | PC | 001 | 2 | DRUGX | -PT30M | DOSE ADMINISTRATION

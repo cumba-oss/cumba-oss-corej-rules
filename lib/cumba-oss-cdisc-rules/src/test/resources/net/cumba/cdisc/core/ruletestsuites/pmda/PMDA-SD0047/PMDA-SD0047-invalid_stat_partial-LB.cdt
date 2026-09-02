@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0047 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD0047/FDA-SD0047-invalid_stat_partial-LB.cdt (verbatim). CL-A A.4 leaf: the authored --STAT != 'NOT DONE' comparison. Row 1 has LBORRES empty with the non-standard status 'PARTIAL' (!= 'NOT DONE') -> FIRES (PMDA's own sheet row 59 grants the exemption only to 'NOT DONE'); row 2's 'NOT DONE' is exempt."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTAT=PARTIAL
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES type=Char label="Result or Finding in Original Units"
+col LBSTAT  type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | SYSBP |  | PARTIAL
+S1 | LB | 001 | 2 | SYSBP |  | NOT DONE

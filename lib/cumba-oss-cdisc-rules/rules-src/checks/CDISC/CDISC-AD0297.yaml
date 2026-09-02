@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0297"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of TOXGGRy for a given\
+  \ value of TOXGGRyN, where y is an integer [1-9, not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TOXGGRy) and not empty(TOXGGRyN) and has_multiple_values_for(TOXGGRy, TOXGGRyN)
+Outcome:
+  Message: "TOXGGRy has more than one value for the same value of TOXGGRyN, where\
+    \ y is an integer [1-9, not zero-padded]."
+  Output_Variables:
+  - "TOXGGRy"
+  - "TOXGGRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "TOXGGRy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TOXGGRy\
+    \ for a given value of TOXGGRyN"
+  Rule_Failure_Criteria: "There is more than one value of TOXGGRy for a given value\
+    \ of TOXGGRyN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR297"
+        Version: "1"
+      Version: "5.0"

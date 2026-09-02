@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0136B expect=violation domain=ADLBC
+#note "Mirror of AD0135B: dependent SHIFT1N, key SHIFT1. Key NORMALTOHIGH carries two distinct dependents {2, 3}, so both rows holding it fire."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=SYSBP SHIFT1=NORMALTOHIGH SHIFT1N=2
+#expectViolationAt row=2 PARAMCD=SYSBP SHIFT1=NORMALTOHIGH SHIFT1N=3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | NORMALTOHIGH   | 2
+CDISCPILOT01 | 01-701-1023 | SYSBP | NORMALTOHIGH   | 3
+CDISCPILOT01 | 01-701-1034 | SYSBP | NORMALTONORMAL | 1

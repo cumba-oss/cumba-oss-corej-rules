@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD1069"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of --PARM is not the same across all records\
+  \ that share the same value of --PARMCD."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DI"
+    - "TS"
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "--PARM"
+Check:
+  expression: >-
+    var_exists("--PARMCD") and is_inconsistent_across_dataset(--PARM, keys=[--PARMCD])
+Outcome:
+  Message: "Value of --PARM is not consistent for a given value of --PARMCD."
+  Output_Variables:
+  - "--PARMCD"
+  - "--PARM"
+Source:
+  Message: "Inconsistent value for --PARM within --PARMCD"
+  Description: "All values of a Parameter (--PARM) variables should be the same for\
+    \ a given value of a Parameter Short Name (--PARMCD) variables."
+  Domains: "TS, STUDY REFERENCE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1069"
+        Version: "1"
+      Version: "1.6"

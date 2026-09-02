@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD9704 expect=skipped domain=MI
+# Rule:Description: PMDA-SD9704 — the Required key MISPEC is not populated.
+#note "MISPEC is absent from MI, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(MISPEC) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sdtmig version=3-4
+dataset MI
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col MISEQ type=Char
+col MITESTCD type=Char
+col MITEST type=Char
+---
+S1      | MI     | S1-001  | 1     | MIEXAM   | Microscopic Examination
+---

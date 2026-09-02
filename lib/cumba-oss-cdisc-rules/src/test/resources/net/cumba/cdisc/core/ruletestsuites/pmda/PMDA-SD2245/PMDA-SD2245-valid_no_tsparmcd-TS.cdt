@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2245 expect=skipped domain=TS
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. FRESH, DISCRIMINATING. DELIBERATELY NO TSPARMCD COLUMN. Predicted SILENT: NonEmptyGuardInliner arm 2 put var_exists(\"TSPARMCD\") in front of the positive comparison (visible in rules/rules-pmda-sdtmig-3-4.json), so the whole conjunction is false. The rule was NOT skipped before the phase-4 hoist - it declares no Requirements.Variables - so this is the derived-guard channel, not the scope channel. A fire means the derivation changed; escalate, do not rewrite. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col TSSEQ   type=Num
+col TSPARM  type=Char label="Trial Summary Parameter"
+col TSVAL   type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | Data Cutoff Date | 30JUN2020
+CDISCPILOT01 | TS | 2 | Study Start Date | 2020-01-01

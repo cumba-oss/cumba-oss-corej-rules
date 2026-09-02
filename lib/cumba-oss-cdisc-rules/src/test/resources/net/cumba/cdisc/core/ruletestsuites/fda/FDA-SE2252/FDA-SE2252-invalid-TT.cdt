@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2252 expect=violation domain=TT
+#note "Second in-scope domain: TT carries RSTGCD as its topic variable; the 9-character value on row 1 fires."
+#library standard=sendig-dart version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 RSTGCD=LACTPERIX
+dataset TT label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTG    type=Char label="Repro Stage"
+---
+S1 | TT | LACTPERIX | Lactation period
+S1 | TT | LACTPERI | Lactation period

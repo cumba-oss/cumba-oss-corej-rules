@@ -1,0 +1,54 @@
+Core:
+  Id: "PMDA-AD0476"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Strata from Verification Source (N) (STRATAVN) is\
+  \ present and Strata from Verification Source (STRATAV) is present and STRATAV does\
+  \ not have a single value across records sharing the same value of STRATAVN, considering\
+  \ only the records on which both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "STRATAV"
+Check:
+  expression: >-
+    var_exists("STRATAVN") and not empty(STRATAVN) and not empty(STRATAV) and
+    is_inconsistent_across_dataset(STRATAV, keys=[STRATAVN])
+Outcome:
+  Message: "Inconsistent value for STRATAV within STRATAVN."
+  Output_Variables:
+  - "STRATAV"
+  - "STRATAVN"
+Source:
+  Message: "Inconsistent value for STRATAV"
+  Description: "There should be only a single value of Strata from Verification Source\
+    \ (STRATAV) variable for a given value of Strata from Verification Source (N)\
+    \ (STRATAVN) variable, considering only those rows on which both variables are\
+    \ populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0476"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0476"
+        Version: "1"
+      Version: "6.0"

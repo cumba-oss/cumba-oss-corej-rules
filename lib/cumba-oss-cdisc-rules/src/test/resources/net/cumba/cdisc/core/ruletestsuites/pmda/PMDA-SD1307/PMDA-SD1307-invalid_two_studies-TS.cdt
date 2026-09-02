@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1307 expect=violation domain=TS
+#note "FRESH - the per-STUDYID $ keying pin (DISCRIMINATING). One TS dataset, four rows across two studies: S1 (HLTSUBJI=N, TDIGRP empty) + S2 (HLTSUBJI=Y, TDIGRP empty). $HLTSUBJI_N_COUNT is grouped by STUDYID and lands per row's own STUDYID: S1's group counts 1 -> row 2 fires; S2's group counts 0 -> row 4 SILENT. Count 1. A fire on row=4 as well means the $ is study-global - escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=TDIGRP
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | HLTSUBJI | Healthy Subject Indicator | N
+S1 | TS | 2 | TDIGRP   | Diagnosis Group           |
+S2 | TS | 1 | HLTSUBJI | Healthy Subject Indicator | Y
+S2 | TS | 2 | TDIGRP   | Diagnosis Group           |

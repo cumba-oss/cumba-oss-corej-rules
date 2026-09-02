@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1321 expect=violation domain=AE
+#note "ADAPTED-FROM fda/FDA-SD1321/FDA-SD1321-invalid-AE.cdt (AE + SUPPAE blocks, both fenced). Subject 001 has AE records but no SUPPAE record with QNAM='AETRTEM'; subject 002 has one. One Group finding for subject 001."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | 001 | 1 | Headache | HEADACHE
+S1 | AE | 002 | 1 | Nausea   | NAUSEA
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 002 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+---

@@ -1,0 +1,82 @@
+name: PMDA-AD9999
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5a — group-A backfill, and the **only ADaM-family**
+  member of the dataset-level Define set. `PMDA-AD9999` fires when the structure an ADaM
+  dataset declares in the Define-XML is not one of the three supported ADaM structures:
+  `not empty(ds_class("DEFINE")) and upper(ds_class("DEFINE")) not in ["SUBJECT LEVEL
+  ANALYSIS DATASET", "BASIC DATA STRUCTURE", "OCCURRENCE DATA STRUCTURE"]`. It had **no
+  `.cdt` scenario and no other executable coverage anywhere in the tree** before this spec.
+
+  **It is NOT a twin of `FDA-SD9999` / `PMDA-SD9999`, and the difference matters for the
+  fixture.** Despite the shared `-9999` id and the shared `ds_class("DEFINE")` operand:
+
+  * it is **ADaM**, so `config` is `adamig` / `1.3` and both lanes resolve `coreId:` from the
+    PMDA ADaM bundle (`rules-pmda-adamig-1-3.json`), not an SDTM one;
+  * its scope is `Domains.Include: ALL`, not the `Exclude: [SUPP--, AP--]` of the SD twins;
+  * it declares **no Operations at all**. There is no `$domain_is_custom` gate, so
+    `library_mocks.domain_custom` is neither needed nor meaningful here — the SD9999 trap
+    (Java reads the mock, the fork reads library dataset names, and a real domain name makes
+    the two routes disagree) simply does not arise. Mocking it anyway would be inert noise
+    that reads as a live precondition.
+  * the same absence removes the EC-37 divergence its SD siblings carry: with no Operation
+    for the Check to consume, Java's load-time-derived effective `Output_Variables` equals
+    the authored list the fork consumes verbatim, so both lanes emit the same single key.
+    Hence **no `parity-diff-baseline.json` entry** — the SD9999 entry is not copied over.
+
+  `ADXX` is a deliberately non-standard ADaM dataset name. Nothing in this rule consults
+  library metadata (the class operand comes from the Define, not from the library), and the
+  spec declares no `library_mocks` at all — several shipped ADaM specs run that way — but a
+  name that cannot collide with a real ADaM structure keeps the fixture's one moving part the
+  Define channel. `ADAM OTHER` is the Define-XML v2.1 ADaM class value for a dataset that is
+  none of ADSL/BDS/OCCDS, so the fixture is the rule's real-world case rather than a
+  synthetic string.
+
+  Authoring constraints honoured:
+
+  * `define_dataset_class` is the ONLY attribute declared — the only one the rule reads, and
+    one of the three with a Java sink. It lands under `className` (D10), not under the YAML
+    spelling; copying it literally would leave the operand undefined and this rule would
+    silently stop firing on the Java lane. The other eight allowed sub-keys are
+    Python-lane-only and give opposite verdicts across lanes.
+  * `define_dataset_name` / `define_dataset_location` are NOT restated, so D4's derivation
+    from the block key (`ADXX` => name `ADXX`, location `adxx.xpt`) stays on the execution
+    path. The location default is load-bearing on the Python lane: the fork merges the Define
+    frame onto the study frame on (`dataset_name`, `dataset_location`) and
+    `DummyDataset.filename` is `f"{domain.lower()}.xpt"`.
+  * Every `define_dataset_*` attribute in `Output_Variables` is declared, so neither lane
+    renders an absent key (Java) against a `null` (Python).
+  * `expected_status` is hand-authored — capture is status-blind, and the Java status channel
+    is blind to a dead Define channel (killing it yields `EXECUTED` with zero findings, not
+    `SKIPPED`). The non-zero Java count below is what proves the fixture live.
+  **Single dataset, deliberately — and no EC-41 multi-dataset guard is needed for this family.**
+  The Fix #132 regression guards (`FDA-SD1325-*-leak`, `FDA-SD9999-define-only-leak`) are all
+  SDTMIG-3.4, so neither the ADaM nor the SEND family has one. That is fine and not an omission:
+  the builder narrowing is engine-wide and family-independent — it keys on the dataset under
+  evaluation, not on the standard — and the cache-identity half is pinned by fork unit tests
+  over `RELREC`/`RELSUB` and `SUPPAPQS`/`SQAPQS`. A per-family multi-dataset spec would
+  re-measure the same engine code path through a different corpus, which is duplication rather
+  than coverage.
+python_source: rules-pmda-adamig-1-3.json (PMDA-AD9999)
+rule:
+  coreId: PMDA-AD9999
+datasets:
+  ADXX:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+define_xml:
+  ADXX:
+    define_dataset_class: ADAM OTHER
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: PMDA-AD9999
+    dataset: ADXX
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      define_dataset_class: ADAM OTHER
+expected_errors: []

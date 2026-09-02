@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0293"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ARMCD is populated in the Trial Visits (TV) dataset\
+  \ and the value is not found in TA.ARMCD."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TV"
+Operations:
+- id: "$ta_armcd"
+  expression: "distinct(ARMCD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD not in $ta_armcd
+Outcome:
+  Message: "ARMCD is not a value found in TA.ARMCD."
+  Output_Variables:
+  - "ARMCD"
+  - "$ta_armcd"
+Source:
+  Class: "TDM"
+  Domain: "TV"
+  Variable: "ARMCD"
+  Condition: "ARMCD ^= null"
+  Rule: "ARMCD in TA.ARMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0293"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0293"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0293"
+        Version: "1"
+      Version: "2.0"

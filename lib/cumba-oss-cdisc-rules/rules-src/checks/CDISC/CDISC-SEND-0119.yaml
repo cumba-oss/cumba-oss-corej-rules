@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0119"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Comments (CO) comment longer than 200 characters\
+  \ is not split into sequential 200-character sections across the COVAL and COVAL1..COVALn\
+  \ columns; each 200-character section must occupy its own column named sequentially\
+  \ from COVAL through COVALn with no gaps in the series."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Operations:
+- id: "$coval_series_incomplete"
+  expression: "column_series_metadata(COVAL, name_pattern=\"^COVAL\\\\d+$\", min_length=200)"
+Check:
+  expression: >-
+    $coval_series_incomplete == true
+Outcome:
+  Message: "A comment longer than 200 characters is not correctly split into sequential\
+    \ 200-character COVAL/COVAL1..COVALn columns."
+  Output_Variables:
+  - "COVAL"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "COVAL"
+  Plain_Text_Explanation: "If the comment is over 200 characters the comment must\
+    \ be broken into 200 character-sections in columns labelled COVAL-COVALn."
+  Condition: "Comment value > 200 characters in length"
+  Rule: "Comment is broken into 200-character sections AND each 200-character section\
+    \ is in a separate column AND each column is named sequentially from COVAL through\
+    \ COVALn"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND119"
+        Version: "1"
+      Version: "5.0"

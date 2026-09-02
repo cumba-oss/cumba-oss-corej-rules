@@ -1,0 +1,32 @@
+Core:
+  Id: "DRAFT-900021"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when the define.xml enumerates a term for a variable's\
+  \ non-extensible CDISC controlled terminology codelist that is not a published term\
+  \ of that codelist in the CDISC Library."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    var_codelist_extensible("LIBRARY") == false and not
+    contains_all(library_variable_codelist_coded_values, define_variable_codelist_coded_values)
+Outcome:
+  Message: "A term enumerated in the define.xml for a non-extensible CDISC controlled\
+    \ terminology codelist is not a published term of that codelist in the CDISC Library."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_codelist_coded_values"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

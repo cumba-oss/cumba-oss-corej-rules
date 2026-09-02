@@ -1,0 +1,43 @@
+Core:
+  Id: "FDA-SD1402"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Agent (AGENDTC) is populated and\
+  \ is later than Date/Time of Last Challenge Agent Admin (RFCENDTC) in the DM dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AG"
+Requirements:
+  Variables:
+    All:
+    - "AGENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(AGENDTC) and date(AGENDTC) > DM.RFCENDTC
+Outcome:
+  Message: "AGENDTC is populated and is later than RFCENDTC in the DM dataset."
+  Output_Variables:
+  - "AGENDTC"
+  - "DM.RFCENDTC"
+Source:
+  FDA_Validator_Rule_Message: "AGENDTC date is after RFCENDTC"
+  FDA_Validator_Rule_Description: "End Date/Time of Agent (AGENDTC) variable value\
+    \ must be less than or equal to Date/Time of Last Challenge Agent Admin (RFCENDTC)."
+  Domains: "AG"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1402"
+        Version: "1"
+      Version: "1.6"

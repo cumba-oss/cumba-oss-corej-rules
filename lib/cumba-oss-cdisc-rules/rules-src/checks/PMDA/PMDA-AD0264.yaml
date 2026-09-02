@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-AD0264"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Imputation Flag (*TMF) variable is populated\
+  \ for a record but its corresponding Time (*TM) variable is missing on that record;\
+  \ a *TM value flagged as imputed by a populated *TMF must itself have a value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*TMF) and empty(*TM)
+Outcome:
+  Message: "*TMF is populated, but *TM is not populated."
+  Output_Variables:
+  - "*TMF"
+  - "*TM"
+Source:
+  Message: "*TMF is populated, but *TM is not populated"
+  Description: "If a Time (*TM) variable is indicated to be imputed by population\
+    \ of an Imputation Flag (*TMF) variable value, that Time (*TM) variable must have\
+    \ a value."
+  Domains: "ADSL, BDS, OCCDS, ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0264"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0264"
+        Version: "1"
+      Version: "6.0"

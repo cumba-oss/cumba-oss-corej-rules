@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1470 expect=noViolation domain=LB
+#note "LBORNRLO populated (3.9) throughout; LBORRES takes five forms all matching ^[><]?=? ?-?[0-9]+(\\.[0-9]+)?$, including the sheet's own worked example `<= -1.2` ([><] takes <, =? takes =, ' ?' the space, -? the minus)."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBORNRLO type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 12.5    | 3.9
+S1 | LB | 002 | 2 | GLUC | -3      | 3.9
+S1 | LB | 003 | 3 | GLUC | <= -1.2 | 3.9
+S1 | LB | 004 | 4 | GLUC | > 5     | 3.9
+S1 | LB | 005 | 5 | GLUC | <0.5    | 3.9
+---

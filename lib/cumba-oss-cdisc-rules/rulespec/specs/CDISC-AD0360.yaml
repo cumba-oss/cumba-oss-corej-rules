@@ -1,0 +1,40 @@
+name: CDISC-AD0360
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0360: There is more than one value of DTHCAUSN for a given value of DTHCAUS, considering only those rows on which both variables are populated.
+  Bare-leaf Check (`has_multiple_values_for`) scoped to SUBJECT LEVEL ANALYSIS DATASET (ADSL).
+  Two subjects share DTHCAUS='CARDIAC' but with distinct DTHCAUSN values; both rows fire. A third subject has a unique DTHCAUS and does not fire.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0360)
+rule:
+  coreId: CDISC-AD0360
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', DTHCAUS: 'CARDIAC', DTHCAUSN: '1'}       # bad — shared DTHCAUS='CARDIAC'
+      - {STUDYID: S1, USUBJID: '002', DTHCAUS: 'CARDIAC', DTHCAUSN: '2'}       # bad — distinct DTHCAUSN for same DTHCAUS
+      - {STUDYID: S1, USUBJID: '003', DTHCAUS: 'NEUROLOGIC', DTHCAUSN: '3'}    # ok — unique DTHCAUS
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0360
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DTHCAUS: 'CARDIAC'
+      DTHCAUSN: '1'
+  - rule_id: CDISC-AD0360
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DTHCAUS: 'CARDIAC'
+      DTHCAUSN: '2'
+expected_errors: []

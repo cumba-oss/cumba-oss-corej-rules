@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0534"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when RELGRyN is present but the corresponding RELGRy\
+  \ is not present, where y is an integer [1-99, not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("RELGRyN") and not var_exists("RELGRy")
+Outcome:
+  Message: "RELGRyN is present but the corresponding RELGRy is not present."
+  Output_Variables:
+  - "RELGRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "RELGRyN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "RELGRyN is present and RELGRy is not present"
+  Rule_Failure_Criteria: "RELGRy is not present"
+  Condition_Failure: "RELGRyN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR534"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR534"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR534"
+        Version: "2"
+      Version: "5.0"

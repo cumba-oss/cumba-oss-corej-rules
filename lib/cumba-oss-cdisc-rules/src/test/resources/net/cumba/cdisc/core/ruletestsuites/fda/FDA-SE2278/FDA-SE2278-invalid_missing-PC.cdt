@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2278 expect=violation domain=PC
+#note "present-but-missing case (the same empty(PCLLOQ) leaf that carries column absence since Plan B phase 4d'): the 'BLQ' record on row 1 has no PCLLOQ value -> fires; row 2 carries it."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSTRESC=BLQ
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Standardized Result in Character Format"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSPEC   type=Char label="Specimen Material Type"
+---
+STUDY01 | PC | STUDY01-001 | 1 | DRUGX | BLQ | .   | PLASMA
+STUDY01 | PC | STUDY01-002 | 1 | DRUGX | BQL | 0.5 | PLASMA

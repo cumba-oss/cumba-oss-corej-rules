@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0378"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Lowest Level Term Code (--LLTCD) value is not\
+  \ a valid Lowest Level Term code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--LLTCD"
+Operations:
+- id: "$lltcd_valid"
+  expression: "valid_external_dictionary_code(--LLTCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"LLTCD\")"
+Check:
+  expression: >-
+    $lltcd_valid == false
+Outcome:
+  Message: "Lowest Level Term Code (--LLTCD) is not a valid MedDRA Lowest Level Term\
+    \ code."
+  Output_Variables:
+  - "--LLTCD"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--LLTCD"
+  Rule: "--LLTCD = MedDRA lowest level code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0378"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0378"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0378"
+        Version: "1"
+      Version: "2.0"

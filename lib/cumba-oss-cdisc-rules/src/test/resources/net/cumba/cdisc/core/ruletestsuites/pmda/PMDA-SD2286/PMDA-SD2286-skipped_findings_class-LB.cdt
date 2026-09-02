@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2286 expect=skipped domain=LB
+#note "LBVAMTU populated, LBVAMT blank - would fire if in scope; both columns present so the Variables gate passes and the CLASS gate is provably the skip reason. Scope.Classes.Include [INTERVENTIONS] rejects FINDINGS -> skipped. ONE pin of the SDTM class-include gate."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+col LBVAMT  type=Num
+col LBVAMTU type=Char
+---
+S1 | LB | 001 | 1 | . | mg

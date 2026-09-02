@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0096 expect=violation domain=ADLBC
+#note "PARAMCD is filler (no structure gate). Grouped by TRTAN=1 the target TRTA holds {DRUGA, DRUGA, DRUGB} -> minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 TRTA=DRUGB TRTAN=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+col TRTAN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | DRUGB | 1

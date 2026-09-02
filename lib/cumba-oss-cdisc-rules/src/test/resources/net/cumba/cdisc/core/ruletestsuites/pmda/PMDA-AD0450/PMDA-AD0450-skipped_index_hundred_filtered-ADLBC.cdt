@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0450 expect=skipped domain=ADLBC
+#note "O-3 (Fix #336): the _wildcards-as-FILTER pin, moved from index 10 to index 100. Both patterns match and capture '100', but this rule declares _wildcards {y:{min:1,max:99}}, so satisfiesFilters rejects both instances, anyAnchor is false, expand returns empty -> NoMatch -> SKIPPED. If this reports a violation the filter is not being applied - escalate, do not rewrite."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID     type=Char
+col USUBJID     type=Char
+col PARAMCD     type=Char
+col MCRIT100ML  type=Char
+col MCRIT100MN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | PARTIAL |
+---

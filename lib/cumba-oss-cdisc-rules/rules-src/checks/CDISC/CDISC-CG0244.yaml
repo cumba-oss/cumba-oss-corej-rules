@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-CG0244"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Trial Arms (TA) or Trial Visits (TV) record has\
+  \ a Planned Arm (ARM) value of 'Screen Failure', 'Not Assigned', 'Unplanned Treatment',\
+  \ or 'Not Treated'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Check:
+  expression: >-
+    ARM in ["Screen Failure", "Not Assigned", "Unplanned Treatment", "Not Treated"]
+Outcome:
+  Message: "ARM is one of the non-treatment values ('Screen Failure', 'Not Assigned',\
+    \ 'Unplanned Treatment', 'Not Treated') that should not appear in a Trial Arms\
+    \ (TA) or Trial Visits (TV) record."
+  Output_Variables:
+  - "ARM"
+Source:
+  Class: "TDM"
+  Domain: "TA, TV"
+  Variable: "ARM"
+  Rule: "ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not\
+    \ Treated')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0244"
+        Version: "2"
+      Version: "2.0"

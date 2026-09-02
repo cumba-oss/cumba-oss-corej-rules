@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0265 expect=skipped domain=TS
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. FRESH, DISCRIMINATING. DELIBERATELY NO TSVALCD COLUMN. Predicted SILENT for a DERIVED reason: NonEmptyGuardInliner arm 4 (the relationship-call arm) emitted var_exists(\"TSVAL\") AND var_exists(\"TSVALCD\") into the shipped expression, so the conjunction is false. Read against the sheet Condition literally ('TSVAL ^= null and TSVALCD ^= null') an absent column means every record has a null TSVALCD, which is also silence - the two readings agree here, which is why this is a pin and not a finding. A fire means arm 4 stopped emitting; escalate, do not rewrite. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | SEXPOP | Sex of Participants | BOTH
+S1 | TS | 2 | SEXPOP | Sex of Participants | BOTH

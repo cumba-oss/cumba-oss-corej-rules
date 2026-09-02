@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0064-D"
+Sheet_Rule_Identifier: "DD0064"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem/Alias"
+Attribute: "Context"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Alias Context attribute must have a value of 'DomainDescription' for split datasets (when child of ItemGroupDef) and 'nci:ExtCodeID' for CodeList, CodeListItem or EnumeratedItem elements."
+# One sheet row, four parent-scoped legs (base: ItemGroupDef; -B/-C/-D:
+# CodeList / CodeListItem / EnumeratedItem) - the guard mini-language cannot
+# test the parent's element name, so each parent gets its own selector
+# (0165-B/-C convention). EnumeratedItem leg: Context must be 'nci:ExtCodeID'. Alias elements
+# under other parents are outside the row's reach.
+Message: "Invalid Alias Context value"
+Check:
+  kind: "one_of"
+  attribute: "Context"
+  values: ["nci:ExtCodeID"]

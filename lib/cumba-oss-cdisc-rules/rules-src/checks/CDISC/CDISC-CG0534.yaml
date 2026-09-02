@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0534"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Reason Arm and/or Actual Arm is Null (ARMNRS)\
+  \ variable is populated and not equal to 'UNPLANNED TREATMENT' but Subject Reference\
+  \ Start Date/Time (RFSTDTC) is populated; this assumes the study day milestone associated\
+  \ with RFSTDTC is the start of study treatment."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    not empty(ARMNRS) and ARMNRS != "UNPLANNED TREATMENT" and not empty(RFSTDTC)
+Outcome:
+  Message: "RFSTDTC is populated when ARMNRS is populated and not equal to 'UNPLANNED\
+    \ TREATMENT'."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFSTDTC"
+  Condition: "Milestone associated with RFSTDTC is start of treatment and ARMNRS ^=null\
+    \ and ARMNRS ^='UNPLANNED TREATMENT'."
+  Rule: "RFSTDTC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0534"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0534"
+        Version: "1"
+      Version: "2.0"

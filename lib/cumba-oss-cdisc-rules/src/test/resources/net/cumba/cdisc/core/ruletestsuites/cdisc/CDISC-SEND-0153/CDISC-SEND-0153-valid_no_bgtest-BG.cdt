@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0153 expect=noViolation domain=BG
+#note "BGTEST NOT declared. Scope only requires BGSTRESU, so the rule EXECUTES; the authored var_exists(\"BGTEST\") conjunct is false and the rule is silent. Pins that the authored presence gate does real work: without it the grouped operator would drop the absent key and misfire over the whole dataset as one group."
+dataset BG label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | BG | 001 | 1 | g
+CDISCPILOT01 | BG | 002 | 2 | g
+CDISCPILOT01 | BG | 003 | 3 | kg
+---

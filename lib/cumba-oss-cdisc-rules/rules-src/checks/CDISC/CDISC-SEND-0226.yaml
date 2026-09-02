@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0226"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the same Planned Order of Element within Arm (TAETORD)\
+  \ value occurs more than once within the same Planned Arm Code (ARMCD) in the Trial\
+  \ Arms (TA) dataset; TAETORD must be unique within an Arm."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Check:
+  expression: >-
+    not is_unique_set([ARMCD, TAETORD])
+Outcome:
+  Message: "TAETORD is not unique within the Arm (the same ARMCD and TAETORD combination\
+    \ occurs on more than one record)."
+  Output_Variables:
+  - "ARMCD"
+  - "TAETORD"
+Source:
+  Class: "TDM"
+  Domain: "TA"
+  Variable: "TAETORD"
+  Plain_Text_Explanation: "TAETORD provides the order of the planned Element within\
+    \ the Arm."
+  Rule: "TAETORD is unique within an ARM AND TAETORD is in the order in which the\
+    \ Elements occur"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND226"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0136 expect=noViolation domain=ADLBC
+#note "The row with a missing DEPENDENT (SHIFT1N) is excluded (D.13), leaving the single dependent {1} -> silent. The operator supplies the exclusion itself; the rule text says nothing about SHIFTyN."
+#library standard=adamig version=1-0
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMALTOHIGH | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | NORMALTOHIGH | .
+CDISCPILOT01 | 01-701-1034 | GLUC | NORMALTOHIGH | 1
+---

@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0281"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of AESEVN for a given\
+  \ value of AESEV."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AESEVN) and not empty(AESEV) and has_multiple_values_for(AESEVN, AESEV)
+Outcome:
+  Message: "AESEVN has more than one value for the same value of AESEV."
+  Output_Variables:
+  - "AESEV"
+  - "AESEVN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AESEVN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of AESEVN\
+    \ for a given value of AESEV"
+  Rule_Failure_Criteria: "There is more than one value of AESEVN for a given value\
+    \ of AESEV"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR281"
+        Version: "1"
+      Version: "5.0"

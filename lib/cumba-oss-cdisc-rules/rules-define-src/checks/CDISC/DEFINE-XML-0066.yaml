@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0066"
+Sheet_Rule_Identifier: "66"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of attribute OrderNumber must be an integer number."
+# Value check fires only on a present OrderNumber (all-or-none presence is sheet
+# id 238). The sheet's $ParentItemGroupDef[@Name]/ItemRef[@ItemOID] placeholders
+# are carried by the finding's xpath.
+Message: "The value of attribute OrderNumber [${value}] is not an integer number for the ItemRef element."
+Check:
+  kind: "matches_regex"
+  attribute: "OrderNumber"
+  format: "integer"

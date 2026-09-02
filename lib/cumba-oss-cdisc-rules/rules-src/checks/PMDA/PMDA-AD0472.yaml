@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0472"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a stratification factor index w, Strat Factor\
+  \ w Value Used for Rand (N) (STRATwRN) is present and Strat Factor w Value Used\
+  \ for Rand (STRATwR) is present and STRATwR does not have a single value across\
+  \ records sharing the same value of STRATwRN, considering only the records on which\
+  \ both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "STRATwR"
+Check:
+  expression: >-
+    var_exists("STRATwRN") and not empty(STRATwRN) and not empty(STRATwR) and
+    is_inconsistent_across_dataset(STRATwR, keys=[STRATwRN])
+Outcome:
+  Message: "Inconsistent value for STRATwR within STRATwRN."
+  Output_Variables:
+  - "STRATwR"
+  - "STRATwRN"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Message: "Inconsistent value for STRATwR"
+  Description: "There should be only a single value of Strat Factor w Value Used for\
+    \ Rand (STRATwR) variable for a given value of Strat Factor w Value Used for Rand\
+    \ (N) (STRATwRN) variable, considering only those rows on which both variables\
+    \ are populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0472"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0472"
+        Version: "1"
+      Version: "6.0"

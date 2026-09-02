@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0133"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record is present in the DD domain but DTHFL in\
+  \ the DM dataset does not equal 'Y' for the corresponding subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+    - "USUBJID"
+Operations:
+- id: "$usubjids_in_dd"
+  expression: "distinct(USUBJID, domain=\"DD\")"
+Check:
+  expression: >-
+    DTHFL != "Y" and USUBJID in $usubjids_in_dd
+Outcome:
+  Message: "DTHFL does not equal 'Y' when a record is present in the DD domain for\
+    \ the subject."
+  Output_Variables:
+  - "DTHFL"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "DTHFL"
+  Condition: "DD record present for subject"
+  Rule: "DTHFL = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0133"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0133"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0133"
+        Version: "1"
+      Version: "2.0"

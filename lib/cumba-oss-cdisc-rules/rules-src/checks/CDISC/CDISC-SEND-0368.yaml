@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-SEND-0368"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Nonclinical Pregnancy Results (PY)\
+  \ record for the same subject (USUBJID) and test (PYTESTCD) shares the same Result\
+  \ Location (PYRESLOC); when a count is recorded separately by location there must\
+  \ be a distinct PYRESLOC for each record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PY"
+Check:
+  expression: >-
+    not is_unique_set([PYRESLOC, USUBJID, PYTESTCD])
+Outcome:
+  Message: "PYRESLOC is not distinct across PY records that share the same USUBJID\
+    \ and PYTESTCD."
+  Output_Variables:
+  - "PYTESTCD"
+  - "PYRESLOC"
+Source:
+  Class: "FND"
+  Domain: "PY"
+  Variable: "PYRESLOC"
+  Plain_Text_Explanation: "When the Corpora Lutea Count is recorded separately for\
+    \ each ovary there should be a record for each location (PYRESLOC). This covers\
+    \ possiblilty of 3 records for left, right, total (bilateral or null). This also\
+    \ applies to recording results separately for the left and right uterine horns\
+    \ vs. the total uterine count (e.g., Number of Implantations, Number of Resorptions,\
+    \ etc.)."
+  Condition: "If > 1 record for one test per USUBID"
+  Rule: "PYRESLOC for each record are not equivalent"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND368"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND368"
+        Version: "1"
+      Version: "5.0"

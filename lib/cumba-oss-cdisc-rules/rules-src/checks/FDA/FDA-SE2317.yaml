@@ -1,0 +1,92 @@
+Core:
+  Id: "FDA-SE2317"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TXPARMCD is not unique within a SETCD in the Trial\
+  \ Sets (TX) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Check:
+  expression: >-
+    not empty(TXPARMCD) and not is_unique_set([TXPARMCD, SETCD])
+Outcome:
+  Message: "TXPARMCD is not unique within SETCD in the Trial Sets (TX) domain."
+  Output_Variables:
+  - "SETCD"
+  - "TXPARMCD"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate TXPARMCD within a SETCD"
+  FDA_Validator_Rule_Description: "The value of Parameter Code (TXPARMCD) variable\
+    \ must be unique for each Trial Set (SETCD) within the Trial Sets (TX) domain."
+  Domains: "TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2317"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB050"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2317"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB050"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2317"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB050"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2317"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB050"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2317"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB050"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.1"

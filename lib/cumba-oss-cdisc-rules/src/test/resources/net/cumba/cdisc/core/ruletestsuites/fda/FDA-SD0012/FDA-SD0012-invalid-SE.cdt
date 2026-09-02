@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0012 expect=violation domain=SE
+#note "Row 1 has SESTDY=10 after SEENDY=5 -> fires. Row 2 is ordered correctly, row 3 has no SEENDY so the pair cannot be compared."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 SESTDY=10 SEENDY=5
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDY  type=Num  label="Study Day of Start of Element"
+col SEENDY  type=Num  label="Study Day of End of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 10 | 5
+S1 | SE | 001 | 2 | TRT  | 1  | 28
+S1 | SE | 001 | 3 | FUP  | 29 |

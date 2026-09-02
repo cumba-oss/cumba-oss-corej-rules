@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1208 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. ONE row: both operands are calendar-COMPLETE (day precision or finer) with readable cores, so IsoDateComparison takes the fast path and compares the CORES at the COARSER of the two precisions - day - where they are equal, so '>' is false and the rule is SILENT. This is exactly the case the class comment says a naive hull reading would get wrong (a day-precision hull is [T00:00:00, T23:59:59], and mixing a lower against an upper would flip it); the owner ruled the coarser-precision fast path on 2026-08-13. A DM whose first treatment carries a time and whose last carries only a date is ordinary submitted data, so this is a realistic shape and no twin covers it. A fire means the fast path is gone; escalate."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-06-20T10:30 | 2020-06-20

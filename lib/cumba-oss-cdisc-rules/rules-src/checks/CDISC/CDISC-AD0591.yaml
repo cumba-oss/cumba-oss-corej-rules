@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-AD0591"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the same subject, a variable's value does not\
+  \ match the value of the identically named variable in ADSL, considering only records\
+  \ where both values are populated."
+Executability: "Fully Executable"
+ExecutabilityHint:
+  Category: "fully executable"
+  Detail: "Declared-token template. The Expansion block binds &VAR to every variable\
+    \ this dataset shares by name with ADSL, and the engine emits one concrete rule\
+    \ per shared variable, each comparing that variable against ADSL's after an inner\
+    \ join on STUDYID / USUBJID — the CDISC-CG0218 / PMDA-AD0208 shape. The join keys\
+    \ are not expanded over: compared against themselves after merging on them they\
+    \ are equal by construction. When ADSL is not among the loaded datasets, or the\
+    \ resolver cannot enumerate other datasets, the rule is skipped with a stated\
+    \ reason rather than expanded to nothing. NARROWING, stated so it is not invisible:\
+    \ the two non_empty guards are carried over verbatim from the pre-expansion rule.\
+    \ The ADSL-side guard suppresses rows whose ADSL value is genuinely empty; a subject\
+    \ absent from ADSL is dropped by the inner join and is reported by CDISC-AD0256,\
+    \ the ADSL-membership rule (D-TA-2). The dataset-side guard means a value present\
+    \ in ADSL but missing here is NOT reported, which ADaMIG 2.3.1 arguably does require;\
+    \ logged as SHEET-ISSUES entry 35 for the sheet author rather than changed here."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "STUDYID"
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(`&VAR`) and not empty(`ADSL.&VAR`) and var_exists(`&VAR`) and var_exists(`ADSL.&VAR`)
+    and `&VAR` != `ADSL.&VAR`
+Outcome:
+  Message: "For this subject, this variable's value does not match the value of the\
+    \ identically named variable in ADSL."
+  Output_Variables:
+  - "&VAR"
+  - "ADSL.&VAR"
+Expansion:
+- token: "&VAR"
+  over: "shared_variables"
+  with: "ADSL"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "A variable is present with the same name\
+    \ as a variable present in ADSL but the variables do not have identical values\
+    \ for a given value of USUBJID"
+  Rule_Failure_Criteria: "A variable in the ADaM IG and a variable in ADSL with the\
+    \ same name do not have identical values of USUBJID"
+  Condition_Failure: "A variable is present in ADSL with the same name as a variable\
+    \ present in ADaM IG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR591"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR591"
+        Version: "1"
+      Version: "5.0"

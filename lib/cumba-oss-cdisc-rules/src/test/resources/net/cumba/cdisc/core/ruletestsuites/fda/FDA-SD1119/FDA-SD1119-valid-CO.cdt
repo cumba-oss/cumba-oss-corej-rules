@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1119 expect=noViolation domain=CO
+#note "Row 1 related (RDOMAIN/IDVAR populated) but no Identifier/Timing variable populated; row 2 standalone comment with VISIT populated but RDOMAIN and IDVAR empty -> no violation."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+col VISIT    type=Char label="Visit Name"
+col CODY     type=Num  label="Study Day of Comment"
+---
+S1 | CO | AE | 001 | 1 | AESEQ | 1 | Comment on AE record   |        |
+S1 | CO |    | 001 | 2 |       |   | General comment        | WEEK 1 | 8

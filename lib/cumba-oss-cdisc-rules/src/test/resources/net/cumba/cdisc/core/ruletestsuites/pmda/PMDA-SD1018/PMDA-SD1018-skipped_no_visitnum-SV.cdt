@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1018 expect=skipped domain=SV
+#note "Requirements.Variables.All: [VISITNUM] gates against the PRIMARY dataset pre-merge -> auditable SKIP naming the absent variable. THE PMDA-vs-FDA discriminator: the FDA twin carries no Variables gate and would execute here."
+#library standard=sdtmig version=3-4
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISIT    type=Char
+col VISITDY  type=Num
+col SVUPDES  type=Char
+---
+CDISCPILOT01 | SV | 01-701-1015 | SCREENING | -7 |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1
+---

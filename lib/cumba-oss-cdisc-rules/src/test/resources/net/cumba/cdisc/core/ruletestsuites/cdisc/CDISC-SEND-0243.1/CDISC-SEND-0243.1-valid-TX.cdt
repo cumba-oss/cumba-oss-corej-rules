@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0243.1 expect=noViolation domain=TX
+#note "Rows 1 and 2 carry valid ISO 8601 dates for the two date Trial Set Parameters, and row 3's blank value belongs to a parameter outside the rule's list -> no violation."
+#library standard=sendig version=3-1-1
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+STUDY01 | TX | SET1 | 1 | DOSSTDTC | Dosing Start Date | 2026-01-15
+STUDY01 | TX | SET1 | 2 | DOSENDTC | Dosing End Date   | 2026-02-15
+STUDY01 | TX | SET2 | 3 | SPECIES  | Species           |

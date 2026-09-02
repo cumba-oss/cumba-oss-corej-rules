@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0209 expect=noViolation domain=ADSL
+# Rule:Description: The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.SITEID is not equal to DM.SITEID
+#note "same USUBJID, ADSL.SITEID == DM.SITEID -> noViolation"
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SITEID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 701
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SITEID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 701
+---

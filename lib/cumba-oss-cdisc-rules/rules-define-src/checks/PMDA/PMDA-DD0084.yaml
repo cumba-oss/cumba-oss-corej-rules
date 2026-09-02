@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0084"
+Sheet_Rule_Identifier: "DD0084"
+Rule_Set: "PMDA"
+Element: "leaf"
+Attribute: "href"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "folder"
+Plain_Text_Rule: "Referenced File must exist. Define-XML specification represents File references as xlink:href attributes within def:leaf element."
+# The sheet names def:leaf/@xlink:href as THE file-reference carrier, so the
+# rule scopes every def:leaf. Folder-gated (plan SS3.6): SKIPs without a
+# submission folder. The engine resolves the href against the folder, strips
+# any #fragment, and rejects hrefs escaping the folder (absolute or ../) as
+# missing. Blank hrefs are out of reach (presence is the XSD's beat). The
+# stylesheet variant of this row is DD0085 - a processing instruction the
+# element tree cannot see, checked via stylesheet_file_exists over the
+# DOM-extracted PI hrefs (PMDA-DD0085.yaml).
+Message: "Referenced File is missing [${value}]"
+Check:
+  kind: "referenced_file_exists"
+  attribute: "href"

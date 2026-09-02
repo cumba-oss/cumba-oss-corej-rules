@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD2288 expect=noViolation domain=DM
+#note "001 is covered by a DISPOSITION EVENT DS row; 002 (SCRNFAIL) is excluded from the check entirely. 0 violations."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+---
+S1 | DM | 001 | A01
+S1 | DM | 002 | SCRNFAIL
+---
+
+dataset DS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSCAT   type=Char
+---
+S1 | DS | 001 | DISPOSITION EVENT

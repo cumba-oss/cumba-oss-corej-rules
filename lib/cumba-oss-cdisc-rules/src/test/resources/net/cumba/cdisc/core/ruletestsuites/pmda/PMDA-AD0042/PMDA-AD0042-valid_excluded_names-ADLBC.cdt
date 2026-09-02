@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0042 expect=noViolation domain=ADLBC
+#note "Both names end with TM and both carry a non-time format, so both would fire without the two exclusions: ARELTM is excluded by name; ASTDTM by the not ends_with(varname, DTM) conjunct. Pins BOTH exclusions in one fixture."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ARELTM  type=Num format=8.
+col ASTDTM  type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 2 | 1
+---

@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0292 expect=skipped domain=PC
+#note "THE 0290/0292 DIVERGENCE POINT, and the reason M3-D21 calls the pair a strict SUBSET rather than a duplicate: Requirements.Variables.All names --TPT, --TPTNUM AND --TPTREF, so on a dataset with no --TPTREF column 0292 SKIPS while 0290 runs and fires. Keep the file -- it is the boundary of the overlap, and it is why the ruling widened 0290 instead of retiring 0292."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTEST   type=Char label="Pharmacokinetic Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCTPT    type=Char label="Planned Time Point Name"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | PC | 001 | 1 | DRUGX | Drug X | 412 | 1 HOUR | 1
+S1 | PC | 002 | 1 | DRUGX | Drug X | 388 | 1 HOUR | 2
+S1 | PC | 003 | 1 | DRUGX | Drug X | 350 | 2 HOUR | 3
+---

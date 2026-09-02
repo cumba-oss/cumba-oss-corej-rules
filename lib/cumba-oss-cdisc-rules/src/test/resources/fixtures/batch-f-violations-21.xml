@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch F (methods / comments / alias / misc leaves) violations fixture: each
+     batch-F rule fires exactly once.
+     0060: ItemDef IT.AE.AETERM has an empty Description (no TranslatedText).
+     0061: same empty Description (sheet duplicate of 60).
+     0062: CodeListItem Decode has no TranslatedText.
+     0095: IG.SUPPAE has Name!=Domain (SUPPAE vs AE) and no Alias
+           (IG.AE has Name==Domain, so it stays silent).
+     0096: IG.SUPPAE (SUPP name under def:Context="Submission") has no Alias.
+     0100: ItemDef Alias has no Context attribute.
+     0101: CodeList Alias has no Name attribute.
+     0205: MT.6 has two Description children (each with TranslatedText).
+     0206: first MethodDef has no OID.
+     0207: MT.2 has no Name.
+     0208: MT.3 has no Type.
+     0209: MT.4 has Type="Derivation" (an ODM 1.3.2 MethodType term, but not one of the two Define-XML allows).
+     0210: MT.5 has no Description.
+     0212: first def:CommentDef has no OID.
+     0213: two def:CommentDef share OID="COM.DUP".
+     0214: COM.NODESC has no Description.
+     0215: COM.TWODESC has two Description children.
+     0216: two def:leaf share ID="LF.DUP".
+     0218: LF.NOTITLE has no def:title.
+     0219: LF.TWOTITLE has two def:title children.
+     0221: MT.4's FormalExpression has no Context attribute.
+     0248: LF.NOHREF has no xlink:href.
+     0259: leaf ID="9BAD LEAF" starts with a digit and contains a space. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-f-bad"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHF.BAD">
+    <GlobalVariables>
+      <StudyName>BATCHF-BAD</StudyName>
+      <StudyDescription>Batch F violations fixture study</StudyDescription>
+      <ProtocolName>BATCHF-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch F broken MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.1" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE"/>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Domain="AE"/>
+      <ItemDef OID="IT.AE.AETERM" Name="AETERM" DataType="text">
+        <Description/>
+        <Alias Name="AETERM"/>
+      </ItemDef>
+      <CodeList OID="CL.NY" Name="No Yes Response" DataType="text">
+        <CodeListItem CodedValue="N">
+          <Decode/>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID"/>
+      </CodeList>
+      <MethodDef Name="Method without OID" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Method without OID.</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.2" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Method without Name.</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.3" Name="Method without Type">
+        <Description>
+          <TranslatedText xml:lang="en">Method without Type.</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.4" Name="Method with bad Type" Type="Derivation">
+        <Description>
+          <TranslatedText xml:lang="en">Method with an ODM-only Type value.</TranslatedText>
+        </Description>
+        <FormalExpression>STUDYID || "." || SUBJID</FormalExpression>
+      </MethodDef>
+      <MethodDef OID="MT.5" Name="Method without Description" Type="Imputation"/>
+      <MethodDef OID="MT.6" Name="Method with two Descriptions" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">First description.</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second description.</TranslatedText>
+        </Description>
+      </MethodDef>
+      <def:CommentDef>
+        <Description>
+          <TranslatedText xml:lang="en">Comment without OID.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.DUP">
+        <Description>
+          <TranslatedText xml:lang="en">First duplicate comment.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.DUP">
+        <Description>
+          <TranslatedText xml:lang="en">Second duplicate comment.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.NODESC"/>
+      <def:CommentDef OID="COM.TWODESC">
+        <Description>
+          <TranslatedText xml:lang="en">First comment description.</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second comment description.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:leaf ID="LF.DUP" xlink:href="first.pdf">
+        <def:title>First duplicate leaf</def:title>
+      </def:leaf>
+      <!-- the second LF.DUP lives under an ItemGroupDef, NOT as a sibling: proves 0216 is
+           document-wide (unique_among_siblings would stay silent here) -->
+      <ItemGroupDef OID="IG.LEAFHOME" Name="LH" Repeating="No" Purpose="Tabulation">
+        <def:leaf ID="LF.DUP" xlink:href="second.pdf">
+          <def:title>Second duplicate leaf</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <def:leaf ID="LF.NOTITLE" xlink:href="notitle.pdf"/>
+      <def:leaf ID="LF.TWOTITLE" xlink:href="twotitles.pdf">
+        <def:title>First title</def:title>
+        <def:title>Second title</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.NOHREF">
+        <def:title>Leaf without href</def:title>
+      </def:leaf>
+      <def:leaf ID="9BAD LEAF" xlink:href="badid.pdf">
+        <def:title>Leaf with invalid ID</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

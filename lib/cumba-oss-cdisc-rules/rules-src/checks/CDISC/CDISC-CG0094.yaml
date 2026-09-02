@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0094"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reason Not Done (--REASND) is populated but Completion\
+  \ Status (--STAT) is not set to 'NOT DONE'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "EX"
+    - "AE"
+    - "DS"
+    - "DV"
+    - "IE"
+Requirements:
+  Variables:
+    All:
+    - "--REASND"
+    - "--STAT"
+Check:
+  expression: >-
+    not empty(--REASND) and --STAT != "NOT DONE"
+Outcome:
+  Message: "--STAT is not set to 'NOT DONE' when --REASND is provided."
+  Output_Variables:
+  - "--STAT"
+  - "!--REASND"
+Source:
+  Class: "ALL"
+  Domain: "NOT(EX, AE, DS, DV, IE)"
+  Variable: "--STAT"
+  Condition: "--REASND ^= null"
+  Rule: "--STAT = 'NOT DONE'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0094"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0094"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0094"
+        Version: "1"
+      Version: "2.0"

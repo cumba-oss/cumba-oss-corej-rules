@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0117 expect=noViolation domain=ADLBC
+#note "THE LOAD-BEARING-GUARD PIN (finding AD0117-F1). ATPTN absent. Data would fire under the degraded key (regroup on [PARAMCD] alone, flagging the minority POSTDOSE row), but the rule is silent because var_exists(ATPTN) is false - ATPT and PARAMCD are present so their not empty(...) conjuncts do not silence it. ATPT is still present so Requirements.Variables.All [ATPT] does not skip the rule."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | PREDOSE
+CDISCPILOT01 | 01-701-1023 | GLUC | PREDOSE
+CDISCPILOT01 | 01-701-1034 | GLUC | POSTDOSE

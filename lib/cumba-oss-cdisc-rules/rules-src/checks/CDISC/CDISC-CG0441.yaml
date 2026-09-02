@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-CG0441"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARMCD equals 'STOPRULE' and TSVAL is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    TSPARMCD == "STOPRULE" and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty when TSPARMCD equals 'STOPRULE'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'STOPRULE'"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0441"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0441"
+        Version: "1"
+      Version: "2.0"

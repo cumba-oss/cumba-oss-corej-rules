@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1237 expect=noViolation domain=DO
+#note "FRESH, DISCRIMINATING. SPDEVID declared, so the Requirements.Variables gate passes and the rule EXECUTES. Zero data rows. Predicted SILENT: with no rows there are no tuples to duplicate. A fire here, or a SKIP, is a stage-R classification — escalate."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DOSEQ    type=Num  label="Sequence Number"
+col DOTESTCD type=Char label="Device Property Short Name"
+col DOORRES  type=Char label="Device Property Result"
+---

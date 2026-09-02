@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1287 expect=violation domain=AE
+#note "2:1 split within PTCD 10019211 (two Headache, one Cephalalgia) -> ONLY the minority row 3 fires (mechanism pin: minority-flagging, not all-group flagging)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 AEDECOD=Cephalalgia
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDECOD type=Char
+col AEPTCD  type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE  | Headache    | 10019211
+S1 | AE | 002 | 1 | HEADACHE  | Headache    | 10019211
+S1 | AE | 003 | 1 | HEAD ACHE | Cephalalgia | 10019211

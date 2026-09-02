@@ -1,0 +1,11 @@
+#!RuleTest
+#test DRAFT-900044 expect=noViolation domain=ADSL
+#note "The discriminating negative for DRAFT-900044-invalid-ADSL: the SAME carry-over lane runs (RFSTDTC is undefined on ADSL, the companion publishes it) but the dataset keeps the published label, so neither level fires. BOTH labels carry a trailing space -- the published one and the dataset one -- so this scenario pins both halves of the whitespace defence: the candidate lane normalising what the library publishes, and the rule trimming what the dataset declares. CMTRT is the one real corpus mismatch and it differs only by a trailing space."
+#library-include DRAFT-900044-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time "
+---
+CDISCPILOT01 | 01-701-1015 | 2026-01-01
+---

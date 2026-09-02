@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1332 expect=noViolation domain=AE
+#note "Row 1: unresolved event, no end date - conformant. Row 2: resolved event may carry an end date. Isolates both conjuncts in one fixture."
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEOUT   type=Char
+col AESTDTC type=Char
+col AEENDTC type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | NOT RECOVERED/NOT RESOLVED | 2020-01-05 |
+CDISCPILOT01 | AE | 01-701-1015 | 2 | RECOVERED/RESOLVED | 2020-01-06 | 2020-01-09
+---

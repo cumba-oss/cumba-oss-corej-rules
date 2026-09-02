@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0239"
+Sheet_Rule_Identifier: "239"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "IsReferenceData"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The value of the IsReferenceData attribute must be 'Yes' when the ItemGroupDef references a Trial Design dataset."
+Message: "The value of IsReferenceData [${value}] is not 'Yes' for ItemGroupDef when ItemGroupDef/def:Class/@Name='TRIAL DESIGN'."
+# Value-kind convention: fires only when IsReferenceData is present with a non-'Yes'
+# value. An absent IsReferenceData on a TRIAL DESIGN dataset (ODM default 'No') is
+# not flagged — value checks fire only on present values (plan §3.3); the sheet has
+# no companion presence row for this case.
+Check:
+  kind: "one_of"
+  attribute: "IsReferenceData"
+  values: ["Yes"]
+  when:
+    path: "Class/@Name"
+    equals: "TRIAL DESIGN"

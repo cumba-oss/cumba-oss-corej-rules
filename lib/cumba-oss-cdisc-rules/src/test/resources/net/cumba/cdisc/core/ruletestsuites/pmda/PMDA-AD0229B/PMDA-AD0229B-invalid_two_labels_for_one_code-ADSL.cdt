@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0229B expect=violation domain=ADSL
+#note "The ACTUAL-sequence counterpart of AD0227B. Group TRTSEQAN=1 holds {A-B x2, B-A x1} -> row 3 is the minority."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQA=B-A TRTSEQAN=1
+dataset ADSL class=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTSEQA  type=Char
+col TRTSEQAN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | B-A | 1
+S1 | 004 | B-A | 2
+S1 | 005 | B-A | 2

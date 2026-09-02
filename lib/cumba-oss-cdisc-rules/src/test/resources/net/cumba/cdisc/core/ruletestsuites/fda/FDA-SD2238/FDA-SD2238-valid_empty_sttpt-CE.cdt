@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2238 expect=noViolation domain=CE
+#note "Boundary: one record of the 001 / 2020-01-15 group leaves --STTPT empty while the others agree. An empty --STTPT is not a competing value, so no inconsistency is reported."
+#library standard=sdtmig version=3-4
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ   type=Num  label="Sequence Number"
+col CETERM  type=Char label="Reported Term for the Clinical Event"
+col CESTDTC type=Char label="Start Date/Time of Clinical Event"
+col CESTTPT type=Char label="Start Reference Time Point"
+---
+S1 | CE | 001 | 1 | RASH    | 2020-01-15 | SCREENING
+S1 | CE | 001 | 2 | ITCHING | 2020-01-15 |
+S1 | CE | 001 | 3 | FEVER   | 2020-01-15 | SCREENING

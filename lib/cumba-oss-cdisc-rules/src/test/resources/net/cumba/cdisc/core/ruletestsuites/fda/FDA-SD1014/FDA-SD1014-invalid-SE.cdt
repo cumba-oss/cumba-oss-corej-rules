@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1014 expect=violation domain=SE
+#note "SPECIAL PURPOSE branch of the scope (SE is in scope, DM is excluded): row 2 carries TAETORD=7 which TA does not define -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TAETORD=7
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+---
+S1 | SE | 001 | 1 | SCRN | 1
+S1 | SE | 001 | 2 | TRT  | 7
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 2 | TRT

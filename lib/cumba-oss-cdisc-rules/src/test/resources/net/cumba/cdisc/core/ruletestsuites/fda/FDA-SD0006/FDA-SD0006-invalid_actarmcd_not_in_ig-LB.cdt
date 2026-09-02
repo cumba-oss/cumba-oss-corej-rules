@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SD0006 expect=violation domain=LB
+#note "SDTMIG 3.1.2 has no ACTARMCD in DM at all, so the DM.ACTARMCD != 'NOTTRT' exclusion is vacuously true for every subject. That does NOT flood the rule: the surviving conjuncts still carry the whole finding. Subject 001 has LBBLFL=Y -> clean. Subject 002 has no baseline record -> fires. Subject 003 has no baseline record either but ARMCD='SCRNFAIL' -> excluded by the ARMCD conjunct. One violation out of three subjects, not three."
+#library standard=sdtmig version=3-1-2
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBBLFL   type=Char label="Baseline Flag"
+---
+S1 | LB | 001 | 1 | ALB | Y
+S1 | LB | 001 | 2 | ALB |
+S1 | LB | 002 | 1 | ALB |
+S1 | LB | 002 | 2 | ALB | N
+S1 | LB | 003 | 1 | ALB |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | ARM1     | Arm 1
+S1 | DM | 002 | ARM1     | Arm 1
+S1 | DM | 003 | SCRNFAIL | Screen Failure
+---

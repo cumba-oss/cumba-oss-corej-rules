@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0044 expect=violation domain=ADLBC
+# Rule:Description: A variable with a suffix of TM and a variable with a suffix of DTM with the same root name have different time values
+#note "ATM=08:30:00 but ADTM time part 09:30:00 differs -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATM type=Char
+col ADTM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 08:30:00 | 2012-01-01T09:30:00
+---

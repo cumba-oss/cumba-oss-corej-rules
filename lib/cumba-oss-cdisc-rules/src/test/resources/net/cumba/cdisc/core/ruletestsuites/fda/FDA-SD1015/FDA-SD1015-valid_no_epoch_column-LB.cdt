@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1015 expect=skipped domain=LB
+#note "Boundary for the Requirements.Variables.All EPOCH gate: LB carries no EPOCH column at all, so the rule is skipped rather than treating the absent column as a non-matching value."
+#library standard=sdtmig version=3-4
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 001 | 1 | ALB | 40
+CDISCPILOT01 | LB | 001 | 2 | ALT | 22
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | A | Drug A | 1 | SCRN | SCREENING
+---

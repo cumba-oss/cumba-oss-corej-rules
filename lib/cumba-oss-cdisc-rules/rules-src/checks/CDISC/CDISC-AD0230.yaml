@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0230"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, in an ADSL dataset, there is more than one value\
+  \ of TRTSEQAN for a given value of TRTSEQA."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTSEQAN) and not empty(TRTSEQA) and has_multiple_values_for(TRTSEQAN, TRTSEQA)
+Outcome:
+  Message: "There is more than one value of TRTSEQAN for a given value of TRTSEQA"
+  Output_Variables:
+  - "TRTSEQA"
+  - "TRTSEQAN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTSEQAN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTSEQAN\
+    \ for a given value of TRTSEQA"
+  Rule_Failure_Criteria: "There is more than one value of TRTSEQAN for a given value\
+    \ of TRTSEQA"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR230"
+        Version: "1"
+      Version: "5.0"

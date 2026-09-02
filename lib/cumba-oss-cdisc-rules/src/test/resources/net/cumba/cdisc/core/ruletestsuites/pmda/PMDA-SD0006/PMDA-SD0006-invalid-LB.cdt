@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD0006 expect=violation domain=LB
+#note "Subject 002 is assigned and treated but has no LBBLFL=Y record (only blank/N) -> one violation for the subject group; 001 has a baseline record."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBBLFL   type=Char label="Baseline Flag"
+---
+S1 | LB | 001 | 1 | ALB | Y
+S1 | LB | 001 | 2 | ALB |
+S1 | LB | 002 | 1 | ALB |
+S1 | LB | 002 | 2 | ALB | N
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | ARM1 | Arm 1 | ARM1
+S1 | DM | 002 | ARM1 | Arm 1 | ARM1
+---

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P4 (value / format / enum) clean 2.1 fixture: every P4 rule executes
+     with zero findings, with guard-positive material proving the checks really ran:
+       Standards   - SDTMIG 3.4 / ADaMIG 1.3 (valid DD0022 versions, Status Final),
+                     plus a CT standard the DD0022 name guards must ignore
+       IG.DM       - SDTM-bound Tabulation dataset, SASDatasetName DM <-> dm.xpt
+                     (DD0052), DomainDescription Alias (DD0064)
+       IG.ADSL     - ADaM-bound Analysis dataset (DD0053-B)
+       IG.SUPPAE   - hosts the QVAL value-list chain: value/variable Origin Types
+                     equal (DD0074), value Length 1 <= variable 200 (DD0123)
+       ItemDefs    - DOMAIN=Assigned (DD0106), STUDYID=Protocol (DD0108), two
+                     USUBJID definitions with one Origin Type (DD0109), Predecessor
+                     origin with DATASET.VARIABLE text (DD0148), AEDECOD referencing
+                     the MedDRA codelist (DD0113, OD0080)
+       CL.MEDDRA   - Dictionary=MEDDRA Version=26.1 (DD0025/DD0112/DD0112-B)
+       CL.SEX      - text codelist with $-prefixed SASFormatName (OD0019/OD0078),
+                     nci:ExtCodeID aliases (DD0064-B/-C/-D), ExtendedValue=Yes item
+       CL.INTC/CL.FLOATC - integer/float codelists with type-conforming terms
+       WC.OK       - RangeCheck SoftHard=Soft (DD0044)
+       CL.CUSTOM   - def:IsNonStandard=Yes (DD0130) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p4-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP4">
+    <GlobalVariables>
+      <StudyName>PMDAP4-STUDY</StudyName>
+      <StudyDescription>PMDA batch P4 clean fixture study</StudyDescription>
+      <ProtocolName>PMDAP4-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P4 MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No" IsReferenceData="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.DOMAIN" OrderNumber="2" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="3" Mandatory="Yes" KeySequence="2"/>
+        <ItemRef ItemOID="IT.SEX" OrderNumber="4" Mandatory="Yes"/>
+        <Alias Context="DomainDescription" Name="Demographics"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per event"
+                    def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID2" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.AEDECOD" OrderNumber="2" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.VISITNUM" OrderNumber="3" Mandatory="No"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.AE" xlink:href="ae.xpt">
+          <def:title>ae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No" IsReferenceData="No"
+                    SASDatasetName="ADSL" Purpose="Analysis"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.ADSL" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Level Analysis Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.BASE" OrderNumber="1" Mandatory="No"/>
+        <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
+        <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
+          <def:title>adsl.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Domain="SUPPAE" Repeating="Yes"
+                    IsReferenceData="No" SASDatasetName="SUPPAE" Purpose="Tabulation"
+                    def:Structure="One record per qualifier per record"
+                    def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Qualifiers for AE</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.QVAL" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="RELATIONSHIP"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.STUDYID" Name="STUDYID" DataType="text" Length="12"
+               SASFieldName="STUDYID">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Protocol"/>
+      </ItemDef>
+      <ItemDef OID="IT.DOMAIN" Name="DOMAIN" DataType="text" Length="2"
+               SASFieldName="DOMAIN">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID2" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.VISITNUM" Name="VISITNUM" DataType="integer" Length="3"
+               SASFieldName="VISITNUM">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.SEX" Name="SEX" DataType="text" Length="1" SASFieldName="SEX">
+        <Description>
+          <TranslatedText xml:lang="en">Sex</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+        <CodeListRef CodeListOID="CL.SEX"/>
+      </ItemDef>
+      <ItemDef OID="IT.AEDECOD" Name="AEDECOD" DataType="text" Length="200"
+               SASFieldName="AEDECOD">
+        <Description>
+          <TranslatedText xml:lang="en">Dictionary-Derived Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+        <CodeListRef CodeListOID="CL.MEDDRA"/>
+      </ItemDef>
+      <ItemDef OID="IT.BASE" Name="BASE" DataType="float" Length="8" SignificantDigits="2"
+               SASFieldName="BASE">
+        <Description>
+          <TranslatedText xml:lang="en">Baseline Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Predecessor">
+          <Description>
+            <TranslatedText xml:lang="en">ADLB.AVAL</TranslatedText>
+          </Description>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+        <def:ValueListRef ValueListOID="VL.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL.AESER" Name="AESER" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <def:ValueListDef OID="VL.QVAL">
+        <ItemRef ItemOID="IT.QVAL.AESER" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.OK"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.OK">
+        <RangeCheck SoftHard="Soft" Comparator="EQ" def:ItemOID="IT.AEDECOD">
+          <CheckValue>HEADACHE</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <CodeList OID="CL.MEDDRA" Name="Dictionary-Derived Term" DataType="text">
+        <ExternalCodeList Dictionary="MEDDRA" Version="26.1"/>
+      </CodeList>
+      <CodeList OID="CL.SEX" Name="Sex" DataType="text" SASFormatName="$SEXF"
+                def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="M">
+          <Alias Context="nci:ExtCodeID" Name="C20197"/>
+        </EnumeratedItem>
+        <EnumeratedItem CodedValue="F" def:ExtendedValue="Yes">
+          <Alias Context="nci:ExtCodeID" Name="C16576"/>
+        </EnumeratedItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <CodeList OID="CL.INTC" Name="Integer Codes" DataType="integer"
+                SASFormatName="INTF">
+        <EnumeratedItem CodedValue="1"/>
+        <EnumeratedItem CodedValue="2"/>
+      </CodeList>
+      <CodeList OID="CL.FLOATC" Name="Float Codes" DataType="float">
+        <EnumeratedItem CodedValue="1.5"/>
+        <EnumeratedItem CodedValue="2"/>
+      </CodeList>
+      <CodeList OID="CL.CUSTOM" Name="Sponsor Codes" DataType="text"
+                def:IsNonStandard="Yes">
+        <CodeListItem CodedValue="A">
+          <Decode>
+            <TranslatedText xml:lang="en">Code A</TranslatedText>
+          </Decode>
+          <Alias Context="nci:ExtCodeID" Name="C12345"/>
+        </CodeListItem>
+      </CodeList>
+      <MethodDef OID="MT.BASE" Name="Baseline Derivation" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Copied from ADLB.AVAL</TranslatedText>
+        </Description>
+      </MethodDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

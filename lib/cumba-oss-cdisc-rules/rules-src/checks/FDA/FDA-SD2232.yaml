@@ -1,0 +1,96 @@
+Core:
+  Id: "FDA-SD2232"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset does not contain\
+  \ a record where TSPARMCD equals 'SSTDTC' (Study Start Date)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$sstdtc_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"SSTDTC\"))"
+Check:
+  expression: >-
+    $sstdtc_count == 0
+Outcome:
+  Message: "Missing SSTDTC Trial Summary Parameter: a 'Study Start Date' (SSTDTC)\
+    \ record must be present in the Trial Summary (TS) domain."
+  Output_Variables:
+  - "$sstdtc_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing SSTDTC Trial Summary Parameter"
+  FDA_Validator_Rule_Description: "'Study Start Date' (SSTDTC) record must be populated\
+    \ in Trial Summary (TS) domain. It is expected for SDTM IG v3.1.2 data and required\
+    \ for data in all more recent SDTM versions."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2232"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2232"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2232"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2232"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2232"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

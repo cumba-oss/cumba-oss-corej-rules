@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2285 expect=noViolation domain=LB
+#note "All populated LBLOINC values are LOINC codes in the dummy dictionary (1558-6, 2345-7); the blank LBLOINC row does not fire (completeness is another rule's concern) -> no violation."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBLOINC  type=Char
+---
+S01 | LB | 001 | 1 | GLUCF | 1558-6
+S01 | LB | 001 | 2 | GLUC  | 2345-7
+S01 | LB | 002 | 1 | ALB   |

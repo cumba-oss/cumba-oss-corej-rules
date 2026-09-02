@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1244 expect=violation domain=LB
+#note "Shipped Check var_exists(\"--TPTNUM\") and not var_exists(\"--TPT\") resolves per the EC-36 prefix rule to LBTPTNUM/LBTPT; both leaves are dataset constants -> BroadcastFold -> exactly ONE violation reported at row=1 regardless of row count."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTPTNUM=1
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTPTNUM type=Num
+---
+S1 | LB | 001 | 1 | 1

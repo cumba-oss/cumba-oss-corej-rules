@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1375 expect=violation domain=DM
+#note "any-branch 2: a screen-failure subject has a populated RFENDTC -> fires on row 1; row 2 (NOTASSGN, RFENDTC empty) is conformant."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 RFENDTC=2020-02-10 ACTARMCD=SCRNFAIL
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-02-10 | SCRNFAIL
+CDISCPILOT01 | DM | 01-701-1023 |            | NOTASSGN

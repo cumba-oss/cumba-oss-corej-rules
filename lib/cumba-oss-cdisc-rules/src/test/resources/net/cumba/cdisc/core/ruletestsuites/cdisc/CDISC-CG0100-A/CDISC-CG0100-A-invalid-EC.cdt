@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0100-A expect=violation domain=EC
+#note "H3 sister rule (minted 2026-08-19 per the absent-column doctrine): EC carries NONE of ECDOSE, ECDOSTXT, ECSTAT, ECOCCUR - no dose information is recorded anywhere. Sensitivity is Dataset, so the finding is reported ONCE for the dataset although both rows satisfy the check; the per-row twins stay silent on this configuration."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ type=Num label="Sequence Number"
+col ECTRT type=Char label="Name of Treatment"
+col ECSTDTC type=Char label="Start Date/Time of Treatment"
+---
+S1 | EC | 001 | 1 | DRUG A | 2020-02-01
+S1 | EC | 001 | 2 | DRUG A | 2020-02-08

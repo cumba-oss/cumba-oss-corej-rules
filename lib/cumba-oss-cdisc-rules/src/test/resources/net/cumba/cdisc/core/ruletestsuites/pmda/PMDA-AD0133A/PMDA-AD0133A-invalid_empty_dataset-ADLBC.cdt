@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0133A expect=violation domain=ADLBC
+#note "EMPTY-DATASET PIN, expectation CORRECTED at stage-G escalation. Columns declared (A1LO absent - the firing shape), zero rows. The Check is 100% dataset-constant (every leaf is var_exists), so RuleRunner.executeUnified's Guard-residual D2/D2b BroadcastFold.fold decides it against the ORIGINAL context - whose declared column schema survives at 0 rows - BEFORE the 0-row synthetic zero-column table is ever built. var_exists(R2A1LO) and (not var_exists(AVAL) or not var_exists(A1LO)) folds TRUE against that declared schema -> datasetBroadcastResult emits exactly one violation, reported at row=1 (no value pin: extractOutputValues on a zero-row table yields an empty string). Was PMDA-AD0133A-valid_empty_dataset-ADLBC.cdt / expect=noViolation / count=0; renamed and inverted, not duplicated."
+#expectViolationCount 1
+#expectViolationAt row=1
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col R2A1LO  type=Num
+---
+---

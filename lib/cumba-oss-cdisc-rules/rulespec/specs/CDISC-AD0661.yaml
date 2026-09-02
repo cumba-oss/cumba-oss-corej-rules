@@ -1,0 +1,39 @@
+name: CDISC-AD0661
+kind: rule
+description: |
+  Wave D8 port - T3-VMC Variable Metadata Check. BDS/ADNCA: ADOSEDUR exists and
+  (NDOSEDUR not_exists OR DOSEDURU not_exists). Baselined on Python lane under
+  Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection before evaluating the Check,
+  so `exists(ADOSEDUR)` / `not_exists(NDOSEDUR|DOSEDURU)` resolve against
+  meta-field columns and yield 0 violations. Java evaluates the leaves
+  against the original column metadata and fires correctly.
+python_source: rules-adamig-1-3.json (CDISC-AD0661)
+rule:
+  coreId: CDISC-AD0661
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      ADOSEDUR: DOUBLE
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ADOSEDUR: 1.0, NFRLT: 0.0, AFRLT: 0.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0661
+    dataset: ADNCA
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ADOSEDUR: '1'
+expected_errors: []

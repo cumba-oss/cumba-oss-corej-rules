@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2286 expect=noViolation domain=EC
+#note "Row 1: both populated (5/mg) -> silent. Row 2: both blank -> silent. Row 3: VAMT populated, VAMTU blank - the converse direction is NOT this rule's business -> silent. 0 violations."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset EC class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num
+col ECVAMT  type=Num
+col ECVAMTU type=Char
+---
+S1 | EC | 001 | 1 | 5  | mg
+S1 | EC | 001 | 2 | .  |
+S1 | EC | 001 | 3 | 5  |

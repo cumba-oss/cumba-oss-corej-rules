@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0732 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD for a subject, there is more than one value of BASE for a given value of BASEC, considering only those rows on which both variables are populated
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE type=Char
+col BASEC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.1 | NORMAL
+CDISCPILOT01 | 01-701-1015 | GLUC | 8.0 | HIGH
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.1 | NORMAL
+---

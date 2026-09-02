@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0519"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable name ends in EDTF but its label does\
+  \ not end with 'Imputation Flag' (or 'Imput. Flag') or does not contain 'End' or\
+  \ does not contain 'Date', unless the variable is TRTEDTF, TRnnEDTF (nn=01-99),\
+  \ or one of the standard library variables."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$library_variables"
+  expression: "get_column_order_from_library()"
+Check:
+  expression: >-
+    ends_with(varname(), "EDTF") and varname() !~ /^TR(T|0[1-9]|[1-9][0-9])EDTF$/ and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
+    contains(var_label("DATA"), "Date")) and varname() not in $library_variables
+Outcome:
+  Message: "A variable ending in EDTF has a label that does not end with 'Imputation\
+    \ Flag' (or 'Imput. Flag') or does not contain 'End' or does not contain 'Date'."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*EDTF"
+  Natural_Language_Rule_Failure_Criteria: "A variable ending in EDTF must contain\
+    \ \"End Date Imputation Flag\" in the label"
+  Rule_Failure_Criteria: "*EDTF does not contain \"End Date Imputation Flag\" in the\
+    \ label"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR519"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR519"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR519"
+        Version: "1"
+      Version: "5.0"

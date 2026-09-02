@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0280 expect=noViolation domain=LB
+#note "LBREASND is present and populated on the NOT DONE record, so the rule is silent. Negative control for the absent-column scenario."
+#library standard=sendig version=3-1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBREASND type=Char label="Reason Not Done"
+---
+S1 | LB | 001 | 1 | ALB | NOT DONE | Sample haemolysed

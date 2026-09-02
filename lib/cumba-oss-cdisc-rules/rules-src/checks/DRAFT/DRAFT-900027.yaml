@@ -1,0 +1,29 @@
+Core:
+  Id: "DRAFT-900027"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when a date imputation flag (*DTF) is not populated but\
+  \ the corresponding date (*DT) is imputed."
+Executability: "Not Executable"
+ExecutabilityHint:
+  Category: "not executable"
+  Detail: "No engine operator detects that a date value was imputed, and the check's\
+    \ $dt_variable / $dtf_variable / $is_imputed operands have no defining operations.\
+    \ Executing this rule needs an Expansion design that pairs each *DT variable with\
+    \ its *DTF flag plus an imputation detector (e.g. comparing the analysis date\
+    \ to the precision of its source --DTC); until then the rule is parked at load."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty($dt_variable) and empty($dtf_variable) and $is_imputed == true
+Outcome:
+  Message: "Date imputation flag (*DTF) is not populated but the corresponding date\
+    \ (*DT) appears to be imputed."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

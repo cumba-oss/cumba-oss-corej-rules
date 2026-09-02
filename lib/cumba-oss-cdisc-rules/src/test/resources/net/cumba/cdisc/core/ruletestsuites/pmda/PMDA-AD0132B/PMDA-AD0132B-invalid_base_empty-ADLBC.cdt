@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0132B expect=violation domain=ADLBC
+#note "Row 1: BASE missing (lone .) while CHG populated -> first conjunct true, second true via the bare empty(BASE) leaf -> FIRES. Row 2: everything populated -> silent. Pin AVAL and CHG but NOT BASE (blank on the fired row canonicalises to null)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 AVAL=10 CHG=5
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col BASE    type=Num
+col CHG     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 10 | . | 5
+CDISCPILOT01 | 01-701-1023 | ALB | 10 | 4 | 6

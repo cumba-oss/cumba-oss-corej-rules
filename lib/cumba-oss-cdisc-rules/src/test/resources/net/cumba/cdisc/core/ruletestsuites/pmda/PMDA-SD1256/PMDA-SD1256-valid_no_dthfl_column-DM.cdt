@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1256 expect=skipped domain=DM
+#note "FRESH, DISCRIMINATING: the machine-guard consequence pin (var_exists(DTHFL) injected by the loader). Without the guard an absent column would read as empty and '' != 'Y' would fire on the DEATH row (absent = all-missing policy); with the guard the conjunction is false so the rule executes and reports nothing (no fire, no skip - Scope has no Variables gate). PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | 001
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | SUBJECT DIED | DEATH
+---

@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-AD0511"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable name ends in SDTM but its label does\
+  \ not contain 'Start Datetime', unless the variable is one of the standard library\
+  \ variables."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$library_variables"
+  expression: "get_column_order_from_library()"
+Check:
+  expression: >-
+    ends_with(varname(), "SDTM") and not contains(var_label("DATA"), "Start Datetime") and varname()
+    not in $library_variables
+Outcome:
+  Message: "A variable ending in SDTM does not contain 'Start Datetime' in the label."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*SDTM"
+  Natural_Language_Rule_Failure_Criteria: "A variable ending in SDTM must contain\
+    \ \"Start Datetime\" in the label"
+  Rule_Failure_Criteria: "*SDTM does not contain \"Start Datetime\" in the label"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR511"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR511"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR511"
+        Version: "1"
+      Version: "5.0"

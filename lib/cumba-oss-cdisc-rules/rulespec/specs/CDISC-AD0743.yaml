@@ -1,0 +1,46 @@
+name: CDISC-AD0743
+kind: rule
+description: |
+  Wave B4 port — T1b PlainIntermediate.
+  CDISC-AD0743: Within PARAMCD, more than one AVAL for a given AVALC.
+  Record-data rule scoped to BASIC DATA STRUCTURE / MEDICAL DEVICE BDS.
+  Bare-leaf Check + has_multiple_values_for with within=PARAMCD — Python gaps
+  (Finding #26 + #28). Baselines on Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0743)
+rule:
+  coreId: CDISC-AD0743
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVAL]
+    column_types:
+      AVAL: DOUBLE
+    rows:
+      # PARAMCD=HGB: AVALC='Normal' maps to two AVAL (13.0 and 14.0) -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVAL: 13.0, AVALC: 'Normal'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVAL: 14.0, AVALC: 'Normal'}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVAL: 16.0, AVALC: 'High'}
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: 'GLUC', AVAL: 5.0, AVALC: 'Normal'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0743
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVAL: 13.0}
+    status: SUCCESS
+    output_variables:
+      PARAMCD: 'HGB'
+      AVAL: '13'
+      AVALC: 'Normal'
+  - rule_id: CDISC-AD0743
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVAL: 14.0}
+    status: SUCCESS
+    output_variables:
+      PARAMCD: 'HGB'
+      AVAL: '14'
+      AVALC: 'Normal'
+expected_errors: []

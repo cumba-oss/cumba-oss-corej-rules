@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0173"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when LBTOX or LBTOXGR is declared in the LB Define-XML\
+  \ document without an external codelist (dictionary name and version)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    var_name("DEFINE") in ["LBTOX", "LBTOXGR"] and empty(var_external_dictionary("DEFINE"))
+Outcome:
+  Message: "LBTOX/LBTOXGR has no external codelist (dictionary name and version) in\
+    \ the Define-XML document."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_external_dictionary"
+Source:
+  Class: "FND"
+  Domain: "LB"
+  Variable: "LBTOX, LBTOXGR"
+  Plain_Text_Explanation: "If LBTOXGR or LBTOX are used; the sponsor is expected to\
+    \ provide the name of the scale and version used to map the terms, utilizing the\
+    \ Define-XML document external codelist attributes."
+  Condition: "LBTOXGR ^=null OR LBTOX ^=null"
+  Rule: "Define-XML document contains the name of the scale and version used to map\
+    \ the terms"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND173"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0157 expect=noViolation domain=ADLBC
+#note "The contrast that makes the concrete enumeration observable: with no CRITy column at all, every var_exists(\"CRITn\") is false, so the rule EXECUTES and reports nothing (finding AD0157-F1) - a wildcard-formed twin would instead be SKIPPED here (compare PMDA-AD0221-skipped_no_caty_columns / PMDA-AD0355-skipped_no_region_columns)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30
+CDISCPILOT01 | 01-701-1023 | ALB | 31

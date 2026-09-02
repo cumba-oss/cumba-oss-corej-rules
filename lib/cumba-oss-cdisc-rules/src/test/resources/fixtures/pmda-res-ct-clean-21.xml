@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA residual batch, CT-gated clean fixture (same stub CtProvider as the CT
+     violations fixture). Every CT residual leg executes with zero findings:
+       DD0029/-B   - CL.UNITE/CL.UNITC carry only in-list terms ('mg') plus a
+                     properly marked extension ('L')
+       DD0132/-B   - CL.SEXE/CL.SEXC carry no def:ExtendedValue markings
+       DD0099/0100 - AR.OK's AnalysisReason/AnalysisPurpose are CT submission
+                     values -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-res-ct-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.RES">
+    <GlobalVariables>
+      <StudyName>RES-STUDY</StudyName>
+      <StudyDescription>PMDA residual CT clean fixture study</StudyDescription>
+      <ProtocolName>RES-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="RES MDV" def:DefineVersion="2.1.0">
+      <CodeList OID="CL.UNITE" Name="Unit" DataType="text">
+        <EnumeratedItem CodedValue="mg"/>
+        <EnumeratedItem CodedValue="L" def:ExtendedValue="Yes"/>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <CodeList OID="CL.UNITC" Name="Unit Decoded" DataType="text">
+        <CodeListItem CodedValue="mg">
+          <Decode>
+            <TranslatedText xml:lang="en">milligram</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <CodeList OID="CL.SEXE" Name="Sex" DataType="text">
+        <EnumeratedItem CodedValue="F"/>
+        <EnumeratedItem CodedValue="M"/>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <CodeList OID="CL.SEXC" Name="Sex Decoded" DataType="text">
+        <CodeListItem CodedValue="M">
+          <Decode>
+            <TranslatedText xml:lang="en">Male</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="F">
+          <Decode>
+            <TranslatedText xml:lang="en">Female</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.1" Name="Table 14-1.01">
+          <arm:AnalysisResult OID="AR.OK"
+                              AnalysisReason="DATA DRIVEN"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.ADLB"/>
+            </arm:AnalysisDatasets>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+    </MetaDataVersion>
+  </Study>
+</ODM>

@@ -1,0 +1,122 @@
+Core:
+  Id: "PMDA-SD1321"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject has Adverse Event (AE) records but no\
+  \ treatment-emergent flag is submitted for that subject in SUPPAE (no SUPPAE record\
+  \ where QNAM is equal to 'AETRTEM'), including the case where the SUPPAE dataset\
+  \ is entirely absent."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$aetrtem_count"
+  expression: "record_count(QNAM, domain=\"SUPPAE\", group=[USUBJID], filter=filter(QNAM=\"\
+    AETRTEM\"))"
+- id: "$study_datasets"
+  expression: "dataset_names()"
+Check:
+  expression: >-
+    not shares_elements_with($study_datasets, keys=[SUPPAE]) or $aetrtem_count < 1
+Outcome:
+  Message: "Subject has AE records but no treatment-emergent flag is present in SUPPAE\
+    \ for that subject (no record with QNAM equal to 'AETRTEM')."
+  Output_Variables:
+  - "$aetrtem_count"
+Source:
+  Message: "No Treatment Emergent info for Adverse Event (missing SUPPAE)"
+  Description: "A treatment-emergent flag should be included in SUPPAE according to\
+    \ the FDA business rule that states, 'A treatment-emergent flag should be submitted'."
+  Domains: "AE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1321"
+        Version: "1"
+      Version: "1.6"

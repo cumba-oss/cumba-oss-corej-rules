@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE2241 expect=violation domain=CL
+#note "Subject 001's latest DS disposition starts 2020-01-20; CL row 1 is observed 2020-01-21 (after) -> fires. Row 2 (subject 002, same date) stays clean because 002's latest disposition is 2020-01-25 -> proves the per-USUBJID max."
+#library standard=sendig version=3-1-1
+#library dataset-class CL FINDINGS
+#expectViolationCount 1
+#expectViolationAt row=1 CLDTC=2020-01-21
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLDTC    type=Char label="Date/Time of Observation"
+---
+S1 | CL | 001 | 1 | CLSIGN | 2020-01-21
+S1 | CL | 002 | 1 | CLSIGN | 2020-01-21
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY   | RECOVERY            | 2020-01-10
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-20
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-25

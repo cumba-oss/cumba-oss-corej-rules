@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0105 expect=skipped domain=EX
+# Rule:Description: Raise an error when the EC domain is present and Treatment Vehicle Amount (EXVAMT) is present in the EX dataset.
+#note "AUTHORED BY Plan B phase 4c (grounding R-B2: this rule had NO scenario directory at all, so its whole EC dependency shipped unpinned). EX carries EXVAMT, and there is NO EC block. The rule declares Requirements.Datasets [EC], so the run cannot answer it and RuleRunner skips at the Requirements gate — BEFORE AbsentDatasetSkip.decide. Until 4c the same shape was an authored ds_exists(\"EC\") conjunct that evaluated FALSE and reported nothing: an EXECUTED-and-silent verdict indistinguishable from a rule that looked and found nothing. This scenario is the Gate C evidence for that status move; Gate A sees the EC half of 4c (6 status rows) but nothing about THIS rule, which ships no scenario in either snapshot's study."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXVAMT  type=Char label="Planned Amount"
+---
+S1 | EX | 001 | 1 | DRUGA | 5
+S1 | EX | 001 | 2 | DRUGA | 5
+---

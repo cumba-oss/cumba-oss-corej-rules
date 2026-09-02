@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1073 expect=violation domain=AE
+#note "AEOCCUR is present in AE although the IG prohibits it (AEs are always occurring events) -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEOCCUR type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Y

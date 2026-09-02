@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0350"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SCAT is equal to the domain name."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+Check:
+  expression: >-
+    not empty(ds_label("LIBRARY")) and equalsIgnoreCase(--SCAT, ds_label("LIBRARY"))
+Outcome:
+  Message: "--SCAT must not be equal to the domain name."
+  Output_Variables:
+  - "--SCAT"
+  - "library_dataset_label"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Rule: "--SCAT ^= Domain Name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0350"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0350"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0350"
+        Version: "1"
+      Version: "2.0"

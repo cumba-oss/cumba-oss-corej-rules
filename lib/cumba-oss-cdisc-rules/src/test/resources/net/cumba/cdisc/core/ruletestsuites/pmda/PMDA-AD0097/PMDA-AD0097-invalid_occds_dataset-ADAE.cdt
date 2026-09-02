@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0097 expect=violation domain=ADAE
+#note "DISCRIMINATING (finding AD0097-F1, M2-Q1 pin). An OCCURRENCE dataset is OUTSIDE the sheet's 'BDS, ADNCA, MDBDS, ADAMOTHER' list, but Scope.Domains.Include: [ALL] admits it, so the rule executes and fires. This fixture asserts the scope as SHIPPED. If the M2-Q1 lane narrows the Scope, this is the one fixture that must be re-authored (to expect=skipped) - it is named in finding AD0097-F1 for exactly that reason. Its mirror image is PMDA-AD0111-skipped_occds_structure-ADAE. ESCALATE, do not rewrite, if this lands otherwise."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 TRTPG1N=1
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1

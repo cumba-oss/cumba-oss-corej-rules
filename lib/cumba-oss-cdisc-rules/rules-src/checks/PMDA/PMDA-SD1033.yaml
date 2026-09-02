@@ -1,0 +1,116 @@
+Core:
+  Id: "PMDA-SD1033"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ARMCD is present and ARM is present and ARM does\
+  \ not have the same value across records with the same value of ARMCD."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+    - "TA"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Check:
+  expression: >-
+    var_exists("ARMCD") and is_inconsistent_across_dataset(ARM, keys=[ARMCD])
+Outcome:
+  Message: "Inconsistent value for ARM within ARMCD"
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+Source:
+  Message: "Inconsistent value for ARM"
+  Description: "A value for Description of Planned Arm (ARM) must have a unique value\
+    \ for Planned Arm Code (ARMCD) with the domain."
+  Domains: "DM, TA, TV"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1033"
+        Version: "1"
+      Version: "1.6"

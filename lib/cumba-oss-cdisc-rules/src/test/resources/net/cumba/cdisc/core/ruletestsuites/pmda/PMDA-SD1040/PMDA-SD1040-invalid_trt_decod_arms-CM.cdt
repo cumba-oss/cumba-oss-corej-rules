@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1040 expect=violation domain=CM
+#note "Row 1: CMSCAT equalsIgnoreCase CMTRT -> FIRES (--TRT arm, case-folded). Row 2: CMSCAT == CMDECOD -> FIRES (--DECOD arm, the sixth arm FDA-SD1040 lacks). Row 3: clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMSEQ=1
+#expectViolationAt row=2 CMSEQ=2
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMDECOD  type=Char
+col CMSCAT   type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN     | ACETYLSALICYLIC ACID | aspirin
+S1 | CM | 001 | 2 | PARACETAMOL | PARACETAMOL           | PARACETAMOL
+S1 | CM | 001 | 3 | IBUPROFEN   | IBUPROFEN             | NSAID
+---

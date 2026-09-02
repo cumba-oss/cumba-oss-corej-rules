@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0420"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --OCCUR is 'N' and --STRF (Start Relative to Reference\
+  \ Period) is populated for a non-occurred event or intervention."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--OCCUR"
+    - "--STRF"
+Check:
+  expression: >-
+    --OCCUR == "N" and not empty(--STRF)
+Outcome:
+  Message: "--STRF is populated when --OCCUR is 'N'."
+  Output_Variables:
+  - "--OCCUR"
+  - "--STRF"
+Source:
+  Class: "INT, EVT"
+  Domain: "ALL"
+  Variable: "--STRF"
+  Condition: "--OCCUR = 'N'"
+  Rule: "--STRF = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0420"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0420"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0420"
+        Version: "1"
+      Version: "2.0"

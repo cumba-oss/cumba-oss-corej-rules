@@ -1,0 +1,97 @@
+Core:
+  Id: "FDA-SD1151"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IETESTCD is present and IETEST is present and IETESTCD\
+  \ does not have the same value across records with the same value of IETEST."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TI"
+Requirements:
+  Variables:
+    All:
+    - "IETESTCD"
+Check:
+  expression: >-
+    var_exists("IETEST") and is_inconsistent_across_dataset(IETESTCD, keys=[IETEST])
+Outcome:
+  Message: "Inconsistent value for IETESTCD within IETEST"
+  Output_Variables:
+  - "IETESTCD"
+  - "IETEST"
+Source:
+  FDA_Validator_Rule_Message: "Inconsistent value for IETESTCD within IETEST"
+  FDA_Validator_Rule_Description: "All values of Inclusion/Exclusion Criterion Short\
+    \ Name  (IETESTCD) should be the same for a given value of Inclusion/Exclusion\
+    \ Criterion (IETEST)."
+  Domains: "TI"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1151"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1151"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1151"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1151"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1151"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

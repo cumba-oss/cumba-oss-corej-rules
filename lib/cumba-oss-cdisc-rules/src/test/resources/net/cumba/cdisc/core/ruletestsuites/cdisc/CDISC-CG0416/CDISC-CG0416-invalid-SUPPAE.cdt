@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0416 expect=violation domain=SUPPAE
+#note "ADAPTED-FROM fda/FDA-SD1049/FDA-SD1049-invalid-SUPPAE.cdt (data and pins verbatim). QLABEL on row 2 is 41 characters, one past the 40-character limit -> fires; the 40-character row 1 is the passing boundary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 IDVAR=AESEQ IDVARVAL=2
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AEOK | Qualifier label of exactly forty chars X | Y
+S1 | AE | 001 | AESEQ | 2 | AEBAD | Qualifier label of exactly forty chars XY | Y

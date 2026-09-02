@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0072-B"
+Sheet_Rule_Identifier: "DD0072"
+Rule_Set: "PMDA"
+Element: "ValueListDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+# Branch 2 of PMDA row DD0072 (companion of PMDA-DD0072; review-pmda-p3 W3):
+# when a variable delegates its Origin to the value level, every ItemDef the
+# def:ValueListDef references must carry a def:Origin. Mirror of CDISC
+# DEFINE-XML-0155-B (0142-style reverse join; first-referrer-only caveat).
+Plain_Text_Rule: "For regulatory submission data, Origin is required for all SDTM, ADaM, and SEND variables. It is at the sponsors discretion whether to provide Origin at the Variable or Value Level. When Origin is provided for each Value Level item, then providing Origin on the Variable is optional. Define-XML specification represents variable Origin as def:Origin element under ItemDef element. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+Message: "Missing Origin: a value-level ItemDef has no def:Origin and the delegating variable carries none either."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Origin/@Type"
+      exists: false
+    - path: "../@OID->ValueListRef@ValueListOID/../Origin/@Type"
+      exists: false

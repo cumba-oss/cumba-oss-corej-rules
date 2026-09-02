@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0245 expect=noViolation domain=ADTTE
+#note "Isolates the `not var_exists(\"STARTDT\")` conjunct: a well-formed time-to-event dataset carrying CNSR, STARTDT and ADT. The second conjunct is false, so the rule executes and stays silent."
+#library standard=adamig version=1-3
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+col ADT     type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 120 | 21915 | 22035 | 0
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 300 | 21915 | 22215 | 1

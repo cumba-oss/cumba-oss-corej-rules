@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD1277 expect=skipped domain=AE
+#note "FRESH, DISCRIMINATING - the batch's guard-silenced-vs-skip pin, EVENTS side (finding SD1276-F1 context). AE has no Requirements.Variables gate, so a dataset without AETERM still EXECUTES; the machine-emitted var_exists(\"--TERM\") guard is false on every row -> noViolation, not skipped. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1

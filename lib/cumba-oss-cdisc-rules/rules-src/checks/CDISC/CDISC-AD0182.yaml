@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-AD0182"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is not present, BTOXGR is populated, and\
+  \ BTOXGR does not equal ATOXGR where ABLFL equals Y for a given value of PARAMCD\
+  \ for a subject"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BTOXGR"
+    - "ATOXGR"
+    - "ABLFL"
+Operations:
+- id: "$baseline_atoxgr"
+  expression: "max(ATOXGR, group=[USUBJID, PARAMCD], filter=filter(ABLFL=\"Y\"))"
+Check:
+  expression: >-
+    not var_exists("BASETYPE") and not empty(BTOXGR) and BTOXGR != $baseline_atoxgr
+Outcome:
+  Message: "BTOXGR does not equal the ATOXGR value recorded where ABLFL equals Y,\
+    \ for this subject and PARAMCD"
+  Output_Variables:
+  - "PARAMCD"
+  - "BTOXGR"
+  - "$baseline_atoxgr"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BTOXGR"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is not present, BTOXGR is populated,\
+    \ and BTOXGR is not equal to ATOXGR where ABLFL is equal to Y for a given value\
+    \ of PARAMCD for a subject"
+  Rule_Failure_Criteria: "BTOXGR is not equal to ATOXGR where ABLFL is equal to Y\
+    \ for a given value of PARAMCD for a subject"
+  Condition_Failure: "BASETYPE is not present and BTOXGR is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR182"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR182"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR182"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR182"
+        Version: "1"
+      Version: "5.0"

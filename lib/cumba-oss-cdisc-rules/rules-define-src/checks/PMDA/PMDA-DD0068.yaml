@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0068"
+Sheet_Rule_Identifier: "DD0068"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Length attribute must be empty when DataType is not integer, float, or text."
+Message: "Invalid use of Length"
+# Same shape as CDISC twin 0143. The guard also passes for an ItemDef with no
+# DataType at all (a missing DataType is "not" integer/float/text; its absence
+# is another rule's finding). Note not_exists' presence symmetry: a
+# present-but-blank Length counts as empty.
+Check:
+  kind: "not_exists"
+  target: "@Length"
+  when:
+    not:
+      path: "@DataType"
+      oneOf: ["integer", "float", "text"]

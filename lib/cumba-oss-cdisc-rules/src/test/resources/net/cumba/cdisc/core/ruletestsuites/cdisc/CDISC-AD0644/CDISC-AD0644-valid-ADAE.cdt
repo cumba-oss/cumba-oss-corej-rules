@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0644 expect=noViolation domain=ADAE
+# Rule:Description: Raise an error when a matched SDTM AE record (joined on USUBJID+AESEQ) has AESEV present, but AESEV is not a column of the ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col AESEV type=Char
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | MILD | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ type=Num
+col AESEV type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | MILD
+---

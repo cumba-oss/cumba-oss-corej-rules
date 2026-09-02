@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0283"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a record where TSPARMCD equals 'DCUTDTC' (Data\
+  \ Cutoff Date), TSVAL is neither a valid ISO 8601 date/time nor an SDTM masked date,\
+  \ in which an unknown component is written as a hyphen placeholder."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    TSPARMCD == "DCUTDTC" and invalid_date(TSVAL)
+Outcome:
+  Message: "Invalid TSVAL value for DCUTDTC: TSVAL must be a valid ISO 8601 date/time\
+    \ or an SDTM masked date when TSPARMCD equals 'DCUTDTC' (Data Cutoff Date)."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = DCUTDTC"
+  Rule: "TSVAL conforms to ISO 8601 date"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0283"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0283"
+        Version: "1"
+      Version: "2.0"

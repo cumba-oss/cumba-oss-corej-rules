@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0460 expect=noViolation domain=AE
+# Rule:Description: Raise an error when the High Level Term (--HLT) is not on the MedDRA primary system organ class hierarchy path.
+#note "EC-36 pin, negative twin: every AESOC is genuinely on its AEHLT hierarchy path, so the rule must stay quiet. Guards the resolved dictionary_parent against over-firing — before EC-36 this passed only because the operation always returned null. Child and parent carry the MedDRA preferred case: the flag-less rule compares verbatim against the as-authored hierarchy (D-TA-3 default, Fix #266), and since the C1 data repair that hierarchy is authored in the levels' preferred form."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLT type=Char label="High Level Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Headaches NEC | Nervous system disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Nausea and vomiting symptoms | Gastrointestinal disorders
+---

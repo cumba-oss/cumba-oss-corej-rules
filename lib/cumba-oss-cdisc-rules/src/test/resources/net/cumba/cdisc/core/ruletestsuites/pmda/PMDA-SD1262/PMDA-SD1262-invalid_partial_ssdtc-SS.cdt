@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1262 expect=violation domain=SS
+#note "DISCRIMINATING: IsoDateComparison '<' is FOR-ALL over hulls. Row 1's month-precision SSDTC=2020-05 has upper hull 2020-05-31T23:59:59, which wholly precedes the max 2020-06-01 -> fires. Row 2's SSDTC=2020-06 has a hull that straddles the max -> silent. If either row flips, escalate — the FOR-ALL hull read of '<' is refuted."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 SSDTC=2020-05
+dataset SS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Subject Status Result in Std Format"
+col SSDTC    type=Char label="Date/Time of Status Assessment"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD | 2020-05
+S1 | SS | 001 | 2 | SURVSTAT | DEAD | 2020-06
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | RANDOMIZED | 2020-05-10
+S1 | DS | 001 | 2 | DEATH      | DEATH      | 2020-06-01
+---

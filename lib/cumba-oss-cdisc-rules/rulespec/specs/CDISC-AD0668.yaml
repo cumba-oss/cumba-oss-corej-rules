@@ -1,0 +1,33 @@
+name: CDISC-AD0668
+kind: rule
+description: |
+  Wave A8 port — T1a PlainSimple.
+  CDISC-AD0668: ACYCLE is populated and ACYCLEC is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0668)
+rule:
+  coreId: CDISC-AD0668
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      ACYCLE: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ACYCLE: 1, ACYCLEC: 'Cycle 1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, ACYCLE: 1, ACYCLEC: ''}         # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0668
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ACYCLE: '1'
+      ACYCLEC: null
+expected_errors: []

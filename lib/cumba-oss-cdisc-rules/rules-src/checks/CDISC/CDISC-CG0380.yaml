@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0380"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Preferred Term Code (--PTCD) value is not a valid\
+  \ Preferred Term code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--PTCD"
+Operations:
+- id: "$ptcd_valid"
+  expression: "valid_external_dictionary_code(--PTCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"PTCD\")"
+Check:
+  expression: >-
+    $ptcd_valid == false
+Outcome:
+  Message: "Preferred Term Code (--PTCD) is not a valid MedDRA Preferred Term code."
+  Output_Variables:
+  - "--PTCD"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--PTCD"
+  Rule: "--PTCD = MedDRA preferred term code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0380"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0380"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0380"
+        Version: "1"
+      Version: "2.0"

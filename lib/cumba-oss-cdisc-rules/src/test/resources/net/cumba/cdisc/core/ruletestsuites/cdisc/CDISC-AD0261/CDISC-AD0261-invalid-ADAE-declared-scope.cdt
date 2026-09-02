@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0261 expect=violation domain=ADAE
+# Rule:Description: Raise an error when AEDECOD is not present in an ADVERSE EVENT sub-class OCCDS dataset (e.g., ADAE).
+# Declared-tier pin: no column carries an OCCDS or ADVERSE EVENT signal, so both scope axes come
+# from the structure= / subclass= declaration alone — the Define-XML def:Class / def:SubClass path.
+# The declaration must reach RuleRunner as well as the scenario pre-gate; without it the rule is
+# SKIPPED mid-execution and this scenario fails.
+# The #define block is the mandatory carrier for the declaration: RuleRunner reads the declared
+# tier from `defineProvider != null ? defineProvider : libraryProvider`, so the harness refuses a
+# structure=/subclass= scenario with neither block rather than materialise an empty provider and
+# silently disable that level's availability self-skips.
+#define standard=adamig version=1-3
+#expectViolationCount 1
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---

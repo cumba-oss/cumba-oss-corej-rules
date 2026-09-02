@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-AD0180"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SRCDOM is populated and its value is not an SDTM\
+  \ domain name"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "SRCDOM"
+Operations:
+- id: "$sdtm_domains"
+  expression: "standard_domains()"
+Check:
+  expression: >-
+    not empty(SRCDOM) and SRCDOM not in $sdtm_domains
+Outcome:
+  Message: "SRCDOM is populated, but its value is not an SDTM domain name"
+  Output_Variables:
+  - "SRCDOM"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "SRCDOM"
+  Natural_Language_Rule_Failure_Criteria: "SRCDOM has a value that is not an SDTM\
+    \ domain name or null"
+  Rule_Failure_Criteria: "SRCDOM has a value that is not an SDTM domain name or null"
+  Condition_Failure: "SRCDOM is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR180"
+        Version: "1"
+      Version: "5.0"

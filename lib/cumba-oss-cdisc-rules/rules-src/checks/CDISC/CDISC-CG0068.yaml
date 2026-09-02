@@ -1,0 +1,74 @@
+Core:
+  Id: "CDISC-CG0068"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has multiple Disposition (DS) records\
+  \ with Standardized Disposition Term (DSDECOD) equal to 'INFORMED CONSENT OBTAINED'\
+  \ and the earliest Start Date/Time of Event (DSSTDTC) for the subject is not equal\
+  \ to the subject's Date/Time of Informed Consent (RFICDTC) in the Demographics (DM)\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSDECOD"
+    - "DSSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$min_ds_dsstdtc"
+  expression: "min_date(DSSTDTC, domain=\"DS\", group=[USUBJID], filter=filter(DSDECOD=\"\
+    INFORMED CONSENT OBTAINED\"))"
+Check:
+  expression: >-
+    not empty(DSSTDTC) and DSDECOD == "INFORMED CONSENT OBTAINED" and
+    present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == DSSTDTC and
+    $min_ds_dsstdtc != DM.RFICDTC
+Outcome:
+  Message: "DSDECOD equals 'INFORMED CONSENT OBTAINED' on multiple records but the\
+    \ earliest DSSTDTC for the subject is not equal to RFICDTC in the DM dataset."
+  Output_Variables:
+  - "DSDECOD"
+  - "DSSTDTC"
+  - "$min_ds_dsstdtc"
+  - "DM.RFICDTC"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSSTDTC"
+  Condition: "Multiple informed consents obtained and DSDECOD = 'INFORMED CONSENT\
+    \ OBTAINED'"
+  Rule: "For each subject, earliest DSSTDTC = DM.RFICDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"

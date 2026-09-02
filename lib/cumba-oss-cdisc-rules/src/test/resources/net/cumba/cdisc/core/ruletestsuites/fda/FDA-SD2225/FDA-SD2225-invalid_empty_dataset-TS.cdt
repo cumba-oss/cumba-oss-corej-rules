@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2225 expect=violation domain=TS
+#note "TS is present but carries zero records, so the ADAPT parameter is certainly missing -> one dataset-level finding (boundary: the dataset-level record_count still resolves to 0 on an empty table)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---

@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0027-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IESCAT is populated and its value is equal to IECAT\
+  \ in the Trial Inclusion/Exclusion Criteria (TI) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TI"
+Requirements:
+  Variables:
+    All:
+    - "IESCAT"
+    - "IECAT"
+Check:
+  expression: >-
+    not empty(IESCAT) and IESCAT == IECAT
+Outcome:
+  Message: "IESCAT is populated but has the same value as IECAT."
+  Output_Variables:
+  - "IECAT"
+  - "IESCAT"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "TI"
+  Variable: "IESCAT"
+  Condition: "--SCAT ^= null"
+  Rule: "IESCAT is populated and its value is equal to IECAT in the Trial Inclusion/Exclusion\
+    \ Criteria (TI) dataset"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Condition: "--SCAT ^= null"
+  Rule: "--SCAT ^= --CAT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0027"
+        Version: "1"
+      Version: "2.0"

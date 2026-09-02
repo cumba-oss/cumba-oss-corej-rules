@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0400"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a LOINC Code (--LOINC) value is not a valid code\
+  \ in the LOINC dictionary."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--LOINC"
+Operations:
+- id: "$loinc_code_valid"
+  expression: "valid_external_dictionary_code(--LOINC, external_dictionary_type=\"\
+    loinc\", dictionary_term_type=\"LOINC\")"
+Check:
+  expression: >-
+    $loinc_code_valid == false
+Outcome:
+  Message: "LOINC Code (--LOINC) is not a valid LOINC code."
+  Output_Variables:
+  - "--LOINC"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--LOINC"
+  Rule: "--LOINC = valid code in the version of the LOINC dictionary specified in\
+    \ define.xml"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"

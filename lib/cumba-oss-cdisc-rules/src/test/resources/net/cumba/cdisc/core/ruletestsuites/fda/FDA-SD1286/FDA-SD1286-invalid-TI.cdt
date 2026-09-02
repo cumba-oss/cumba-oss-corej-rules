@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1286 expect=violation domain=TI
+#note "IETESTCD INCL01 appears twice within TIVERS 1.0 -> both duplicate records fire; the version-2.0 INCL01 record does not."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 IETESTCD=INCL01 TIVERS=1.0
+#expectViolationAt row=2 IETESTCD=INCL01 TIVERS=1.0
+dataset TI class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Incl/Excl Criterion"
+col TIVERS   type=Char label="Protocol Criteria Versions"
+---
+S1 | TI | INCL01 | Age >= 18 | 1.0
+S1 | TI | INCL01 | Age >= 21 | 1.0
+S1 | TI | INCL01 | Age >= 21 | 2.0

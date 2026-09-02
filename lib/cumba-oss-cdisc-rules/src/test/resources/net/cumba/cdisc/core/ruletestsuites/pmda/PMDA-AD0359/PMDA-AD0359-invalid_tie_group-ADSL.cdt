@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0359 expect=violation domain=ADSL
+#note "Batch's single is_inconsistent TIE pin: group DTHCAUSN=1 holds two distinct non-blank targets with one occurrence each - no strict majority - so on a tie EVERY non-blank row of the group fires. Count 2, not 1."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 DTHCAUS=MYOCARDIALINFARCTION DTHCAUSN=1
+#expectViolationAt row=2 DTHCAUS=SEPSIS DTHCAUSN=1
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col DTHCAUS  type=Char
+col DTHCAUSN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | MYOCARDIALINFARCTION | 1
+CDISCPILOT01 | 01-701-1023 | SEPSIS                | 1

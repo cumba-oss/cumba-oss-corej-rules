@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1272 expect=violation domain=FA
+#note "FRESH, DISCRIMINATING - pins ScopeMatcher's FINDINGS-ABOUT subsumption (a class=\"FINDINGS ABOUT\" dataset satisfies Classes.Include [FINDINGS]) plus the FA-prefix wildcard resolution --TESTCD -> FATESTCD. Row 2 uses the placeholder 'OTHER' -> fires. If this comes back SKIPPED, escalate - it would refute the subsumption read."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 FATESTCD=OTHER
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ   type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAOBJ   type=Char label="Object of the Observation"
+---
+S1 | FA | 001 | 1 | OCCUR | VOMITING
+S1 | FA | 001 | 2 | OTHER | VOMITING

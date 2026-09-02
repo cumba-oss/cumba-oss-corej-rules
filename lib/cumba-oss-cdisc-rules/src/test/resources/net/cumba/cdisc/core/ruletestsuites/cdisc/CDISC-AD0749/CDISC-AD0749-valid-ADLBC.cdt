@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0749 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of BASECATy for a given value of BASE and y, where y is a single-digit integer [1-9]
+#note "within PARAMCD=GLUC, each BASE maps to a single BASECAT1 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE type=Num
+col BASECAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 10 | HIGH
+CDISCPILOT01 | 01-701-1023 | GLUC | 5 | NORMAL
+---

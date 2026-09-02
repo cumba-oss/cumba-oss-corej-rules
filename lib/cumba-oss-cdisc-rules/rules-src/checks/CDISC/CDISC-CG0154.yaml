@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0154"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Element Code (ETCD) and Description of Element (ELEMENT)\
+  \ do not have a one-to-one relationship within the domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+    - "TA"
+    - "TE"
+Requirements:
+  Variables:
+    All:
+    - "ELEMENT"
+    - "ETCD"
+Check:
+  expression: >-
+    not is_unique_relationship(ETCD, ELEMENT) or not is_unique_relationship(ELEMENT, ETCD)
+Outcome:
+  Message: "ETCD and ELEMENT do not have a one-to-one relationship within the domain."
+  Output_Variables:
+  - "ETCD"
+  - "ELEMENT"
+Source:
+  Class: "SPC, TDM"
+  Domain: "SE, TA, TE"
+  Variable: "ETCD"
+  Condition: "ELEMENT present in dataset and ETCD present in dataset"
+  Rule: "ELEMENT and ETCD have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0154"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0154"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0154"
+        Version: "1"
+      Version: "2.0"

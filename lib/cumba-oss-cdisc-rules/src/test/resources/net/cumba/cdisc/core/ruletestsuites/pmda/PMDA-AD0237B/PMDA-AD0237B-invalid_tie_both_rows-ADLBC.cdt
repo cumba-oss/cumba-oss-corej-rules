@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0237B expect=violation domain=ADLBC
+#note "POOLA vs POOLAA tie inside TRTPG1N=1 -> no majority -> both rows are flagged."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 TRTPG1=POOLA TRTPG1N=1
+#expectViolationAt row=2 TRTPG1=POOLAA TRTPG1N=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTPG1 type=Char
+col TRTPG1N type=Num
+---
+S1 | 001 | SYSBP | POOLA | 1
+S1 | 002 | SYSBP | POOLAA | 1
+S1 | 003 | SYSBP | POOLB | 2

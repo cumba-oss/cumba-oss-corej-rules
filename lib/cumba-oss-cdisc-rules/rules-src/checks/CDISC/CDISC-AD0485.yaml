@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-AD0485"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when PBCHGCyN is populated and PBCHGCAy is empty on the\
+  \ same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PBCHGCyN) and empty(PBCHGCAy)
+Outcome:
+  Message: "PBCHGCyN is populated but PBCHGCAy is empty."
+  Output_Variables:
+  - "PBCHGCAy"
+  - "PBCHGCyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "PBCHGCAy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, PBCHGCyN is populated\
+    \ and PBCHGCAy is not populated"
+  Rule_Failure_Criteria: "PBCHGCAy is not populated"
+  Condition_Failure: "PBCHGCyN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR485"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR485"
+        Version: "2"
+      Version: "5.0"

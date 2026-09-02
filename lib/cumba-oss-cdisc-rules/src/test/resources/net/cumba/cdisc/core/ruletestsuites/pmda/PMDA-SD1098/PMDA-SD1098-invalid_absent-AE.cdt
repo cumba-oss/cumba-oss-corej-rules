@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1098 expect=violation domain=AE
+#note "AECAT column absent while AESCAT is populated -> the bare empty() leaf on the absent column is TRUE on every row (absent = all-missing, EC-43) and the rule fires (Plan B phase 4d' deleted the redundant not var_exists disjunct this note used to name)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESCAT=MIGRAINE
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESCAT  type=Char label="Subcategory for Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | MIGRAINE

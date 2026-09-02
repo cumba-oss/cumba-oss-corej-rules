@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0664 expect=noViolation domain=ADNCA
+# Rule:Description: Raise an error when, on a record in an ADNCA v1.0 dataset, COHORT is populated and COHORTN is present but not populated.
+#note "COHORT populated and COHORTN populated -> noViolation (companion is present and not empty)"
+dataset ADNCA class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col COHORT type=Char
+col COHORTN type=Num
+col PARAMCD type=Char
+col NFRLT type=Num
+col AFRLT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Cohort 1 | 1 | CONC | 0 | 0.5
+---

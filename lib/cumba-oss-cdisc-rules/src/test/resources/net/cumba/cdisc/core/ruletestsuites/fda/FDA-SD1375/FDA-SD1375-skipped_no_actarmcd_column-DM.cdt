@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1375 expect=skipped domain=DM
+#note "PLAN-retire-corpus-transforms phase 4 + T2 review H1 disclosure: ACTARMCD is hoisted to Requirements.Variables.All, so a DM dataset without the column takes the auditable SKIP where the unguarded empty(ACTARMCD) arm used to fire per row (Fix #330 remedy: ACTARMCD is Req/Exp in the governing IGs and the presence rules report the absence once). Mirrors the PMDA twin absent-column scenario."
+#library standard=sdtmig version=3-2
+dataset DM label="Demographics"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFSTDTC  type=Char
+col RFENDTC  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-05 | 2020-02-10
+---

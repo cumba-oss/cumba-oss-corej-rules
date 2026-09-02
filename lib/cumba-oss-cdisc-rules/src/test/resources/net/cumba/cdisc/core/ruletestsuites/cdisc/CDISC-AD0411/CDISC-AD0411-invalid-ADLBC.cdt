@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0411 expect=violation domain=ADLBC
+# Rule:Description: On a given record, ANLzzFN is populated and ANLzzFL is not populated
+#note "ANL01FN populated, ANL01FL empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ANL01FN type=Char
+col ANL01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | VAL | 
+---

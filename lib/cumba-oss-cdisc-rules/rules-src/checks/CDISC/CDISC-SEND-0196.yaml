@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0196"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Category for Parameter (PPCAT) is populated\
+  \ but its value is not an analyte name present in PCTEST in the Pharmacokinetics\
+  \ Concentrations (PC) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Operations:
+- id: "$pc_analytes"
+  expression: "distinct(PCTEST, domain=\"PC\")"
+Check:
+  expression: >-
+    not empty(PPCAT) and PPCAT not in $pc_analytes
+Outcome:
+  Message: "The Category for Parameter (PPCAT) value is not an analyte name present\
+    \ in PCTEST in the Pharmacokinetics Concentrations (PC) dataset."
+  Output_Variables:
+  - "PPCAT"
+  - "$pc_analytes"
+Source:
+  Class: "FND"
+  Domain: "PP"
+  Variable: "PPCAT"
+  Plain_Text_Explanation: "PPCAT is the name of the analyte in PCTEST whose profile\
+    \ the parameter is associated with."
+  Rule: "PPCAT is the name of the analyte in PCTEST whose profile the parameter is\
+    \ associated with."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND196"
+        Version: "1"
+      Version: "5.0"

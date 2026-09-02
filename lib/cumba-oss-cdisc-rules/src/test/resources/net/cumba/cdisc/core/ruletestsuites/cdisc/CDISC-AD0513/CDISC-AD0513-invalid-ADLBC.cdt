@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-AD0513 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in SDTF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Start" and "Date"
+#note "ASDTF has no Imputation-Flag suffix; BSDTF lacks "Start"; CSDTF lacks "Date"; DSDTF carries the phrase but not at the END; ESDTF differs only in CASE. TR1SDTF, TRTSDTF, TR01SDTF and TR99SDTF all carry the SAME label, so only the ^TR(T|[0-9]{2})SDTF$ exclusion separates them: the near-miss TR1SDTF (one digit) still fires, the three excluded names do not."
+#expectViolationCount 6
+#expectViolationAt variable_label="Start Date Flag" variable_name=ASDTF
+#expectViolationAt variable_label="Analysis Date Imput. Flag" variable_name=BSDTF
+#expectViolationAt variable_label="Analysis Start Imput. Flag" variable_name=CSDTF
+#expectViolationAt variable_label="Start Date Imputation Flag Extra" variable_name=DSDTF
+#expectViolationAt variable_label="Analysis Start Date imputation Flag" variable_name=ESDTF
+#expectViolationAt variable_label="Date of First Exposure Imput. Flag" variable_name=TR1SDTF
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDTF type=Char label="Start Date Flag"
+col BSDTF type=Char label="Analysis Date Imput. Flag"
+col CSDTF type=Char label="Analysis Start Imput. Flag"
+col DSDTF type=Char label="Start Date Imputation Flag Extra"
+col ESDTF type=Char label="Analysis Start Date imputation Flag"
+col TR1SDTF type=Char label="Date of First Exposure Imput. Flag"
+col TRTSDTF type=Char label="Date of First Exposure Imput. Flag"
+col TR01SDTF type=Char label="Date of First Exposure Imput. Flag"
+col TR99SDTF type=Char label="Date of First Exposure Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x | x | x | x | x | x
+---

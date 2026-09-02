@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0018 expect=noViolation domain=ADSL
+#note "FRESH - the Source's own carve-out: this rule runs only if a variable has a label defined in the ADaM metadata. AGE matches the Library; SPONFL is a sponsor-created variable with no library entry, so var_name(\"LIBRARY\") is null and it is never judged, even though its label matches nothing -> 0 violations."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL AGE name=AGE label="Age" simpleDatatype=Num
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col SPONFL  type=Char label="Sponsor Derived Flag"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | Y

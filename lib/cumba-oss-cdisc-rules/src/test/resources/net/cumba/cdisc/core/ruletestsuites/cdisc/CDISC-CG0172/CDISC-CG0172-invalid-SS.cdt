@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0172 expect=violation domain=SS
+#note "SSSTRESC=DEAD and SSDTC is earlier than the subject's latest DS.DSSTDTC"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset SS label="Subject Status"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC type=Char label="Date/Time of Collection"
+---
+CDISCPILOT01 | SS | 01-701-1015 | DEAD | 2013-01-01
+---
+
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | 2014-01-14
+CDISCPILOT01 | DS | 01-701-1015 | 2 | 2014-07-02
+---

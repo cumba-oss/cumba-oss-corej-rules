@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0277 expect=noViolation domain=BW
+#note "The negative half of the 'uri=' contract, and the probe that proves the attribute is load-bearing: identical to the invalid twin except that no uri= is declared, so getTableURI() is null, $dataset_location is null, the regex folds a missing value to the empty string and nothing fires. Matches the withUri(null) arm of Cx1FileMetadataRulesProbeTest.send277_firesOnUppercaseFileName. The verdict is noViolation, not skipped: extract_metadata needs no provider, so the rule executes either way."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Findings as Collected"
+---
+S1 | BW | 001 | 1 | BW | 250
+S1 | BW | 002 | 1 | BW | 260

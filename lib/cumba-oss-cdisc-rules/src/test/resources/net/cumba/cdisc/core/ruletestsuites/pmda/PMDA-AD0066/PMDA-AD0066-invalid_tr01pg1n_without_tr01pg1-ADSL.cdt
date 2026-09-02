@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0066 expect=violation domain=ADSL
+#note "The tuple (xx=01, y=1) is captured from TR01PG1N; TR01PG1 is synthesised absent -> one expansion, one violation at reported row 1. TR01PG1N does NOT match the TRxxPGy pattern (that one is ^TR(\\d{2})PG(\\d+)$, which cannot absorb the trailing N)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 TR01PG1N=1
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TR01PG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1

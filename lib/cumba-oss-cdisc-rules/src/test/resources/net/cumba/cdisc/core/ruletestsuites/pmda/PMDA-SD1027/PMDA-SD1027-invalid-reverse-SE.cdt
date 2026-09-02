@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1027 expect=violation domain=SE
+#note "Reverse direction: ELEMENT 'Screen' shared by two ETCD values (SCRN1/SCRN2), each ETCD itself maps to one ELEMENT. PMDA sheet row 124 likewise states only the ETCD->ELEMENT direction; the reverse arm is authored deliberately and is byte-identical to twin fda/FDA-SD1027/FDA-SD1027-invalid-reverse-SE.cdt, which is the origin of this fixture -- is_not_unique_relationship is bidirectional by construction and fires on both 'Screen' rows."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ELEMENT=Screen
+#expectViolationAt row=3 ELEMENT=Screen
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN1 | Screen    | 2020-01-01
+S1 | SE | 001 | 2 | TRT   | Treatment | 2020-01-15
+S1 | SE | 002 | 1 | SCRN2 | Screen    | 2020-02-01
+S1 | SE | 002 | 2 | TRT   | Treatment | 2020-02-15

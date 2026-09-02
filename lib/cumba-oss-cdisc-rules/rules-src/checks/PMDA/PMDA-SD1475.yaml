@@ -1,0 +1,36 @@
+Core:
+  Id: "PMDA-SD1475"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable label exceeds 40 characters, breaching\
+  \ the SAS XPORT v5 transport-format limit."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    len(variable_label) > 40
+Outcome:
+  Message: "Variable label length is greater than 40 characters."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Message: "Variable label length is greater than 40 characters"
+  Description: "Variable Label should follow limitations of SAS XPORT format v5. It\
+    \ should not exceed 40 characters."
+  Domains: "ALL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1475"
+        Version: "1"
+      Version: "6.0"

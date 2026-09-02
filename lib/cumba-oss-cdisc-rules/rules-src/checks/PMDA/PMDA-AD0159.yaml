@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-AD0159"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Analysis Window Diff from Target (AWTDIFF) is populated\
+  \ but the values required to derive it are not both present and populated: the Analysis\
+  \ Window Target (AWTARGET) must be populated, and at least one of Analysis Relative\
+  \ Day (ADY) or Analysis Relative Time (ARELTM) must be present and populated. AWTDIFF\
+  \ is the absolute value of (ADY or ARELTM) minus AWTARGET."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(AWTDIFF) and (empty(AWTARGET) or empty(ADY) and empty(ARELTM))
+Outcome:
+  Message: "AWTDIFF is populated, but AWTARGET and/or one of [ADY, ARELTM] are not\
+    \ both present and populated."
+  Output_Variables:
+  - "ADY"
+  - "ARELTM"
+  - "AWTARGET"
+  - "AWTDIFF"
+Source:
+  Message: "Calculation issue: AWTDIFF is populated, but AWTARGET and/or one of [ADY,\
+    \ ARELTM] are not both present and populated"
+  Description: "If AWTDIFF (Analysis Window Diff from Target) is populated AWTARGET\
+    \ (Analysis Window Target) must be populated. AWTDIFF = Absolute value of (ADY\
+    \ or ARELTM) - AWTARGET. Note: A future rule should validate that the calculation\
+    \ is correct. Rule enhanced by Pinnacle 21 to include ADY and ARELTM. If only\
+    \ AWTDIFF is present and populated, this rule will fire even if some or all other\
+    \ variables are not present. This may fire simultaneously with AD0158."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0159"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0159"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0159"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0159"
+        Version: "1"
+      Version: "6.0"

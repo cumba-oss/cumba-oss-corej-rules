@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1393 expect=violation domain=MB
+#note "Row 1: MBDTC and DM.RFXSTDTC are both complete dates but MBXDY is missing -> fires. Row 2: MBXDY populated -> clean."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test or Finding Short Name"
+col MBDTC    type=Char label="Date/Time of Collection"
+col MBXDY    type=Num  label="Day of Obs Relative to Exposure"
+---
+S1 | MB | 001 | 1 | AEROBIC | 2020-01-10 | .
+S1 | MB | 001 | 2 | AEROBIC | 2020-01-10 | 6
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+---
+S1 | DM | 001 | 2020-01-05
+---

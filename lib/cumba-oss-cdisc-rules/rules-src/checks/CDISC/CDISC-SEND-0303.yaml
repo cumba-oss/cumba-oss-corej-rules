@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-SEND-0303"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Unscheduled Flag (--USCHFL) is populated with\
+  \ a value other than \"Y\"; --USCHFL must be either \"Y\" or empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--USCHFL"
+Check:
+  expression: >-
+    not empty(--USCHFL) and --USCHFL != "Y"
+Outcome:
+  Message: "--USCHFL is populated with a value other than Y; the only valid populated\
+    \ value is Y."
+  Output_Variables:
+  - "--USCHFL"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--USCHFL"
+  Plain_Text_Explanation: "--USCHFL value must either be \"Y\" or null"
+  Condition: "--USCHFL ^= null"
+  Rule: "--USCHFL = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND303"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND303"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND303"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND303"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND303"
+        Version: "1"
+      Version: "5.0"

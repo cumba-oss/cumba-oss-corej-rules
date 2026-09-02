@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2228 expect=violation domain=MI
+#note "MIRESCAT is not in the dataset at all while MISTRESC carries an abnormal finding -- the guarded variable's column is ABSENT ENTIRELY. Under EC-43 an absent column is all-missing, so empty(<var>) is TRUE on every row and the rule reports its defect on the rows its other conjuncts select. The variable was removed from Requirements.Variables.All on 2026-08-27 (owner ruling) because it is Permissible in this domain and NO rule anywhere reports its absence -- neither a specific presence rule nor the generic Required/Expected rules, which do not cover Permissible variables. Before that removal this scenario would have taken a silent dataset SKIP."
+#expectViolationCount 1
+#library standard=sendig version=3-1-1
+dataset MI class=FINDINGS label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Num  label="Sequence Number"
+col MITESTCD type=Char label="Test Short Name"
+col MISTRESC type=Char label="Standardized Result"
+---
+S1 | MI | 001 | 1 | MIEXAM | INFILTRATE

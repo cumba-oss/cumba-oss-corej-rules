@@ -1,0 +1,34 @@
+#!RuleTest
+#test PMDA-SD1336 expect=violation domain=TR
+#note "Row 2 references tumour T02, which TU never identifies. Row 3 references T01, which TU identifies only for subject 001 — the lookup is grouped by USUBJID, so subject 002 must still fire. Row 1 matches; row 4 leaves TRLNKID empty and must not fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=001 TRLNKID=T02
+#expectViolationAt row=3 USUBJID=002 TRLNKID=T01
+dataset TR label="Tumor Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRSEQ    type=Num  label="Sequence Number"
+col TRLNKID  type=Char label="Link ID"
+col TRTESTCD type=Char label="Tumor Assessment Short Name"
+col TRORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TR | 001 | 1 | T01 | LDIAM | 20
+CDISCPILOT01 | TR | 001 | 2 | T02 | LDIAM | 15
+CDISCPILOT01 | TR | 002 | 1 | T01 | LDIAM | 12
+CDISCPILOT01 | TR | 002 | 2 |  | SUMDIAM | 12
+---
+
+dataset TU label="Tumor Identification"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TUSEQ    type=Num  label="Sequence Number"
+col TULNKID  type=Char label="Link ID"
+col TUTESTCD type=Char label="Tumor Identification Short Name"
+col TUORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TU | 001 | 1 | T01 | TUMIDENT | TARGET
+CDISCPILOT01 | TU | 002 | 1 | T05 | TUMIDENT | TARGET
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0041 expect=violation domain=CM
+#note "Row 1 populates CMOCCUR although the record is not pre-specified (CMPRESP='N') -> fires. Row 2 is pre-specified; row 3 leaves CMOCCUR empty."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMPRESP=N CMOCCUR=Y
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMPRESP type=Char label="Pre-Specified"
+col CMOCCUR type=Char label="Occurrence"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | N | Y
+S1 | CM | 001 | 2 | IBUPROFEN | Y | N
+S1 | CM | 001 | 3 | PARACETAM |   |

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0084 expect=noViolation domain=DM
+#note "Boundary: AGE=1 is the smallest permitted value; a missing AGE is out of the condition -> no violation. Adapted verbatim from FDA-SD0084."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | 001 | 56 | YEARS | M
+S1 | DM | 002 | 002 | 1  | YEARS | F
+S1 | DM | 003 | 003 | .  | YEARS | M

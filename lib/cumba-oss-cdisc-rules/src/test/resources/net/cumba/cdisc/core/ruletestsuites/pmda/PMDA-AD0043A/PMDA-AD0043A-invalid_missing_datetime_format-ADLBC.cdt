@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0043A expect=violation domain=ADLBC
+#note "ADTM ends with DTM and declares no format -> ONE finding. NO row= pin; pin variable_name only (variable_format is blank on the fired variable)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ADTM
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM    type=Num
+---
+S1 | 001 | ALB | 1900000
+---

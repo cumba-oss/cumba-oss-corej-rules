@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SE2343"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --VAL is populated with a value that is not a valid\
+  \ ISO 8601 duration (time period, e.g. P80Y) for a record where --PARMCD equals\
+  \ 'INTSAC' (Interim Sacrifice Period). An empty --VAL is permitted. Applies to the\
+  \ TS and TX domains (TSVAL/TSPARMCD and TXVAL/TXPARMCD)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "--PARMCD"
+Check:
+  expression: >-
+    --PARMCD == "INTSAC" and not empty(--VAL) and invalid_duration(--VAL, negative=false)
+Outcome:
+  Message: "Invalid --VAL value for INTSAC: --VAL must be in ISO 8601 duration format\
+    \ (e.g., P80Y) or empty when --PARMCD equals 'INTSAC' (Interim Sacrifice Period)."
+  Output_Variables:
+  - "--PARMCD"
+  - "--VAL"
+Source:
+  FDA_Validator_Rule_Message: "Invalid --VAL value for INTSAC"
+  FDA_Validator_Rule_Description: "TSVAL/TXVAL value must be either ISO 8601 format\
+    \ for time period (e.g. P80Y) or null, when TSPARMCD/TXPARMCD='INTSAC'."
+  Domains: "TS, TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2343"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2343"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2343"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2343"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2343"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

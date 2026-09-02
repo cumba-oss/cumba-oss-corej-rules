@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0146 expect=noViolation domain=ADLBC
+#note "Load-bearing var_exists(\"PARAMN\") pin: PARAMN, the operator's KEY, is absent. Without the guard the absent key would be dropped, EC-44/Fix #134 would collapse the table into one group and row 3 would fire; var_exists(\"PARAMN\") is false, so the rule is executed and silent. It does NOT skip: this rule declares no Requirements.Variables block at all."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+S1 | 001 | ALB | Albumin
+S1 | 002 | ALB | Albumin
+S1 | 003 | ALB | Bilirubin

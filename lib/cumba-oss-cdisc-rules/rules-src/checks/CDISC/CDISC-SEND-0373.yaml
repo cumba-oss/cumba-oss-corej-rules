@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-SEND-0373"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Distribution/Pattern (FXDISTR) value contains\
+  \ a semicolon, indicating multiple terms; FXDISTR must contain only a single term."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FX"
+Requirements:
+  Variables:
+    All:
+    - "FXDISTR"
+Check:
+  expression: >-
+    not empty(FXDISTR) and contains(FXDISTR, ";")
+Outcome:
+  Message: "FXDISTR contains a semicolon, indicating multiple terms; only a single\
+    \ term is allowed."
+  Output_Variables:
+  - "FXDISTR"
+Source:
+  Class: "FND"
+  Domain: "FX"
+  Variable: "FXDISTR"
+  Plain_Text_Explanation: "The Distribution of Pattern variable in FX (FXDISTR) cannot\
+    \ be populated with multiple terms."
+  Condition: "FXDISTR ^= null"
+  Rule: "Only one term from the DSTRBN controlled list is present OR one extended\
+    \ term is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND373"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND373"
+        Version: "1"
+      Version: "5.0"

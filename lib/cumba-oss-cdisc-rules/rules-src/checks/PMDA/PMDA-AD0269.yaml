@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0269"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a treatment-flag variable (Treatment Emergent Analysis\
+  \ Flag TRTEMFL, Pre-treatment Flag PREFL, On Treatment Record Flag ONTRTFL, Follow-up\
+  \ Flag FUPFL, or Last Value On Treatment Record Flag LVOTFL) has a value other than\
+  \ Y or empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() =~ /^(TRTEMFL|PREFL|ONTRTFL|FUPFL|LVOTFL)$/ and not empty(value()) and value() not in
+    ["Y"]
+Outcome:
+  Message: "Flag variable has a populated value other than Y."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Variable flag value is not Y or null"
+  Description: "A Treatment Flag variable must have a value that is Y or null. Examples\
+    \ of such Flags variables in ADaM-IG 1.2 are Treatment Emergent Analysis Flag\
+    \ (TRTEMFL), Pre-treatment Flag (PREFL), On Treatment Record Flag (ONTRTFL), Follow-up\
+    \ Flag (FUPFL), and Last Value On Treatment Record Flag (LVOTFL)."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0269"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0269"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0269"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0269"
+        Version: "1"
+      Version: "6.0"

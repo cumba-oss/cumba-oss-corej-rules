@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0027 expect=noViolation domain=LB
+#note "Every record with populated original units (LBORRESU) also carries an original result (LBORRES). Row 3 has neither."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5 | mmol/L
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | 40  |
+CDISCPILOT01 | LB | 01-701-1023 | 1 | GLUC |     |

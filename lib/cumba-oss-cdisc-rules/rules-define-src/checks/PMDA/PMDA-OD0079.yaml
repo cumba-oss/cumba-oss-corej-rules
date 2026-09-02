@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-OD0079"
+Sheet_Rule_Identifier: "OD0079"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Term must be unique within a Codelist. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element."
+# One sheet row, two rules (P3's DD0076/DD0077 split precedent): this leg checks
+# EnumeratedItem terms, PMDA-OD0079-B the CodeListItem ones. The schema forbids
+# mixing the two kinds inside one CodeList, so per-leg sibling uniqueness IS
+# per-codelist uniqueness; a (schema-invalid) mixed CodeList's cross-kind
+# duplicate would escape both legs (documented deviation). The sheet's <codelist>
+# placeholder is carried by the finding's xpath (CodeList[@OID=...]).
+Message: "Duplicate Term [${value}] in Codelist"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "CodedValue"

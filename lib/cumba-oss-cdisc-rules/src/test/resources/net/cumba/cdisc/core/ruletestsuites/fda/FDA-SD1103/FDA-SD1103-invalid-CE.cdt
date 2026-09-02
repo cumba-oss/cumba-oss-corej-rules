@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1103 expect=violation domain=CE
+#note "CESTRTPT is present but the reference time point it is relative to, CESTTPT, is absent -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ    type=Num  label="Sequence Number"
+col CESTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+S1 | CE | 001 | 1 | BEFORE

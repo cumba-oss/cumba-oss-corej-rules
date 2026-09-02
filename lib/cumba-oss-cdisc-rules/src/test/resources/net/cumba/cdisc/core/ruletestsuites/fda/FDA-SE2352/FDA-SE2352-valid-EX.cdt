@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2352 expect=noViolation domain=EX
+#note "Row 1 was actually administered (dose 10) and therefore may name its lot number; row 2 was not administered (dose 0) and correctly leaves the lot number empty."
+#library standard=sendig version=3-1-1
+dataset EX label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+col EXDOSE  type=Num  label="Dose per Administration"
+col EXDOSU  type=Char label="Dose Units"
+col EXLOT   type=Char label="Lot Number"
+---
+S1 | 001 | 1 | COMPOUND A | 10 | mg/kg | LOT123
+S1 | 001 | 2 | VEHICLE    | 0  | mg/kg |

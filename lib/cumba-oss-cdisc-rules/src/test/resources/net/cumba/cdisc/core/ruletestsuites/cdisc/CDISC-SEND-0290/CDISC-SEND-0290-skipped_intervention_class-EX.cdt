@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0290 expect=skipped domain=EX
+#note "Scope.Classes.Include is [FINDINGS] and the declared class is INTERVENTIONS, so the harness pre-gate reports 'class INTERVENTIONS not in Scope.Classes.Include [FINDINGS]' and the rule never runs -- even though the three rows carry a REAL one-to-many defect. The class= declaration is LOAD-BEARING: without it the SDTM arm of the class gate returns null, the rule RUNS and this data FIRES. expect=skipped is the honest contract; the harness refuses expect=noViolation here."
+#library standard=sendig version=3-1-1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col EXSEQ    type=Num  label="Sequence Number"
+col EXTRT    type=Char label="Name of Treatment"
+col EXDOSE   type=Num  label="Dose"
+col EXTPT    type=Char label="Planned Time Point Name"
+col EXTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | EX | 001 | 1 | DRUG X | 10 | 1 HOUR | 1
+S1 | EX | 002 | 1 | DRUG X | 10 | 1 HOUR | 2
+S1 | EX | 003 | 1 | DRUG X | 10 | 2 HOUR | 3
+---

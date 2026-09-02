@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-AD0769"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of AESEV for a given\
+  \ value of AESEVN, considering only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AESEV) and not empty(AESEVN) and has_multiple_values_for(AESEV, AESEVN)
+Outcome:
+  Message: "AESEV takes more than one value for the same value of AESEVN, considering\
+    \ only rows on which both variables are populated."
+  Output_Variables:
+  - "AESEV"
+  - "AESEVN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AESEV"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of AESEV for\
+    \ a given value of AESEVN, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of AESEV for a given value\
+    \ of AESEVN"
+  Condition_Failure: "On rows where both AESEV and AESEVN are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR769"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR769"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR769"
+        Version: "1"
+      Version: "5.0"

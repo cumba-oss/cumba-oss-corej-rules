@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2219 expect=noViolation domain=TS
+#note "STYPE/INTERVENTIONAL present and a TRT record present -> $trt_count=1 -> silent. (The space-bearing value 'DRUG A' appears only in a data cell, never in a pin.)"
+#library standard=sdtmig version=3-4
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | STYPE | Study Type                         | INTERVENTIONAL
+S1 | TS | 2 | TRT   | Investigational Therapy or Treatment | DRUG A

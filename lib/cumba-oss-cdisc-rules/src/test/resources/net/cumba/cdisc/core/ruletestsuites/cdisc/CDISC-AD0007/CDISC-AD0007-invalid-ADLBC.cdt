@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0007 expect=violation domain=ADLBC
+# Rule:Description: A variable with a suffix of FN is present but a variable with the same root and a suffix of FL is not present
+#note "SAFFN present but SAFFL absent -> violation"
+#expectViolationCount 1
+#expectViolationAt SAFFN=1
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFFN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+---

@@ -1,0 +1,72 @@
+Core:
+  Id: "CDISC-SEND-0319"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the collection date/time (--DTC), the study day\
+  \ (--DY), and the nominal day (--NOMDY) are all not populated in a record; when\
+  \ neither --DTC nor --DY is collected, --NOMDY must be populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CL"
+    - "LB"
+Check:
+  expression: >-
+    empty(--DTC) and empty(--DY) and empty(--NOMDY)
+Outcome:
+  Message: "--NOMDY is missing even though neither --DTC nor --DY is populated."
+  Output_Variables:
+  - "--DTC"
+  - "--DY"
+  - "--NOMDY"
+Source:
+  Class: "FND"
+  Domain: "CL, LB"
+  Variable: "--NOMDY"
+  Plain_Text_Explanation: "If --DTC and --DY were not collected, --NOMDY must be populated."
+  Condition: "--DTC = null AND --DY = null"
+  Rule: "--NOMDY ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND319"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND319"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND319"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND319"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND319"
+        Version: "1"
+      Version: "5.0"

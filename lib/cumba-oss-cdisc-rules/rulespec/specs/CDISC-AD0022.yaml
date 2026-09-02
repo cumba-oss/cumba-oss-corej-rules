@@ -1,0 +1,28 @@
+name: CDISC-AD0022
+kind: rule
+description: |
+  Wave A1 port — T1a PlainSimple.
+  CDISC-AD0022: PPROTFL must be 'Y' or 'N' when populated on ADSL.
+python_source: rules-adamig-1-3.json (CDISC-AD0022)
+rule:
+  coreId: CDISC-AD0022
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PPROTFL: Y}
+      - {STUDYID: S1, USUBJID: '002', PPROTFL: MAYBE}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0022
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      PPROTFL: MAYBE
+expected_errors: []

@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1020 expect=noViolation domain=AE
+#note "DISCRIMINATING: does ds_exists mean inventory presence or non-emptiness? DM is declared in the inventory with ZERO data rows. Predicted noViolation with the rule executing, grounded in source: OperatorRegistry.existsAsDataset is ctx.getDatasetResolver().resolve(name) != null, and the scenario resolver registers every declared block with no row-count filter -> a 0-row DM still resolves and ds_exists(\"DM\") is TRUE."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1370 expect=violation domain=RE
+#note "Row 2 has RESTREFC populated while RESTREFN is missing -> fires; rows 1 and 3 are conformant."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 RESEQ=2
+dataset RE class=FINDINGS label="Respiratory System Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RESEQ    type=Num  label="Sequence Number"
+col RETESTCD type=Char label="Respiratory Test Short Name"
+col RESTREFC type=Char label="Reference Result in Standard Format"
+col RESTREFN type=Num  label="Numeric Reference Result in Std Units"
+---
+S1 | RE | 001 | 1 | FEV1 | 3.5 | 3.5
+S1 | RE | 001 | 2 | FVC  | 4.2 | .
+S1 | RE | 001 | 3 | PEF  |     | .

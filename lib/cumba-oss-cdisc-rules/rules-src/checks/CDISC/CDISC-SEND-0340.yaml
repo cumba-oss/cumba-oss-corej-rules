@@ -1,0 +1,74 @@
+Core:
+  Id: "CDISC-SEND-0340"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable declared in the Define-XML document is\
+  \ marked Expected by the CDISC Library, has no populated values across any record,\
+  \ and the Define-XML document includes no comment explaining why."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    not empty(var_name("DEFINE")) and var_core("LIBRARY") == "Exp" and
+    max_value_length(variable_name) == 0 and var_has_comment("DEFINE") == false
+Outcome:
+  Message: "A variable declared in the Define-XML document has no comment."
+  Output_Variables:
+  - "define_variable_name"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "If expected variables in a domain are all null, a comment\
+    \ should be included in the Define-XML document to explain why all records are\
+    \ null."
+  Condition: "Variable Core Status = Expected and are null for all records"
+  Rule: "The Define-XML document includes a comment to explain why all records are\
+    \ null."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND340"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND340"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND340"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND340"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND340"
+        Version: "1"
+      Version: "5.0"

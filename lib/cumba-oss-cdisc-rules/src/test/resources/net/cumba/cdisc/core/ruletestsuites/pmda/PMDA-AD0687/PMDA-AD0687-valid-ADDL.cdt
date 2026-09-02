@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0687 expect=noViolation domain=ADDL
+#library standard=adamig version=1-3
+#note "Negative control mirroring CDISC-AD0687-valid-ADDL: DEVIPDT (21915) is less than DEVXPDT (22281), so the rule must stay silent. expect=noViolation additionally asserts the rule EXECUTED, so this cannot pass by being out of scope; the -invalid- twin is the positive control against passing vacuously. NOTE this fixture was green BOTH before and after the value_is_reference fix - a rule that can never fire is silent here too - so it proves nothing on its own and only the -invalid- twin pins the defect."
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col DEVIPDT type=Num
+col DEVXPDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | 21915 | 22281
+---

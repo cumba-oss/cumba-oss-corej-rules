@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0666 expect=violation domain=ADNCA
+# Rule:Description: Raise an error when DOSPCTDF is populated but DOSEP and DOSEA are not populated in an ADNCA v1.0 dataset.
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADNCA
+col STUDYID type=Char
+col USUBJID type=Char
+col DOSPCTDF type=Char
+col DOSEP type=Char
+col DOSEA type=Char
+col PARAMCD type=Char
+col NFRLT type=Num
+col AFRLT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Y |  | | CONC | 0 | 0.5
+---

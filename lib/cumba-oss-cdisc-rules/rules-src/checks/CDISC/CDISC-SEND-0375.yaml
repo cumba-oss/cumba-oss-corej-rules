@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-SEND-0375"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Result Category (FXRESCAT) is populated for a record\
+  \ whose standardized finding is UNREMARKABLE (FXSTRESC equals \"UNREMARKABLE\")\
+  \ or whose test was not done (FXSTAT equals \"NOT DONE\"); FXRESCAT should be empty\
+  \ in those cases."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FX"
+Requirements:
+  Variables:
+    All:
+    - "FXRESCAT"
+Check:
+  expression: >-
+    not empty(FXRESCAT) and (var_exists("FXSTRESC") and FXSTRESC == "UNREMARKABLE" or
+    var_exists("FXSTAT") and FXSTAT == "NOT DONE")
+Outcome:
+  Message: "FXRESCAT is populated when FXSTRESC is \"UNREMARKABLE\" or FXSTAT is \"\
+    NOT DONE\"."
+  Output_Variables:
+  - "FXSTRESC"
+  - "FXRESCAT"
+  - "FXSTAT"
+Source:
+  Class: "FND"
+  Domain: "FX"
+  Variable: "FXRESCAT"
+  Plain_Text_Explanation: "FXRESCAT should be populated except when no abnormal findings\
+    \ were observed (FXSTRESC = \"UNREMARKABLE\") or the test was not done (FXSTAT\
+    \ = \"NOT DONE\")."
+  Condition: "FXSTRESC = \"UNREMARKABLE\" OR FXSTAT = \"NOT DONE\""
+  Rule: "FXRESCAT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND375"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND375"
+        Version: "1"
+      Version: "5.0"

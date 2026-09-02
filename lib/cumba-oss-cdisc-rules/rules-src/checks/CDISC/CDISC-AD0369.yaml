@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-AD0369"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when *DTF is populated and neither *DT nor *DTM is populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(*DTF) and empty(*DT) and empty(*DTM)
+Outcome:
+  Message: "*DTF is populated, but neither *DT nor *DTM is populated."
+  Output_Variables:
+  - "*DT"
+  - "*DTM"
+  - "*DTF"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "*DT; *DTM"
+  Natural_Language_Rule_Failure_Criteria: "*DTF is populated and neither *DT nor *DTM\
+    \ is populated"
+  Rule_Failure_Criteria: "Neither *DT nor *DTM is populated"
+  Condition_Failure: "*DTF is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR369"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR369"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR369"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR369"
+        Version: "2"
+      Version: "5.0"

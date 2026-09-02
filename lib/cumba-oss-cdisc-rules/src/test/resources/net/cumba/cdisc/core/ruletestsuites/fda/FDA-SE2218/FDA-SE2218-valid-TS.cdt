@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2218 expect=noViolation domain=TS
+#note "TS carries a TSPARMCD=STSTDTC record ('Study Start Date'), so the required Trial Summary parameter is present -> no violation."
+#library standard=sendig version=3-1-1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | DOSSTDTC | Start Date/Time of Dose Interval | 2023-06-01
+S01 | TS | 2 | STSTDTC | Study Start Date | 2023-06-01
+S01 | TS | 3 | STENDTC | Study End Date | 2023-06-28
+S01 | TS | 4 | STITLE | Study Title | 28-Day Repeat Dose Toxicity Study

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0028 expect=violation domain=FA
+#note "FINDINGS ABOUT is in scope too: FASTNRHI=0.5 is below FASTNRLO=2 on row 1 -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FASTNRLO=2 FASTNRHI=0.5
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FASTNRLO type=Num  label="Reference Range Lower Limit-Std Units"
+col FASTNRHI type=Num  label="Reference Range Upper Limit-Std Units"
+---
+S1 | FA | 001 | 1 | SEV | 2 | 0.5
+S1 | FA | 001 | 2 | SEV | 1 | 3

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1009 expect=violation domain=TE
+#note "Second in-scope domain: TE carries ETCD as its topic variable; the 9-character value on row 1 fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ETCD=RUNINPBOX
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TE | RUNINPBOX | Placebo run-in
+S1 | TE | RUNINPBO | Placebo run-in

@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0142"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Code (PARAMCD) does not have a single\
+  \ consistent value for each unique value of the Parameter (PARAM), evaluated on\
+  \ rows where both PARAMCD and PARAM are populated; within a study each PARAM value\
+  \ must map to one PARAMCD value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(PARAM) and is_inconsistent_across_dataset(PARAMCD,
+    keys=[PARAM])
+Outcome:
+  Message: "Inconsistent value for PARAMCD within a unique PARAM"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMCD"
+Source:
+  Message: "Inconsistent value for PARAMCD within a unique PARAM"
+  Description: "Within a study, All PARAMCD values must be the same for each unique\
+    \ value of PARAM when both PARAMCD and PARAM are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0142"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0142"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0142"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0142"
+        Version: "1"
+      Version: "6.0"

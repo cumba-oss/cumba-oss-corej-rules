@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1437 expect=noViolation domain=AC
+#note "A CAGTCAT record carries ACVAL 'RADIOLOGICAL/NUCLEAR', so a 'Combined Injury (Rad and Non-Rad) Ind' (CIRNRIND) record is expected -- and an ACPARMCD='CIRNRIND' record is present -> no violation."
+#library standard=sendig version=ar-1-0
+dataset AC label="Challenge Agent Characterization"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ACSEQ    type=Num  label="Sequence Number"
+col ACPARMCD type=Char label="Challenge Agent Parameter Short Name"
+col ACPARM   type=Char label="Challenge Agent Parameter"
+col ACVAL    type=Char label="Parameter Value"
+---
+S1 | AC | 1 | CAGTCAT  | Challenge Agent Category     | RADIOLOGICAL/NUCLEAR
+S1 | AC | 2 | CAGTSUPN | Challenge Agent Supplier Name | ACME LABS
+S1 | AC | 3 | CIRNRIND | Combined Injury (Rad and Non-Rad) Ind | N

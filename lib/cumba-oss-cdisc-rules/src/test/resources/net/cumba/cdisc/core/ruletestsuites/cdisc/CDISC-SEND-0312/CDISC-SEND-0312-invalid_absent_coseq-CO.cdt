@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0312 expect=violation domain=CO
+#note "The ABSENT-TARGET arm (EC-53 / Fix #143), the POOLID companion of cdisc/CDISC-SEND-0311-invalid_absent_coseq-CO. No COSEQ column: the target is dropped and the check regroups on [POOLID], so rows 1 and 2 both fire and row 3 is unique. What does NOT save this rule is its authored var_exists(\"POOLID\") -- that guards the KEY, not the TARGET, and COSEQ carries no guard at all. Do NOT pin COSEQ here."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 POOLID=POOL1
+#expectViolationAt row=2 POOLID=POOL1
+dataset CO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char
+col COVAL   type=Char label="Comment"
+---
+S1 | CO |  | POOL1 | First
+S1 | CO |  | POOL1 | Second
+S1 | CO |  | POOL2 | Third
+---

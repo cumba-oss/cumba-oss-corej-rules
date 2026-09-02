@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0004"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the data type of a variable in the dataset does\
+  \ not match the data type declared for that variable in the Define-XML document."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_name("DEFINE")) and var_type("DATA") != var_type("DEFINE")
+Outcome:
+  Message: "The variable's data type in the dataset does not match the data type declared\
+    \ for the variable in the Define-XML document."
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+  - "define_variable_name"
+  - "define_variable_data_type"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Variable-level metadata in Define-XML document should include\
+    \ the data Type (e.g., whether the variable value is a character or numeric)"
+  Rule: "Variable-level metadata in Define-XML document uses the appropriate corresponding\
+    \ data type."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND4"
+        Version: "1"
+      Version: "5.0"

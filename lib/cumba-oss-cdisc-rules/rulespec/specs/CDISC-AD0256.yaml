@@ -1,0 +1,36 @@
+name: CDISC-AD0256
+kind: rule
+description: |
+  Wave C3 port — T2-SharesNoElements. Scope=ALL.
+  CDISC-AD0256: fire when ADSL is present among the study datasets and
+  ADSL.USUBJID is not populated for a primary-domain row (subject not
+  in ADSL after MD-merge on USUBJID). Operation `dataset_names` populates
+  $datasets; Check uses `shares_no_elements_with [ADSL]` under `not`.
+python_source: rules-adamig-1-3.json (CDISC-AD0256)
+rule:
+  coreId: CDISC-AD0256
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+      - {STUDYID: S1, USUBJID: '002'}
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0256
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ADSL.USUBJID: null
+expected_errors: []

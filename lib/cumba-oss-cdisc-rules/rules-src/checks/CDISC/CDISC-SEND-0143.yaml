@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0143"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Completion/Reason Not Done (--STAT) is populated\
+  \ with a value that is not a term in the (ND) controlled terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+Operations:
+- id: "$nd_terms"
+  expression: "codelist_terms(codelists=[ND], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    not empty(--STAT) and --STAT not in $nd_terms
+Outcome:
+  Message: "--STAT is populated with a value that is not a term in the (ND) controlled\
+    \ terminology codelist."
+  Output_Variables:
+  - "--STAT"
+  - "$nd_terms"
+Source:
+  Class: "FND"
+  Domain: "NOT (SC)"
+  Variable: "--STAT"
+  Plain_Text_Explanation: "If --STAT is populated, the value must be from the (ND)\
+    \ codelist"
+  Condition: "--STAT  ^= null"
+  Rule: "--STAT = value from (ND) codelist"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND143"
+        Version: "1"
+      Version: "5.0"

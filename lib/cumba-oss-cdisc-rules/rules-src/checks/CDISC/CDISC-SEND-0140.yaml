@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-SEND-0140"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Disposition (DS) record exists for\
+  \ the same Unique Subject Identifier (USUBJID); the DS domain should hold one record\
+  \ per subject."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, DOMAIN])
+Outcome:
+  Message: "More than one DS record exists for the same subject (USUBJID); DS should\
+    \ contain one record per subject."
+  Output_Variables:
+  - "DOMAIN"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "ALL"
+  Plain_Text_Explanation: "DS has one record per USUBJID in DM"
+  Rule: "DS has one record per USUBJID in DM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND140"
+        Version: "1"
+      Version: "5.0"

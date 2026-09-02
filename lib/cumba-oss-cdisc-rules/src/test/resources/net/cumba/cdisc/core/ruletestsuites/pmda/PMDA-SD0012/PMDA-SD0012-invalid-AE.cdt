@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0012 expect=violation domain=AE
+#note "Row 2's AESTDY (15) is after AEENDY (10) -> fires. Row 1 is ordered correctly."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AESTDY  type=Num  label="Study Day of Start of Adverse Event"
+col AEENDY  type=Num  label="Study Day of End of Adverse Event"
+---
+S1 | AE | 001 | 1 | 5  | 10
+S1 | AE | 001 | 2 | 15 | 10

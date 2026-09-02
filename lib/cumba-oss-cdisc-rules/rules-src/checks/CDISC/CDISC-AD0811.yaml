@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-AD0811"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when USUBJIDN is populated and USUBJID is not populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(USUBJIDN) and empty(USUBJID)
+Outcome:
+  Message: "USUBJIDN is populated, but USUBJID is not populated."
+  Output_Variables:
+  - "USUBJIDN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "USUBJID"
+  Natural_Language_Rule_Failure_Criteria: "USUBJIDN is populated and USUBJID is not\
+    \ populated"
+  Rule_Failure_Criteria: "USUBJID is not populated"
+  Condition_Failure: "USUBJIDN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR811"
+        Version: "1"
+      Version: "5.0"

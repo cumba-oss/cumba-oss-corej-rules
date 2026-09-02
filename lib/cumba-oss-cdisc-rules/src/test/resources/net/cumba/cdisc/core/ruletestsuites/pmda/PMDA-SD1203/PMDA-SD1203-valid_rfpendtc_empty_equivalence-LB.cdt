@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1203 expect=noViolation domain=LB
+#note "Row 1: subject 002's RFPENDTC is EMPTY -> saturation -> clean - THE discriminating fixture for finding SD1203-F1 (the dropped FDA guard `not empty(DM.RFPENDTC)` is a no-op). Row 2: boundary equal -> clean. Row 3: empty LBDTC -> clean."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBDTC    type=Char
+---
+S1 | LB | 002 | 1 | GLUC | 2021-01-01
+S1 | LB | 001 | 2 | ALB  | 2020-06-30
+S1 | LB | 001 | 3 | CHOL |
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30
+S1 | DM | 002 |

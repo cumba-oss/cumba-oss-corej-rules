@@ -1,0 +1,25 @@
+name: FDA-SE1074-fire
+kind: rule
+description: |
+  FDA-SE1074 (T10 curated list): a variable that may be used only in SDTM human studies
+  must not be present in a SEND dataset. The SEND DM dataset below carries ACTARM, which is
+  in the curated SDTM-human-only list, so the rule fires (variable_name = ACTARM).
+python_source: rules-sendig-3-1-1.json (FDA-SE1074)
+rule:
+  coreId: FDA-SE1074
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARM: DRUG}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+expected_violations:
+  - rule_id: FDA-SE1074
+    dataset: DM
+    row_key: {STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      variable_name: ACTARM
+expected_errors: []

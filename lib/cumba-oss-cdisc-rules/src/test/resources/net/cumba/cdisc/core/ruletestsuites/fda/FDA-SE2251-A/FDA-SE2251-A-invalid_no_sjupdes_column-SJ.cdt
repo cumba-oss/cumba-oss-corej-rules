@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2251-A expect=violation domain=SJ
+#note "At least one record has RSTGCD = UNPLAN and the SJUPDES column is NOT PRESENT. The published row (Condition RSTGCD = \"UNPLAN\" -> Rule SJUPDES ^= null) is violated: an absent column is null on every record. Sensitivity is Dataset, so this is ONE finding for the missing column rather than one per unplanned record - which is why the parent rule now lists SJUPDES in Requirements.Variables.All and defers the absent case to this sister."
+#expectViolationCount 1
+#library standard=sendig version=dart-1-1
+dataset SJ label="Subject Stages" class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+---
+S1 | SJ | 001 | 1 | UNPLAN
+S1 | SJ | 001 | 2 | PLANNED

@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0088"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Occurrence (--OCCUR) variable is present in\
+  \ the dataset but the Pre-specified (--PRESP) variable is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Check:
+  expression: >-
+    not var_exists("--PRESP") and var_exists("--OCCUR")
+Outcome:
+  Message: "--PRESP variable is not present when --OCCUR variable is present."
+  Output_Variables:
+  - "--OCCUR"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(AE, DS, DV, EX)"
+  Variable: "--OCCUR"
+  Condition: "--PRESP not present in dataset"
+  Rule: "--OCCUR not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"

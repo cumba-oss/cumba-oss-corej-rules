@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0320 expect=violation domain=ADSL
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. No label= attribute at all. An absent label still fires: the left operand of != is a CALL (ds_label(\"DATA\")), not a direct column, so NonEmptyGuardInliner derives no absent-column guard for it. Same shape shipped green as pmda/PMDA-AD0320B/PMDA-AD0320B-invalid_no_label-ADDL.cdt."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt dataset_name=ADSL
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 56

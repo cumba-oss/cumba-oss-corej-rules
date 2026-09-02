@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2244 expect=skipped domain=TS
+#note "Absent-column pin for the machine-derived guard (EC-43). TSVCDREF is NOT declared, so the loader's derived var_exists(\"TSVCDREF\") conjunct is false, so the rule EXECUTES and stays silent instead of firing on an all-missing column. expect=noViolation before the phase-4 hoist, now skipped: nothing in Scope gates this rule on TSVCDREF. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S1 | TS | 1 | FCNTRY | Planned Country of Investigational Sites | USA | USA

@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0248"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TAETORD is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Check:
+  expression: >-
+    not empty(TAETORD) and TAETORD !~ /^(-?[1-9]\\d*|0)$/
+Outcome:
+  Message: "TAETORD is not an integer."
+  Output_Variables:
+  - "TAETORD"
+Source:
+  Class: "TDM"
+  Domain: "TA"
+  Variable: "TAETORD"
+  Rule: "TAETORD is an integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0248"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0248"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0248"
+        Version: "1"
+      Version: "2.0"

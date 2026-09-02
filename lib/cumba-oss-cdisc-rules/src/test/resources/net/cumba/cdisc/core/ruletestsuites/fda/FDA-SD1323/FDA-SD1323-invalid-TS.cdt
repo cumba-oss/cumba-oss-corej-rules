@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1323 expect=violation domain=TS
+#note "Row 1: TSPARMCD=FCNTRY with TSVAL='Germany' which is not a term of the (synthetic) COUNTRY codelist {USA, CAN, DEU} -> fires. Row 2 (FCNTRY, USA) is a valid term; row 3 (FCNTRY, empty TSVAL) is guarded out by non_empty; row 4 is another parameter."
+#library standard=sdtmig version=3-4
+#library codelist-terms COUNTRY USA CAN DEU
+#expectViolationCount 1
+#expectViolationAt row=1 TSVAL=Germany
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | FCNTRY  | Germany
+S1 | TS | 2 | FCNTRY  | USA
+S1 | TS | 3 | FCNTRY  |
+S1 | TS | 1 | SPONSOR | ACME PHARMA

@@ -1,0 +1,27 @@
+Rule_Id: "DEFINE-XML-0155-B"
+Sheet_Rule_Identifier: "155"
+Rule_Set: "CDISC"
+Element: "ValueListDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+# Branch 2 of sheet row 155 (companion of DEFINE-XML-0155, one-row-two-rules
+# convention): when a variable delegates its Origin to the value level, every
+# ItemDef referenced from the def:ValueListDef must carry a def:Origin. Scoped
+# to each value-level ItemRef (the universal quantifier becomes per-node), with
+# the fire-always vehicle + deref guard. The variable-level-Origin exemption is
+# encoded by the reverse join: the referencing variable ItemDef is reached via
+# ../@OID->ValueListRef@ValueListOID/.. (first-referrer-only, as 0142).
+Plain_Text_Rule: "All variable definitions must have a  def:Origin child element when there is no def:ValueListRef child element. When there is a def:ValueListRef either the variable definition must have a def:Origin or it must be provided for each ItemDef referenced in the def:ValueLIstDef."
+Message: "def:Origin is missing on a value-level ItemDef and the delegating variable carries none either."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Origin/@Type"
+      exists: false
+    - path: "../@OID->ValueListRef@ValueListOID/../Origin/@Type"
+      exists: false

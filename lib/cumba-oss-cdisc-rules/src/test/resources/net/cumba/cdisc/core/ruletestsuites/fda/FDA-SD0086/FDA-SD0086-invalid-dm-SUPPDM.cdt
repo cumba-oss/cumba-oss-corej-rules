@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD0086 expect=violation domain=SUPPDM
+#note "DM branch: QNAM RACEOTH occurs twice for subject 001 (parent record = subject for DM) -> both duplicate rows fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 QNAM=RACEOTH
+#expectViolationAt row=2 QNAM=RACEOTH
+dataset SUPPDM class=RELATIONSHIP label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | DM | 001 |  |  | RACEOTH | Other race A
+S1 | DM | 001 |  |  | RACEOTH | Other race B
+S1 | DM | 002 |  |  | RACEOTH | Other race

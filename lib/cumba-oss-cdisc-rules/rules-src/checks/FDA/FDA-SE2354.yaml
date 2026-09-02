@@ -1,0 +1,71 @@
+Core:
+  Id: "FDA-SE2354"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --REASEX is populated but --EXCLFL is not set to\
+  \ 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--REASEX"
+Check:
+  expression: >-
+    not empty(--REASEX) and (not var_exists("--EXCLFL") or --EXCLFL != "Y")
+Outcome:
+  Message: "--EXCLFL is not set to 'Y' when --REASEX is populated."
+  Output_Variables:
+  - "--EXCLFL"
+  - "!--REASEX"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for --EXCLFL, when --REASEX is provided"
+  FDA_Validator_Rule_Description: "Exclude from Statistics (--EXCLFL) should be set\
+    \ to 'Y', when Reason for Exclusion from Statistics (--REASEX) is populated."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2354"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2354"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2354"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2354"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2354"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.1"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0033 expect=skipped domain=DS
+#note "DSTPT is present and populated, DSTPTNUM is present but missing -> the row would fire; DS is a member of the included EVENTS class, so ONLY the Domains.Exclude [DS] rejects. Pinned on behalf of SD0034's identical [DS] block."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col DSSEQ    type=Num
+col DSTERM   type=Char
+col DSTPT    type=Char
+col DSTPTNUM type=Num
+---
+S1 | DS | 001 | 1 | DISPOSITION EVENT | PRE-DOSE | .

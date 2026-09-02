@@ -1,0 +1,47 @@
+name: CDISC-AD0746
+kind: rule
+description: |
+  Wave C1 port — T2-Op (Operations without Match_Datasets).
+  CDISC-AD0746: SRCDOM must be an SDTM domain name, ADaM dataset name, or
+  null. Uses Operation `dataset_names` to collect the list of study
+  datasets and checks SRCDOM via `is_not_contained_by $datasets`.
+
+  Scope covers BASIC DATA STRUCTURE, MEDICAL DEVICE BASIC DATA STRUCTURE,
+  OCCURRENCE DATA STRUCTURE, and MEDICAL DEVICE OCCURRENCE DATA STRUCTURE;
+  we use ADLB (BDS) as the primary fixture domain and include LB as an
+  SDTM source domain so the dataset list has {ADLB, LB}. A row with
+  SRCDOM='LB' is valid; a row with SRCDOM='BOGUS' fires.
+python_source: rules-adamig-1-3.json (CDISC-AD0746)
+rule:
+  coreId: CDISC-AD0746
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # ok — SRCDOM='LB' is in {ADLB, LB}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, SRCDOM: 'LB'}
+      # ok — SRCDOM empty (null-treated — non_empty fails)
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, SRCDOM: ''}
+      # bad — SRCDOM='BOGUS' not in {ADLB, LB}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, SRCDOM: 'BOGUS'}
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: HGB}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-AD0746
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      SRCDOM: BOGUS
+expected_errors: []

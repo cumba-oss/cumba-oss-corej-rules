@@ -1,0 +1,56 @@
+Core:
+  Id: "PMDA-SD1375"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Subject Reference End Date/Time (RFENDTC) is populated\
+  \ even though the actual arm shows the subject was not treated, that is when Actual\
+  \ Arm Code (ACTARMCD) is empty or equal to 'SCRNFAIL' (Screen Failure), 'NOTASSGN'\
+  \ (Not Assigned) or 'NOTTRT' (Not Treated)."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(RFENDTC) and (empty(ACTARMCD) or ACTARMCD in ["SCRNFAIL", "NOTASSGN", "NOTTRT"])
+Outcome:
+  Message: "RFENDTC is populated for a subject who did not receive treatment (ACTARMCD\
+    \ is empty or equal to 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT')."
+  Output_Variables:
+  - "RFENDTC"
+  - "ACTARMCD"
+Source:
+  Message: "RFENDTC is populated for subject who did not receive treatment"
+  Description: "RFENDTC must be null when actual arm indicates that the subject is\
+    \ a screen failure ('Screen Failure'), was not assigned to an arm ('Not Assigned')\
+    \ or was not treated ('NOTTRT') (or null). This rule applies to studies where\
+    \ RFENDTC is associated with a treatment date."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1375"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1375"
+        Version: "1"
+      Version: "1.6"

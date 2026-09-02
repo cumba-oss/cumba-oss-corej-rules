@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD0007 expect=noViolation domain=LB
+#note "Boundary: one record of an otherwise unit-consistent group leaves --STRESU empty. A blank standard unit is excluded from the consistency computation (post-EC-1 default), so an empty cell is not a second value and must not be reported."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBSCAT   type=Char label="Subcategory for Lab Test"
+col LBSPEC   type=Char label="Specimen Type"
+col LBMETHOD type=Char label="Method of Test or Examination"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | CHEMISTRY | GLUCOSE | SERUM | ENZYMATIC | mmol/L
+S1 | LB | 002 | 1 | GLUC | CHEMISTRY | GLUCOSE | SERUM | ENZYMATIC |
+S1 | LB | 003 | 1 | GLUC | CHEMISTRY | GLUCOSE | SERUM | ENZYMATIC | mmol/L

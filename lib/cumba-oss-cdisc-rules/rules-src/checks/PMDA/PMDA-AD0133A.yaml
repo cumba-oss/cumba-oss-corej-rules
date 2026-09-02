@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0133A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Ratio to Analysis Range y Lower Limit (R2AyLO) is\
+  \ present in the dataset but Analysis Value (AVAL) and/or Analysis Range y Lower\
+  \ Limit (AyLO) is not present. Because R2AyLO equals AVAL divided by AyLO, both\
+  \ AVAL and AyLO must be present for calculation consistency."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("R2AyLO") and (not var_exists("AVAL") or not var_exists("AyLO"))
+Outcome:
+  Message: "R2AyLO is present, but AVAL and/or AyLO is not present."
+  Output_Variables:
+  - "R2AyLO"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Calculation issue: R2AyLO is present, but AVAL and/or AyLO is not present"
+  Description: "R2AyLO = AVAL / AyLO. therefore if R2AyLO is present, both AVAL and\
+    \ AyLO must be present for calculation consistency."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0133A"
+        Version: "1"
+      Version: "6.0"

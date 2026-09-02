@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0092"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTPN and TRTP are both populated and there is more\
+  \ than one value of TRTPN for a given value of TRTP"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "TRTPN"
+Check:
+  expression: >-
+    not empty(TRTPN) and not empty(TRTP) and has_multiple_values_for(TRTPN, TRTP)
+Outcome:
+  Message: "More than one value of TRTPN was found for the same value of TRTP"
+  Output_Variables:
+  - "TRTP"
+  - "TRTPN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTPN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTPN for\
+    \ a given value of TRTP"
+  Rule_Failure_Criteria: "There is more than one value of TRTPN for a given value\
+    \ of TRTP"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR92"
+        Version: "1"
+      Version: "5.0"

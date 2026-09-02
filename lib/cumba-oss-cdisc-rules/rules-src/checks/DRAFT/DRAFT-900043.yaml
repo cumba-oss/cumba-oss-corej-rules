@@ -1,0 +1,43 @@
+Core:
+  Id: "DRAFT-900043"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when DSSCAT is present in the DS dataset but empty on\
+  \ a record with DSCAT = 'DISPOSITION EVENT' for a subject that has more than one\
+  \ such record per Epoch."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+  Domains:
+    Include:
+    - "DS"
+  Use_Case: "INDH"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    not is_unique_set([DSCAT, USUBJID, EPOCH]) and DSCAT == "DISPOSITION EVENT" and empty(DSSCAT)
+Outcome:
+  Message: "DSSCAT is empty on a record with DSCAT = 'DISPOSITION EVENT' where the\
+    \ subject has more than one DISPOSITION EVENT record per Epoch; DSSCAT is required\
+    \ to distinguish study-participation from study-treatment dispositions."
+  Output_Variables:
+  - "USUBJID"
+  - "EPOCH"
+  - "DSCAT"
+  - "DSSCAT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0535"
+        Version: "1"
+      Version: "2.0"

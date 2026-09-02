@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0666 expect=violation domain=DM
+#note "Row 1 gives AGEU=YEARS with a missing AGE -> age should be provided when age units are populated (the '.' is the SAS null convention)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AGEU=YEARS
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 |    | YEARS
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 63 | YEARS

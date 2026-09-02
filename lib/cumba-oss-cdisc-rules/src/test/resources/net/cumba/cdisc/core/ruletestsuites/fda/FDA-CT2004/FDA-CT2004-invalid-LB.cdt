@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-CT2004 expect=violation domain=LB
+#note "Under the value-level condition LBTESTCD='PH' the Define-XML binds LBSTRESC to codelist C99901 (ACID/NEUTRAL/ALKALINE), declared non-extensible in the CDISC CT. Row 2 submits 'BASIC', which is not a term -> fires. Row 1 uses a term, row 3 does not meet the value-level condition and row 4 leaves the value empty."
+#library standard=sdtmig version=3-4
+#library codelist-extensible C99901 false
+#define-xml FDA-CT2004-define.xml
+#expectViolationCount 1
+#expectViolationAt variable_name=LBSTRESC variable_value=BASIC
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | PH   | ACID
+S1 | LB | 001 | 2 | PH   | BASIC
+S1 | LB | 001 | 3 | GLUC | 5.5
+S1 | LB | 001 | 4 | PH   |

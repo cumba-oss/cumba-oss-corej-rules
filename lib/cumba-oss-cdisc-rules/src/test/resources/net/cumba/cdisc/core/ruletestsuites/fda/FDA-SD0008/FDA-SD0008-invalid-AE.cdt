@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD0008 expect=violation domain=AE
+#note "AEDECOD 'Cephalgia' is not a Preferred Term of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid PT."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEDECOD=Cephalgia
+dataset AE class=EVENTS
+col USUBJID type=Char
+col AEDECOD type=Char
+---
+001 | Headache
+001 | Cephalgia

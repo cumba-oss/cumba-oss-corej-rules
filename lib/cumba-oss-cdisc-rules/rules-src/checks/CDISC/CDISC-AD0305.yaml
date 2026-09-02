@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-AD0305"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when SMQzzNAM is populated and SMQzzSC is empty, where\
+  \ zz is an integer [01-99, zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(SMQzzNAM) and empty(SMQzzSC)
+Outcome:
+  Message: "SMQzzNAM is populated and SMQzzSC is empty"
+  Output_Variables:
+  - "SMQzzNAM"
+  - "SMQzzSC"
+wildcards:
+  zz:
+    min: 1
+    max: 99
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "SMQzzSC where zz is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "SMQzzNAM is populated and SMQzzSC is not\
+    \ populated"
+  Rule_Failure_Criteria: "SMQzzSC is not populated"
+  Condition_Failure: "SMQzzNAM is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR305"
+        Version: "2"
+      Version: "5.0"

@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0426"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Standard Units (--STRESU) is provided but Character\
+  \ Result/Finding in Std Format (--STRESC) is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESU"
+Check:
+  expression: >-
+    not empty(--STRESU) and empty(--STRESC)
+Outcome:
+  Message: "--STRESC is empty when --STRESU is provided."
+  Output_Variables:
+  - "--STRESC"
+  - "--STRESU"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESC"
+  Condition: "--STRESU ^= null"
+  Rule: "--STRESC (in standard units) ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0426"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0426"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0426"
+        Version: "1"
+      Version: "2.0"

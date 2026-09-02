@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1324 expect=noViolation domain=DM
+#note "AGE carries a non-matching label but is not declared in the define (only AGEU is, and it agrees) -> silent: a label mismatch is only assertable against a declared variable."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGEU name=AGEU label="Age Units"
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

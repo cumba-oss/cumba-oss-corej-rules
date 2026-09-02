@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch C2 (deref-guarded ItemGroupDef rules 105, 106, 251, 252) violations 2.1
+     fixture: each rule fires exactly once. One dedicated violator per rule, plus
+     compliant and standard-less decoys proving the guards fire selectively:
+       IG.SDTMNODOM - SDTMIG-bound, no Domain, Purpose="Tabulation"  -> 105 only
+       IG.ADAMDOM   - ADaMIG-bound, Domain="AD", Purpose="Analysis"  -> 106 only
+       IG.SENDPURP  - SENDIG-bound, Domain="BW", Purpose="Analysis"  -> 251 only
+                      (also proves 251's SEND branch)
+       IG.ADAMPURP  - ADaMIG-bound, no Domain, Purpose="Tabulation"  -> 252 only
+       IG.DM        - SDTMIG-bound, fully compliant                  -> nothing
+       IG.ADSL      - ADaMIG-bound, fully compliant                  -> nothing
+       IG.XX        - no def:StandardOID, no Domain, Purpose="Analysis": violates
+                      every check body but no guard passes            -> nothing -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-c2-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHC2V">
+    <GlobalVariables>
+      <StudyName>BATCHC2V-STUDY</StudyName>
+      <StudyDescription>Batch C2 violations fixture study</StudyDescription>
+      <ProtocolName>BATCHC2V-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch C2 violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.SEND" Name="SENDIG" Type="IG" Version="3.1.1" Status="Final"/>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.SDTMNODOM" Name="AE" Repeating="Yes"
+                    SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per adverse event per subject"
+                    def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events (Domain missing)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.AE" xlink:href="ae.xpt">
+          <def:title>ae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADAMDOM" Name="ADAE" Domain="AD" Repeating="Yes"
+                    SASDatasetName="ADAE" Purpose="Analysis"
+                    def:Structure="One record per adverse event per subject"
+                    def:ArchiveLocationID="LF.ADAE" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events Analysis (Domain wrongly provided)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
+        <def:leaf ID="LF.ADAE" xlink:href="adae.xpt">
+          <def:title>adae.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SENDPURP" Name="BW" Domain="BW" Repeating="Yes"
+                    SASDatasetName="BW" Purpose="Analysis"
+                    def:Structure="One record per body weight per subject"
+                    def:ArchiveLocationID="LF.BW" def:StandardOID="STD.SEND">
+        <Description>
+          <TranslatedText xml:lang="en">Body Weights (Purpose not Tabulation)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.BW" xlink:href="bw.xpt">
+          <def:title>bw.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADAMPURP" Name="ADLB" Repeating="Yes"
+                    SASDatasetName="ADLB" Purpose="Tabulation"
+                    def:Structure="One record per analysis parameter per visit per subject"
+                    def:ArchiveLocationID="LF.ADLB" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Laboratory Analysis (Purpose not Analysis)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="BASIC DATA STRUCTURE"/>
+        <def:leaf ID="LF.ADLB" xlink:href="adlb.xpt">
+          <def:title>adlb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics (compliant decoy)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No"
+                    SASDatasetName="ADSL" Purpose="Analysis"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.ADSL" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Subject-Level Analysis Dataset (compliant decoy)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
+        <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
+          <def:title>adsl.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.XX" Name="XX" Repeating="No"
+                    SASDatasetName="XX" Purpose="Analysis"
+                    def:Structure="One record per finding per subject"
+                    def:ArchiveLocationID="LF.XX" def:IsNonStandard="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Standard-less decoy (no guard passes)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:leaf ID="LF.XX" xlink:href="xx.xpt">
+          <def:title>xx.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

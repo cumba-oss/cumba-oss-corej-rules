@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-SEND-0312 expect=violation domain=CO
+#note "No RDOMAIN column: the DOMAIN cell already resolves the scope and RDOMAIN would only add a way to get it wrong. Rows 1 and 2 share (COSEQ, POOLID) = (1, POOL1) and both members of a duplicate group are flagged -> count 2. Row 3 is unique; row 4 proves POOLID is part of the key rather than COSEQ being globally unique. Rows 5 and 6 are the DISCRIMINATOR: under FOLD_BLANK_KEYS a blank POOLID is a real key component so the operator flags them, but the rule's own `not empty(POOLID)` conjunct -- the sheet's Condition cell 'POOLID ^= null' -- keeps them out of the violation set. Count 2, NOT 4. M3-D20 added COSEQ to Output_Variables (target plus key, the CDISC-SEND-0386 convention); the COSEQ pin resolved through the primary-table fallback before and resolves through the projection now, so it survives unchanged."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 POOLID=POOL1 COSEQ=1
+#expectViolationAt row=2 POOLID=POOL1 COSEQ=1
+dataset CO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO |     | POOL1 | 1 | First
+S1 | CO |     | POOL1 | 1 | Duplicate
+S1 | CO |     | POOL1 | 2 | Second
+S1 | CO |     | POOL2 | 1 | Other pool
+S1 | CO | 001 |       | 9 | Subject comment
+S1 | CO | 002 |       | 9 | Subject comment again
+---

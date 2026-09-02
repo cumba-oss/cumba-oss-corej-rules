@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SD1340 expect=violation domain=EX
+#note "Row 1: non-run-in EX record (EPOCH='TREATMENT') for subject with ACTARMCD='NOTTRT' -> fires. Row 2: EX record with EPOCH present-but-empty (not a run-in record) for subject with empty ACTARMCD -> fires. Row 3: run-in record for the NOTTRT subject -> excluded. Row 4: treated subject -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 EXSEQ=1
+#expectViolationAt row=2 EXSEQ=1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | EX | 001 | 1 | DRUG A  | TREATMENT
+S1 | EX | 002 | 1 | DRUG A  |
+S1 | EX | 001 | 2 | PLACEBO | RUN-IN
+S1 | EX | 003 | 1 | DRUG A  | TREATMENT
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | NOTTRT
+S1 | DM | 002 |
+S1 | DM | 003 | ARMA
+---

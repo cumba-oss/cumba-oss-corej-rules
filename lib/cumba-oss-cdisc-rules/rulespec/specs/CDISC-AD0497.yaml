@@ -1,0 +1,37 @@
+name: CDISC-AD0497
+kind: rule
+description: |
+  Wave C3 port — T3-DatasetMetaCheck (Sensitivity=Dataset, Scope=ALL).
+  CDISC-AD0497: fire when dataset_name matches ^AD AND the library
+  dataset-class is empty. Operation dataset_class_from_library →
+  $dataset_class. When the class mock resolves (ADLB → BDS), the
+  $dataset_class leaf is non-empty → no violation.
+
+  NOT both-lane green, despite both lanes reporting 0 violations — an
+  earlier revision of this description claimed it was. Java EXECUTED;
+  the vendored Python fork does not implement dataset_class_from_library
+  at all (the name is absent from its operation registry), so it raises
+  "Failed to execute rule operation" and emits nothing. The agreement on
+  0 violations is therefore an accident of the fork failing before it
+  can fire. Measured 2026-07-30 by PLAN-parity-expected-status P1;
+  recorded in parity-diff-baseline.json with channels: ["status"], so
+  the violation channel stays asserted on both lanes.
+python_source: rules-adamig-1-3.json (CDISC-AD0497)
+rule:
+  coreId: CDISC-AD0497
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+  dataset_metadata:
+    ADLB:
+      className: BASIC DATA STRUCTURE
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-AD0695"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is present, BASE is populated, and BASE\
+  \ does not equal the AVAL value from the record where ABLFL equals 'Y', for a given\
+  \ value of PARAMCD and BASETYPE within a device and subject combination."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Operations:
+- id: "$baseline_aval"
+  expression: "max(AVAL, group=[USUBJID, PARAMCD, SPDEVID, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BASE) and BASE != $baseline_aval
+Outcome:
+  Message: "BASE does not equal the AVAL value recorded where ABLFL equals 'Y' for\
+    \ this PARAMCD, BASETYPE, device, and subject combination."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "BASETYPE"
+Source:
+  Class: "MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASE"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is present, BASE is populated,\
+    \ and BASE is not equal to AVAL where ABLFL is equal to Y for a given value of\
+    \ PARAMCD and BASETYPE for a combination of device and subject"
+  Rule_Failure_Criteria: "BASE is not equal to AVAL where ABLFL is equal to Y for\
+    \ a given value of PARAMCD and BASETYPE for a combination of device and subject"
+  Condition_Failure: "USUBJID, SPDEVID, and BASETYPE are present and BASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR695"
+        Version: "1"
+      Version: "5.0"

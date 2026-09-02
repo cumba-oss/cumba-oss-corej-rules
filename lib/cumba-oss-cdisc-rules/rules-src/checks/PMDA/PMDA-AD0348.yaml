@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0348"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the character Analysis Range y\
+  \ Lower Limit (C) (AyLOC) does not have a single consistent value for each unique\
+  \ combination of Parameter Code (PARAMCD) and the numeric Analysis Range y Lower\
+  \ Limit (AyLO), evaluated on rows where PARAMCD and AyLO are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(AyLO) and is_inconsistent_across_dataset(AyLOC, keys=[PARAMCD,
+    AyLO])
+Outcome:
+  Message: "Inconsistent value for AyLOC"
+  Output_Variables:
+  - "PARAMCD"
+  - "AyLO"
+  - "AyLOC"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for AyLOC"
+  Description: "Within a Study and a Parameter, all Analysis Range y Lower Limit (C)\
+    \ (AyLOC) variable values must be the same for each unique value of Analysis Range\
+    \ y Lower Limit (AyLO) variable when variable AyLO is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0348"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0348"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0348"
+        Version: "1"
+      Version: "6.0"

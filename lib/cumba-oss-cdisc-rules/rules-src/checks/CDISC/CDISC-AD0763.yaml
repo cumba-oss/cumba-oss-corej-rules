@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0763"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of TRTPGyN for a given\
+  \ value of TRTPGy, where y is an integer [1-99, not zero-padded], considering only\
+  \ rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(TRTPGyN) and not empty(TRTPGy) and has_multiple_values_for(TRTPGyN, TRTPGy)
+Outcome:
+  Message: "TRTPGyN has more than one value for this TRTPGy, among rows where both\
+    \ are populated"
+  Output_Variables:
+  - "TRTPGy"
+  - "TRTPGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTPGyN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTPGyN\
+    \ for a given value of TRTPGy, where y is an integer [1-99, not zero-padded],\
+    \ considering only those rows on which both variables are populated"
+  Rule_Failure_Criteria: "There is more than one value of TRTPGyN for a given value\
+    \ of TRTPGy"
+  Condition_Failure: "On rows where TRTPGyN and TRTPGy are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR763"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR763"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR763"
+        Version: "1"
+      Version: "5.0"

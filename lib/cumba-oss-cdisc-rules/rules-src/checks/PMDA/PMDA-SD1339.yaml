@@ -1,0 +1,86 @@
+Core:
+  Id: "PMDA-SD1339"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when EPOCH is empty or not present even though a start\
+  \ date (--STDTC) or a collection date (--DTC) is populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+    - "SV"
+    - "DX"
+    - "DO"
+    - "DU"
+    - "SC"
+    - "DS"
+    - "DT"
+    - "MH"
+Check:
+  expression: >-
+    empty(EPOCH) and (var_exists("--STDTC") and not empty(--STDTC) or var_exists("--DTC") and not
+    empty(--DTC))
+Outcome:
+  Message: "EPOCH is empty when a start date (--STDTC) or collection date (--DTC)\
+    \ is populated."
+  Output_Variables:
+  - "EPOCH"
+  - "--STDTC"
+  - "--DTC"
+Source:
+  Message: "Missing EPOCH value when a start or observation date is provided"
+  Description: "The EPOCH variable is not populated, however either a start date or\
+    \ a collection date is provided. The presence of a start date or collection date\
+    \ for a record should allow for the EPOCH variable to be populated. Variables\
+    \ requested by the relevant regulatory agency in policy documents (e.g., EPOCH)\
+    \ should be included in the dataset and populated."
+  Domains: "SPECIAL PURPOSE (-CO, -DM, -SV), INTERVENTIONS (-DX), FINDINGS (-DO, -DU,\
+    \ -SC), EVENTS (-DS, -DT, -MH), FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1339"
+        Version: "1"
+      Version: "1.6"

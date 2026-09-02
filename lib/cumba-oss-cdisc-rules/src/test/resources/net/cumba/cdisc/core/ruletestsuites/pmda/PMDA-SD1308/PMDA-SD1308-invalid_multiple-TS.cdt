@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1308 expect=violation domain=TS
+#note "ADAPTED-FROM cdisc/CDISC-CG0275-invalid_multiple-TS-1.cdt (rows verbatim; TSPARM added for the FDA/PMDA column set). Two CURTRT records, both with an empty TSVAL -> BOTH rows are reported. Pins the per-ROW record granularity."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 TSSEQ=2
+#expectViolationAt row=3 TSSEQ=3
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | ADDON  | Added on to Existing Treatments | Y
+S01 | TS | 2 | CURTRT | Current Therapy or Treatment    |
+S01 | TS | 3 | CURTRT | Current Therapy or Treatment    |
+S01 | TS | 4 | TITLE  | Trial Title                     | A Study of Drug X

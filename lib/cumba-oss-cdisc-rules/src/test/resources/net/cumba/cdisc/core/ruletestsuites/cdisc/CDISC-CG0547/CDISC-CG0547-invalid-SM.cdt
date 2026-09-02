@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0547 expect=violation domain=SM
+#note "Row 2 leaves SMSTDTC empty -> fires; row 1 is populated."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 SMSEQ=2 SMSTDTC=
+dataset SM class="SPECIAL PURPOSE" label="Disease Milestones"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SMSEQ    type=Num  label="Sequence Number"
+col MIDS     type=Char label="Disease Milestone Instance Name"
+col MIDSTYPE type=Char label="Disease Milestone Type"
+col SMSTDTC  type=Char label="Start Date/Time of Milestone"
+---
+S1 | SM | 001 | 1 | DIAGNOSIS1 | DIAGNOSIS | 2020-01-15
+S1 | SM | 001 | 2 | RELAPSE1   | RELAPSE   |

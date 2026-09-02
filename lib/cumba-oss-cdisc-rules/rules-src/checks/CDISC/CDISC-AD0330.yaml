@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-AD0330"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a parameter, there is more than one value\
+  \ of BASECAyN for a given value of BASECATy, considering only rows on which both\
+  \ variables are populated, where y is an integer [1-99, not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BASECAyN) and not empty(BASECATy) and has_multiple_values_for(BASECAyN, BASECATy,
+    within=PARAMCD)
+Outcome:
+  Message: "Within this parameter, BASECAyN has more than one value for the same value\
+    \ of BASECATy, considering only rows on which both variables are populated, where\
+    \ y is an integer [1-99, not zero-padded]."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASECATy"
+  - "BASECAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASECAyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of BASECAyN for a given value of BASECATy, considering only those\
+    \ rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of BASECAyN\
+    \ for a given value of BASECATy"
+  Condition_Failure: "On rows where both BASECAyN and BASECATy are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR330"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR330"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR330"
+        Version: "2"
+      Version: "5.0"

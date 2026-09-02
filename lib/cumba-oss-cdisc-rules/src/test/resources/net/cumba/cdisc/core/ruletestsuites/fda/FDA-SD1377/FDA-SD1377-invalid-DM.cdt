@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1377 expect=violation domain=DM
+#note "Subject 01-002 is a SCREEN FAILURE with no IE record -> fires on row 2. Row 1 (SCREEN FAILURE) has an IE record; row 3 (ARMNRS='NOT ASSIGNED') is outside the condition."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-001 |     | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-002 |     | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-003 |     | NOT ASSIGNED
+---
+
+dataset IE label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+---
+CDISCPILOT01 | IE | 01-001 | 1 | INCL01 | INCLUSION
+---

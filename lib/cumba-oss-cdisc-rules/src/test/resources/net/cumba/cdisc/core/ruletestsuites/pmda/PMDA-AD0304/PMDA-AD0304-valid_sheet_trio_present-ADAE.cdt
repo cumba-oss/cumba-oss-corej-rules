@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0304 expect=noViolation domain=ADAE
+#note "The sheet's requirement names exactly three variables (SMQzzNAM, SMQzzCD, SMQzzSC) and all three are present here; SMQ01SCN is deliberately NOT declared. The shipped Check is var_exists(\"SMQzzNAM\") and (not var_exists(\"SMQzzCD\") or not var_exists(\"SMQzzSC\")), so this conformant dataset is silent. Pins the dropped fourth arm (Fix #281, ruling M2-D14): SMQzzSCN is Perm in the ADaM OCCDS model and the sheet names it in neither its Message nor its Description, so requiring it over-reported - while the third disjunct stood this fired once."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col SMQ01NAM type=Char
+col SMQ01CD  type=Num
+col SMQ01SC  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | MIGRAINE | 20000105 | NARROW
+CDISCPILOT01 | 01-701-1023 | NAUSEA | MIGRAINE | 20000105 | BROAD

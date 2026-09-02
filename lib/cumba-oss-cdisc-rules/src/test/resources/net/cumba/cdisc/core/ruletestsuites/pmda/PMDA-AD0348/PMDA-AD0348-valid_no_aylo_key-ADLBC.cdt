@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0348 expect=noViolation domain=ADLBC
+#note "A1LO is not declared -- data that would fire under a degraded key. Here the absent column is the GUARD-and-key one, so not empty(A1LO) is false on every row and the rule is EXECUTED and silent. Deliberate mirror of PMDA-AD0347-valid_no_aylo_target: same missing-column story from the other side, both stay silent for DIFFERENT engine reasons (guard vs absent-target fast path)."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1LOC   type=Char
+---
+S1 | 001 | ALB | LOWNORMAL
+S1 | 002 | ALB | LOWNORMAL
+S1 | 003 | ALB | BELOWNORMAL

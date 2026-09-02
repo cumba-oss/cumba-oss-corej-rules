@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0586"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when PBCHG is populated and does not equal ((BASE-AVAL)/AVAL)*100."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PBCHG) and PBCHG != (((BASE - AVAL) / AVAL) * 100)
+Outcome:
+  Message: "PBCHG is populated but does not equal ((BASE-AVAL)/AVAL)*100."
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "BASE"
+  - "PBCHG"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "PBCHG"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject,\
+    \ PBCHG is populated and is not equal to ((BASE-AVAL)/AVAL)*100"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject, PBCHG is\
+    \ not equal to ((BASE-AVAL)/AVAL)*100"
+  Condition_Failure: "PBCHG is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR586"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR586"
+        Version: "1"
+      Version: "5.0"

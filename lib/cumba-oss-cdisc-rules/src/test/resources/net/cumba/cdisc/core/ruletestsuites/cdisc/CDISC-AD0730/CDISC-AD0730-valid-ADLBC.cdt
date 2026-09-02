@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0730 expect=noViolation domain=ADLBC
+# Rule:Description: There is more than one value of PARCATy for a given value of PARCATyN, considering only those rows on which both variables are populated
+#note "each PARCAT1N maps to a single PARCAT1 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+col PARCAT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | CHEMISTRY | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | HEMATOLOGY | 2
+---

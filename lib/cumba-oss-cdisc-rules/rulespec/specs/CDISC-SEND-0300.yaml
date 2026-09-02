@@ -1,0 +1,100 @@
+name: CDISC-SEND-0300
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5a — group-A backfill, and the **only rule in the whole
+  corpus that reads `define_dataset_name`**. It is also the only SEND-family member of the
+  dataset-level Define set, and it had **no `.cdt` scenario and no other executable coverage
+  anywhere in the tree** before this spec.
+
+  The rule: an empty dataset must not be described in the Define-XML. Native expression
+  `$dataset_record_count == 0 and not empty(ds_name("DEFINE"))`, over the
+  `record_count` Operation; `Rule_Type: Dataset Metadata Check against Define XML`,
+  `Sensitivity: Dataset`, `Scope.Use_Case: NONCLIN`, `Domains.Include: ALL`.
+
+  **Why the `define_xml` block declares no dataset attribute — read before "fixing" it.**
+  The only Define operand this rule reads is `define_dataset_name`, and that operand is
+  **derived, not declared**: D4 defaults it to the block key on both lanes (Java
+  `SpecDefineXml.datasetAttrs` seeds `{name: key}`; Python `define_dataset_records` fills
+  `define_dataset_name` when the record's value is `None`). Restating it would *remove* the
+  derivation from the execution path on the Python lane (the fill branch is
+  `if record.get(...) is None`) and make the assertion vacuous — and R6 rejects any value
+  other than the derived default anyway, so restating it could only ever re-assert what D4
+  already computed.
+
+  A dataset-level (object) block WOULD still be legal — R3 only requires a shape-B key to carry
+  at least one attribute, and the P5b specs (`FDA-SD1063`, `FDA-SD0061` and their PMDA twins)
+  do exactly that, declaring an inert sink-backed `define_dataset_label` purely to satisfy R3
+  while the rule reads the key set. Measured here too: a shape-B block with an inert
+  `define_dataset_label` yields the identical result (n=1). So shape A is not forced — it is
+  CHOSEN, for the reason below.
+
+  So the key carries the **variable-level (array) shape** instead — which is exactly D4's
+  documented cross-shape contract and the only rule-level coverage it has:
+  `SpecDefineXml.datasetAttrs` registers `{name: key}` for a shape-A value too, because "a
+  variable-level key is still a dataset the Define declares"; registering it only for shape B
+  left the Java lane serving no `define_dataset_name` where the Python lane served the key.
+  This spec is the end-to-end pin for that: kill the shape-A branch on either lane and
+  `non_empty(define_dataset_name)` goes false and the spec drops to zero findings. The shape
+  is also the faithful modelling of the defect — a real Define-XML describes an empty dataset
+  with a full `ItemGroupDef`, ItemRefs and all.
+
+  **The 0-row dataset.** `rows: []` is an established fixture shape
+  (`CORE-000579`, `CDISC-AD0061-empty`) and is what makes `$dataset_record_count == 0` true.
+  It does **not** trip the fork's "Dataset skipped — Dataset is empty after preprocessing and
+  operations" divergence that `CDISC-AD0061-empty` is baselined for: that skip keys on the
+  *evaluated frame* being empty, and a `Dataset Metadata Check against Define XML` builds a
+  metadata frame (one row per dataset, merged against the Define frame), not the data. The
+  precedent is direct — `CORE-000579` is `record_count == 0` over a 0-row `AE` and fires on
+  both lanes.
+  Consequence of the 0-row table: the dataset-level violation has no row to carry, so
+  `row_key` is all-null on both lanes, exactly as in `CORE-000579`.
+
+  `BW` (Body Weight) is a real SENDIG domain, and that is safe here: unlike the `*-SD9999`
+  rules this Check has no `domain_is_custom` gate, so no custom-vs-standard route can diverge
+  between the lanes and no `library_mocks` are needed.
+
+  Authoring constraints honoured:
+
+  * **Zero** `define_dataset_*` attributes declared — the rule reads only the derived name.
+    Nothing Python-lane-only is in play, so no opposite-verdict hazard.
+  * `Output_Variables` is `[$dataset_record_count, define_dataset_name]`. The
+    `define_dataset_*` half is populated by D4 on **both** lanes, so it is a real value on
+    both, not Java's absent key against Python's `null` — the hazard that rule exists for
+    does not arise. The native `rules/` entry keeps `$dataset_record_count` as a *named*
+    Operation (it is not inlined away, unlike `CORE-000579`'s), so Java's load-time-derived
+    effective `Output_Variables` and the fork's verbatim authored list agree and no
+    `parity-diff-baseline.json` entry is needed.
+  * `expected_status` is hand-authored — capture is status-blind, and the Java status channel
+    is blind to a dead Define channel (killing it yields `EXECUTED` with zero findings, not
+    `SKIPPED`). The non-zero Java count below is what proves the fixture live.
+  **Single dataset, deliberately — and no EC-41 multi-dataset guard is needed for this family.**
+  The Fix #132 regression guards (`FDA-SD1325-*-leak`, `FDA-SD9999-define-only-leak`) are all
+  SDTMIG-3.4, so neither the ADaM nor the SEND family has one. That is fine and not an omission:
+  the builder narrowing is engine-wide and family-independent — it keys on the dataset under
+  evaluation, not on the standard — and the cache-identity half is pinned by fork unit tests
+  over `RELREC`/`RELSUB` and `SUPPAPQS`/`SQAPQS`. A per-family multi-dataset spec would
+  re-measure the same engine code path through a different corpus, which is duplication rather
+  than coverage.
+python_source: rules-cdisc-sendig-3-1-1.json (CDISC-SEND-0300)
+rule:
+  coreId: CDISC-SEND-0300
+datasets:
+  BW:
+    row_key: [STUDYID, USUBJID, BWSEQ]
+    rows: []
+config:
+  standard: sendig
+  standard_version: 3.1.1
+define_xml:
+  BW:
+    - {define_variable_name: BWSTRESN}
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: CDISC-SEND-0300
+    dataset: BW
+    row_key: {BWSEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      $dataset_record_count: '0'
+      define_dataset_name: BW
+expected_errors: []

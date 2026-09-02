@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0680"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, DEVTYGyN is populated but DEVTYGy\
+  \ is empty."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(DEVTYGyN) and empty(DEVTYGy)
+Outcome:
+  Message: "DEVTYGyN is populated but DEVTYGy is empty on this record."
+  Output_Variables:
+  - "DEVTYGy"
+  - "DEVTYGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "DEVICE LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "DEVTYGy where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, DEVTYGyN is populated\
+    \ and DEVTYGy is not populated"
+  Rule_Failure_Criteria: "DEVTYGy is not populated"
+  Condition_Failure: "DEVTYGyN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR680"
+        Version: "1"
+      Version: "5.0"

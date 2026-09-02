@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0235"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record with TXPARMCD equal to 'ARMCD'\
+  \ exists for the same Trial Set (SETCD) in the Trial Sets (TX) dataset; each Trial\
+  \ Set should have only one ARMCD parameter."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "TXPARMCD"
+Operations:
+- id: "$armcd_count"
+  expression: "record_count(group=[STUDYID, SETCD], filter=filter(TXPARMCD=\"ARMCD\"\
+    ))"
+Check:
+  expression: >-
+    TXPARMCD == "ARMCD" and $armcd_count > 1
+Outcome:
+  Message: "More than one TX record with TXPARMCD equal to 'ARMCD' exists for the\
+    \ same Trial Set (SETCD)."
+  Output_Variables:
+  - "SETCD"
+  - "TXPARMCD"
+  - "$armcd_count"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "ARMCD"
+  Plain_Text_Explanation: "Every Trial Set should have only one ARMCD."
+  Rule: "Each Trial Set must have a single TXPARMCD = \"ARMCD\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND235"
+        Version: "1"
+      Version: "5.0"

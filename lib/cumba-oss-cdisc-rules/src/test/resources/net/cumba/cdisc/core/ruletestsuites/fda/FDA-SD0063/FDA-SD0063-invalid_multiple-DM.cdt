@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0063 expect=violation domain=DM
+#note "Two independently mislabelled variables: AGE carries 'Age in Years' instead of 'Age' and SEX carries 'Gender' instead of 'Sex'. Each variable is its own defect, so both must be reported."
+#library standard=sdtmig version=3-2
+#library variable-metadata DM AGE  name=AGE  label="Age"
+#library variable-metadata DM AGEU name=AGEU label="Age Units"
+#library variable-metadata DM SEX  name=SEX  label="Sex"
+#expectViolationCount 2
+#expectViolationAt variable_name=AGE
+#expectViolationAt variable_name=SEX
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age in Years"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Gender"
+---
+S1 | 001 | 56 | YEARS | M

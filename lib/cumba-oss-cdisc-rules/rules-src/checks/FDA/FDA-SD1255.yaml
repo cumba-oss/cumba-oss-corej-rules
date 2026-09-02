@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SD1255"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESDTH in the AE dataset equals 'Y' but DTHFL in\
+  \ the DM dataset does not equal 'Y' for the corresponding subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "AE"
+Check:
+  expression: >-
+    var_exists(AE.AESDTH) and AE.AESDTH == "Y" and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when AESDTH in the AE dataset equals 'Y'."
+  Output_Variables:
+  - "DTHFL"
+  - "AE.AESDTH"
+Source:
+  FDA_Validator_Rule_Message: "DTHFL does not equal 'Y' when AE.AESDTH = 'Y'"
+  FDA_Validator_Rule_Description: "DTHFL must equal 'Y' when there is a record in\
+    \ the Adverse Events (AE) domain with AESDTH = 'Y'."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1255"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1255"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1255"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1255"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0135"
+        Version: "1"
+      Version: "2.0"

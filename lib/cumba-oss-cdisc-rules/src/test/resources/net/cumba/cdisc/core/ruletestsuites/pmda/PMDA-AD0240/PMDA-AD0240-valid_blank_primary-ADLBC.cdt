@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0240 expect=noViolation domain=ADLBC
+#note "Row 1: TRTAG1 BLANK. The blank-dependent row is excluded twice over (the rule's not empty(TRTAG1) conjunct and D.13), leaving key 1 with {POOLB} -> silent."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTAG1  type=Char
+col TRTAG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 |       | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLB | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLC | 3

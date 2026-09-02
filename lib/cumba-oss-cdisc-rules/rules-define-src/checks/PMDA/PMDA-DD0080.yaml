@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0080"
+Sheet_Rule_Identifier: "DD0080"
+Rule_Set: "PMDA"
+Element: "MethodDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Methods that are referenced from a Variable or Value Level metadata should be included in Define.xml. Define-XML specification represents Methods as MethodDef elements within MetaDataVersion element."
+# ItemRef/@MethodOID is the only legal method reference; the bare ItemRef
+# referrer covers both containers (ItemGroupDef and def:ValueListDef) = the
+# sheet's "Variable or Value Level metadata".
+Message: "Method ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - element: "ItemRef"
+    attribute: "MethodOID"

@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-0233"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Trial Set description (SET) value\
+  \ exists for a given Trial Set Code (SETCD); a SETCD must identify a single Trial\
+  \ Set within the trial."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Check:
+  expression: >-
+    not empty(SETCD) and not empty(SET) and has_multiple_values_for(SET, SETCD)
+Outcome:
+  Message: "More than one SET value exists for a given SETCD; a SETCD must uniquely\
+    \ identify a Trial Set within the trial."
+  Output_Variables:
+  - "SETCD"
+  - "SET"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "SETCD"
+  Plain_Text_Explanation: "Each Trial Set must be identified by a SETCD which is unique\
+    \ within the trial."
+  Rule: "Each Trial Set must be identified by a SETCD which is unique within the trial."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND233"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0042A expect=violation domain=ADLBC
+#note "Domains.Include ALL, no scope key needed. ASTTM ends with TM, not DTM, not ARELTM, declared Num, empty display format -> one finding for the VARIABLE. Row index is a column index here: no row= pin, and no variable_format= pin (blank on the fired variable is the very thing the rule reports)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ASTTM
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTTM   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 13.5

@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0067"
+Sheet_Rule_Identifier: "DD0067"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Variables that are referenced from a Dataset or Value Level metadata should be included in Define.xml. Define-XML specification represents variables as ItemDef elements and variable references as ItemRef elements within an ItemGroupDef or def:ValueListDef."
+# Orphan detection (plan 3.35): the sheet names ItemRef as the reference vehicle,
+# and the bare ItemRef referrer covers both legal containers (ItemGroupDef and
+# def:ValueListDef). arm:AnalysisVariable/@ItemOID deliberately does NOT count as
+# a reference - the sheet's closed list is Dataset or Value Level metadata.
+Message: "Variable ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - element: "ItemRef"
+    attribute: "ItemOID"

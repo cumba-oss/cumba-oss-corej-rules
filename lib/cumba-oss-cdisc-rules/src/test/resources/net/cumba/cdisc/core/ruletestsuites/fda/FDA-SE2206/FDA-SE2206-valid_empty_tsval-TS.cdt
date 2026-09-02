@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2206 expect=noViolation domain=TS
+#note "The TSPARMCD=EXPSTDTC record is present but its TSVAL is empty. This rule counts parameter RECORDS, not populated values (the value-level checks are separate rules) -> no violation."
+#library standard=sendig version=3-1-1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STITLE | Study Title | 28-Day Repeat Dose Toxicity Study
+S01 | TS | 2 | EXPSTDTC | Experimental Start Date | 

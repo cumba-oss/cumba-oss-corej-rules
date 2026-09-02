@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0432 expect=violation domain=DM
+#note "column-absent case: AGE is populated but the AGEU column is absent from the dataset altogether -> fires. An ABSENT AGEU FIRES here rather than silencing the rule - the opposite of the machine-guard default. Plan B phase 4d' deleted the AUTHORED not var_exists(\"AGEU\") disjunct that used to say so explicitly; under absent = all-missing (EC-43) the bare empty(AGEU) leaf carries the case and the verdict is unchanged."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+---
+S1 | DM | 001 | 45

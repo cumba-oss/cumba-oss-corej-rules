@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1445 expect=violation domain=FA
+#note "FINDINGS ABOUT class dataset is in scope (sheet: 'FINDINGS, FINDINGS ABOUT'). Rows 1/2: two FALOBXFL='Y' records for the same USUBJID/FATESTCD/FAOBJ -> both fire (FAOBJ is not part of the key, but the rows are identical on it anyway). Row 3: different FATESTCD -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 FASEQ=1
+#expectViolationAt row=2 FASEQ=2
+dataset FA class="FINDINGS ABOUT"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAOBJ    type=Char label="Object of the Observation"
+col FALOBXFL type=Char label="Last Observation Before Exposure Flag"
+---
+S1 | FA | S1-001 | 1 | OCCUR | FEVER    | Y
+S1 | FA | S1-001 | 2 | OCCUR | FEVER    | Y
+S1 | FA | S1-001 | 3 | SEV   | FEVER    | Y

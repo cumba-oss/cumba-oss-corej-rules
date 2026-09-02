@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0079"
+Sheet_Rule_Identifier: "79"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:WhereClauseDef child element for  ItemRef is permitted only for def:ValueListDef/[@OID]/ItemRef."
+# The sheet row says "def:WhereClauseDef child element", but the child element an
+# ItemRef can carry is def:WhereClauseRef (spec 2.1 SS5.3.9.2/SS5.3.9.2.1: "Not
+# allowed as a child element of an ItemRef element if the parent node is a
+# def:ItemGroupDef element"); the check targets the real child name. Scoped to
+# ItemGroupDef/ItemRef so value-list ItemRefs (where it is required) are untouched.
+Message: "ItemGroupDef/ItemRef has a def:WhereClauseRef child element. It is permitted only for def:ValueListDef/ItemRef elements."
+Check:
+  kind: "not_exists"
+  target: "def:WhereClauseRef"

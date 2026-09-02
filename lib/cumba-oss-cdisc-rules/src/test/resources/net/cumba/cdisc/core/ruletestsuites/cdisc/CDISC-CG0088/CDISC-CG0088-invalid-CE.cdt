@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0088 expect=violation domain=CE
+#note "ADAPTED-FROM fda/FDA-SD1147/FDA-SD1147-invalid-CE.cdt. CEOCCUR is present but the pre-specified flag CEPRESP that gives it meaning is absent -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ   type=Num  label="Sequence Number"
+col CETERM  type=Char label="Reported Term for the Clinical Event"
+col CEOCCUR type=Char label="Clinical Event Occurrence"
+---
+S1 | CE | 001 | 1 | RASH | Y

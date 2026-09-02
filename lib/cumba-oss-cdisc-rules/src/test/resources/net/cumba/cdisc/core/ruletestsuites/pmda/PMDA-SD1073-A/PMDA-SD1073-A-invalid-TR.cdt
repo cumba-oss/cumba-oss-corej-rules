@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1073-A expect=violation domain=TR
+#note "TRLOC is present in TR although the IG prohibits it (TR does not include anatomical location information) -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TR label="Tumor Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col TRSEQ    type=Num
+col TRTESTCD type=Char
+col TRLOC    type=Char
+---
+S1 | TR | 001 | 1 | LDIAM | LIVER
+---

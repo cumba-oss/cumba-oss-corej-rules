@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1461 expect=violation domain=AE
+#note "Row 1: AEBODSYS populated, AEBDSYCD missing -> fires. Row 2: pair populated -> silent. Row 3: both blank -> silent. `--` resolves per domain: --BODSYS -> AEBODSYS, --BDSYCD -> AEBDSYCD (Num, Exp in SDTMIG 3.4 AE)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AEBODSYS=INFECTIONS
+dataset AE
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEBODSYS type=Char
+col AEBDSYCD type=Num
+---
+S1 | AE | 001 | 1 | INFECTIONS | .
+S1 | AE | 001 | 2 | INFECTIONS | 10021881
+S1 | AE | 001 | 3 |            | .

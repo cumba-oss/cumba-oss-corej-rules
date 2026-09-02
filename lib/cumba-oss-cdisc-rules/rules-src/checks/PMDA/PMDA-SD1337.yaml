@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-SD1337"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an RSLNKID value in the RS domain is not present\
+  \ as a TRLNKID value in the TR domain for the same subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RS"
+Requirements:
+  Variables:
+    All:
+    - "RSLNKID"
+Operations:
+- id: "$tr_lnkid"
+  expression: "distinct(TRLNKID, domain=\"TR\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(RSLNKID) and RSLNKID not in $tr_lnkid
+Outcome:
+  Message: "RSLNKID does not match any TRLNKID value in the TR domain for the subject."
+  Output_Variables:
+  - "RSLNKID"
+  - "$tr_lnkid"
+Source:
+  Message: "RSLNKID value does not exist in TR domain"
+  Description: "A Link ID (RSLNKID) value for a response assessment that is referenced\
+    \ in the Disease Response (RS) domain for a subject must also be present in the\
+    \ Tumor Results (TR) domain for the appropriate measurement records for that subject."
+  Domains: "RS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1337"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1337"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1337"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1337"
+        Version: "1"
+      Version: "1.6"

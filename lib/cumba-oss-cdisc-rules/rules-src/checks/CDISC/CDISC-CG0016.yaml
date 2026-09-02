@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0016"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable described as Expected in the SDTM IG\
+  \ is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$expected_variables"
+  expression: "expected_variables()"
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$missing_expected_variables"
+  expression: "minus($expected_variables, subtract=$dataset_variables)"
+Check:
+  expression: >-
+    not contains_all($dataset_variables, $expected_variables)
+Outcome:
+  Message: "Expected variable is not present in the dataset."
+  Output_Variables:
+  - "$missing_expected_variables"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Variable Core Status = Expected"
+  Rule: "Variable present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0016"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0016"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0016"
+        Version: "1"
+      Version: "2.0"

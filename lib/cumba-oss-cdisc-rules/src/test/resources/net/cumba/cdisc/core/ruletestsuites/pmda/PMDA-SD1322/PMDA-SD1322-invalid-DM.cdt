@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1322 expect=violation domain=DM
+#note "COUNTRY is bound to the non-extensible COUNTRY (ISO 3166-1 alpha-3) codelist with terms USA/CAN/DEU. Row 2 submits 'ZZZ', which is not a term -> fires. Row 1 uses a term, row 3 is empty (non_empty guard)."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM COUNTRY codelist=COUNTRY codelist_extensible=false codelist_coded_values="[\"USA\",\"CAN\",\"DEU\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=COUNTRY variable_value=ZZZ
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COUNTRY type=Char label="Country"
+---
+S1 | DM | 001 | USA
+S1 | DM | 002 | ZZZ
+S1 | DM | 003 |

@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-SD1469"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when EXVAMTU is present in the EX dataset while the\
+  \ EC dataset also exists in the study. When the EC domain is implemented in conjunction\
+  \ with the EX domain, EXVAMT and EXVAMTU should not be used in EX; the collected\
+  \ values are represented in ECDOSE and ECDOSU instead."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Datasets:
+  - "EC"
+Operations:
+- id: "$exvamtu_exists"
+  expression: "variable_exists(EXVAMTU)"
+Check:
+  expression: >-
+    $exvamtu_exists == true
+Outcome:
+  Message: "EXVAMTU is present in the EX domain when the EC domain exists."
+  Output_Variables:
+  - "$exvamtu_exists"
+Source:
+  Message: "EXVAMTU variable in EX domain is present when EC domain exists"
+  Description: "When the EC domain is implemented in conjunction with the EX domain,\
+    \ EXVAMT and EXVAMTU should not be used in EX; collected values instead would\
+    \ be represented in ECDOSE and ECDOSU."
+  Domains: "EX"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1469"
+        Version: "1"
+      Version: "6.0"

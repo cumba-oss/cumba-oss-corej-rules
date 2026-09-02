@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1258 expect=violation domain=DM
+#note "First branch of the any-tree: row 1 has a populated RFSTDTC while ACTARMCD is empty (subject was not treated) -> fires. Rows 2/3 are conformant."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 RFSTDTC=2020-01-15 ACTARMCD=
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | 2020-01-15 |
+S1 | DM | 002 | 2020-01-20 | A
+S1 | DM | 003 |            |

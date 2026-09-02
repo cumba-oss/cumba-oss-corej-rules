@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-CG0658"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SVPRESP is empty and VISITDY is populated. VISITDY\
+  \ is the Planned Study Day of a visit and should not be populated for unplanned\
+  \ visits."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "VISITDY"
+Check:
+  expression: >-
+    empty(SVPRESP) and not empty(VISITDY)
+Outcome:
+  Message: "VISITDY is populated when SVPRESP is empty. VISITDY is the Planned Study\
+    \ Day of a visit and should not be populated for unplanned visits."
+  Output_Variables:
+  - "SVPRESP"
+  - "VISITDY"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "VISITDY"
+  Condition: "SVPRESP = null"
+  Rule: "VISITDY = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0658"
+        Version: "1"
+      Version: "2.0"

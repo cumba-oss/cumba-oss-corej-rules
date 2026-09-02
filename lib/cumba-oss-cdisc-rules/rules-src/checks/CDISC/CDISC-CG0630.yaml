@@ -1,0 +1,33 @@
+Core:
+  Id: "CDISC-CG0630"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when FETUSID is present in the dataset, since FETUSID\
+  \ is not permitted in human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("FETUSID")
+Outcome:
+  Message: "Variable FETUSID is present but is not permitted in human clinical trials."
+  Output_Variables:
+  - "FETUSID"
+Source:
+  Class: "ALL"
+  Variable: "FETUSID"
+  Rule: "FETUSID not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0630"
+        Version: "1"
+      Version: "2.0"

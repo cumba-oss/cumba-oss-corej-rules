@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0076 expect=noViolation domain=ADSL
+#note "Rows 1 and 2: TRT01P BLANK. Rows 1 and 2 disagree, but their key is blank and is excluded from the functional dependency by two independent routes - the rule's own not empty(TRT01P) conjunct and the D.13 emptiness exception in the operator -> silent. Pins the emptiness exception on the KEY side."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 |       | 0
+CDISCPILOT01 | 01-701-1023 |       | 1
+CDISCPILOT01 | 01-701-1034 | DRUGA | 2

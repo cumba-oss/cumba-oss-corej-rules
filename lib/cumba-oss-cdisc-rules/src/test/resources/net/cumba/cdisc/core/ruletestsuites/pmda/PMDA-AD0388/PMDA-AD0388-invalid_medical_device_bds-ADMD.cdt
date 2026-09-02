@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0388 expect=violation domain=ADMD
+#note "*** TRIPWIRE. PARAMCD detects BASIC DATA STRUCTURE and SPDEVID specialises it to MEDICAL DEVICE BASIC DATA STRUCTURE (structureSet [MDBDS, BDS], Fix #179), which the Include list names outright. Group (GRADE3, GLUC) holds {3, 3, 4} -> minority row 3 fires. A SKIPPED verdict here would be a real detection, not an authoring slip."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC BTOXGRH=GRADE3 BTOXGRHN=4
+dataset ADMD
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col PARAMCD  type=Char
+col BTOXGRH  type=Char
+col BTOXGRHN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | GRADE3 | 3
+CDISCPILOT01 | 01-701-1023 | DEV01 | GLUC | GRADE3 | 3
+CDISCPILOT01 | 01-701-1034 | DEV02 | GLUC | GRADE3 | 4

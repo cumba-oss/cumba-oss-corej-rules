@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1150 expect=noViolation domain=TI
+#note "DISCRIMINATING. IETEST values genuinely disagree, so the FDA twin would fire and so would this rule if TIVERS carried any value - but a group whose KEY COMPONENT is blank is DROPPED entirely under the shipped DROP_MISSING_KEYS default (W32-E3 / Fix #241), so nothing groups and nothing fires. This is a PMDA-ONLY silence created by the extra key (SD1150-F4). If it FIRES, DROP_MISSING_KEYS has changed - escalate, do not populate TIVERS."
+#library standard=sdtmig version=3-4
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+col TIVERS   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older |
+S1 | TI | INCL01 | Age at least 18 years |

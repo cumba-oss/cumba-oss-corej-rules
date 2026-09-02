@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0328 expect=noViolation domain=ADLBC
+#note "AVALCA1N is not declared. The expander still seeds y=1 from AVALCAT1, but here the ABSENT column is the operator's TARGET, which short-circuits to an empty violation set (EC-53 fast path), while the guard not empty(AVALCAT1) stays true. EXECUTED and silent. Deliberate mirror of PMDA-AD0327-invalid_degraded_key_no_avalcayn: same missing column, opposite verdict, because the rule reads it on the other side of the operator."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVALCAT1 type=Char
+---
+S1 | 001 | ALB | LOW
+S1 | 002 | ALB | LOW
+S1 | 003 | ALB | HIGH

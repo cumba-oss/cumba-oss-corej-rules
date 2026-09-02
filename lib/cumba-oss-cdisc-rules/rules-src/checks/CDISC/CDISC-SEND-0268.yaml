@@ -1,0 +1,97 @@
+Core:
+  Id: "CDISC-SEND-0268"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable that exists nowhere in the SDTM model\
+  \ - neither in this domain's own general-observation-class table, nor in the IG\
+  \ domain table, nor in any other general-observation-class table - is present in\
+  \ the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+Operations:
+- id: "$model_order"
+  expression: "get_model_column_order()"
+- id: "$library_order"
+  expression: "get_column_order_from_library()"
+- id: "$events_vars"
+  expression: "get_model_filtered_variables(model_class=\"EVENTS\")"
+- id: "$interventions_vars"
+  expression: "get_model_filtered_variables(model_class=\"INTERVENTIONS\")"
+- id: "$findings_vars"
+  expression: "get_model_filtered_variables(model_class=\"FINDINGS\")"
+- id: "$findings_about_vars"
+  expression: "get_model_filtered_variables(model_class=\"FINDINGS ABOUT\")"
+Check:
+  expression: >-
+    varname() not in $model_order and varname() not in $library_order and varname() not in
+    $events_vars and varname() not in $interventions_vars and varname() not in $findings_vars and
+    varname() not in $findings_about_vars
+Outcome:
+  Message: "A variable that cannot be added to this domain per the model is present."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "Variables not found in referenced SDTM v1.5 must not be\
+    \ added to the domain structure."
+  Condition: "Variable does not exist in SDTM v1.5"
+  Rule: "Variable can not be added to the domain structure"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND268.1"
+        Version: "1"
+      Version: "5.0"

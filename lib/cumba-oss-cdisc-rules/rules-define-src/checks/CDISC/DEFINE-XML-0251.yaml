@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0251"
+Sheet_Rule_Identifier: "251"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "Purpose"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The value of the Purpose attribute must be \"Tabulation\" for an ItemGroupDef element that represents a dataset defined as following an SDTMIG or SENDIG standard."
+# Sheet: '//ItemGroupDef/@Purpose must be "Tabulation" where def:Standard/@Name
+# begins with "SDTM" or "SEND" and ItemGroupDef[@def:StandardOID = def:Standard/@OID].'
+# The guard dereferences def:StandardOID to the def:Standard's Name (begins-with,
+# full-match regex). Value check fires only on a present Purpose — presence is a
+# separate rule (Purpose is Required in the schema).
+Message: "The Purpose attribute for ItemGroupDef is not \"Tabulation\" [${value}] but the dataset follows an SDTM or SEND standard."
+Check:
+  kind: "one_of"
+  attribute: "Purpose"
+  values: ["Tabulation"]
+  when:
+    path: "@StandardOID->Standard@OID/@Name"
+    matchesRegex: "(SDTM|SEND).*"

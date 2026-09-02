@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SE2255 expect=violation domain=TP
+#note "The repro stage description 'Gestation Day 0 to 6' is coded both GD0-6 and GEST0-6, so RSTGCD is not unique for a given RSTAGE. Every record of the offending description is reported."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 RSTAGE="Gestation Day 0 to 6" RSTGCD=GD0-6
+#expectViolationAt row=2 RSTAGE="Gestation Day 0 to 6" RSTGCD=GEST0-6
+dataset TP class="TRIAL DESIGN" label="Trial Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col RPATH    type=Char label="Description of Planned Repro Path"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | PATH1 | Main Path   | 1 | GD0-6    | Gestation Day 0 to 6  | GESTATION | 0
+S1 | TP | PATH2 | Second Path | 1 | GEST0-6  | Gestation Day 0 to 6  | GESTATION | 0
+S1 | TP | PATH1 | Main Path   | 2 | GD7-13   | Gestation Day 7 to 13 | GESTATION | 7

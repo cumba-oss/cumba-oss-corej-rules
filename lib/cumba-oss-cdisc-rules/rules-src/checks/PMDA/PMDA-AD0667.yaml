@@ -1,0 +1,41 @@
+Core:
+  Id: "PMDA-AD0667"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DOSPCTDF (Percent Diff. Nominal vs. Actual Dose)\
+  \ is populated on a record but TRTA (Actual Treatment) is not populated; when DOSPCTDF\
+  \ is populated, TRTA must be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "TRTA"
+Check:
+  expression: >-
+    not empty(DOSPCTDF) and empty(TRTA)
+Outcome:
+  Message: "DOSPCTDF is populated but TRTA is not populated."
+  Output_Variables:
+  - "DOSPCTDF"
+  - "TRTA"
+Source:
+  Message: "DOSPCTDF is populated and TRTA is not populated"
+  Description: "If DOSPCTDF (Percent Diff. Nominal vs. Actual Dose) is populated,\
+    \ then TRTA (Actual Treatment) must be populated."
+  Domains: "ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0667"
+        Version: "1"
+      Version: "6.0"

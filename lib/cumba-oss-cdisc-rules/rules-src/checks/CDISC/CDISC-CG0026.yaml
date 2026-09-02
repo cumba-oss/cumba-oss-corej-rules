@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0026"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Time Point Reference (--TPTREF) is not populated\
+  \ but Date/Time of Reference Time Point (--RFTDTC) is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--TPTREF"
+    - "--RFTDTC"
+Check:
+  expression: >-
+    empty(--TPTREF) and not empty(--RFTDTC)
+Outcome:
+  Message: "--RFTDTC is populated when --TPTREF is not populated."
+  Output_Variables:
+  - "--TPTREF"
+  - "--RFTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--RFTDTC"
+  Condition: "--TPTREF = null"
+  Rule: "--RFTDTC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0026"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0026"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0026"
+        Version: "1"
+      Version: "2.0"

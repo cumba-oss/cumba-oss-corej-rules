@@ -1,0 +1,99 @@
+Core:
+  Id: "FDA-SE2201"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset contains neither\
+  \ a record where TSPARMCD equals 'AGE' (Age) nor a record where TSPARMCD equals\
+  \ 'AGETXT' (Age Text)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$age_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"AGE\"))"
+- id: "$agetxt_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"AGETXT\"))"
+Check:
+  expression: >-
+    $age_count == 0 and $agetxt_count == 0
+Outcome:
+  Message: "Missing both AGE and AGETXT Trial Summary Parameters: an 'Age' (AGE) record\
+    \ or an 'Age Text' (AGETXT) record must be present in the Trial Summary (TS) domain."
+  Output_Variables:
+  - "$age_count"
+  - "$agetxt_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing both AGE and AGETXT Trial Summary Parameters"
+  FDA_Validator_Rule_Description: "'Age' (AGE) or 'Age Text' (AGETXT) records should\
+    \ be populated in Trial Summary (TS) domain."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2201"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2201"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2201"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2201"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2201"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

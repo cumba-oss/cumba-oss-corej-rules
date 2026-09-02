@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0453"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary Parameter Value (TSVAL) for a\
+  \ PCLAS trial-summary parameter is not a valid term from NDF-RT."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$ndfrt_term_valid"
+  expression: "valid_external_dictionary_value(TSVAL, external_dictionary_type=\"\
+    medrt\", dictionary_term_type=\"MEDRT\")"
+Check:
+  expression: >-
+    TSPARMCD == "PCLAS" and $ndfrt_term_valid == false
+Outcome:
+  Message: "TSVAL is not a valid NDF-RT term for the PCLAS parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'PCLAS'"
+  Rule: "TSVAL is a valid term from NDF-RT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0453"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0453"
+        Version: "1"
+      Version: "2.0"

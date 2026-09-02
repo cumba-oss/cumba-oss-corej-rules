@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0053 expect=violation domain=ADSL
+# Rule:Description: The value of USUBJID is not present in SDTM.DM
+#note "DM present but ADSL USUBJID has no matching DM row -> DM.USUBJID empty after join -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-9999
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-9999
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

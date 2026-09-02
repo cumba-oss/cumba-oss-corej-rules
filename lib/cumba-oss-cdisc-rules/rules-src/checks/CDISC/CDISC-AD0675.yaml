@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-AD0675"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, DEVGRy is populated but DEVGRyN\
+  \ is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(DEVGRy) and empty(DEVGRyN)
+Outcome:
+  Message: "DEVGRy is populated but DEVGRyN is not populated on this record."
+  Output_Variables:
+  - "DEVGRy"
+  - "DEVGRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "DEVICE LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "DEVGRyN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, DEVGRy is populated\
+    \ and DEVGRyN is not populated"
+  Rule_Failure_Criteria: "DEVGRyN is not populated"
+  Condition_Failure: "DEVGRy is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR675"
+        Version: "1"
+      Version: "5.0"

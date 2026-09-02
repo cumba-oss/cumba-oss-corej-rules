@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-AD0006"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of FL is present and a\
+  \ variable with the same root and a suffix of FN is populated with a value other\
+  \ than 0 or 1"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists(*FL) and not empty(*FN) and *FN not in [0, 1]
+Outcome:
+  Message: "A variable with a suffix of FN is populated with a value other than 0\
+    \ or 1, while the variable with the same root and a suffix of FL is present"
+  Output_Variables:
+  - "*FN"
+  - "*FL"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*FN"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of FL is present\
+    \ and a variable with the same root and a suffix of FN has a value that is not\
+    \  0, 1 or null"
+  Rule_Failure_Criteria: "A variable with a suffix of FN has a value that is not \
+    \ 0, 1 or null"
+  Condition_Failure: "Variable with a suffix of FL is present and a variable with\
+    \ the same root and a suffix of FN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR6"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR6"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR6"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR6"
+        Version: "1"
+      Version: "5.0"

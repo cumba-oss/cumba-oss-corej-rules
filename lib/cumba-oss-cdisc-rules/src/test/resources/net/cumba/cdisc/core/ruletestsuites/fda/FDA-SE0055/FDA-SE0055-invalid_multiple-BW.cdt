@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE0055 expect=violation domain=BW
+#note "Two independently mistyped variables: BWSTRESN submitted Char although the IG defines Num, and BWTESTCD submitted Num although the IG defines Char. Each variable's data type is its own defect, so both must be reported."
+#library standard=sendig version=3-1-1
+#library variable-metadata BW BWTESTCD name=BWTESTCD simpleDatatype=Char label="Test Short Name"
+#library variable-metadata BW BWSTRESC name=BWSTRESC simpleDatatype=Char label="Standardized Result in Character Format"
+#library variable-metadata BW BWSTRESN name=BWSTRESN simpleDatatype=Num  label="Standardized Result in Numeric Format"
+#expectViolationCount 2
+#expectViolationAt variable_name=BWTESTCD
+#expectViolationAt variable_name=BWSTRESN
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWTESTCD type=Num  label="Test Short Name"
+col BWSTRESC type=Char label="Standardized Result in Character Format"
+col BWSTRESN type=Char label="Standardized Result in Numeric Format"
+---
+S1 | 001 | 1 | 250 | 250

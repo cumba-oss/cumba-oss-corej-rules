@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0386"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Body System or Organ Class Code (--BDSYCD) value\
+  \ is not a valid System Organ Class code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--BDSYCD"
+Operations:
+- id: "$bdsycd_valid"
+  expression: "valid_external_dictionary_code(--BDSYCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOCCD\")"
+Check:
+  expression: >-
+    $bdsycd_valid == false
+Outcome:
+  Message: "Body System or Organ Class Code (--BDSYCD) is not a valid MedDRA System\
+    \ Organ Class code."
+  Output_Variables:
+  - "--BDSYCD"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--BDSYCD"
+  Rule: "--BDSYCD = MedDRA system organ class code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0386"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0386"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0386"
+        Version: "1"
+      Version: "2.0"

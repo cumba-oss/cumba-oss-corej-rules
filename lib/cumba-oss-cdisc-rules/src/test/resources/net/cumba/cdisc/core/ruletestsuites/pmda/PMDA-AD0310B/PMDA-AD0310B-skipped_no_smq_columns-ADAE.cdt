@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0310B expect=skipped domain=ADAE
+#note "No column matching ^SMQ(\\d{2})SC$ or ^SMQ(\\d{2})SCN$. Scope pre-gate passes (declared OCCDS/ADVERSE EVENT), then the expander drops the rule: tryExpand returns NoMatch -> SKIPPED: Template did not match any columns in dataset. THE BATCH'S SINGLE PIN on wildcard NoMatch for the SMQzzSC family; AD0311B shares the identical mechanism and gets no duplicate."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | MILD | 2

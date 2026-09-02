@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1467 expect=noViolation domain=CM
+#note "Row 1: proper prespecified answer (PRESP=Y OCCUR=Y STAT blank) -> neither branch fires. Row 2: PRESP=Y OCCUR=N STAT blank -> neither branch fires. Row 3: spontaneous (PRESP blank OCCUR blank STAT blank), OCCUR unused -> conjunct 1 silent. 0 violations."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMPRESP type=Char
+col CMOCCUR type=Char
+col CMSTAT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN | Y | Y |
+S1 | CM | 002 | 1 | ASPIRIN | Y | N |
+S1 | CM | 003 | 1 | ASPIRIN | | |

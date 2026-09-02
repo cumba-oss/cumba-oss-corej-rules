@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0052"
+Sheet_Rule_Identifier: "DD0052"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "SASDatasetName attribute and filename (without extension) identified by def:ArchiveLocationID (def:leaf/xlink:href attribute) must have the same value."
+# CDISC twin 0112 - AGREE (same deref + file-basename shape). Case-insensitive
+# on purpose, as in the twin: the SASDatasetName is the upper-case XPT root
+# name while the archive file on disk is conventionally lower case (DM vs
+# dm.xpt, spec SS5.3.11). Either side missing => no finding (presence rows are
+# separate).
+Message: "SASDatasetName/def:ArchiveLocationID mismatch [${value}]"
+Check:
+  kind: "compare"
+  left: "@SASDatasetName"
+  right: "@ArchiveLocationID->leaf@ID/@href"
+  caseInsensitive: true
+  rightTransform: "file-basename"

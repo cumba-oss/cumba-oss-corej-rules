@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-CT2001 expect=violation domain=DM
+#note "SEX is bound to the non-extensible CDISC codelist SEX (C66731) whose terms are M/F/U. Row 2 submits 'X', which is not a term and cannot be added to a non-extensible codelist -> fires. Row 1 uses a valid term and row 3 leaves SEX empty."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM SEX codelist=SEX codelist_extensible=false codelist_coded_values="[\"M\",\"F\",\"U\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=SEX variable_value=X
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | M
+S1 | DM | 002 | X
+S1 | DM | 003 |

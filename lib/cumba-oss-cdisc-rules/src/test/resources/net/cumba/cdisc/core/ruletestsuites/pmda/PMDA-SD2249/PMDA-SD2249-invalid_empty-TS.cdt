@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2249 expect=violation domain=TS
+#note "Boundary: TSVAL is present but empty on the ACTSUB record. An empty value is not a number, so the 'TSVAL must be numeric when TSPARMCD=ACTSUB' requirement is violated and the rule must fire. (Positive control added by PLAN-absent-guard-test-hardening P3: PMDA-SD2249 previously had ONLY an expect=skipped fixture, which asserts non-execution and so proved nothing about the rule ever running. Modelled on its twin FDA-SD2249.)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=ACTSUB
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | ACTSUB | Actual Number of Subjects |

@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-SEND-0249"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record's Study Identifier (STUDYID) does not match\
+  \ any STUDYID value present in the Trial Summary (TS) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$ts_studyid"
+  expression: "distinct(STUDYID, domain=\"TS\")"
+Check:
+  expression: >-
+    not empty(STUDYID) and STUDYID not in $ts_studyid
+Outcome:
+  Message: "STUDYID does not match the STUDYID in the Trial Summary (TS) dataset."
+  Output_Variables:
+  - "STUDYID"
+  - "$ts_studyid"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "STUDYID"
+  Plain_Text_Explanation: "The STUDYID in all domains must match the STUDYID in TS."
+  Rule: "STUDYID = TS.STUDYID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249"
+        Version: "1"
+      Version: "5.0"

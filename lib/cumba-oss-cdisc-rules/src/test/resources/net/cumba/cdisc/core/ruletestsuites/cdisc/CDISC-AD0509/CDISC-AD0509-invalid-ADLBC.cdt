@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0509 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in SDT must contain "Start Date" in the label
+#note "ASDT label "Analysis Date" lacks "Start Date" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Date" variable_name=ASDT
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDT type=Char label="Analysis Date"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

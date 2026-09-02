@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-SEND-0371"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Character Result/Finding in Std Format (FMSTRESC)\
+  \ is not populated with a term from the Nonclinical DART Sex (NCDSEX) controlled\
+  \ terminology codelist for a fetal sex determination (FMTESTCD equals \"SEXFETAL\"\
+  )."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FM"
+Requirements:
+  Variables:
+    All:
+    - "FMSTRESC"
+    - "FMTESTCD"
+Operations:
+- id: "$ncdsex_terms"
+  expression: "codelist_terms(codelists=[NCDSEX], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    FMTESTCD == "SEXFETAL" and not empty(FMSTRESC) and FMSTRESC not in $ncdsex_terms
+Outcome:
+  Message: "FMSTRESC is not populated with a term from the (NCDSEX) controlled terminology\
+    \ codelist when FMTESTCD is \"SEXFETAL\"."
+  Output_Variables:
+  - "FMTESTCD"
+  - "FMSTRESC"
+  - "$ncdsex_terms"
+Source:
+  Class: "FND"
+  Domain: "FM"
+  Variable: "FMSTRESC"
+  Plain_Text_Explanation: "FMSTRESC must be populated using the NCDSEX contolled list\
+    \ when   FMTESTCD is \"SEXFETAL\"."
+  Condition: "FMTESTCD = \"SEXFETAL\""
+  Rule: "FMSTRESC populated using the NCDSEX controlled list"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND371"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND371"
+        Version: "1"
+      Version: "5.0"

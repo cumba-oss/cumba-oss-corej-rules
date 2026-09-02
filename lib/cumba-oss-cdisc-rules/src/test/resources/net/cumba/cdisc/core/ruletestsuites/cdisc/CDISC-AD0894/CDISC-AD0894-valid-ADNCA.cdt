@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0894 expect=noViolation domain=ADNCA
+# Rule:Description: Raise an error when, within the study, an ADNCA v1.0 dataset has more than one value of ACYCLE for a given value of ACYCLEC (considering only rows on which both variables are populated).
+dataset ADNCA
+col STUDYID type=Char
+col USUBJID type=Char
+col ACYCLE type=Char
+col ACYCLEC type=Char
+col PARAMCD type=Char
+col NFRLT type=Num
+col AFRLT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | CYCLE 1 | CONC | 0 | 0.5
+CDISCPILOT01 | 01-701-1023 | 2 | CYCLE 2 | CONC | 0 | 0.5
+CDISCPILOT01 | 01-701-1015 | 1 | CYCLE 1 | CONC | 0 | 0.5
+---

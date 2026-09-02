@@ -1,0 +1,30 @@
+name: CDISC-AD0474
+kind: rule
+description: |
+  Wave A6 port — T1a PlainSimple.
+  CDISC-AD0474: On a given record, STRATAV is populated and STRATAVN is not populated.
+  Record-data rule scoped to SUBJECT LEVEL ANALYSIS DATASET; non_empty + empty pair; literal column names per star-as-literal convention.
+python_source: rules-adamig-1-3.json (CDISC-AD0474)
+rule:
+  coreId: CDISC-AD0474
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', STRATAV: '', STRATAVN: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', STRATAV: 'X', STRATAVN: ''}      # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0474
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      STRATAV: 'X'
+      STRATAVN: null
+expected_errors: []

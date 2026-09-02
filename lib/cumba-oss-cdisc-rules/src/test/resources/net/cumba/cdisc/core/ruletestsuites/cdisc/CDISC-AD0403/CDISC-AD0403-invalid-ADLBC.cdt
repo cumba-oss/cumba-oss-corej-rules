@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0403 expect=violation domain=ADLBC
+# Rule:Description: Within a subject, there is more than one value of ATOXDSCL for a given value of PARAM, considering only those rows on which both variables are populated
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col ATOXDSCL type=Char
+col PARAM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Grade 1 low | GLUCOSE
+CDISCPILOT01 | 01-701-1015 | Grade 2 low | GLUCOSE
+CDISCPILOT01 | 01-701-1015 | Grade 1 low | SODIUM
+---

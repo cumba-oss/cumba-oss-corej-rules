@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0107"
+Sheet_Rule_Identifier: "DD0107"
+Rule_Set: "PMDA"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Related Domain Abbreviation (RDOMAIN) variable should have Origin set to 'Assigned'."
+# Guarded on the owning ItemDef's Name; 'Origin' is read as the def:Origin
+# Type attribute (both Define-XML versions carry it there). Fires only on a
+# present Type - a missing Origin is a presence row's beat.
+Message: "Origin for RDOMAIN variable is not set to Assigned"
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["Assigned"]
+  when:
+    path: "../@Name"
+    equals: "RDOMAIN"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1335 expect=noViolation domain=DM
+#note "BOUNDARY: three flavours of unpositionable RFXSTDTC, RFICDTC=2020-03-15 on all three (a value that would be 'after' any reasonable reading of the comparator). Row 1: RFXSTDTC=2020-02-30 is calendar-impossible (LocalDate.of rejects Feb 30). Row 2: RFXSTDTC=UNKNOWN is a junk token. Row 3: RFXSTDTC=----03-01 is a year-masked SDTM value. All three are unpositionable -- IsoDateBounds.lower/upper return null, CalendarDates.isCompleteDate is false for each so the compareIso fast path is not taken either, and every one of the six comparison operators then answers FALSE. The rule is SILENT on all three rows, deliberately: you cannot compare against a value you do not have. The impossible RFXSTDTC value itself is PMDA-SD0003's finding, not SD1335's -- the two rules partition the defect rather than double-reporting it."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFICDTC  type=Char label="Date/Time of Informed Consent"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-02-30 | 2020-03-15
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | UNKNOWN    | 2020-03-15
+CDISCPILOT01 | DM | 01-701-1028 | 1028 | ----03-01  | 2020-03-15

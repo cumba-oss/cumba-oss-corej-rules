@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-AD0313"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when SMQzzSCN is populated and does not equal 1 or 2,\
+  \ where zz is a zero-padded two-digit integer [01-99]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() =~ /^SMQ(0[1-9]|[1-9][0-9])SCN$/ and not empty(value()) and value() not in [1, 2]
+Outcome:
+  Message: "SMQzzSCN does not equal 1 or 2, where zz is a zero-padded two-digit integer\
+    \ [01-99]."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "SMQzzSCN where zz is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "SMQzzSCN is not equal to 1 or 2, where\
+    \ zz is a zero-padded two-digit integer [01-99]"
+  Rule_Failure_Criteria: "SMQzzSCN is not equal to 1 or 2"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR313"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR313"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR313"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR313"
+        Version: "2"
+      Version: "5.0"

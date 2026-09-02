@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2023 expect=violation domain=DM
+#note "Row 2 has BRTHDTC populated while AGE is missing -> fires; rows 1 and 3 are conformant."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 BRTHDTC=1980-02-29
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BRTHDTC type=Char label="Date/Time of Birth"
+col AGE     type=Num  label="Age"
+---
+S1 | DM | 001 | 1975-04-11 | 45
+S1 | DM | 002 | 1980-02-29 | .
+S1 | DM | 003 |            | .

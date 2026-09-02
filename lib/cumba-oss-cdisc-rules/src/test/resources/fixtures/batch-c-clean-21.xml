@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch C (datasets / ItemGroupDef family) clean 2.1 fixture: every batch-C rule
+     (57, 93, 94, 104, 108-110, 112-129, 239-241, 260) executes with zero findings.
+     Exercises the four dataset shapes the rules distinguish: a plain standard
+     dataset (IG.DM), a Trial Design reference-data dataset (IG.TE, guards of 239
+     and 260 pass positively), a non-standard dataset (IG.XX, def:IsNonStandard
+     without def:StandardOID, with the 57-required Description), and an empty
+     dataset (IG.ND, def:HasNoData='Yes' with the 240-required comment and no
+     def:ArchiveLocationID). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-c"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHC">
+    <GlobalVariables>
+      <StudyName>BATCHC-STUDY</StudyName>
+      <StudyDescription>Batch C clean fixture study</StudyDescription>
+      <ProtocolName>BATCHC-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch C MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.1" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No"
+                    IsReferenceData="No" SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.1"
+                    def:CommentOID="COM.1">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.TE" Name="TE" Domain="TE" Repeating="No"
+                    IsReferenceData="Yes" SASDatasetName="TE" Purpose="Tabulation"
+                    def:Structure="One record per element"
+                    def:ArchiveLocationID="LF.TE" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Trial Elements</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="TRIAL DESIGN"/>
+        <def:leaf ID="LF.TE" xlink:href="te.xpt">
+          <def:title>te.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.XX" Name="XX" Repeating="No"
+                    SASDatasetName="XX" Purpose="Tabulation"
+                    def:Structure="One record per finding per subject"
+                    def:ArchiveLocationID="LF.XX" def:IsNonStandard="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Sponsor-defined findings</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:leaf ID="LF.XX" xlink:href="xx.xpt">
+          <def:title>xx.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ND" Name="ND" Domain="ND" Repeating="No"
+                    SASDatasetName="ND" Purpose="Tabulation"
+                    def:Structure="One record per event per subject"
+                    def:StandardOID="STD.1" def:CommentOID="COM.1"
+                    def:HasNoData="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Planned domain without data</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <def:CommentDef OID="COM.1">
+        <Description>
+          <TranslatedText xml:lang="en">No records were collected for this planned dataset.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

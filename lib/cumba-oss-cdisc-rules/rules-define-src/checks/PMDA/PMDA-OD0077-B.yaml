@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-OD0077-B"
+Sheet_Rule_Identifier: "OD0077"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Codelist Term must match the Data Type of the containing CodeList. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element."
+# Float leg of PMDA-OD0077 (see the base rule's comment): the pattern is the
+# XML Schema float lexical shape (optional sign, decimal with optional
+# fraction, optional exponent) - an integer literal is a valid float.
+Message: "Codelist/Term Data Type mismatch"
+Check:
+  kind: "matches_regex"
+  attribute: "CodedValue"
+  pattern: '[+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?'
+  when:
+    path: "../@DataType"
+    equals: "float"

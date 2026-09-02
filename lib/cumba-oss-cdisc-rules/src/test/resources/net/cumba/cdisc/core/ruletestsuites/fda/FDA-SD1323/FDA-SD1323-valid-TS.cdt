@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1323 expect=noViolation domain=TS
+#note "Every populated FCNTRY TSVAL (USA, CAN) is a term of the (synthetic) COUNTRY codelist; the empty FCNTRY TSVAL is guarded out by non_empty and the non-FCNTRY parameter is out of scope."
+#library standard=sdtmig version=3-4
+#library codelist-terms COUNTRY USA CAN DEU
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | FCNTRY  | USA
+S1 | TS | 2 | FCNTRY  | CAN
+S1 | TS | 3 | FCNTRY  |
+S1 | TS | 1 | SPONSOR | Germany

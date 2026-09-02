@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0106 expect=violation domain=ADLBC
+#note "Roles are the reverse of PMDA-AD0105: TARGET is numeric APERIOD, key is APERIODC. Grouped by APERIODC=PERIOD1 the target holds {1, 1, 2} -> minority row 3 fires. These same rows do NOT fire under PMDA-AD0105."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 APERIOD=2 APERIODC=PERIOD1
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col APERIOD  type=Num
+col APERIODC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | PERIOD1
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | PERIOD1
+CDISCPILOT01 | 01-701-1034 | GLUC | 2 | PERIOD1

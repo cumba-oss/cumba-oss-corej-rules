@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0750 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of CHGCATy for a given value of CHG and y, where y is an integer [1-99, not zero-padded]
+#note "within PARAMCD=GLUC, each CHG maps to a single CHGCAT1 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CHG type=Num
+col CHGCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 10 | INCREASE
+CDISCPILOT01 | 01-701-1023 | GLUC | 0 | NO CHANGE
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE1157 expect=noViolation domain=CM
+#note "CMRSTMOD only populated where CMRSTIND=Y; RSTIND=N/empty rows have no RSTMOD -> no violation."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMRSTIND type=Char label="Restraint Indicator"
+col CMRSTMOD type=Char label="Restraint Mode"
+---
+S1 | CM | 001 | 1 | Y | SLING
+S1 | CM | 001 | 2 | N |
+S1 | CM | 001 | 3 |   |

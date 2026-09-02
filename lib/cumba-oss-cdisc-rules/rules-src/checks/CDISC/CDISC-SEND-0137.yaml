@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0137"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the EXDOSE variable declared in the EX Define-XML\
+  \ document has no Comment."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Check:
+  expression: >-
+    varname() == "EXDOSE" and not empty(var_name("DEFINE")) and var_has_comment("DEFINE") == false
+Outcome:
+  Message: "EXDOSE has no comment (explanation of intended or actual dose levels)\
+    \ in the Define-XML document."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "EXDOSE"
+  Plain_Text_Explanation: "The Define-XML document contains an explanation of EXDOSE\
+    \ values with respect for intended or actual dose levels."
+  Rule: "Define-XML document contains entry for EXDOSE (explanation of value as intended\
+    \ or actual dose levels)."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND137"
+        Version: "1"
+      Version: "5.0"

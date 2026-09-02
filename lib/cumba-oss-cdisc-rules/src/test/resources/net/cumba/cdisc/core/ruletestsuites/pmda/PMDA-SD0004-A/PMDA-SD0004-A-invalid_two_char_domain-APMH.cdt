@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0004-A expect=violation domain=APMH
+#note "Sponsor put the two-character parent code MH in DOMAIN where an AP dataset must carry the four-character AP code APMH. prefix(dataset_name,4)='APMH' != DOMAIN='MH' -> fires once for the whole two-row table (dataset granularity)."
+#expectViolationCount 1
+#expectViolationAt DOMAIN=MH
+#library standard=sdtmig version=3-4
+dataset APMH
+col STUDYID type=Char
+col DOMAIN  type=Char
+col APID    type=Char
+col MHSEQ   type=Num
+col MHTERM  type=Char
+---
+CDISCPILOT01 | MH | AP-001 | 1 | HEADACHE
+CDISCPILOT01 | MH | AP-001 | 2 | NAUSEA

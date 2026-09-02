@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0020B"
+Sheet_Rule_Identifier: "DD0020B"
+Rule_Set: "PMDA"
+Element: "MetaDataVersion"
+Attribute: "DefineVersion"
+Applicable_Versions: ["2.1"]
+Severity: "Reject"
+Plain_Text_Rule: "The def:DefineVersion should have a value of '2.0.0' for Define-XML v2.0 or '2.1.n' for Define-XML v2.1. The n in '2.1.n' reflects updates to the schema."
+# One sheet row, two version legs (0140/0160 base-is-2.1 convention): the sheet
+# ties each allowed shape to its Define-XML version, so each leg pins its own
+# pattern - stricter than CDISC twin 0028, which accepts either shape in either
+# version (DISAGREEMENT flagged: the PMDA wording is version-linked). 2.1 leg.
+Message: "Invalid def:DefineVersion value"
+Check:
+  kind: "matches_regex"
+  attribute: "DefineVersion"
+  pattern: '2\.1\.\d+'

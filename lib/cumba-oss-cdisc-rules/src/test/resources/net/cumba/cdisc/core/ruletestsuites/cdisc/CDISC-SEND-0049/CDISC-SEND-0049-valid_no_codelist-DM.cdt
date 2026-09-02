@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=noViolation domain=DM
+#note "The first-conjunct pin: the Library provider exists and knows both variables but declares no coded values for either, so no codelist applies and the rule executes with zero findings. Every populated cell is deliberately non-conformant, so the fixture is discriminating. Contrast CDISC-SEND-0049-skipped_no_library-DM: provider absent = SKIPPED, provider present but silent on codelists = EXECUTED-and-noViolation."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM SEX label="Sex"
+#library variable-metadata DM SPECIES label="Species"
+#expectViolationCount 0
+dataset DM class="SPECIAL PURPOSE" label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+---
+S1 | DM | 001 | X | HAMSTER
+S1 | DM | 002 | Q | GERBIL
+S1 | DM | 003 | Z | FERRET

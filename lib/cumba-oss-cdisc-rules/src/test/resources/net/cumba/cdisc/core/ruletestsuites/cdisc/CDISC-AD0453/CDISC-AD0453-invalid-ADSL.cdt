@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0453 expect=violation domain=ADSL
+# Rule:Description: On a given record, REGIONyN is populated and REGIONy is not populated
+#note "REGION1N populated, REGION1 empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col REGION1N type=Char
+col REGION1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X | 
+---

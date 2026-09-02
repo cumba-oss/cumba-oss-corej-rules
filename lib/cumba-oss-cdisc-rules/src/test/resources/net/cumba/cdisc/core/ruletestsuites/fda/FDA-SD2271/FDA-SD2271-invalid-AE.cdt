@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD2271 expect=violation domain=AE
+#note "AESTDY is present but AESTDTC is not -> a start study day without the start date it is derived from -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AESTDY   type=Num  label="Study Day of Start of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 5
+---

@@ -1,0 +1,71 @@
+Core:
+  Id: "FDA-SE0070"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Demographics (DM) subject whose Planned Arm Code\
+  \ (ARMCD) is populated has no record in the Exposure (EX) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$ex_usubjid"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+Check:
+  expression: >-
+    not empty(ARMCD) and USUBJID not in $ex_usubjid
+Outcome:
+  Message: "Subject has ARMCD populated but has no record in the EX dataset."
+  Output_Variables:
+  - "ARMCD"
+  - "$ex_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "No Exposure record found for subject"
+  FDA_Validator_Rule_Description: "All Demographics (DM) subjects (USUBJID) participating\
+    \ in a study that includes investigational product should have at least one record\
+    \ in the Exposure (EX) domain, except for subjects where ARMCD is not populated."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0070"
+        Version: "1"
+      Version: "1.6"

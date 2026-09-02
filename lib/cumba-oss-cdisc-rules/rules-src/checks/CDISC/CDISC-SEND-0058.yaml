@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0058"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the End Date/Time (--ENDTC) is populated, the Start/Collection\
+  \ Date/Time (--DTC) is populated, and --ENDTC is earlier than --DTC; the end date/time\
+  \ must be the same as or later than the start date/time."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+    - "--DTC"
+Check:
+  expression: >-
+    not empty(--ENDTC) and not empty(--DTC) and date(--ENDTC) < --DTC
+Outcome:
+  Message: "--ENDTC is earlier than --DTC."
+  Output_Variables:
+  - "--DTC"
+  - "--ENDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENDTC"
+  Plain_Text_Explanation: "--ENDTC must be greater than or equal to --DTC"
+  Condition: "--ENDTC ^=null"
+  Rule: "--ENDTC >= --DTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND58"
+        Version: "1"
+      Version: "5.0"

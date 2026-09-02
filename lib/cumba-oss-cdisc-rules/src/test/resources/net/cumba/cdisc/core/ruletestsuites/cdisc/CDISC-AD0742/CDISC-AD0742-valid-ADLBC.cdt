@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0742 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of AVALC for a given value of AVAL, considering only those rows on which both variables are populated
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVALC type=Char
+col AVAL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMAL | 5.1
+CDISCPILOT01 | 01-701-1015 | GLUC | HIGH | 8.0
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMAL | 5.1
+---

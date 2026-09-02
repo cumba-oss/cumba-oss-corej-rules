@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0007"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Collection Study Day (--DY) is populated but the\
+  \ date portion of Collection Study Date/Time (--DTC) or Subject Reference Start\
+  \ Date/Time (RFSTDTC) is not a complete date, i.e. empty, invalid, or only partially\
+  \ specified."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--DY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    (var_exists("--DTC") and not is_complete_date_part(--DTC) or not
+    is_complete_date_part(DM.RFSTDTC)) and not empty(--DY)
+Outcome:
+  Message: "--DY is populated when the date portion of --DTC or RFSTDTC is incomplete."
+  Output_Variables:
+  - "--DTC"
+  - "--DY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DY"
+  Condition: "The date portion of --DTC ^= complete date or the date portion of DM.RFSTDTC\
+    \ ^= complete date"
+  Rule: "--DY = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0007"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0007"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0007"
+        Version: "1"
+      Version: "2.0"

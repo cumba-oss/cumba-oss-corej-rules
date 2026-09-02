@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0336"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --CAT is equal to the domain label, making the category\
+  \ value redundant with the domain name."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--CAT"
+Check:
+  expression: >-
+    not empty(ds_label("LIBRARY")) and equalsIgnoreCase(--CAT, ds_label("LIBRARY"))
+Outcome:
+  Message: "--CAT value is redundant with the domain name (domain label)."
+  Output_Variables:
+  - "--CAT"
+  - "library_dataset_label"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--CAT"
+  Rule: "--CAT ^= Domain Name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0336"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0336"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0336"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE1157 expect=violation domain=CM
+#note "CMRSTMOD populated while CMRSTIND=N (row 1) or empty (row 2) -> fires; RSTIND=Y row 3 is conformant."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 2
+#expectViolationAt row=1 CMSEQ=1
+#expectViolationAt row=2 CMSEQ=2
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMRSTIND type=Char label="Restraint Indicator"
+col CMRSTMOD type=Char label="Restraint Mode"
+---
+S1 | CM | 001 | 1 | N | SLING
+S1 | CM | 001 | 2 |   | CHAIR
+S1 | CM | 001 | 3 | Y | SLING

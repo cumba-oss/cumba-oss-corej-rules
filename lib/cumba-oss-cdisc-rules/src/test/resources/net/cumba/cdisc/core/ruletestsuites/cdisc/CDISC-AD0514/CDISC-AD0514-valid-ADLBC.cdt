@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0514 expect=noViolation domain=ADLBC
+# Rule:Description: A variable ending in STMF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Start" and "Time"
+#note "CDISC's own ADaMIG labels: ASTMF spells Imputation in full; APERSTMF, ASPRSTMF and the expanded AP01STMF abbreviate to "Imput." -> all accepted"
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTMF type=Char label="Analysis Start Time Imputation Flag"
+col APERSTMF type=Char label="Period Start Time Imput. Flag"
+col ASPRSTMF type=Char label="Subperiod Start Time Imput. Flag"
+col AP01STMF type=Char label="Period 01 Start Time Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x
+---

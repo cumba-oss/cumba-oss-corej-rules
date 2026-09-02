@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD1017 expect=noViolation domain=SV
+#note "CL-A A.7 (wave TA-4): the not empty(VISITNUM) guard adopted from FDA-SD1017. Row 2 leaves VISITNUM empty for a planned visit - an empty cell is trivially 'not in' the TV set, and before the guard the rule reported a mismatch about a value that does not exist. Emptiness of a Required variable is a different rule's business; this rule now stays silent. Row 1 matches TV."
+#library standard=sdtmig version=3-4
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+S1 | SV | 001 | 1 | SCREENING |
+S1 | SV | 001 |   | BASELINE  |
+---
+
+dataset TV class="TRIAL DESIGN" label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | TV | 1 | SCREENING
+S1 | TV | 2 | WEEK 2

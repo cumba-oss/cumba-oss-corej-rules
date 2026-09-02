@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0339"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a record, the Multi-Response Criterion y Evaluation\
+  \ (MCRITyML) variable is populated but its corresponding Analysis Multi-Response\
+  \ Criterion y (MCRITy) variable is not populated; whenever MCRITyML carries a value,\
+  \ MCRITy must also carry a value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(MCRITyML) and empty(MCRITy)
+Outcome:
+  Message: "MCRITyML is populated, but MCRITy is not populated."
+  Output_Variables:
+  - "MCRITy"
+  - "MCRITyML"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "MCRITy is not populated when MCRITyML is populated"
+  Description: "When Multi-Response Criterion y Evaluation (MCRITyML) variable value\
+    \ is populated, then its corresponding Analysis Multi-Response Criterion y (MCRITy)\
+    \ variable must be also populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0339"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0339"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0339"
+        Version: "1"
+      Version: "6.0"

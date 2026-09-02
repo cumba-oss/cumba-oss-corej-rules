@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1074 expect=violation domain=DM
+#note "NEW with the M2-P6 ruling (option (b'), Fix #306) - the two names that separate (b') from (b). SETCD and RPATHCD are SEND-only by the same metadata test as AGETXT (SETCD on DM/RELREF/TX, RPATHCD on DM/TP, neither on any sdtmig dataset), and (b) - the finding's four-name widening - would have left both silent. Two offending columns -> two findings at Variable granularity. STUDYID/DOMAIN/USUBJID are the control: they are SDTM names and must not fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt variable_name=SETCD
+#expectViolationAt variable_name=RPATHCD
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+col RPATHCD type=Char label="Repro Path Code"
+---
+S1 | DM | 001 | SET01 | RP01

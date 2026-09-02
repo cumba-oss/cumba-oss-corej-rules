@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0084"
+Sheet_Rule_Identifier: "84"
+Rule_Set: "CDISC"
+Element: "WhereClauseDef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+# First shipped custom-kind rule (budget 1/15): cross-dataset detection needs
+# reverse ItemRef-membership resolution + a distinct-dataset count, outside the
+# declarative DSL. Semantics documented on the check class.
+Plain_Text_Rule: "Comment must be provided for a where clause when two or more datasets are referenced in where clause conditions."
+Message: "def:CommentOID is missing on a where clause whose conditions reference variables from two or more datasets."
+Check:
+  kind: "custom"
+  className: "net.cumba.cdisc.define.conformance.checks.WhereClauseCrossDatasetCommentCheck"

@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-AD0328"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when there is more than one value of AVALCAyN for a given\
+  \ value of AVALCATy within a parameter, considering only records where both variables\
+  \ are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AVALCAyN) and not empty(AVALCATy) and has_multiple_values_for(AVALCAyN, AVALCATy,
+    within=PARAMCD)
+Outcome:
+  Message: "Within this parameter, more than one value of AVALCAyN is present for\
+    \ the same populated value of AVALCATy"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVALCATy"
+  - "AVALCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "AVALCAyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of AVALCAyN for a given value of AVALCATy, considering only those\
+    \ rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of AVALCAyN\
+    \ for a given value of AVALCATy"
+  Condition_Failure: "On rows where both AVALCAyN and AVALCATy are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR328"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR328"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR328"
+        Version: "2"
+      Version: "5.0"

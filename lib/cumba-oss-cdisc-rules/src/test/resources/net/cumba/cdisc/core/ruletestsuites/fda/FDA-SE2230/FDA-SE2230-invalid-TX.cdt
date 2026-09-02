@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2230 expect=violation domain=TX
+#note "Set code CTRL is described both as 'Control Group' and as 'Control', so SET is not the same for a given SETCD. Every record of the offending set code is reported."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 SETCD=CTRL SET="Control Group"
+#expectViolationAt row=2 SETCD=CTRL SET=Control
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S1 | TX | CTRL | Control Group | 1 | TRTDOS | Treatment Dose | 0
+S1 | TX | CTRL | Control       | 2 | GRPLBL | Group Label    | Control
+S1 | TX | HD   | High Dose     | 1 | TRTDOS | Treatment Dose | 100

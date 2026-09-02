@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2010 expect=violation domain=CE
+#note "CEHLT 'Cephalgia disorders' is not a High Level Term of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid HLT (--HLT resolves to CEHLT, the Events-class model Variable Qualifier)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CEHLT="Cephalgia disorders"
+dataset CE
+col USUBJID type=Char
+col CEHLT   type=Char
+---
+001 | Headaches NEC
+001 | Cephalgia disorders

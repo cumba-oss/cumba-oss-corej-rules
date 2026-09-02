@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-SEND-0350"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Repro Stage Short Name (RSTGCD) is \"UNPLAN\" but\
+  \ Repro Stage (RSTAGE) is populated; RSTAGE must be left blank for unplanned stages."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Requirements:
+  Variables:
+    All:
+    - "RSTAGE"
+    - "RSTGCD"
+Check:
+  expression: >-
+    RSTGCD == "UNPLAN" and not empty(RSTAGE)
+Outcome:
+  Message: "RSTAGE is populated while RSTGCD is \"UNPLAN\"."
+  Output_Variables:
+  - "RSTGCD"
+  - "RSTAGE"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "RSTAGE"
+  Plain_Text_Explanation: "If RSTGCD is \"UNPLAN\", the RSTAGE name should be left\
+    \ blank."
+  Condition: "RSTGCD = \"UNPLAN\""
+  Rule: "RSTAGE = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND350"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND350"
+        Version: "1"
+      Version: "5.0"

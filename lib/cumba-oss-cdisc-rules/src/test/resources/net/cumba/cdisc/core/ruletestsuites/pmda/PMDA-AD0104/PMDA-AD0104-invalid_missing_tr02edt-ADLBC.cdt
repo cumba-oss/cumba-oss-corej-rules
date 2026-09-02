@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-AD0104 expect=violation domain=ADLBC
+#note "Row 1: TR01EDT present -> no. Row 2: no TR02EDT -> FIRES. JOIN: ADSL on [USUBJID], inner, 1:1, subject present."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 APERIOD=2
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col APERIOD type=Num
+---
+S1 | 001 | GLUC | 5.1 | 1
+S1 | 001 | GLUC | 5.4 | 2
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01EDT type=Char
+---
+S1 | 001 | 2020-02-01

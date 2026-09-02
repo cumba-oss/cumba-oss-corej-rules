@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0053 expect=noViolation domain=ADSL
+# Rule:Description: The value of USUBJID is not present in SDTM.DM
+#note "ADSL USUBJID matches a DM row -> DM.USUBJID populated after join -> noViolation"
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

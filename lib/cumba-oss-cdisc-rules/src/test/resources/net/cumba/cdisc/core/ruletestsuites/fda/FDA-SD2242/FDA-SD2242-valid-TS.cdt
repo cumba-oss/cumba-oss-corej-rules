@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2242 expect=noViolation domain=TS
+#note "The TRT record carries TSVCDREF='UNII' exactly as the FDA rule requires, so nothing is flagged. The second record is a different TSPARMCD and is outside this rule's condition."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Parameter Value Code Reference"
+---
+S1 | TS | 1 | TRT | Investigational Therapy or Treatment | ASPIRIN | R16CO5Y76E | UNII
+S1 | TS | 2 | CURTRT | Current Treatment | ASPIRIN | R16CO5Y76E | UNII

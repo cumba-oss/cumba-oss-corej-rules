@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD1319 expect=violation domain=DV
+#note "DV branch of the DS/DV scope: row 1 DVSTDTC before RFICDTC -> fires. Row 2: DVSTDTC after RFICDTC -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DVSEQ=1
+dataset DV class=EVENTS label="Protocol Deviations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DVSEQ   type=Num  label="Sequence Number"
+col DVTERM  type=Char label="Protocol Deviation Term"
+col DVSTDTC type=Char label="Start Date/Time of Deviation"
+---
+S1 | DV | 001 | 1 | VISIT OUT OF WINDOW | 2019-12-20
+S1 | DV | 001 | 2 | MISSED ASSESSMENT   | 2020-02-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFICDTC type=Char label="Date/Time of Informed Consent"
+---
+S1 | DM | 001 | 2020-01-01
+---

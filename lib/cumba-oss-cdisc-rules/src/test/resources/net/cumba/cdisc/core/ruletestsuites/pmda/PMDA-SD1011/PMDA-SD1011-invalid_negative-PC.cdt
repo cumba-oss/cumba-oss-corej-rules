@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1011 expect=violation domain=PC
+#note "Pins the leaf's negative=false setting: '-PT30M' on row 2 is a NEGATIVE ISO 8601 duration, which base ISO 8601 does not allow, so PCELTM must be reported. ADAPTED-FROM fda/FDA-SD1011/FDA-SD1011-invalid_negative-PC.cdt — data verbatim, but the sidecar is CHANGED: PMDA-SD1011 ships only in rules-pmda-sdtmig-*, not in any SENDIG package, so this scenario declares sdtmig version=3-4 (not the twin's sendig 3-1-1) or the membership assertion fails. PC is a FINDINGS domain in SDTMIG as well, so the body needs no other change."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=PCELTM variable_value=-PT30M
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+STUDY01 | PC | 001 | 1 | DRUGX | PT30M
+STUDY01 | PC | 001 | 2 | DRUGX | -PT30M

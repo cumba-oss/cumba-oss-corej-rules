@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-AD0778"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of ARELN for a given\
+  \ value of AREL, considering only rows on which both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AREL) and not empty(ARELN) and has_multiple_values_for(ARELN, AREL)
+Outcome:
+  Message: "ARELN takes more than one value for the same value of AREL, considering\
+    \ only rows on which both variables are populated."
+  Output_Variables:
+  - "AREL"
+  - "ARELN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ARELN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of ARELN for\
+    \ a given value of AREL, considering only those rows on which both variables are\
+    \ populated"
+  Rule_Failure_Criteria: "There is more than one value of ARELN for a given value\
+    \ of AREL"
+  Condition_Failure: "On rows where both ARELN and AREL are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR778"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR778"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR778"
+        Version: "1"
+      Version: "5.0"

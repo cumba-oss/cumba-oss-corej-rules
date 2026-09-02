@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0650 expect=skipped domain=ADAE
+#note "Pins the MACHINE-DERIVED guard: var_exists(ONTRTFL) folds FALSE on an absent column, so the rule EXECUTES and stays silent. That guard is DERIVED - it must never be written into the rule. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ASEQ     type=Num
+col AEDECOD  type=Char
+col ONTRT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y

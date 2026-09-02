@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1023 expect=noViolation domain=LB
+#note "Fix #246 flood arm, KEPT through the D-TA-6a re-authoring: TV is absent entirely, so $tv_visit_keys is the empty set and the vacuous-on-empty membership would be true on every row with a populated (VISIT, VISITNUM). The top-level var_exists(TV.VISIT) guard resolves TV through the dataset resolver, finds nothing, and suppresses the rule with no finding. PMDA-SD1023 gained the same guard at wave TA-4 (CL-G.1 / EC-82 option (a)), completing the Fix #246 family - the twins are byte-identical again."
+#library standard=sdtmig version=3-4
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---

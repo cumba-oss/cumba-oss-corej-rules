@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2277 expect=violation domain=BW
+#note "BWCOMMENT is declared with a length of 250 characters, beyond the 200-character SAS v5 transport limit -> fires on that variable. This is a variable-metadata rule, so the location is pinned by variable_name."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt variable_name=BWCOMMENT
+dataset BW label="Body Weight"
+col STUDYID   type=Char length=20  label="Study Identifier"
+col USUBJID   type=Char length=40  label="Unique Subject Identifier"
+col BWTESTCD  type=Char length=8   label="Test Short Name"
+col BWSTRESC  type=Char length=50  label="Standardized Result in Character Format"
+col BWCOMMENT type=Char length=250 label="Comment"
+---
+S1 | 001 | BW | 250 | free text

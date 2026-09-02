@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-CT2003 expect=noViolation domain=LB
+#note "Every populated LBTESTCD maps to the same CDISC-CT concept id as its paired LBTEST decode (ALB/Albumin = C64431, BILI/Bilirubin = C64433), so the one-to-one relationship holds and the rule stays silent. The empty row proves the 'not empty(value())' guard: an unpopulated code is not a finding."
+#library standard=sdtmig version=3-4
+#library codelist-codes LB LBTESTCD ALB=C64431 BILI=C64433
+#library codelist-codes LB LBTEST Albumin=C64431 Bilirubin=C64433
+#expectViolationCount 0
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+---
+S1 | LB | 001 | ALB | Albumin
+S1 | LB | 002 | BILI | Bilirubin
+S1 | LB | 003 |  |

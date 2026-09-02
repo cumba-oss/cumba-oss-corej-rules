@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0266"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVCDREF is not populated and TSVCDVER is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    not empty(TSVCDVER) and empty(TSVCDREF)
+Outcome:
+  Message: "TSVCDREF is empty when TSVCDVER is populated."
+  Output_Variables:
+  - "TSVCDREF"
+  - "TSVCDVER"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDREF"
+  Condition: "TSVCDVER ^= null"
+  Rule: "TSVCDREF ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0266"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0266"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0266"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,60 @@
+Core:
+  Id: "FDA-SD1384"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Day of Obs Rel to Challenge Agent (--CHDY) is populated\
+  \ and both the date portion of --DTC and the date portion of RFCSTDTC are complete\
+  \ dates, but --CHDY does not equal the value computed by the study day algorithm\
+  \ relative to the Date/Time of First Challenge Agent Admin (RFCSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--CHDY"
+    - "--DTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_chdy_algorithm"
+  expression: "dy(--DTC, reference=\"RFCSTDTC\")"
+Check:
+  expression: >-
+    not empty(--CHDY) and is_complete_date(--DTC) and is_complete_date(DM.RFCSTDTC) and --CHDY !=
+    $value_chdy_algorithm
+Outcome:
+  Message: "Day of Obs Rel to Challenge Agent (--CHDY) does not equal the value derived\
+    \ by the study day algorithm against RFCSTDTC even though the date portions of\
+    \ --DTC and RFCSTDTC are complete dates and --CHDY is populated."
+  Output_Variables:
+  - "$value_chdy_algorithm"
+  - "--DTC"
+  - "--CHDY"
+  - "DM.RFCSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "Incorrect value for --CHDY variable"
+  FDA_Validator_Rule_Description: "Day of Obs Rel to Challenge Agent (--CHDY) variable\
+    \ value should be populated as defined by CDISC standards: --CHDY = (date portion\
+    \ of --DTC) - (date portion of RFCSTDTC) +1 if --DTC is on or after RFCSTDTC;\
+    \ --CHDY = (date portion of --DTC) - (date portion of RFCSTDTC) if --DTC precedes\
+    \ RFCSTDTC."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1384"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2010 expect=violation domain=AE
+#note "AEHLT 'Cephalgia disorders' is not a High Level Term of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid HLT."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEHLT="Cephalgia disorders"
+dataset AE
+col USUBJID type=Char
+col AEHLT   type=Char
+---
+001 | Headaches NEC
+001 | Cephalgia disorders

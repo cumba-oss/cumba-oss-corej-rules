@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1365 expect=noViolation domain=SUPPAE
+#note "PERMANENT PIN OF A RULED DEVIATION - not a flip candidate (M2-P8, option (B), ruled 2026-08-21). The Check gates on RDOMAIN='DM', so the same population-flag QNAM attached to a non-DM parent is deliberately NOT reported. The FDA sheet row 378 says SUPPQUAL, but the row also names CG0528 as the publisher, and the CDISC rows 1167-1168 behind that id say Domain: DM and write 'ADSL Population flags not in SUPPDM' into the Rule cell. coreJ follows the originating authority; the DM restriction is faithful to the flags' history as standard SUPPDM qualifiers. The deviation is on the record as a sheet issue under M2-D31 (owed by the ruling, filed by the coordinator). ⛔ Do NOT re-aim this fixture to expect=violation: that is option (A), which was REJECTED. Twin: pmda/PMDA-SD1365/PMDA-SD1365-valid_other_rdomain-SUPPAE.cdt, identical pin."
+#library standard=sdtmig version=3-4
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | SAFFL | Safety Population Flag | Y

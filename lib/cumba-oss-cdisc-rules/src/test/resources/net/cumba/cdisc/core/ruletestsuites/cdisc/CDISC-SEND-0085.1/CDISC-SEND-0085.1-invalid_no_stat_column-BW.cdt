@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0085.1 expect=violation domain=BW
+#note "The --STAT-ABSENT arm, which the backtick defect never touched: --ORRES exists and is empty on row 1 and `not var_exists(\"--STAT\")` is TRUE, so the rule fires there and is silent on row 2, which carries a result. Green both before and after M3-D2 -- authored separately from -invalid_blank_stat-BW precisely because it exercises the one disjunct the defect did not collapse."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 BWSEQ=1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWORRESU type=Char label="Original Units"
+---
+S1 | BW | 001 | 1 | BW |     | g
+S1 | BW | 001 | 2 | BW | 250 | g
+---

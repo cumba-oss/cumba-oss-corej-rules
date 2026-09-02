@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0307"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the species parameter (TXPARMCD equals \"SPECIES\"\
+  ), more than one species value (TXVAL) is present for a given Trial Set (SETCD)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Requirements:
+  Variables:
+    All:
+    - "TXPARMCD"
+Check:
+  expression: >-
+    TXPARMCD == "SPECIES" and has_multiple_values_for(TXVAL, SETCD, within=TXPARMCD)
+Outcome:
+  Message: "A Trial Set (SETCD) contains more than one species (TXVAL) for TXPARMCD\
+    \ equal to 'SPECIES'."
+  Output_Variables:
+  - "SETCD"
+  - "TXPARMCD"
+  - "TXVAL"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "TXPARM"
+  Plain_Text_Explanation: "Trial Sets (TX) can have multiple species and/or strains\
+    \ if they are different by set."
+  Condition: "TXPARMCD = \"SPECIES\" is present in TX"
+  Rule: "One Trial Set cannot contain more than one species."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND307"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND307"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND307"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND307"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND307"
+        Version: "1"
+      Version: "5.0"

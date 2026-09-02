@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0204 expect=noViolation domain=ADSL
+# Rule:Description: The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.AGE is not equal to DM.AGE
+#note "same USUBJID, ADSL.AGE 63 == DM.AGE 63 -> noViolation"
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 63
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col AGE type=Num
+---
+CDISCPILOT01 | DM | 01-701-1015 | 63
+---

@@ -1,0 +1,56 @@
+name: EMPTYSTR-date-not-equal-empty
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category C.1).
+  date_not_equal_to "2020-01-01" on an empty cell. The honest coreJ engine fires
+  on "" (already did, and stays that way); Python's date compare is not-comparable
+  on "" and does not fire.
+
+  NOTE on the converter gate: the production CORE→native path
+  (RulePackageConverter) wraps date_not_equal_to in `AND non_empty(target)`, so
+  converted CORE rules match Python (no fire on empty). The spec-runner Java lane
+  evaluates the legacy engine directly from the raw CORE leaf and does NOT route
+  through RulePackageConverter, so the gate is invisible here and the honest engine
+  fires on the empty row. Baselined on the python lane (expected matches the
+  un-gated honest Java engine).
+python_notes: |
+  Python date_not_equal_to does not fire on an empty/non-comparable cell → only the
+  genuinely-different date row fires. coreJ honest engine fires the empty row too.
+  The production converter gate (Phase 6) reconciles converted CORE rules with
+  Python; the spec-runner does not apply that gate.
+python_source: PLAN-empty-string-membership-parity.md (C.1)
+check:
+  name: AESTDTC
+  operator: date_not_equal_to
+  value: "2020-01-01"
+  value_is_literal: true
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AESTDTC: '2020-01-01'}    # equal → no fire
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AESTDTC: '2021-06-15'}    # differ → fires (both)
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AESTDTC: ''}              # empty → coreJ fires, Python does not
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-date-not-equal-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESTDTC: '2021-06-15'
+    STUDYID: S1
+    USUBJID: '002'
+- rule_id: AUTO-EMPTYSTR-date-not-equal-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESTDTC:
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

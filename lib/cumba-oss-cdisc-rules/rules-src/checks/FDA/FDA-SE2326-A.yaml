@@ -1,0 +1,107 @@
+Core:
+  Id: "FDA-SE2326-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL does not contain at least a complete (full)\
+  \ date in ISO 8601 format for a record where TSPARMCD equals 'STENDTC' (Study End\
+  \ Date)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    TSPARMCD == "STENDTC" and not is_complete_date_part(TSVAL)
+Outcome:
+  Message: "TSVAL is an incomplete date for TSPARMCD equal to 'STENDTC' (Study End\
+    \ Date); it must be in ISO 8601 format and include at least the full date."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source_Proposed:
+  Sheet_Issue: "#108"
+  FDA_Validator_Rule_Message: "TSVAL is an incomplete date for TSPARMCD equal to 'STENDTC'\
+    \ (Study End Date); it must be in ISO 8601 format and include at least the full\
+    \ date."
+  FDA_Validator_Rule_Description: "TSVAL does not contain at least a complete (full)\
+    \ date in ISO 8601 format for a record where TSPARMCD equals 'STENDTC' (Study\
+    \ End Date)."
+  Domains: "TS"
+Source:
+  FDA_Validator_Rule_Message: "Invalid TSVAL value for STENDTC"
+  FDA_Validator_Rule_Description: "TSVAL variable value must be in ISO 8601 format,\
+    \ when TSPARMCD='STENDTC'."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2326"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2326"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2326"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2326"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2326"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

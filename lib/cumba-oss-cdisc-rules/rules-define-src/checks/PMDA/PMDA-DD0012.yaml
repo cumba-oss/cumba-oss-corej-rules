@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0012"
+Sheet_Rule_Identifier: "DD0012"
+Rule_Set: "PMDA"
+Element: "leaf"
+Attribute: "ID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The ID attribute for Document must be unique within Define.xml. Define-XML specification represents Documents as def:leaf elements within MetaDataVersion element."
+# unique_in_document, not unique_among_siblings: def:leaf elements live under both
+# MetaDataVersion (documents) and ItemGroupDef (dataset locations), and the sheet
+# demands uniqueness "within Define.xml" (CDISC twin 216 makes the same call).
+Message: "Duplicate Document ID [${value}]"
+Check:
+  kind: "unique_in_document"
+  attribute: "ID"

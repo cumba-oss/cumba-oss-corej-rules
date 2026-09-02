@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0095-A expect=violation domain=SUPPSV
+#note "In SDTM-IG 3.4 the SV exemption no longer applies: a SUPP-- referencing SV (class SPECIAL PURPOSE, not general-observation, not DM) fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RDOMAIN=SV
+#library dataset-class SV "SPECIAL PURPOSE"
+dataset SUPPSV class=RELATIONSHIP label="Supplemental Qualifiers for SV"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QVAL    type=Char label="Data Value"
+---
+S1 | SV | 001 | VISITREA | Unscheduled visit reason

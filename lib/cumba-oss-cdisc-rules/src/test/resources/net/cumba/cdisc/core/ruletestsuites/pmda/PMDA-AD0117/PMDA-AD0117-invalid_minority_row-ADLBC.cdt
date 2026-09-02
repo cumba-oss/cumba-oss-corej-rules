@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0117 expect=violation domain=ADLBC
+#note "Group (GLUC, 1) holds ATPT {PREDOSE, PREDOSE, POSTDOSE} -> minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC ATPT=POSTDOSE ATPTN=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+col ATPTN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | POSTDOSE | 1

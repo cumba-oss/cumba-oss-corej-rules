@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0039 expect=violation domain=ADLBC
+# Rule:Description: A variable with a suffix of DTF has a value that is not within Controlled Terminology for DATEFL
+#note "ADTF value "X" not in allowed set -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTF type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | X
+---

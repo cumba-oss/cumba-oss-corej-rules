@@ -1,0 +1,29 @@
+Rule_Id: "DEFINE-XML-0159-B"
+Sheet_Rule_Identifier: "159"
+Rule_Set: "CDISC"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+# Companion of DEFINE-XML-0159 (one sheet row, two rules — the 0124/0124-B
+# precedent): 0159 covers the missing-def:DocumentRef half; this rule compares
+# the present def:DocumentRef's leafID with the def:AnnotatedCRF document
+# reference (Origin -> .. ItemDef -> ../.. MetaDataVersion). compare skips when
+# either side is missing (no def:DocumentRef -> 0159's finding; no
+# def:AnnotatedCRF -> its own presence rule). Deviation (documented): compare is
+# first-match on both sides — an Origin with several def:DocumentRef children or
+# a document with several def:AnnotatedCRF references is only checked against
+# the first of each (any-match compare flagged as needs-DSL-discussion).
+Plain_Text_Rule: "The def:DocumentRef of a def:Origin with Type = 'Collected' must reference the document which corresponds to AnnotatedCRF."
+Message: "ItemDef with def:Origin Type = 'Collected' does not reference the annotated CRF document (def:DocumentRef leafID does not match def:AnnotatedCRF) [${value}]."
+Check:
+  kind: "compare"
+  left: "DocumentRef/@leafID"
+  right: "../../AnnotatedCRF/DocumentRef/@leafID"
+  op: "equals"
+  when:
+    all:
+    - path: "@Type"
+      equals: "Collected"
+    - path: "@Source"
+      oneOf: ["Investigator", "Subject"]

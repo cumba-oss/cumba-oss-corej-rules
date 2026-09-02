@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1268 expect=violation domain=TS
+#note "row 1: TSVCDVER is populated but TSVCDREF (the terminology it versions) is empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSVCDVER=21.0
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+S1 | TS | 1 | INDIC | Trial Indication | ASTHMA | 10003553 |  | 21.0
+S1 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | P65Y |  |  |

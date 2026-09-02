@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD0052 expect=violation domain=VS
+#note "The visit named 'WEEK 2' is numbered both 2 and 3, so VISITNUM is not constant for a given VISIT. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VISIT="WEEK 2" VISITNUM=2
+#expectViolationAt row=2 VISIT="WEEK 2" VISITNUM=3
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | VS | 001 | 1 | SYSBP | 2 | WEEK 2
+S1 | VS | 002 | 1 | SYSBP | 3 | WEEK 2
+S1 | VS | 001 | 2 | SYSBP | 1 | SCREENING

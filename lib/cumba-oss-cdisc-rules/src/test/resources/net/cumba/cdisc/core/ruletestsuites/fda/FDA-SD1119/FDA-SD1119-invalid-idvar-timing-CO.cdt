@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1119 expect=violation domain=CO
+#note "IDVAR populated (RDOMAIN empty -> IDVAR branch of the related-guard) and numeric timing CODY populated -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVAR=AESEQ
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col COVAL    type=Char label="Comment"
+col CODY     type=Num  label="Study Day of Comment"
+---
+S1 | CO |  | 001 | 1 | AESEQ | Comment | 5
+S1 | CO |  | 001 | 2 |       | Comment | 5

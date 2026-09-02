@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0438 expect=violation domain=ADLBC
+# Rule:Description: On a given record, AVALCAyN is populated and AVALCATy is not populated
+#note "AVALCA1N populated, AVALCAT1 empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AVALCA1N type=Char
+col AVALCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | VAL | 
+---

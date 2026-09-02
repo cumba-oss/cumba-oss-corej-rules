@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD2268 expect=violation domain=TS
+#note "Row 2: TSPARMCD=TDIGRP with TSVALCD=99999999, which is not a concept ID in the dummy SNOMED dictionary -> fires. Row 1 carries a valid concept ID (25064002); row 3 has the same invalid code under AGEMAX (outside the TDIGRP condition); row 4 has a blank TSVALCD (completeness is another rule's concern -> no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSPARMCD=TDIGRP TSVALCD=99999999
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | TDIGRP | 25064002
+S01 | TS | 2 | TDIGRP | 99999999
+S01 | TS | 3 | AGEMAX | 99999999
+S01 | TS | 4 | TDIGRP |

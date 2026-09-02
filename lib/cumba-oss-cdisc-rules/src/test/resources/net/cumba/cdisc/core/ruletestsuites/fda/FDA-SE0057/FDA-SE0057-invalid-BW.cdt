@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE0057 expect=violation domain=BW
+#note "The SEND IG declares BWORRESU Expected for BW but the submitted dataset does not carry the column -> one dataset-level finding naming the missing Expected variable."
+#library standard=sendig version=3-1-1
+#library expected-variables BW BWORRES BWORRESU BWSTRESC
+#expectViolationCount 1
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWSTRESC type=Char label="Standardized Result in Character Format"
+---
+S1 | BW | 001 | 1 | 250 | 250

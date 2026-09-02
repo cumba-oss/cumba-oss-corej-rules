@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0127 expect=noViolation domain=SE
+#note "POLARITY PIN, silent direction -- the partner of CDISC-SEND-0127-invalid_last_se_ne_dsstdtc-SE. The last Subject Element (SESEQ=2) ends 2020-01-15, EXACTLY the disposition date, which the sheet Rule 'SEENDTC = DS.DSSTDTC of the disposition' names as conformant, so the rule must be silent. Against the pre-M3-D1 == form this file REPORTED the conforming subject; the pair pins the polarity from both sides rather than merely pinning that something fires. NOT vacuous: changing SEENDTC on row 2 to 2020-01-20 makes this same file fire, which is the invalid sibling."
+#library standard=sendig version=3-0
+#expectViolationCount 0
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-01-15
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-01-15
+---

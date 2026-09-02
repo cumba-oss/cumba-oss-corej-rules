@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0545"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Disease Milestone Type (MIDSTYPE) is not unique\
+  \ within a subject for a disease milestone that can occur only once (the matching\
+  \ Trial Disease Milestones (TM) record has TMRPT equal to 'N')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SM"
+Requirements:
+  Variables:
+    All:
+    - "MIDSTYPE"
+Match_Datasets:
+- Keys:
+  - "MIDSTYPE"
+  Name: "TM"
+Operations:
+- id: "$tm_midstype"
+  expression: "distinct(MIDSTYPE, domain=\"TM\")"
+Check:
+  expression: >-
+    MIDSTYPE in $tm_midstype and TM.TMRPT == "N" and not is_unique_set([MIDSTYPE, USUBJID])
+Outcome:
+  Message: "MIDSTYPE is not unique within subject when the corresponding TM milestone\
+    \ has TMRPT equal to 'N'."
+  Output_Variables:
+  - "MIDSTYPE"
+  - "$tm_midstype"
+  - "TM.TMRPT"
+Source:
+  Class: "SPC"
+  Domain: "SM"
+  Variable: "MIDSTYPE"
+  Condition: "MIDSTYPE = TM.MIDSTYPE and TM.TMRPT = 'N'"
+  Rule: "MIDSTYPE is unique per subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0545"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0545"
+        Version: "1"
+      Version: "2.0"

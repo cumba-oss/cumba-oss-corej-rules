@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0118"
+Sheet_Rule_Identifier: "DD0118"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "library"
+Plain_Text_Rule: "When using a standard codelist in define.xml, the NCI code should match."
+# Library-gated. The library assigns the variable its standard codelist c-code
+# (variableCodelistCCode); the document side is the ItemDef's CodeListRef ->
+# CodeList -> Alias[@Context="nci:ExtCodeID"]/@Name. Both present and unequal
+# => finding. A CodeList without the nci alias is DD0031's beat; whether the
+# c-code is known to CT at all is DD0033's - both out of reach here.
+Message: "Codelist NCI Code does not match the Standard Codelist NCI Code [${value}]"
+Check:
+  kind: "library_codelist_ccode_matches"

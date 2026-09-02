@@ -1,0 +1,94 @@
+name: FDA-SD1063
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the first CROSS-ENGINE coverage for `FDA-SD1063`,
+  and the FIRING arm of the two-spec A/B that pins the Define dataset-NAME list (D3).
+
+  Group B, not group A. `FDA-SD1063` reads no `define_dataset_*` operand at all: it reads the
+  Define's dataset NAME LIST, through the `define_dataset_names` OPERATION.
+  Rule_Type is plain `Dataset Metadata Check` (NOT `... against Define XML`), so on the fork the
+  frame comes from `ContentMetadataDatasetBuilder`, which reads no Define whatsoever — the Define
+  reaches the rule only via the operation. That is why this spec is independent of Fix #132 /
+  EC-41: the builder that fix narrowed is not on this rule's path. On the Java lane
+  `RuleRunner:578` threads the define provider into the Operation suppliers unconditionally, and
+  `OperationExecutor.evalDefineDatasetNames` calls `getDatasetNames()` — nothing Rule_Type-gated.
+
+  Check: `ds_name("DATA") not in $define_datasets` (legacy `dataset_name is_not_contained_by
+  $define_datasets`). Sensitivity `Dataset`, Output_Variables `[dataset_name]`.
+
+  Fixture: the study ships AE and VS; the Define declares VS only. AE — a submitted dataset the
+  Define does not describe — is the violation. **AE must be the PRIMARY**, and that is a
+  correctness requirement, not a style choice: the Java lane evaluates the primary table only
+  (`SpecRunner` drives `RuleRunner.execute` with it), and the Python adapter keeps only the
+  primary dataset's result bucket. Putting the offending dataset anywhere else yields Java 0 —
+  a broken fixture, not a clean rule.
+
+  Both lanes report exactly one violation, byte-identical, so no `parity-diff-baseline.json`
+  entry is needed or wanted. Note there is NO EC-37 delta here even though the Check consumes an
+  Operation: measured, Java's load-time effective Output_Variables do not project
+  `$define_datasets` for this rule, so both lanes emit `{dataset_name: AE}` and nothing else.
+
+  **The A/B partner is `FDA-SD1063-declared`** — same two datasets, same rows, same config; the
+  ONLY difference is that its `define_xml` block also declares AE, and it reports zero. Read the
+  two together: this spec proves the rule fires when the name list omits the dataset, the sibling
+  proves it stops firing when the name list contains it. Neither is a bare count.
+
+  **What this spec deliberately does NOT pin: the §3.5 empty-name-list trap.** Measured, not
+  assumed — with the Define name list forced to `[]` this spec stays GREEN at 1, because
+  `ds_name("DATA") not in []` is still true. The trap (a non-null provider opens `RuleRunner`'s
+  define skip gate at `:554-568` while `DEFINE_DATASET_NAMES` has no empty-to-not-available
+  demotion, unlike `DEFINE_KEY_VARIABLES` at `OperationExecutor.java:1193-1201`) is guarded by
+  `FDA-SD1063-declared` and by `FDA-SD0061`, both of which go RED under that mutation. Do not
+  read this spec as covering it.
+
+  Why VS carries `define_dataset_label` and nothing else: a block key must declare at least one
+  attribute (R3), yet this rule reads no dataset attribute — it reads the KEY. `label` is one of
+  the only THREE attributes with a Java sink (`name` / `label` / `className`,
+  `RuleRunner.injectDatasetLevel`); the other eight the fork exposes are Python-lane-only and
+  give OPPOSITE verdicts across lanes, so they must never appear in a spec for a rule that does
+  not read them. Its value is the key itself, which is also the label both lanes hard-wire for a
+  submitted dataset (Java `OverlayDataTable.empty(domain, domain, ...)`, Python
+  `DummyDataset({"label": domain})`), so it stays inert under any rule.
+
+  `define_dataset_name` / `define_dataset_location` are deliberately NOT declared, so D4's
+  derivation stays on the execution path (`VS` => name `VS`, location `vs.xpt`). R6 would accept
+  a restatement, but restating a derived default REMOVES the derivation from the path — Python's
+  fill branches are `if record.get(...) is None` and Java re-assigns the identical value.
+
+  `expected_status: EXECUTED` is explicit but adds no strength (both lanes default to it). Note
+  the Java status channel is BLIND to a dead Define channel: killing it yields EXECUTED with zero
+  findings, not SKIPPED. Only `expected_violations` catches that, which is why a non-zero Java
+  count is a hard precondition for reading anything here.
+
+  Case note (PLAN §7 item 2, NOT exercised and deliberately so): both engines uppercase
+  `$define_datasets` (`OperationExecutor.upperCaseAll`; `define_dataset_names.py:31`) while the
+  LHS `ds_name("DATA")` is `Normalization.RAW` and `is_not_contained_by` is case-SENSITIVE, so a
+  lower/mixed-case dataset name fires spuriously on BOTH engines. That is a rule/engine semantics
+  gap, not a parity divergence; this fixture uses uppercase names so it cannot mask one.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1063)
+rule:
+  coreId: FDA-SD1063
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  VS:
+    define_dataset_label: VS
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SD1063
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      dataset_name: AE
+expected_errors: []

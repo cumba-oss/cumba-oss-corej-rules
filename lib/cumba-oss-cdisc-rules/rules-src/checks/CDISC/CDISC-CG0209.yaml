@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0209"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SEENDTC is not populated for an element that is\
+  \ not the subject's last element."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    empty_within_except_last_row(SEENDTC, USUBJID, keep_missings=false, ordering=SESTDTC)
+Outcome:
+  Message: "SEENDTC is not populated for an element that is not the subject's last\
+    \ element."
+  Output_Variables:
+  - "SESTDTC"
+  - "SEENDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEENDTC"
+  Condition: "Not last record"
+  Rule: "SEENDTC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0209"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0209"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0209"
+        Version: "2"
+      Version: "2.0"

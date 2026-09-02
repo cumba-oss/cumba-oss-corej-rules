@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0398 expect=violation domain=SE
+#library standard=sendig version=3-1-1
+#note "Element 1 ends 2014-01-05, three days AFTER Element 2 starts - the Elements overlap, which no reading permits. Exactly one finding, on the CURRENT row. Row 2 ends exactly when row 3 starts and is conformant; the last Element never fires."
+#expectViolationCount 1
+#expectViolationAt row=1 SESEQ=1 USUBJID=01-701-1015
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+STUDY01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-05
+STUDY01 | SE | 01-701-1015 | 2 | 2014-01-02 | 2014-01-09
+STUDY01 | SE | 01-701-1015 | 3 | 2014-01-09 | 2014-07-02
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0794 expect=violation domain=ADLBC
+# Rule:Description: On a given record, a variable with a suffix of SDTM has a value greater than a value of a variable with the same root and a suffix of EDTM, and both variables are populated
+#note "ASDTM=100 > AEDTM=50, both populated -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDTM type=Num
+col AEDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 100 | 50
+---

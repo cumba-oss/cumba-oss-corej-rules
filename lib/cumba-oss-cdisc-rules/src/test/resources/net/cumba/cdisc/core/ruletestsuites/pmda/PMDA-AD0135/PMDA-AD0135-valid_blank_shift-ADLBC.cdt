@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0135 expect=noViolation domain=ADLBC
+#note "The blank-dependent row is excluded from the functional dependency (D.13 emptiness exception) AND by the rule's own not empty(SHIFTy) conjunct, leaving the single dependent {NORMALTOHIGH} -> silent."
+#library standard=adamig version=1-0
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMALTOHIGH | 1
+CDISCPILOT01 | 01-701-1023 | GLUC |              | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | NORMALTOHIGH | 1
+---

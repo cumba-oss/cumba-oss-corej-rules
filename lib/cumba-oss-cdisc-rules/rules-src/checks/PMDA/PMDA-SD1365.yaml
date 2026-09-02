@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD1365"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an ADSL population flag (such as COMPLT, FASFL/FULLSET,\
+  \ ITT, PPROTFL/PPROT, SAFFL/SAFETY) is present as a supplemental qualifier for DM."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+    - "QNAM"
+Check:
+  expression: >-
+    RDOMAIN == "DM" and QNAM in ["ENRFL", "SAFFL", "EFFFL", "ITTFL", "PPROTFL", "COMPLFL", "FASFL",
+    "COMPLT", "FULLSET", "ITT", "PPROT", "SAFETY"]
+Outcome:
+  Message: "ADSL population flag is present in SUPPDM."
+  Output_Variables:
+  - "RDOMAIN"
+  - "QNAM"
+Source:
+  Message: "ADSL Population Flags provided in SDTM"
+  Description: "ADSL Population Flags, which had standard Supplemental Qualifiers\
+    \ included in previous versions of the SDTMIG (COMPLT, FASFL/FULLSET, ITT, PPROTFL/PPROT,\
+    \ SAFFL/SAFETY, etc.) should no longer be used in SDTM."
+  Domains: "SUPPQUAL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1365"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1365"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1365"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1365"
+        Version: "1"
+      Version: "1.6"

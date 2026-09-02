@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0081 expect=violation domain=ADSL
+# Rule:Description: TRTxxP is present and xx is greater than 01 and TRT{xx-1}P is not present
+#note "TRT02P present but TRT01P absent -> violation (representative of the period-gap any-branch)"
+#expectViolationCount 1
+#expectViolationAt TRT02P="Xanomeline High Dose"
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT02P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Xanomeline High Dose
+---

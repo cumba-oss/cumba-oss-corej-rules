@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1366 expect=skipped domain=DM
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. RE-NOTED under the M2-P9 ruling (Fix #307): same verdict, THIRD mechanism. ARMNRS is not declared. The rule still EXECUTES (noViolation, not skipped - there is no Requirements.Variables gate, and M2-D22 owes none because ARMNRS is Expected in SDTMIG 3.3/3.4 DM). Before the ruling it was silent because empty(ARMNRS) broadcasts TRUE over a wholly-absent column (the EC-43 T2 carve-out) and the authored not empty(ARMNRS) therefore broadcast FALSE. Now the Check is a bare membership leaf, so NonEmptyGuardInliner arms it with var_exists(\"ARMNRS\") - visible only in the shipped rules/*.json, not in rules-src - and that conjunct is false. The verdict is unchanged and the note is the record of why it is unchanged for a different reason. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+col RFENDTC type=Char
+---
+CDISCPILOT01 | DM | 01-701-1028 | 2020-01-05 | 2020-06-30

@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0553"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ORRES is empty while --LOBXFL equals 'Y' and the\
+  \ record is not derived (--DRVFL is not equal to 'Y' or --DRVFL is not present)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ORRES"
+    - "--LOBXFL"
+Check:
+  expression: >-
+    empty(--ORRES) and --LOBXFL == "Y" and (not var_exists("--DRVFL") or --DRVFL != "Y")
+Outcome:
+  Message: "--ORRES is empty even though --LOBXFL equals 'Y' and either --DRVFL is\
+    \ not present in dataset or is not equal to 'Y'."
+  Output_Variables:
+  - "!--ORRES"
+  - "--LOBXFL"
+  - "--DRVFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--ORRES"
+  Condition: "--LOBXFL = 'Y' and --DRVFL = null"
+  Rule: "--ORRES ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0553"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0553"
+        Version: "2"
+      Version: "2.0"

@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SE1149"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Date/Time of Treatment (EXSTDTC) is populated\
+  \ and is later than the Experimental End Date (EXPENDTC)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "EXSTDTC"
+Operations:
+- id: "$exp_end"
+  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
+    EXPENDTC\")"
+Check:
+  expression: >-
+    not empty(EXSTDTC) and date(EXSTDTC) > $exp_end
+Outcome:
+  Message: "EXSTDTC is populated and is later than the Experimental End Date (TS EXPENDTC)."
+  Output_Variables:
+  - "EXSTDTC"
+  - "$exp_end"
+Source:
+  FDA_Validator_Rule_Message: "EXSTDTC date is after EXPENDTC in TS domain"
+  FDA_Validator_Rule_Description: "Start Date/Time of Treatment (EXSTDTC) variable\
+    \ value must be less than or equal to Date/Time of Experimental End Date (EXPENDTC)\
+    \ in Trial Summary (TS) domain."
+  Domains: "INTERVENTIONS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1149"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB008"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1149"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB008"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1149"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB008"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1149"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB008"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE1149"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB008"
+        Version: "1"
+      Version: "1.5"

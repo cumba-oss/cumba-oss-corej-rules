@@ -1,0 +1,42 @@
+Core:
+  Id: "PMDA-AD0147"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Parameter (Number) (PARAMN)\
+  \ takes more than one value for the same Parameter (PARAM); when PARAM is populated,\
+  \ every record sharing a PARAM value must carry the same PARAMN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARAM"
+    - "PARAMN"
+Check:
+  expression: >-
+    not empty(PARAM) and is_inconsistent_across_dataset(PARAMN, keys=[PARAM])
+Outcome:
+  Message: "Inconsistent value for PARAMN"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMN"
+Source:
+  Message: "Inconsistent value for PARAMN"
+  Description: "Within a study, all PARAMN values must be the same for each unique\
+    \ value of PARAM when the primary variable PARAM is populated."
+  Domains: "BDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0147"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,41 @@
+name: CDISC-AD0722
+kind: rule
+description: |
+  Wave B4 port — T1b PlainIntermediate.
+  CDISC-AD0722: more than one TRTP for a given TRTPN.
+  Record-data rule scoped to BASIC DATA STRUCTURE / MEDICAL DEVICE BDS.
+  Bare-leaf Check (no all/any wrapper) + has_multiple_values_for — both Python
+  gaps (Finding #26 + #28). Baselines on Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0722)
+rule:
+  coreId: CDISC-AD0722
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', TRTP: 'Placebo', TRTPN: '0'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', TRTP: 'PlaceboX', TRTPN: '0'}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', TRTP: 'Active',  TRTPN: '1'}
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: 'HGB', TRTP: 'Active',  TRTPN: '1'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0722
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      TRTP: 'Placebo'
+      TRTPN: '0'
+  - rule_id: CDISC-AD0722
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      TRTP: 'PlaceboX'
+      TRTPN: '0'
+expected_errors: []

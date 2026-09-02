@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0355 expect=violation domain=ADSL
+#note "ORIENTATION: REGION1N is the KEY and REGION1 the TARGET (the reverse of the other C-a62789e7 members). Group REGION1N=1 holds REGION1 {ASIA,ASIA,EUROPE}: minority row 3 fires; group 2 has one row and is silent. Use exactly one index - a REGION2/REGION2N pair would be a second expansion and counts aggregate."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 REGION1=EUROPE REGION1N=1
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col REGION1  type=Char
+col REGION1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ASIA     | 1
+CDISCPILOT01 | 01-701-1023 | ASIA     | 1
+CDISCPILOT01 | 01-701-1034 | EUROPE   | 1
+CDISCPILOT01 | 01-701-1045 | AMERICAS | 2

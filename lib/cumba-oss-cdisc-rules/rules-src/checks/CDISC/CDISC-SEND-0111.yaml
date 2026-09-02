@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0111"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the BRTHDTC variable is populated but the Origin\
+  \ (Type) declared for it in the DM Define-XML document is not Collected."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    varname() == "BRTHDTC" and not empty(var_name("DEFINE")) and max_value_length(variable_name) > 0
+    and var_origin_type("DEFINE") not in ["Collected", "CRF"]
+Outcome:
+  Message: "BRTHDTC is populated but its Origin (Type) declared in the Define-XML\
+    \ document is not Collected."
+  Output_Variables:
+  - "variable_name"
+  - "define_variable_origin_type"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "BRTHDTC"
+  Plain_Text_Explanation: "BRTHDTC should be collected.   If BRTHDTC was not collected\
+    \ this variable should be left blank.  BRTHDTC should never be derived from another\
+    \ variable."
+  Condition: "BRTHDTC ^= null"
+  Rule: "BRTHDTC ORIGIN = collected in the Define-XML document"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND111"
+        Version: "1"
+      Version: "5.0"

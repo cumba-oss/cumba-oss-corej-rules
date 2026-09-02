@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0451 expect=violation domain=ADLBC
+# Rule:Description: On a given record, MCRITyMN is populated and MCRITyML is not populated
+#note "MCRIT1MN populated, MCRIT1ML empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col MCRIT1MN type=Char
+col MCRIT1ML type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X | 
+---

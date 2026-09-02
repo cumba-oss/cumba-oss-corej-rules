@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0037 expect=violation domain=DM
+#note "Track B: adapted from FDA-SD0037-invalid-DM.cdt. The Define-XML associates ARMCD with a sponsor codelist holding A / B / SCRNFAIL. Row 3 submits 'C', which is not one of the declared terms -> fires. Rows 1/2 use declared terms and COUNTRY has no codelist in the define, so its values are never checked."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD0037-define.xml
+#expectViolationCount 1
+#expectViolationAt variable_name=ARMCD variable_value=C
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col COUNTRY type=Char label="Country"
+---
+S1 | DM | 001 | A | USA
+S1 | DM | 002 | B | DEU
+S1 | DM | 003 | C | JPN

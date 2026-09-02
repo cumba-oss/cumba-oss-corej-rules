@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0565"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --CONC is present in a Findings-class dataset whose\
+  \ domain is not MS."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+  Domains:
+    Exclude:
+    - "MS"
+Check:
+  expression: >-
+    var_exists("--CONC")
+Outcome:
+  Message: "--CONC is present in a Findings dataset other than MS, but it is a domain-specific\
+    \ variable permitted only in the MS domain."
+  Output_Variables:
+  - "--CONC"
+Source:
+  Class: "FND"
+  Domain: "NOT(MS)"
+  Variable: "--CONC"
+  Rule: "--CONC not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"

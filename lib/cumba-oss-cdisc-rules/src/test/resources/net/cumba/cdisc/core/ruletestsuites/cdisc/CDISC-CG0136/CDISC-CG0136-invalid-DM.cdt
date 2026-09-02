@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0136 expect=violation domain=DM
+#note "Subject 001: DS has DSDECOD=DEATH but DM.DTHFL=N -> fires. Subject 002: DEATH with DTHFL=Y -> ok. Subject 003: DSDECOD=COMPLETED, DTHFL=N -> ok."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | N
+S1 | DM | 002 | Y
+S1 | DM | 003 | N
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | SUBJECT DIED    | DEATH
+S1 | DS | 002 | 1 | SUBJECT DIED    | DEATH
+S1 | DS | 003 | 1 | STUDY COMPLETED | COMPLETED
+---

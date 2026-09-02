@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0249.1 expect=noViolation domain=BW
+#note "DOMAIN NOT declared. Scope only requires STUDYID, so the rule EXECUTES; the authored var_exists(\"DOMAIN\") conjunct is false and the rule stays silent despite the inconsistency. Pins the declared underreporting edge (Executability: Partially Executable - Possible Underreporting)."
+dataset BW label="Body Weight"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BWSEQ   type=Num  label="Sequence Number"
+---
+STUDYA | 001 | 1
+STUDYA | 002 | 2
+STUDYB | 003 | 3
+---

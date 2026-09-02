@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1229 expect=noViolation domain=LB
+#note "Every record whose value-level condition is Mandatory=Yes (GLUC) has LBSTRESC populated; the PH/URINE condition is Mandatory=No, so its empty value is allowed."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD1229-define.xml
+dataset LB
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBSPEC   type=Char
+col LBSTRESC type=Char
+---
+001 | GLUC | SERUM | 5.5
+001 | PH   | URINE |

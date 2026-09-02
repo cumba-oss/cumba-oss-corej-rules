@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0084 expect=noViolation domain=ADSL
+#note "Row 1: TRTEDT equals the max -> clean. Row 2: TR01EDT and TR02EDT both null -> the all-blank row omits its key from the GroupedResult -> $trxx_max missing -> `not empty($trxx_max)` false -> clean. Row 3: TRTEDT missing -> first conjunct false -> clean."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTEDT   type=Num
+col TR01EDT  type=Num
+col TR02EDT  type=Num
+---
+S1 | 01-001 | 22010 | 22000 | 22010
+S1 | 01-002 | 22000 |       |
+S1 | 01-003 |       | 22010 |

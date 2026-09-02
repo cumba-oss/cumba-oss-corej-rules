@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2261 expect=violation domain=TP
+#note "Second in-scope domain: TP carries RPATHCD as its topic variable; the 21-character value on row 1 fires."
+#library standard=sendig-dart version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 RPATHCD=PATH-COHORT-F0-MALE12
+dataset TP label="Trial Repro Paths"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RPATHCD type=Char label="Planned Repro Path Code"
+col RPATH   type=Char label="Planned Repro Path"
+---
+S1 | TP | PATH-COHORT-F0-MALE12 | F0 male path
+S1 | TP | PATH-COHORT-F0-MALE1 | F0 male path

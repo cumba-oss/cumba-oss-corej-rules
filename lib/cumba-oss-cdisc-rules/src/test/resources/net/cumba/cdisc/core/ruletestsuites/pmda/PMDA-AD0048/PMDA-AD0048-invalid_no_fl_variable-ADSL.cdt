@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0048 expect=violation domain=ADSL
+#note "The lone 'FL' column is the boundary pin: ^.+FL$ requires at least one character before FL, so a column named exactly FL does not count -> $fl_variable_count=0 -> fires once. Two data rows pin the DATASET granularity (a per-record derivation would report 2). Pin by the quoted projected $-key, never row= (AD0090 precedent)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt "$fl_variable_count"=0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col FL      type=Char
+---
+S1 | 001 | 45 | Y
+S1 | 002 | 50 | Y

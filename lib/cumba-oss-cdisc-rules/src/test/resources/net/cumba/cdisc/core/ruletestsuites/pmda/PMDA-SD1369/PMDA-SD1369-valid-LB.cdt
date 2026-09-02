@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1369 expect=noViolation domain=LB
+#note "Row 1: LBORREF populated and LBSTREFC populated. Row 2: LBORREF empty, LBDRVFL not 'Y', LBSTREFC empty -> neither branch holds. Row 3: derived record (LBDRVFL='Y') with LBSTREFC populated -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORREF  type=Char label="Reference Result in Original Units"
+col LBSTREFC type=Char label="Reference Result in Standard Format"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | GLUC | 4.5 | 4.5 |
+S1 | LB | 001 | 2 | ALB  |     |     |
+S1 | LB | 001 | 3 | HGB  |     | 7.0 | Y

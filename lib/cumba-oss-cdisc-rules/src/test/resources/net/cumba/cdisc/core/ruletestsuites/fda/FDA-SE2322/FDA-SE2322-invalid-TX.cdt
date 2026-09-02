@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2322 expect=violation domain=TX
+#note "TX branch of the scope: --PARMCD/--VAL resolve to TXPARMCD/TXVAL, so the same non-numeric 'SPLANSUB' value must be reported in the Trial Sets domain too."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TXPARMCD=SPLANSUB TXVAL=twenty
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+STUDY01 | TX | 1 | Control | 1 | GRPLBL | Group Label | Control
+STUDY01 | TX | 1 | Control | 2 | SPLANSUB | Planned Number of Subjects | twenty

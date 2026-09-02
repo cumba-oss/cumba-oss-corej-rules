@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1396 expect=noViolation domain=FA
+#note "Guard boundaries, all clean: row 1 fully conformant; row 2 FADTC incomplete (year-month) so a missing FACHDY is tolerated; row 3 subject 002 whose DM.RFCSTDTC is empty; row 4 FADTC empty."
+#library standard=sendig version=ar-1-0
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FADTC    type=Char label="Date/Time of Collection"
+col FACHDY   type=Num  label="Day of Obs Rel to Challenge Agent"
+---
+S1 | FA | 001 | 1 | SEV | 2020-01-10 | 6
+S1 | FA | 001 | 2 | SEV | 2020-01    | .
+S1 | FA | 002 | 1 | SEV | 2020-01-10 | .
+S1 | FA | 001 | 3 | SEV |            | .
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2020-01-05
+S1 | DM | 002 |
+---

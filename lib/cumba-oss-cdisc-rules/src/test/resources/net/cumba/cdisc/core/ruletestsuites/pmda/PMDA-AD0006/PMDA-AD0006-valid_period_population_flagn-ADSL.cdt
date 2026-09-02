@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0006 expect=noViolation domain=ADSL
+#note "The numeric mirror of pmda/PMDA-AD0005/PMDA-AD0005-valid_period_population_flag-ADSL.cdt, and the only AD0006 pin of the widened Exception branch. SAFRFN is a real ADaMIG 1.0 period-level numeric Safety Population Flag - one of the ten *RFN/*PFN variables the sheet's Exception names (COMPRFN/COMPPFN, FASRFN/FASPFN, ITTRFN/ITTPFN, PPROTRFN/PPROTPFN, SAFRFN/SAFPFN). The shipped Check excepts varname() !~ /^(.*RFN|.*PFN|ABLFN|ANL\\d\\dFN)$/, so the value 2 is carved out and the rule stays silent. Pins Fix #272 (ruling M2-D5, owner refinement `.*RFN|.*PFN`): under the previous anchored whole-name RFN|PFN alternation - a dead branch, since no ADaM variable is named RFN or PFN in any IG version - this dataset fired once at row=1 variable_name=SAFRFN. version=1-0 is load-bearing: ADaMIG 1.1 dropped the numeric twins. Carry EXACTLY ONE *RFN column."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFRFN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2

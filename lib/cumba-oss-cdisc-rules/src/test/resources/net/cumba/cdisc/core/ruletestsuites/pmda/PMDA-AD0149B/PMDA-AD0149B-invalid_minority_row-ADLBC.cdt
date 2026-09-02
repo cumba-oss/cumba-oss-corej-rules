@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0149B expect=violation domain=ADLBC
+#note "Same shape as the AD0149 fixture - deliberately, since the two rules carry the same Check and never run in the same submission."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC AVAL=1 AVALC=HIGH
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1034 | GLUC | 1 | HIGH

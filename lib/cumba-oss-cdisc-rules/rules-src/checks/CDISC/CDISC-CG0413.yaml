@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0413"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Domain Abbreviation (DOMAIN) value is not consistent\
+  \ with the name of the dataset (the dataset name does not begin with the DOMAIN\
+  \ value)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+    - "RELREF"
+    - "POOLDEF"
+    - "AP--"
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    prefix(dataset_name, 2) != DOMAIN
+Outcome:
+  Message: "The dataset name does not begin with the DOMAIN value."
+  Output_Variables:
+  - "dataset_name"
+  - "DOMAIN"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "DOMAIN"
+  Rule: "Dataset name begins with DOMAIN value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0413"
+        Version: "1"
+      Version: "2.0"

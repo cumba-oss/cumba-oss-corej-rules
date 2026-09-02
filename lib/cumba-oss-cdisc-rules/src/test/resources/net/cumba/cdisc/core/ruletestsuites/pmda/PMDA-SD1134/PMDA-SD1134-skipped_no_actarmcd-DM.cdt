@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1134 expect=skipped domain=DM
+#note "FRESH. DELIBERATELY NO ACTARMCD COLUMN. Contrast with PMDA-SD1133-valid_no_actarmcd-DM: the SAME missing column, the SAME domain, and a DIFFERENT verdict - because SD1134 declares Requirements.Variables.All [ACTARMCD] (its target) where SD1133 declares [ACTARM]. SD1134 never executes; SD1133 executes and is silenced by its authored guard. Both are correct. Do not 'fix' either toward the other."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ACTARM  type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | Placebo
+S1 | DM | 002 | Placebo Arm

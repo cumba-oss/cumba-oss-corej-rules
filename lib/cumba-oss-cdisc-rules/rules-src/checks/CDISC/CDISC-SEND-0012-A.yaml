@@ -1,0 +1,90 @@
+Core:
+  Id: "CDISC-SEND-0012-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose Core designation in the SENDIG\
+  \ is Required is not populated in any record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$required_variables"
+  expression: "required_variables()"
+Check:
+  expression: >-
+    varname() in $required_variables and empty(value())
+Outcome:
+  Message: "A Required variable is not populated."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source_Proposed:
+  Sheet_Issue: "#20"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "a variable whose Core designation in the SENDIG is Required\
+    \ is not populated in any record"
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Required variables must always be included in the dataset\
+    \ and cannot be null for any record."
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND12"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0278-A expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL', but no record with TSPARMCD equal to 'INTTYPE' is present in TS.
+#note "Cross-half exclusivity: the INTTYPE record EXISTS but its TSVAL is empty. That is CDISC-CG0278's case -- the absence half must stay silent."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | INTERVENTIONAL
+S01 | TS | 2 | INTTYPE | 
+---

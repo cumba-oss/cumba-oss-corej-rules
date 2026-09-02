@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0661 expect=violation domain=ADNCA
+#note "The MIRROR disjunct: NDOSEDUR is present, DOSEDURU is absent, so not var_exists(DOSEDURU) is TRUE. Authoring both arms is what makes the or a real disjunction rather than a redundant duplicate of the sibling scenario. ONE violation at row 1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 ADOSEDUR=24
+dataset ADNCA structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col ADOSEDUR type=Num
+col NDOSEDUR type=Num
+col NFRLT    type=Num
+col AFRLT    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 24 | 24 | 0 | 0.5

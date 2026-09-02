@@ -1,0 +1,82 @@
+Core:
+  Id: "FDA-SD0063"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the label of a standard variable does not match\
+  \ the variable label specified for that variable in the SDTM Implementation Guide."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() == var_name("LIBRARY") and not empty(var_label("LIBRARY")) and var_label("DATA") !=
+    var_label("LIBRARY")
+Outcome:
+  Message: "The variable label does not match the variable label specified in the\
+    \ SDTMIG."
+  Output_Variables:
+  - "variable_name"
+  - "library_variable_label"
+  - "variable_label"
+Source:
+  FDA_Validator_Rule_Message: "SDTM/dataset variable label mismatch"
+  FDA_Validator_Rule_Description: "Variable Label in the dataset should match the\
+    \ variable label described in SDTM IG. When creating a new domain Variable Labels\
+    \ could be adjusted as appropriate to properly convey the meaning in the context\
+    \ of the data being submitted."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0063"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0063"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0063"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0303"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0303"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0303"
+        Version: "1"
+      Version: "2.0"

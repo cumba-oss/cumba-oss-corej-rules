@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0234 expect=violation domain=ADSL
+#note "Mixed-group template (twin of AD0231): TR01AG1 seeds tuple (xx=01, y=1) and TRTxxA resolves to the matching column TRT01A. Key TRT01A=DRUGA holds TR01AG1 {POOLX x2, POOLY x1} -> row 3 is the minority; group DRUGB is consistent and reuses POOLY, pinning the many-actual-treatments-to-one-pool direction the Source allows."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRT01A=DRUGA TR01AG1=POOLY
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01A  type=Char
+col TR01AG1 type=Char
+---
+S1 | 001 | DRUGA | POOLX
+S1 | 002 | DRUGA | POOLX
+S1 | 003 | DRUGA | POOLY
+S1 | 004 | DRUGB | POOLY
+S1 | 005 | DRUGB | POOLY

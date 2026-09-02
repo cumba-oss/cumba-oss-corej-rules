@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0886 expect=violation domain=ADPPK
+#note "Subclass-scoped (D21): the rule gates on Data_Structures ['BASIC DATA STRUCTURE'] AND Subclasses ['POPULATION PHARMACOKINETIC ANALYSIS'], with no Domains facet. PARAMCD/AVAL give AdamDataStructureDetector the BDS indicator; the remaining NONMEM columns give AdamSubclassDetector its popPK signature (a control column EVID or MDV, plus >=3 of DV/MDV/AMT/EVID/CMT). AFRLT is absent, so the check fires."
+# Rule:Description: Raise an error when AFRLT is not present in an ADPPKIG v1.0 dataset.
+#expectViolationCount 1
+dataset ADPPK
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col EVID    type=Num
+col MDV     type=Num
+col DV      type=Num
+col AMT     type=Num
+col CMT     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 | 0 | 0 | 12.5 | 0 | 1
+---

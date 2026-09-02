@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0131"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, BASETYPE is populated\
+  \ for at least one record and is not populated for at least one record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BASETYPE"
+Grouping:
+  Variables:
+  - "PARAMCD"
+Operations:
+- id: "$basetype_mixed"
+  expression: "has_mixed_emptiness_within_group(BASETYPE, group=[PARAMCD])"
+Check:
+  expression: >-
+    $basetype_mixed == true
+Outcome:
+  Message: "BASETYPE is populated for some records and not populated for others within\
+    \ this PARAMCD."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASETYPE"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASETYPE"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, BASETYPE\
+    \ is populated for at least one record and is not populated for at least one record"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, BASETYPE is populated for\
+    \ at least one record and is not populated for at least one record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR131"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR131"
+        Version: "1"
+      Version: "5.0"

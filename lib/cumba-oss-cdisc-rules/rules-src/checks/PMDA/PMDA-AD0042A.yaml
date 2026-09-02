@@ -1,0 +1,61 @@
+Core:
+  Id: "PMDA-AD0042A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'TM' (but not 'DTM')\
+  \ has a missing SAS display format. *TM variables must have a non-missing SAS time\
+  \ format."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "TM") and not ends_with(varname(), "DTM") and varname() != "ARELTM" and
+    var_type("DATA") == "Num" and empty(var_format("DATA"))
+Outcome:
+  Message: "A variable whose name ends in 'TM' has a missing SAS time format."
+  Output_Variables:
+  - "variable_name"
+  - "variable_format"
+Source:
+  Message: "*TM variable has missing SAS Time Format"
+  Description: "*TM variables must have non-missing SAS Time Format."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0042A"
+        Version: "1"
+      Version: "6.0"

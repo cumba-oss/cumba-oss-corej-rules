@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0497"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset name starts with 'AD' but the dataset\
+  \ class is missing."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dataset_class"
+  expression: "dataset_class_from_library()"
+Check:
+  expression: >-
+    starts_with(ds_name("DATA"), "AD") and empty($dataset_class)
+Outcome:
+  Message: "Dataset name starts with \"AD\" but the dataset class is not defined in\
+    \ the CDISC Library."
+  Output_Variables:
+  - "dataset_name"
+  - "!$dataset_class"
+Source:
+  Class: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "A dataset name starts with \"AD\" when\
+    \ the dataset class is missing"
+  Rule_Failure_Criteria: "Dataset name starts with \"AD\""
+  Condition_Failure: "Dataset class is missing"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR497"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR497"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR497"
+        Version: "1"
+      Version: "5.0"

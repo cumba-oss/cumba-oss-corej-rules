@@ -1,0 +1,82 @@
+Core:
+  Id: "FDA-SD1301"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Offset from the Anchor (TDSTOFF) is populated with\
+  \ a value that is not 0 and is not a positive value in ISO 8601 duration format."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TD"
+Requirements:
+  Variables:
+    All:
+    - "TDSTOFF"
+Check:
+  expression: >-
+    not empty(TDSTOFF) and TDSTOFF != "0" and TDSTOFF !~
+    /^P(?=\\d+[YMWD]|T\\d+[HMS])(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(?=\\d+[HMS])(\\d+H)?(\\d+M)?(\\d+S)?)?$/
+Outcome:
+  Message: "TDSTOFF is populated with a value that is not 0 and not a positive value\
+    \ in ISO 8601 duration format."
+  Output_Variables:
+  - "TDSTOFF"
+Source:
+  FDA_Validator_Rule_Message: "Invalid value for TDSTOFF variable"
+  FDA_Validator_Rule_Description: "Offset from the Anchor (TDSTOFF) variable value\
+    \ must be either 0, ISO 8601 format for duration (e.g. P80Y), or null."
+  Domains: "TD"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1301"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1301"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1301"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0376"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0376"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0376"
+        Version: "1"
+      Version: "2.0"

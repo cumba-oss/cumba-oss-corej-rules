@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0153 expect=noViolation domain=BG
+#note "EMPTY-DATASET PIN, re-noted under PLAN-zero-row-routing-rekey.md (owner rulings Q1 / Q5 / 6c-1, Fix #349 / EC-89; policy text: lib/corej-cdisc-rules/documentation/zero-row-policy.md). BG declared with BGTEST and BGSTRESU, zero rows. Ruled: a row-reading rule has nothing to check on an empty dataset -> EXECUTED, 0 findings, never SKIPPED. Mechanism after the fix: var_exists(\"BGTEST\") is TRUE on the real metadata (it used to be FALSE only because the retired synthetic table had no columns), and is_inconsistent_across_dataset(BGSTRESU, keys=[BGTEST]) needs rows -- over the real 0-row table there is no group to be inconsistent. The empty BG is reported once, by CDISC-SEND-0278."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset BG label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGTEST   type=Char label="Body Weight Gain Test Name"
+col BGSTRESU type=Char label="Standard Units"
+---

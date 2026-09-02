@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1355 expect=violation domain=DM
+# Rule:Description: Raise an error when variable MIDS is present in any of the dataset and TM dataset is missing.
+#note "MIDS variable is present and no TM dataset exists. Every MIDS value is BLANK - var_exists is COLUMN presence independent of values, so the rule fires once (presence-not-population)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MIDS type=Char label="Milestone Instance Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 |
+---

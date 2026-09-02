@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1351 expect=violation domain=PP
+#note "row 1: PPENINT populated but PPSTINT present-and-empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PPTESTCD=AUCALL PPENINT=P7D
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPSTRESC type=Char label="Character Result/Finding in Std Format"
+col PPSTINT  type=Char label="Planned Start of Assessment Interval"
+col PPENINT  type=Char label="Planned End of Assessment Interval"
+---
+S1 | PP | 001 | 1 | AUCALL | 120.5 |  | P7D
+S1 | PP | 002 | 1 | AUCALL | 98.1 | P0D | P7D

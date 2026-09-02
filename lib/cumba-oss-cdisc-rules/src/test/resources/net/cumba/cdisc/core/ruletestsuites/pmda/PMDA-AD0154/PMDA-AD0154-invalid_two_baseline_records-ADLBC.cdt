@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0154 expect=violation domain=ADLBC
+#note "The genuine defect the rule names: one subject/parameter/baseline-type set carrying TWO baseline-flagged records. GREEN under BOTH the shipped rule and the proposed minimal fix -- shipped flags both rows because the triple (USUBJID, PARAMCD, BASETYPE) repeats; the proposal flags both because the quadruple (ABLFL, USUBJID, PARAMCD, BASETYPE) repeats. USUBJID deliberately NOT pinned -- it is a location variable the engine attaches itself and is correctly absent from Output_Variables."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=GLUC BASETYPE=LAST ABLFL=Y
+#expectViolationAt row=2 PARAMCD=GLUC BASETYPE=LAST ABLFL=Y
+dataset ADLBC
+col STUDYID   type=Char
+col USUBJID   type=Char
+col PARAMCD   type=Char
+col BASETYPE  type=Char
+col ABLFL     type=Char
+col AVAL      type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | 10
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | 12

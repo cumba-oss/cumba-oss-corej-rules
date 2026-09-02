@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD2271"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --STDY is present in the dataset but --STDTC is\
+  \ not present."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Check:
+  expression: >-
+    var_exists("--STDY") and not var_exists("--STDTC")
+Outcome:
+  Message: "--STDY is present in the dataset but --STDTC is not present."
+  Output_Variables:
+  - "--STDY"
+Source:
+  Message: "Missing --STDTC variable when --STDY variable is present"
+  Description: "Start Study Date/Time (--STDTC) variable should be included into dataset\
+    \ when Study Day of Start (--STDY) variable is present."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2271"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2271"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2271"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2271"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0141 expect=violation domain=ADLBC
+#note "Grouped by PARAMCD=GLUC the target PARAM holds {Glucose, Glucose, GlucoseSI} -> minority row 3 fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC PARAM=GlucoseSI
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | Glucose
+CDISCPILOT01 | 01-701-1023 | GLUC | Glucose
+CDISCPILOT01 | 01-701-1034 | GLUC | GlucoseSI
+---

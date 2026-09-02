@@ -1,0 +1,60 @@
+Core:
+  Id: "PMDA-AD0054"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Unique Subject Identifier (USUBJID) has duplicate\
+  \ values within the Subject-Level Analysis Dataset (ADSL); ADSL must have one record\
+  \ per subject."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("USUBJID") and not is_unique_set([USUBJID])
+Outcome:
+  Message: "USUBJID has duplicate values within the ADSL dataset."
+  Output_Variables:
+  - "USUBJID"
+Source:
+  Message: "USUBJID duplicate values are not allowed within a study"
+  Description: "There should be only one record for a unique value of USUBJID per\
+    \ study in the ADSL dataset."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0054"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0054"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0054"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0054"
+        Version: "1"
+      Version: "6.0"

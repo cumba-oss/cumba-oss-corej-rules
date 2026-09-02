@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2236 expect=skipped domain=DM
+#note "Absent-column fold: ACTARMCD is not declared at all. The guarded conjunct `not empty(ACTARMCD)` folds FALSE on the absent column and short-circuits the AND, so the rule executes and finds nothing rather than skipping (ACTARMCD is core=Exp, so no Requirements.Variables gate is authored). PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col ARMCD    type=Char label="Planned Arm Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | PBO
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | TRT

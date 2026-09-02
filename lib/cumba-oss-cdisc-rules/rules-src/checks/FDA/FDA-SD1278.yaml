@@ -1,0 +1,98 @@
+Core:
+  Id: "FDA-SD1278"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL and TSVALCD are populated but do not have\
+  \ a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVAL"
+    - "TSVALCD"
+Check:
+  expression: >-
+    not empty(TSVAL) and not empty(TSVALCD) and not is_unique_relationship(TSVAL, TSVALCD)
+Outcome:
+  Message: "TSVALCD and TSVAL do not have a one-to-one relationship."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALCD"
+Source:
+  FDA_Validator_Rule_Message: "Inconsistent value for TSVALCD within TSVAL"
+  FDA_Validator_Rule_Description: "Parameter Value Code (TSVALCD) and Parameter Value\
+    \ (TSVAL) should have a one-to-one relationship."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1278"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1278"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1278"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1278"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"

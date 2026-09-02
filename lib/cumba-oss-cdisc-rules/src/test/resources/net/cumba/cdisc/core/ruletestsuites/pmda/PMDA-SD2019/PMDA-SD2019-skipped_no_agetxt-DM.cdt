@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2019 expect=skipped domain=DM
+#note "FRESH. DELIBERATELY NO AGETXT COLUMN. Requirements.Variables.All [AGETXT] rejects the dataset, so the rule SKIPS. This is the ordinary case - AGETXT is only collected where the exact birth date is unknown - which is exactly why the auditable zero is worth pinning."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 56 | YEARS
+CDISCPILOT01 | DM | 01-701-1023 | 42 | YEARS

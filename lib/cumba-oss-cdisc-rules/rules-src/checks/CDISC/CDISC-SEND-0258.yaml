@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0258"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a CO record has no parent-record linkage (RDOMAIN,\
+  \ IDVAR, and IDVARVAL are all empty) and also identifies neither a subject (USUBJID)\
+  \ nor a pool (POOLID); a comment must at least identify the subject or pool it relates\
+  \ to."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Check:
+  expression: >-
+    empty(RDOMAIN) and empty(IDVAR) and empty(IDVARVAL) and empty(USUBJID) and empty(POOLID)
+Outcome:
+  Message: "A CO record has RDOMAIN, IDVAR, and IDVARVAL all empty but identifies\
+    \ neither a subject (USUBJID) nor a pool (POOLID)."
+  Output_Variables:
+  - "RDOMAIN"
+  - "POOLID"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "USUBJID"
+Source:
+  Class: "REL"
+  Domain: "CO"
+  Variable: "RDOMAIN, IDVAR, USUBJID, POOLID, IDVARVAL"
+  Plain_Text_Explanation: "Comments related only to a subject in general would have\
+    \ RDOMAIN, IDVAR, IDVARVAL null, as the only key needed to identify the relationship/association\
+    \ to that subject is USUBJID (or POOLID in the case of comments on a pool of subjects)."
+  Condition: "Comments related only to a subject"
+  Rule: "RDOMAIN, IDVAR, and IDVARVAL = null AND (USUBJID ^= null OR POOLID ^= null)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND258"
+        Version: "1"
+      Version: "5.0"

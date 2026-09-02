@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1449 expect=skipped domain=AE
+#note "AETERM is absent from AE (and ten of the twelve coding variables besides), so Requirements.Variables.All [AETERM] gates the rule to SKIPPED. This asserts the SKIP, not a would-otherwise-fire -- the Check opens not empty(AETERM), and an absent column is an all-missing column (EC-43), so empty would be TRUE and the negation FALSE, i.e. silence either way. expect=skipped is the honest contract; noViolation would pass vacuously."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AESOC   type=Char label="Primary System Organ Class"
+---
+S1 | AE | 001 | 1 | Headache | Nervous system disorders

@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1030 expect=violation domain=CM
+#note "Row 1: 002 has CMSTRF populated but RFSTDTC empty in DM -> fires. Row 2: 005 has CMSTRF populated but NO DM record, so the inner join drops the row and it no longer fires -- D-TA-2 (inner is the doctrine: a subject absent from DM is FDA-SD0064's finding, not this rule's); it fired here until the Join_Type was removed. Row 3: 001 has RFSTDTC populated -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=002
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRF  type=Char label="Start Relative to Reference Period"
+---
+S1 | CM | 002 | 1 | ASPIRIN | BEFORE
+S1 | CM | 005 | 1 | ASPIRIN | BEFORE
+S1 | CM | 001 | 1 | ASPIRIN | BEFORE
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 |
+---

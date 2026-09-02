@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0650 expect=noViolation domain=ADAE
+#note "STAGE-G AUTHORING CORRECTION: the instruction list's column spec ('ONTRTFL(Char), ONTRTFL(Char)') duplicates the same column name, which a .cdt table cannot represent; the near-miss shape is completed by analogy with the sibling PMDA-AD0647/AD0648 near-miss fixtures. ONTRT01FL is a TWO-digit index, where ^ONTRT\\dFL\$ demands exactly one, so varname() is false for every column and nothing fires despite the firing value pattern. This is the fixture that keeps the four flag rules apart."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID   type=Char
+col USUBJID   type=Char
+col ASEQ      type=Num
+col AEDECOD   type=Char
+col ONTRT01FL type=Char
+col ONTRTFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y | N

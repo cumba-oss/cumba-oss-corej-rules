@@ -1,0 +1,92 @@
+Core:
+  Id: "CDISC-SEND-0056"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a combined-tissue Specimen Material Type (--SPEC)\
+  \ value, whose contributing tissues are separated by a solidus (/), contains a token\
+  \ that is not a submission value in the (SPEC) controlled terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--SPEC"
+Operations:
+- id: "$spec_terms"
+  expression: "codelist_terms(codelists=[SPEC], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    not empty(--SPEC) and contains(--SPEC, "/") and not contains_all($spec_terms, split_by(--SPEC,
+    "/"))
+Outcome:
+  Message: "A solidus-separated --SPEC token is not a submission value in the (SPEC)\
+    \ controlled terminology codelist."
+  Output_Variables:
+  - "--SPEC"
+  - "$spec_terms"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "A single value may represent a combination of multiple\
+    \ contributing items, delimited by slashes (“/”). In these cases, the combination\
+    \ is the collected value, the value analyzed, etc., not the individual contributing\
+    \ items composing the value."
+  Condition: "A single value represents a combination of multiple contributing items\
+    \ and CDISC published Controlled Terminology applies to the value"
+  Rule: "Multiple contributing items are separated by \"/\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND56"
+        Version: "1"
+      Version: "5.0"

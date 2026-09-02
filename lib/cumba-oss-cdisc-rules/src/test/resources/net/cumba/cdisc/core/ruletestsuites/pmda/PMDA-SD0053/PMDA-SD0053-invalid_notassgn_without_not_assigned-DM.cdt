@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0053 expect=violation domain=DM
+#note "First disjunct: row 1 has ARMCD='NOTASSGN' but ARM='Not assigned to arm', not the exact required string 'Not Assigned' -> fires. Row 2 is correctly paired and row 3 carries neither sentinel; both are load-bearing, pinning that the rule is exact-string, not substring, and leaves an ordinary arm untouched."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=NOTASSGN ARM="Not assigned to arm"
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+---
+S1 | DM | 001 | NOTASSGN | Not assigned to arm
+S1 | DM | 002 | NOTASSGN | Not Assigned
+S1 | DM | 003 | A        | Placebo

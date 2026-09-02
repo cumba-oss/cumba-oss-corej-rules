@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0416"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Developmental Milestone (DPTEST) is populated with\
+  \ a value that is not a term in the (DPTEST) controlled terminology codelist; DPTEST\
+  \ must be a developmental milestone."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DP"
+Requirements:
+  Variables:
+    All:
+    - "DPTEST"
+Operations:
+- id: "$dptest_terms"
+  expression: "codelist_terms(codelists=[DPTEST], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    not empty(DPTEST) and DPTEST not in $dptest_terms
+Outcome:
+  Message: "DPTEST is populated with a value that is not a term in the (DPTEST) controlled\
+    \ terminology codelist (not a developmental milestone)."
+  Output_Variables:
+  - "DPTEST"
+  - "$dptest_terms"
+Source:
+  Class: "FND"
+  Domain: "DP"
+  Variable: "DPTEST"
+  Plain_Text_Explanation: "DPTEST should be limited to developmental milestones."
+  Rule: "DPTEST must be a developmental milestone."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND416"
+        Version: "1"
+      Version: "5.0"

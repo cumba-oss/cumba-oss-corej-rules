@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0047"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Category (--CAT) is populated and its value is identical\
+  \ to the Dictionary-Derived Term (--DECOD) or the Body System or Organ Class (--BODSYS)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--CAT"
+Check:
+  expression: >-
+    not empty(--CAT) and (var_exists("--DECOD") and --CAT == --DECOD or var_exists("--BODSYS") and
+    --CAT == --BODSYS)
+Outcome:
+  Message: "--CAT is redundant with --DECOD or --BODSYS (--CAT is equal to --DECOD\
+    \ or --BODSYS)."
+  Output_Variables:
+  - "--CAT"
+  - "--DECOD"
+  - "--BODSYS"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--CAT"
+  Plain_Text_Explanation: "--CAT should not be the same as  --DECOD or --BODSYS"
+  Condition: "--CAT ^= null"
+  Rule: "--CAT ^= --DECOD or --BODSYS"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND47"
+        Version: "1"
+      Version: "5.0"

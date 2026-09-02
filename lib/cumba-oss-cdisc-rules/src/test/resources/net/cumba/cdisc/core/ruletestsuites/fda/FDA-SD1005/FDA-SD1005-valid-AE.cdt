@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD1005 expect=noViolation domain=AE
+#note "AE.STUDYID equals the STUDYID carried in DM -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+STUDY01 | AE | 001 | 1 | HEADACHE
+STUDY01 | AE | 002 | 1 | NAUSEA
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+STUDY01 | DM | 001 | M
+STUDY01 | DM | 002 | F

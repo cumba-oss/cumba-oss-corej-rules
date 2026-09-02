@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0496"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset name does not start with 'AD' although\
+  \ the dataset class is not missing."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not starts_with(ds_name("DATA"), "AD")
+Outcome:
+  Message: "The dataset name does not start with \"AD\" although the dataset belongs\
+    \ to an ADaM class."
+  Output_Variables:
+  - "dataset_name"
+Source:
+  Class: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "A dataset name does not start with \"AD\"\
+    \ when dataset class is not missing"
+  Rule_Failure_Criteria: "Dataset name does not start with \"AD\""
+  Condition_Failure: "Dataset class is non-missing"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR496"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR496"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR496"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR496"
+        Version: "1"
+      Version: "5.0"

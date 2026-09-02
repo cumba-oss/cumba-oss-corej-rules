@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD2243 expect=violation domain=TS
+#note "Row 1: a PCLAS record names 'UNII', which is neither MED-RT nor NDF-RT -> fires. Row 2 is the conformant twin."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSVCDREF=UNII
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | PCLAS | Cyclooxygenase Inhibitors | N0000175722 | UNII
+CDISCPILOT01 | TS | 2 | PCLAS | Antihistamine             | N0000175503 | MED-RT

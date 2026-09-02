@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0287B expect=violation domain=ADAE
+#note "KEY=AERELN (2nd arg), DEPENDENT=AEREL (1st arg): key 1 carries {RELATED,UNLIKELY} -> rows 1,2 fire; key 2 is single-valued. Record granularity -> 2 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 AEREL=RELATED AERELN=1
+#expectViolationAt row=2 USUBJID=01-701-1023 AEREL=UNLIKELY AERELN=1
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AEREL   type=Char
+col AERELN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | RELATED  | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | UNLIKELY | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH     | RELATED  | 2

@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0240"
+Sheet_Rule_Identifier: "240"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:CommentOID attribute must be provided when the value of the ItemGroupDef def:HasNoData attribute is 'Yes'."
+Message: "Comment is not provided for ItemGroupDef when the def:HasNoData attribute value is 'Yes'."
+Check:
+  kind: "exists"
+  target: "@CommentOID"
+  when:
+    path: "@HasNoData"
+    equals: "Yes"

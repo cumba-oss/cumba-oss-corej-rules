@@ -1,0 +1,89 @@
+name: FDA-SD1325-define-only-leak
+kind: rule
+description: |
+  REGRESSION GUARD for **Fix #132** (EC-41/H5), variant (i) — a DEFINE-ONLY dataset's defect
+  must not be reported against a submitted dataset that has none.
+
+  **Status: GREEN on both lanes since Fix #132.** Written under
+  PLAN-parity-define-dataset-channel P3a as a *measurement* of a live fork defect (Java 0 vs
+  Python 1, baselined `lane: python`), it was converted to a guard in P4 when the fix landed:
+  the fork now agrees at 0 and the `parity-diff-baseline.json` entry was retired. Its job from
+  here on is to stay green — a `1` on the Python lane means Fix #132 has been reverted or
+  regressed, most plausibly by a submodule bump that re-takes upstream's builder.
+
+  Fixture: same as `FDA-SD1325-multi` (three submitted datasets AE/VS/LB plus one Define-only
+  key ZZ, same rows, same config). Two things change: which key carries the mismatching label, and
+  ZZ switching from `define_dataset_class` to `define_dataset_label` — in `-multi` ZZ carries a
+  class precisely so it cannot itself fire, whereas here it must.
+  Here AE, VS and LB each declare the label the harness gives their submitted dataset (the key
+  itself), so no submitted dataset has a defect, and the Define-only ZZ — a dataset the study
+  never shipped — carries `Zed Only`.
+
+  What it catches, and by what mechanism:
+
+  * Java: 0 violations, EXECUTED. `RuleRunner.injectDatasetLevel` injects the Define
+    attributes of the dataset under evaluation ONLY, so ZZ's row cannot reach AE's check.
+    This half has never moved and is the canonical answer.
+  * Python, BEFORE Fix #132: 1 violation, EXECUTED, attributed to AE and carrying
+    `dataset_label: null` + `define_dataset_label: Zed Only` — i.e. ZZ's Define row, with a
+    null submitted label because no such dataset was submitted.
+    `DatasetMetadataDefineDatasetBuilder.build` outer-merged the WHOLE study frame against the
+    WHOLE Define frame, so `how="outer"` synthesised the Define-only row into EVERY dataset's
+    frame; `validate_single_rule` then loops per dataset and the fork emitted THREE findings,
+    one attributed to each of AE, VS and LB, all carrying ZZ's values. The spec channel keeps
+    only the primary domain's bucket, so it saw 1 of those 3.
+  * Python, AFTER Fix #132: 0 violations, EXECUTED. `build()` narrows the study side to the
+    dataset under evaluation (`dataset_name == self.dataset_metadata.name`) and merges the
+    Define frame onto it with `how="left"`. Both halves are load-bearing here: the narrowing
+    alone would not help, because an outer merge re-admits every unmatched Define row as a
+    synthesised left-null row — which is exactly the row this spec is about.
+
+  The `dataset_label: null` cell is the fingerprint of the leak: a row present in the Define
+  frame and absent from the study frame. A correct per-dataset builder cannot produce it,
+  because the dataset under evaluation is by construction a submitted one. If this spec ever
+  goes red again, look for that null first — it distinguishes the outer-merge regression from
+  the sibling-row regression `FDA-SD1325-sibling-leak` guards.
+
+  This spec is REQUIRED to be read together with `FDA-SD1325-multi`, and that requirement gets
+  STRONGER now that both lanes report 0: a spec whose expectation is `[]` on both lanes proves
+  nothing on its own. That sibling pins the identical fixture to a non-zero count when the
+  primary itself is dirty, which is what makes the 0 here a genuine "the rule ran and found
+  nothing". The status channel cannot supply that assurance on either lane — killing the Java
+  Define channel yields EXECUTED with zero findings, not SKIPPED, because the define skip gate
+  keys on the provider merely being non-null and `putIfNonNull` then drops the operand
+  silently. Without the anchor, a broken fixture and a working guard are indistinguishable.
+
+  No `parity-diff-baseline.json` entry: both lanes agree on both channels, so both are
+  asserted normally. Do not re-add one — the XFAIL machinery would then demand a divergence
+  that no longer exists.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1325)
+rule:
+  coreId: FDA-SD1325
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: ALT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+  LB:
+    define_dataset_label: LB
+  ZZ:
+    define_dataset_label: Zed Only
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

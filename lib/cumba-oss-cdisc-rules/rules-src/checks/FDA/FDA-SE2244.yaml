@@ -1,0 +1,95 @@
+Core:
+  Id: "FDA-SE2244"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the standardized result (--STRESC) is identical\
+  \ to the original result (--ORRES) and is not 'NORMAL' or 'UNREMARKABLE' although\
+  \ a result-modifier qualifier (--SEV, --CHRON, --DISTR) or a supplemental --RESMOD\
+  \ record is populated; --STRESC should carry the base observation without modifiers."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CL"
+    - "MA"
+    - "MI"
+Requirements:
+  Variables:
+    All:
+    - "--STRESC"
+    - "--ORRES"
+Operations:
+- id: "$resmod_cl"
+  expression: "supp_qnam_present(domain=\"SUPPCL\", key_value=\"CLRESMOD\")"
+- id: "$resmod_ma"
+  expression: "supp_qnam_present(domain=\"SUPPMA\", key_value=\"MARESMOD\")"
+- id: "$resmod_mi"
+  expression: "supp_qnam_present(domain=\"SUPPMI\", key_value=\"MIRESMOD\")"
+Check:
+  expression: >-
+    --STRESC == --ORRES and --STRESC not in ["NORMAL", "UNREMARKABLE"] and (not empty(--SEV) or not
+    empty(--CHRON) or not empty(--DISTR) or $resmod_cl == true or $resmod_ma == true or $resmod_mi
+    == true)
+Outcome:
+  Message: "--STRESC is identical to --ORRES although a modifier qualifier (--SEV,\
+    \ --CHRON, --DISTR) or a supplemental --RESMOD record is populated and --STRESC\
+    \ is not 'NORMAL' or 'UNREMARKABLE'; --STRESC should carry the base observation\
+    \ without modifiers."
+  Output_Variables:
+  - "--ORRES"
+  - "--STRESC"
+  - "--CHRON"
+  - "--DISTR"
+  - "--SEV"
+Source:
+  FDA_Validator_Rule_Message: "--STRESC is the same as --ORRES when --STRESC is not\
+    \ 'NORMAL' or 'UNREMARKABLE' and a Qualifier variable is populated"
+  FDA_Validator_Rule_Description: "Result or Finding in Standard Format (--STRESC)\
+    \ should be populated with the base observation without modifiers. Other relevant\
+    \ components of the Result or Finding in Original Units (--ORRES) finding must\
+    \ be parsed into one or more Qualifier variables and the Supplemental Qualifier\
+    \ --RESMOD."
+  Domains: "CL, MA, MI"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2244"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2244"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2244"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2244"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2244"
+        Version: "1"
+      Version: "1.6"

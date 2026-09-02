@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0154"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Result or Finding in Original Units (BGORRES)\
+  \ is empty but the Completion Status (BGSTAT) is not \"NOT DONE\"; a body-weight-gain\
+  \ record with a missing result should have BGSTAT set to \"NOT DONE\"."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "BG"
+Requirements:
+  Variables:
+    All:
+    - "BGSTAT"
+Check:
+  expression: >-
+    empty(BGORRES) and BGSTAT != "NOT DONE"
+Outcome:
+  Message: "BGORRES is empty but BGSTAT is not \"NOT DONE\"."
+  Output_Variables:
+  - "BGORRES"
+  - "BGSTAT"
+Source:
+  Class: "FND"
+  Domain: "BG"
+  Variable: "--STAT"
+  Plain_Text_Explanation: "If one of the two body weights needed for the calculation\
+    \ is missing, BGORRES should be null and BGSTAT should be \"NOT DONE\"."
+  Condition: "One or both of the two body weights needed for the calculation is missing"
+  Rule: "BGORRES = null AND BGSTAT = \"NOT DONE\"."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND154"
+        Version: "1"
+      Version: "5.0"

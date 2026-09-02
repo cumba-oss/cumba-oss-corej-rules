@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-CG0063"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record for the same subject (USUBJID)\
+  \ in the Disposition (DS) dataset has Category for Disposition Event (DSCAT) equal\
+  \ to 'DISPOSITION EVENT' and Epoch (EPOCH) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    DSCAT == "DISPOSITION EVENT" and present_on_multiple_rows_within(DSCAT, within=USUBJID) and
+    empty(EPOCH)
+Outcome:
+  Message: "Multiple records for the same USUBJID have DSCAT equal to 'DISPOSITION\
+    \ EVENT' but EPOCH is not populated."
+  Output_Variables:
+  - "DSCAT"
+  - "EPOCH"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "EPOCH"
+  Condition: "Multiple events per subject where DSCAT = 'DISPOSITION EVENT'"
+  Rule: "EPOCH ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0063"
+        Version: "1"
+      Version: "2.0"

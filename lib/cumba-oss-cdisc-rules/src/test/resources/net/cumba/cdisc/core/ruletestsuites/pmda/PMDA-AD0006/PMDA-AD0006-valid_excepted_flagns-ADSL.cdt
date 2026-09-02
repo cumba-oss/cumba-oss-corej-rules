@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0006 expect=noViolation domain=ADSL
+#note "Both cells hold a value outside [0,1] but both are silenced by the exception regex (ABLFN literally, ANL01FN via ^ANL\\d\\dFN$). Pins the two live exception branches. Do not add ONTRTFN."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ABLFN   type=Num
+col ANL01FN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2 | 3

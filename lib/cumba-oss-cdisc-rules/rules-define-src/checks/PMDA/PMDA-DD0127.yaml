@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0127"
+Sheet_Rule_Identifier: "DD0127"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "An NCI Code must not be provided when a codelist is non-standard (i.e., codelist does not have a Terminology version defined)."
+Message: "Invalid use of NCI Code for Codelist"
+# "NCI Code" = an Alias child with Context 'nci:ExtCodeID'; "Terminology
+# version defined" = the CodeList's def:StandardOID binding (the 2.1 carrier of
+# the CT version, mirroring rows DD0128/DD0129). The target grammar cannot
+# select an Alias by its Context, so the 0124-B fire-always vehicle states the
+# violation in the guard. No CDISC twin (0176 is the inverse presence rule).
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "@StandardOID"
+      exists: false
+    - path: "Alias/@Context"
+      equals: "nci:ExtCodeID"

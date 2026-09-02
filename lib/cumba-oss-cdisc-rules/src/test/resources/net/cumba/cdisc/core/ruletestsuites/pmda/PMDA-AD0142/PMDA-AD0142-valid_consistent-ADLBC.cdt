@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0142 expect=noViolation domain=ADLBC
+#note "Same shape as the invalid fixture, but row 3 carries PARAMCD=ALB, so each PARAM group maps to exactly one PARAMCD and nothing fires."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+S1 | 001 | ALB  | Albumin   | 40
+S1 | 002 | ALB  | Albumin   | 41
+S1 | 003 | ALB  | Albumin   | 42
+S1 | 001 | BILI | Bilirubin | 8
+S1 | 002 | BILI | Bilirubin | 9

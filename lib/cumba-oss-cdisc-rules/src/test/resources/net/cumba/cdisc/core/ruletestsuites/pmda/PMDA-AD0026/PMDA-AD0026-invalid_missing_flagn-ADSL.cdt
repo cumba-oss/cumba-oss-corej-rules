@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0026 expect=violation domain=ADSL
+#note "A lone '.' in a numeric field is null. SAFFN missing -> one finding."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=SAFFN USUBJID=01-701-1023
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFN   type=Num
+col ITTFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1
+CDISCPILOT01 | 01-701-1023 | . | 0
+---

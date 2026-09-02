@@ -1,0 +1,86 @@
+name: EC49-affix-not-equal-empty
+kind: check_operator
+description: |
+  EC-49 — `prefix_not_equal_to` / `suffix_not_equal_to` over an EMPTY value. Since Fix #148 this
+  is a CONVERGENCE pin for DETECTION: both engines fire the empty row, and the spec exists to
+  keep them there.
+
+  ⚠ It is nonetheless STILL BASELINED (`lane: python`, `channels: ["violations"]`), and that is
+  not a leftover — see "Why the baseline entry did not retire" below.
+
+  It was filed 2026-08-03 as a divergence and baselined `lane: python`. coreJ used to suppress
+  the empty row: `ExprCompiler.compileComparison` gave the affix NEQ family its own branch and
+  intersected the result with `Primitives.nonEmpty(lv)`, commented "the ported legacy operators
+  (prefix_/suffix_not_equal_to) NEVER fire on a missing value" — so an empty (or absent)
+  `--STDTC` cast no vote. The fork never had that mask: its `prefix_not_equal_to` is
+  `~prefix_equal_to(...)`, documented as "Complement of `prefix_equal_to`", so `"" != "20"` is
+  true and it fires.
+
+  Fix #148 (2026-08-04) removed the mask. The affix negatives now behave like every other
+  negative leaf — an empty operand fires and `non_empty(X)` is the author's opt-out — which is
+  what the fork already did, so the two lanes agree on DETECTION. The engine change is pinned
+  Java-side by `AbsentColumnFoldTest`; register §45 carries the reasoning (the retired
+  CORE-RULES-JAVA-EXTENSIONS.md §22 is indexed in
+  `corej-cdisc-rules/documentation/expression-docs-disposition.md` §A).
+
+  WHY THE BASELINE ENTRY DID NOT RETIRE. Measured 2026-08-04: both lanes now fire exactly rows
+  002 and 003, with identical row keys and status. What still diverges on the `violations`
+  channel is the ordinary EC-37 / Fix #127 residual — Java derives the effective
+  Output_Variables at load time and reports AESTDTC alongside the row-key columns, Python
+  consumes the authored list verbatim and omits it. That residual is PRE-EXISTING (measured
+  against the pre-Fix-#148 spec, Python already differed on row 002 by the AESTDTC key alone),
+  so the entry was RE-CITED onto the EC-37 cluster rather than deleted. Deleting it would turn
+  a silent XFAIL into a hard red on the *unclaimed*-channel branch of the guard. Same class as
+  the sibling entry EC43-absent-equals-blank-control.
+
+  Rows 001 and 002 are the controls that prove the operator still discriminates (matching affix
+  -> no fire; differing affix -> fires on both engines). Row 003 is the one Fix #148 changed and
+  is the reason to keep this spec: it is the only CROSS-LANE pin on the empty-operand polarity.
+  (The Java side alone is pinned by AbsentColumnFoldTest; nothing else pins the fork's half.)
+python_notes: |
+  Both lanes fire rows 002 and 003. Python fires row 003 (empty --STDTC) because the extracted
+  prefix "" differs from "20"; since Fix #148 coreJ does the same, having dropped the
+  Primitives.nonEmpty mask that used to suppress the row.
+python_source: EC-49 (filed 2026-08-03 from PLAN-negative-leaf-absent-column.md Phase 0 step 5;
+  resolved 2026-08-04 by Fix #148, PLAN-affix-negative-empty-mask-removal.md)
+check:
+  name: AESTDTC
+  operator: prefix_not_equal_to
+  value: "20"
+  value_is_literal: true
+  prefix: 2
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    # prefix "20" == "20" -> no fire on either engine
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AESTDTC: '2020-01-01'}
+    # prefix "19" != "20" -> fires on BOTH engines (the control that proves the operator works)
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AESTDTC: '1999-06-15'}
+    # empty -> "" != "20" -> fires on BOTH engines since Fix #148. THE CONVERGENCE.
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AESTDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+- rule_id: AUTO-EC49-affix-not-equal-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESTDTC: '1999-06-15'
+    STUDYID: S1
+    USUBJID: '002'
+- rule_id: AUTO-EC49-affix-not-equal-empty
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    # the empty cell surfaces as null in the finding payload, not as ''
+    AESEQ: '1'
+    AESTDTC: null
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

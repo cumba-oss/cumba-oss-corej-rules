@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0658 expect=noViolation domain=ADNCA
+#note "Isolates the leading not empty(NCAXFN) conjunct - the sheet's 'must be 1 OR NULL' half. A missing NCAXFN means 'included in the NCA calculation' and must not be flagged. Executes (column declared, Requirements.Variables gate satisfied) and stays silent."
+#expectViolationCount 0
+#library standard=adamig version=1-3
+dataset ADNCA structure=BDS subclass=NCA
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col NCAXFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC |
+CDISCPILOT01 | 01-701-1023 | CONC |
+---

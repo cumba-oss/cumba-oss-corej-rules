@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-CG0313"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when one or more of the variables STUDYID, DOMAIN, USUBJID\
+  \ (or POOLID), or --SEQ is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    not var_exists("STUDYID") or not var_exists("DOMAIN") or not var_exists("--SEQ") or not
+    var_exists("USUBJID") and not var_exists("POOLID")
+Outcome:
+  Message: "One or more of the variables STUDYID, DOMAIN, USUBJID (or POOLID), or\
+    \ --SEQ is not present in the dataset."
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "STUDYID, USUBJID or POOLID, DOMAIN, and --SEQ exist"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0313"
+        Version: "1"
+      Version: "2.0"

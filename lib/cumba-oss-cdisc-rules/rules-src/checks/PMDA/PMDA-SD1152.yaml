@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-SD1152"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when records are not unique for the combination of Key\
+  \ Variables declared in the Define-XML."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$define_key_variables"
+  expression: "define_key_variables()"
+Check:
+  expression: >-
+    not is_unique_set([STUDYID, $define_key_variables])
+Outcome:
+  Message: "Records are not unique for the combination of Key Variables declared in\
+    \ the Define-XML."
+  Output_Variables:
+  - "STUDYID"
+  - "$define_key_variables"
+Source:
+  Message: "Duplicate records per Key Variables in Define.xml"
+  Description: "The structure of study data should be one record per unique combination\
+    \ of values in Key Variables provided in Define.xml file by KeySequence attribute\
+    \ for each domain or dataset. Note that Key Variables should represent physical\
+    \ structure of collected data. Utilization of artificial surrogate keys like --SEQ\
+    \ variable should be avoided. Current implementation of the rule is limited to\
+    \ the domain and does not use additional non-standard variables stored in SUPPQUAL\
+    \ datasets."
+  Domains: "ALL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1152"
+        Version: "1"
+      Version: "6.0"

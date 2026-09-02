@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0207 expect=violation domain=ADSL
+# Rule:Description: The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.RACE is not equal to DM.RACE
+#note "same USUBJID, ADSL.RACE != DM.RACE -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col RACE type=Char
+---
+CDISCPILOT01 | 01-701-1015 | BLACK OR AFRICAN AMERICAN
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col RACE type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | WHITE
+---

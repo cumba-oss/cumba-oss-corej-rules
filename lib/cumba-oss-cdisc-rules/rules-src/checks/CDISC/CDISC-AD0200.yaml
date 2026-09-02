@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-AD0200"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable in ADaM shares its name with a variable\
+  \ defined in the ADaM IG but the two do not have identical data types."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_type("LIBRARY")) and var_type("DATA") != var_type("LIBRARY")
+Outcome:
+  Message: "A variable in the ADaM IG and a variable in ADaM with the same name do\
+    \ not have identical data types"
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+  - "library_variable_data_type"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ALL"
+  Natural_Language_Rule_Failure_Criteria: "A variable is present in ADaM with the\
+    \ same name as a variable defined in the ADaM IG but the variables do not have\
+    \ identical data types"
+  Rule_Failure_Criteria: "A variable in the ADaM IG and a variable in ADaM with the\
+    \ same name do not have identical data types"
+  Condition_Failure: "A variable is present in ADaM with the same name as a variable\
+    \ present in ADaM IG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR200"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR200"
+        Version: "1"
+      Version: "5.0"

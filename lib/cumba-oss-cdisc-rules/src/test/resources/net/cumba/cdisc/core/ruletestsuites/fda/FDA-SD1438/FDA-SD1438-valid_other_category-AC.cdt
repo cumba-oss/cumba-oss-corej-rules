@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1438 expect=noViolation domain=AC
+#note "Guard branch: the CAGTCAT record's ACVAL is 'CHEMICAL', not 'RADIOLOGICAL/NUCLEAR', so the IRORSEQ parameter is not expected even though no ACPARMCD='IRORSEQ' record exists -> no violation. Pins that the ACVAL half of the CAGTCAT filter is load-bearing."
+#library standard=sendig version=ar-1-0
+dataset AC label="Challenge Agent Characterization"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ACSEQ    type=Num  label="Sequence Number"
+col ACPARMCD type=Char label="Challenge Agent Parameter Short Name"
+col ACPARM   type=Char label="Challenge Agent Parameter"
+col ACVAL    type=Char label="Parameter Value"
+---
+S1 | AC | 1 | CAGTCAT  | Challenge Agent Category     | CHEMICAL
+S1 | AC | 2 | CAGTSUPN | Challenge Agent Supplier Name | ACME LABS

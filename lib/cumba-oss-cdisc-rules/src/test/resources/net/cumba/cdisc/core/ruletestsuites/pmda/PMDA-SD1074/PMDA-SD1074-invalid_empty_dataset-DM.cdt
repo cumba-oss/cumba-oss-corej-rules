@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1074 expect=violation domain=DM
+#note "DISCRIMINATING. The corpus's first 0-row x variable-metadata fixture. The rule routes through the pure-metadata broadcast gate, whose per-variable loop is bounded by the REAL table's column count and never reads the row count -- so the declared SPECIES column still fires even though the dataset carries zero data rows. If this reports 0 violations, a skip, or a different count, that is a real detection to escalate to stage R; do not edit this fixture toward observed behaviour."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=SPECIES
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SPECIES type=Char label="Species"
+---

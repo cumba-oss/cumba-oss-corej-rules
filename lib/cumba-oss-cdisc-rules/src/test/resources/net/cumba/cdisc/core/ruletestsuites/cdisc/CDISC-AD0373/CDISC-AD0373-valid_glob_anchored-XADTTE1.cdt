@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0373 expect=skipped domain=XADTTE1
+#note "Glob anchoring guard. Scope.Domains entries containing metacharacters are matched as ANCHORED, case-insensitive FULL matches on the raw dataset name, so Include:['ADTTE*'] must not reach XADTTE1 — a substring or unanchored match would. Same fixture as the ADTTE1 twin (CNSR absent), so if the anchoring ever regressed this scenario would start firing instead of silently drifting; expect=skipped is asserted as a non-execution, which expect=noViolation could not distinguish."
+# Rule:Description: Raise an error when CNSR is not present in an ADTTE (time-to-event) dataset.
+dataset XADTTE1
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+---
+CDISCPILOT01 | 01-701-1015 | TTDTH | 120
+---

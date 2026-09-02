@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1309 expect=violation domain=TS
+#note "FRESH, DISCRIMINATING - pins the group=[STUDYID] keying of $STYPE_INTERVENTIONAL (per-row resolution through the row's own study; 0 pre-populated for non-matching groups). S1 is interventional with an empty TRT -> group count 1, FIRES. S2 is observational with an equally empty TRT -> group count 0, SILENT. Exactly one finding although two TRT rows are equally empty."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | STYPE | Study Type                            | INTERVENTIONAL
+S1 | TS | 2 | TRT   | Investigational Therapy or Treatment  |
+S2 | TS | 1 | STYPE | Study Type                            | OBSERVATIONAL
+S2 | TS | 2 | TRT   | Investigational Therapy or Treatment  |

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0100 expect=violation domain=EC
+#note "H3 convergence (ruled 2026-08-19): the dose leg is the hole-free bare comparison ECDOSE <= 0, so only a RECORDED non-positive dose fires. The ECOCCUR column is ABSENT (Perm in EC; treat-as-empty applies per D-TA-4c and the guard tolerates it). Row 1 has ECDOSE=0 recorded -> fires; row 2 has ECDOSE > 0 -> silent; row 3 leaves ECDOSE empty -> silent under the converged shape (a missing dose is CDISC-CG0462's subject, and the all-absent dataset shape is CDISC-CG0100-A's)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1 USUBJID=01-701-1015
+dataset EC label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ type=Num label="Sequence Number"
+col ECSTAT type=Char label="Completion Status"
+col ECDOSTXT type=Char label="Dose Description"
+col ECDOSE type=Num label="Dose per Administration"
+---
+CDISCPILOT01 | EC | 01-701-1015 | 1 |  |  | 0
+CDISCPILOT01 | EC | 01-701-1023 | 2 |  |  | 100
+CDISCPILOT01 | EC | 01-701-1028 | 3 |  |  |

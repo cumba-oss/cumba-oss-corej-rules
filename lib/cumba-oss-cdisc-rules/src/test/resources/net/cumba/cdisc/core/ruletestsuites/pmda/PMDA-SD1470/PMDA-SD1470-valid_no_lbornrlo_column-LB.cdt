@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1470 expect=noViolation domain=LB
+#note "LBORNRLO is NOT declared. An absent column folds to all-missing, so the bare empty(LBORNRLO) broadcast-folds to TRUE and the leading not empty(LBORNRLO) to FALSE - the rule EXECUTES and stays silent. noViolation WITH execution, not skipped."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | LB | 001 | 1 | GLUC | POSITIVE
+S1 | LB | 002 | 2 | GLUC | NEGATIVE
+---

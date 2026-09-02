@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0037B expect=violation domain=ADXX
+#note "DISCRIMINATING FIXTURE for board item M2-Q1 face A (finding AD0037B-F1). AD0037B is scoped Domains.Include:[ALL] with NO Data_Structures facet, so a declared ADAM OTHER dataset (structure=OTHER) is IN scope and fires - contrast with the six-token Data_Structures idiom of AD0044/AD0045/AD0046 under which the identical dataset is OUT of scope (pinned by pmda/PMDA-AD0012/PMDA-AD0012-skipped_adam_other-ADXX.cdt and pmda/PMDA-AD0013/PMDA-AD0013-skipped_adam_other_structure-ADMISC.cdt). Per stage-R instruction: key AGEGR1=YOUNG carries {1,2} -> rows 1,3 fire. NEVER re-aim."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 AGEGR1=YOUNG AGEGR1N=1
+#expectViolationAt row=3 USUBJID=01-701-1034 AGEGR1=YOUNG AGEGR1N=2
+dataset ADXX structure=OTHER
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AGEGR1   type=Char
+col AGEGR1N  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | YOUNG | 1
+CDISCPILOT01 | 01-701-1023 | ALB | OLD   | 1
+CDISCPILOT01 | 01-701-1034 | ALB | YOUNG | 2

@@ -1,0 +1,117 @@
+Core:
+  Id: "PMDA-SD1021"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a character variable value has a leading space,\
+  \ contains a carriage return, or consists entirely of a period ('.'), excluding\
+  \ the COVALn and TSVALn variables."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "RELSPEC"
+    - "RELSUB"
+Check:
+  expression: >-
+    var_type("DATA") == "Char" and varname() !~ /^(COVAL[0-9]*|TSVAL[0-9]*)$/ and value() =~ /^
+    |.*\\r|^\\.$/
+Outcome:
+  Message: "Character variable value has a leading space, a carriage return, or is\
+    \ a single period."
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+  - "variable_value"
+Source:
+  Message: "Unexpected character value in variable"
+  Description: "Character values should not have leading space ' ' characters, carriage\
+    \ returns, or '.' as an entire value. The only exceptions are COVALn and TSVALn\
+    \ variables."
+  Domains: "ALL (-RELSPEC, -RELSUB)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1021"
+        Version: "1"
+      Version: "1.6"

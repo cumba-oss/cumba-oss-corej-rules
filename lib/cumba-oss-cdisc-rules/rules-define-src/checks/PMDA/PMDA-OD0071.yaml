@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-OD0071"
+Sheet_Rule_Identifier: "OD0071"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "SignificantDigits"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The Significant Digits attribute is required when DataType is float."
+Message: "Missing Significant Digits value"
+# Exact duplicate of CDISC twin 0145 (PMDA severity Warning vs CDISC default
+# Error).
+Check:
+  kind: "exists"
+  target: "@SignificantDigits"
+  when:
+    path: "@DataType"
+    equals: "float"

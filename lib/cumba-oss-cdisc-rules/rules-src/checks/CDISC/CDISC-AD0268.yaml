@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-AD0268"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ADURN is populated but ADURU is empty."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ADURN"
+    - "ADURU"
+Check:
+  expression: >-
+    not empty(ADURN) and empty(ADURU)
+Outcome:
+  Message: "ADURU is empty even though ADURN is populated."
+  Output_Variables:
+  - "ADURN"
+  - "ADURU"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ADURU"
+  Natural_Language_Rule_Failure_Criteria: "ADURN is populated and ADURU is not populated"
+  Rule_Failure_Criteria: "ADURU is not populated"
+  Condition_Failure: "ADURN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR268"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR268"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR268"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR268"
+        Version: "2"
+      Version: "5.0"

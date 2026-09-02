@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-AD0252-C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject-level or device-level analysis dataset\
+  \ (ADSL or ADDL) contains the basic-data-structure numeric-code analysis variables\
+  \ AVALCAyN or BASECAyN (introduced in ADaMIG 1.1), which are prohibited at subject\
+  \ and device level."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("AVALCAyN") or var_exists("BASECAyN")
+Outcome:
+  Message: "A variable that is prohibited in the subject-level analysis dataset is\
+    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
+    \ variables AVALCAyN and BASECAyN."
+  Output_Variables:
+  - "AVALCAyN"
+  - "BASECAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source_Proposed:
+  Message: "A variable that is prohibited in the subject-level analysis dataset is\
+    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
+    \ variables AVALCAyN and BASECAyN."
+  Description: "A subject-level or device-level analysis dataset (ADSL or ADDL) contains\
+    \ the basic-data-structure numeric-code analysis variables AVALCAyN or BASECAyN\
+    \ (introduced in ADaMIG 1.1), which are prohibited at subject and device level."
+  Domains: "SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET"
+  Severity: "Error"
+Source:
+  Message: "Variable present in dataset is prohibited for use in ADaM"
+  Description: "Variables described in ADaM IG as inappropriate for usage must be\
+    \ not included in the dataset. i.e., for ADAE, there is no need for AVAL, AVALC\
+    \ and Parameter variables."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0252"
+        Version: "1"
+      Version: "6.0"

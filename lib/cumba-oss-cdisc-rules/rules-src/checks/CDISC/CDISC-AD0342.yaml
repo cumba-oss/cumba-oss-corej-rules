@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0342"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a parameter, ANRLO has more than one value\
+  \ for a given value of ANRLOC"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    has_multiple_values_for(ANRLO, ANRLOC, within=PARAMCD)
+Outcome:
+  Message: "Within this parameter, ANRLO has more than one value for the same value\
+    \ of ANRLOC."
+  Output_Variables:
+  - "PARAMCD"
+  - "ANRLO"
+  - "ANRLOC"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ANRLO"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of ANRLO for a given value of ANRLOC"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of ANRLO\
+    \ for a given value of ANRLOC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR342"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR342"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR342"
+        Version: "2"
+      Version: "5.0"

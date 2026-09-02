@@ -1,0 +1,10 @@
+#!RuleTest
+#test PMDA-AD0054 expect=noViolation domain=ADSL
+#note "DISCRIMINATING, the ONE fixture where PMDA-AD0054 and its CDISC twin part company. The twin carries Requirements.Variables.All: [USUBJID] and SKIPS here; PMDA-AD0054 has no such gate, so it EXECUTES and is silent, because the AUTHORED leading conjunct var_exists('USUBJID') folds FALSE on the absent column and kills the AND (EC-53 / Fix #143 safety). MUST be expect=noViolation. If the lane accepts AD0054-F1, THIS is the fixture to re-author."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 56
+CDISCPILOT01 | 44

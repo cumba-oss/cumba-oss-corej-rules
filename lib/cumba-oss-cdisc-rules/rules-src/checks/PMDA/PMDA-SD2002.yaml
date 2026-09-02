@@ -1,0 +1,107 @@
+Core:
+  Id: "PMDA-SD2002"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Actual Arm Code (ACTARMCD) is populated and its\
+  \ value does not match an Arm Code (ARMCD) entry in the Trial Arms (TA) dataset.\
+  \ Subjects who failed screening ('SCRNFAIL'), were not fully assigned to an Arm\
+  \ ('NOTASSGN'), were randomized but not treated ('NOTTRT'), or received non-planned\
+  \ treatment ('UNPLAN') are expected exceptions and are excluded from the check."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Operations:
+- id: "$ta_armcd"
+  expression: "distinct(ARMCD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in $ta_armcd and ACTARMCD not in ["SCRNFAIL", "NOTASSGN",
+    "NOTTRT", "UNPLAN"]
+Outcome:
+  Message: "Invalid value for ACTARMCD."
+  Output_Variables:
+  - "ACTARMCD"
+  - "$ta_armcd"
+Source:
+  Message: "Invalid value for ACTARMCD"
+  Description: "Actual Arm Code (ACTARMCD) values should match entries in the Trial\
+    \ Arms (TA) dataset, except for subjects who failed screening ('SCRNFAIL'), or\
+    \ were not fully assigned to an Arm ('NOTASSGN'), or randomized, but not treated\
+    \ ('NOTTRT'), or received non-planned treatment ('UNPLAN')."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2002"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1026 expect=noViolation domain=RELREC
+#note "FRESH. RELTYPE POPULATED on every row so that only the suffix leaf can silence the rule: (1) IDVAR='AEGRPID' -- a 7-character non---SEQ IDVAR, suffix 'PID', no match; (2) IDVAR='EQ' -- a two-character IDVAR, SHORTER than n=3, so BuiltinFunctions.affixValue returns the whole string 'EQ', which cannot equal SEQ; (3) IDVAR='Q' -- a one-character IDVAR, same fallback, whole string 'Q'; (4) IDVAR MISSING -- folds to '' under affixValue, again no match. All four silent. Pins the affix contract that the twin never exercises: suffix(x, n) on a value shorter than n yields the whole string rather than an error or a pad, and the fallback can never manufacture a SEQ match because 'SEQ' is itself 3 characters long."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AEGRPID | G1 | ONE  | R01
+S1 | CM | 001 | EQ      | 1  | MANY | R02
+S1 | FA | 001 | Q       | 1  | ONE  | R03
+S1 | MH | 001 |         | 1  | ONE  | R04

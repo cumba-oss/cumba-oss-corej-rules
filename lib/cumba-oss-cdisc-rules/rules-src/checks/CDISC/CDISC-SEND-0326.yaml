@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-SEND-0326"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pharmacokinetic Concentrations (PC) record used\
+  \ to compute a time-concentration profile has no Planned Elapsed Time from Time\
+  \ Point Reference (PCELTM). A record carrying a Time Point Reference (PCTPTREF)\
+  \ participates in a concentration profile; PCELTM must be populated for such records\
+  \ so the plasma concentration can be placed on the profile timeline. An unscheduled\
+  \ record does not carry PCTPTREF, so PCTPTREF being populated is the profile-membership\
+  \ signal."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Check:
+  expression: >-
+    not empty(PCTPTREF) and empty(PCELTM)
+Outcome:
+  Message: "The PC record carries a Time Point Reference (PCTPTREF) but PCELTM is\
+    \ empty; PCELTM must be populated for a record contributing to a time-concentration\
+    \ profile."
+  Output_Variables:
+  - "PCELTM"
+  - "PCTPTREF"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCELTM"
+  Plain_Text_Explanation: "Specimen concentrations (e.g., plasma) used to calculate\
+    \ a time concentration profile must have PCELTM populated with the nominal time\
+    \ from the reference (dose) in order to accurately construct a graph. PCELTM should\
+    \ be the timing used to calculate the profile."
+  Condition: "Specimen concentration (e.g., plasma) was used to calculate a time concentration\
+    \ profile"
+  Rule: "PCELTM is populated with the nominal time from reference (dose)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND326"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND326"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND326"
+        Version: "1"
+      Version: "5.0"

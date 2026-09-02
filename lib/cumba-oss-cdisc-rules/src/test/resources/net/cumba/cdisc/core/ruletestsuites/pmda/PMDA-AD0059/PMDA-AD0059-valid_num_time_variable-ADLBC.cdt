@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0059 expect=noViolation domain=ADLBC
+#note "ASTTM is declared type=Num with the value 48600 (seconds since midnight). Deliberately NOT declared type=Time - the loader auto-derives a format for Date/Time/DateTime, which is irrelevant here; the fixture tests the TYPE, not the format. var_type(DATA) != Num is false -> silent."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTTM   type=Num
+---
+S1 | 001 | ALB | 48600
+---

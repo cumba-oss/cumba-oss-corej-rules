@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0401 expect=violation domain=ADLBC
+# Rule:Description: AVAL is not populated or ATOXGRL is not populated, and ATOXDSCL is populated
+#note "ATOXDSCL populated, AVAL empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col ATOXGRL type=Char
+col ATOXDSCL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT |  | 2 | Grade 2 low
+---

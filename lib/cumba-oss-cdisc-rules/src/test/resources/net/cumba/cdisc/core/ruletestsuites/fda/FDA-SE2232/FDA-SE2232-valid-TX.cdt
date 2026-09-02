@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2232 expect=noViolation domain=TX
+#note "Every TXVAL carried under TXPARMCD='ARMCD' (1, 2) is defined as a TA.ARMCD; the TRTDOS parameter row is outside the rule's condition -> no violation."
+#library standard=sendig version=3-1-1
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+STUDY01 | TX | S1 | Control  | 1 | ARMCD  | Planned Arm Code | 1
+STUDY01 | TX | S2 | HighDose | 1 | ARMCD  | Planned Arm Code | 2
+STUDY01 | TX | S2 | HighDose | 2 | TRTDOS | Treatment Dose   | 500
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+STUDY01 | TA | 1 | Control   | 1 | TRT
+STUDY01 | TA | 2 | High Dose | 1 | TRT
+---

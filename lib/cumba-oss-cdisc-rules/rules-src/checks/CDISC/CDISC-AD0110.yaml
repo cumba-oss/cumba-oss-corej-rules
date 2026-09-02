@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-AD0110"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of AVISIT for a given value of AVISITN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "AVISIT"
+    - "AVISITN"
+Check:
+  expression: >-
+    has_multiple_values_for(AVISIT, AVISITN, within=PARAMCD)
+Outcome:
+  Message: "AVISIT has more than one value for this PARAMCD and AVISITN."
+  Output_Variables:
+  - "AVISIT"
+  - "AVISITN"
+  - "PARAMCD"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "AVISIT"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of AVISIT for a given value of AVISITN"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, there is more than one\
+    \ value of AVISIT for a given value of AVISITN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR110"
+        Version: "1"
+      Version: "5.0"

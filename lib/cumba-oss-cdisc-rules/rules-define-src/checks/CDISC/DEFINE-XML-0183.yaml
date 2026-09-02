@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0183"
+Sheet_Rule_Identifier: "183"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: "Rank"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute Rank must be provided for the EnumeratedItem element when there is at least one Rank attribute value provided for the same CodeList."
+# The guard walks to the parent CodeList and matches any EnumeratedItem
+# sibling (self included) carrying a Rank — the sheet's
+# "$ParentCodeList/EnumeratedItem/@Rank is provided" condition verbatim.
+Message: "Attribute Rank is missing for an EnumeratedItem element in a CodeList which has attribute Rank provided for another EnumeratedItem."
+Check:
+  kind: "exists"
+  target: "@Rank"
+  when:
+    path: "../EnumeratedItem/@Rank"
+    exists: true

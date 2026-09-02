@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0277 expect=violation domain=BW
+#note "The dataset's source URI ends in BW.xpt, so extract_metadata(\"dataset_location\") - the last path segment of getTableURI() - is 'BW.xpt', which matches /[A-Z]/ and fires. $dataset_location is a dataset-level scalar, so the comparison folds to a dataset constant: ONE violation reported at row 1 regardless of the row count."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 "$dataset_location"=BW.xpt
+dataset BW class=FINDINGS label="Body Weight" uri=file:///study/send/BW.xpt
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Findings as Collected"
+---
+S1 | BW | 001 | 1 | BW | 250
+S1 | BW | 002 | 1 | BW | 260

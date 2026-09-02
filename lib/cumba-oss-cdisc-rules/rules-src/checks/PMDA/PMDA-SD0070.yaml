@@ -1,0 +1,128 @@
+Core:
+  Id: "PMDA-SD0070"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject in the Demographics (DM) dataset, other\
+  \ than a screen-failure subject (ARMCD equals 'SCRNFAIL'), a not-assigned subject\
+  \ (ARMCD equals 'NOTASSGN'), or a not-treated subject (ACTARMCD equals 'NOTTRT'),\
+  \ has no record in the Exposure (EX) dataset."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ex_record_count"
+  expression: "record_count(domain=\"EX\", group=[USUBJID])"
+Check:
+  expression: >-
+    ARMCD != "SCRNFAIL" and ARMCD != "NOTASSGN" and (not var_exists("ACTARMCD") or ACTARMCD !=
+    "NOTTRT") and $ex_record_count < 1
+Outcome:
+  Message: "No Exposure (EX) record is present for the subject."
+  Output_Variables:
+  - "ARMCD"
+  - "ACTARMCD"
+  - "$ex_record_count"
+Source:
+  Message: "No Exposure record found for subject"
+  Description: "All Demographics (DM) subjects (USUBJID) participating in a study\
+    \ that includes investigational product should have at least one record in the\
+    \ Exposure (EX) domain, except for subjects who failed screening (ARMCD = 'SCRNFAIL'),\
+    \ were not fully assigned to an Arm (ARMCD = 'NOTASSGN') or did not receive study\
+    \ treatment (ACTARMCD = 'NOTTRT')."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0070"
+        Version: "1"
+      Version: "1.6"

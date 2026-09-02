@@ -1,0 +1,49 @@
+Core:
+  Id: "FDA-SE2264"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Repro Phase (RPHASE) is empty or not present but\
+  \ at least one Repro Phase timing variable (RPPLDY, RPPLSTDY, RPPLENDY, --RPDY,\
+  \ --RPSTDY, or --RPENDY) is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+Check:
+  expression: >-
+    (not empty(RPPLDY) or not empty(RPPLSTDY) or not empty(RPPLENDY) or not empty(--RPDY) or not
+    empty(--RPSTDY) or not empty(--RPENDY)) and empty(RPHASE)
+Outcome:
+  Message: "RPHASE is empty or not present when a Repro Phase timing variable is populated."
+  Output_Variables:
+  - "RPHASE"
+  - "RPPLDY"
+  - "RPPLSTDY"
+  - "RPPLENDY"
+  - "--RPDY"
+  - "--RPSTDY"
+  - "--RPENDY"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for RPHASE when Repro Phase Day values\
+    \ are provided"
+  FDA_Validator_Rule_Description: "Repro Phase (RPHASE) is required to be populated\
+    \ when any Repro Phase timing variable is populated: Planned Repro Phase Day of\
+    \ Observation (RPPLDY), Planned Repro Phase Day of Obs Start (RPPLSTDY), Planned\
+    \ Repro Phase Day of Obs End (RPPLENDY), Actual Repro Phase Day of Observation\
+    \ (--RPDY), Actual Repro Phase Day of Obs Start (--RPSTDY), Actual Repro Phase\
+    \ Day of Obs End (--RPENDY)"
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2264"
+        Version: "1"
+      Version: "1.6"

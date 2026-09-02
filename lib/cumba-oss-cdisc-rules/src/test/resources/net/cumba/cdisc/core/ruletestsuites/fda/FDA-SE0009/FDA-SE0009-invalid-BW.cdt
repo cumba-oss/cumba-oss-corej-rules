@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE0009 expect=violation domain=BW
+#note "Row 3 leaves both BWDTC and BWDY empty -> fires; rows 1 and 2 populate one of the two."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=3 BWSEQ=3 BWDTC=
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWDTC    type=Char label="Date/Time of Measurement"
+col BWDY     type=Num  label="Study Day of Measurement"
+---
+S1 | BW | 001 | 1 | BW | 2020-01-05 | .
+S1 | BW | 001 | 2 | BW |            | 8
+S1 | BW | 001 | 3 | BW |            | .

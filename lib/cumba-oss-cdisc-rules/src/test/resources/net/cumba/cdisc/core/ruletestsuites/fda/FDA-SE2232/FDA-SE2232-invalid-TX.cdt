@@ -1,0 +1,33 @@
+#!RuleTest
+#test FDA-SE2232 expect=violation domain=TX
+#note "TXVAL=9 under TXPARMCD='ARMCD' is not a TA.ARMCD -> fires on row 2. Row 1 matches TA; row 3 carries the same unknown value under TXPARMCD='TRTDOS' and is guarded out by the TXPARMCD leaf; row 4 has an empty TXVAL and is guarded out by the non_empty leaf."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TXVAL=9
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+STUDY01 | TX | S1 | Control  | 1 | ARMCD  | Planned Arm Code | 1
+STUDY01 | TX | S2 | HighDose | 1 | ARMCD  | Planned Arm Code | 9
+STUDY01 | TX | S2 | HighDose | 2 | TRTDOS | Treatment Dose   | 9
+STUDY01 | TX | S3 | LowDose  | 1 | ARMCD  | Planned Arm Code |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+STUDY01 | TA | 1 | Control   | 1 | TRT
+STUDY01 | TA | 2 | High Dose | 1 | TRT
+---

@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-CG0117"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Actual Arm (ACTARM) is populated,\
+  \ its value does not match an Arm (ARM) entry in the Trial Arms (TA) dataset, and\
+  \ it is not one of the reserved values 'Screen Failure', 'Not Assigned', 'Not Treated',\
+  \ or 'Unplanned Treatment'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARM"
+Operations:
+- id: "$ta_arm"
+  expression: "distinct(ARM, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ACTARM) and ACTARM not in $ta_arm and ACTARM not in ["Screen Failure", "Not Assigned",
+    "Not Treated", "Unplanned Treatment"]
+Outcome:
+  Message: "ACTARM is not among the values of ARM in the TA dataset and is not one\
+    \ of the reserved values 'Screen Failure', 'Not Assigned', 'Not Treated', or 'Unplanned\
+    \ Treatment'."
+  Output_Variables:
+  - "ACTARM"
+  - "$ta_arm"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARM"
+  Condition: "ACTARM not in TA.ARM"
+  Rule: "ACTARM in ('Screen Failure', 'Not Assigned', 'Not Treated', 'Unplanned Treatment')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0117"
+        Version: "1"
+      Version: "2.0"

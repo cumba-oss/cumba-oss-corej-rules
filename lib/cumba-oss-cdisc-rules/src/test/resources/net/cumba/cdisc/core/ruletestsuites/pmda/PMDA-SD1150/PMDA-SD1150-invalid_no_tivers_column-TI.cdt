@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1150 expect=violation domain=TI
+#note "DISCRIMINATING - the OPPOSITE half of valid_blank_tivers. NO TIVERS COLUMN AT ALL: TIVERS is Permissible and a grouping key absent from the dataset is silently DROPPED and the check REGROUPS on what remains, so the rule behaves exactly like FDA-SD1150 and fires on the tie. TIVERS is in Output_Variables but absent from the data, so it is omitted from the value map - DO NOT PIN IT."
+#expectViolationCount 2
+#expectViolationAt row=1 IETESTCD=INCL01 IETEST="Age 18 years or older"
+#expectViolationAt row=2 IETESTCD=INCL01 IETEST="Age at least 18 years"
+#library standard=sdtmig version=3-4
+dataset TI
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older
+S1 | TI | INCL01 | Age at least 18 years

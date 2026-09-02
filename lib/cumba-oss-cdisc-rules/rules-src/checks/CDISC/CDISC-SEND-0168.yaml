@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0168"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Food and Water Consumption (FW) record\
+  \ exists for the same combination of Test Short Name (FWTESTCD), subject or pool\
+  \ (USUBJID/POOLID), and measurement interval (FWDTC and FWENDTC); the domain should\
+  \ hold one record per test per interval per subject or pool."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FW"
+Check:
+  expression: >-
+    not is_unique_set([FWTESTCD, USUBJID, POOLID, FWDTC, FWENDTC])
+Outcome:
+  Message: "More than one FW record exists for the same test (FWTESTCD), subject or\
+    \ pool (USUBJID/POOLID), and interval (FWDTC/FWENDTC)."
+  Output_Variables:
+  - "POOLID"
+  - "FWTESTCD"
+  - "FWDTC"
+  - "FWENDTC"
+Source:
+  Class: "FND"
+  Domain: "FW"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per test per interval per subject or pool"
+  Rule: "One record per test per interval per subject or pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND168"
+        Version: "1"
+      Version: "5.0"

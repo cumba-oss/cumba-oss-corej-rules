@@ -1,0 +1,135 @@
+Core:
+  Id: "PMDA-SD1201"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an Events class domain contains more than one record\
+  \ for the same subject (USUBJID) with the same --TERM, --DECOD, --CAT, --SCAT, --OCCUR,\
+  \ --LOC, --LAT, --DIR, --SEV, --TOXGR, VISITNUM, VISITDY, --STTPT, and --STDTC values."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--TERM"
+Check:
+  expression: >-
+    not is_unique_set([--TERM, USUBJID, --DECOD, --CAT, --SCAT, --OCCUR, --LOC, --LAT, --DIR, --SEV,
+    --TOXGR, VISITNUM, VISITDY, --STTPT, --STDTC])
+Outcome:
+  Message: "Duplicate records in domain: more than one Event record exists for the\
+    \ subject with the same key values."
+  Output_Variables:
+  - "--TERM"
+  - "--DECOD"
+  - "--CAT"
+  - "--SCAT"
+  - "--OCCUR"
+  - "--LOC"
+  - "--LAT"
+  - "--DIR"
+  - "--SEV"
+  - "--TOXGR"
+  - "VISITNUM"
+  - "VISITDY"
+  - "--STTPT"
+  - "--STDTC"
+Source:
+  Message: "Duplicate records in domain"
+  Description: "The structure of Events class domains should be one record per Event\
+    \ per subject. No Events with the same Collected Term (--TERM), Decoded Term (--DECOD),\
+    \ Category (--CAT), Subcategory (--SCAT), Occurrence (--OCCUR), Location (--LOC),\
+    \ Laterality (--LAT), Directionality (--DIR), Severity (--SEV), Toxicity Grade\
+    \ (--TOXGR), Visit Number (VISITNUM), Visit Day (VISITDY), and Start Reference\
+    \ Time Point (--STTPT) values for the same Subject (USUBJID) and the same Start\
+    \ Date (--STDTC) are expected."
+  Domains: "EVENTS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1201"
+        Version: "1"
+      Version: "1.6"

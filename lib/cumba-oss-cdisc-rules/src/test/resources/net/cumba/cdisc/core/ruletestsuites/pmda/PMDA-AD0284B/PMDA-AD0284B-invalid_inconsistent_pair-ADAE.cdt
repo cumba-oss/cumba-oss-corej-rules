@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0284B expect=violation domain=ADAE
+#note "KEY=ASEV (2nd arg), DEPENDENT=ASEVN (1st arg): key MILD carries {1,2} -> rows 1,3 fire; key MODERATE is single-valued. Record granularity -> 2 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 ASEV=MILD ASEVN=1
+#expectViolationAt row=3 USUBJID=01-701-1034 ASEV=MILD ASEVN=2
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col ASEV    type=Char
+col ASEVN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD     | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | MODERATE | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH     | MILD     | 2

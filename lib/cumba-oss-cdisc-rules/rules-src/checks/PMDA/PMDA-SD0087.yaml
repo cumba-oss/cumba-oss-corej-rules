@@ -1,0 +1,117 @@
+Core:
+  Id: "PMDA-SD0087"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when RFSTDTC is empty for a randomized subject, that\
+  \ is a subject whose ARMCD is populated and is not equal to 'SCRNFAIL' or 'NOTASSGN'."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD not in ["SCRNFAIL", "NOTASSGN"] and empty(RFSTDTC)
+Outcome:
+  Message: "RFSTDTC is empty for a randomized subject (ARMCD is populated and not\
+    \ equal to 'SCRNFAIL' or 'NOTASSGN')."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ARMCD"
+Source:
+  Message: "RFSTDTC is not provided for a randomized subject"
+  Description: "Subject Reference Start Date/Time (RFSTDTC) should be populated for\
+    \ all randomized subjects, those where Planned Arm Code (ARMCD) is not equal to\
+    \ 'SCRNFAIL' or 'NOTASSGN' or null."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0087"
+        Version: "1"
+      Version: "1.6"

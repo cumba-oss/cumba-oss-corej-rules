@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0186"
+Sheet_Rule_Identifier: "186"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "ct"
+Plain_Text_Rule: "Attribute def:ExtendedValue must be provided for the EnumeratedItem element when the CodedValue is an extended value."
+# CT-gated (P5): per the Rule column, def:ExtendedValue is required when the
+# parent CodeList's @def:StandardOID is provided (the when-guard), the CT
+# codelist (resolved via the CodeList's nci:ExtCodeID alias) is extensible,
+# and the CodedValue is not one of its submission values.
+Message: "Attribute def:ExtendedValue is missing for element EnumeratedItem[@CodedValue] [${value}] in CodeList[@Name]."
+Check:
+  kind: "extended_value_marking"
+  mode: "required"
+  when:
+    path: "../@def:StandardOID"
+    exists: true

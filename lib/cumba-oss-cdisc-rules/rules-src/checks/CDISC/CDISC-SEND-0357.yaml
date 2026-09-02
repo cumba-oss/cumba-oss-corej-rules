@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-SEND-0357"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Implantation Site Label (ICIMPLBL) is present on\
+  \ multiple records within a subject (USUBJID) but Result Location (ICRESLOC) is\
+  \ empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "IC"
+Check:
+  expression: >-
+    present_on_multiple_rows_within(ICIMPLBL, within=USUBJID) and empty(ICRESLOC)
+Outcome:
+  Message: "ICRESLOC is empty for a record whose ICIMPLBL is duplicated within the\
+    \ subject."
+  Output_Variables:
+  - "ICIMPLBL"
+  - "ICRESLOC"
+Source:
+  Class: "FND"
+  Domain: "IC"
+  Variable: "ICRESLOC"
+  Plain_Text_Explanation: "ICRESLOC should be populated if ICIMPLBL is not unique\
+    \ for a USUBJID."
+  Condition: "Duplicate ICIMPLBL per USUBJID"
+  Rule: "ICRESLOC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND357"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND357"
+        Version: "1"
+      Version: "5.0"

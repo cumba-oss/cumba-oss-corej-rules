@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0123 expect=violation domain=ADLBC
+#note "Key PARAMCD=GLUC; target PARAMTYP holds {DERIVED, DERIVED, IMPUTED} -> minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC PARAMTYP=IMPUTED
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col PARAMTYP type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DERIVED
+CDISCPILOT01 | 01-701-1023 | GLUC | DERIVED
+CDISCPILOT01 | 01-701-1034 | GLUC | IMPUTED

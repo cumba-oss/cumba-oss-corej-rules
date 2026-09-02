@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-AD0613 expect=noViolation domain=ADLBC
+#note "Rows w=1 PHETM=50400 and w=2 PHETM=50400, ADSL PH1ETM=PH2ETM=50400 -> both silent. Same two-primary-rows-one-ADSL-row binding as the invalid twin."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHETM    type=Num
+---
+S1 | 01-701-1015 | ALB  | 30 | 1 | 50400
+S1 | 01-701-1015 | ALB2 | 31 | 2 | 50400
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1ETM  type=Num
+col PH2ETM  type=Num
+---
+S1 | 01-701-1015 | 50400 | 50400

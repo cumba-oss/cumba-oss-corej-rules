@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0090"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --RFTDTC is present in the dataset but --TPTREF\
+  \ is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--RFTDTC") and not var_exists("--TPTREF")
+Outcome:
+  Message: "--TPTREF is not present in the dataset when --RFTDTC is present in the\
+    \ dataset."
+  Output_Variables:
+  - "--RFTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPTREF"
+  Condition: "--RFTDTC present in dataset"
+  Rule: "--TPTREF present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0090"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0090"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0090"
+        Version: "1"
+      Version: "2.0"

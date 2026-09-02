@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1037 expect=noViolation domain=LB
+#note "CL-A A.8 (wave TA-4): the sheet's 'and greater than 0' gate adopted from FDA-SD1037. Row 1 records grade 0 - the absence of toxicity - with no LBTOX; before the gate the rule demanded a toxicity name for a toxicity that did not occur. Row 2's grade 2 names its toxicity."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOX    type=Char label="Toxicity"
+col LBTOXGR  type=Char label="Toxicity Grade"
+---
+S1 | LB | 001 | 1 | ALT |                      | 0
+S1 | LB | 001 | 2 | ALT | HYPERTRANSAMINASEMIA | 2

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0176 expect=skipped domain=ADLBC
+#note "ABLFL is not declared at all. The rule has no Requirements.Variables gate, so it still EXECUTES; the absent column reads as all-missing and the leading `not empty(ABLFL)` is false on every row - the negation is what stops the bare-empty broadcast fold from producing a dataset-level violation. This pins that ABLFL's outright absence is PMDA-AD0127A's business, not this rule's. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0

@@ -1,0 +1,86 @@
+Core:
+  Id: "CDISC-AD0898"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when an ADaM record's STUDYID, USUBJID, and --SEQ combination\
+  \ does not match any record in the parent SDTM domain."
+Executability: "Fully Executable"
+ExecutabilityHint:
+  Category: "fully executable"
+  Detail: "Declared-token template. The Expansion block binds &DOM to the prefix of\
+    \ every column matching &DOMSEQ, and the engine emits one concrete rule per such\
+    \ column, each left-joining the dataset to that parent SDTM domain on STUDYID\
+    \ / USUBJID / --SEQ and firing on the unmatched records — the CDISC-AD0053 / PMDA-AD0258\
+    \ shape, which those two rules author by hand for a pinned AE. known_domain_only\
+    \ keeps only prefixes the library attests as dataset names, which is what excludes\
+    \ ADaM's own ASEQ, SRCSEQ and RECSEQ (SRCSEQ names its parent in SRCDOM, not in\
+    \ the variable name). A column whose parent domain is not among the loaded datasets\
+    \ is dropped with a stated reason, and if none survives the rule is skipped rather\
+    \ than expanded to nothing."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Match_Datasets:
+- Name: "&DOM"
+  Keys:
+  - "STUDYID"
+  - "USUBJID"
+  - "&DOMSEQ"
+  Join_Type: "left"
+Check:
+  expression: >-
+    var_exists(`&DOM.&DOMSEQ`) and empty(`&DOM.&DOMSEQ`)
+Outcome:
+  Message: "The ADaM --SEQ value is not present in the parent SDTM domain's --SEQ."
+  Output_Variables:
+  - "&DOMSEQ"
+  - "&DOM.&DOMSEQ"
+Expansion:
+- token: "&DOM"
+  over: "domain_from_variable"
+  pattern: "&DOMSEQ"
+  known_domain_only: true
+Source:
+  Class: "ALL"
+  Variable_or_Item: "--SEQ"
+  Natural_Language_Rule_Failure_Criteria: "For a value of AD*.USUBJID that is a value\
+    \ of --.USUBJID, a value of AD*.--SEQ is not a value of --.--SEQ"
+  Rule_Failure_Criteria: "A value of AD*.--SEQ is not a value of --.--SEQ"
+  Condition_Failure: "USUBJID is present and there is a value of AD*.USUBJID that\
+    \ is a value of --.USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR898"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR898"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR898"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR898"
+        Version: "1"
+      Version: "5.0"

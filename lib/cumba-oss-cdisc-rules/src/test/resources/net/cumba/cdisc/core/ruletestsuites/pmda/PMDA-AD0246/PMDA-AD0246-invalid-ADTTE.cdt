@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0246 expect=violation domain=ADTTE
+#note "ADT and ADTM both absent; CNSR present -> fires once for the dataset."
+#expectViolationCount 1
+#expectViolationAt CNSR=0
+#library standard=adamig version=1-3
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | OS | 0
+---

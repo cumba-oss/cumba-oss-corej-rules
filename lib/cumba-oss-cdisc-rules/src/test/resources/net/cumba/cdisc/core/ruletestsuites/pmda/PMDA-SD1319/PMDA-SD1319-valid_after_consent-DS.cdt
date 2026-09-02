@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1319 expect=noViolation domain=DS
+#note "Row 1: date after consent -> clean. Row 2: empty DSSTDTC -> clean. Row 3: subject 002 with a pre-consent date but RFICDTC EMPTY in DM -> saturation -> clean. Row 4: subject 003 with a pre-consent date and NO DM row at all -> the inner join DROPS the row before the Check runs (the join-drop pin for the batch). DM-entirely-absent is the carve-out, never authored."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSDECOD type=Char
+col DSSTDTC type=Char
+---
+S1 | DS | 001 | 1 | RANDOMIZED | 2020-01-15
+S1 | DS | 001 | 2 | COMPLETED  |
+S1 | DS | 002 | 1 | RANDOMIZED | 2019-06-01
+S1 | DS | 003 | 1 | RANDOMIZED | 2019-06-01
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFICDTC  type=Char
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 |

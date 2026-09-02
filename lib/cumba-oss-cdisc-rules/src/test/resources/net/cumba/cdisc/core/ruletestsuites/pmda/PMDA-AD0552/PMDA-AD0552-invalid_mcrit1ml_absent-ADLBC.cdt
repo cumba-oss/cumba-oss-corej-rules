@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0552 expect=violation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), MCRIT1MN(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | 1`. MCRIT1MN is declared, MCRIT1ML is NOT a column of the table at all - that absence is the violation. Wildcard: `MCRITyMN` matches MCRIT1MN so the tuple y=1 is seeded; `MCRITyML` has no matching column and its concrete name MCRIT1ML is synthesised as absent, giving the single expansion `var_exists('MCRIT1MN') and not var_exists('MCRIT1ML')` = TRUE. Presence Check -> dataset granularity -> exactly ONE violation."
+#expectViolationCount 1
+#expectViolationAt MCRIT1MN=1
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col MCRIT1MN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 1

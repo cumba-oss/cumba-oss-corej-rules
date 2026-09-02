@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0038 expect=violation domain=LB
+#note "Row 1 (LBDY=-3) is a legitimate negative study day, silent. Row 2 (LBDY=0) fires — there is no study day 0. ADAPTED-FROM fda/FDA-SD0038/FDA-SD0038-invalid-LB.cdt (verbatim; pin strengthened)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=LBDY variable_value=0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | -3
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 0

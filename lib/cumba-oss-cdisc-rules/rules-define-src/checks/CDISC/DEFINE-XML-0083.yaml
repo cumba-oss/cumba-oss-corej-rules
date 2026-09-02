@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0083"
+Sheet_Rule_Identifier: "83"
+Rule_Set: "CDISC"
+Element: "WhereClauseDef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:CommentOID attribute on the def:WhereClauseDef element must reference an existing def:CommentDef element."
+# Value check fires only on a present def:CommentOID — the attribute is Conditional
+# (spec §5.3.10); its conditional-presence requirement is sheet id 84 (deferred:
+# needs a custom reverse-membership check), not this rule.
+Message: "There is no def:CommentDef with an OID attribute that matches def:WhereClauseDef/def:CommentOID [${value}]."
+Check:
+  kind: "references"
+  attribute: "CommentOID"
+  targetElement: "CommentDef"
+  targetKey: "OID"

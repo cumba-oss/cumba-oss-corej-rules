@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2020 expect=violation domain=DM
+#note "Numeric-emptiness boundary. Row 1: AGE is the NUMBER ZERO, which is NOT empty, so not empty(AGE) is TRUE and the record FIRES against the populated AGETXT. Row 2: AGE is the Num MISSING marker, not empty(AGE) is FALSE, silent. A neonate carrying AGE=0 alongside an AGETXT range is a realistic submission."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 AGETXT=18-65
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGETXT  type=Char label="Age Range"
+col AGEU    type=Char label="Age Units"
+---
+S1 | DM | 001 | 0  | 18-65 | YEARS
+S1 | DM | 002 | .  | 18-65 | YEARS

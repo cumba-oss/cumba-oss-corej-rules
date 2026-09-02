@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0178"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Test Name (MATEST) is \"Clinical Signs Follow-up\"\
+  \ but Specimen Material Type (MASPEC) is populated; MASPEC should not be used for\
+  \ this test."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MA"
+Requirements:
+  Variables:
+    All:
+    - "MASPEC"
+    - "MATEST"
+Check:
+  expression: >-
+    MATEST == "Clinical Signs Follow-up" and not empty(MASPEC)
+Outcome:
+  Message: "MASPEC is populated when MATEST is \"Clinical Signs Follow-up\"; MASPEC\
+    \ should not be used."
+  Output_Variables:
+  - "MATEST"
+  - "MASPEC"
+Source:
+  Class: "FND"
+  Domain: "MA"
+  Variable: "MASPEC, MATEST"
+  Plain_Text_Explanation: "When MATEST is \"Clinical Signs Follow-up\" MASPEC should\
+    \ not be used."
+  Condition: "MATEST = \"Clinical Signs Follow-up\""
+  Rule: "MASPEC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND178"
+        Version: "1"
+      Version: "5.0"

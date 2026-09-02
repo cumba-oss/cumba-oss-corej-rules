@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2286 expect=violation domain=EC
+#note "Row 1: ECVAMTU populated (mg), ECVAMT missing -> fires. Row 2: pair populated -> silent. --VAMT/--VAMTU are model-level Interventions record/variable qualifiers (Num/Char)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECVAMTU=mg
+dataset EC class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num
+col ECVAMT  type=Num
+col ECVAMTU type=Char
+---
+S1 | EC | 001 | 1 | .  | mg
+S1 | EC | 001 | 2 | 5  | mg

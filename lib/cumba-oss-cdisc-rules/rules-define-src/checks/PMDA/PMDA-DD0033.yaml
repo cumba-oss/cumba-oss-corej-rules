@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0033"
+Sheet_Rule_Identifier: "DD0033"
+Rule_Set: "PMDA"
+Element: "CodeList/Alias"
+Attribute: "Name"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "ct"
+Plain_Text_Rule: "NCI Code for Codelist must exist in CDISC Controlled Terminology. Define-XML specification represents NCI Code as Name attribute on Alias element when Context attribute is \"nci:ExtCodeID\"."
+# CT-gated (P5): scoped to codelist-level Alias elements (direct children of
+# CodeList; item-level aliases are PMDA-DD0034's). Only aliases with
+# Context="nci:ExtCodeID" are considered (built into the kind); their Name
+# must resolve to a CT codelist c-code.
+Message: "Unknown NCI Code value ${value} for Codelist"
+Check:
+  kind: "nci_code_known"
+  level: "codelist"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2279 expect=noViolation domain=PC
+#note "Each time point reference identifies one nominal study day within its subject or pool; the same reference text is reused across subjects and pools, which is not a violation."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY  type=Num  label="Nominal Study Day for Tabulations"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 |       | 1 | DRUGX | 1 | DOSE 1
+S1 | PC | 001 |       | 2 | DRUGX | 8 | DOSE 2
+S1 | PC | 002 |       | 1 | DRUGX | 1 | DOSE 1
+S1 | PC |     | POOL1 | 1 | DRUGX | 1 | DOSE 1

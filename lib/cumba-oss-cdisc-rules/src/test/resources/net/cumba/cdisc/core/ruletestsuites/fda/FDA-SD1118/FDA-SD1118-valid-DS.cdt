@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1118 expect=noViolation domain=DS
+#note "Each row populates at least one of DSSTDTC / DSDTC / DSSTDY -> no violation."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSDTC   type=Char label="Date/Time of Collection"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | COMPLETED | COMPLETED |  | 2020-01-15 |
+S1 | DS | 002 | 1 | ADVERSE EVENT | ADVERSE EVENT | 2020-02-01 |  |
+S1 | DS | 003 | 1 | COMPLETED | COMPLETED |  |  | 10

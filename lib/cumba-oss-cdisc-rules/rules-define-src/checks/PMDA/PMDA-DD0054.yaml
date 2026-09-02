@@ -1,0 +1,27 @@
+Rule_Id: "PMDA-DD0054"
+Sheet_Rule_Identifier: "DD0054"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For regulatory submission data, Class field is required and must be included in Define.xml and cannot be empty. Define-XML v2.0 specification represents Class as def:Class attribute on ItemGroupDef element. Define-XML v2.1 specification represents Class as a def:Class child element under the ItemGroupDef element."
+Message: "Missing Class value"
+# The sheet names two version-dependent carriers (2.0: @def:Class attribute,
+# 2.1: def:Class child element) - one target cannot cover both, so the 0124-B
+# fire-always vehicle demands that at least one form be present. DISAGREEMENT
+# with CDISC twin 0131 flagged: 0131 exempts def:IsNonStandard datasets (a
+# spec-grounded review carve-out) and gates on Submission context; the PMDA row
+# has neither, so this rule also fires on Class-less non-standard datasets -
+# authored from the PMDA row verbatim (full-mirror policy).
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "@Class"
+      exists: false
+    - path: "Class"
+      exists: false

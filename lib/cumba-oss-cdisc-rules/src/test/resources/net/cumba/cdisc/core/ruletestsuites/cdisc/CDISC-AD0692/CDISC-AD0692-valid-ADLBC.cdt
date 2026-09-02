@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0692 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD for a combination of device and subject, BASEC is populated and there is not at least one record with ABLFL equal to Y
+#note "group has an ABLFL=Y record -> count > 0 -> noViolation"
+dataset ADLBC class=MD-BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col PARAMCD type=Char
+col BASEC type=Char
+col ABLFL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | GLUC | NORMAL | Y
+---

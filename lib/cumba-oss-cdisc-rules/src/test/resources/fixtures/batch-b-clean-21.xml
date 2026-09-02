@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch B (documents / annotations) clean 2.1 fixture: every batch-B rule
+     (38, 39, 42, 43, 45-50, 51, 54) executes with zero findings.
+     Exercises DocumentRef in all its parents (AnnotatedCRF, SupplementalDoc,
+     Origin, MethodDef) and both PDFPageRef shapes (FirstPage/LastPage and
+     PageRefs). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-b"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHB">
+    <GlobalVariables>
+      <StudyName>BATCHB-STUDY</StudyName>
+      <StudyDescription>Batch B clean fixture study</StudyDescription>
+      <ProtocolName>BATCHB-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch B MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.1" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+      </def:Standards>
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <def:SupplementalDoc>
+        <def:DocumentRef leafID="LF.CSDRG"/>
+      </def:SupplementalDoc>
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" SASDatasetName="DM"
+                    Domain="DM" Purpose="Tabulation">
+        <ItemRef ItemOID="IT.DM.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="12">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF">
+            <def:PDFPageRef Type="PhysicalRef" FirstPage="12" LastPage="14"/>
+          </def:DocumentRef>
+        </def:Origin>
+      </ItemDef>
+      <MethodDef OID="MT.DERIVE" Name="Derivation" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Derived per reviewer guide</TranslatedText>
+        </Description>
+        <def:DocumentRef leafID="LF.CSDRG">
+          <def:PDFPageRef Type="NamedDestination" PageRefs="AE_SUMMARY"/>
+        </def:DocumentRef>
+      </MethodDef>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.CSDRG" xlink:href="csdrg.pdf">
+        <def:title>Reviewer Guide</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

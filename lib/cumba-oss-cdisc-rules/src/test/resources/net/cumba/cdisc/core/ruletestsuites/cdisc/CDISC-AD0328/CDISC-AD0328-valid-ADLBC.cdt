@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0328 expect=noViolation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of AVALCAyN for a given value of AVALCATy, considering only those rows on which both variables are populated
+#note "within PARAMCD=ALB, each AVALCAT1 value maps to a single AVALCA1N value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVALCA1N type=Char
+col AVALCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | low | 1
+CDISCPILOT01 | 01-701-1023 | ALB | low | 1
+---

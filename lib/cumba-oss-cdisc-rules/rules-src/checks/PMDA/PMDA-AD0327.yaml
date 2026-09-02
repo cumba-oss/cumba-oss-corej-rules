@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0327"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and a parameter, the character Analysis\
+  \ Value Category y (AVALCATy) variable does not hold a single consistent value for\
+  \ each unique value of its numeric equivalent Analysis Value Category y (N) (AVALCAyN),\
+  \ evaluated on rows where the primary variable AVALCATy is populated. AVALCATy is\
+  \ a derived category variable (name ends in AVALCAT followed by y, y = 1-9) and\
+  \ AVALCAyN is its numeric code (AVALCA followed by y then N). The mapping is evaluated\
+  \ within each Parameter Code (PARAMCD)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(AVALCATy) and is_inconsistent_across_dataset(AVALCATy,
+    keys=[PARAMCD, AVALCAyN])
+Outcome:
+  Message: "Inconsistent value for AVALCATy"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVALCATy"
+  - "AVALCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for AVALCAT*"
+  Description: "Within a Study and a Parameter, all Analysis Value Category y (AVALCATy)\
+    \ variable values must be the same for each unique value of Analysis Value Category\
+    \ y (N) (AVALCAyN) variable when the primary variable AVALCAy is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0327"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0327"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0327"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-SEND-0167 expect=violation domain=DD
+#note "FRESH, per M3-SEND-T1-K3-01 stage-r. DISCRIMINATING BY CONSTRUCTION: subject 001 is in \$scheduled_subjects (DSDECOD TERMINAL SACRIFICE is one of the four filtered terms) and carries THREE DD records, so the per-subject answer (1) and the per-record answer (3) differ. Subject 002's DSDECOD FOUND DEAD is not in the filter -> silent. Ruled per subject (SD1316-F3), anchored at the group's first flagged row = DD row 1."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DD label="Death Diagnosis"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DDSEQ    type=Num  label="Sequence Number"
+col DDTESTCD type=Char label="Death Diagnosis Short Name"
+col DDTEST   type=Char label="Death Diagnosis Test Name"
+col DDORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | DD | 001 | 1 | GROSSPATH | Gross Pathology       | NO VISIBLE LESIONS
+S1 | DD | 001 | 2 | MICROPATH | Microscopic Pathology | HEPATOCELLULAR NECROSIS
+S1 | DD | 001 | 3 | CAUSDTH   | Cause of Death        | UNDETERMINED
+S1 | DD | 002 | 1 | CAUSDTH   | Cause of Death        | MORIBUND
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | Terminal sacrifice | TERMINAL SACRIFICE | 2020-03-30
+S1 | DS | 002 | 1 | Found dead         | FOUND DEAD         | 2020-03-12
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0485 expect=violation domain=ADLBC
+#note "Mirror of PMDA-AD0484. PBCHGC1N populated but PBCHGCA1 empty on row 1 -> fires. Row 2 both populated -> silent. ONE expansion (y=1)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 PBCHGC1N=1
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col PBCHGC1N   type=Num
+col PBCHGCA1   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 |
+CDISCPILOT01 | 01-701-1023 | GLUC | 2 | INCREASED
+---

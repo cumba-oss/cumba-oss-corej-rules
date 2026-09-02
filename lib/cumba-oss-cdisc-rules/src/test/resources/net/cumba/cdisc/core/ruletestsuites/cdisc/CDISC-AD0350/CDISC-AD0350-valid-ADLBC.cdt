@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0350 expect=noViolation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of AyHI for a given value of AyHIC
+#note "each A1HIC value maps to a single A1HI value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1HI type=Char
+col A1HIC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | A1 | G
+CDISCPILOT01 | 01-701-1015 | GLUC | A2 | H
+---

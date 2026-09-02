@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0053 expect=violation domain=TA
+#note "Second in-scope domain: pins that Scope.Domains.Include: [DM, TA] really reaches TA. Row 1 has ARMCD='NOTASSGN' but ARM='ScreenFailure', not 'Not Assigned' -> fires. ARM value is deliberately space-free here so the pin needs no quoting."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=NOTASSGN ARM=ScreenFailure
+dataset TA
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char
+col ELEMENT type=Char
+---
+S1 | TA | NOTASSGN | ScreenFailure | 1 | SCRN | Screening
+S1 | TA | A        | Placebo       | 1 | SCRN | Screening

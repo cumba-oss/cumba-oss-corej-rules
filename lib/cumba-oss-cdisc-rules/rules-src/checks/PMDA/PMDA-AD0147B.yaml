@@ -1,0 +1,60 @@
+Core:
+  Id: "PMDA-AD0147B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Parameter (Number) (PARAMN)\
+  \ takes more than one value for the same Parameter (PARAM) on records where both\
+  \ PARAM and PARAMN are populated; every record sharing a PARAM value must carry\
+  \ the same PARAMN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARAM"
+    - "PARAMN"
+Check:
+  expression: >-
+    not empty(PARAM) and not empty(PARAMN) and is_inconsistent_across_dataset(PARAMN, keys=[PARAM])
+Outcome:
+  Message: "Inconsistent value for PARAMN"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMN"
+Source:
+  Message: "Inconsistent value for PARAMN"
+  Description: "Within a study, all PARAMN values must be the same for each unique\
+    \ value of PARAM when both variables PARAM and PARAMN are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0147B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0147B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0147B"
+        Version: "1"
+      Version: "6.0"

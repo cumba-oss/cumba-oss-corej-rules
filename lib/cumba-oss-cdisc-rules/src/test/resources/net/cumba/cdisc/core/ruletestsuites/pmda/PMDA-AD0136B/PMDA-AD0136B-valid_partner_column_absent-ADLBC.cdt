@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0136B expect=noViolation domain=ADLBC
+#note "SHIFT1N (the dependent) is absent. SHIFT1 seeds tuple y=1 so the expansion runs and SHIFT1N is synthesised absent; no Requirements.Variables block on this rule, so nothing skips it. noViolation WITH THE RULE EXECUTING - contrast with the sibling skipped_no_shift_columns fixture. Silent for two reasons: not empty(SHIFT1N) is false over the absent column, and compileHasMultipleValuesFor short-circuits on a negative dependent index."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | NORMALTOHIGH
+CDISCPILOT01 | 01-701-1023 | SYSBP | LOWTONORMAL

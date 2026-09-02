@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2251 expect=violation domain=SJ
+#note "Row 1 is an unplanned repro stage but leaves the unplanned-stage description SJUPDES empty -> fires."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 RSTGCD=UNPLAN
+dataset SJ label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col SJUPDES type=Char label="Description of Unplanned Repro Stage"
+---
+S1 | 001 | 1 | UNPLAN |           |
+S1 | 001 | 2 | GEST   | Gestation |

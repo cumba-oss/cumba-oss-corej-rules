@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1060 expect=violation domain=SV
+#note "DISCRIMINATING -- the (b)-vs-(c) discriminator of EC-53 / Fix #143, on the exact expression AbsentTargetUniqueSetTest names as its minimal shape. VISITNUM column is absent. The absent TARGET is dropped and the check regroups on the surviving key [USUBJID]: rows 1 and 2 share S1-001 and FIRE; row 3 must NOT fire -- it duplicates nothing. Answer (b), a structural flip, would fire all three, and row 3 is the tell; that is the CORE-000213 / CORE-001034 over-firing defect. Answer (a), pre-Fix-#143, would fire none. VISITNUM is the rule's only Output_Variable and it is not in the dataset -- pin on USUBJID (read from the primary table) plus row=."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=S1-001
+#expectViolationAt row=2 USUBJID=S1-001
+dataset SV class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+---
+S1 | SV | S1-001 | 2020-01-01
+S1 | SV | S1-001 | 2020-01-02
+S1 | SV | S1-002 | 2020-01-03

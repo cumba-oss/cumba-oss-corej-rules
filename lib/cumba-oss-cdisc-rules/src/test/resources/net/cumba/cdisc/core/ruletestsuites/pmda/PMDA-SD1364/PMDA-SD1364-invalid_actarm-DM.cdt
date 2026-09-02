@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1364 expect=violation domain=DM
+#note "any-branch 2: an 'ASSIGNED, NOT TREATED' subject has an empty ACTARMCD but a populated ACTARM -> fires on row 1. RE-PINNED by M2-D25 (exact, case-sensitive CT comparison): the rows carried 'Assigned, Not Treated' in mixed case while the Check normalised with upper(); with upper() retired the data now carries the exact ARMNULRS submission value, preserving the any-branch-2 coverage. Pin addresses by identity (USUBJID) since #expectViolationAt values must be space-free."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |  | Arm A | ASSIGNED, NOT TREATED
+CDISCPILOT01 | DM | 01-701-1023 |  |       | ASSIGNED, NOT TREATED

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0077 expect=noViolation domain=ADSL
+#note "Carries PMDA-AD0076's VIOLATION data verbatim. Under AD0077's direction every TRT01PN key (0, 1, 2) has exactly ONE dependent, so the rule is silent on data that fires twice under AD0076. This fixture is the directional discriminator and is the reason the two rules are not duplicates."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P  type=Char
+col TRT01PN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | PLACEBO | 0
+CDISCPILOT01 | 01-701-1023 | PLACEBO | 1
+CDISCPILOT01 | 01-701-1034 | DRUGA   | 2

@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-AD0154"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record is flagged as the actual baseline\
+  \ (Baseline Record Flag ABLFL equals Y) for the same combination of Unique Subject\
+  \ Identifier (USUBJID), Parameter Code (PARAMCD) and Baseline Type (BASETYPE); only\
+  \ one record per [USUBJID, PARAMCD, BASETYPE] may carry ABLFL equal to Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ABLFL"
+    - "PARAMCD"
+    - "BASETYPE"
+Check:
+  expression: >-
+    ABLFL == "Y" and var_exists("PARAMCD") and var_exists("BASETYPE") and not is_unique_set([ABLFL,
+    USUBJID, PARAMCD, BASETYPE])
+Outcome:
+  Message: "Multiple baseline records exist for a unique USUBJID, PARAMCD, BASETYPE"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASETYPE"
+  - "ABLFL"
+Source:
+  Message: "Multiple baseline records exist for a unique USUBJID, PARAMCD, BASETYPE"
+  Description: "For a set of [Subject (USUBJID), Parameter (PARAMCD), baseline type\
+    \ (BASETYPE)] only one record can be the actual baseline value, marked by ABLFL\
+    \ = Y."
+  Domains: "BDS, ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0154"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0154"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0154"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0154"
+        Version: "1"
+      Version: "6.0"

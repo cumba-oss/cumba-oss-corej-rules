@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD2265 expect=violation domain=TS
+#note "Row 2: TSPARMCD=PCLAS with TSVALCD=N0000000181 (Cyclooxygenase Inhibitors in the dummy MED-RT) but TSVAL=Adrenergic beta-Antagonists -> code and term come from different MED-RT records -> fires. Row 1 is a correctly paired record; row 3 has the same mismatch under AGEMAX (outside the PCLAS condition); rows 4/5 have a blank term or blank code (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL="Adrenergic beta-Antagonists" TSVALCD=N0000000181
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | PCLAS  | Cyclooxygenase Inhibitors   | N0000000181
+S01 | TS | 2 | PCLAS  | Adrenergic beta-Antagonists | N0000000181
+S01 | TS | 3 | AGEMAX | Adrenergic beta-Antagonists | N0000000181
+S01 | TS | 4 | PCLAS  |                             | N0000000181
+S01 | TS | 5 | PCLAS  | Cyclooxygenase Inhibitors   |

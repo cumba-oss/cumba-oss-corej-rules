@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1201 expect=violation domain=AE
+#note "Rows 1 and 2 are identical on USUBJID + the full Events key (--TERM, --DECOD, --CAT, --SCAT, --OCCUR, --LOC, --LAT, --DIR, --SEV, --TOXGR, VISITNUM, VISITDY, --STTPT, --STDTC); only AESEQ differs, which is not part of the key -> both fire. Row 3 differs in AESEV -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AECAT    type=Char label="Category for Adverse Event"
+col AESCAT   type=Char label="Subcategory for Adverse Event"
+col AEOCCUR  type=Char label="AE Occurrence"
+col AELOC    type=Char label="Location of Event"
+col AELAT    type=Char label="Laterality"
+col AEDIR    type=Char label="Directionality"
+col AESEV    type=Char label="Severity/Intensity"
+col AETOXGR  type=Char label="Standard Toxicity Grade"
+col VISITNUM type=Num  label="Visit Number"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col AESTTPT  type=Char label="Start Reference Time Point"
+col AESTDTC  type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | Headache | NEURO | | Y | HEAD | | | MILD   | 1 | 1 | 1 | | 2020-01-01
+S1 | AE | S1-001 | 2 | HEADACHE | Headache | NEURO | | Y | HEAD | | | MILD   | 1 | 1 | 1 | | 2020-01-01
+S1 | AE | S1-001 | 3 | HEADACHE | Headache | NEURO | | Y | HEAD | | | SEVERE | 3 | 1 | 1 | | 2020-01-01

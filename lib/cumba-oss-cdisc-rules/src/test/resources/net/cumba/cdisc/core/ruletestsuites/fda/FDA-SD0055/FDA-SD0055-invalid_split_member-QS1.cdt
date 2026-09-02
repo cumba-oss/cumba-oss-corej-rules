@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0055 expect=violation domain=QS1
+#note "Fix #373 — QS1 is a DIGIT SPLIT of QS (DOMAIN=QS). The Library publishes DOMAINS, never a sponsor's split-member file names, so before Fix #373 var_type(\"LIBRARY\") resolved to nothing on QS1 and the non_empty guard silenced the rule. It now resolves via the member's CDISC domain, so the Char-vs-Num mismatch on QSORRES fires. QSTESTCD matches; STUDYID/USUBJID carry no Library type so the guard still excludes them."
+#library standard=sdtmig version=3-4
+#library variable-metadata QS QSORRES  name=QSORRES  simpleDatatype=Char label="Finding in Original Units"
+#library variable-metadata QS QSTESTCD name=QSTESTCD simpleDatatype=Char label="Question Short Name"
+#expectViolationCount 1
+#expectViolationAt variable_name=QSORRES
+dataset QS1 class=FINDINGS label="Questionnaires - Part 1"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSTESTCD type=Char label="Question Short Name"
+col QSORRES  type=Num  label="Finding in Original Units"
+---
+S1 | QS | 001 | ADAS01 | 5

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2201 expect=noViolation domain=TS
+#note "ADAPTED-FROM fda/FDA-SD2201/FDA-SD2201-valid_null_flavor-TS.cdt. ADDON record present with TSVAL empty and TSVALNF=NA: the rule checks record PRESENCE, not value population (PMDA row 450 'record must be populated in TS domain' = the record exists) -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Null Flavor"
+---
+CDISCPILOT01 | TS | 1 | TITLE  | Trial Title                | A Randomized Study of Drug X |
+CDISCPILOT01 | TS | 2 | TPHASE | Trial Phase Classification | PHASE III TRIAL              |
+CDISCPILOT01 | TS | 3 | ADDON | Added on to Existing Treatments |  | NA

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0053 expect=violation domain=DM
+#note "Second disjunct ('and vice versa'): row 1 has ARM='Not Assigned' while ARMCD='NOTASGN' is a near-miss (one S) for the sentinel 'NOTASSGN' -> fires. This is the only fixture that exercises the second half of the or-tree; without it the first branch alone would satisfy every other scenario."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=NOTASGN ARM="Not Assigned"
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+---
+S1 | DM | 001 | NOTASGN  | Not Assigned
+S1 | DM | 002 | NOTASSGN | Not Assigned
+S1 | DM | 003 | A        | Placebo

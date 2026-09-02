@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9701 expect=skipped domain=FA
+# Rule:Description: FDA-SD9701 — the Required key FAOBJ is not populated.
+#note "FAOBJ is absent from FA, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(FAOBJ) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sdtmig version=3-4
+dataset FA
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col FASEQ type=Char
+col FATESTCD type=Char
+col FATEST type=Char
+---
+S1      | FA     | S1-001  | 1     | SEV      | Severity
+---

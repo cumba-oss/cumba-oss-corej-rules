@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2204 expect=noViolation domain=TS
+#note "Boundary between 'record absent' and 'record present but value empty': the TSPARMCD='LENGTH' record exists but TSVAL is empty and the null flavor is declared in TSVALNF. The FDA message is \"Missing LENGTH Trial Summary Parameter\" and the CDISC twin CG0287 formalises the same intent as \"at least one record with TSPARMCD equal to each of the required values\", so this rule is about the presence of the parameter record, not about TSVAL being populated -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Null Flavor"
+---
+CDISCPILOT01 | TS | 1 | TITLE  | Trial Title                | A Randomized Study of Drug X |
+CDISCPILOT01 | TS | 2 | TPHASE | Trial Phase Classification | PHASE III TRIAL              |
+CDISCPILOT01 | TS | 3 | LENGTH | Trial Length |  | NA

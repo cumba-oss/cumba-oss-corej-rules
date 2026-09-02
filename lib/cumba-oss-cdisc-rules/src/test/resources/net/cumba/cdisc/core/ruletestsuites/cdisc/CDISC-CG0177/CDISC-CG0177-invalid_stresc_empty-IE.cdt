@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0177 expect=violation domain=IE
+#note "FRESH: row 1 has IEORRES populated but IESTRESC blank -> fires (a literal Char compare of \"\" against \"Y\" is unequal). Row 2 agrees and is silent. Pins the ONE-SIDED-empty half of the operator contract, whose complement (both empty) is pinned on the group's other member PMDA-SD0085-valid_both_empty-IE. Pin only 'row=1 IEORRES=Y' -- do not attempt to pin the empty IESTRESC."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IEORRES=Y
+dataset IE class=FINDINGS label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+col IEORRES  type=Char label="I/E Criterion Original Result"
+col IESTRESC type=Char label="I/E Criterion Result in Std Format"
+---
+S1 | IE | 001 | 1 | EXCL01 | EXCLUSION | Y |
+S1 | IE | 002 | 1 | INCL01 | INCLUSION | N | N

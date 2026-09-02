@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0422 expect=violation domain=ADSL
+# Rule:Description: On a given record, TRxxAGy is populated and TRxxAGyN is not populated
+#note "TR01AG1 populated, TR01AG1N empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01AG1 type=Char
+col TR01AG1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | VAL | 
+---

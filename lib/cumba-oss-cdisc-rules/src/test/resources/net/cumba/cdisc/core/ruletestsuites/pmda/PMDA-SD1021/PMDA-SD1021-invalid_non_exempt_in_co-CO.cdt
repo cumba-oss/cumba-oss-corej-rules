@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1021 expect=violation domain=CO
+#note "The exemption is NAME-scoped, not domain-scoped: COREF is not COVALn, so the same leading space that is tolerated in COVAL is reported here. Adapted from fda/FDA-SD1021-invalid_non_coval-CO.cdt."
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=COREF
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char
+col RDOMAIN type=Char
+col USUBJID type=Char
+col COSEQ   type=Num
+col COREF   type=Char
+col COVAL   type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | " VISIT 2" | subject reported dizziness

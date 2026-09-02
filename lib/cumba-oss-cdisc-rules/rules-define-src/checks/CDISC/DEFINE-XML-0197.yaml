@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0197"
+Sheet_Rule_Identifier: "197"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the def:ExtendedValue attribute must be \"Yes\"."
+# Value check fires only on a present def:ExtendedValue (the conditional
+# presence/absence rows, sheet ids 201/202, are deferred to the P5 CT-gated
+# batch).
+Message: "The value of def:ExtendedValue [${value}] is not \"Yes\" for the CodeListItem element."
+Check:
+  kind: "one_of"
+  attribute: "ExtendedValue"
+  values: ["Yes"]

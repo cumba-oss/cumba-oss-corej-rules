@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-AD0605 expect=violation domain=ADLBC
+#note "MECHANISM PIN (Fix #269 / EC-84) - the shape that USED TO CRASH the run. Rows 1 and 3 carry a populated APHASEN, row 2 is blank, so the leading `not empty(APHASEN)` never empties the mask and compileAnd reaches the substituted comparison; Primitives.scan then resolves the RHS for EVERY row, including row 2. Before Fix #269 that row threw OperandSubstitutor.SubstitutionException out through RuleRunner (a JUnit ERROR, not a verdict). Now the unresolvable substitution is `no value` for that row, the rule evaluates, and only row 3 (APHASEN=2 -> ADSL.PH2SDT=23100, PHSDT 23900 != 23100) fires. Row 1 matches (23000 == PH1SDT). Row 2 is silent because the rule's own `not empty(APHASEN)` guard excludes it - the per-row `no value` is not, by itself, a suppression."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 APHASEN=2 PHSDT=23900
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHSDT    type=Num
+---
+S1 | 01-701-1015 | ALB | 30 | 1 | 23000
+S1 | 01-701-1023 | ALB | 31 | . | 23500
+S1 | 01-701-1031 | ALB | 32 | 2 | 23900
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDT  type=Num
+col PH2SDT  type=Num
+---
+S1 | 01-701-1015 | 23000 | 23100
+S1 | 01-701-1023 | 23000 | 23100
+S1 | 01-701-1031 | 23000 | 23100

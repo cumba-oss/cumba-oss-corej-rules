@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1040 expect=noViolation domain=CM
+#note "Row 1: distinct -> clean. Row 2: empty CMSCAT - leading not empty(--SCAT) gate false, both-empty corner shielded -> clean (load-bearing)."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMDECOD  type=Char
+col CMSCAT   type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN | ACETYLSALICYLIC ACID | OTC
+S1 | CM | 001 | 2 |         |                       |
+---

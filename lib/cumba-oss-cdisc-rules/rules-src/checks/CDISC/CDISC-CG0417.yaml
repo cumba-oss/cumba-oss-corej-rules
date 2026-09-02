@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0417"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when QNAM is longer than 8 characters, starts with a\
+  \ number, or contains characters other than uppercase letters, numbers, and underscores."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Check:
+  expression: >-
+    not empty(QNAM) and not is_valid_name(QNAM)
+Outcome:
+  Message: "QNAM is longer than 8 characters, starts with a number, or contains characters\
+    \ other than uppercase letters, numbers, and underscores."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "QNAM"
+  Rule: "QNAM value length <=8 and cannot start with a number and cannot contain characters\
+    \ other than letters in upper case, numbers, or underscores"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0417"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0417"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0417"
+        Version: "1"
+      Version: "2.0"

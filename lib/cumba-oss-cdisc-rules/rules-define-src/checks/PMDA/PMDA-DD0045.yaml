@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0045"
+Sheet_Rule_Identifier: "DD0045"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Domain"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For SDTM and SEND submission data (where def:StandardName is 'SDTM-IG' or 'SEND-IG'), Domain attribute is required and must be included in Define.xml and cannot be empty. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+Message: "Missing Domain value"
+# Version legs dispatched organically: the sheet's literal condition
+# (MetaDataVersion/@def:StandardName in 'SDTM-IG'/'SEND-IG') only exists in 2.0
+# documents; in 2.1 the analogous binding is ItemGroupDef/@def:StandardOID ->
+# def:Standard whose Name begins with SDTM/SEND (CDISC twin 0105's encoding) -
+# a judgment call documented here, since the PMDA row marks 2.1 applicable but
+# is worded in 2.0 vocabulary.
+Check:
+  kind: "exists"
+  target: "@Domain"
+  when:
+    any:
+    - path: "../@StandardName"
+      oneOf: ["SDTM-IG", "SEND-IG"]
+    - path: "@StandardOID->Standard@OID/@Name"
+      matchesRegex: "(SDTM|SEND).*"

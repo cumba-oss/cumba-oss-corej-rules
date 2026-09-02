@@ -1,0 +1,69 @@
+Core:
+  Id: "CDISC-CG0143"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the earliest Disposition (DS) record for a subject\
+  \ indicates that informed consent was obtained, but the Subject Reference Start\
+  \ Date/Time of Informed Consent (RFICDTC) in the Demographics (DM) domain does not\
+  \ equal that earliest Start Date/Time of Disposition Event (DSSTDTC)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSDECOD"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$min_ds_dsstdtc"
+  expression: "min_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and date(DSSTDTC) ==
+    $min_ds_dsstdtc and not empty(DM.RFICDTC) and date(DM.RFICDTC) != $min_ds_dsstdtc
+Outcome:
+  Message: "RFICDTC does not equal the earliest DSSTDTC for the subject's informed\
+    \ consent record in the DS dataset."
+  Output_Variables:
+  - "DSDECOD"
+  - "DSSTDTC"
+  - "$min_ds_dsstdtc"
+  - "DM.RFICDTC"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFICDTC"
+  Condition: "DS.DSTERM indicates informed consent obtained"
+  Rule: "RFICDTC = earliest DS.DSSTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0143"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0143"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0143"
+        Version: "1"
+      Version: "2.0"

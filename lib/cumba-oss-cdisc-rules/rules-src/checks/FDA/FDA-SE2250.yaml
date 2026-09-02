@@ -1,0 +1,41 @@
+Core:
+  Id: "FDA-SE2250"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Repro Stage (RSTAGE) is populated\
+  \ while Repro Stage Code (RSTGCD) is equal to 'UNPLAN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Requirements:
+  Variables:
+    All:
+    - "RSTAGE"
+    - "RSTGCD"
+Check:
+  expression: >-
+    RSTGCD == "UNPLAN" and not empty(RSTAGE)
+Outcome:
+  Message: "RSTAGE is populated when RSTGCD equals 'UNPLAN'."
+  Output_Variables:
+  - "RSTGCD"
+  - "RSTAGE"
+Source:
+  FDA_Validator_Rule_Message: "RSTAGE value is populated, when RSTGCD = 'UNPLAN'"
+  FDA_Validator_Rule_Description: "Description of Repro Stage (RSTAGE) should be NULL,\
+    \ when subject's experience for a particular period of time is represented as\
+    \ an unplanned Repro Stage, where Repro Stage Code (RSTGCD) is equal to 'UNPLAN'."
+  Domains: "SJ"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2250"
+        Version: "1"
+      Version: "1.6"

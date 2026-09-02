@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0767 expect=noViolation domain=ADSL
+# Rule:Description: There is more than one value of TRTxxAN for a given value of TRTxxA, where xx is an integer [01-99, zero-padded], considering only those rows on which both variables are populated
+#note "each TRT01A maps to a single TRT01AN -> noViolation"
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01A type=Char
+col TRT01AN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | 0
+CDISCPILOT01 | 01-701-1023 | Drug High | 9
+---

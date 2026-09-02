@@ -1,0 +1,67 @@
+Core:
+  Id: "PMDA-AD0366A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Randomized Population Flag (RANDFL) is 'Y' but Date\
+  \ of Randomization (RANDDT) is missing on the same subject record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "RANDDT"
+    - "RANDFL"
+Check:
+  expression: >-
+    RANDFL == "Y" and empty(RANDDT)
+Outcome:
+  Message: "Missing value for RANDDT when RANDFL is Y"
+  Output_Variables:
+  - "RANDFL"
+  - "RANDDT"
+Source:
+  Message: "Missing value for RANDDT when RANDFL is Y"
+  Description: "Date of Randomization (RANDDT) variable value should be populated\
+    \ for randomized subjects (when Randomized Population Flag (RANDFL) variable value\
+    \ is 'Y')."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0366A"
+        Version: "1"
+      Version: "6.0"

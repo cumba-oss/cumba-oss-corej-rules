@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2239 expect=noViolation domain=CL
+#note "CLRESCAT carries its own value on both rows, distinct from CLTEST, CLCAT and CLSCAT -> nothing is redundant. Row 2 leaves CLRESCAT empty, which the non_empty gate excludes."
+#library standard=sendig version=3-1-1
+dataset CL label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLTEST   type=Char label="Clinical Observation Name"
+col CLCAT    type=Char label="Category for Clinical Observation"
+col CLSCAT   type=Char label="Subcategory for Clinical Observation"
+col CLRESCAT type=Char label="Result Category"
+---
+S1 | 001 | 1 | CLSIGN | Clinical Signs | CLINICAL OBSERVATION | SKIN | ERYTHEMA
+S1 | 001 | 2 | CLSIGN | Clinical Signs | CLINICAL OBSERVATION | SKIN |

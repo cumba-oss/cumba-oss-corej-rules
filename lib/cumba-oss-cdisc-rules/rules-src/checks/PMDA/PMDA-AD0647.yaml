@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-AD0647"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Treatment Emergent Period xx Flag (TREMxxFL) is\
+  \ 'Y' on a record whose overall Treatment Emergent Analysis Flag (TRTEMFL) is not\
+  \ 'Y'. If any TREMxxFL is flagged Y, the overall TRTEMFL must also be Y."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "TRTEMFL"
+Check:
+  expression: >-
+    varname() =~ /^TREM(0[1-9]|[1-9][0-9])FL$/ and value() == "Y" and TRTEMFL != "Y"
+Outcome:
+  Message: "TREMxxFL equals Y but TRTEMFL does not equal Y"
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+  - "TRTEMFL"
+Source:
+  Message: "TREMxxFL = Y and TRTEMFL != Y"
+  Description: "If TREMxxFL is included, TRTEMFL is defined as the overall treatment\
+    \ emergent flag. If any Treatment Emergent Period xx Flag (TREMxxFL) variables\
+    \ are flagged Y, then the overall Treatment Emergent Analysis Flag (TRTEMFL) variable\
+    \ should also be Y."
+  Domains: "ADAE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0647"
+        Version: "1"
+      Version: "6.0"

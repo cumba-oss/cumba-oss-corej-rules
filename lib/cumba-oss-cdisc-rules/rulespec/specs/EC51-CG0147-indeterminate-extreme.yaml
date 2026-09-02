@@ -1,0 +1,93 @@
+name: EC51-CG0147-indeterminate-extreme
+kind: rule
+description: |
+  EC-51 Half B (register §49) / `Fix #145` — `missing_values: "indeterminate"` on a grouped
+  `max_date`, on the SHIPPED rule, measured on BOTH lanes. This is the first spec anywhere in
+  the corpus that exercises the key: the retired `CORE-RULES-JAVA-EXTENSIONS.md` §24 (indexed in
+  `corej-cdisc-rules/documentation/expression-docs-disposition.md` §A) stood on "0 shipped
+  rules declare it" until wave 6 (`ae8e88e5c`, 2026-08-05) migrated four, and the standing house
+  rule — *the first rule to author a divergent construct brings its own parity spec* — was four
+  rules in arrears until wave 16 lane D.
+
+  WHAT DIVERGES, measured 2026-08-08 on fork `195c7172`. Subject `002` has two EX records; one
+  carries `EXENDTC: ''`.
+
+    - coreJ resolves the native `rules/` expression
+      `max_date(EXENDTC, domain="EX", group=[USUBJID], missing_values="indeterminate")`.
+      A missing candidate makes the group's extreme UNDETERMINABLE, so
+      `evalDateExtremeGrouped` (`OperationExecutor`) emits NO KEY for `002`. The consuming leaf
+      is `RFXENDTC != <no value>` — `not_equal_to` is negative polarity
+      (`RulePackageLoader.REPORTS_ON_NO_VALUE`), so it FIRES. One violation on `002`.
+    - The fork drops the key. `OperationParams` is bound from an explicit
+      `operation.get(...)` whitelist at `utilities/rule_processor.py:434` with no
+      `missing_values` arm, so the key is discarded without comment and `max_date` runs with
+      `skip` semantics. It DOES carry EC-51 Half A (`Fix #141`): `base_operation.py:226`
+      `_drop_blank_candidates` removes the blank row BEFORE `groupby` — but `002` still has a
+      populated row, so the group survives and the extreme resolves to `2026-02-05`. Measured
+      directly (liveness probe below): `$max_ex_exendtc: '2026-02-05'`. `RFXENDTC` equals it, the
+      leaf is false, and the fork reports NOTHING.
+
+  ⚠ A DETECTION divergence, not a reporting one — and specifically NOT the §25 output-surface
+  shape that the sibling `CORE-000238` spec's baseline entry carries. There the two lanes fire
+  the same violation on the same row and disagree only about which `$`-variables decorate it;
+  here the fork produces no violation at all, so there are no columns to disagree about.
+  Baselined `lane: python`, `channels: ["violations"]`.
+
+  ⚠ `CORE-000238` is this rule modulo `Scope.Use_Case: "INDH"` — its `Check` and `Operations`
+  are byte-identical in both `rules/` and `rules-legacy/` — so it deliberately gets no EC-51
+  spec of its own. Its existing spec populates `EXENDTC` on every `EX` row and therefore never
+  reaches an indeterminate group (measured 2026-08-08), which is why that spec's baseline entry
+  cites §25 alone and is correct as filed.
+
+  ⚠ Fork repair is NOT scheduled — fork-only work drops off the active list under the Java-first
+  direction of 2026-08-03. The three verbatim hops it would take (`models/rule.py` →
+  `rule_processor.py` → `models/operation_params.py`, plus a row mask before `groupby`) are
+  recorded in `plans/done/PLAN-operation-empty-value-disposition.md` §5.4.
+
+  WHY THE FIXTURE HAS A CONTROL SUBJECT. Subject `001` has no blank `EXENDTC` and its
+  `RFXENDTC` equals the resolved extreme, so BOTH lanes report nothing for it. Without it a
+  fixture in which every row fires would not distinguish "the disposition changed the answer"
+  from "the rule fires on everything".
+
+  NEUTER-AND-WATCH, 2026-08-08. Rewriting subject `002`'s `RFXENDTC` from `2026-02-05` to
+  `2026-09-09` — which makes the extreme irrelevant because the fork's resolved value differs
+  too — makes the PYTHON lane report the same row (`$max_ex_exendtc: '2026-02-05'`,
+  `$max_ex_exstdtc: '2026-02-03'`), i.e. the spec is NOT vacuous on the fork: it observes the
+  fork resolving the extreme the disposition was supposed to suppress. Deleting the
+  `EXENDTC: ''` row makes the JAVA lane report nothing, so the Java expectation is pinned on the
+  blank cell and not on the rule firing generally.
+rule:
+  coreId: CDISC-CG0147
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXENDTC: '2026-02-05'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-02-01', EXENDTC: '2026-02-05'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2026-02-03', EXENDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: CDISC-CG0147
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002]'
+      $max_ex_exendtc:
+      $max_ex_exstdtc: '2026-02-03'
+      RFXENDTC: '2026-02-05'
+expected_errors: []

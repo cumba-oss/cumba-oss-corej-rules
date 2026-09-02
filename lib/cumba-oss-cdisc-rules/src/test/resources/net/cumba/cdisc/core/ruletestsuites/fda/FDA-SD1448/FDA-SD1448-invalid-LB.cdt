@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1448 expect=violation domain=LB
+#note "Row 2 LBSTRESC='<0.5' is not a numeric value, yet LBSTRESN=0.5 is populated; row 3 does the same with 'BLQ'."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 LBSTRESC=<0.5 LBSTRESN=0.5
+#expectViolationAt row=3 LBSTRESC=BLQ LBSTRESN=0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | 40   | 40
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | <0.5 | 0.5
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREA | BLQ  | 0

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0142 expect=skipped domain=ADAE
+#note "structure=OCCDS is the DECLARED tier and beats the columns (Fix #154, corej.defineFirst=true), so the dataset's structure set is [OCCURRENCE DATA STRUCTURE], which is not in Scope.Data_Structures.Include -> out of scope, never runs, even though the data (a PARAMCD/PARAM tie) would fire if it did. The mandatory carrier for the declaration is the #library line already required by the pmda family."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+S1 | 001 | ALB  | Albumin
+S1 | 002 | ALBU | Albumin

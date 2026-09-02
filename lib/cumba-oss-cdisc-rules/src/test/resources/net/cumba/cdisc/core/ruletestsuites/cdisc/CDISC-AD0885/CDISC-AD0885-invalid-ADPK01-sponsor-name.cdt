@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0885 expect=violation domain=ADPK01
+#note "D21 DISCRIMINATOR, half 2 -- what dropping the Domains facet buys. ADPK01 is a sponsor name outside BOTH old globs (ADPPK* and ADPPT*), but the dataset IS a popPK analysis dataset: BDS via PARAMCD/AVAL, and the NONMEM signature via EVID plus DV/MDV/AMT. Subclass scoping identifies it by what it is, so the rule fires and catches the missing USUBJIDN. Neuter by restoring the Domains facet: the glob no longer matches the name, the rule is skipped, and this scenario goes red."
+# Rule:Description: Raise an error when USUBJIDN is not present in an ADPPKIG v1.0 dataset.
+#expectViolationCount 1
+dataset ADPK01
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col EVID    type=Num
+col MDV     type=Num
+col DV      type=Num
+col AMT     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 | 0 | 0 | 12.5 | 0
+---

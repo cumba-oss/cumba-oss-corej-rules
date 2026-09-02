@@ -1,0 +1,82 @@
+name: EC43-not-equal-absent
+kind: rule
+description: |
+  EC-63's RETIREMENT — the emitted column-vs-literal guard, read as ONE authored rule by BOTH lanes.
+
+  ⚑ RE-AUTHORED 2026-08-07 (wave 13 lane F, owner decision "option 2") from `kind: check_operator`
+  to `kind: rule`. `Fix #169` emitted X1's column-vs-literal `var_exists` guard into `rules-legacy/`
+  for 357 rules, but this spec could not see it: a `kind: check_operator` spec is scaffolded in
+  memory on BOTH lanes (`RuleScaffold` on the Java side, `engine_adapter._build_rule_dict` on the
+  Python side), so it never reads a corpus file at all. coreJ's in-memory `NonEmptyGuardInliner`
+  silenced the scaffolded rule while the fork, having no injector, fired every row — the divergence
+  filed as register §62 / EC-63 and baselined under cluster `column-vs-literal-negative-guard`.
+
+  The rule below carries the emitted shape VERBATIM (`LegacyColumnVsLiteralGuardEmitter`: a
+  `$guard_var_exists_<COL>` `variable_exists` operation plus a leading `== true` conjunct — compare
+  `FDA-SD0066` in `rules-legacy/rules-fda-sendig-dart-1-1.json`). Both lanes therefore evaluate the
+  SAME authored guard and reach the same verdict: TSVAL is absent, `var_exists(TSVAL)` is false, the
+  rule reports nothing. No baseline entry; EC-63 is retired.
+
+  ⚑ WHAT THIS SPEC IS FOR NOW: it is the **fork-side regression test for the emitted shape**, which
+  nothing else had. Gate G3 of `PLAN-legacy-column-vs-literal-guard-emission.md` was never measured
+  (no `.venv-py-parity`, unmaterialised submodule), and of the 1018 corpus-backed specs ZERO bind to
+  a rule in the guarded 357. If the fork ever stops honouring the emitted `variable_exists` guard,
+  this spec reddens.
+
+  ⚠ EC-43's OPERATOR claim does NOT live here any more. Converting this spec to `kind: rule` moved
+  it to the rule layer; the claim itself — an absent column folds to all-missing, so the negative is
+  true on every row — is pinned by the sibling `EC43-not-equal-absent-operator`, added in the same
+  change. Nothing about EC-43 is retracted: what the operator computes is EC-43's business, whether
+  the enclosing rule reports is the author's, and both statements hold.
+
+  ⚠ The two lanes reach the same verdict by different routes, and that asymmetry is
+  production-faithful. Java: `RulePackageLoader.installNativeExpr` lowers the `variable_exists`
+  operation to the `var_exists(TSVAL)` check function (`VariableExistsInliner`), and
+  `NonEmptyGuardInliner` then structurally de-duplicates its own injected guard against the authored
+  one. Python: the operation stays an operation and evaluates as the broadcast scalar the fork
+  implements. One authored guard, two engines, one verdict.
+
+  ⚠ The pre-`Fix #166` expectation of this spec — both rows firing — did not "return" here, as §7
+  item 4 of the plan predicted before §7bis was decided. With the guard authored into the rule both
+  lanes are SILENT, so `expected_violations` is empty; the two-row assertion moved to
+  `EC43-not-equal-absent-operator`.
+python_notes: |
+  The fork computes the `variable_exists` operation over the TS frame, gets False, and the leading
+  `$guard_var_exists_TSVAL == true` conjunct is therefore false on every row, so `all` never fires.
+  The `not_equal_to` leaf still computes exactly what EC-38 / Fix #128 says it computes (TSVAL
+  materialised as all-missing, `"" != "PLANNED"` true on both rows) — it is simply ANDed with a
+  false guard.
+python_source: EC-43 (PLAN-negative-leaf-absent-column.md Phase 2); guard shape from Fix #169
+rule:
+  id: auto-EC43-not-equal-absent
+  Core:
+    Id: AUTO-EC43-not-equal-absent
+  Description: >-
+    EC-63 retirement fixture — the emitted column-vs-literal guard over an absent TSVAL.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains:
+      Include: [TS]
+  Check:
+    all:
+    - {name: "$guard_var_exists_TSVAL", operator: equal_to, value: true}
+    - {name: TSVAL, operator: not_equal_to, value: "PLANNED", value_is_literal: true}
+  Outcome:
+    Message: auto
+    Output_Variables: [STUDYID, TSPARMCD, TSSEQ]
+  Operations:
+  - {id: "$guard_var_exists_TSVAL", operator: variable_exists, name: TSVAL}
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+    # TSVAL is declared nowhere: the column is absent from the dataset entirely.
+    - {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
+    - {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

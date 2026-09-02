@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2330 expect=violation domain=TS
+#note "No TSPARMCD=DOSSTDTC record anywhere in TS -> the 'Start Date Time Of Dose Interval' parameter is missing, one dataset-level finding. the near-miss parameters DOSENDTC (same DOS prefix) and STSTDTC / EXPSTDTC (same STDTC suffix) would wrongly silence the rule under a loose match."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | DOSENDTC | End Date Time Of Dose Interval             | 2021-02-10
+S01 | TS | 2 | STSTDTC  | Nonclinical Study Start Date               | 2020-12-14
+S01 | TS | 3 | EXPSTDTC | Experiment Start Date                      | 2021-01-05

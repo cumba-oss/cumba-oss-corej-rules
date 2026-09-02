@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0154 expect=noViolation domain=ADLBC
+#note "Three baseline records in three DIFFERENT (USUBJID, PARAMCD, BASETYPE) sets, so every tuple is unique under BOTH the shipped and the proposed Check and nothing fires. Predicted GREEN under both -- the batch's ordinary negative control for AD0154, deliberately free of the multi-record shape the predicted-red fixture isolates."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID   type=Char
+col USUBJID   type=Char
+col PARAMCD   type=Char
+col BASETYPE  type=Char
+col ABLFL     type=Char
+col AVAL      type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | 10
+CDISCPILOT01 | 01-701-1023 | GLUC | LAST | Y | 11
+CDISCPILOT01 | 01-701-1015 | ALB | LAST | Y | 40

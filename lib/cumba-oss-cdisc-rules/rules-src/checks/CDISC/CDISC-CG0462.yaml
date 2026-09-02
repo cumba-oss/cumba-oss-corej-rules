@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0462"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ECDOSE is missing, ECOCCUR is not equal to 'N',\
+  \ ECSTAT is empty, and ECDOSTXT is empty or not present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Check:
+  expression: >-
+    empty(ECDOSE) and (not var_exists("ECOCCUR") or ECOCCUR != "N") and empty(ECSTAT) and
+    empty(ECDOSTXT)
+Outcome:
+  Message: "ECDOSTXT is empty or not present when ECDOSE is missing, ECOCCUR does\
+    \ not equal 'N' and ECSTAT is empty."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+  - "ECDOSTXT"
+  - "ECSTAT"
+Source:
+  Class: "INT"
+  Domain: "EC"
+  Variable: "ECDOSTXT"
+  Condition: "ECDOSE = null and ECOCCUR ^= 'N' and ECSTAT = null"
+  Rule: "ECDOSTXT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0462"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0462"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0462"
+        Version: "2"
+      Version: "2.0"

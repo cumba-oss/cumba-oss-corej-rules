@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1238 expect=violation domain=PC
+#note "row 1: PCRFTDTC populated but PCTPTREF present-and-empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PCRFTDTC=2020-01-02T08:00
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTPTREF type=Char label="Time Point Reference"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+S1 | PC | 001 | 1 | DRUGA |  | 2020-01-02T08:00
+S1 | PC | 002 | 1 | DRUGA | DOSE ADMINISTRATION | 2020-01-03T08:00

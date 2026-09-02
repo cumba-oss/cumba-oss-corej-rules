@@ -1,0 +1,49 @@
+Core:
+  Id: "PMDA-SD1452"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a non-missing Treatment Vehicle Amount (--VAMT)\
+  \ value is negative (less than 0)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--VAMT"
+Check:
+  expression: >-
+    not empty(--VAMT) and --VAMT < 0
+Outcome:
+  Message: "Negative value for --VAMT"
+  Output_Variables:
+  - "--VAMT"
+Source:
+  Message: "Negative value for --VAMT"
+  Description: "Non-missing Treatment Vehicle Amount (--VAMT) value must be greater\
+    \ than or equal to 0."
+  Domains: "INTERVENTIONS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1452"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1452"
+        Version: "1"
+      Version: "1.6"

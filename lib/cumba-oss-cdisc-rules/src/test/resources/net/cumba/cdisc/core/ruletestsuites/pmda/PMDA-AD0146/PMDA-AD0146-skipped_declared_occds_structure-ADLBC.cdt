@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0146 expect=skipped domain=ADLBC
+#note "The only way this rule can be made to skip: declared OCCDS beats the PARAM/PARAMCD BDS detection (Fix #154), giving structure set [OCCURRENCE DATA STRUCTURE], not the rule's single Include token. Data is the invalid fixture's, i.e. it would fire if it ran."
+#library standard=adamig version=1-0
+dataset ADLBC structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+S1 | 001 | ALB   | Albumin    | 1
+S1 | 002 | ALB   | Albumin    | 1
+S1 | 003 | ALB   | Bilirubin  | 1
+S1 | 004 | CREAT | Creatinine | 2
+S1 | 005 | CREAT | Creatinine | 2

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0311 expect=violation domain=ADAE
+#note "KEY=SMQ01SC (2nd arg), DEPENDENT=SMQ01SCN (1st arg): key BROAD carries {1,2} -> rows 1,2 fire; key NARROW is single-valued. Wildcard gives exactly ONE tuple (zz=01) -> one expansion. Record granularity -> 2 violations. Add NO further SMQ<dd>SC/SMQ<dd>SCN column."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 SMQ01SC=BROAD SMQ01SCN=1
+#expectViolationAt row=2 USUBJID=01-701-1023 SMQ01SC=BROAD SMQ01SCN=2
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEDECOD  type=Char
+col SMQ01SC  type=Char
+col SMQ01SCN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | BROAD | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | BROAD | 2
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | NARROW | 2

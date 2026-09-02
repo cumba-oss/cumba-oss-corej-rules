@@ -1,0 +1,27 @@
+Core:
+  Id: "DRAFT-900026"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when DTYPE is not present in a Basic Data Structure dataset;\
+  \ DTYPE is conditionally required when derived records exist in the dataset."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The engine cannot detect whether the dataset actually contains derived\
+    \ records, so the rule fires for every Basic Data Structure dataset without DTYPE,\
+    \ including datasets that hold no derived records and legitimately omit it."
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not var_exists("DTYPE")
+Outcome:
+  Message: "DTYPE variable is not present. DTYPE is conditionally required when derived\
+    \ records exist in the dataset."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

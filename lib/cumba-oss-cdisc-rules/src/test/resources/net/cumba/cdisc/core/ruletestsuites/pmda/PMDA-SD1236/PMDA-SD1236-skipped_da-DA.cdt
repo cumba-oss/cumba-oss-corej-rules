@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1236 expect=skipped domain=DA
+#note "FRESH - the batch's Domains.Include reject pin. Rows are VIOLATING-SHAPED (duplicate DASEQ within one SPDEVID+USUBJID; --SEQ resolves to DASEQ so Requirements.Variables passes), but DA is not in Domains.Include [DX, DO, DU, DE, DT] -> the rule must not execute."
+#library standard=sdtmig version=3-4
+dataset DA label="Drug Accountability"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DASEQ   type=Num  label="Sequence Number"
+col DATESTCD type=Char label="Drug Accountability Test Short Name"
+---
+S1 | DA | D1 | 001 | 1 | DISPAMT
+S1 | DA | D1 | 001 | 1 | RETAMT

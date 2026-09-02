@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-AD0290"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the ARELN variable is not uniquely determined by\
+  \ AREL within the dataset: a single value of AREL maps to more than one value of\
+  \ ARELN, considering only the records on which AREL is populated."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The sheet's 'inconsistent across studies' intent is reinterpreted as a\
+    \ within-dataset unique-relationship check between the char/numeric pair ARELN/AREL\
+    \ (has_multiple_values_for); the cross-study scope is not evaluated."
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AREL) and has_multiple_values_for(ARELN, AREL)
+Outcome:
+  Message: "There is more than one value of ARELN for a given value of AREL (within\
+    \ the dataset)."
+  Output_Variables:
+  - "AREL"
+  - "ARELN"
+Source:
+  Message: "Inconsistent value for ARELN"
+  Description: "Across studies, all Analysis Causality (N) (ARELN) variable values\
+    \ must be the same for each unique value of Analysis Causality (AREL) variable\
+    \ when the primary variable AREL is populated."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0290"
+        Version: "1"
+      Version: "6.0"

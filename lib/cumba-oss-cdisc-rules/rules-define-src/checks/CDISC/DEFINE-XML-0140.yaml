@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0140"
+Sheet_Rule_Identifier: "140"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: "DataType"
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the DataType attribute must be one of \"text\", \"integer\", \"float\", \"date\", \"datetime\", \"time\", \"partialDate\", \"partialTime\", \"partialDatetime\", \"incompleteDatetime\", \"durationDatetime\", \"intervalDatetime\"."
+# The 12-value list matches the 2.1 spec SS4.3.1 table exactly. The 2.0 spec's
+# table lacks intervalDatetime, so this rule is version-split (0160/0160-B
+# precedent; review-batch-d WARN 1): this is the 2.1 half, DEFINE-XML-0140-B
+# carries the 11-value 2.0 half. Value check fires only on a present DataType
+# (presence is sheet id 139).
+Message: "The value of DataType [${value}] is not one of \"text\", \"integer\", \"float\", \"date\", \"datetime\", \"time\", \"partialDate\", \"partialTime\", \"partialDatetime\", \"incompleteDatetime\", \"durationDatetime\", \"intervalDatetime\" for the ItemDef element."
+Check:
+  kind: "one_of"
+  attribute: "DataType"
+  values: ["text", "integer", "float", "date", "datetime", "time", "partialDate", "partialTime", "partialDatetime", "incompleteDatetime", "durationDatetime", "intervalDatetime"]

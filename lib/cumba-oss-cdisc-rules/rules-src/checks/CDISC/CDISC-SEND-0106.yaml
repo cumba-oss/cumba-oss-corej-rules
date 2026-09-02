@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-0106"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Strain/Substrain (STRAIN) is not populated for any\
+  \ record in DM and the Trial Summary (TS) dataset does not carry the strain at study\
+  \ level."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$strain_null"
+  expression: "variable_is_null(STRAIN)"
+- id: "$ts_strain"
+  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
+    STRAIN\")"
+Check:
+  expression: >-
+    $strain_null == true and empty($ts_strain)
+Outcome:
+  Message: "STRAIN is not populated in DM and the Trial Summary (TS) does not carry\
+    \ a strain value."
+  Output_Variables:
+  - "STRAIN"
+Source:
+  Class: "SPC, TDM"
+  Domain: "DM,TS"
+  Variable: "STRAIN"
+  Plain_Text_Explanation: "If strain information is not included in DM it must be\
+    \ included in TS."
+  Condition: "DM.STRAIN = null"
+  Rule: "Record with TSPARMCD = \"STRAIN\" is present in TS and TSVAL ^= null for\
+    \ that record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND106"
+        Version: "1"
+      Version: "5.0"

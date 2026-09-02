@@ -1,0 +1,38 @@
+Core:
+  Id: "FDA-SD9713"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when subject visits are recorded (the SV dataset is present)\
+  \ but the TV (Trial Visits) dataset is not present in the study."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Check:
+  expression: >-
+    not ds_exists("TV")
+Outcome:
+  Message: "The TV (Trial Visits) dataset is not present in the study although subject\
+    \ visits are recorded in SV."
+Source_Proposed:
+  Sheet_Issue: "#160,#161,#162"
+  FDA_Validator_Rule_Message: "The TV (Trial Visits) dataset is not present in the\
+    \ study although subject visits are recorded in SV."
+  FDA_Validator_Rule_Description: "Subject visits are recorded (the SV dataset is\
+    \ present) but the TV (Trial Visits) dataset is not present in the study."
+  Domains: "SV"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+  - Name: "SDTMIG"
+    Version: "3.1.2"

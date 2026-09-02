@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD1332"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Outcome of Adverse Event (AEOUT) is equal to\
+  \ 'NOT RECOVERED/NOT RESOLVED' but an End Date/Time of Adverse Event (AEENDTC) is\
+  \ provided."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AEOUT"
+Check:
+  expression: >-
+    AEOUT == "NOT RECOVERED/NOT RESOLVED" and not empty(AEENDTC)
+Outcome:
+  Message: "AEENDTC is populated, when AEOUT is equal to NOT RECOVERED/NOT RESOLVED."
+  Output_Variables:
+  - "AEOUT"
+  - "AEENDTC"
+Source:
+  Message: "AEOUT = NOT RECOVERED/NOT RESOLVED, but an end date is provided"
+  Description: "The Outcome of Adverse Event (AEOUT) variable is populated with the\
+    \ value NOT RECOVERED/NOT RESOLVED, however the End Date/Time of Adverse Event\
+    \ (AEENDTC) variable is populated with an end date for the adverse event. If the\
+    \ adverse event has an outcome of NOT RECOVERED/NOT RESOLVED, it is expected that\
+    \ no end date is available."
+  Domains: "AE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"

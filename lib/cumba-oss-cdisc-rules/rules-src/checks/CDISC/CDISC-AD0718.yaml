@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-AD0718"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of TRTxxP for a given\
+  \ value of TRTxxPN, considering only those rows on which both TRTxxP and TRTxxPN\
+  \ are populated, where xx is an integer [01-99, zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTxxP) and not empty(TRTxxPN) and has_multiple_values_for(TRTxxP, TRTxxPN)
+Outcome:
+  Message: "There is more than one value of TRTxxP for a given value of TRTxxPN, considering\
+    \ only those rows on which both TRTxxP and TRTxxPN are populated"
+  Output_Variables:
+  - "TRTxxP"
+  - "TRTxxPN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTxxP where xx is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTxxP\
+    \ for a given value of TRTxxPN, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of TRTxxP for a given value\
+    \ of TRTxxPN"
+  Condition_Failure: "Considering only those rows on which both TRTxxP and TRTxxPN\
+    \ are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR718"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR718"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR718"
+        Version: "1"
+      Version: "5.0"

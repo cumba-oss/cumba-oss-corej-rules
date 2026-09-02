@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2349 expect=violation domain=TF
+#note "Second scoped domain: the same check resolves --DTHREL to TFDTHREL in TF. Row 1 carries the lower-case word 'unknown' instead of the allowed 'U' -> fires; row 2 uses 'U' and is conformant."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 TFDTHREL=unknown
+dataset TF label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Test Short Name"
+col TFSTRESC type=Char label="Standardized Result in Standard Format"
+col TFRESCAT type=Char label="Result Category"
+col TFDTHREL type=Char label="Relationship to Death"
+col TFSPEC   type=Char label="Specimen Material Type"
+---
+STUDY01 | TF | STUDY01-001 | 1 | TUMOR | ADENOMA   | BENIGN | unknown | LIVER
+STUDY01 | TF | STUDY01-001 | 2 | TUMOR | CARCINOMA | MALIGNANT | U    | LIVER

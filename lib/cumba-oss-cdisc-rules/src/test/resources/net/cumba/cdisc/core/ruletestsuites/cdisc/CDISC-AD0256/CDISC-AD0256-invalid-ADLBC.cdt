@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0256 expect=violation domain=ADLBC
+# Rule:Description: The values of USUBJID are not present in ADSL
+#note "ADSL present but ADLBC USUBJID has no matching ADSL row -> ADSL.USUBJID empty after join -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-9999
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-9999 | ALT | 12.5
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---

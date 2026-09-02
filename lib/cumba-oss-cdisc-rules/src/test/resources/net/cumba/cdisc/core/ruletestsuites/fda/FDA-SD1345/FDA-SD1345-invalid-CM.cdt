@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1345 expect=violation domain=CM
+#note "Row 2: CMCLAS=NOTACLASS is not a WHODrug ATC text term in the dummy dictionary -> fires. Row 1 is a valid ATC text in its preferred case (the D-TA-3 sensitive default, Fix #266); row 3 is blank (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CMSEQ=2 CMCLAS=NOTACLASS
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMCLAS  type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | Analgesics
+S01 | CM | 001 | 2 | Mystery pill  | NOTACLASS
+S01 | CM | 002 | 1 | Unknown med   |

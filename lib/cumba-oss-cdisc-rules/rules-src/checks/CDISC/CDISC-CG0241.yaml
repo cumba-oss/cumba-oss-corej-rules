@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0241"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ELTM is populated but --ELTM does not have the\
+  \ same value across records that share the same DOMAIN, VISITNUM, --TPTREF, and\
+  \ --TPTNUM."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+Check:
+  expression: >-
+    not empty(--TPT) and not empty(--ELTM) and not empty(--TPTNUM) and
+    is_inconsistent_across_dataset(--ELTM, keys=[DOMAIN, VISITNUM, --TPTREF, --TPTNUM])
+Outcome:
+  Message: "Inconsistent value for --ELTM: it is not the same value across records\
+    \ with the same values of DOMAIN, VISITNUM, --TPTREF, and --TPTNUM."
+  Output_Variables:
+  - "DOMAIN"
+  - "VISITNUM"
+  - "--TPT"
+  - "--TPTNUM"
+  - "--ELTM"
+  - "--TPTREF"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ELTM"
+  Condition: "--TPT ^= null and --TPTNUM ^= null and --ELTM ^= null"
+  Rule: "--ELTM is the same value across records with the same values of DOMAIN, VISITNUM,\
+    \ --TPTREF, and --TPTNUM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"

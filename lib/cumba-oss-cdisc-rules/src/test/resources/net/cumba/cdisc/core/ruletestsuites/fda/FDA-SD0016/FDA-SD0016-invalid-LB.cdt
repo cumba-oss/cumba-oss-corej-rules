@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0016 expect=violation domain=LB
+#note "Row 1 is flagged derived (LBDRVFL='Y') but LBSTRESC is empty -> fires. Row 2 is derived and populated; row 3 is empty but not derived."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTESTCD=ALB LBSTRESC= LBDRVFL=Y
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALB  |    | Y
+S1 | LB | 001 | 2 | GLUC | 5  | Y
+S1 | LB | 001 | 3 | CHOL |    |

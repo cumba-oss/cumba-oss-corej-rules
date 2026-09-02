@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1130 expect=skipped domain=SUPPDM
+#note "FRESH. SUPPDM deliberately carries no QNAM column. Requirements.Variables.All [QNAM] rejects the dataset, so the rule SKIPS. SUPPDM is a second six-character SUPP-- name, which also keeps the domain axis honest."
+#library standard=sdtmig version=3-4
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char
+col QORIG    type=Char
+---
+S1 | DM | 001 |   |   | Race Other | Asian | CRF
+S1 | DM | 002 |   |   | Race Other | Other | CRF

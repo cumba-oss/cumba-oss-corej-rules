@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0333 expect=violation domain=ADLBC
+#note "PCHGCATy compiles to ^PCHGCAT(\\d+)$ (matches PCHGCAT1) and PCHGCAyN to ^PCHGCA(\\d+)N$ (matches PCHGCA1N) -- neither column matches the other's pattern. One tuple (y=1). Target is the LABEL PCHGCAT1, key is the pair [PARAMCD, PCHGCA1N]. Group (GLUC, 1) holds PCHGCAT1 {INCR x2, DECR x1} -> row 3 is the lone minority. Row 4 has the same label but key value 2, so it forms its own single-valued group and stays silent."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=GLUC PCHGCAT1=DECR PCHGCA1N=1
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col PCHGCAT1 type=Char
+col PCHGCA1N type=Num
+---
+S1 | 001 | GLUC | 5.0 | INCR | 1
+S1 | 002 | GLUC | 5.1 | INCR | 1
+S1 | 003 | GLUC | 5.2 | DECR | 1
+S1 | 004 | GLUC | 5.3 | DECR | 2

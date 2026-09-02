@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0062"
+Sheet_Rule_Identifier: "DD0062"
+Rule_Set: "PMDA"
+Element: "TranslatedText"
+Attribute: "lang"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The xml:lang attribute for TranslatedText element must be unique within a single parent element."
+# The xml: prefix is stripped on load (namespace-agnostic tree), so the attribute
+# is addressed as bare "lang". CDISC twin 63 (same shape).
+Message: "Duplicate xml:lang [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "lang"

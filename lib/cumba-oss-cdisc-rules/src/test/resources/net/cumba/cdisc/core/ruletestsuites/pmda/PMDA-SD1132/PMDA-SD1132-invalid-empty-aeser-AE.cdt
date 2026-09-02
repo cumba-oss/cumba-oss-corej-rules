@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1132 expect=violation domain=AE
+#note "Only ONE criterion column present (AESLIFE). Row 1: AESLIFE=Y and AESER EMPTY, and an empty value is not 'Y', so it FIRES; row 2: silent. Pins both halves at once: a present-but-blank AESER fires, and the seven authored var_exists guards let the six absent criterion columns drop out of the disjunction without disabling it."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESLIFE=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESLIFE type=Char label="Is Life Threatening"
+---
+S1 | AE | 001 | 1 | ANAPHYLAXIS | | Y
+S1 | AE | 001 | 2 | HEADACHE    | | N

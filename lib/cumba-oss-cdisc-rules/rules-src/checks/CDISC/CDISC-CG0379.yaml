@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0379"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Dictionary-Derived Term (--DECOD) value is not\
+  \ a valid Preferred Term in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "--DECOD"
+Operations:
+- id: "$decod_valid"
+  expression: "valid_external_dictionary_value(--DECOD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"PT\", case_sensitive=false)"
+Check:
+  expression: >-
+    not empty(--DECOD) and $decod_valid == false
+Outcome:
+  Message: "Dictionary-Derived Term (--DECOD) is not a valid MedDRA Preferred Term."
+  Output_Variables:
+  - "--DECOD"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--DECOD"
+  Condition: "--DECOD ^= null"
+  Rule: "--DECOD = MedDRA preferred TERM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0379"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0379"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0379"
+        Version: "1"
+      Version: "2.0"

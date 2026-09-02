@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0160"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Window Unit (AWU) variable is present\
+  \ in the dataset but the Analysis Window Beginning Timepoint (AWLO) and Analysis\
+  \ Window Ending Timepoint (AWHI) variables are not both present; when AWU is used,\
+  \ both AWLO and AWHI must accompany it."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("AWU") and (not var_exists("AWLO") or not var_exists("AWHI"))
+Outcome:
+  Message: "AWU is present, but AWLO and AWHI are not both present."
+  Output_Variables:
+  - "AWU"
+Source:
+  Message: "AWU is present, but both AWLO and AWHI are not present"
+  Description: "If Analysis Window Unit (AWU) variable is present, then Analysis Window\
+    \ Beginning Timepoint (AWLO) and (Analysis Window Ending Timepoint) AWHI variables\
+    \ must be present."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0160"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0160"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0160"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0160"
+        Version: "1"
+      Version: "6.0"

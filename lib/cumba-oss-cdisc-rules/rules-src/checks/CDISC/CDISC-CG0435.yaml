@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0435"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date/Time of Death (DTHDTC) is populated but Subject\
+  \ Death Flag (DTHFL) is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Check:
+  expression: >-
+    not empty(DTHDTC) and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when DTHDTC is populated."
+  Output_Variables:
+  - "DTHDTC"
+  - "DTHFL"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "DTHFL"
+  Condition: "DTHDTC ^= null"
+  Rule: "DTHFL = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0435"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0435"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0435"
+        Version: "1"
+      Version: "2.0"

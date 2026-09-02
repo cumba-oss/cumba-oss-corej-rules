@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0042 expect=violation domain=ADLBC
+# Rule:Description: A numeric variable with a suffix of TM does not have a time format, excluding ARELTM and variables with a suffix of DTM
+#note "ASTTM is numeric, suffix TM (not DTM/ELTM/ARELTM), format 8. is not a time format -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Num variable_format=8. variable_name=ASTTM
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col ASTTM type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | 13.5
+---

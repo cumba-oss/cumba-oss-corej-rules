@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0291"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVALNF is empty and TSVAL is populated with a value,\
+  \ or synonym of a value, from the ISO 21090 null flavor codelist."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVALNF"
+Check:
+  expression: >-
+    empty(TSVALNF) and upper(TSVAL) in ["NI", "NO INFORMATION", "INV", "INVALID", "OTH", "OTHER",
+    "PINF", "POSITIVE INFINITY", "NINF", "NEGATIVE INFINITY", "UNC", "UNENCODED", "DER", "DERIVED",
+    "UNK", "UNKNOWN", "ASKU", "ASKED BUT UNKNOWN", "NAV", "TEMPORARILY UNAVAILABLE", "NASK",
+    "NOT ASKED", "TRC", "TRACE", "MSK", "MASKED", "QS", "SUFFICIENT QUANTITY", "NA",
+    "NOT APPLICABLE", "NP", "NOT PRESENT"]
+Outcome:
+  Message: "TSVAL is populated with a value from the ISO 21090 null flavor codelist\
+    \ while TSVALNF is empty."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALNF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSVALNF = null"
+  Rule: "TSVAL not populated with values or synonyms of values in the ISO 21090 null\
+    \ flavor codelist (or other terms that can be represented as null flavors)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0291"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0291"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0291"
+        Version: "1"
+      Version: "2.0"

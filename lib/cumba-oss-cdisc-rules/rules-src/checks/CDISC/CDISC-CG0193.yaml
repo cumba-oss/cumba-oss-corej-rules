@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0193"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a microorganism has been identified (MBTESTCD equal\
+  \ to 'ORGANISM') but the Result Category (MBRESCAT) is not populated, excluding\
+  \ records where MBSTRESC equals 'NO GROWTH' or MBMETHOD equals 'GRAM STAIN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MB"
+Requirements:
+  Variables:
+    All:
+    - "MBTESTCD"
+    - "MBMETHOD"
+Check:
+  expression: >-
+    MBTESTCD == "ORGANISM" and not equalsIgnoreCase(MBSTRESC, "NO GROWTH") and MBMETHOD !=
+    "GRAM STAIN" and empty(MBRESCAT)
+Outcome:
+  Message: "MBRESCAT is empty when MBTESTCD equals 'ORGANISM'."
+  Output_Variables:
+  - "MBTESTCD"
+  - "MBSTRESC"
+  - "MBRESCAT"
+  - "MBMETHOD"
+Source:
+  Class: "FND"
+  Domain: "MB"
+  Variable: "MBRESCAT"
+  Condition: "MBTESTCD = 'ORGANISM' and MBSTRESC ^= 'NO GROWTH' and MBMETHOD ^= 'GRAM\
+    \ STAIN'"
+  Rule: "MBRESCAT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"

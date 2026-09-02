@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0144 expect=skipped domain=BW
+#note "THE --ORRES ALL-FACET GATE (Fix #331, M2-D24 bucket 2). Requirements.Variables.All gained the wildcard entry `--ORRES` (the pre-existing `--STAT` entry is satisfied: BWSTAT is declared, blank on both rows). BW declares no BWORRES column, so ScopeMatcher.resolveScopeVariable (EC-36) resolves `--ORRES` to BWORRES, finds it absent and the rule is SKIPPED naming it. Drop the `--ORRES` entry and the rule EXECUTES: under Fix #330 empty(--ORRES) is TRUE on every row of the absent column and empty(--STAT) holds on both blank rows, so it would fire twice -- which is exactly the flood the gate exists for. ⚠ A skip cannot prove `--` RESOLUTION by itself (an unresolved literal entry would also skip); the positive proof that `--STAT`/`--ORRES` resolve is -invalid_stat_empty-BW, which declares both columns and FIRES. Five bucket-2 `--` gates were added under Fix #331 (this rule's --ORRES, CDISC-CG0348/CORE-000200's --ORRES, FDA/PMDA-SD1320's --STRESC)."
+#library standard=sendig version=3-1-1
+dataset BW label="Body Weight" class=FINDINGS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWSTAT   type=Char label="Completion Status"
+---
+S1 | BW | 001 | 1 | BW |
+S1 | BW | 001 | 2 | BW |
+---

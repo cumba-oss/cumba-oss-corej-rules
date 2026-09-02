@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0236 expect=noViolation domain=ADSL
+#note "Blank cell is the TARGET, so the D.2 emptiness exception excludes it from both the distinct-value count and the flag pass and group POOLA holds the single distinct value {1}; the row is NOT dropped from grouping, because its key TR01AG1 is populated. The blank-target contract on the actual-pooled-treatment family."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01AG1  type=Char
+col TR01AG1N type=Num
+---
+S1 | 001 | POOLA |  1
+S1 | 002 | POOLA |  1
+S1 | 003 | POOLA |

@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0304"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AEREASND is present in the AE dataset, as the --REASND\
+  \ Qualifier is not permitted in the AE domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Check:
+  expression: >-
+    var_exists("AEREASND")
+Outcome:
+  Message: "AEREASND is present in the AE dataset, but this Qualifier is not permitted\
+    \ in the AE domain."
+  Output_Variables:
+  - "AEREASND"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "AEREASND"
+  Rule: "AEREASND not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0304"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0304"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0304"
+        Version: "1"
+      Version: "2.0"

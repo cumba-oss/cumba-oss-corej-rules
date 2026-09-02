@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-AD0236"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRxxAGyN is populated, TRxxAGy is populated, and\
+  \ there is more than one value of TRxxAGyN for a given value of TRxxAGy"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRxxAGyN) and not empty(TRxxAGy) and has_multiple_values_for(TRxxAGyN, TRxxAGy)
+Outcome:
+  Message: "More than one value of TRxxAGyN is recorded for the same value of TRxxAGy"
+  Output_Variables:
+  - "TRxxAGy"
+  - "TRxxAGyN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 9
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRxxAGyN where xx is an integer [01-99, zero-padded] and y is\
+    \ an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRxxAGyN\
+    \ for a given value of TRxxAGy, where xx is an integer [01-99, zero-padded] and\
+    \ y is a single-digit integer [1-9]"
+  Rule_Failure_Criteria: "There is more than one value of TRxxAGyN for a given value\
+    \ of TRxxAGy"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR236"
+        Version: "1"
+      Version: "5.0"

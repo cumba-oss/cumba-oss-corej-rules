@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0467 expect=noViolation domain=LB
+#note "LB carries only the Findings collection timing variable LBDTC; LBSTDTC is absent -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-15
+S1 | LB | 001 | 2 | GLUC | 2020-01-16

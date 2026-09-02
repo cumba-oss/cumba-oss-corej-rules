@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1340 expect=noViolation domain=EX
+#note "Pins the NEW inner-join semantics: subject 005 has an EX record but no DM record at all. Under the removed Join_Type: left, DM.ACTARMCD was null after the merge, the empty(DM.ACTARMCD) arm was true, and this rule fired claiming the subject was 'not treated' -- which is factually wrong about a subject that is simply missing from DM. The inner join drops the row instead: D-TA-2 (inner is the doctrine), and the unmatched subject is PMDA-SD0064's finding. DM is present and non-empty (subject 001, ACTARMCD=TRTA), so a rule that still left-joined WOULD fire here: this is a discriminator, not a vacuous pass."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | EX | 005 | 1 | DRUG A | TREATMENT
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | TRTA

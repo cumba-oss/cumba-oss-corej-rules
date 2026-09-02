@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0885 expect=violation domain=ADPPT
+#note "Declared-tier pin for D21, and the documented cost of dropping the Domains facet. ADPPT carries no NONMEM columns, so AdamSubclassDetector's popPK heuristic yields nothing (this is the motivating case named in its javadoc). The subclass therefore has to come from the Define-XML def:SubClass declaration -- structure=BDS subclass=POPPK -- which since Fix #154 is resolve()'s TOP tier rather than a fallback. Fix #154's last-resort name tier does not reach this fixture either: it requires BASIC DATA STRUCTURE, and STUDYID/USUBJID alone detect ADAM OTHER, so the declared structure=BDS is what supplies BDS in the first place. Pair with the -undeclared- twin, which is SKIPPED."
+# The #define block is the mandatory carrier for a structure=/subclass= declaration:
+# ScenarioDeclaredScopeProvider.install() refuses a declaration with no provider block.
+#define standard=adamig version=1-3
+#expectViolationCount 1
+dataset ADPPT structure=BDS subclass=POPPK
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---

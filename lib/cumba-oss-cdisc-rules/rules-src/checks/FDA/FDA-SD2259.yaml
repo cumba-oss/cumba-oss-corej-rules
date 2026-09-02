@@ -1,0 +1,103 @@
+Core:
+  Id: "FDA-SD2259"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Value (TSVAL) and its code (TSVALCD)\
+  \ for an INDIC trial-summary parameter are not the term and concept ID of the same\
+  \ SNOMED CT concept."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$indic_pair_valid"
+  expression: "valid_external_dictionary_code_term_pair(TSVALCD, external_dictionary_type=\"\
+    snomed\", external_dictionary_term_variable=\"TSVAL\")"
+Check:
+  expression: >-
+    TSPARMCD == "INDIC" and $indic_pair_valid == false
+Outcome:
+  Message: "TSVAL and TSVALCD do not reference the same SNOMED CT concept for the\
+    \ INDIC parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "TSVALCD"
+Source:
+  FDA_Validator_Rule_Message: "TSVAL/TSVALCD value mismatch for INDIC"
+  FDA_Validator_Rule_Description: "TSVAL and TSVALCD values must be populated from\
+    \ the same concept description record in SNOMED CT."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2259"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2259"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2259"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2259"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2259"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

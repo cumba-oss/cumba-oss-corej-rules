@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1367 expect=skipped domain=DS
+#note "EPOCH column absent: rows 1/2 duplicate (USUBJID, DSSCAT) disposition events, but the rule's EPOCH gate stops it instead of letting it run the coarser per-DSSCAT check. WHY skipped AND NOT noViolation (wave-17 lane A, R-4.11 hoist): the gate used to be a top-level 'EPOCH exists' leaf and this fixture then asserted expect=noViolation - the rule executed to a silent zero. It is now Requirements.Variables.All EPOCH, so the same zero is reported as 'skipped - variable EPOCH absent'. Violations are 0 both ways; only the reporting changed. (Cloned for the PMDA twin by P5 finding F6: the two rules are field-identical, so the EPOCH-target gate was otherwise pinned for FDA-SD1367 only.)"
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSCAT  type=Char label="Subcategory for Disposition Event"
+---
+S1 | DS | S1-001 | 1 | ADVERSE EVENT | ADVERSE EVENT | DISPOSITION EVENT | STUDY TREATMENT
+S1 | DS | S1-001 | 2 | COMPLETED     | COMPLETED     | DISPOSITION EVENT | STUDY TREATMENT

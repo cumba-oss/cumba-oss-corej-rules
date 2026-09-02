@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1034 expect=skipped domain=TA
+#note "ARM is absent from TA, so Requirements.Variables.All gates the rule to SKIPPED. The sheet conditions the rule on ARM being present ('ARM is present and ARMCD is present'), so there is no ARM/ARMCD consistency to assert here."
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ARMCD    type=Char label="Planned Arm Code"
+col TAETORD  type=Num  label="Order of Element within Arm"
+col ETCD     type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | A | 1 | SCRN
+CDISCPILOT01 | TA | A | 2 | TRT
+---

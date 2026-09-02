@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0036"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when neither USUBJID nor POOLID is populated on a record;\
+  \ every record containing subject-level or pool-level data must have USUBJID or\
+  \ POOLID populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    empty(USUBJID) and empty(POOLID)
+Outcome:
+  Message: "Neither USUBJID nor POOLID is populated; one of the two identifiers is\
+    \ required."
+  Output_Variables:
+  - "POOLID"
+Source:
+  Class: "INT, FND, EVT"
+  Domain: "ALL"
+  Variable: "USUBJID, POOLID"
+  Plain_Text_Explanation: "For all records containing subject level or pool level\
+    \ data, USUBJID or POOLID is required."
+  Rule: "USUBJID ^=null OR POOLID ^=null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND36"
+        Version: "1"
+      Version: "5.0"

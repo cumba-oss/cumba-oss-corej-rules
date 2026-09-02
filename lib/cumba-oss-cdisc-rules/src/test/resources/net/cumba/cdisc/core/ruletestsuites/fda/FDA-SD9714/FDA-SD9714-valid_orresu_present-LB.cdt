@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD9714 expect=noViolation domain=LB
+#note "Two negative controls in one dataset is not possible here, so this pins the ordinary case: LBORRES has values AND LBORRESU is present. The rule is silent. (The all-empty --ORRES case is pinned by var_is_null returning true and is covered by the sibling rule set.)"
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 40 | g/L

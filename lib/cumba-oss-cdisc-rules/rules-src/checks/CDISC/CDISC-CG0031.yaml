@@ -1,0 +1,70 @@
+Core:
+  Id: "CDISC-CG0031"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISIT is populated with a value that does not match\
+  \ any VISIT value defined in the Trial Visits (TV) dataset, for a record where SVPRESP\
+  \ is not present or equals 'Y'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "USUBJID"
+  - "VISIT"
+  Name: "SV"
+Operations:
+- id: "$tv_visit"
+  expression: "distinct(VISIT, domain=\"TV\")"
+Check:
+  expression: >-
+    var_exists(TV.VISIT) and (not var_exists(SV.SVPRESP) or SV.SVPRESP == "Y") and not empty(VISIT)
+    and VISIT not in $tv_visit
+Outcome:
+  Message: "VISIT value for a planned visit does not match any VISIT value in the\
+    \ TV dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "SV.SVPRESP"
+  - "$tv_visit"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISIT"
+  Condition: "VISIT ^= null and is planned"
+  Rule: "VISIT in TV.VISIT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0011 expect=violation domain=TA
+#note "Pins the SECOND Domains.Include token (Scope is ['DM','TA'], matching the sheet's Domains cell 'DM, TA'). TA has no USUBJID - one record per planned Element per Arm. Row 1: the SCRNFAIL arm is described as 'Screening Failure' -> fires. Row 2 conformant; row 3 unrelated pair. FRESH - no twin equivalent; TA is in the rule's own Scope and untested by fda/FDA-SD0011, so this fixture closes a hole in BOTH families."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=SCRNFAIL ARM="Screening Failure"
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | SCRNFAIL | Screening Failure | 1 | SCRN | Screening
+S1 | TA | SCRNFAIL | Screen Failure    | 1 | SCRN | Screening
+S1 | TA | A        | Placebo           | 1 | SCRN | Screening

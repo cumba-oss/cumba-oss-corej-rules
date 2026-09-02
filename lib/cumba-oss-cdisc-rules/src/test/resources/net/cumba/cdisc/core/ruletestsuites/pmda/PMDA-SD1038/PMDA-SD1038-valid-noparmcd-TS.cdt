@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1038 expect=noViolation domain=TS
+#note "Guard branch: TSPARMCD column is absent, so the top-level AUTHORED 'TSPARMCD exists' guard is false and the rule must not fire even though TSSEQ 1 is duplicated."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col TSSEQ   type=Num  label="Sequence Number"
+col TSVAL   type=Char label="Parameter Value"
+---
+S1 | TS | 1 | Study of X
+S1 | TS | 1 | Acme

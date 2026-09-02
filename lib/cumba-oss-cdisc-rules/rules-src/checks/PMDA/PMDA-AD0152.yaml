@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0152"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record is flagged as the baseline (Baseline Record\
+  \ Flag ABLFL equals Y) but the Baseline Value (BASE) does not equal the Analysis\
+  \ Value (AVAL); on the baseline record BASE must equal AVAL."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ABLFL"
+    - "BASE"
+    - "AVAL"
+Check:
+  expression: >-
+    ABLFL == "Y" and not empty(BASE) and not empty(AVAL) and BASE != AVAL
+Outcome:
+  Message: "ABLFL equals Y, but BASE does not equal AVAL"
+  Output_Variables:
+  - "AVAL"
+  - "BASE"
+  - "ABLFL"
+Source:
+  Message: "ABLFL = Y, but BASE != AVAL"
+  Description: "If the record is flagged as the baseline (ABLFL = Y), then the baseline\
+    \ Value (BASE) must equal the Analysis Value (AVAL)."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0152"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0152"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0152"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0152"
+        Version: "1"
+      Version: "6.0"

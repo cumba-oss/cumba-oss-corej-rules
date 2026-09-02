@@ -1,0 +1,35 @@
+name: CDISC-AD0254
+kind: rule
+description: |
+  Wave D2 port — T3-VMC. Bare-leaf Check: PARAM exists. OCCDS/ADAE with PARAM present.
+  Baselined on Python lane under Finding #9 (VMC dataset projection divergence;
+  plus §0b bullet 4 bare-leaf KeyError quirk).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection and yields 0 violations (or
+  the bare-leaf KeyError quirk). Java fires correctly; expected matches
+  Java's 1 dataset-level violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0254)
+rule:
+  coreId: CDISC-AD0254
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, PARAM: 'Adverse Event'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0254
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      PARAM: 'Adverse Event'
+expected_errors: []

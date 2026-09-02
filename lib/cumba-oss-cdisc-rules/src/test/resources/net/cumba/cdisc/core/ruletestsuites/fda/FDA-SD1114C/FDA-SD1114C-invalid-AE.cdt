@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1114C expect=violation domain=AE
+#note "AEBODSYS 'NERVOUS SYSTEM DISORDERS' is a valid SOC but not in MedDRA's preferred case ('Nervous system disorders') -> the case-sensitive check fires on row 2; row 1 matches exactly."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEBODSYS="NERVOUS SYSTEM DISORDERS"
+dataset AE
+col USUBJID  type=Char
+col AEBODSYS type=Char
+---
+001 | Nervous system disorders
+001 | NERVOUS SYSTEM DISORDERS

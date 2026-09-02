@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0788 expect=violation domain=ADAE
+# Rule:Description: There is more than one value of SMQzzSCN for a given value of SMQzzSC, considering only those rows on which both variables are populated
+#note "SMQ01SC=BROAD maps to two distinct SMQ01SCN -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col SMQ01SC type=Char
+col SMQ01SCN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | BROAD | 1
+CDISCPILOT01 | 01-701-1015 | 2 | BROAD | 2
+---

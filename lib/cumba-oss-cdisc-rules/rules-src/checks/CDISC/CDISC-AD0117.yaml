@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-AD0117"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of ATPT for a given value of ATPTN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATPT"
+    - "ATPTN"
+Check:
+  expression: >-
+    has_multiple_values_for(ATPT, ATPTN, within=PARAMCD)
+Outcome:
+  Message: "ATPT has more than one value for this PARAMCD and ATPTN."
+  Output_Variables:
+  - "ATPT"
+  - "ATPTN"
+  - "PARAMCD"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ATPT"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of ATPT for a given value of ATPTN"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, there is more than one\
+    \ value of ATPT for a given value of ATPTN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR117"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR117"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR117"
+        Version: "1"
+      Version: "5.0"

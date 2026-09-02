@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1201 expect=noViolation domain=AE
+#note "MINOR-STRENGTHENED twin: rows 1/2 differ in AESEV+AETOXGR, rows 1/3 differ in AESTDTC -> no full-key duplicate. Row 4 duplicates row 1's entire key under a DIFFERENT subject (S1-002) and must stay silent - pins USUBJID's participation in the key."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AECAT    type=Char label="Category for Adverse Event"
+col AESCAT   type=Char label="Subcategory for Adverse Event"
+col AEOCCUR  type=Char label="AE Occurrence"
+col AELOC    type=Char label="Location of Event"
+col AELAT    type=Char label="Laterality"
+col AEDIR    type=Char label="Directionality"
+col AESEV    type=Char label="Severity/Intensity"
+col AETOXGR  type=Char label="Standard Toxicity Grade"
+col VISITNUM type=Num  label="Visit Number"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col AESTTPT  type=Char label="Start Reference Time Point"
+col AESTDTC  type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | Headache | NEURO | | Y | HEAD | | | MILD   | 1 | 1 | 1 | | 2020-01-01
+S1 | AE | S1-001 | 2 | HEADACHE | Headache | NEURO | | Y | HEAD | | | SEVERE | 3 | 1 | 1 | | 2020-01-01
+S1 | AE | S1-001 | 3 | HEADACHE | Headache | NEURO | | Y | HEAD | | | MILD   | 1 | 1 | 1 | | 2020-02-01
+S1 | AE | S1-002 | 1 | HEADACHE | Headache | NEURO | | Y | HEAD | | | MILD   | 1 | 1 | 1 | | 2020-01-01

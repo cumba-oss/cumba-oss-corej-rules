@@ -1,0 +1,23 @@
+Rule_Id: "PMDA-OD0077"
+Sheet_Rule_Identifier: "OD0077"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Codelist Term must match the Data Type of the containing CodeList. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element."
+# One sheet row, two data-type legs (this: integer; -B: float) - a term
+# 'matches' the containing CodeList's DataType when its CodedValue parses as
+# that type; DataType='text' admits anything, so no text leg exists. Wildcard
+# scope + parent-DataType guard covers EnumeratedItem and CodeListItem in one
+# leg: only elements carrying a CodedValue are checked (value kinds skip
+# absent attributes), and no other CodedValue-bearing element sits under a
+# DataType-bearing parent. Integer leg (canned 'integer' format).
+Message: "Codelist/Term Data Type mismatch"
+Check:
+  kind: "matches_regex"
+  attribute: "CodedValue"
+  format: "integer"
+  when:
+    path: "../@DataType"
+    equals: "integer"

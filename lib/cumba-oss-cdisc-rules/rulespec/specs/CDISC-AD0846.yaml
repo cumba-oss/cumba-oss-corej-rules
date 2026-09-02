@@ -1,0 +1,30 @@
+name: CDISC-AD0846
+kind: rule
+description: |
+  Wave A10 port — T1a PlainSimple.
+  CDISC-AD0846: FORMN is populated and FORM is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0846)
+rule:
+  coreId: CDISC-AD0846
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', FORMN: '', FORM: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', FORMN: 'X', FORM: ''}     # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0846
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      FORM: null
+      FORMN: 'X'
+expected_errors: []

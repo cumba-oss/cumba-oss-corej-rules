@@ -1,0 +1,26 @@
+Rule_Id: "DEFINE-XML-0242"
+Sheet_Rule_Identifier: "242"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:CommentOID attribute must be provided for an ItemDef when its ItemOID is referenced in an ItemRef that has the def:HasNoData  attribute  value 'Yes'."
+# Reverse join (ItemDef conditioned on its referencing ItemRefs) — scoped to the
+# ItemRef and encoded with the 0124-B fire-always vehicle: the guard states the
+# violation (this ItemRef says def:HasNoData="Yes", the ItemOID resolves, and the
+# resolved ItemDef carries no def:CommentOID); the not_exists check on the
+# guard-guaranteed @ItemOID fires once per offending reference. The finding sits
+# on the ItemRef (deviation, documented; its ItemOID names the ItemDef).
+Message: "ItemDef def:CommentOID is not provided when an ItemRef referencing it has the def:HasNoData attribute set to 'Yes'."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@HasNoData"
+      equals: "Yes"
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/@CommentOID"
+      exists: false

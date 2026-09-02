@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0041A expect=violation domain=ADMISC
+#note "The structure detects as ADAM OTHER, but this rule's Scope is Domains.Include: [ALL] with no structure facet at all, so it RUNS and fires. Other half of the discriminating pair for finding AD0059-F2 - the same sheet Domains string is realised as an enumerated six-token Data_Structures list on AD0059 (which skips here) and as Domains ALL on AD0041A/AD0043A (which run)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ADT
+dataset ADMISC
+col STUDYID type=Char
+col USUBJID type=Char
+col ADT     type=Num
+---
+S1 | 001 | 22000
+---

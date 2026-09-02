@@ -1,0 +1,35 @@
+Core:
+  Id: "CDISC-CG0091"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --TPTNUM is present in the dataset but --TPT is\
+  \ not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--TPTNUM") and not var_exists("--TPT")
+Outcome:
+  Message: "--TPT is not present in the dataset when --TPTNUM is present in the dataset."
+  Output_Variables:
+  - "--TPTNUM"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPT"
+  Condition: "--TPTNUM present in dataset"
+  Rule: "--TPT present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0091"
+        Version: "1"
+      Version: "2.0"

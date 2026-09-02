@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1130 expect=violation domain=SQAE
+#note "FRESH. Exercises the second Scope.Domains token, 'SQ--'. The name is exactly four characters (SQ + the two-character RDOMAIN): ScopeMatcher requires name.length() == prefix.length() + 2. If this scenario comes back SKIPPED that is a stage-R classification, NOT a scenario to rewrite - escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 QNAM=AESOSP
+#expectViolationAt row=2 QNAM=AEMISAE
+dataset SQAE label="Supplemental Qualifiers for AE (split)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP  | Other Medically Important SAE | Y | CRF
+S1 | AE | 002 | AESEQ | 1 | AEMISAE | Other Medically Important SAE | Y | CRF

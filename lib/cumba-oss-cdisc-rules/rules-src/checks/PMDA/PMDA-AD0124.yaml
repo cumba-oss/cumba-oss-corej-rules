@@ -1,0 +1,73 @@
+Core:
+  Id: "PMDA-AD0124"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and considering only records on\
+  \ which PARAMCD is populated, a Parameter Category (PARCATy) takes more than one\
+  \ value for the same Parameter Code (PARAMCD). A parameter may be categorised only\
+  \ once, although the same category may be reused across parameters."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARCATy"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and not empty(PARAMCD) and is_inconsistent_across_dataset(PARCATy,
+    keys=[PARAMCD])
+Outcome:
+  Message: "Inconsistent value for PARCATy within a unique PARAMCD"
+  Output_Variables:
+  - "PARAMCD"
+  - "PARCATy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for PARCATy within a unique PARAMCD"
+  Description: "Within a study, all PARCATy values must be the same for each unique\
+    \ value of PARAMCD when PARAMCD is populated. A Parameter can only be categorized\
+    \ once. However, that Category can be used across PARAMs."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0124"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0124"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0124"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0124"
+        Version: "1"
+      Version: "6.0"

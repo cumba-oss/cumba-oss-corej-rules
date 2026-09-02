@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0047 expect=violation domain=LB
+#note "LBSTAT and LBDRVFL columns are absent from the dataset: the not_exists branches hold, so row 1 with empty LBORRES fires. Row 2 has LBORRES populated -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | GLUC |
+S1 | LB | 001 | 2 | ALB  | 4.1

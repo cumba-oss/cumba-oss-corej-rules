@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0232 expect=violation domain=ADSL
+#note "One index pair (xx=01, y=1); both patterns carry the full capture set {xx, y} so both seed and the tuples dedupe. Key TR01PG1N=1 holds TR01PG1 {POOLA x2, POOLAA x1} -> row 3 is the minority."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TR01PG1=POOLAA TR01PG1N=1
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1  type=Char
+col TR01PG1N type=Num
+---
+S1 | 001 | POOLA  | 1
+S1 | 002 | POOLA  | 1
+S1 | 003 | POOLAA | 1
+S1 | 004 | POOLB  | 2
+S1 | 005 | POOLB  | 2

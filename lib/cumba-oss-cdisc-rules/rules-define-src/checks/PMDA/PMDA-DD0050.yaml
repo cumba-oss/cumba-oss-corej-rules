@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0050"
+Sheet_Rule_Identifier: "DD0050"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For split datasets (where more than one ItemGroupDef exists for the same Domain), the 2-letter prefix in SASDatasetName attribute and Domain attribute must have the same value."
+# Custom (budget 5/15): split detection needs document-wide Domain counting,
+# outside the DSL - semantics on the check class (literal 2-character prefix
+# vs whole Domain, absent-SASDatasetName skip, case-sensitive). Unlike DD0049
+# the row has no standard-family or SUPPQUAL qualification - none is added.
+# No CDISC twin (the CDISC sheet has no split-dataset rows).
+Message: "Domain/SASDatasetName mismatch for split dataset"
+Check:
+  kind: "custom"
+  className: "net.cumba.cdisc.define.conformance.checks.SplitDatasetSasNamePrefixCheck"

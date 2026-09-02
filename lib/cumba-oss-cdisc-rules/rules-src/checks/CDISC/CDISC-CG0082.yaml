@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0082"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --BODSYS is populated but --BDSYCD is missing or\
+  \ not present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--BODSYS"
+Check:
+  expression: >-
+    not empty(--BODSYS) and empty(--BDSYCD)
+Outcome:
+  Message: "--BDSYCD is missing or not present when --BODSYS is populated."
+  Output_Variables:
+  - "--BODSYS"
+  - "--BDSYCD"
+Source:
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--BDSYCD"
+  Condition: "--BODSYS ^= null"
+  Rule: "--BDSYCD ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0082"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0082"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0082"
+        Version: "2"
+      Version: "2.0"

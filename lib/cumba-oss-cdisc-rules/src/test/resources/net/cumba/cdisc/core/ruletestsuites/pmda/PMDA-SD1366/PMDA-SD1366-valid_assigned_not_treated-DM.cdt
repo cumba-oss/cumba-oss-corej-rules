@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1366 expect=noViolation domain=DM
+#note "FLIPPED by the M2-P9 ruling (option (b), Fix #307) - the file was authored as expect=violation and named itself the tell that would flip if the FDA/CDISC narrowing were propagated. It has been. The subject WAS randomised ('ASSIGNED, NOT TREATED'), and CDISC CG0530's Cited Guidance - the cell all three families' rows trace back to - reads 'Required for all randomized subjects; null for screen failures or unassigned subjects', so SDTMIG REQUIRES RFENDTC here. The literal PMDA form (not empty(ARMNRS) and not empty(RFENDTC)) reported this conformant record; the narrowed membership list does not. This fixture and fda/FDA-SD1366/FDA-SD1366-valid-DM.cdt row 4 no longer assert opposite verdicts on the same data, which was the finding."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+col RFENDTC type=Char
+col ARMNRS  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1034 | 2020-01-05 | 2020-02-10 | ASSIGNED, NOT TREATED

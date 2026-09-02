@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0552 expect=skipped domain=ADAE
+#note "dataset ADAE structure=OCCDS. Columns STUDYID(Char), USUBJID(Char), AEDECOD(Char), MCRIT1MN(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | HEADACHE | 1`. This is the FIRING shape (MCRIT1MN present, MCRIT1ML absent), so the ONLY thing that can stop the rule is the scope gate: OCCURRENCE DATA STRUCTURE is outside `Scope.Data_Structures.Include: [BASIC DATA STRUCTURE, MEDICAL DEVICE BASIC DATA STRUCTURE]`. Precedent pmda/PMDA-AD0157/PMDA-AD0157-skipped_occds_structure-ADAE.cdt. Deliberately NO PARAMCD/AVAL column, so the declaration and the column heuristic agree on OCCDS and the fixture does not depend on the Fix #154 precedence tie-break. The matching wildcard column MCRIT1MN is deliberately PRESENT so the skip is attributable to Scope and not to a NoMatch."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col MCRIT1MN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1

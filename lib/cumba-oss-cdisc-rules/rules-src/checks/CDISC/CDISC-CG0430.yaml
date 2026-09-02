@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0430"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SCAT is present in a dataset, but --CAT is not\
+  \ present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--SCAT") and not var_exists("--CAT")
+Outcome:
+  Message: "--CAT variable is not present when --SCAT variable is present."
+  Output_Variables:
+  - "--SCAT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--CAT"
+  Condition: "--SCAT present in dataset"
+  Rule: "--CAT present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0430"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0430"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0430"
+        Version: "1"
+      Version: "2.0"

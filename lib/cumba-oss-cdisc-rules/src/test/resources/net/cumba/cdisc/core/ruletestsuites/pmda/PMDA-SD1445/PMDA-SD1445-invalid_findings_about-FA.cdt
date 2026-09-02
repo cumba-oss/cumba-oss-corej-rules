@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1445 expect=violation domain=FA
+#note "FAOBJ is not part of the key set (rows identical on it anyway). Rows 1/2 duplicate the tuple -> 2 violations. Row 3's FATESTCD differs -> silent. Pins that Classes.Include reaches FINDINGS ABOUT and --TESTCD/--LOBXFL resolve to FATESTCD/FALOBXFL."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 FASEQ=1
+#expectViolationAt row=2 FASEQ=2
+dataset FA class="FINDINGS ABOUT"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col FASEQ    type=Num
+col FATESTCD type=Char
+col FAOBJ    type=Char
+col FALOBXFL type=Char
+---
+S1 | FA | 001 | 1 | OCCUR | FEVER | Y
+S1 | FA | 001 | 2 | OCCUR | FEVER | Y
+S1 | FA | 001 | 3 | SEV   | FEVER | Y

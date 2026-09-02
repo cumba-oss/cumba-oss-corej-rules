@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1133 expect=violation domain=DM
+#note "ACTARMCD=PBO is described both as 'Placebo' and as 'Placebo Arm', so a single actual-arm code carries two arm descriptions. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ACTARMCD=PBO ACTARM=Placebo
+#expectViolationAt row=2 ACTARMCD=PBO ACTARM="Placebo Arm"
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | PBO | Placebo
+S1 | DM | 002 | PBO | Placebo Arm
+S1 | DM | 003 | ACT | Active

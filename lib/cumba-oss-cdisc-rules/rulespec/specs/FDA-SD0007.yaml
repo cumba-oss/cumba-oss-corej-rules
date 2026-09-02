@@ -1,0 +1,29 @@
+name: FDA-SD0007
+kind: rule
+description: |
+  EC-11 (is_inconsistent_across_dataset excludes blanks). FDA-SD0007 flags
+  --STRESU that is inconsistent across records sharing the same --TESTCD (and
+  other grouping units). A NOT-DONE record carries a blank LBSTRESU; because a
+  blank target is a deliberate emptiness-exception (neither counted nor flagged),
+  the group's only distinct non-blank unit is "mg/dL" → the group is consistent
+  and NOTHING fires. Both lanes agree (Python already excludes blanks via the
+  strip()!="" participation test), so this is a plain parity spec (no baseline
+  entry). Pre-EC-11 the blank row was the lone minority and over-fired.
+python_source: rules-sdtmig-3-4.json (FDA-SD0007)
+rule:
+  coreId: FDA-SD0007
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: 'mg/dL'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: 'mg/dL'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '003', LBSEQ: 1, LBTESTCD: GLUC, LBCAT: CHEMISTRY, LBSPEC: SERUM, LBSTRESU: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations: []
+expected_errors: []

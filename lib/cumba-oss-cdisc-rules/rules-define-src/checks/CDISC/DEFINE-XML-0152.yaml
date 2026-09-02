@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0152"
+Sheet_Rule_Identifier: "152"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:StandardOID attribute on the CodeList element must reference an existing def:Standard element with Type=\"CT\"."
+# Deviation (documented): the references kind cannot constrain attributes of the
+# resolved target, so the Type="CT" refinement lives in the companion rule
+# DEFINE-XML-0152-B (same split as sheet id 124 / DEFINE-XML-0124-B).
+Message: "There is no def:Standard of type 'CT' with an OID attribute that matches the CodeList def:StandardOID value [${value}]."
+Check:
+  kind: "references"
+  attribute: "StandardOID"
+  targetElement: "Standard"
+  targetKey: "OID"

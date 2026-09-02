@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch D1 violations 2.0 fixture, exercising the 2.0-only DEFINE-XML-0160-B
+     (Define-XML 2.0 Origin Type term set): IT.B carries the 2.1-only term
+     "Collected" (invalid in 2.0, fires once); IT.A carries the 2.0 term "CRF"
+     (valid, decoy). Everything else is compliant for the both-version rules
+     (no ItemGroupDefs, so the ItemRef-scoped rules have an empty scope; 2.0 has
+     no ODM def:Context, so the Context-guarded rules never pass their guard). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-d1-violations-20"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30">
+  <Study OID="ST.BATCHD1V20">
+    <GlobalVariables>
+      <StudyName>BATCHD1V20-STUDY</StudyName>
+      <StudyDescription>Batch D1 violations 2.0 fixture study</StudyDescription>
+      <ProtocolName>BATCHD1V20-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch D1 violations 2.0 MDV"
+                     def:DefineVersion="2.0.0">
+      <ItemDef OID="IT.A" Name="VARA" DataType="text" Length="20">
+        <def:Origin Type="CRF"/>
+      </ItemDef>
+      <ItemDef OID="IT.B" Name="VARB" DataType="text" Length="20">
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

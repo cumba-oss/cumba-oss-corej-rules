@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1095 expect=violation domain=L
+#note "Second Check branch (shorter_than 3): a dataset named L carrying DOMAIN=LB differs from its base domain, so it is treated as a split, and a 1-character split name is shorter than the 3-character minimum -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset L class=FINDINGS label="Laboratory Test Results - mis-named split"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | HGB

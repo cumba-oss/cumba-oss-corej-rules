@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0043"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SUPPAE record with QNAM equal to 'AESOSP' is present\
+  \ but the linked AE record does not have AESMIE equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPPAE"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Match_Datasets:
+- Child: true
+  Keys:
+  - "USUBJID"
+  - "IDVAR"
+  - "IDVARVAL"
+  Name: "AE"
+Check:
+  expression: >-
+    QNAM == "AESOSP" and var_exists("AESMIE") and AESMIE != "Y"
+Outcome:
+  Message: "A SUPPAE record with QNAM equal to 'AESOSP' is present, but the linked\
+    \ AE record does not have AESMIE equal to 'Y'."
+  Output_Variables:
+  - "QNAM"
+  - "AESMIE"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "AESMIE"
+  Condition: "Record present in SUPPAE where SUPPAE.QNAM=AESOSP"
+  Rule: "AESMIE = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"

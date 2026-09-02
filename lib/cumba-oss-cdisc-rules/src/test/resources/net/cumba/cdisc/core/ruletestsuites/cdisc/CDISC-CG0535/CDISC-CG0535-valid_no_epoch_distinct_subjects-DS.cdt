@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0535 expect=noViolation domain=DS
+#note "The DISCRIMINATING half of CG0535's absent-EPOCH coverage (P5 finding F1). CG0535 carries Sensitivity: Dataset, so its violation COUNT is structurally 1 however many rows fire - measured 2026-07-31, three firing rows still report 1. A count/row pin therefore cannot exclude an over-fire on this rule; only a case that must report NOTHING can. Three DISTINCT subjects, EPOCH and DSSCAT both absent: the degraded key is (DSCAT, USUBJID), every tuple is unique, and the rule must stay silent. If dropping the absent EPOCH ever over-collapsed the key, this fires and the fixture goes red."
+#library standard=sdtmig version=3-3
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT
+CDISCPILOT01 | DS | 01-701-1023 | 1 | DISPOSITION EVENT
+CDISCPILOT01 | DS | 01-701-1034 | 1 | DISPOSITION EVENT
+---

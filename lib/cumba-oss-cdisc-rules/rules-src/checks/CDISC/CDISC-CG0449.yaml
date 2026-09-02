@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0449"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary Parameter Value Code (TSVALCD)\
+  \ for an INDIC or TDIGRP trial-summary parameter is not a valid concept identifier\
+  \ from SNOMED CT."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$snomed_code_valid"
+  expression: "valid_external_dictionary_code(TSVALCD, external_dictionary_type=\"\
+    snomed\", dictionary_term_type=\"SNOMEDCD\")"
+Check:
+  expression: >-
+    TSPARMCD in ["INDIC", "TDIGRP"] and $snomed_code_valid == false
+Outcome:
+  Message: "TSVALCD is not a valid SNOMED CT concept identifier for the INDIC or TDIGRP\
+    \ parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVALCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALCD"
+  Condition: "TSPARMCD in ('INDIC', 'TDIGRP')"
+  Rule: "TSVALCD is a valid concept identifier from SNOMED CT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0449"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0449"
+        Version: "1"
+      Version: "2.0"

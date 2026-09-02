@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0166 expect=noViolation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), ANRIND(Char). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | HIGH`. The mirror of scenario 1: the COMPANION ANRIND is declared and the CONDITION variable BNRIND is not, so the first conjunct `var_exists('BNRIND')` is FALSE and the rule stays silent. This is the DISCRIMINATING direction test - it is the scenario that fails if the two operands are ever swapped. The rule has no wildcard and no scope gate here, so it executes and evaluates FALSE."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANRIND type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | HIGH

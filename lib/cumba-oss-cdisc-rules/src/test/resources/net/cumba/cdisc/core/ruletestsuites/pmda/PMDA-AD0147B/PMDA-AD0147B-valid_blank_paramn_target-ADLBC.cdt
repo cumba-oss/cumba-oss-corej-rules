@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0147B expect=noViolation domain=ADLBC
+#note "PARAMN is the TARGET here, so row 3's blank PARAMN is excluded from the Albumin group's distinct-value count and from the flag pass: one distinct non-blank value survives and nothing fires. Same column as PMDA-AD0146B's blank-key fixture, different mechanism."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+S1 | 001 | ALB | Albumin | 1
+S1 | 002 | ALB | Albumin | 1
+S1 | 003 | ALB | Albumin |

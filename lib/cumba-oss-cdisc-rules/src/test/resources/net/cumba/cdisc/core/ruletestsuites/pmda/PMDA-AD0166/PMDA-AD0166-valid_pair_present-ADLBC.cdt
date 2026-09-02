@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0166 expect=noViolation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), BNRIND(Char), ANRIND(Char). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | NORMAL | HIGH`. Both halves of the pair are declared, so the second conjunct `not var_exists('ANRIND')` is FALSE and the rule is silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BNRIND type=Char
+col ANRIND type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | NORMAL | HIGH

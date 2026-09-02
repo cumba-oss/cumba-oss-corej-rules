@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=skipped domain=PC
+#note "Requirements.Variables.All is [PCSTRESN] and the column is not declared, so ScopeMatcher rejects the dataset and the rule is NOT EXECUTED. Untouched by M3-D16, which changes only the Condition half of the Check."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | PC | S1-001 | 1 | DRUGX | 0.05 | 0.1 | BLQ
+S1 | PC | S1-002 | 2 | DRUGX | 0.04 | 0.1 | BLQ
+---

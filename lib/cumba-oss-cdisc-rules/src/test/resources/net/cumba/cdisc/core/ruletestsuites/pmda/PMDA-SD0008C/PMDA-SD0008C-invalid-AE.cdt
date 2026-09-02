@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0008C expect=violation domain=AE
+#note "AEDECOD 'HEADACHE' is a valid MedDRA Preferred Term but not in the dictionary's preferred case ('Headache') -> the case-sensitive check fires on row 2; row 1 matches exactly."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEDECOD=HEADACHE
+dataset AE class=EVENTS
+col USUBJID type=Char
+col AEDECOD type=Char
+---
+001 | Headache
+001 | HEADACHE

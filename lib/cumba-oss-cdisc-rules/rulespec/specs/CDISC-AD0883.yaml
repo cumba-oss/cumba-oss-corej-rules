@@ -1,0 +1,43 @@
+name: CDISC-AD0883
+kind: rule
+description: |
+  Wave B7 port - T1b PlainIntermediate.
+  CDISC-AD0883: Within a dataset, there is more than one value of COUNTRY for a given value of COUNTRYL, considering only those rows on which both variables are populated
+  Record-data rule scoped to BASIC DATA STRUCTURE. Bare-leaf Check (no all/any
+  wrapper) + has_multiple_values_for - both Python gaps: business_rules
+  KeyError: 'name' (Finding #26) and DataframeType lacks has_multiple_values_for
+  (Finding #28). Baselines on Python lane; expected matches Java's per-row
+  output.
+python_source: rules-adamig-1-3.json (CDISC-AD0883)
+rule:
+  coreId: CDISC-AD0883
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: 'S1', USUBJID: '001', PARAMCD: 'HGB', COUNTRYL: 'A', COUNTRY: '0'}
+      - {STUDYID: 'S1', USUBJID: '002', PARAMCD: 'HGB', COUNTRYL: 'A', COUNTRY: '1'}
+      - {STUDYID: 'S1', USUBJID: '003', PARAMCD: 'HGB', COUNTRYL: 'B', COUNTRY: '2'}
+      - {STUDYID: 'S1', USUBJID: '004', PARAMCD: 'HGB', COUNTRYL: 'B', COUNTRY: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0883
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COUNTRY: '0'
+      COUNTRYL: 'A'
+  - rule_id: CDISC-AD0883
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COUNTRY: '1'
+      COUNTRYL: 'A'
+expected_errors: []

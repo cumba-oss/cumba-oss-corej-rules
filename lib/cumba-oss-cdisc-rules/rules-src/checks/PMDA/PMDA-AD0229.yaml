@@ -1,0 +1,40 @@
+Core:
+  Id: "PMDA-AD0229"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Actual Sequence of Treatment (TRTSEQA) is populated\
+  \ and does not have the same value across all records that share the same Actual\
+  \ Sequence of Treatments (N) (TRTSEQAN); within a study each TRTSEQAN value must\
+  \ map to one TRTSEQA value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTSEQA) and var_exists("TRTSEQAN") and is_inconsistent_across_dataset(TRTSEQA,
+    keys=[TRTSEQAN])
+Outcome:
+  Message: "TRTSEQA is not the same value across all records with the same TRTSEQAN."
+  Output_Variables:
+  - "TRTSEQA"
+  - "TRTSEQAN"
+Source:
+  Message: "Inconsistent value for TRTSEQA"
+  Description: "Within a study, all Actual Sequence of Treatment (TRTSEQA) variable\
+    \ values must be the same for each unique value of Actual Sequence of Treatments\
+    \ (N) (TRTSEQAN) when the primary variable TRTSEQA is populated."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0229"
+        Version: "1"
+      Version: "6.0"

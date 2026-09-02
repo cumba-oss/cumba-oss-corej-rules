@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2348 expect=violation domain=TX
+#note "TXSEQ 1 appears twice within the TX dataset (once per trial set, but uniqueness is dataset-wide because TX has no USUBJID) -> both duplicate records fire."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 TXSEQ=1
+#expectViolationAt row=3 TXSEQ=1
+dataset TX class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S1 | TX | SET1 | 1 | SPGRPCD | 1
+S1 | TX | SET1 | 2 | GRPLBL  | Control
+S1 | TX | SET2 | 1 | SPGRPCD | 2

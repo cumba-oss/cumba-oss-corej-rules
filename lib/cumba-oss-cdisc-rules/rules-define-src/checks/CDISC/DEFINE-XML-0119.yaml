@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0119"
+Sheet_Rule_Identifier: "119"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "ArchiveLocationID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "def:ArchiveLocationID is required when ODM@def:Context='Submission' and def:HasNoData is not present."
+Message: "def:ArchiveLocationID is missing for ItemGroupDef when def:Context='Submission' and def:HasNoData is not present."
+Check:
+  kind: "exists"
+  target: "@ArchiveLocationID"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - not:
+        path: "@HasNoData"
+        equals: "Yes"

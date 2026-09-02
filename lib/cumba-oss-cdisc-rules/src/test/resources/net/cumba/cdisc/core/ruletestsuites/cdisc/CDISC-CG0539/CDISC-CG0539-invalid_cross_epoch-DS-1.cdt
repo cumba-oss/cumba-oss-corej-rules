@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0539 expect=violation domain=DS
+# Rule:Description: Raise an error when a subject has more than one Disposition Event record (DSCAT equals 'DISPOSITION EVENT') per Epoch (EPOCH) and more than one of those records has Subcategory for Disposition Event (DSSCAT) equal to 'STUDY TREATMENT'.
+#note "D16 case B -- the whole substance of removing EPOCH from the is_not_unique_set key, and the only scenario in this rule's set whose verdict that conjunct alone decides. One subject, three DISPOSITION EVENT records: two in SCREENING (DSSCAT=STUDY TREATMENT and DSSCAT=STUDY PARTICIPATION) and one in TREATMENT (DSSCAT=STUDY TREATMENT). The sheet's Rule is per SUBJECT -- 'No more than 1 record per subject has DSSCAT = STUDY TREATMENT' -- and this subject has two such records, so it is a real violation. Leaf by leaf on row 1: the gate record_count(DSCAT, filter=DSCAT='DISPOSITION EVENT', group=[USUBJID, EPOCH]) is 2 for (01-701-1015, SCREENING) so '> 1' holds -- the gate is the sheet's Condition and stays PER EPOCH, unchanged by D16; DSSCAT equals the literal STUDY TREATMENT; and the uniqueness tuple, now (DSSCAT, USUBJID), repeats across rows 1 and 3, so row 1 is flagged. Row 3 is NOT flagged because its epoch (TREATMENT) holds only one disposition record, so the gate is false there -- hence exactly one finding, not two. Row 2 fails the DSSCAT literal. BEFORE D16 the tuple was (DSSCAT, USUBJID, EPOCH): (STUDY TREATMENT, subject, SCREENING) and (STUDY TREATMENT, subject, TREATMENT) are distinct, nothing was a duplicate, and the rule was SILENT on a violation of its own sheet Rule. This fixture is RED against the pre-D16 rule. EPOCH is PRESENT on every row here, so the EPOCH exists guard that D17 removes would have passed either way -- this fixture isolates D16 and says nothing about D17."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1 USUBJID=01-701-1015
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSCAT  type=Char label="Subcategory for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY TREATMENT | SCREENING
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY PARTICIPATION | SCREENING
+CDISCPILOT01 | DS | 01-701-1015 | 3 | DISPOSITION EVENT | STUDY TREATMENT | TREATMENT
+---

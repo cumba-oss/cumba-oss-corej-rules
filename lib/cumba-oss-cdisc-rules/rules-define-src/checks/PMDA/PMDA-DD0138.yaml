@@ -1,0 +1,23 @@
+Rule_Id: "PMDA-DD0138"
+Sheet_Rule_Identifier: "DD0138"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The referenced standard (name and version) is not valid or could not be found."
+# Wildcard scope (PMDA-DD0071 precedent): the generic "Referenced Standard is
+# missing" leg - any def:StandardOID (per DD0139 these appear only on
+# ItemGroupDef and CodeList) must resolve to a def:Standard. Overlaps the
+# per-carrier PMDA rows DD0122 (ItemGroupDef leg) and the existence portion of
+# DD0125 (CodeList/Type=CT leg); the intra-PMDA overlap is recorded in the
+# crossref return. The catalogue-validation nuance of "(name and version) is
+# not valid" (is the Name+Version a real published standard?) needs the CDISC
+# Library standards catalogue and is out of scope (CDISC-0263 gap precedent);
+# only the reference-resolution slice is authored here.
+Message: "Referenced Standard is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "StandardOID"
+  targetElement: "Standard"
+  targetKey: "OID"

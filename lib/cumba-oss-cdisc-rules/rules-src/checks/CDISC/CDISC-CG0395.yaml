@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0395"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESMIE is populated and its value is not 'Y' or\
+  \ 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESMIE"
+Check:
+  expression: >-
+    not empty(AESMIE) and AESMIE not in ["Y", "N"]
+Outcome:
+  Message: "AESMIE is populated, but its value is not 'Y' or 'N'."
+  Output_Variables:
+  - "AESMIE"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--SMIE"
+  Condition: "--SMIE ^= null"
+  Rule: "--SMIE in ('Y','N')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0395"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0395"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0395"
+        Version: "1"
+      Version: "2.0"

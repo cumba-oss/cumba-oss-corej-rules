@@ -1,0 +1,15 @@
+#!RuleTest
+#test DRAFT-900025 expect=violation domain=DM
+#note "ARMCD binds codelist CL.ARM (A1/'Arm One', A2/'Arm Two'). Partner resolution: ARMCD strips suffix CD -> ARM exists as a column, binds no codelist (verdict UNKNOWN) -> suffix path accepts. Row 2: code A2 is a term, decode expectation 'Arm Two' != 'Wrong Arm' -> fires once; row 1 matches."
+#library standard=sdtmig version=3-4
+#define-xml DRAFT-900025-define.xml
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=ARMCD variable_value=A2
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+---
+S1 | 001 | A1 | Arm One
+S1 | 002 | A2 | Wrong Arm

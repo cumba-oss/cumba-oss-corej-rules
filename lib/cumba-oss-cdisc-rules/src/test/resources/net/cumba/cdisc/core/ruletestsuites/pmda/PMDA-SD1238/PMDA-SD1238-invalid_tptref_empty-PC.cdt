@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1238 expect=violation domain=PC
+#note "Row 1: PCRFTDTC populated with PCTPTREF empty -> fires. Row 2: both populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PCRFTDTC=2020-01-02T08:00
+dataset PC class=FINDINGS
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col PCSEQ     type=Num
+col PCTESTCD  type=Char
+col PCTPTREF  type=Char
+col PCRFTDTC  type=Char
+---
+S1 | PC | 001 | 1 | DRUGA |      | 2020-01-02T08:00
+S1 | PC | 001 | 2 | DRUGA | DOSE | 2020-01-02T08:00

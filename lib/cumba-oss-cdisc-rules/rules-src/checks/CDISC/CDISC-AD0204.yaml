@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-AD0204"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a subject, DM has a value for AGE and ADSL.AGE\
+  \ does not equal that value"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Name: "DM"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    var_exists(DM.AGE) and AGE != DM.AGE
+Outcome:
+  Message: "For this subject, ADSL.AGE does not equal DM.AGE"
+  Output_Variables:
+  - "AGE"
+  - "DM.AGE"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "AGE"
+  Natural_Language_Rule_Failure_Criteria: "The value of ADSL.USUBJID is equal to the\
+    \ value of DM.USUBJID and ADSL.AGE is not equal to DM.AGE"
+  Rule_Failure_Criteria: "ADSL.AGE is not equal to DM.AGE"
+  Condition_Failure: "The value of ADSL.USUBJID is equal to the value of DM.USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR204"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR204"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR204"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR204"
+        Version: "1"
+      Version: "5.0"

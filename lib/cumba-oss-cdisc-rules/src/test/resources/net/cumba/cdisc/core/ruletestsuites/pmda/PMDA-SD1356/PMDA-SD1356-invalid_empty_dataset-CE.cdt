@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1356 expect=violation domain=CE
+#note "FRESH, DISCRIMINATING - presence-on-empty: CE with the same 6 columns INCLUDING RELMIDS and ZERO data rows, no TM. The Check is dataset-constant presence and the broadcast fold decides BEFORE the zero-column substitution -> ONE violation at reported row=1: an empty CE still DECLARES the RELMIDS variable while the study lacks TM. If anything else comes back, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ   type=Num  label="Sequence Number"
+col CETERM  type=Char label="Reported Term for the Clinical Event"
+col RELMIDS type=Char label="Temporal Relation to Milestone Instance"
+---
+---

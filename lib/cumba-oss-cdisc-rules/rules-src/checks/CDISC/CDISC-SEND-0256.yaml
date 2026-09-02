@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0256"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Evaluator (QEVAL) is populated on a record whose\
+  \ Origin (QORIG) is COLLECTED or DERIVED; QEVAL is used only for subjective results\
+  \ and must be empty for objectively collected or derived data."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Check:
+  expression: >-
+    upper(QORIG) in ["COLLECTED", "DERIVED"] and not empty(QEVAL)
+Outcome:
+  Message: "QEVAL is populated for a record with objectively collected or derived\
+    \ data (QORIG is COLLECTED or DERIVED); QEVAL must be empty."
+  Output_Variables:
+  - "QNAM"
+  - "QORIG"
+  - "QEVAL"
+Source:
+  Class: "REL"
+  Domain: "SUPP--"
+  Variable: "QEVAL"
+  Plain_Text_Explanation: "QEVAL is null for records that contain objectively collected\
+    \ or derived data."
+  Condition: "Records that contain objectively collected or derived data"
+  Rule: "QEVAL = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND256"
+        Version: "1"
+      Version: "5.0"

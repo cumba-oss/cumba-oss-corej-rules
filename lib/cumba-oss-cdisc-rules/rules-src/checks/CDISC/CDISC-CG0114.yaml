@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0114"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Dose Units (--DOSU) is empty but Dose per Administration\
+  \ (--DOSE), Dose Description (--DOSTXT) or Total Daily Dose (--DOSTOT) is provided."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DOSU"
+Check:
+  expression: >-
+    empty(--DOSU) and (var_exists("--DOSE") and not empty(--DOSE) or var_exists("--DOSTXT") and not
+    empty(--DOSTXT) or var_exists("--DOSTOT") and not empty(--DOSTOT))
+Outcome:
+  Message: "--DOSU is empty when --DOSE, --DOSTXT or --DOSTOT is provided."
+  Output_Variables:
+  - "--DOSE"
+  - "--DOSTXT"
+  - "--DOSU"
+  - "--DOSTOT"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--DOSU"
+  Condition: "--DOSE ^= null or --DOSTOT ^= null or --DOSTXT ^= null"
+  Rule: "--DOSU ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0114"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0114"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0114"
+        Version: "1"
+      Version: "2.0"

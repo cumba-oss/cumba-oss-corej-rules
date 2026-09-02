@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0647 expect=skipped domain=ADAE
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. Pins the MACHINE-DERIVED guard: the shipped Check reads '... and var_exists(TRTEMFL) and TRTEMFL != Y' because NonEmptyGuardInliner arm 5 wraps a negative comparison against a string literal, and that conjunct folds FALSE on an absent column, so the rule EXECUTES and stays silent. That guard is DERIVED - it must never be written into the rule. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ASEQ     type=Num
+col AEDECOD  type=Char
+col TREM01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y

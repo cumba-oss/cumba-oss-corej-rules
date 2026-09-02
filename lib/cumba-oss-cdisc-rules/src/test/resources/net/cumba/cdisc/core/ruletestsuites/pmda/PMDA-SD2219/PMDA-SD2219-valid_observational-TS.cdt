@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2219 expect=noViolation domain=TS
+#note "STYPE record present but TSVAL='OBSERVATIONAL' -> $interventional_count=0 (TSVAL filter key fails - exact-match AND) -> condition branch false -> silent."
+#library standard=sdtmig version=3-4
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S1 | TS | 1 | STYPE | Study Type | OBSERVATIONAL
+S1 | TS | 2 | TTYPE | Trial Type | NATURAL HISTORY

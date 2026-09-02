@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0006 expect=noViolation domain=ADSL
+#note "Rows 1,2 in the allowed set {0,1}; row 3 (SAS missing '.') caught by not empty(value()). Rule executes, stays silent."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ONTRTFN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 0
+CDISCPILOT01 | 01-701-1023 | 1
+CDISCPILOT01 | 01-701-1034 | .

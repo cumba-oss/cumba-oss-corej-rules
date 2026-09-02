@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0294 expect=violation domain=ADAE
+#note "KEY=AETOXGR (2nd arg), DEPENDENT=AETOXGRN (1st arg): key GRADE1 carries {1,2} -> rows 1,2 fire; key GRADE3 is single-valued. Record granularity -> 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 AETOXGR=GRADE1 AETOXGRN=1
+#expectViolationAt row=2 USUBJID=01-701-1023 AETOXGR=GRADE1 AETOXGRN=2
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEDECOD  type=Char
+col AETOXGR  type=Char
+col AETOXGRN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | GRADE1 | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | GRADE1 | 2
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | GRADE3 | 3

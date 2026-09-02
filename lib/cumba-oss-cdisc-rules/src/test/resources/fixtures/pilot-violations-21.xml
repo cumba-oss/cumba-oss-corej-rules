@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deliberately broken 2.1 fixture: each pilot rule fires at least once.
+     0004: CreationDateTime not ISO 8601. 0006: ODMVersion missing.
+     0011: two Study children. 0017: def:Context invalid.
+     0044: Collected/Investigator DocumentRef without PDFPageRef.
+     0063: duplicate xml:lang under one Description.
+     0065: ItemRef ItemOID dangles. 0230: OID "DUP.1" reused. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pilot-bad"
+     FileType="Snapshot"
+     CreationDateTime="03.07.2026 10:15"
+     def:Context="Wrong">
+  <Study OID="DUP.1">
+    <GlobalVariables>
+      <StudyName>PILOT-BAD</StudyName>
+      <StudyDescription>Broken pilot fixture</StudyDescription>
+      <ProtocolName>PILOT-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="DUP.1" Name="Broken MDV" def:DefineVersion="2.1.0">
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" SASDatasetName="DM"
+                    Domain="DM" Purpose="Tabulation">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+          <TranslatedText xml:lang="en">Demographics again</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.MISSING" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text">
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+  <Study OID="ST.SECOND">
+    <GlobalVariables>
+      <StudyName>SECOND</StudyName>
+      <StudyDescription>Second study to violate cardinality</StudyDescription>
+      <ProtocolName>PILOT-03</ProtocolName>
+    </GlobalVariables>
+  </Study>
+</ODM>

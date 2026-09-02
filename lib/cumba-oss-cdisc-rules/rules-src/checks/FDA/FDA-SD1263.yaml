@@ -1,0 +1,128 @@
+Core:
+  Id: "FDA-SD1263"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a microorganism has been identified (MBTESTCD equal\
+  \ to 'ORGANISM') but the Result Category (MBRESCAT) is not populated, excluding\
+  \ records where MBSTRESC equals 'NO GROWTH' or MBMETHOD equals 'GRAM STAIN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MB"
+Requirements:
+  Variables:
+    All:
+    - "MBRESCAT"
+    - "MBTESTCD"
+    - "MBMETHOD"
+Check:
+  expression: >-
+    MBTESTCD == "ORGANISM" and not equalsIgnoreCase(MBSTRESC, "NO GROWTH") and MBMETHOD !=
+    "GRAM STAIN" and empty(MBRESCAT)
+Outcome:
+  Message: "MBRESCAT is empty when MBTESTCD equals 'ORGANISM'."
+  Output_Variables:
+  - "MBTESTCD"
+  - "MBSTRESC"
+  - "MBRESCAT"
+  - "MBMETHOD"
+Source:
+  FDA_Validator_Rule_Message: "MBRESCAT is null when MBTESTCD = 'ORGANISM'"
+  FDA_Validator_Rule_Description: "MBRESCAT is expected to be populated in all records\
+    \ where a microorganism has been identified (MBTESTCD = 'ORGANISM'), excluding\
+    \ records where MBSTRESC equals 'NO GROWTH' or MBMETHOD equals 'GRAM STAIN'."
+  Domains: "MB"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1263"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0193"
+        Version: "2"
+      Version: "2.0"

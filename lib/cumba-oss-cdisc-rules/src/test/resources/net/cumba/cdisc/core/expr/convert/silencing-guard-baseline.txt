@@ -1,0 +1,77 @@
+# Silencing-guard ratchet baseline (SilencingGuardHoistGateTest). One line per
+# src-file|Core.Id|guarded-vars still authored in the old Check-guard form (R-4.11;
+# R-4.11a-required and '*'-wildcard pair guards are excluded by the classifier and
+# never listed). The set may only SHRINK - delete lines as families are migrated to
+# Scope.Variables.Include. See plans/PLAN-generator-silencing-guard-hoist.md.
+# 2026-07-24: the whole backlog was migrated (41 rules across ADaM/SEND/PMDA/FDA/
+# DRAFT/CG) - this baseline is EMPTY and the gate is effectively a zero-assert.
+#
+# 2026-07-31 (PLAN-absent-column-guard-backlog P3a): 37 entries added for 10 rules.
+# These are the R-4.11 escape hatch, not backlog: the Check `exists` leaf is
+# PYTHON-LOAD-BEARING and must NOT be hoisted away.
+#
+# Since EC-38 / Fix #128 the fork evaluates an absent target as all-missing and lets
+# each operator compute its own polarity, so a NEGATED class-V leaf — which is what
+# these rules ship as (`not is_integer(TSVAL)`, `not contains_all(TSPARMCD, …)`) —
+# FIRES on every row of an absent column in BOTH engines. Measured 2026-07-31:
+#   Java  : not is_integer(TSVAL) with TSVAL absent -> {0, 1}
+#   Python: is_not_integer({"target": "TSVAL"})     -> [True, True]
+# Python reads no part of Scope.Variables (Rule.from_cdisc_metadata reads Scope.Classes,
+# Domains, Entities, Use_Case, Data_Structures, Subclasses - never Variables), so hoisting
+# the leaf out of the Check
+# would leave Python unguarded while Java skips — a parity divergence. Both halves are
+# required; the Scope.Variables entry is present too, for the auditable SKIPPED verdict.
+#
+# R-4.11a's PYTHON_GUARD_REQUIRED_OPERATORS carve-out in SilencingGuardScan lists only
+# the three class-D operators and so does not cover this case. See
+# CORE-RULES-GUARD-MATRIX.md (revised 2026-07-31, class V) and the plan's §7 / P2.
+# 2026-08-11 (wave 33): the scan moved from the deleted rules-legacy/ corpus to
+# rules-src/checks - the same authored Check surface, read directly. The first field
+# is now the rules-src path (FAMILY/CORE-nnn.yaml), not a package file, and the ~3.8x
+# IG-version package fan-out collapses to ONE line per rule. Lossless: in every prior
+# baseline the distinct Core.Id count already equalled the distinct id|vars count.
+# See plans/PLAN-cut-rules-legacy.md.
+# 2026-08-22 (Fix #340, EC-86 / M3-D18 / M2-D24 (iii)): the 4 EQ-0468 entries added at
+# wave TA-6 (CDISC-CG0462 / CORE-000217 / FDA-SD1279 / PMDA-SD1279 | ECDOSE) are DELETED.
+# Fix #340 removed the `var_exists("ECDOSE") and empty(ECDOSE)` guards from those four
+# rules outright - the ruling forbids the hand-authored shape - so the entries went stale
+# and the ratchet's stale half required their removal. The set SHRANK, as the note says.
+# 2026-08-23 (Plan A Phase 1, Fix #352, D-8 / ruling 3): the 2 AD0054 entries
+# (CDISC-AD0054 / PMDA-AD0054 | USUBJID) are DELETED. SilencingGuardScan no longer
+# distinguishes the `name` position from a `value` member for is_(not_)unique_set - the
+# engine builds ONE key tuple and drops an absent member uniformly (EC-53), so the keyless
+# `is_not_unique_set(USUBJID)` guard is class-D REQUIRED, hidden by the carve-out, and now
+# recorded in silencing-guard-carveout-grouping-key-baseline.txt. Nothing in the corpus moved.
+# Before/after: 12 -> 10 entries here.
+CDISC/CDISC-CG0284.yaml|CDISC-CG0284|TSVAL
+CDISC/CDISC-CG0287.yaml|CDISC-CG0287|TSPARMCD
+CDISC/CDISC-SEND-0247.yaml|CDISC-SEND-0247|TSPARMCD
+CORE/CORE-000740.yaml|CORE-000740|TSPARMCD
+FDA/FDA-SD1221.yaml|FDA-SD1221|TSVAL
+FDA/FDA-SD2246.yaml|FDA-SD2246|TSVAL
+FDA/FDA-SD2249.yaml|FDA-SD2249|TSVAL
+PMDA/PMDA-SD1221.yaml|PMDA-SD1221|TSVAL
+PMDA/PMDA-SD2246.yaml|PMDA-SD2246|TSVAL
+PMDA/PMDA-SD2249.yaml|PMDA-SD2249|TSVAL
+#
+# 2026-08-26 (PLAN-retire-corpus-transforms phase 4): CDISC-AD0591's guard is
+# DELIBERATELY LOAD-BEARING IN THE CHECK and cannot be hoisted: the rule is an
+# unresolved `&VAR` template (a genuine T3 engine gap — see
+# AdamGapRevalidationG2ProbeTest), and the loader's Requirements R-gate REJECTS an
+# expansion token in Requirements.Variables.All ("the scope gate runs before
+# expansion and would match the token literally"). The guard was previously baked
+# into rules/ by the retired corpus guard pass; it is now authored, keeping the
+# template a silent no-op instead of a mis-firing literal-column comparison.
+CDISC/CDISC-AD0591.yaml|CDISC-AD0591|&VAR
+#
+# 2026-08-26 (PLAN-retire-corpus-transforms phase 4): the AESMIE guard on the three
+# SUPPAE-primary twins is JOIN-SOURCED and deliberately load-bearing in the Check.
+# AESMIE reaches the rule only through the Match_Datasets join to AE, so a
+# Requirements.Variables.All gate — which tests the PRIMARY dataset before the join —
+# would skip the rule on every SUPPAE dataset (AESMIE is never a SUPPAE column),
+# silencing a live rule. The Check-level guard evaluates on the POST-join table,
+# which is the only surface that can see the column. (Measured: hoisting these
+# SKIPPED the three rules on testdata/study and failed their AE-carrying scenarios.)
+CDISC/CDISC-CG0043.yaml|CDISC-CG0043|AESMIE
+CORE/CORE-000597.yaml|CORE-000597|AESMIE
+FDA/FDA-SD1143.yaml|FDA-SD1143|AESMIE

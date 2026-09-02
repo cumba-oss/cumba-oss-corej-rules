@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-AD0865"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RACE is populated and RACEN is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "RACEN"
+Check:
+  expression: >-
+    not empty(RACE) and empty(RACEN)
+Outcome:
+  Message: "RACE is populated, but RACEN is not populated."
+  Output_Variables:
+  - "RACE"
+  - "RACEN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "RACEN"
+  Natural_Language_Rule_Failure_Criteria: "RACE is populated and RACEN is not populated"
+  Rule_Failure_Criteria: "RACEN is not populated"
+  Condition_Failure: "RACE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR865"
+        Version: "1"
+      Version: "5.0"

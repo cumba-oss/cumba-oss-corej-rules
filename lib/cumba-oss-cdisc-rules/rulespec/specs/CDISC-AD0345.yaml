@@ -1,0 +1,46 @@
+name: CDISC-AD0345
+kind: rule
+description: |
+  Wave B1 port - T1b PlainIntermediate.
+  CDISC-AD0345: Within a parameter, there is more than one value of ANRHIC for a given value of ANRHI.
+  Inverse of CDISC-AD0344 - ANRHI must uniquely determine ANRHIC. Bare-leaf
+  Check at root - Python KeyError; baseline Python lane with Java expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0345)
+rule:
+  coreId: CDISC-AD0345
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN, ANRHI, ANRHIC]
+    column_types:
+      AVISITN: LONG
+      ANRHI: DOUBLE
+    rows:
+      # PARAMCD=HGB: ANRHI=17.0 maps to two distinct ANRHIC ('17 g/dL' vs 'high-a') -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ANRHI: 17.0, ANRHIC: 17 g/dL}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, ANRHI: 17.0, ANRHIC: high-a}
+      # PARAMCD=HGB: ANRHI=18.0 consistent
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, ANRHI: 18.0, ANRHIC: 18 g/dL}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0345
+    dataset: ADLB
+    row_key: {ANRHI: 17.0, ANRHIC: 17 g/dL, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ANRHI: '17'
+      ANRHIC: 17 g/dL
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0345
+    dataset: ADLB
+    row_key: {ANRHI: 17.0, ANRHIC: high-a, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ANRHI: '17'
+      ANRHIC: high-a
+      PARAMCD: HGB
+expected_errors: []

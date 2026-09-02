@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0350 expect=noViolation domain=ADLBC
+#note "A1HIC absent -> not empty(A1HIC) is broadcast false; the rule executes and stays silent although the degraded key would flag row 3."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col A1HI type=Num
+---
+S1 | 001 | SYSBP | SystolicBP | 160
+S1 | 002 | SYSBP | SystolicBP | 160
+S1 | 003 | SYSBP | SystolicBP | 180

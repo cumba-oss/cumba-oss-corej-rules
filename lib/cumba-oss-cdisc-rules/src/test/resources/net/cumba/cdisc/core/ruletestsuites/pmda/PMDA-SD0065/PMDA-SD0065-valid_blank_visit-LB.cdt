@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD0065 expect=noViolation domain=LB
+#note "H4 (ruled 2026-08-19, VISITNUM measured Exp/Perm - never Req - in the validated scope, so the tuple keeps VISIT): the new not empty(VISIT) conjunct silences the blank-VISIT over-fire. Row 2's visit IS in SV (USUBJID 001 / VISITNUM 2 / WEEK 2); only its VISIT cell is blank on this record, and the raw tuple probe ['001','','2'] would never match - the rule stays silent instead of reporting a visit that exists."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT  type=Char label="Completion Status"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT   type=Char label="Visit Name"
+---
+S1 | LB | 001 | 1 | ALB |  | 1 | SCREENING
+S1 | LB | 001 | 2 | ALB |  | 2 |
+---
+
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Visit"
+---
+S1 | SV | 001 | 1 | SCREENING | 2020-01-01
+S1 | SV | 001 | 2 | WEEK 2    | 2020-01-15

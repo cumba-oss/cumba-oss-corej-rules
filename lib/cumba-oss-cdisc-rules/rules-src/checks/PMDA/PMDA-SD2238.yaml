@@ -1,0 +1,124 @@
+Core:
+  Id: "PMDA-SD2238"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STTPT does not have the same value across records\
+  \ with the same values of USUBJID and --STDTC."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "DE"
+    - "DT"
+    - "DX"
+    - "EC"
+    - "HO"
+    - "PR"
+Requirements:
+  Variables:
+    All:
+    - "--STTPT"
+Check:
+  expression: >-
+    var_exists("USUBJID") and var_exists("--STDTC") and is_inconsistent_across_dataset(--STTPT,
+    keys=[USUBJID, --STDTC])
+Outcome:
+  Message: "Inconsistent value for --STTPT within USUBJID and --STDTC"
+  Output_Variables:
+  - "--STDTC"
+  - "--STTPT"
+Source:
+  Message: "Inconsistent value for --STTPT"
+  Description: "Start Reference Time Point (--STTPT) value must be consistent for\
+    \ all records with same Subject (USUBJID) and Start Date/Time (--STDTC) values."
+  Domains: "INTERVENTIONS (-DX, -EC, -PR), EVENTS (-DE, -DT, -HO)"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2238"
+        Version: "1"
+      Version: "1.6"

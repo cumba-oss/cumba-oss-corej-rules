@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1010 expect=skipped domain=SE
+#note "DELIBERATELY NO ETCD COLUMN (ETCD is Required in SE; this dataset is deliberately malformed to isolate the guard). Requirements.Variables.All: [ELEMENT] is satisfied so the rule executes; the shipped expression's leading machine-emitted var_exists(\"ETCD\") conjunct folds FALSE and short-circuits the AND -> no violation. Positive-comparison-operand arm of the absent-column guard family. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | 001 | 1 | Unscheduled Run-in | 2020-01-10

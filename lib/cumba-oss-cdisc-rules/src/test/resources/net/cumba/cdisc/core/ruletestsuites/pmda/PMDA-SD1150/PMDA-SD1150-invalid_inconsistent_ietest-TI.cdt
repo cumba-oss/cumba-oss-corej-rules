@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1150 expect=violation domain=TI
+#note "Group (IETESTCD=INCL01, TIVERS=1) holds two distinct non-blank IETEST values, one row each - a TIE - and on a tie is_inconsistent_across_dataset flags EVERY non-blank row of the group. Row 3 is a different group and is silent."
+#expectViolationCount 2
+#expectViolationAt row=1 IETESTCD=INCL01 IETEST="Age 18 years or older" TIVERS=1
+#expectViolationAt row=2 IETESTCD=INCL01 IETEST="Age at least 18 years" TIVERS=1
+#library standard=sdtmig version=3-4
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+col TIVERS   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older | 1
+S1 | TI | INCL01 | Age at least 18 years | 1
+S1 | TI | EXCL01 | Pregnant or nursing   | 1

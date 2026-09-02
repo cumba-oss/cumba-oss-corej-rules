@@ -1,0 +1,86 @@
+Core:
+  Id: "CDISC-SEND-0264"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Result or Finding in Original Units (--ORRES) is\
+  \ empty but Character Result/Finding in Std Format (--STRESC) is populated; --STRESC\
+  \ is derived from --ORRES and must be empty when --ORRES is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ORRES"
+    - "--STRESC"
+Check:
+  expression: >-
+    empty(--ORRES) and not empty(--STRESC)
+Outcome:
+  Message: "--STRESC is populated when --ORRES is empty; --STRESC is derived from\
+    \ --ORRES and must be empty when --ORRES is empty."
+  Output_Variables:
+  - "--ORRES"
+  - "--STRESC"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESC"
+  Plain_Text_Explanation: "The variable, --STRESC, is derived either by the conversion\
+    \ of values in --ORRES to values with standard units, or by the assignment of\
+    \ the value of --ORRES."
+  Condition: "--ORRES = null"
+  Rule: "--STRESC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND264"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1360 expect=noViolation domain=DM
+#note "Row 1: both arm codes populated, ARMNRS empty -> ok. Row 2: subject assigned but never treated (ACTARMCD empty) so ARMNRS is legitimately populated -> must NOT fire. Row 3: neither arm code populated, ARMNRS populated -> ok."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+S1 | DM | 001 | A | A |
+S1 | DM | 002 | A |   | ASSIGNED, NOT TREATED
+S1 | DM | 003 |   |   | SCREEN FAILURE

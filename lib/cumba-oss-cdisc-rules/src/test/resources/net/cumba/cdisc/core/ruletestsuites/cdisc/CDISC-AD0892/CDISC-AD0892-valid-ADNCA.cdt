@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0892 expect=noViolation domain=ADNCA
+# Rule:Description: Raise an error when, within the study, an ADNCA v1.0 dataset has more than one value of COHORT for a given value of COHORTN (considering only rows on which both variables are populated).
+dataset ADNCA
+col STUDYID type=Char
+col USUBJID type=Char
+col COHORT type=Char
+col COHORTN type=Char
+col PARAMCD type=Char
+col NFRLT type=Num
+col AFRLT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1 | CONC | 0 | 0.5
+CDISCPILOT01 | 01-701-1023 | 2 | 2 | CONC | 0 | 0.5
+CDISCPILOT01 | 01-701-1015 | 1 | 1 | CONC | 0 | 0.5
+---

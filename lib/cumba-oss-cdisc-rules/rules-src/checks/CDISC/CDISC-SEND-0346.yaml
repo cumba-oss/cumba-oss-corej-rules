@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0346"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record in the Trial Summary (TS) dataset\
+  \ has TSPARMCD equal to 'STDIR' (Study Director)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$stdir_count"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"STDIR\"))"
+Check:
+  expression: >-
+    TSPARMCD == "STDIR" and $stdir_count > 1
+Outcome:
+  Message: "More than one record with TSPARMCD equal to 'STDIR' exists in the Trial\
+    \ Summary (TS) dataset."
+  Output_Variables:
+  - "TSPARMCD"
+  - "$stdir_count"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "Only a single record for TSPARM Study Director should exist."
+  Rule: "Only one record with TSPARMCD = STDIR exists"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND346"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND346"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND346"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND346"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND346"
+        Version: "1"
+      Version: "5.0"

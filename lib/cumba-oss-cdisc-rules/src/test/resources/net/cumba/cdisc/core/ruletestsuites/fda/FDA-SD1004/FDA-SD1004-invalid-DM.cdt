@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1004 expect=violation domain=DM
+#note "ARMCD on row 2 is 21 characters, one past the 20-character limit -> fires; the 20-character row 1 is the passing boundary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ARMCD=PLACEBO-RUN-IN-ARM-AB
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | PLACEBO-RUN-IN-ARM-A | Placebo run-in arm A
+S1 | DM | 002 | PLACEBO-RUN-IN-ARM-AB | Placebo run-in arm AB

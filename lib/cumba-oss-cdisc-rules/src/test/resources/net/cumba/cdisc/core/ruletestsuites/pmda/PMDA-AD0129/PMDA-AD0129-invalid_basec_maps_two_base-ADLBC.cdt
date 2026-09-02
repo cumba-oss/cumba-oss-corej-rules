@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0129 expect=violation domain=ADLBC
+#note "Dependent BASE, key BASEC, within=PARAMCD (M2-P1 / Fix #302 dropped the USUBJID component). Same subject and parameter, so one partition under either spelling and the verdict is unchanged. Key NORMAL carries two distinct dependents {120, 130}, so BOTH populated rows holding it fire; key HIGH carries one. Single pin of D.13's flag-every-populated-row contract - count 2 for a two-row disagreement."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=SYSBP BASE=120 BASEC=NORMAL
+#expectViolationAt row=2 PARAMCD=SYSBP BASE=130 BASEC=NORMAL
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE    type=Num
+col BASEC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 120 | NORMAL
+CDISCPILOT01 | 01-701-1015 | SYSBP | 130 | NORMAL
+CDISCPILOT01 | 01-701-1015 | SYSBP | 140 | HIGH

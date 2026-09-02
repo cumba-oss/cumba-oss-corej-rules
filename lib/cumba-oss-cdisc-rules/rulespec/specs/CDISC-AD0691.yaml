@@ -1,0 +1,39 @@
+name: CDISC-AD0691
+kind: rule
+description: |
+  Wave C3 port — T2-Grouping (Sensitivity=Group). MDBDS class scope.
+  CDISC-AD0691: within (USUBJID, PARAMCD, SPDEVID), BASE populated and
+  no ABLFL=Y record → fire. Output_Variables: BASE, ABLFL.
+python_source: rules-adamig-1-3.json (CDISC-AD0691)
+rule:
+  coreId: CDISC-AD0691
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, SPDEVID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # Group OK: ABLFL=Y present
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, AVISITN: 0, ABLFL: Y, BASE: '13.5'}
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASE: '13.5'}
+      # Group BAD: BASE populated, no ABLFL=Y
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, AVISITN: 0, ABLFL: '', BASE: '14.0'}
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASE: '14.0'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    medical device basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0691
+    dataset: ADLB
+    row_key: {AVISITN: 0, PARAMCD: HGB, SPDEVID: D2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ablfl_y_count: '0'
+      ABLFL:
+      BASE: '14.0'
+      PARAMCD: HGB
+      SPDEVID: D2
+expected_errors: []

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0005 expect=violation domain=LB
+#note "USUBJID empty on all rows (branch 1 gated out by `not empty(USUBJID)`). Rows 1/2: the (DOMAIN, POOLID, LBSEQ) tuple duplicates -> both fire via the POOLID branch. Row 3: different POOLID -> clean. POOLID is a General-Observations model Identifier."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 POOLID=P1
+#expectViolationAt row=2 POOLID=P1
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col POOLID   type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+---
+S1 | LB |  | P1 | 1 | ALB
+S1 | LB |  | P1 | 1 | GLUC
+S1 | LB |  | P2 | 1 | ALB

@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD2272"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --ENDY is present in the dataset but --ENDTC is\
+  \ not present."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Check:
+  expression: >-
+    var_exists("--ENDY") and not var_exists("--ENDTC")
+Outcome:
+  Message: "--ENDY is present in the dataset but --ENDTC is not present."
+  Output_Variables:
+  - "--ENDY"
+Source:
+  Message: "Missing --ENDTC variable when --ENDY variable is present"
+  Description: "End Study Date/Time (--ENDTC) variable should be included into dataset\
+    \ when Study Day of End (--ENDY) variable is present."
+  Domains: "SPECIAL PURPOSE (-CO, -DM), INTERVENTIONS, FINDINGS, EVENTS, FINDINGS\
+    \ ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2272"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2272"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2272"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2272"
+        Version: "1"
+      Version: "1.6"

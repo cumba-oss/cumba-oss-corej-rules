@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0001 expect=noViolation domain=LB
+#note "Same shape as the invalid scenario, but the define's DOMAIN CodedValue LB carries alias C11111, which IS in the library's published domain codes {C11111, C22222} -> silent."
+#library standard=sdtmig version=3-4
+#library codelist-terms DOMAIN C11111 C22222
+#define-xml CDISC-CG0001-valid-define.xml
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+---
+S1 | LB | 001 | 1 | GLUC

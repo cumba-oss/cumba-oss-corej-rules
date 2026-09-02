@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0079 expect=noViolation domain=MH
+#note "Row 1: MHSTDTC before RFSTDTC -> ok. Row 2: MHSTDTC empty -> not empty(MHSTDTC) guard. Row 3: subject 002 with empty RFSTDTC -> null hull saturates the comparison FALSE."
+#library standard=sdtmig version=3-4
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHSTDTC type=Char label="Start Date/Time of Medical History Event"
+---
+S1 | MH | 001 | 1 | ASTHMA   | 2019-12-31
+S1 | MH | 001 | 2 | DIABETES |
+S1 | MH | 002 | 1 | ASTHMA   | 2020-05-01
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 |
+---

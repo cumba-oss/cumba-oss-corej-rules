@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE0011 expect=noViolation domain=PC
+#note "Row 1 has PCRFTDTC with a matching PCTPTREF; row 2 has no PCRFTDTC so the rule does not apply -> no violation."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCTPTREF type=Char label="Time Point Reference"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+S1 | PC | 001 | 1 | DRUGX | DOSE ADMINISTRATION | 2020-01-05T08:00
+S1 | PC | 001 | 2 | DRUGX |                     |

@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0492 expect=noViolation domain=ADLBC
+#note "DISCRIMINATING-adjacent. No SHIFT column at all; the tuple y=1 is still seeded by BASECAT1. WildcardExpander SYNTHESISES the unmatched pattern's concrete name SHIFT1 as an absent column, so an expansion EXISTS and the rule EXECUTES - var_exists(SHIFT1) is then false and it stays silent. Must be noViolation, not skipped: skipped would hide a broken synthesis step."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASECAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | LOW

@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-SEND-0413"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Developmental Milestone Test Results\
+  \ (DP) record exists for the same combination of Test Short Name (DPTESTCD), Unique\
+  \ Subject Identifier (USUBJID), and observation date (DPDTC); the DP domain expects\
+  \ one record per test per observation time per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DP"
+Check:
+  expression: >-
+    not is_unique_set([DPTESTCD, USUBJID, DPDTC])
+Outcome:
+  Message: "More than one DP record exists for the same test (DPTESTCD), subject (USUBJID),\
+    \ and observation date (DPDTC)."
+  Output_Variables:
+  - "DPTESTCD"
+  - "DPDTC"
+Source:
+  Class: "FND"
+  Domain: "DP"
+  Variable: "ALL"
+  Plain_Text_Explanation: "dp.xpt, Developmental Milestone Test Results — Findings.\
+    \ One record per test per observation time per subject, Tabulation."
+  Rule: "dp.xpt, Developmental Milestone Test Results — Findings. One record per test\
+    \ per observation time per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND413"
+        Version: "1"
+      Version: "5.0"

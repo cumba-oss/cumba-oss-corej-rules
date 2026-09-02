@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0074"
+Sheet_Rule_Identifier: "DD0074"
+Rule_Set: "PMDA"
+Element: "ValueListDef/ItemRef"
+Attribute: "Type"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "When Origin is provided at both the Variable and Value Level, then Origin Type values must match."
+# 0142's double-deref shape: scoped to def:ValueListDef/ItemRef, the left side
+# dereferences @ItemOID to the value-level ItemDef's Origin Type; the right
+# side walks to the parent def:ValueListDef, dereferences its @OID to the
+# def:ValueListRef carrying it and reads the enclosing variable-level ItemDef's
+# Origin Type. Either side missing => no finding ('when provided at both
+# levels'). First-match on both sides (0142's documented deviation for value
+# lists shared by several variables).
+Message: "Variable/Value Level Origin Type mismatch [${value}]"
+Check:
+  kind: "compare"
+  left: "@ItemOID->ItemDef@OID/Origin/@Type"
+  right: "../@OID->ValueListRef@ValueListOID/../Origin/@Type"

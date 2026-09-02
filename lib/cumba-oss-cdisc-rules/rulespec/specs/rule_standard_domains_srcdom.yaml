@@ -1,0 +1,54 @@
+name: rule_standard_domains_srcdom
+kind: rule
+description: |
+  EC-14 layer (i) parity — Java `standard_domains` mirror of Python's existing standard_domains
+  op. SRCDOM must be an SDTM domain name (or null). The Operation `standard_domains` builds
+  $sdtm_domains (the union of standard domain names, mocked via library_mocks.classes); the
+  Check fires when SRCDOM is populated AND is_not_contained_by that union. SRCDOM=DM passes
+  (a standard domain), SRCDOM=XX fires (custom), blank SRCDOM passes (the non_empty guard).
+  The adamig config keeps the Python model contribution empty (adamig is not in the SDTM
+  model family, so its curated model mock carries no dataset_names), so both engines see
+  exactly the mocked domain set. $sdtm_domains is left out of Output_Variables because Python
+  returns a sorted list while Java preserves insertion order — the membership check is
+  order-independent.
+rule:
+  id: standard-domains-srcdom
+  Core: {Id: EC14-STANDARD-DOMAINS}
+  Description: SRCDOM must be an SDTM domain name or null.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [ADAE]}
+  Requirements:
+    Variables: {All: [SRCDOM]}
+  Operations:
+    - id: $sdtm_domains
+      operator: standard_domains
+  Check:
+    all:
+      - {name: SRCDOM, operator: non_empty}
+      - {name: SRCDOM, operator: is_not_contained_by, value: $sdtm_domains}
+  Outcome:
+    Message: SRCDOM has a value that is not an SDTM domain name or null.
+    Output_Variables: [SRCDOM]
+datasets:
+  ADAE:
+    row_key: [USUBJID, SRCDOM]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', SRCDOM: DM}
+      - {STUDYID: S1, USUBJID: '002', SRCDOM: XX}
+      - {STUDYID: S1, USUBJID: '003', SRCDOM: ''}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    special_purpose: [DM]
+    events: [AE]
+expected_violations:
+  - rule_id: EC14-STANDARD-DOMAINS
+    dataset: ADAE
+    row_key: {USUBJID: '002', SRCDOM: XX}
+    status: SUCCESS
+    output_variables: {SRCDOM: XX}
+expected_errors: []

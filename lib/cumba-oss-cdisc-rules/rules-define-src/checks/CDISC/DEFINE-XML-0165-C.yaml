@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0165-C"
+Sheet_Rule_Identifier: "165"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+# Companion of DEFINE-XML-0165 (one sheet row, three rules): an
+# ExternalCodeList must not coexist with EnumeratedItem or CodeListItem
+# children (exclusive content choice; same fire-always vehicle as 0165-B).
+Plain_Text_Rule: "CodeList element must contain either one or more EnumeratedItem elements, one or more CodeListItem elements or one ExternalCodelist element."
+Message: "CodeList contains an ExternalCodeList element alongside EnumeratedItem or CodeListItem elements; it must contain only one of the three content forms."
+Check:
+  kind: "not_exists"
+  target: "ExternalCodeList"
+  when:
+    any:
+    - path: "EnumeratedItem"
+      exists: true
+    - path: "CodeListItem"
+      exists: true

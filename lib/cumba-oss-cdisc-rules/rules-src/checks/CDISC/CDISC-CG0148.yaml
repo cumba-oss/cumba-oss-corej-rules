@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0148"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Exposure (EX) records are present for a subject,\
+  \ but the Subject Reference Start Date/Time of Study Treatment (RFXSTDTC) in the\
+  \ Demographics (DM) domain does not equal the earliest Exposure Start Date/Time\
+  \ (EXSTDTC) in the EX domain for that subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Operations:
+- id: "$ex_usubjid"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+- id: "$min_ex_exstdtc"
+  expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ex_usubjid and RFXSTDTC != $min_ex_exstdtc
+Outcome:
+  Message: "RFXSTDTC does not equal the earliest value of EXSTDTC in the EX dataset\
+    \ for the subject."
+  Output_Variables:
+  - "RFXSTDTC"
+  - "$min_ex_exstdtc"
+  - "$ex_usubjid"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXSTDTC"
+  Condition: "EX records present for subject"
+  Rule: "RFXSTDTC = earliest EX.EXSTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0148"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0148"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0148"
+        Version: "2"
+      Version: "2.0"

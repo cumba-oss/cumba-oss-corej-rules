@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1465 expect=violation domain=CO
+#note "Row 1 has IDVARVAL populated while RDOMAIN is empty -> fires. Row 2 names its related domain."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVARVAL=3
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO |    | 001 | 1 | AESEQ | 3 | Related comment without its domain
+S1 | CO | AE | 001 | 2 | AESEQ | 1 | Properly keyed comment

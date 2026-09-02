@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1135 expect=violation domain=EX
+#note "First branch: EXSTDY=-3 on row 2 is a negative exposure start study day -> fires. Rows 1/3 carry positive study days."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 EXSTDY=-3
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDY  type=Num  label="Study Day of Start of Treatment"
+col EXENDY  type=Num  label="Study Day of End of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 1  | 7
+S1 | EX | 001 | 2 | DRUG A | -3 | 7
+S1 | EX | 001 | 3 | DRUG A | 8  | 14

@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD2003 expect=violation domain=DM
+#note "DISCRIMINATING: TA is declared with zero data rows -> distinct(TA.ARM) is the EMPTY set. Row 1's populated, non-reserved ACTARM=Placebo is 'not in {}' and fires. Row 2's ACTARM='Screen Failure' is reserved and stays SILENT even though $ta_arm is empty (exception-precedence under an empty aggregate). Row 3 has a blank ACTARM and stays guarded. Escalate if count is 0 (EmptyResult.SET refuted) OR if row 2 fires (exception-precedence refuted)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-001 ACTARM=Placebo
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-001 | Placebo        | Placebo        |
+CDISCPILOT01 | DM | 01-002 | Screen Failure | Screen Failure | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-003 |                |                | NOT ASSIGNED
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---

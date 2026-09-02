@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD0025 expect=violation domain=LB
+#note "DISCRIMINATING two-sided '>' hull matrix (IsoDateComparison FOR-ALL: fires iff lower(--DTC) > upper(--ENDTC); the tree's first pin with the partial on the RIGHT side). Row 1: lower(2020-04)=2020-04-01 clears upper(2020-03-15) -> fires. Row 2: lower(2020-03)=2020-03-01 straddles upper(2020-03-15) -> silent. Row 3 (RHS hull): upper(2020-02)=2020-02-29 (leap year) < 2020-03-20 -> fires. Row 4: upper(2020-03)=2020-03-31 straddles 2020-03-20 -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBDTC=2020-04 LBENDTC=2020-03-15
+#expectViolationAt row=3 LBDTC=2020-03-20 LBENDTC=2020-02
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | GLUC | 2020-04     | 2020-03-15
+S1 | LB | 001 | 2 | GLUC | 2020-03     | 2020-03-15
+S1 | LB | 001 | 3 | ALB  | 2020-03-20  | 2020-02
+S1 | LB | 001 | 4 | ALB  | 2020-03-20  | 2020-03

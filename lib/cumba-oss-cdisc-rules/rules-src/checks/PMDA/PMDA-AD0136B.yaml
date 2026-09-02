@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD0136B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the numeric Shift (SHIFTyN) does not have a single\
+  \ consistent value for each unique value of the character Shift (SHIFTy), evaluated\
+  \ on rows where Parameter Code (PARAMCD), SHIFTy and SHIFTyN are all populated;\
+  \ within a study each SHIFTy value must map to one SHIFTyN value. Applies across\
+  \ the basic-data-structure, non-compartmental-analysis and medical-device basic-data-structure\
+  \ ADaM structures."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(SHIFTy) and not empty(SHIFTyN) and
+    has_multiple_values_for(SHIFTyN, SHIFTy, within=PARAMCD)
+Outcome:
+  Message: "Inconsistent value for SHIFTyN"
+  Output_Variables:
+  - "PARAMCD"
+  - "SHIFTy"
+  - "SHIFTyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for SHIFTyN"
+  Description: "Within a study, all SHIFTyN values must be the same for each unique\
+    \ value of SHIFTy when PARAMCD, SHIFTy, and SHIFTyN variables are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0136B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0136B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0136B"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1268 expect=violation domain=TS
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: DELIBERATELY NO TSVCDREF COLUMN. The shipped expression's machine-emitted var_exists(\"TSVCDREF\") conjunct folds FALSE -> no violation, with the rule executing: an ABSENT TSVCDREF is not reported although an EMPTY one is (EC-43 / Fix #139 - absent is not empty). Bare-empty() arm of the absent-column guard family. TSVCDREF is Expected in SDTMIG 3.4 TS, so its absence is a separate conformance failure left to another channel."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+S1 | TS | 1 | INDIC | Trial Indication | ASTHMA | 10003553 | 21.0

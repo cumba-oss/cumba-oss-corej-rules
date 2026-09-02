@@ -1,0 +1,40 @@
+name: EMPTYSTR-not-unique-rel-numeric
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category D.12,
+  string vs numeric). The common --FL (string flag) vs --FN (numeric) case where
+  the numeric side carries a genuine missing value. A missing/NaN --FN folds to ""
+  and, since J1, an empty value is EXCLUDED from the relationship map
+  (GroupSemantics: `if (a.isEmpty() || b.isEmpty()) continue`). So row 002's
+  empty SUPPFN drops out and "Y" maps only to {1} → unique → no fire; coreJ emits
+  0 violations (the Java-canonical expected result).
+
+  J1 REVERSED the earlier D.12 "deliberate divergence" decision (coreJ used to fold
+  the missing --FN to "" and flag the "Y" rows). NOTE: the vendored Python engine
+  does NOT align here — unlike the string-empty sibling, it does not drop the
+  numeric NaN, so it emits 2 violations. Baselined lane=python (see
+  parity-diff-baseline.json / PLAN-run-green-parity-fixes.md).
+python_notes: |
+  For a numeric (Long) --FN column the vendored Python is_not_unique_relationship
+  does NOT exclude the NaN value from the mapping, so "Y"→{1, NaN} reads as
+  non-unique and Python emits 2 violations — diverging from coreJ's 0. This is the
+  numeric-empty case; the string-empty sibling (EMPTYSTR-not-unique-relationship)
+  DOES drop the "" key and aligns at 0. Expected matches Java (0); Python XFAILs.
+python_source: PLAN-empty-string-membership-parity.md (D.12 string-vs-numeric); PLAN-java-parity-defect-fixes.md (J1)
+check:
+  name: SUPPFL
+  operator: is_not_unique_relationship
+  value: SUPPFN
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, USUBJID, QNAM]
+    column_types: {SUPPFN: Long}
+    rows:
+      - {STUDYID: S1, USUBJID: '001', QNAM: A, SUPPFL: 'Y', SUPPFN: 1}   # Y → {1}: empty FN row excluded (J1) → unique → no fire
+      - {STUDYID: S1, USUBJID: '002', QNAM: B, SUPPFL: 'Y', SUPPFN: ''}  # empty FN excluded (J1) → not a participant
+      - {STUDYID: S1, USUBJID: '003', QNAM: C, SUPPFL: 'N', SUPPFN: 2}   # N → {2} unique → no fire
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations: []
+expected_errors: []

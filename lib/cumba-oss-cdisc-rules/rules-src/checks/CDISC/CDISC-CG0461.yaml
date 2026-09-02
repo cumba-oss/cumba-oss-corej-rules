@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0461"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the High Level Group Term (--HLGT) is not on the\
+  \ MedDRA primary system organ class hierarchy path."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLGT"
+    - "--SOC"
+Operations:
+- id: "$hlgt_on_path"
+  expression: "valid_external_dictionary_hierarchy(--HLGT, external_dictionary_type=\"\
+    meddra\", dictionary_parent=\"--SOC\")"
+Check:
+  expression: >-
+    $hlgt_on_path == false
+Outcome:
+  Message: "High Level Group Term (--HLGT) is not on the MedDRA primary system organ\
+    \ class path."
+  Output_Variables:
+  - "--HLGT"
+  - "--SOC"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--HLGT"
+  Rule: "--HLGT on path to MedDRA primary system organ class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0461"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0461"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0461"
+        Version: "1"
+      Version: "2.0"

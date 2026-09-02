@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-SEND-0380"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reproductive Stage Code (RSTGCD) and Reproductive\
+  \ Stage (RSTAGE) do not form a unique one-to-one pair across Trial Repro Stages\
+  \ (TT) records."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Requirements:
+  Variables:
+    All:
+    - "RSTGCD"
+    - "RSTAGE"
+Check:
+  expression: >-
+    not is_unique_relationship(RSTGCD, RSTAGE)
+Outcome:
+  Message: "RSTGCD and RSTAGE do not form a unique one-to-one pair."
+  Output_Variables:
+  - "RSTGCD"
+  - "RSTAGE"
+Source:
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "RSTGCD, RSTAGE"
+  Plain_Text_Explanation: "Each RSTGCD/RSTAGE is a unique pair."
+  Rule: "Each RSTGCD AND RSTAGE have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND380"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND380"
+        Version: "1"
+      Version: "5.0"

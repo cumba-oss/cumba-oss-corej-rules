@@ -1,0 +1,42 @@
+Core:
+  Id: "FDA-SE2253"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both TTENRL (Rule for End of Repro Stage) and TTDUR\
+  \ (Planned Duration of Repro Stage) are empty or not present; at least one should\
+  \ be populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Requirements:
+  Variables:
+    Any:
+    - "TTENRL"
+    - "TTDUR"
+Check:
+  expression: >-
+    empty(TTENRL) and empty(TTDUR)
+Outcome:
+  Message: "Both TTENRL and TTDUR are empty; at least one of TTENRL or TTDUR should\
+    \ be populated."
+  Output_Variables:
+  - "TTENRL"
+  - "TTDUR"
+Source:
+  FDA_Validator_Rule_Message: "Missing values for TTENRL and TTDUR"
+  FDA_Validator_Rule_Description: "At least one of Rule for End of Repro Stage (TTENRL)\
+    \ or Planned Duration of Repro Stage (TTDUR) should be populated."
+  Domains: "TT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2253"
+        Version: "1"
+      Version: "1.6"

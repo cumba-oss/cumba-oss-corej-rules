@@ -1,0 +1,92 @@
+Core:
+  Id: "FDA-SE2237"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Parameter Value (TSVAL) is populated with a term\
+  \ from the Null Flavor Reason (NULLFLAV) codelist in the Trial Summary (TS) domain;\
+  \ such values should be recorded in Parameter Null Flavor (TSVALNF) rather than\
+  \ in TSVAL."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVAL"
+Operations:
+- id: "$nullflav_terms"
+  expression: "codelist_terms(codelists=[NULLFLAV], level=\"term\", returntype=\"\
+    value\")"
+Check:
+  expression: >-
+    not empty(TSVAL) and TSVAL in $nullflav_terms
+Outcome:
+  Message: "TSVAL is populated with a Null Flavor Reason (NULLFLAV) term; this value\
+    \ must be recorded in Parameter Null Flavor (TSVALNF) rather than in Parameter\
+    \ Value (TSVAL)."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  FDA_Validator_Rule_Message: "Value from NULLFLAV codelist is populated in TSVAL"
+  FDA_Validator_Rule_Description: "Values from the Null Flavor Reason (NULLFLAV) codelist\
+    \ should be populated in Parameter Null Flavor (TSVALNF) rather than Parameter\
+    \ Value (TSVAL) in the Trial Summary (TS) domain when using SENDIG v3.1 and later."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2237"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2237"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2237"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2237"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

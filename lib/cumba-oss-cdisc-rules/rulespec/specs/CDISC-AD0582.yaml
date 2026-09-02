@@ -1,0 +1,42 @@
+name: CDISC-AD0582
+kind: rule
+description: |
+  Wave C4 port — T2-CalcOps (baseline Python lane).
+  CDISC-AD0582: BCHG must equal BASE - AVAL on BDS.
+  Check uses `not_equal_to_subtract` with value [BASE, AVAL].
+  Python's DataframeType does not implement `not_equal_to_subtract`
+  and raises AssertionError; Java fires on the row where
+  BCHG ≠ BASE - AVAL.
+python_source: rules-adamig-1-3.json (CDISC-AD0582)
+rule:
+  coreId: CDISC-AD0582
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      AVAL: DOUBLE
+      BASE: DOUBLE
+      BCHG: DOUBLE
+    rows:
+      # ok — BCHG=5.0 matches BASE-AVAL=10-5
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, AVAL: 5.0, BASE: 10.0, BCHG: 5.0}
+      # bad — BCHG=4.0 but BASE-AVAL=5.0
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, AVAL: 5.0, BASE: 10.0, BCHG: 4.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0582
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      BCHG: '4'
+      PARAMCD: 'HGB'
+      BASE: '10'
+      AVAL: '5'
+expected_errors: []

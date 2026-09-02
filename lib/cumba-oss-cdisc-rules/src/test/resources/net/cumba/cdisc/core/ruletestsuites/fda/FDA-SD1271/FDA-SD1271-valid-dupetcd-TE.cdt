@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1271 expect=noViolation domain=TE
+#note "Same ETCD with two DIFFERENT combinations: this is a duplicate-ETCD defect owned by FDA-SD1064 (ETCD unique within TE), not by SD1271, which flags the identical combination repeated under the same ETCD. Documents the rule partition -> no violation here."
+#library standard=sdtmig version=3-4
+dataset TE class="TRIAL DESIGN" label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+S1 | TE | SCRN | Screening | Informed consent | Randomization | P14D
+S1 | TE | SCRN | Screening | Informed consent | Randomization | P21D
+S1 | TE | TRT  | Treatment | Randomization    | End of treatment | P28D

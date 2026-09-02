@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0334 expect=violation domain=ADLBC
+#note "Mirror of AD0333: target is the numeric PCHGCA1N, key is the pair [PARAMCD, PCHGCAT1], guard is not empty(PCHGCAT1). Group (GLUC, INCR) holds PCHGCA1N {1 x2, 2 x1} -> row 3 is the lone minority. Row 4 shares the label but has a different PARAMCD and stays silent. One expansion (y=1)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=GLUC PCHGCAT1=INCR PCHGCA1N=2
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col PCHGCAT1 type=Char
+col PCHGCA1N type=Num
+---
+S1 | 001 | GLUC | 5.0 | INCR | 1
+S1 | 002 | GLUC | 5.1 | INCR | 1
+S1 | 003 | GLUC | 5.2 | INCR | 2
+S1 | 004 | ALB  | 4.0 | INCR | 7

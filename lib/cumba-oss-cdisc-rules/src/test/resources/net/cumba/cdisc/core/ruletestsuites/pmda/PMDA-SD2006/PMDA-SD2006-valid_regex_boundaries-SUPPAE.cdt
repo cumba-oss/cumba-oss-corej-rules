@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD2006 expect=noViolation domain=SUPPAE
+#note "FRESH. Negative half of the anchoring contract: (1) AEDECODX -- the regex is $-anchored, a trailing character kills the match; (2) aedecod -- [A-Z]{2} is case-sensitive, lowercase never matches; (3) AAADECOD -- [A-Z]{2} is ^-anchored to exactly two letters, a three-letter prefix cannot match; (4) DECOD -- the token alone, with no two-letter prefix; (5) AESOCX -- SOC followed by a stray character. All five silent. (The positive half, where the regex backtracks from SOC to SOCCD via AESOCCD, needs no fixture to be true -- not authored here.)"
+#library standard=sdtmig version=3-4
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AEDECODX | Dictionary-Derived Term Extra | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | aedecod  | lowercase decod               | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 3 | AAADECOD | three letter prefix            | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 4 | DECOD    | bare token                     | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 5 | AESOCX   | soc plus stray char             | Y

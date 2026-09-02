@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SE2277 expect=noViolation domain=BW
+#note "Boundary: BWCOMMENT is declared at exactly 200 characters, which is still within the SAS v5 transport limit. The short lengths (8, 20, 40, 50) must not be compared as text — '50' would sort above '200' under a string comparison, so this scenario also pins the numeric comparison."
+#library standard=sendig version=3-1-1
+dataset BW label="Body Weight"
+col STUDYID   type=Char length=20  label="Study Identifier"
+col USUBJID   type=Char length=40  label="Unique Subject Identifier"
+col BWTESTCD  type=Char length=8   label="Test Short Name"
+col BWSTRESC  type=Char length=50  label="Standardized Result in Character Format"
+col BWCOMMENT type=Char length=200 label="Comment"
+---
+S1 | 001 | BW | 250 | free text

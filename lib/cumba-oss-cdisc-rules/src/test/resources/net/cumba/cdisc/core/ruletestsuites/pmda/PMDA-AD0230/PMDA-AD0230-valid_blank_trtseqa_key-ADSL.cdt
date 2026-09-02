@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0230 expect=noViolation domain=ADSL
+#note "TRTSEQA is both the grouping key and the not empty(...) subject here, so row 3 (blank TRTSEQA) is excluded twice over: DROP_MISSING_KEYS removes it from grouping, and its own conjunct is false. The surviving A-B group holds one distinct TRTSEQAN."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSEQA type=Char
+col TRTSEQAN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 |     | 2

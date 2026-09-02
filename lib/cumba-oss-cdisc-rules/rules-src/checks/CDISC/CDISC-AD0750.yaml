@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-AD0750"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of CHGCATy for a given value of CHG, where y is an integer [1-99,\
+  \ not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(CHGCATy) and not empty(CHG) and has_multiple_values_for(CHGCATy, CHG, within=PARAMCD)
+Outcome:
+  Message: "Within a given value of PARAMCD, there is more than one value of CHGCATy\
+    \ for a given value of CHG, where y is an integer [1-99, not zero-padded]"
+  Output_Variables:
+  - "PARAMCD"
+  - "CHG"
+  - "CHGCATy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "CHGCATy where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of CHGCATy for a given value of CHG and y, where y is\
+    \ an integer [1-99, not zero-padded]"
+  Rule_Failure_Criteria: "There is more than one value of CHGCATy for a given value\
+    \ of CHG"
+  Condition_Failure: "Within a given value of PARAMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR750"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR750"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR750"
+        Version: "1"
+      Version: "5.0"

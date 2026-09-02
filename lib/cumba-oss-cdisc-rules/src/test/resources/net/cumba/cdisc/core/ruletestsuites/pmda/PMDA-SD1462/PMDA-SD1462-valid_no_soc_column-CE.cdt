@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1462 expect=skipped domain=CE
+#note "CESOC is absent from the CE IG spec (model-permissible only); the shipped machine guard var_exists(\"--SOC\") is false -> the rule EXECUTES and reports NOTHING - silent noViolation, not a skip, not a fire. Pins the prior ACCEPT-NO-ACTION ruling ('CE/MH inert but harmless; matches sheet cross-listing'). PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CESEQ    type=Num
+col CETERM   type=Char
+col CEBODSYS type=Char
+---
+S1 | CE | 001 | 1 | FEVER | GENERAL DISORDERS
+---

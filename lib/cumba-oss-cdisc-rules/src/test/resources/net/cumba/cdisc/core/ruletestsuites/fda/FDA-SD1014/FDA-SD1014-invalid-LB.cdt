@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1014 expect=violation domain=LB
+#note "Row 2 carries TAETORD=9 which TA does not define -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TAETORD=9
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+---
+S1 | LB | 001 | 1 | ALB | 1
+S1 | LB | 001 | 2 | ALB | 9
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 2 | TRT

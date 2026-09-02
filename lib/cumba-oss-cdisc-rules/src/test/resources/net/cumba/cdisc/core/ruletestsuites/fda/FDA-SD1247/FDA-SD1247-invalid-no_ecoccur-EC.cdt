@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1247 expect=violation domain=EC
+#note "Regression pin for the T6 fix: every branch tolerates an absent ECOCCUR via not_exists, so ECDOSE=0 on an administration record fires although the ECOCCUR column was not collected."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECDOSE  type=Num  label="Dose"
+---
+S1 | EC | 001 | 1 | DRUG A | 0
+S1 | EC | 001 | 2 | DRUG A | 5

@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0044"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subcategory (--SCAT) is populated and its value\
+  \ is identical to the Domain Abbreviation (DOMAIN)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "DOMAIN"
+Check:
+  expression: >-
+    not empty(--SCAT) and --SCAT == DOMAIN
+Outcome:
+  Message: "--SCAT is redundant with the domain name (--SCAT is equal to DOMAIN)."
+  Output_Variables:
+  - "DOMAIN"
+  - "--SCAT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--SCAT"
+  Plain_Text_Explanation: "--SCAT should not be the same as the domain name"
+  Condition: "--SCAT ^= null"
+  Rule: "--SCAT ^= Domain Name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND44"
+        Version: "1"
+      Version: "5.0"

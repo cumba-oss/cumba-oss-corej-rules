@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0044"
+Sheet_Rule_Identifier: "DD0044"
+Rule_Set: "PMDA"
+Element: "RangeCheck"
+Attribute: "SoftHard"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The SoftHard attribute must have a value of 'Soft' or 'Hard'."
+# CDISC twin 0088 (spec SS5.3.10.1) - AGREE. Value check fires only on a
+# present SoftHard.
+Message: "Invalid SoftHard value"
+Check:
+  kind: "one_of"
+  attribute: "SoftHard"
+  values: ["Soft", "Hard"]

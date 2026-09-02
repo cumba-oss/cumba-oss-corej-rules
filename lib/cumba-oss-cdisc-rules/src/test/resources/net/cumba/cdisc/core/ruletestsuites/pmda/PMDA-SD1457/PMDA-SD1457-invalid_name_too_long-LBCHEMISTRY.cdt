@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1457 expect=violation domain=LBCHEMISTRY
+#note "ds_name(\"DATA\") !~ /^[A-Z0-9_]{1,8}$/ fires because the dataset name LBCHEMISTRY (11 characters) exceeds 8. This is a DATASET-level check: one finding for the dataset, addressed by the projected output variable dataset_name and NOT by row=. First #expectViolationAt dataset_name= pin in the corpus - see the batch note caveat."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt dataset_name=LBCHEMISTRY
+dataset LBCHEMISTRY
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1

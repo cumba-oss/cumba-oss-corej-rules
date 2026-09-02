@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0106"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when APERIODC and APERIOD are both populated and there\
+  \ is more than one value of APERIOD for a given value of APERIODC"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "APERIOD"
+    - "APERIODC"
+Check:
+  expression: >-
+    not empty(APERIODC) and not empty(APERIOD) and has_multiple_values_for(APERIOD, APERIODC)
+Outcome:
+  Message: "More than one value of APERIOD was found for the same value of APERIODC"
+  Output_Variables:
+  - "APERIOD"
+  - "APERIODC"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "APERIOD"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of APERIOD\
+    \ for a given value of APERIODC"
+  Rule_Failure_Criteria: "There is more than one value of APERIOD for a given value\
+    \ of APERIODC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR106"
+        Version: "1"
+      Version: "5.0"

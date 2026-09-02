@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0428"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTxxAN is populated but TRTxxA is empty"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(TRTxxAN) and empty(TRTxxA)
+Outcome:
+  Message: "TRTxxAN is populated, but TRTxxA is empty"
+  Output_Variables:
+  - "TRTxxA"
+  - "TRTxxAN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTxxA where xx is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TRTxxAN is populated\
+    \ and TRTxxA is not populated"
+  Rule_Failure_Criteria: "TRTxxA is not populated"
+  Condition_Failure: "TRTxxAN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR428"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR428"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0311 expect=violation domain=CO
+#note "THE ABSENT-TARGET ARM of is_(not_)unique_set (EC-53 / Fix #143). No COSEQ column at all: the absent target is DROPPED from the key tuple and the check regroups on the surviving key [USUBJID], so rows 1 and 2 both fire and row 3 is unique. This rule carries NO var_exists guard on COSEQ, unlike its sibling CDISC-SEND-0312 which authors one on POOLID, which is exactly why it moves. Do NOT pin COSEQ -- the column does not exist. ESCALATE if this reports 0 or SKIPPED."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=001
+dataset CO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | 001 | First
+S1 | CO | 001 | Second
+S1 | CO | 002 | Third
+---

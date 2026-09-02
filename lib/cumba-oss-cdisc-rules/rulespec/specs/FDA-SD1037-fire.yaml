@@ -1,0 +1,31 @@
+name: FDA-SD1037-fire
+kind: rule
+description: |
+  Representative fixture for the numeric-guard capability (greater_than with a literal 0 after a
+  non_empty guard). FDA-SD1037 fires when a Toxicity Grade (--TOXGR) is populated and > 0 while the
+  Toxicity (--TOX) value is empty/absent. LB row 1 has LBTOXGR=2 and empty LBTOX -> fires; row 2 has
+  LBTOXGR=0 (guarded out); row 3 has LBTOXGR populated but LBTOX present.
+python_source: rules-sdtmig-3-4.json (FDA-SD1037)
+rule:
+  coreId: FDA-SD1037
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTOXGR: '2', LBTOX: ''}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 2, LBTOXGR: '0', LBTOX: ''}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 3, LBTOXGR: '3', LBTOX: Grade 3}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD1037
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBTOXGR: '2'
+expected_errors: []

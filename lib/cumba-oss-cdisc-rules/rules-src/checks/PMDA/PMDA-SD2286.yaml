@@ -1,0 +1,43 @@
+Core:
+  Id: "PMDA-SD2286"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Treatment Vehicle Amount (--VAMT) is missing while\
+  \ Treatment Vehicle Amount Units (--VAMTU) is populated in an Interventions-class\
+  \ dataset."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--VAMTU"
+    - "--VAMT"
+Check:
+  expression: >-
+    not empty(--VAMTU) and empty(--VAMT)
+Outcome:
+  Message: "--VAMT is missing when --VAMTU is populated."
+  Output_Variables:
+  - "--VAMT"
+  - "--VAMTU"
+Source:
+  Message: "Missing value for --VAMT when --VAMTU is populated"
+  Description: "Treatment Vehicle Amount (--VAMT) should not be null when Treatment\
+    \ Vehicle Amount Units (--VAMTU) is populated."
+  Domains: "INTERVENTIONS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2286"
+        Version: "1"
+      Version: "6.0"

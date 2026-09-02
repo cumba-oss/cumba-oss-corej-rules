@@ -1,0 +1,53 @@
+Core:
+  Id: "PMDA-AD0402"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, the character Analysis Toxicity\
+  \ Description High (ATOXDSCH) is populated but the numeric Analysis Value (AVAL)\
+  \ is missing and/or the character Analysis Toxicity Grade High (ATOXGRH) is empty;\
+  \ whenever ATOXDSCH is populated, both AVAL and ATOXGRH must also be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATOXDSCH"
+Check:
+  expression: >-
+    not empty(ATOXDSCH) and (empty(AVAL) or empty(ATOXGRH))
+Outcome:
+  Message: "ATOXDSCH is populated but AVAL and/or ATOXGRH is not populated."
+  Output_Variables:
+  - "AVAL"
+  - "ATOXGRH"
+  - "ATOXDSCH"
+Source:
+  Message: "AVAL is not populated or ATOXGRH is not populated, and ATOXDSCH is populated"
+  Description: "On a given record, if Analysis Toxicity Description High (ATOXDSCH)\
+    \ variable value is populated, then both Analysis Value (AVAL) and the Analysis\
+    \ Toxicity Grade High (ATOXGRH) variable values must be populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0402"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0402"
+        Version: "1"
+      Version: "6.0"

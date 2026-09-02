@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1267 expect=violation domain=TA
+#note "Row 2 has TAETORD=1.5, which is not an integer planned order of element within the arm."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TAETORD=1.5
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | A | Placebo | 1   | SCRN | SCREENING
+CDISCPILOT01 | TA | A | Placebo | 1.5 | TRT  | TREATMENT

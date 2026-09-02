@@ -1,0 +1,124 @@
+Core:
+  Id: "PMDA-SD1012"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Element Code (ETCD) and Description\
+  \ of Element (ELEMENT) does not match an entry in the Trial Elements (TE) dataset,\
+  \ except for unplanned elements where ETCD is 'UNPLAN'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "ETCD"
+  - "ELEMENT"
+  Name: "TE"
+Check:
+  expression: >-
+    ETCD != "UNPLAN" and empty(TE.ETCD)
+Outcome:
+  Message: "The combination of ETCD and ELEMENT does not match any entry in the Trial\
+    \ Elements (TE) dataset."
+  Output_Variables:
+  - "ETCD"
+  - "TE.ETCD"
+Source:
+  Message: "Invalid ETCD/ELEMENT"
+  Description: "The combination of Element Code (ETCD) and Description of Element\
+    \ (ELEMENT) values should match entries in the Trial Elements (TE) dataset, except\
+    \ for unplanned Element (ETCD = 'UNPLAN')."
+  Domains: "SE, TA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1012"
+        Version: "1"
+      Version: "1.6"

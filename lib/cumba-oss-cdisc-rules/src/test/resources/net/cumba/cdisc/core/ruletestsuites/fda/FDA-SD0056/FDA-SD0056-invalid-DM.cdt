@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0056 expect=violation domain=DM
+#note "SEX is Required for DM in SDTMIG 3.4 (Core='Req') but the dataset does not carry the SEX column -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#library required-variables DM STUDYID DOMAIN USUBJID SUBJID SITEID SEX
+#expectViolationCount 1
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+---
+S1 | DM | S1-001 | 001 | 01

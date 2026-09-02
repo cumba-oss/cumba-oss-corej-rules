@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SE1155 expect=violation domain=DM
+#note "The study inventory holds only DM; the Procedure Agents (AG) dataset is absent -> AG dataset should be included in every Animal Rule study submission -> the Domain Presence Check fires."
+#library standard=sendig-ar version=1-0
+#expectViolationCount 1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SETCD   type=Char label="Set Code"
+---
+STUDY01 | DM | STUDY01-001 | 001 | SET1

@@ -1,0 +1,23 @@
+Rule_Id: "PMDA-OD0081"
+Sheet_Rule_Identifier: "OD0081"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Codelist must have at least one item. Define-XML specification allows Codelists to contain 3 types of items: 1) list of Terms (EnumeratedItem); 2) list of Terms and Decoded Values (CodeListItem); 3) or a reference to external dictionary (ExternalCodeList)."
+# Same empty-CodeList encoding as CDISC twin 0165: for a CodeList with neither
+# CodeListItem nor ExternalCodeList children the guard passes and at least one
+# EnumeratedItem is demanded, so the rule fires exactly when all three content
+# forms are absent. The sheet MESSAGE's "<codelist>" placeholder is dropped
+# (presence findings carry no value; the xpath names the CodeList).
+Message: "Codelist is empty"
+Check:
+  kind: "exists"
+  target: "EnumeratedItem"
+  when:
+    all:
+    - path: "CodeListItem"
+      exists: false
+    - path: "ExternalCodeList"
+      exists: false

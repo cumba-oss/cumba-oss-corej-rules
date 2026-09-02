@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-SEND-0300"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset that contains no records is described\
+  \ in the Define-XML document."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dataset_record_count"
+  expression: "record_count()"
+Check:
+  expression: >-
+    $dataset_record_count == 0 and not empty(ds_name("DEFINE"))
+Outcome:
+  Message: "The dataset contains no records but is described in the Define-XML document."
+  Output_Variables:
+  - "$dataset_record_count"
+  - "define_dataset_name"
+Source:
+  Class: "NA"
+  Domain: "NA"
+  Variable: "NA"
+  Plain_Text_Explanation: "Define-XML document should not include a description of\
+    \ an empty dataset."
+  Condition: "Records are not present in dataset"
+  Rule: "Empty dataset is not described in the Define-XML document"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND300"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND300"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND300"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND300"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND300"
+        Version: "1"
+      Version: "5.0"

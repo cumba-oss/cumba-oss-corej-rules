@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0378 expect=noViolation domain=TT
+#note "Rows 2 and 3 of the invalid fixture, in that order: each Stage populates one of the two variables."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 0
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTENRL  type=Char label="Repro Stage End Rule"
+col TTDUR   type=Char label="Duration of Repro Stage"
+---
+S1 | TT | ST2 | Gestation  | LAST DOSE | 
+S1 | TT | ST3 | Lactation  | | P21D
+---

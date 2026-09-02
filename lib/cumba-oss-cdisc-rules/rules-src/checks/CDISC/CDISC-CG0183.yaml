@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0183"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when LBORRES is populated with a non-quantitative result\
+  \ and the upper end of the reference range in standardized units (LBSTNRHI) is populated.\
+  \ LBSTNRHI should be populated only for continuous measurements; a quantitative\
+  \ (continuous) result is approximated by a numeric LBORRES value, optionally prefixed\
+  \ with a relational operator."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Requirements:
+  Variables:
+    All:
+    - "LBORRES"
+Check:
+  expression: >-
+    not empty(LBORRES) and LBORRES !~ /^(<|>|< |> )?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$/ and not
+    empty(LBSTNRHI)
+Outcome:
+  Message: "LBSTNRHI is populated when LBORRES is not a quantitative (continuous)\
+    \ measurement."
+  Output_Variables:
+  - "LBORRES"
+  - "LBSTNRHI"
+Source:
+  Class: "FND"
+  Domain: "LB"
+  Variable: "LBSTNRHI"
+  Condition: "LBORRES ^= continuous measurement"
+  Rule: "LBSTNRHI = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0183"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0183"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0183"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0232 expect=violation domain=ADSL
+#note "Pins finding AD0124-F1 (missing _wildcards filter) from the behavioural side. y compiles to the unbounded (\\d+), so ^TR(\\d{2})PG(\\d+)$ captures (xx=01, y=10) and -- because this rule declares NO _wildcards block -- the tuple survives and the rule runs on a column its CDISC twin (CDISC-AD0232, y: {min: 1, max: 9}) filters away. Pins CURRENT behaviour; if AD0124-F1 is applied this flips to expect=skipped, exactly as PMDA-AD0616-skipped_index_ten_filtered-ADSL.cdt already pins the filtered case."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TR01PG10=POOLAA TR01PG10N=1
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG10  type=Char
+col TR01PG10N type=Num
+---
+S1 | 001 | POOLA  | 1
+S1 | 002 | POOLA  | 1
+S1 | 003 | POOLAA | 1

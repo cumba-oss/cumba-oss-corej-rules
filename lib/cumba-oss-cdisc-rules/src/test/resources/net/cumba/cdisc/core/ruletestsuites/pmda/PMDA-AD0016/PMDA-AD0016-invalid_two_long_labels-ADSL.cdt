@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0016 expect=violation domain=ADSL
+#note "GRANULARITY PIN: derived Sensitivity is Record, not Dataset, so evaluateMetadataNative's per-variable loop does NOT break after the first firing column and BOTH offending variables are reported. A result of 1 means the level has collapsed to Dataset: escalate, do not reduce the count."
+#expectViolationCount 2
+#expectViolationAt variable_name=LONGONE
+#expectViolationAt variable_name=LONGTWO
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LONGONE type=Char label="ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJX"
+col LONGTWO type=Char label="ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJXY"
+---
+CDISCPILOT01 | 01-701-1015 | x | y

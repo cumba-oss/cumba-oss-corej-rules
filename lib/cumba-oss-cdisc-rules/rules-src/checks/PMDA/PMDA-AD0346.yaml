@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0346"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Ratio to Analysis Range y Lower Limit (R2AyLO)\
+  \ variable is present in a dataset but the corresponding Analysis Range y Lower\
+  \ Limit (AyLO) variable is not present; whenever R2AyLO is included, its companion\
+  \ AyLO variable (same range index y) must also be included."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("R2AyLO") and not var_exists("AyLO")
+Outcome:
+  Message: "AyLO variable is not present when R2AyLO is present"
+  Output_Variables:
+  - "R2AyLO"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "AyLO variable is not present when R2AyLO is present"
+  Description: "If Ratio to Analysis Range y Lower Limit (R2AyLO) flag variable is\
+    \ present, there must also be a corresponding Analysis Range y Lower Limit (AyLO)\
+    \ variable."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0346"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0346"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0346"
+        Version: "1"
+      Version: "6.0"

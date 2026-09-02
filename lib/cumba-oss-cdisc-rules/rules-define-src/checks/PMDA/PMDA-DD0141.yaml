@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0141"
+Sheet_Rule_Identifier: "DD0141"
+Rule_Set: "PMDA"
+Element: "Standard"
+Attribute: "Status"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The value of the Status attribute must be one of the values from the CDISC/NCI standard Status codelist included in the Define-XML Controlled Terminology (C172332)."
+# CDISC twin 0264 - AGREE: the 2.1 spec (SS4.1.1) prints the C172332 term set
+# inline as the closed trio Draft / Final / Provisional, so this is an inline
+# one_of, not CT-gated. Value check fires only on a present Status.
+Message: "Invalid Status value"
+Check:
+  kind: "one_of"
+  attribute: "Status"
+  values: ["Draft", "Final", "Provisional"]

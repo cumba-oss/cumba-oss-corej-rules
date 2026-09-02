@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-AD0682"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pooled Device Model Group (MODELGy) and its numeric\
+  \ counterpart (MODELGyN) are both present and MODELGyN does not have the same value\
+  \ across all records that share the same value of MODELGy within the study, considering\
+  \ only the records on which both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "MODELGyN"
+Check:
+  expression: >-
+    var_exists("MODELGy") and not empty(MODELGy) and not empty(MODELGyN) and
+    is_inconsistent_across_dataset(MODELGyN, keys=[MODELGy])
+Outcome:
+  Message: "MODELGyN has inconsistent values for the same value of MODELGy."
+  Output_Variables:
+  - "MODELGy"
+  - "MODELGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for MODELGyN"
+  Description: "Within a study, All MODELGyN values must be the same for each unique\
+    \ value of MODELGy, when both variables are populated. Analogous rule for AD0681."
+  Domains: "ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0682"
+        Version: "1"
+      Version: "6.0"

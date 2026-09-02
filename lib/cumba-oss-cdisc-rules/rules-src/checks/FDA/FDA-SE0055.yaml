@@ -1,0 +1,69 @@
+Core:
+  Id: "FDA-SE0055"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable's data type in the dataset does not match\
+  \ the data type described in the SEND IG (or the SDTM Model for custom domains)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_type("LIBRARY")) and var_type("DATA") != var_type("LIBRARY")
+Outcome:
+  Message: "Variable data type in the dataset does not match the variable data type\
+    \ in the SEND IG or the Model."
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+  - "library_variable_data_type"
+Source:
+  FDA_Validator_Rule_Message: "SEND/dataset variable type mismatch"
+  FDA_Validator_Rule_Description: "Variable Data Types in the dataset should match\
+    \ the variable data types described in SEND IG and SDTM Model."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0055"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0055"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0055"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0055"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0055"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1317 expect=violation domain=DS
+#note "FRESH, DISCRIMINATING - the three date_not_equal_to decision modes (IsoDateComparison). Row 1: complete DATETIME vs complete date, cores compared at the coarser (day) precision, EQUAL -> != false, clean. Row 2: 2020-06-01 vs partial DTHDTC 2020-05, hulls DISJOINT -> fires. Row 3: 2020-05-10 falls inside the 2020-05 hull, overlap -> clean. Row 4: DTHDTC 'UNKNOWN' passes the not empty guard but has null bounds -> every comparison false, clean. Exactly one finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 DSSEQ=1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | DEATH | 2020-05-10T14:30
+S1 | DS | 002 | 1 | DEATH | 2020-06-01
+S1 | DS | 002 | 2 | DEATH | 2020-05-10
+S1 | DS | 003 | 1 | DEATH | 2020-05-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 | 2020-05-10
+S1 | DM | 002 | 2020-05
+S1 | DM | 003 | UNKNOWN
+---

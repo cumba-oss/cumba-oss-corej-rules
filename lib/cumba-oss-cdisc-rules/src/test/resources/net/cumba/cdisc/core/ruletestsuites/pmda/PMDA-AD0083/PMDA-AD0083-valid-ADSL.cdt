@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0083 expect=noViolation domain=ADSL
+#library standard=adamig version=1-0
+#note "THIS is the fixture that pins the value_is_reference misuse for AD0083, not the -invalid- twin. Both subjects are conformant: TRTSDT equals TR01SDT, so the rule must stay silent. Before the fix the leaf carried value_is_reference:true, which lowered to TRTSDT != colref(TR01SDT); colref reads the column NAMED BY TR01SDT's cell content, no column is named 22281, so colref resolved to null, Primitives.equality folds a null target to the empty string, the non_empty-guarded LHS never equals it, and the NEGATED operator therefore fired on EVERY record passing the guards (R-5.21). This fixture yielded 2 spurious violations before the fix and 0 after. The direction matters: AD0083 was a 100% FALSE POSITIVE, so it is the VALID data that exposes it - a defect an -invalid- fixture alone can never catch."
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDT  type=Num
+col TR01SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21915
+CDISCPILOT01 | 01-701-1023 | 22281 | 22281
+---

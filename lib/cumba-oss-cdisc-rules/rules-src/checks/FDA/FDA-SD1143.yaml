@@ -1,0 +1,108 @@
+Core:
+  Id: "FDA-SD1143"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SUPPAE record with QNAM equal to 'AESOSP' is present\
+  \ but the linked AE record does not have AESMIE equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPPAE"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Match_Datasets:
+- Child: true
+  Keys:
+  - "USUBJID"
+  - "IDVAR"
+  - "IDVARVAL"
+  Name: "AE"
+Check:
+  expression: >-
+    QNAM == "AESOSP" and var_exists("AESMIE") and AESMIE != "Y"
+Outcome:
+  Message: "A SUPPAE record with QNAM equal to 'AESOSP' is present, but the linked\
+    \ AE record does not have AESMIE equal to 'Y'."
+  Output_Variables:
+  - "QNAM"
+  - "AESMIE"
+Source:
+  FDA_Validator_Rule_Message: "No Details info for AESMIE Adverse Event in SUPPAE\
+    \ domain"
+  FDA_Validator_Rule_Description: "When a description of Other Medically Important\
+    \ Serious Adverse Events category is collected on a CRF, sponsors should place\
+    \ the description in the SUPPAE dataset using the standard supplemental qualifier\
+    \ name code AESOSP."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1143"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0043"
+        Version: "1"
+      Version: "2.0"

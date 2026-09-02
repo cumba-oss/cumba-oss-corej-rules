@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0232 expect=noViolation domain=ADSL
+#note "Load-bearing var_exists(\"TRxxPGyN\") pin: TR01PG1N, the operator's KEY, is absent. TRxxPGy seeds tuple (xx=01, y=1) and TRxxPGyN is synthesised as the absent TR01PG1N, so the guard is false and the rule is executed and silent -- even though the degraded key would collapse the table into one group and flag row 3. Requirements.Variables.All: [TRxxPGy] is satisfied, so this is NOT a skip; contrast the mirror PMDA-AD0233-skipped_no_tr01pg1n_column-ADSL.cdt."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1 type=Char
+---
+S1 | 001 | POOLA
+S1 | 002 | POOLA
+S1 | 003 | POOLAA

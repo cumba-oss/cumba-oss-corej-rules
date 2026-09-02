@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD2238 expect=violation domain=CE
+#note "Subject 001 has two records with the same --STDTC 2020-01-15 but two different start reference time points, so --STTPT is not consistent within USUBJID + --STDTC. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CESTDTC=2020-01-15 CESTTPT=SCREENING
+#expectViolationAt row=2 CESTDTC=2020-01-15 CESTTPT=RANDOMIZATION
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ   type=Num  label="Sequence Number"
+col CETERM  type=Char label="Reported Term for the Clinical Event"
+col CESTDTC type=Char label="Start Date/Time of Clinical Event"
+col CESTTPT type=Char label="Start Reference Time Point"
+---
+S1 | CE | 001 | 1 | RASH    | 2020-01-15 | SCREENING
+S1 | CE | 001 | 2 | ITCHING | 2020-01-15 | RANDOMIZATION
+S1 | CE | 001 | 3 | FEVER   | 2020-02-01 | SCREENING

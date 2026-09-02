@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1369 expect=skipped domain=MK
+#note "Violating-shaped data (MKORREF populated, MKSTREFC empty), so the ONLY thing this scenario can fail on is execute-vs-skip. The shipped Scope carries Domains.Exclude [MK, OE] - the exclusions the rule's own sheet DOMAINS cell states, 'FINDINGS (-MK, -OE), FINDINGS ABOUT', encoded in the in-corpus PMDA-SD1454 shape (Fix #279, ruling M2-D12) - so MK is out of scope and the rule is skipped. Unencoded, the rule executed and fired 1 violation at row=1 on a domain its own authority excludes. FDA-SD1369 is deliberately untouched: its sheet cell is plain 'FINDINGS, FINDINGS ABOUT' with no exclusions."
+#library standard=sdtmig version=3-4
+dataset MK class=FINDINGS label="Musculoskeletal System Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MKSEQ    type=Num  label="Sequence Number"
+col MKTESTCD type=Char label="Musculoskeletal Test Short Name"
+col MKORREF  type=Char label="Reference Result in Original Units"
+col MKSTREFC type=Char label="Reference Result in Standard Format"
+---
+S1 | MK | 001 | 1 | JOINT | 5.0 |

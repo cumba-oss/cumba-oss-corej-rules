@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1299 expect=violation domain=LB
+#note "LB carries no Timing-role variable (model Timing variables for LB are LBDTC/LBDY; the dataset has neither) -> the dataset-level check fires once."
+#library standard=sdtmig version=3-4
+#library model-variables LB --DTC:Timing --DY:Timing
+#expectViolationCount 1
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALB | 4.1
+S1 | LB | 001 | 2 | ALT | 22

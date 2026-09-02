@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0058 expect=noViolation domain=ADLBC
+#note "THE AD0058/AD0060 DISCRIMINATOR. ADTM is a CHARACTER datetime variable, which PMDA-AD0060 reports - but its name ends in 'TM', not 'DT', so ends_with(varname(),'DT') is FALSE and AD0058 must stay silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM    type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x

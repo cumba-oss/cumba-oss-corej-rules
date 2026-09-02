@@ -1,0 +1,42 @@
+name: CDISC-AD0225
+kind: rule
+description: |
+  Wave C4 port — T2-CalcOps (baseline Python lane).
+  CDISC-AD0225: PCHG must equal ((AVAL-BASE)/BASE)*100 on BDS.
+  Check uses `not_equal_to_pctchg`. Java's OperatorRegistry implements
+  NOT_EQUAL_TO_PCTCHG; Python's DataframeType does not implement
+  `not_equal_to_pctchg` and raises AssertionError.
+  Java fires on the row where PCHG ≠ ((AVAL-BASE)/BASE)*100; Python errors.
+python_source: rules-adamig-1-3.json (CDISC-AD0225)
+rule:
+  coreId: CDISC-AD0225
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      AVAL: DOUBLE
+      BASE: DOUBLE
+      PCHG: DOUBLE
+    rows:
+      # ok — PCHG=100.0 matches ((10-5)/5)*100
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, AVAL: 10.0, BASE: 5.0, PCHG: 100.0}
+      # bad — PCHG=50.0 but correct is 100.0
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, AVAL: 10.0, BASE: 5.0, PCHG: 50.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0225
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PCHG: '50'
+      PARAMCD: 'HGB'
+      BASE: '5'
+      AVAL: '10'
+expected_errors: []

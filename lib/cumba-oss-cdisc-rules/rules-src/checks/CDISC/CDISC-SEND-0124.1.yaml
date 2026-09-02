@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0124.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ETCD is equal to 'UNPLAN' but ELEMENT is populated;\
+  \ for unplanned Elements ELEMENT must be blank."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "ELEMENT"
+    - "ETCD"
+Check:
+  expression: >-
+    ETCD == "UNPLAN" and not empty(ELEMENT)
+Outcome:
+  Message: "ELEMENT is populated when ETCD is equal to 'UNPLAN'."
+  Output_Variables:
+  - "ETCD"
+  - "ELEMENT"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "ELEMENT"
+  Plain_Text_Explanation: "If ETCD is UNPLAN, the ELEMENT name is left blank."
+  Condition: "ETCD = \"UNPLAN\""
+  Rule: "ELEMENT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND124.1"
+        Version: "1"
+      Version: "5.0"

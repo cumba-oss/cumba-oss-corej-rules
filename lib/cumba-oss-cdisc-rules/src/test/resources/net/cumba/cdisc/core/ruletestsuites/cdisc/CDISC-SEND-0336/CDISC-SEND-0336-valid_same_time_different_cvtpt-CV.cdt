@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0336 expect=noViolation domain=CV
+#note "THE KEY-SET PIN (Fix #294 / M3-D15(i)). Note the EXTRA CVTPT column, which the other two CV fixtures do not declare. Two records for the same test on the same day at DIFFERENT planned time points are conformant under the sheet's 'one record per test per observation time' wording -- and its structural sibling CDISC-SEND-0338 (RE), which carries the SAME sheet sentence and both Variable cells read ALL, already keys on the whole --NOMDY/--TPT/--TPTNUM/--EVLINT timing family. Before M3-D15 CDISC-SEND-0336 keyed on [USUBJID, CVDTC, CVSTINT, CVENINT] only, so CVTPT was outside the tuple, rows 1 and 2 collided and the rule reported 2 violations on routine telemetry -- two domains, one sheet sentence, opposite verdicts on the same data. Widening is safe because an absent key column is silently dropped and the check regroups on the survivors. Row 3 is a different test."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset CV
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CVSEQ    type=Num
+col CVTESTCD type=Char
+col CVDTC    type=Char
+col CVSTINT  type=Char
+col CVENINT  type=Char
+col CVTPT    type=Char
+---
+S1 | CV | ANIMAL1 | 1 | HR | 2023-03-20 |  |  | PREDOSE
+S1 | CV | ANIMAL1 | 2 | HR | 2023-03-20 |  |  | POSTDOSE
+S1 | CV | ANIMAL1 | 3 | QT | 2023-03-20 |  |  | PREDOSE
+---

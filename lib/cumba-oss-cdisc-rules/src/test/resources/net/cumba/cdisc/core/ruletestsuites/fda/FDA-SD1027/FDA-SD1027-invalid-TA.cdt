@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD1027 expect=violation domain=TA
+#note "Sheet direction: ETCD 'TRT' maps to two distinct ELEMENT values ('Treatment' vs 'Treatment Phase') -> fires on both TRT rows."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 ETCD=TRT
+#expectViolationAt row=5 ETCD=TRT
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | A1 | Drug A  | 1 | SCRN | Screen
+S1 | TA | A1 | Drug A  | 2 | TRT  | Treatment
+S1 | TA | A1 | Drug A  | 3 | FU   | Follow-up
+S1 | TA | A2 | Placebo | 1 | SCRN | Screen
+S1 | TA | A2 | Placebo | 2 | TRT  | Treatment Phase

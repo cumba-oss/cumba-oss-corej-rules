@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-CG0041"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when any of AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP,\
+  \ AESLIFE, AESOD, AESMIE or AESINTV is equal to 'Y' but AESER is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESER"
+Check:
+  expression: >-
+    (var_exists("AESCAN") and AESCAN == "Y" or var_exists("AESCONG") and AESCONG == "Y" or
+    var_exists("AESDISAB") and AESDISAB == "Y" or var_exists("AESDTH") and AESDTH == "Y" or
+    var_exists("AESHOSP") and AESHOSP == "Y" or var_exists("AESLIFE") and AESLIFE == "Y" or
+    var_exists("AESOD") and AESOD == "Y" or var_exists("AESMIE") and AESMIE == "Y" or
+    var_exists("AESINTV") and AESINTV == "Y") and AESER != "Y"
+Outcome:
+  Message: "At least one seriousness criterion (AESCAN, AESCONG, AESDISAB, AESDTH,\
+    \ AESHOSP, AESLIFE, AESOD, AESMIE or AESINTV) equals 'Y', but AESER does not equal\
+    \ 'Y'."
+  Output_Variables:
+  - "AESER"
+  - "AESCAN"
+  - "AESCONG"
+  - "AESDISAB"
+  - "AESDTH"
+  - "AESHOSP"
+  - "AESLIFE"
+  - "AESOD"
+  - "AESMIE"
+  - "AESINTV"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "AESER"
+  Condition: "AESCAN = 'Y' or AESCONG = 'Y' or AESDISAB = 'Y' or AESDTH = 'Y' or AESHOSP\
+    \ = 'Y' or AESLIFE = 'Y' or AESOD = 'Y' or AESMIE = 'Y'"
+  Rule: "AESER = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"

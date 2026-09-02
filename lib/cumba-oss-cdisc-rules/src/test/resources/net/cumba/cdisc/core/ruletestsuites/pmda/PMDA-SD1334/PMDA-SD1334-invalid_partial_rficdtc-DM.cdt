@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1334 expect=violation domain=DM
+#note "BOUNDARY: three different partial-date configurations pin IsoDateComparison's uniform forall rule (A > B iff lower(A) > upper(B)). Row 1: RFICDTC is month-precision (2020-03); commonPrecision floors at 10 so the hulls clip to lower(2020-03)=2020-03-01 and upper(2020-02-15)=2020-02-15, and 2020-03-01 > 2020-02-15 holds for every candidate of March -> fires. Row 2: lower(2020-02)=2020-02-01 vs upper(2020-02-20)=2020-02-20, and 2020-02-01 > 2020-02-20 is false -> silent, the hulls overlap so 'after every candidate' fails. Row 3: the partial is on the LEFT operand this time, upper(2020)=2020-12-31, and 2020-06-15 > 2020-12-31 is false -> silent. No twin covers a partial operand on this rule."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RFSTDTC=2020-02-15 RFICDTC=2020-03
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFICDTC  type=Char label="Date/Time of Informed Consent"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-02-15 | 2020-03
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 2020-02-20 | 2020-02
+CDISCPILOT01 | DM | 01-701-1028 | 1028 | 2020 | 2020-06-15

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1105 expect=noViolation domain=DS
+#note "Row 1 is a protocol-milestone record and correctly leaves EPOCH empty; row 2 is a disposition event, for which a populated EPOCH is expected."
+#library standard=sdtmig version=3-2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE |
+CDISCPILOT01 | DS | 01-701-1015 | 2 | COMPLETED                 | COMPLETED                 | DISPOSITION EVENT  | TREATMENT

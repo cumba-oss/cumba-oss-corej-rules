@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0661 expect=violation domain=ADNCA
+#note "ADOSEDUR declared, NDOSEDUR not declared -> the first disjunct not var_exists(NDOSEDUR) is TRUE. Exists-only Check -> BroadcastFold -> exactly ONE violation at row 1. Pin only ADOSEDUR: it is the sole Output_Variable and is a present column."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 ADOSEDUR=24
+dataset ADNCA structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col ADOSEDUR type=Num
+col DOSEDURU type=Char
+col NFRLT    type=Num
+col AFRLT    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 24 | HOURS | 0 | 0.5

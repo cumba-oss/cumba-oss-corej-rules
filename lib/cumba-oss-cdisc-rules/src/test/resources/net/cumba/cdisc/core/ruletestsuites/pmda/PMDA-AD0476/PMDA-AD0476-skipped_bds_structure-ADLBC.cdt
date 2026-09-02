@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0476 expect=skipped domain=ADLBC
+#note "PARAMCD makes the detector return BASIC DATA STRUCTURE, which is neither of the two Include tokens, so the scenario pre-gate refuses execution. Data is deliberately violating and both required variables are present, so the STRUCTURE is the only possible reason for the skip. This fixture pins the Data_Structures block [SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET] ONCE for the six rules that share it (AD0476, AD0477, AD0480, AD0481, AD0616, AD0617)."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col STRATAV  type=Char
+col STRATAVN type=Num
+---
+S1 | 001 | ALB | HIGH | 1
+S1 | 002 | ALB | LOW  | 1
+---

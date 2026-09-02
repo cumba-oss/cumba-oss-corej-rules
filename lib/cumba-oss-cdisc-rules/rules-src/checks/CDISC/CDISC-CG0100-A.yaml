@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0100-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the EC dataset contains no dose information at all:\
+  \ none of the ECDOSE, ECDOSTXT, ECSTAT, and ECOCCUR variables is present in the\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Check:
+  expression: >-
+    not var_exists("ECDOSE") and not var_exists("ECDOSTXT") and not var_exists("ECSTAT") and not
+    var_exists("ECOCCUR")
+Outcome:
+  Message: "The EC dataset contains none of ECDOSE, ECDOSTXT, ECSTAT, and ECOCCUR:\
+    \ no dose information is recorded anywhere in the dataset."
+Source_Proposed:
+  Class: "INT"
+  Domain: "EC"
+  Variable: "ECDOSE"
+  Condition: "ECOCCUR ^= 'N' and ECSTAT = null and ECDOSTXT = null"
+  Rule: "the EC dataset contains no dose information at all: none of the ECDOSE, ECDOSTXT,\
+    \ ECSTAT, and ECOCCUR variables is present in the dataset"
+Source:
+  Class: "INT"
+  Domain: "EC"
+  Variable: "ECDOSE"
+  Condition: "ECOCCUR ^= 'N' and ECSTAT = null and ECDOSTXT = null"
+  Rule: "ECDOSE > 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"

@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1258 expect=violation domain=DM
+#note "Second branch of the any-tree: rows 1-3 carry a populated RFSTDTC while ACTARMCD is one of the untreated codes SCRNFAIL / NOTASSGN / NOTTRT -> each fires. Row 4 is a treated subject."
+#library standard=sdtmig version=3-2
+#expectViolationCount 3
+#expectViolationAt row=1 ACTARMCD=SCRNFAIL
+#expectViolationAt row=2 ACTARMCD=NOTASSGN
+#expectViolationAt row=3 ACTARMCD=NOTTRT
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | 2020-01-15 | SCRNFAIL
+S1 | DM | 002 | 2020-01-16 | NOTASSGN
+S1 | DM | 003 | 2020-01-17 | NOTTRT
+S1 | DM | 004 | 2020-01-18 | A

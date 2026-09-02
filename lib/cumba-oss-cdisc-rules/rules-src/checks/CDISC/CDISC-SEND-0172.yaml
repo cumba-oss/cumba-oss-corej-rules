@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0172"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Derived Flag (--DRVFL) is populated with a value\
+  \ other than \"Y\"; --DRVFL must be either \"Y\" or empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--DRVFL"
+Check:
+  expression: >-
+    not empty(--DRVFL) and --DRVFL != "Y"
+Outcome:
+  Message: "--DRVFL is populated with a value other than \"Y\"."
+  Output_Variables:
+  - "--DRVFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--DRVFL"
+  Plain_Text_Explanation: "--DRVFL value must be either \"Y\" or null."
+  Condition: "--DRVFL ^= null"
+  Rule: "--DRVFL = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND172"
+        Version: "1"
+      Version: "5.0"

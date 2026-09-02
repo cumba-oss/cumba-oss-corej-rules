@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0356 expect=violation domain=ADSL
+# Rule:Description: There is more than one value of REGIONyN for a given value of REGIONy, considering only those rows on which both variables are populated
+#note "REGION1=G maps to two distinct REGION1N values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col REGION1N type=Char
+col REGION1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | A1 | G
+CDISCPILOT01 | 01-701-1023 | A2 | G
+---

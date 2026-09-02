@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0067"
+Sheet_Rule_Identifier: "67"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: "Mandatory"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "Mandatory attribute for the ItemRef corresponding to a SENDIG or SDTMIG variable with Core = \"Req\" must be \"Yes\"."
+# Library-gated (plan define-library-provider follow-up): "Core = Req" comes
+# from the LibraryProvider's variableCoreDesignation. The sheet's Rule column
+# ties the trigger to the PARENT ItemGroupDef's def:Standard (Name beginning
+# SDTM/SEND), so the scope is ItemGroupDef/ItemRef - a ValueListDef/ItemRef
+# (also listed in the sheet's XPaths) has no dataset/standard anchor and is
+# out of reach by construction. An absent Mandatory is the XSD's beat.
+Message: "ItemRef for [${value}] must have Mandatory=\"Yes\" because the standard defines the variable as Core=\"Req\"."
+Check:
+  kind: "library_core_mandatory"

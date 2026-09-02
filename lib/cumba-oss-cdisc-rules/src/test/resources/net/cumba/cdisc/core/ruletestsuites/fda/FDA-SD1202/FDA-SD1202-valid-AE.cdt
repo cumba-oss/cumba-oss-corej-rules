@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1202 expect=noViolation domain=AE
+#note "Row 1: AESTDTC equal to RFPENDTC -> boundary, strict greater-than does not fire. Row 2: AESTDTC before RFPENDTC -> ok. Row 3: AESTDTC empty -> ok. Row 4: subject with empty RFPENDTC -> no comparand, no fire."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-06-30
+S1 | AE | 001 | 2 | NAUSEA   | 2020-03-15
+S1 | AE | 001 | 3 | FATIGUE  |
+S1 | AE | 002 | 1 | HEADACHE | 2021-01-01
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFPENDTC type=Char label="Date/Time of End of Participation"
+---
+S1 | DM | 001 | 2020-06-30
+S1 | DM | 002 |
+---

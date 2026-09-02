@@ -1,0 +1,82 @@
+Core:
+  Id: "FDA-SD1363"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject was not assigned to treatment (ARMNRS\
+  \ indicates Screen Failure, Not Assigned or Screening Not Completed) yet has a populated\
+  \ Planned Arm Code (ARMCD) or Description of Planned Arm (ARM); both must be empty\
+  \ for such subjects, whose empty planned Arm is explained by ARMNRS."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    ARMNRS in ["SCREEN FAILURE", "NOT ASSIGNED", "SCREENING NOT COMPLETED"] and (not empty(ARMCD) or
+    not empty(ARM))
+Outcome:
+  Message: "ARMCD and/or ARM is populated for a subject not assigned to treatment\
+    \ (ARMNRS indicates Screen Failure, Not Assigned or Screening Not Completed)."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+  - "ARMNRS"
+Source:
+  FDA_Validator_Rule_Message: "ARMCD/ARM is populated for a subject not assigned to\
+    \ treatment"
+  FDA_Validator_Rule_Description: "Planned Arm Code (ARMCD) and Description of Planned\
+    \ Arm (ARM) must not be null for subjects who are not assigned to treatment. This\
+    \ includes Screen Failure subjects and Not Assigned subjects."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1363"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1363"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0523"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0570"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0523"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0570"
+        Version: "1"
+      Version: "2.0"

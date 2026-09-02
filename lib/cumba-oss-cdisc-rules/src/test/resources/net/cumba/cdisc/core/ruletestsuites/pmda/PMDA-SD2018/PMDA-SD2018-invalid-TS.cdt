@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD2018 expect=violation domain=TS
+#note "Row 2 populates both TSVAL and TSVALNF -> fires; rows 1 and 3 populate only one of the pair."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVALNF=NA
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | TITLE  | Trial Title     | A Study of X |
+S1 | TS | 2 | AGEMAX | Planned Max Age | 65           | NA
+S1 | TS | 3 | AGEMIN | Planned Min Age |              | NA

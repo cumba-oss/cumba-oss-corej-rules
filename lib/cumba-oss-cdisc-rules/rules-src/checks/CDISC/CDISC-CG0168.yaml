@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0168"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when CODTC is populated for a comment that is related\
+  \ to a parent record (IDVAR is populated)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "CODTC"
+    - "IDVAR"
+Check:
+  expression: >-
+    not empty(IDVAR) and not empty(CODTC)
+Outcome:
+  Message: "CODTC is populated when the comment is related to a parent record (IDVAR\
+    \ is populated)."
+  Output_Variables:
+  - "IDVAR"
+  - "CODTC"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "CODTC"
+  Condition: "IDVAR ^= null"
+  Rule: "CODTC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0168"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0168"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0168"
+        Version: "1"
+      Version: "2.0"

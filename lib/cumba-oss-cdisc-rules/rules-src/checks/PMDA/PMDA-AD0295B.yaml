@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0295B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the ATOXGR variable is not uniquely determined by\
+  \ ATOXGRN within the dataset: a single value of ATOXGRN maps to more than one value\
+  \ of ATOXGR, considering only the records on which both variables are populated.\
+  \ The PMDA validation sheet's 'inconsistent value across studies' intent is reinterpreted\
+  \ as a within-dataset unique (1-to-1) relationship check between the paired character/numeric\
+  \ variables ATOXGR and ATOXGRN; the cross-study scope is not evaluated."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The sheet's 'inconsistent across studies' intent is reinterpreted as a\
+    \ within-dataset unique-relationship check between the char/numeric pair ATOXGR/ATOXGRN\
+    \ (has_multiple_values_for); the cross-study scope is not evaluated."
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ATOXGR) and not empty(ATOXGRN) and has_multiple_values_for(ATOXGR, ATOXGRN)
+Outcome:
+  Message: "There is more than one value of ATOXGR for a given value of ATOXGRN (within\
+    \ the dataset)."
+  Output_Variables:
+  - "ATOXGR"
+  - "ATOXGRN"
+Source:
+  Message: "Inconsistent value for ATOXGR"
+  Description: "Across studies, all Analysis Toxicity Grade (ATOXGR) variable values\
+    \ must be the same for each unique value of Analysis Toxicity Grade (N) (ATOXGRN)\
+    \ variable when both variables are populated."
+  Domains: "OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0295B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0295B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0295B"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,30 @@
+name: CDISC-AD0393
+kind: rule
+description: |
+  Wave A4 port — T1a PlainSimple.
+  CDISC-AD0393: ATOXGRL is populated while ATOXGRLN is empty.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0393)
+rule:
+  coreId: CDISC-AD0393
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ATOXGRL: '', ATOXGRLN: ''}       # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ATOXGRL: 'LOW', ATOXGRLN: ''}    # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0393
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ATOXGRL: 'LOW'
+      ATOXGRLN: null
+expected_errors: []

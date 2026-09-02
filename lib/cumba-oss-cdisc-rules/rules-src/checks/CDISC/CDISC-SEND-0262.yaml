@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-SEND-0262"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one POOLDEF record exists for the same\
+  \ combination of pool (POOLID) and subject (USUBJID); the POOLDEF dataset expects\
+  \ one record per subject per pool."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "POOLDEF"
+Check:
+  expression: >-
+    not is_unique_set([POOLID, USUBJID])
+Outcome:
+  Message: "More than one POOLDEF record exists for the same pool (POOLID) and subject\
+    \ (USUBJID)."
+  Output_Variables:
+  - "POOLID"
+Source:
+  Class: "REL"
+  Domain: "POOLDEF"
+  Variable: "POOLID"
+  Plain_Text_Explanation: "One record per subject per pool"
+  Rule: "One record per subject per pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262"
+        Version: "1"
+      Version: "5.0"

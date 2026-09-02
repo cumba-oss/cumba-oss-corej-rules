@@ -1,0 +1,33 @@
+#!RuleTest
+#test PMDA-SD0077 expect=violation domain=CO
+#note "FRESH - CO primary + wrong-subject + blank-IDVAR faces. Row 1: subject 001's LB has no LBSEQ=5 -> FIRES. Row 2: matches 001's LBSEQ=1 -> silent. Row 3: blank IDVAR and IDVARVAL -> guarded, silent. Row 4: LBSEQ=7 exists ONLY under USUBJID 001, not 002 -> no match under the [USUBJID] standard key -> FIRES. If row 4 is silent (wrong-subject matched anyway) or row 3 fires, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 IDVARVAL=5
+#expectViolationAt row=4 IDVARVAL=7
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | LB | 001 | 1 | LBSEQ | 5 | Comment A
+S1 | CO | LB | 001 | 2 | LBSEQ | 1 | Comment B
+S1 | CO | LB | 001 | 3 |       |   | Comment C
+S1 | CO | LB | 002 | 4 | LBSEQ | 7 | Comment D
+---
+
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+---
+S1 | LB | 001 | 1
+S1 | LB | 001 | 7
+S1 | LB | 002 | 2
+---

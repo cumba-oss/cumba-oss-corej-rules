@@ -1,0 +1,40 @@
+name: CDISC-AD0053
+kind: rule
+description: |
+  Wave C3 port — T2-SharesNoElements. Scope=ALL.
+  CDISC-AD0053: fire when DM is present in the study datasets and
+  DM.USUBJID is not populated for a primary-domain row (i.e. the
+  subject is not found in DM after MD-merge on USUBJID).
+  Operation `dataset_names` populates $datasets; Check uses
+  `shares_no_elements_with [DM]` wrapped in `not` — so the leaf passes
+  when DM is among the study's datasets.
+python_source: rules-adamig-1-3.json (CDISC-AD0053)
+rule:
+  coreId: CDISC-AD0053
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      # USUBJID=001 exists in DM — no violation
+      - {STUDYID: S1, USUBJID: '001'}
+      # USUBJID=002 absent from DM → DM.USUBJID null after MD-merge → violation
+      - {STUDYID: S1, USUBJID: '002'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-AD0053
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DM.USUBJID: null
+expected_errors: []

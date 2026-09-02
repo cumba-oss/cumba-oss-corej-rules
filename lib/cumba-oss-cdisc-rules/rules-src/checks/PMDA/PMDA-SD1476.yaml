@@ -1,0 +1,40 @@
+Core:
+  Id: "PMDA-SD1476"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Subject Race (RACE) is not populated for a subject\
+  \ in the Demographics (DM) domain."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RACE"
+Check:
+  expression: >-
+    empty(RACE)
+Outcome:
+  Message: "RACE is not populated for the subject."
+  Output_Variables:
+  - "RACE"
+Source:
+  Message: "Missing RACE value for subject"
+  Description: "Subject Race (RACE) value should be populated in submission data.\
+    \ This information is important for analysis."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1476"
+        Version: "1"
+      Version: "6.0"

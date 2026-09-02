@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0333 expect=noViolation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of PCHGCATy for a given value of PCHGCAyN, considering only those rows on which both variables are populated
+#note "within PARAMCD=ALB, each PCHGCA1N value maps to a single PCHGCAT1 value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PCHGCAT1 type=Char
+col PCHGCA1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | low | 1
+CDISCPILOT01 | 01-701-1023 | ALB | low | 1
+---

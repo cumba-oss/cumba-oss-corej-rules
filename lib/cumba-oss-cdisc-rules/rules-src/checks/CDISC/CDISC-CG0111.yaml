@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0111"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --DOSE is populated and --DOSTXT is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DOSTXT"
+    - "--DOSE"
+Check:
+  expression: >-
+    not empty(--DOSE) and not empty(--DOSTXT)
+Outcome:
+  Message: "Both --DOSE and --DOSTXT values are populated"
+  Output_Variables:
+  - "--DOSE"
+  - "--DOSTXT"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--DOSTXT"
+  Condition: "--DOSE ^= null"
+  Rule: "--DOSTXT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0111"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0111"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0111"
+        Version: "1"
+      Version: "2.0"

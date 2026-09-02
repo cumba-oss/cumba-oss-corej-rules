@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1457 expect=violation domain=LBchem
+#note "LBchem (6 characters, but carries lower-case letters). Isolates the CHARSET arm of the regex from the LENGTH arm pinned on PMDA-SD1457-invalid_name_too_long."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt dataset_name=LBchem
+dataset LBchem
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1

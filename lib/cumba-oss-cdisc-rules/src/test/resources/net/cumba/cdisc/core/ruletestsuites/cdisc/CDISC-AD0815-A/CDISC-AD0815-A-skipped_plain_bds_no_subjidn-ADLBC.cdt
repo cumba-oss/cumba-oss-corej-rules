@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0815-A expect=skipped domain=ADLBC
+#note "THE FALSE-POSITIVE PIN (review S1 of Fix #331). A plain ADaMIG 1.3 BDS dataset carries SUBJID and -- legitimately -- no SUBJIDN: SUBJIDN exists only in the ADPPKIG population-PK subclass. Without the Scope.Subclasses gate this sister would report an ERROR on every conformant BDS dataset in a submission. The fixture declares structure=BDS and no subclass, so the rule is out of scope and SKIPPED. If this FIRES, the popPK gate has been removed -- escalate, do not rewrite."
+# Declared-tier scope: structure= only; no subclass is declared or detectable, which is the point.
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col SUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 1 | 1015
+---

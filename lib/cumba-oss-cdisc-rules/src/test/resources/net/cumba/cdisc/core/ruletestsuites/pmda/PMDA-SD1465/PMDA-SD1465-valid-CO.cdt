@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1465 expect=noViolation domain=CO
+#note "Row 1 keys its parent record completely; row 2 is a standalone comment with neither IDVARVAL nor RDOMAIN."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | AE | 001 | 1 | AESEQ | 3 | Related comment
+S1 | CO |    | 001 | 2 |       |   | General comment

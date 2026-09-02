@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0028 expect=noViolation domain=LB
+#note "Boundary: row 2 has LBSTNRHI equal to LBSTNRLO, which the rule allows ('must be greater than or equal to'). Row 3 leaves the lower limit missing."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTNRLO type=Num  label="Reference Range Lower Limit-Std Units"
+col LBSTNRHI type=Num  label="Reference Range Upper Limit-Std Units"
+---
+S1 | LB | 001 | 1 | ALB  | 35 | 50
+S1 | LB | 001 | 2 | GLUC | 4  | 4
+S1 | LB | 001 | 3 | HGB  |    | 17

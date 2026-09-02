@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1320 expect=violation domain=LB
+#note "LBSTAT column absent altogether and LBSTRESC empty -> the bare empty(--STAT) leaf is TRUE on every row of the absent column (absent = all-missing, EC-43) and the rule fires (Plan B phase 4d' deleted the redundant not var_exists disjunct this note used to name)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTESTCD=ALB
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | ALB |  |

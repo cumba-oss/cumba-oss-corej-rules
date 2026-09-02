@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0472 expect=noViolation domain=ADSL
+# Rule:Description: There is more than one value of STRATwR for a given value of STRATwRN, considering only those rows on which both variables are populated
+#note "each STRAT1RN value maps to a single STRAT1R -> no violation"
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col STRAT1R type=Char
+col STRAT1RN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | a1 | G1
+CDISCPILOT01 | 01-701-1023 | a2 | G2
+---

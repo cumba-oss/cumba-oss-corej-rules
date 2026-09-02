@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1439 expect=violation domain=VS
+#note "Present keys: USUBJID, --TESTCD, --CAT, --LOC, --POS; the absent key columns (--TSTDTL, --SCAT, --METHOD, --SPEC, --LAT, --DIR, --OBJ) are silently DROPPED from the grouping (EC-44). Rows 1/2: identical key + BLFL=Y duplicated -> BOTH fire. Row 3: blank target + the `--BLFL == \"Y\"` conjunct -> clean. Row 4: different test -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSSEQ=1
+#expectViolationAt row=2 VSSEQ=2
+dataset VS class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VSCAT    type=Char
+col VSLOC    type=Char
+col VSPOS    type=Char
+col VSBLFL   type=Char
+---
+S1 | VS | S1-001 | 1 | SYSBP | VITALS | ARM | SITTING | Y
+S1 | VS | S1-001 | 2 | SYSBP | VITALS | ARM | SITTING | Y
+S1 | VS | S1-001 | 3 | SYSBP | VITALS | ARM | SITTING |
+S1 | VS | S1-001 | 4 | TEMP  | VITALS | ARM | SITTING | Y

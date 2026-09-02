@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2238 expect=noViolation domain=TS
+#note "GLPTYP rows carry a GLP-type value that is not an NY term (or are empty, guarded out by non_empty); the NY term 'Y' sits only on the GLPFL parameter, where it belongs -> no violation."
+#library standard=sendig version=3-1-1
+#library codelist-terms NY Y N NA U
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | GLPTYP | FDA GLP
+S1 | TS | 2 | GLPTYP | OECD GLP
+S1 | TS | 3 | GLPTYP |
+S1 | TS | 1 | GLPFL  | Y

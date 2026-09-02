@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1064 expect=violation domain=TE
+#note "BOUNDARY, D.1 keep axis. ETCD is empty on rows 1 and 2. Under GroupKeyPolicy.FOLD_BLANK_KEYS, '' is a real key value, so rows 1 and 2 carry the identical (\"\") tuple and BOTH fire, while row 3 (ETCD=TRT) does not. Since W38-A1 / Fix #249 an '' cell and a genuine missing marker are DISTINCT KeyPart identities, so this only works because both blanks here are the same kind. Pin on ELEMENT (read from the primary table) plus row=, not on the empty ETCD. No twin covers a blank target on this operator."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ELEMENT=Screening
+#expectViolationAt row=2 ELEMENT="Screening Part 2"
+dataset TE class="TRIAL DESIGN"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TE |  | Screening
+S1 | TE |  | Screening Part 2
+S1 | TE | TRT | Treatment

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1061 expect=violation domain=MS
+#note "MS is present in the study but the companion Microbiology Specimen (MB) dataset is absent -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset MS class=FINDINGS label="Microbiology Susceptibility Test"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MSSEQ   type=Num  label="Sequence Number"
+col MSTESTCD type=Char label="Microbiology Susceptibility Test Short Name"
+---
+S1 | MS | 001 | 1 | MIC
+---

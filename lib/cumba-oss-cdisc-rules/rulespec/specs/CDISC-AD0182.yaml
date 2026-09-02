@@ -1,0 +1,71 @@
+name: CDISC-AD0182
+kind: rule
+description: |
+  Filter-on-max parity pin. CDISC-AD0182: when BASETYPE is not present
+  and BTOXGR is populated, BTOXGR must equal ATOXGR at the baseline
+  record (ABLFL='Y') for each (USUBJID, PARAMCD) group. Operation
+  `max` on ATOXGR with filter ABLFL='Y'. The dataset deliberately has
+  no BASETYPE column (the Check guards on BASETYPE not_exists).
+
+  Group design:
+  - 101/ALT (discriminating): post-baseline ATOXGR '3' is strictly
+    greater than the baseline ATOXGR '1'; BTOXGR='1' everywhere. A
+    filter-ignoring engine computes $max='3' and false-fires; the
+    fixed engine honours the filter ($='1') and stays quiet.
+  - 102/ALT (violation): BTOXGR='3' on the post-baseline row differs
+    from the baseline ATOXGR '2' -> one violation on that row.
+  - 103/ALT (no baseline): no ABLFL='Y' row, so the group's $-value is
+    missing. Both engines treat populated-vs-missing as not-equal
+    (Java ScalarSemantics ""-fold == Python truth table), so the row
+    with populated BTOXGR fires; the row with empty BTOXGR is blocked
+    by the non_empty guard and stays quiet.
+
+  Grade values are quoted strings to avoid numeric-to-string
+  divergence in `output_variables`.
+python_source: rules-adamig-1-3.json (CDISC-AD0182)
+rule:
+  coreId: CDISC-AD0182
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # 101/ALT — discriminating: post ATOXGR > baseline ATOXGR, BTOXGR correct.
+      - {STUDYID: S1, USUBJID: '101', PARAMCD: ALT, AVISITN: 0, ABLFL: Y, ATOXGR: '1', BTOXGR: '1'}
+      - {STUDYID: S1, USUBJID: '101', PARAMCD: ALT, AVISITN: 1, ABLFL: '', ATOXGR: '3', BTOXGR: '1'}
+      # 102/ALT — violation: BTOXGR='3' on the post-baseline row ≠ baseline ATOXGR '2'.
+      - {STUDYID: S1, USUBJID: '102', PARAMCD: ALT, AVISITN: 0, ABLFL: Y, ATOXGR: '2', BTOXGR: '2'}
+      - {STUDYID: S1, USUBJID: '102', PARAMCD: ALT, AVISITN: 1, ABLFL: '', ATOXGR: '1', BTOXGR: '3'}   # bad
+      # 103/ALT — no ABLFL='Y' row; populated BTOXGR vs missing $-value → fires.
+      - {STUDYID: S1, USUBJID: '103', PARAMCD: ALT, AVISITN: 1, ABLFL: '', ATOXGR: '2', BTOXGR: '2'}   # bad (no baseline)
+      # 103/ALT — empty BTOXGR blocked by the non_empty guard → quiet.
+      - {STUDYID: S1, USUBJID: '103', PARAMCD: ALT, AVISITN: 2, ABLFL: '', ATOXGR: '1', BTOXGR: ''}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0182
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: ALT, STUDYID: S1, USUBJID: '102'}
+    status: SUCCESS
+    output_variables:
+      $baseline_atoxgr: '2'
+      ABLFL:
+      ATOXGR: '1'
+      BTOXGR: '3'
+      PARAMCD: ALT
+  - rule_id: CDISC-AD0182
+    dataset: ADLB
+    row_key: {AVISITN: 1, PARAMCD: ALT, STUDYID: S1, USUBJID: '103'}
+    status: SUCCESS
+    output_variables:
+      $baseline_atoxgr:
+      ABLFL:
+      ATOXGR: '2'
+      BTOXGR: '2'
+      PARAMCD: ALT
+expected_errors: []

@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-AD9702"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an indexed ONTRTxxFL flag variable is present in\
+  \ the dataset but the corresponding non-indexed ONTRTFL variable is not; the indexed\
+  \ flags qualify ONTRTFL, so ONTRTFL must exist wherever they do."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() =~ /^(ONTR(0[1-9]|[1-9][0-9])|ONTRT[1-9])FL$/ and not var_exists("ONTRTFL")
+Outcome:
+  Message: "An indexed flag variable is present but ONTRTFL is not."
+  Output_Variables:
+  - "variable_name"
+Source_Proposed:
+  Sheet_Issue: "#164"
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "ONTRTFL"
+  Natural_Language_Rule_Failure_Criteria: "an indexed ONTRxxFL or ONTRTxFL flag variable\
+    \ is present in the dataset but the non-indexed ONTRTFL variable is not"
+  Rule_Failure_Criteria: "ONTRTFL is not present"
+  Condition_Failure: "an indexed ONTRxxFL or ONTRTxFL variable is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+  - Name: "ADaMIG"
+    Version: "1.2"
+  - Name: "ADaMIG"
+    Version: "1.3"

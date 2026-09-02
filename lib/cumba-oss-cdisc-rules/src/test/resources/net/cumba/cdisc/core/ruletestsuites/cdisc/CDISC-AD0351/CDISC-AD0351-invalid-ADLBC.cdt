@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0351 expect=violation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of AyHIC for a given value of AyHI
+#note "within PARAMCD GLUC, A1HI=G maps to two distinct A1HIC values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1HIC type=Char
+col A1HI type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | A1 | G
+CDISCPILOT01 | 01-701-1015 | GLUC | A2 | G
+---

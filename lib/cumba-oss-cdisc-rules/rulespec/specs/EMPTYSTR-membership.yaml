@@ -1,0 +1,42 @@
+name: EMPTYSTR-membership
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category A.1).
+  is_not_contained_by ["Y","N"] now fires on an empty cell — the honest engine
+  evaluates "" literally ("" is not in the list), matching Python's literal
+  membership. Aligned: both engines flag the empty row. No baseline entry.
+python_source: PLAN-empty-string-membership-parity.md (A.1)
+check:
+  name: AESER
+  operator: is_not_contained_by
+  value: ["Y", "N"]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AESER: 'Y'}     # in list → no fire
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AESER: ''}      # empty → fires (literal)
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AESER: 'Z'}     # not in list → fires
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-membership
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESER:
+    STUDYID: S1
+    USUBJID: '002'
+- rule_id: AUTO-EMPTYSTR-membership
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AESER: Z
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

@@ -1,0 +1,40 @@
+name: CDISC-CG0279-A
+kind: rule
+description: |
+  Dataset-absence rule added by PLAN-ts-parameter-absence-coverage.md (D2), giving
+  the CDISC family the PCLAS presence check FDA-SD2223 and PMDA-SD2223 already have.
+  Unlike its record twin CDISC-CG0279 it encodes BOTH conjuncts of SDTMIG Appendix
+  C1: the study is interventional AND INTTYPE is one for which pharmacological
+  class applies ($INTTYPE_PHARM >= 1, the same value list FDA-SD2223 uses). No PCLAS
+  row exists, so $PCLAS_N == 0 and the rule fires once at dataset level.
+  Java-canonical output_variables is empty: Java does not materialise
+  $-operation Output_Variables on a dataset-level finding, where Python emits
+  their values. Pre-existing engine divergence -- see the baseline entry.
+python_source: rules-cdisc-sdtmig-3-3.json (CDISC-CG0279-A)
+rule:
+  coreId: CDISC-CG0279-A
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: STYPE, TSVAL: INTERVENTIONAL}
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 2, TSPARMCD: INTTYPE, TSVAL: DRUG}
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 3, TSPARMCD: TITLE, TSVAL: A Study of Drug X}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0279-A
+    dataset: TS
+    row_key: {STUDYID: S1, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $INTTYPE_PHARM: '1'
+      $PCLAS_N: '0'
+      $STYPE_INTERVENTIONAL: '1'
+      TSPARMCD: 'STYPE'
+      TSVAL: 'INTERVENTIONAL'
+expected_errors: []

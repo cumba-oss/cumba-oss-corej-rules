@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1014 expect=violation domain=LB
+#note "DISCRIMINATING: TA is declared with zero data rows -> distinct(TAETORD) over TA is the EMPTY set. Row 1's populated TAETORD=1 is 'not in {}' and fires; row 2 leaves TAETORD empty and stays guarded. If this reports 0, escalate — it would refute distinct EmptyResult.SET."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TAETORD=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+---
+S1 | LB | 001 | 1 | ALB | 1
+S1 | LB | 001 | 2 | ALB |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---

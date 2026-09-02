@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0524"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject's actual arm is empty (ARMNRS indicates\
+  \ Screen Failure, Not Assigned, Assigned Not Treated, or Unplanned Treatment) but\
+  \ the Actual Arm Code (ACTARMCD) is populated; ACTARMCD must be empty for any of\
+  \ these ARMNRS reasons."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    ARMNRS in ["SCREEN FAILURE", "NOT ASSIGNED", "ASSIGNED, NOT TREATED", "UNPLANNED TREATMENT"] and
+    not empty(ACTARMCD)
+Outcome:
+  Message: "ACTARMCD is populated for a subject whose actual arm is empty (ARMNRS\
+    \ indicates Screen Failure, Not Assigned, Assigned Not Treated, or Unplanned Treatment)."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARMCD"
+  Condition: "Subject not assigned to treatment"
+  Rule: "ACTARMCD = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0524"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0524"
+        Version: "1"
+      Version: "2.0"

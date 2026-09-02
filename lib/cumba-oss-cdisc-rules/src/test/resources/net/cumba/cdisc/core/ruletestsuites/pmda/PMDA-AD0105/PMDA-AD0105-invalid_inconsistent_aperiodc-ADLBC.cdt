@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0105 expect=violation domain=ADLBC
+#note "PARAMCD is filler (no structure gate). Grouped by APERIOD=1 the target APERIODC holds {PERIOD1, PERIOD1, PERIODONE} -> minority row 3 fires. PERIODONE is a deliberately different spelling of the same period."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 APERIOD=1 APERIODC=PERIODONE
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col APERIOD  type=Num
+col APERIODC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | PERIOD1
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | PERIOD1
+CDISCPILOT01 | 01-701-1034 | GLUC | 1 | PERIODONE

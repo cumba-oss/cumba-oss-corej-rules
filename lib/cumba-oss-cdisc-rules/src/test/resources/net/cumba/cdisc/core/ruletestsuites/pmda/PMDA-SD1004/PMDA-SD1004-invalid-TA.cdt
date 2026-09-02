@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1004 expect=violation domain=TA
+#note "ADAPTED-FROM fda/FDA-SD1004/FDA-SD1004-invalid-TA.cdt (data and pins verbatim). Second in-scope domain: TA carries ARMCD as its topic variable; the 21-character value on row 1 fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=PLACEBO-RUN-IN-ARM-AB
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+---
+S1 | TA | PLACEBO-RUN-IN-ARM-AB | Placebo run-in arm AB | 1
+S1 | TA | PLACEBO-RUN-IN-ARM-A | Placebo run-in arm A | 2

@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-CG0119"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Actual Arm (ACTARM) is 'Screen Failure'\
+  \ or 'Not Assigned' but its value does not equal the Description of Planned Arm\
+  \ (ARM)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARM"
+    - "ARM"
+Check:
+  expression: >-
+    ACTARM in ["Screen Failure", "Not Assigned"] and ACTARM != ARM
+Outcome:
+  Message: "ACTARM is 'Screen Failure' or 'Not Assigned' but does not equal ARM."
+  Output_Variables:
+  - "ARM"
+  - "ACTARM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARM"
+  Condition: "ACTARM in ('Screen Failure', 'Not Assigned')"
+  Rule: "ACTARM = ARM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0119"
+        Version: "1"
+      Version: "2.0"

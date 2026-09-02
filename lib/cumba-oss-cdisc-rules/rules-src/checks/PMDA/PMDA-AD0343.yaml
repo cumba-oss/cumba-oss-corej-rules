@@ -1,0 +1,58 @@
+Core:
+  Id: "PMDA-AD0343"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and a parameter, the Analysis Normal\
+  \ Range Lower Limit (C) (ANRLOC) variable does not have a single consistent value\
+  \ across all records sharing the same combination of Parameter Code (PARAMCD) and\
+  \ a populated Analysis Normal Range Lower Limit (ANRLO) value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and not empty(ANRLO) and not empty(PARAMCD) and
+    is_inconsistent_across_dataset(ANRLOC, keys=[PARAMCD, ANRLO])
+Outcome:
+  Message: "Inconsistent value for ANRLOC within a unique ANRLO."
+  Output_Variables:
+  - "PARAMCD"
+  - "ANRLO"
+  - "ANRLOC"
+Source:
+  Message: "Inconsistent value for ANRLOC"
+  Description: "Within a Study and a Parameter, all Analysis Normal Range Lower Limit\
+    \ (C) (ANRLOC) variable values must be the same for each unique value of Analysis\
+    \ Normal Range Lower Limit (ANRLO) variable when variable ANRLO is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0343"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0343"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0343"
+        Version: "1"
+      Version: "6.0"

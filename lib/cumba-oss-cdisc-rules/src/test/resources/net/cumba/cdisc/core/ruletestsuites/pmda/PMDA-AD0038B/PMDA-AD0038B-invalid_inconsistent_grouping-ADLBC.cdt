@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0038B expect=violation domain=ADLBC
+#note "AGEGR1 matches *GRy {*=AGE,y=1}; AGEGR1N matches *GRyN {*=AGE,y=1} - same group set, Step 3 dedupes to ONE expansion. Check is has_multiple_values_for(*GRy, *GRyN): DEPENDENT=AGEGR1 (1st arg), KEY=AGEGR1N (2nd arg): key 1 carries {YOUNG,OLD} -> rows 1,2 fire. Record granularity -> 2 violations. (Corrected 2026-08-20 per stage-R reclassification: argument-role transposition in the original fixture-derivation.)"
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 AGEGR1=YOUNG AGEGR1N=1
+#expectViolationAt row=2 USUBJID=01-701-1023 AGEGR1=OLD AGEGR1N=1
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AGEGR1   type=Char
+col AGEGR1N  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | YOUNG | 1
+CDISCPILOT01 | 01-701-1023 | ALB | OLD   | 1
+CDISCPILOT01 | 01-701-1034 | ALB | YOUNG | 2

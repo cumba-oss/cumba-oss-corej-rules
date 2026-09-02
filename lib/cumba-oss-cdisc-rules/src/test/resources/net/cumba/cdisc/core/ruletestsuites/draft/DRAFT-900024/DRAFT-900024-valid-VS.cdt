@@ -1,0 +1,18 @@
+#!RuleTest
+#test DRAFT-900024 expect=noViolation domain=VS
+#note "Same library lines; define declares only published codes: VSPOS codelist_coded_codes=[C62167,C62166], VSLOC [C32141]. Subset of the published set on every guarded variable -> silent."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 codelist_extensible=false codelist_coded_values="[\"SUPINE\",\"STANDING\"]" codelist_coded_codes="[\"C62167\",\"C62166\"]"
+#library variable-metadata VS VSLOC codelist=C74456 codelist_extensible=false codelist_coded_values="[\"ARM\",\"LEG\"]" codelist_coded_codes="[\"C32141\",\"C32226\"]"
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLOC:Qualifier
+#define variable-metadata VS VSPOS name=VSPOS codelist_coded_values="[\"SUPINE\",\"STANDING\"]" codelist_coded_codes="[\"C62167\",\"C62166\"]"
+#define variable-metadata VS VSLOC name=VSLOC codelist_coded_values="[\"ARM\"]" codelist_coded_codes="[\"C32141\"]"
+#define variable-metadata VS VSTESTCD name=VSTESTCD codelist_coded_codes="[]"
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLOC    type=Char
+---
+001 | SYSBP | SUPINE | ARM
+---

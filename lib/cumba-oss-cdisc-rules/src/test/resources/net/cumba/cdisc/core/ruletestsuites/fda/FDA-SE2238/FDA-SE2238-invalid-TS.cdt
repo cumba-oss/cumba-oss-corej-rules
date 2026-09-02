@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2238 expect=violation domain=TS
+#note "Row 1: TSPARMCD=GLPTYP with TSVAL='Y', a term of the (synthetic) NY codelist -> fires. Row 2 (GLPFL, Y) is a different parameter; row 3 (GLPTYP, non-NY value) and row 4 (GLPTYP, empty TSVAL) stay clean."
+#library standard=sendig version=3-1-1
+#library codelist-terms NY Y N NA U
+#expectViolationCount 1
+#expectViolationAt row=1 TSVAL=Y
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | GLPTYP | Y
+S1 | TS | 1 | GLPFL  | Y
+S1 | TS | 2 | GLPTYP | FDA GLP
+S1 | TS | 3 | GLPTYP |

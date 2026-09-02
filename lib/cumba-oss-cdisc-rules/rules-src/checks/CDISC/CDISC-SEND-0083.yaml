@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0083"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the planned elapsed time (--ELTM) is not constant\
+  \ across records that share the same DOMAIN, VISITDY, --TPTREF, and --TPTNUM; such\
+  \ records are expected to have the same --ELTM value."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+Check:
+  expression: >-
+    not empty(--ELTM) and var_exists("VISITDY") and var_exists("--TPTREF") and
+    var_exists("--TPTNUM") and is_inconsistent_across_dataset(--ELTM, keys=[DOMAIN, VISITDY,
+    --TPTREF, --TPTNUM])
+Outcome:
+  Message: "--ELTM is not consistent across records that share the same DOMAIN, VISITDY,\
+    \ --TPTREF, and --TPTNUM."
+  Output_Variables:
+  - "DOMAIN"
+  - "VISITDY"
+  - "--TPTNUM"
+  - "--ELTM"
+  - "--TPTREF"
+Source:
+  Class: "INT, FND"
+  Domain: "ALL"
+  Variable: "--ELTM"
+  Plain_Text_Explanation: "Within a domain, the --ELTM variable should be populated\
+    \ consistently. This means that if two subjects have the same VISITDY, --TPTREF,\
+    \ and --TPTNUM, it is expected that the --ELTM values are the same."
+  Condition: "--ELTM is ^= null  and DOMAIN, VISITDY, --TPTREF, and --TPTNUM values\
+    \ match for two or more USUBJID or POOLID"
+  Rule: "--ELTM values are the same for these records"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND83"
+        Version: "1"
+      Version: "5.0"

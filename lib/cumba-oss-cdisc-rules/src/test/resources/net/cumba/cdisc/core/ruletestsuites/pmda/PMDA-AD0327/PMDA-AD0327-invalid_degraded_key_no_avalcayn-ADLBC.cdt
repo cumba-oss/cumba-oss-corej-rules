@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0327 expect=violation domain=ADLBC
+#note "AVALCA1N is not declared. The expander still seeds y=1 from AVALCAT1 and resolves the partner name to the (absent) AVALCA1N; the operator then silently DROPS the absent key column and regroups on [PARAMCD] alone, so the ALB group holds {LOW x2, HIGH x1} and row 3 fires. The guard sits on the TARGET, so nothing suppresses this -- the drop-and-regroup coarser check (guard-matrix class D)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 AVALCAT1=HIGH PARAMCD=ALB
+dataset ADLBC class=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVALCAT1 type=Char
+---
+S1 | 001 | ALB | LOW
+S1 | 002 | ALB | LOW
+S1 | 003 | ALB | HIGH

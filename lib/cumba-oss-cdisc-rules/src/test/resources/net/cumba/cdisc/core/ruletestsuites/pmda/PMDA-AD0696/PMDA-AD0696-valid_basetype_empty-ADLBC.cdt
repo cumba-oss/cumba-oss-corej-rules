@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0696 expect=noViolation domain=ADLBC
+#note "Both rows have BASETYPE empty. TODAY: `not empty(BASETYPE)` is false on every row -> silent. PROPOSED: additionally, a blank grouping-key component drops the row from every group (rule-level DROP_MISSING_KEYS). Verdict-identical - pins the populated-keys applicability conjuncts."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col SPDEVID  type=Char
+col PARAMCD  type=Char
+col BASETYPE type=Char
+col ABLFL    type=Char
+col AVAL     type=Num
+---
+S1 | 001 | DEV01 | GLUC | | Y | 100
+S1 | 001 | DEV01 | GLUC | | Y | 105

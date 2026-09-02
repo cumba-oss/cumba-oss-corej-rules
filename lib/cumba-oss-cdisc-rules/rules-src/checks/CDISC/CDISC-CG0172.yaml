@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0172"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SSSTRESC is equal to 'DEAD' in the SS dataset and\
+  \ SSDTC is less than the subject's maximum DSSTDTC in the DS dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SS"
+Requirements:
+  Variables:
+    All:
+    - "SSSTRESC"
+Operations:
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    SSSTRESC == "DEAD" and date(SSDTC) < $max_ds_dsstdtc
+Outcome:
+  Message: "SSDTC is not greater than or equal to the subject's maximum DSSTDTC value\
+    \ in the DS dataset, when SSSTRESC is equal to 'DEAD'."
+  Output_Variables:
+  - "SSSTRESC"
+  - "SSDTC"
+  - "$max_ds_dsstdtc"
+Source:
+  Class: "FND"
+  Domain: "SS"
+  Variable: "SSDTC"
+  Condition: "SSSTRESC = 'DEAD'"
+  Rule: "SSDTC >= all DS.DSSTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0172"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0172"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0172"
+        Version: "2"
+      Version: "2.0"

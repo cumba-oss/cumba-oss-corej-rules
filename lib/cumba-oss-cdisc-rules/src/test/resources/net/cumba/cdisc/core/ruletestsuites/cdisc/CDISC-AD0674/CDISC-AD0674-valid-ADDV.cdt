@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0674 expect=noViolation domain=ADDV
+# Rule:Description: There is more than one value of DEVGRyN for a given value of DEVGRy, considering only those rows on which both variables are populated
+#note "each DEVGR1 value maps to a single DEVGR1N value -> noViolation"
+dataset ADDV class="DEVICE LEVEL ANALYSIS DATASET"
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col DEVGR1N type=Char
+col DEVGR1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | A1 | K1
+CDISCPILOT01 | 01-701-1023 | DEV01 | A2 | K2
+CDISCPILOT01 | 01-701-1028 | DEV01 | A1 | K1
+---

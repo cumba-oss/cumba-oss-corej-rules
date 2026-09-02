@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-CG0465"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Identifying Variable (IDVAR) is empty and Identifying\
+  \ Variable Value (IDVARVAL) is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "IDVAR"
+    - "IDVARVAL"
+Check:
+  expression: >-
+    empty(IDVAR) and not empty(IDVARVAL)
+Outcome:
+  Message: "IDVARVAL is populated when IDVAR is empty."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+Source:
+  Class: "SPC"
+  Domain: "CO, SUPP--"
+  Variable: "IDVARVAL"
+  Condition: "IDVAR = null"
+  Rule: "IDVARVAL = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0465"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0465"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0465"
+        Version: "1"
+      Version: "2.0"

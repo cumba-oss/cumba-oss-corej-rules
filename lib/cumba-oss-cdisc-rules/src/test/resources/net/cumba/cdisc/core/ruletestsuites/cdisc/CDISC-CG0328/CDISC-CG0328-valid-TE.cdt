@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0328 expect=noViolation domain=TE
+#note "Row 1 populates TEENRL, row 2 populates TEDUR, row 3 populates both -> every element satisfies 'at least one of TEENRL or TEDUR should be populated'."
+#library standard=sdtmig version=3-4
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent | End of screening |
+CDISCPILOT01 | TE | TRT  | Treatment | First dose       |                  | P14D
+CDISCPILOT01 | TE | FUP  | Follow-up | Last dose        | End of follow-up | P28D

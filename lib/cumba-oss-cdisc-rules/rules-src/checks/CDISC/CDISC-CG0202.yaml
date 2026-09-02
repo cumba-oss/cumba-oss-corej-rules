@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0202"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Origin (QORIG) is equal to 'ASSIGNED', indicating\
+  \ subjective data, but the Evaluator (QEVAL) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QORIG"
+Check:
+  expression: >-
+    equalsIgnoreCase(QORIG, "ASSIGNED") and empty(QEVAL)
+Outcome:
+  Message: "QEVAL is empty when QORIG equals 'ASSIGNED'."
+  Output_Variables:
+  - "QNAM"
+  - "QORIG"
+  - "QEVAL"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "QEVAL"
+  Condition: "QORIG = 'Assigned'"
+  Rule: "QEVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0202"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0202"
+        Version: "2"
+      Version: "2.0"

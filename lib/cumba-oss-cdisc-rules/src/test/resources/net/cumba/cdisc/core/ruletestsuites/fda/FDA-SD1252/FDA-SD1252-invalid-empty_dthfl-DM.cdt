@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1252 expect=violation domain=DM
+#note "SS has SSSTRESC=DEAD but DM.DTHFL is empty (present-but-blank does not equal 'Y') -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 |
+---
+
+dataset SS class=FINDINGS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Subject Status Result in Std Format"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0366 expect=violation domain=ADSL
+#note "No RANDDT column; RANDFL is present but 'N' on every record (nobody randomized). The shipped Check is the sheet's own presence condition, var_exists(\"RANDFL\") and not var_exists(\"RANDDT\"), so it fires once at row=1 with values {RANDFL=N}. Pins the presence-conditioned rule (Fix #278, ruling M2-D11), which also retired the now-unused $RANDFL_Y_COUNT Operation; the previous $RANDFL_Y_COUNT > 0 form (the CDISC twin's =Y condition) was silent here because no record carries Y. CDISC-AD0366 keeps the =Y condition - correct for its own sheet."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 RANDFL=N
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col RANDFL  type=Char
+---
+S1 | 001 | N
+S1 | 002 | N

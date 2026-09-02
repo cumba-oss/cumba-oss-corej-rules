@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0013"
+Sheet_Rule_Identifier: "DD0013"
+Rule_Set: "PMDA"
+Element: "MethodDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The OID attribute for Method (the Method ID) must be unique within Define.xml. Define-XML specification represents Methods as MethodDef elements within MetaDataVersion element."
+# Sheet scope is "within Define.xml" => document-wide (MethodDef only lives under
+# MetaDataVersion, so this also covers multi-MDV documents the strict way).
+Message: "Duplicate Method OID [${value}]"
+Check:
+  kind: "unique_in_document"
+  attribute: "OID"

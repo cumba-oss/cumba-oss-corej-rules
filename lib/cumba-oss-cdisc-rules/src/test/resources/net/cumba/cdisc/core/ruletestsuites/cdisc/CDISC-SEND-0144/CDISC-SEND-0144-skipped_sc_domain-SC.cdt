@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0144 expect=skipped domain=SC
+#note "THE EXCLUSION PIN (Fix #301 / M3-D23(i)). SC is a FINDINGS-class domain carrying SCORRES and SCSTAT, so the Classes gate admits it and the two rows below are EXACTLY the shape -invalid_stat_empty-BW fires on -- yet the sheet's own Domain cell for SEND144 (rows 727-732, all six byte-identical) reads `NOT (SC)`, an explicit exclusion. That string was transcribed into Source.Domain and then never encoded, so coreJ reported this defect on precisely the domain its authority exempts. Adding Scope.Domains.Exclude [\"SC\"] alongside the existing Classes block encodes it -- ScopeMatcher evaluates the Domains and Classes axes independently, so the two compose -- and the rule is now SKIPPED here. ESCALATE if this reports a violation: the exclusion is not being read."
+#library standard=sendig version=3-1-1
+dataset SC label="Subject Characteristics" class=FINDINGS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SCSEQ    type=Num  label="Sequence Number"
+col SCTESTCD type=Char label="Subject Characteristic Short Name"
+col SCORRES  type=Char label="Result or Finding in Original Units"
+col SCSTAT   type=Char label="Completion Status"
+---
+S1 | SC | 001 | 1 | AGE  |     |
+S1 | SC | 001 | 2 | SEX  |     |
+---

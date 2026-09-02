@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1426 expect=violation domain=AC
+#note "A CAGTCAT record carries ACVAL 'CHEMICAL' but AC holds no ACPARMCD='CHCOAIND' record. FDA: \"'Chemical Agent CoA Indicator' (CHCOAIND) record is expected in the Challenge Agent Characterization (AC) domain when the Parameter Value (ACVAL) for the 'Challenge Agent Category' (CAGTCAT) parameter is 'CHEMICAL'.\" -> the rule must fire exactly once for the dataset."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+dataset AC label="Challenge Agent Characterization"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ACSEQ    type=Num  label="Sequence Number"
+col ACPARMCD type=Char label="Challenge Agent Parameter Short Name"
+col ACPARM   type=Char label="Challenge Agent Parameter"
+col ACVAL    type=Char label="Parameter Value"
+---
+S1 | AC | 1 | CAGTCAT | Challenge Agent Category | CHEMICAL
+S1 | AC | 2 | CAGTSUPN | Challenge Agent Supplier Name | ACME LABS

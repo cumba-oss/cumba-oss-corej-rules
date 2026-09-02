@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0372"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Short Name of Measurement, Test or Examination\
+  \ (--TESTCD) value is longer than 8 characters, starts with a number, or contains\
+  \ characters other than letters, numbers or underscores."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "TRIAL DESIGN"
+Requirements:
+  Variables:
+    All:
+    - "--TESTCD"
+Check:
+  expression: >-
+    not empty(--TESTCD) and --TESTCD !~ /^[A-Za-z_][A-Za-z0-9_]{0,7}$/
+Outcome:
+  Message: "--TESTCD value is longer than 8 characters, starts with a number, or contains\
+    \ characters other than letters, numbers, or underscores."
+  Output_Variables:
+  - "--TESTCD"
+Source:
+  Class: "FND, TDM"
+  Domain: "ALL"
+  Variable: "--TESTCD"
+  Rule: "--TESTCD <= 8 chars and contains only letters, numbers, and underscores and\
+    \ can not start with a number"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0372"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0372"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0372"
+        Version: "1"
+      Version: "2.0"

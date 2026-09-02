@@ -1,0 +1,36 @@
+#!RuleTest
+#test FDA-SD1387 expect=violation domain=MB
+#note "MBXDY populated on every row: row1 MBDTC empty; row2 MBDTC incomplete; row3 DM.RFXSTDTC empty; row4 DM.RFXSTDTC incomplete; row5 subject 004 is absent from DM, so the inner join drops the row and it no longer fires -- D-TA-2 (inner is the doctrine: a subject absent from DM is FDA-SD0064's finding, not this rule's); it fired here until the Join_Type was removed."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 4
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=001
+#expectViolationAt row=3 USUBJID=002
+#expectViolationAt row=4 USUBJID=003
+dataset MB class=FINDINGS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MBSEQ   type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test Code"
+col MBDTC type=Char label="Date/Time of Collection"
+col MBXDY  type=Num  label="Day of Obs Relative to Exposure"
+---
+S1 | MB | 001 | 1 | BACT |  | 5
+S1 | MB | 001 | 2 | BACT | 2023-06 | 5
+S1 | MB | 002 | 1 | BACT | 2023-06-25 | 5
+S1 | MB | 003 | 1 | BACT | 2023-06-25 | 5
+S1 | MB | 004 | 1 | BACT | 2023-06-25 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2023-06-01 | 2023-06-10 | 2023-06-20
+S1 | DM | 002 | 2023-06-01 |            | 2023-06-20
+S1 | DM | 003 | 2023-06-01 | 2023-06    | 2023-06-20

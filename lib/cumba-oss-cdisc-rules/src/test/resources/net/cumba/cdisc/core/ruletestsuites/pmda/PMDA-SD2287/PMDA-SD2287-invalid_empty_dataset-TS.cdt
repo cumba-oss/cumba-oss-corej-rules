@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2287 expect=violation domain=TS
+#note "The batch's single 0-row fixture: record_count with filter over an empty table yields 0 (the operator's declared empty result) and the runtime-scalar comparison folds TRUE above the synthetic-row branch -> 1 violation at row=1. Meaningful: a record-less TS is exactly the sheet's own defect case ('ONGOSIND record must be populated')."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---

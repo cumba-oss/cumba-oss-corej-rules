@@ -1,0 +1,78 @@
+Core:
+  Id: "PMDA-SD1353"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Standardized Result in Character Format (--STRESC)\
+  \ and Result or Finding in Original Units (--ORRES) both represent numeric values\
+  \ but do not equal each other, while Standard Units (--STRESU) equal Original Units\
+  \ (--ORRESU) or both unit variables are empty."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--ORRES"
+    - "--STRESC"
+Check:
+  expression: >-
+    --ORRES =~ /^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$/ and --STRESC =~
+    /^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$/ and (var_exists("--STRESU") and var_exists("--ORRESU") and
+    --STRESU == --ORRESU or empty(--STRESU) and empty(--ORRESU)) and --STRESC != --ORRES
+Outcome:
+  Message: "--STRESC does not equal --ORRES when both values are numeric and --STRESU\
+    \ equals --ORRESU or both units are empty."
+  Output_Variables:
+  - "--ORRES"
+  - "--ORRESU"
+  - "--STRESC"
+  - "--STRESU"
+Source:
+  Message: "--STRESC does not equal --ORRES when --STRESU is equal to --ORRESU"
+  Description: "Standardized Result in Character Format (--STRESC) variable value\
+    \ should be equal to Result or Finding in Original Units (--ORRES) variable value\
+    \ when variable values are numeric and Standard Units (--STRESU) and Original\
+    \ Units (--ORRESU) are populated with the same units or are null."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1353"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1353"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1353"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1353"
+        Version: "1"
+      Version: "1.6"

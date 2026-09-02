@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0029 expect=noViolation domain=LB
+#note "CL-A A.3 (wave TA-4): the numeric-result gate adopted from PMDA-SD0029 - both sheets restrict the requirement to results 'provided as a numeric result'. Row 1's qualitative result (POSITIVE) has no conceivable unit and no longer fires; the old shape fired on any populated LBSTRESC, an over-approximation the rule's own Executability admitted. Row 2's numeric result carries its units."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | POSITIVE |
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | 40       | g/L

@@ -1,0 +1,143 @@
+name: Q16-partial-date-comparison-hull
+kind: rule
+description: |
+  Fix #193 (Q16) — a `date_*` comparison is evaluated over the HULL a possibly-incomplete
+  ISO-8601 value denotes, not over its truncated text. `A op B` means "A op EVERY candidate of
+  B": uniform forall, two-valued, no INDETERMINATE (IsoDateComparison over IsoDateBounds).
+  The fork instead truncates BOTH operands to `get_common_precision(target, comparator)` and
+  compares the truncations — which is exactly the pre-Q16 coreJ path through
+  `ScalarSemantics.compareIso`.
+
+  ⚠ SYNTHETIC INLINE RULE, deliberately. Fix #193 recorded that 0 of 4712 `.cdt` fixtures feed a
+  partial or masked operand into a `date_*` comparison (65 of 110 date rules have fixtures; their
+  538 date cells are 484 complete + 54 blank), and no parity spec carried one either. There is no
+  corpus rule that exercises this, so the pin has to build its own data. Same reason as
+  EC21-date-diff-target-from-evaluation-domain and EC18-date-diff-mode3-sided.
+
+  The leaf is `AESTDTC date_greater_than_or_equal_to AEENDTC`. `>=` is chosen because it is one
+  of the three operators that actually diverge; see python_notes for the measured matrix.
+
+  001 — PARTIAL-vs-COMPLETE. The comparand `2026-03` is a whole month and the target
+        `2026-03-15` sits INSIDE its hull, so `>=` does not hold for every candidate
+        (2026-03-20 is a candidate and is later). coreJ answers FALSE. The fork truncates both
+        to month precision (2026-03-01 vs 2026-03-01) and answers TRUE. THE DIVERGENCE.
+
+  002 — YEAR-PRECISION comparand, the second defect Fix #193 repaired. `2026` parses as a
+        Double, so `ScalarSemantics.tryNumericRhs` claimed it and the pair fell through to the
+        "mixed numeric/ISO shape => violation" arm of `Primitives.dateComparison`, which fired
+        every operator on every row — measured then: `2026-01-17` against `2026` answered TRUE
+        for all six, `==` and `!=` simultaneously. `Primitives.isIsoText` now re-routes a
+        calendar-valid ISO string to the hull rule. The hull of `2026` is the whole year,
+        `2026-03-15` is inside it, so coreJ answers FALSE; the fork's common precision is YEAR,
+        both operands truncate to 2026-01-01, and it answers TRUE. THE DIVERGENCE, second shape.
+
+  003 — CONTROL on PARTIAL data. Target `2026-04-10` is later than every candidate of the
+        comparand month `2026-03`, so the forall holds and BOTH lanes fire, with byte-identical
+        violation records. This is the subject that proves the rule still RUNS on partial
+        operands — without it, "coreJ no-fires on 001/002" would be indistinguishable from
+        "coreJ never evaluated the leaf".
+
+  004 — CONTROL, complete-vs-complete, EQUALITY. Two calendar-complete operands take
+        IsoDateComparison's both-complete fast path (`compareIso` + `matchCmp`) instead of the
+        hulls. Fix #250 (PLAN-compare-iso-core-normalisation) changes the fast path to compare
+        the operands' normalised CORES (trimmed, UTC-shifted, fractional seconds stripped)
+        instead of the raw text, so complete-vs-complete is no longer bit-identical to the
+        pre-Q16 path BY CONSTRUCTION. The verdict here is unchanged either way: for plain
+        calendar dates like these core == raw, on both shapes of the fast path. Both lanes
+        fire. This pins the gate: a regression that sent complete-vs-complete through the hulls
+        would compare T00:00:00 against T23:59:59, make `2026-03-15 >= 2026-03-15` false, and
+        silence every date_greater_than_or_equal_to rule on equal dates.
+
+  005 — CONTROL, complete-vs-complete, NEGATIVE. `2026-03-15 >= 2026-03-20` is false on both
+        lanes. The other half of the gate: 004 alone would still pass if the operator answered
+        TRUE unconditionally.
+
+  006 — BLANK comparand — a PRESENT EMPTY STRING, which is what an SAS/XPT character blank
+        actually is, not a MissingValue. coreJ gives an unpositionable operand an out-of-band
+        unbounded hull (IsoDateBounds.lower/upper both null), so all six operators answer false
+        by arithmetic with no per-operator guard; the fork's `_dates_are_comparable` rejects a
+        falsy operand and returns False. The lanes AGREE, and the subject is carried
+        deliberately: the saturating-bounds arm is the part of Fix #193 most likely to be
+        mistaken for a divergence, and this pins that it is not one.
+python_notes: |
+  The fork's `compare_dates` (cdisc_rules_engine/check_operators/helpers.py, reached from every
+  `date_*` operator through `vectorized_compare_dates`) computes
+  `get_common_precision(target, comparator)` and truncates BOTH operands to it before applying
+  the Python operator. A partial comparand therefore behaves as its own EARLIEST candidate for
+  the inequality operators, and a complete target that merely falls inside the partial's range
+  compares EQUAL to it.
+
+  Measured 2026-08-10 (wave 23 lane E) against the vendored fork at 195c7172
+  (v0.16.0-hf3-19-g195c7172), calling `compare_dates(None, target, comparator, op)` directly.
+  `T` = fork fires, `F` = fork does not; `!` marks the cells where coreJ disagrees:
+
+    target        comparand      ==     !=      <      <=      >      >=
+    '2026-03-15'  '2026-03'      F      T !     F      T !     F      T !    <- 001
+    '2026-03-15'  '2026'         F      T !     F      T !     F      T !    <- 002
+    '2026-04-10'  '2026-03'      F      T       F      F       T      T      <- 003, agrees
+    '2026-03-15'  '2026-03-15'   T      F       F      T       F      T      <- 004, agrees
+    '2026-03-15'  '2026-03-20'   F      T       T      T       F      F      <- 005, agrees
+    '2026-03-15'  ''             F      F       F      F       F      F      <- 006, agrees
+
+  So three of the six operators diverge on an inside-the-hull partial — `>=`, `<=` and `!=` —
+  and `>`, `<` and `==` happen to agree. This spec pins `>=`.
+
+  ⚠ `is_valid_date` in the fork accepts a bare year and a bare year-month (precision 0 and 1)
+  and rejects `''`, `UNKNOWN`, `----03-15` and the calendar-impossible `2026-02-30`, so the
+  masked and junk forms take the fork's not-comparable path and agree with coreJ's saturating
+  hull. Only a CALENDAR-VALID partial can diverge.
+
+  On the harness, the fork fires 001, 002, 003 and 004; coreJ fires 003 and 004 only. Status is
+  EXECUTED on both lanes and neither reports an error, so the divergence is confined to the
+  `violations` channel. The two rows both lanes fire carry identical output_variables.
+  Java-canonical, by the Java-first direction of 2026-08-03: filed, not ported.
+python_source: PLAN-date-comparison-partial-semantics.md (Open question 2) / Fix #193
+rule:
+  id: q16-partial-date-comparison-hull
+  Core: {Id: Q16-DATE-HULL}
+  Description: AESTDTC must be earlier than AEENDTC.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    all:
+      - {name: AESTDTC, operator: date_greater_than_or_equal_to, value: AEENDTC}
+  Outcome:
+    Message: AESTDTC is not earlier than AEENDTC.
+    Output_Variables: [AESTDTC, AEENDTC]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    # 001 — complete target INSIDE the comparand month: coreJ no-fires, fork fires.
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: '1', AESTDTC: '2026-03-15', AEENDTC: '2026-03'}
+    # 002 — YEAR-precision comparand: coreJ no-fires, fork fires.
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: '1', AESTDTC: '2026-03-15', AEENDTC: '2026'}
+    # 003 — CONTROL on partial data: later than every candidate, both lanes fire.
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: '1', AESTDTC: '2026-04-10', AEENDTC: '2026-03'}
+    # 004 — CONTROL complete-vs-complete, equal: both lanes fire (the both-complete gate).
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '004', AESEQ: '1', AESTDTC: '2026-03-15', AEENDTC: '2026-03-15'}
+    # 005 — CONTROL complete-vs-complete, strictly earlier: neither lane fires.
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '005', AESEQ: '1', AESTDTC: '2026-03-15', AEENDTC: '2026-03-20'}
+    # 006 — blank comparand (present empty string): neither lane fires, and that is the point.
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '006', AESEQ: '1', AESTDTC: '2026-03-15', AEENDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+  - rule_id: Q16-DATE-HULL
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: '1'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026-03'
+      AESTDTC: '2026-04-10'
+  - rule_id: Q16-DATE-HULL
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '004', AESEQ: '1'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026-03-15'
+      AESTDTC: '2026-03-15'
+expected_errors: []

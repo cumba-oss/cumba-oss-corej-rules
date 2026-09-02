@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1366 expect=violation domain=DM
+#note "NEW with the M2-P9 ruling (option (b) / M2-D29, Fix #307). FDA-SD1366 was already narrowed to ['SCREEN FAILURE', 'NOT ASSIGNED']; what travelled here is the FIFTH ARMNULRS term (SDTM CT C142179, added 2025-09-26), which the two-name list left unreported in all three families. A subject who did not finish screening was never randomised, so CG0530's Cited Guidance ('Required for all randomized subjects; null for screen failures or unassigned subjects') puts RFENDTC at null - row 1 fires, row 2 is the conformant control on the same term. Cross-read with the PMDA and CDISC carriers, which took the same term in the same lane."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RFENDTC=2020-02-10
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |            | 2020-02-10 | SCREENING NOT COMPLETED
+CDISCPILOT01 | DM | 01-701-1023 |            |            | SCREENING NOT COMPLETED

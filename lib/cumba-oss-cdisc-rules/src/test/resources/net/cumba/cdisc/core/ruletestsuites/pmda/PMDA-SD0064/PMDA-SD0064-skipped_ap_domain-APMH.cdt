@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD0064 expect=skipped domain=APMH
+#note "FRESH (scope mechanism uncovered by any twin fixture). The Domains.Exclude [AP--] WILDCARD is strict prefix+2, so it matches the 4-char APMH. Second block DM carries would-fire data (subjects 001/002 only, USUBJID=999 absent) so the non-finding is attributable to the gate. A real AP dataset carries APID/RSUBJID rather than USUBJID; the USUBJID column exists here solely to make the skip attributable."
+#library standard=sdtmig version=3-4
+dataset APMH label="Associated Persons Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+---
+S1 | APMH | 999 | 1 | HYPERTENSION
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | M
+S1 | DM | 002 | F
+---

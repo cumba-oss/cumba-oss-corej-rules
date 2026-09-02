@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=noViolation domain=MA
+#note "The M3-D9 carve-out. MALAT binds the LAT codelist (LEFT/RIGHT/BILATERAL). Row 1 submits the lawful semicolon combination LEFT;RIGHT, which SENDIG v3.1 and later explicitly permit (SEND57.1) and which no released CDISC SEND CT codelist publishes as a single term - measured, not guaranteed: 0 of 17 426 terms in sendct-2026-03-27 and 0 across all 43 cached SEND CT packages back to 2014 - so the whole-cell comparison alone would report conforming data. Were CDISC ever to publish a semicolon-bearing term, the failure direction is over-reporting, not under-reporting: an exact hit on such a term is already silenced by the whole-cell conjunct. Row 2 is a plain term and row 3 is empty."
+#library standard=sendig version=3-1-1
+#library variable-metadata MA MALAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#expectViolationCount 0
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MALAT    type=Char label="Laterality"
+---
+S1 | MA | 001 | 1 | GMACROS | LEFT;RIGHT
+S1 | MA | 002 | 2 | GMACROS | BILATERAL
+S1 | MA | 003 | 3 | GMACROS |

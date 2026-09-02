@@ -1,0 +1,91 @@
+Core:
+  Id: "PMDA-SD1247"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when ECOCCUR is present and does not equal 'N', ECSTAT\
+  \ does not equal 'NOT DONE', and ECDOSTXT is empty, but ECDOSE is less than or equal\
+  \ to 0."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Requirements:
+  Variables:
+    All:
+    - "ECDOSE"
+Check:
+  expression: >-
+    (not var_exists("ECOCCUR") or ECOCCUR != "N") and (not var_exists("ECSTAT") or ECSTAT !=
+    "NOT DONE") and empty(ECDOSTXT) and ECDOSE <= 0
+Outcome:
+  Message: "ECDOSE is not greater than 0 when ECOCCUR does not equal 'N', ECSTAT does\
+    \ not equal 'NOT DONE', and ECDOSTXT is empty."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+  - "ECDOSTXT"
+  - "ECSTAT"
+Source:
+  Message: "ECDOSE is not greater than 0 when ECOCCUR does not equal 'N' and ECDOSTXT\
+    \ is null"
+  Description: "ECDOSE must be greater than zero when ECOCCUR does not equal 'N',\
+    \ ECSTAT does not equal 'NOT DONE', and ECDOSTXT is null. ECDOSE must not be set\
+    \ to zero (0) as an alternative method for indicating doses not taken, not given,\
+    \ or missed."
+  Domains: "EC"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1247"
+        Version: "1"
+      Version: "1.6"

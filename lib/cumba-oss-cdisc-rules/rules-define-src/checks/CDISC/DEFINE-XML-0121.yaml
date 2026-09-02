@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0121"
+Sheet_Rule_Identifier: "121"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The IsNonStandard attribute must not be populated when the dataset is standard."
+# The sheet carries no Rule Message for this row; the message below is composed from
+# the sheet's Rule column ("@def:IsNonStandard must not be present when
+# @def:StandardOID is present.").
+Message: "Attribute def:IsNonStandard is provided for ItemGroupDef although def:StandardOID is present."
+Check:
+  kind: "not_exists"
+  target: "@IsNonStandard"
+  when:
+    path: "@StandardOID"
+    exists: true

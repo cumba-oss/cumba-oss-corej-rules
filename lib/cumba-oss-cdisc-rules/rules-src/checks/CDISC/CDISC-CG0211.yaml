@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0211"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SEUPDES is populated and ETCD is not equal to 'UNPLAN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "SEUPDES"
+    - "ETCD"
+Check:
+  expression: >-
+    not empty(SEUPDES) and ETCD != "UNPLAN"
+Outcome:
+  Message: "SEUPDES is populated but ETCD is not equal to 'UNPLAN'."
+  Output_Variables:
+  - "ETCD"
+  - "!SEUPDES"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "ETCD"
+  Condition: "SEUPDES ^= null"
+  Rule: "ETCD = 'UNPLAN'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0211"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0211"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0211"
+        Version: "1"
+      Version: "2.0"

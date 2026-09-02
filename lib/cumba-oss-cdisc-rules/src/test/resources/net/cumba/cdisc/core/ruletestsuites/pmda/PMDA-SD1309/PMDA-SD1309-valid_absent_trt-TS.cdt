@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1309 expect=noViolation domain=TS
+#note "ADAPTED-FROM the CDISC-CG0276 sister fixture (valid_absent). No TRT record at all -> the Check is the record-present half only (SD1309-F2); with no TSPARMCD=TRT row nothing can fire. The PMDA family has no absent-record sibling rule (unlike CDISC's CG0276-A)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | Study Type  | INTERVENTIONAL
+S01 | TS | 2 | TITLE | Trial Title | A Study of Drug X

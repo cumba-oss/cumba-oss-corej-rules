@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0092 expect=violation domain=SE
+#note "The dataset carries no SEUPDES column at all, so the bare empty(SEUPDES) leaf is TRUE on every row (absent = all-missing, EC-43) and the unplanned element on row 2 has no description -> fires. Plan B phase 4d' deleted the not var_exists(SEUPDES) disjunct that used to make this a separate branch of an any-tree; the verdict is unchanged. Row 1 is a planned element."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=UNPLAN
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN   | 2020-01-01
+S1 | SE | 001 | 2 | UNPLAN | 2020-01-10

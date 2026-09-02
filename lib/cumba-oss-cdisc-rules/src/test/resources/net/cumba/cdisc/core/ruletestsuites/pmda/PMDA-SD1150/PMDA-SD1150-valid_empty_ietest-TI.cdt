@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1150 expect=noViolation domain=TI
+#note "Pins the emptiness EXCEPTION on the TARGET side: a blank target neither counts toward the group's distinct values nor is ever flagged, so the group has a single distinct non-blank value and nothing fires."
+#library standard=sdtmig version=3-4
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col IETESTCD type=Char
+col IETEST   type=Char
+col TIVERS   type=Char
+---
+S1 | TI | INCL01 | Age 18 years or older | 1
+S1 | TI | INCL01 |                       | 1
+S1 | TI | INCL01 | Age 18 years or older | 1

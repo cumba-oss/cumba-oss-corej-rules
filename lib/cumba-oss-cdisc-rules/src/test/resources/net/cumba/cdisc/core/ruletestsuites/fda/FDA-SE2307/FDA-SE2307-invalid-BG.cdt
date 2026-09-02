@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2307 expect=violation domain=BG
+#note "Row 2 is missing BGENDY and row 3 is missing BGDY -> each fires (both interval timing variables are required). Row 1 is complete."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=2 BGSEQ=2
+#expectViolationAt row=3 BGSEQ=3
+dataset BG class=FINDINGS label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGTESTCD type=Char label="Test Short Name"
+col BGDY     type=Num  label="Study Day of Start of Interval"
+col BGENDY   type=Num  label="Study Day of End of Weight Interval"
+---
+S1 | BG | 001 | 1 | BWGAIN | 1 | 8
+S1 | BG | 001 | 2 | BWGAIN | 8 | .
+S1 | BG | 001 | 3 | BWGAIN | . | 22

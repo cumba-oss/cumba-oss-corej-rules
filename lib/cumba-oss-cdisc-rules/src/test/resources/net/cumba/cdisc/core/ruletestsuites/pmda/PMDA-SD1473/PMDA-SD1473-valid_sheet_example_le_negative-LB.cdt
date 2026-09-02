@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1473 expect=noViolation domain=LB
+#note "The shipped Check adopts PMDA-SD1471's regex verbatim - ^[><]?=? ?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$ (Fix #275, ruling M2-D8) - under which the sheet's OWN worked example `<= -1.2` is a valid numeric result and the rule stays silent. The previous alternation ^(<|>|=|< |> |= )? admitted at most ONE leading relational symbol, so `<=` did not match and the rule reported 1 violation at row 1: an over-report on a value its own authority declares conformant. All three sheet-siblings (SD1470/SD1471/SD1472) accept it."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBSTNRHI type=Char
+---
+S1 | LB | 001 | 1 | GLUC | <= -1.2 | 6.1
+---

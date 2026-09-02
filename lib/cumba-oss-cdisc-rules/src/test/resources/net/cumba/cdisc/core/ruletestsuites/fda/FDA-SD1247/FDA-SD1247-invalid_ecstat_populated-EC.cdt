@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1247 expect=violation domain=EC
+#note "H3 convergence pin (the second half of the REL-0533 delta): the ECSTAT leg is now the sheet's ECSTAT != 'NOT DONE', so a POPULATED completion status other than NOT DONE no longer suppresses. Row 1 has ECSTAT=COMPLETED with a recorded ECDOSE=0 -> fires (the pre-convergence empty(ECSTAT) shape was silent here); row 2's ECSTAT='NOT DONE' still suppresses."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECOCCUR  type=Char label="Occurrence"
+col ECDOSE   type=Num  label="Dose"
+col ECDOSTXT type=Char label="Dose Description"
+col ECSTAT   type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | 0 | | COMPLETED
+S1 | EC | 001 | 2 | DRUG A | Y | 0 | | NOT DONE

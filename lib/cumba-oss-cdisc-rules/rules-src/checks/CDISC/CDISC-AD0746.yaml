@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-AD0746"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SRCDOM is populated but its value is not an SDTM\
+  \ domain name or ADaM dataset name."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Operations:
+- id: "$datasets"
+  expression: "dataset_names()"
+Check:
+  expression: >-
+    not empty(SRCDOM) and SRCDOM not in $datasets
+Outcome:
+  Message: "SRCDOM has a value that is not an SDTM domain name or ADaM dataset name."
+  Output_Variables:
+  - "SRCDOM"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "SRCDOM"
+  Natural_Language_Rule_Failure_Criteria: "SRCDOM has a value that is not an SDTM\
+    \ domain name, ADaM dataset name, or null"
+  Rule_Failure_Criteria: "SRCDOM has a value that is not an SDTM domain name, ADaM\
+    \ dataset name, or null"
+  Condition_Failure: "SRCDOM is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR746"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR746"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR746"
+        Version: "1"
+      Version: "5.0"

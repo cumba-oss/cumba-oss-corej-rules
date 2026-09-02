@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0175"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when I/E Criterion Original Result (IEORRES) does not\
+  \ equal 'Y' while Inclusion/Exclusion Category (IECAT) is 'EXCLUSION'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "IE"
+Requirements:
+  Variables:
+    All:
+    - "IECAT"
+    - "IEORRES"
+Check:
+  expression: >-
+    IECAT == "EXCLUSION" and IEORRES != "Y"
+Outcome:
+  Message: "IEORRES does not equal 'Y' when IECAT is 'EXCLUSION'."
+  Output_Variables:
+  - "IECAT"
+  - "IEORRES"
+Source:
+  Class: "FND"
+  Domain: "IE"
+  Variable: "IEORRES"
+  Condition: "IECAT = 'EXCLUSION'"
+  Rule: "IEORRES = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0175"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0175"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0175"
+        Version: "1"
+      Version: "2.0"

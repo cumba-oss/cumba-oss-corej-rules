@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SD1335"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Informed Consent (RFICDTC) is after\
+  \ the Date/Time of First Study Treatment (RFXSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXSTDTC"
+Check:
+  expression: >-
+    not empty(RFICDTC) and date(RFICDTC) > RFXSTDTC
+Outcome:
+  Message: "RFICDTC is after RFXSTDTC"
+  Output_Variables:
+  - "RFXSTDTC"
+  - "RFICDTC"
+Source:
+  FDA_Validator_Rule_Message: "RFICDTC is after RFXSTDTC"
+  FDA_Validator_Rule_Description: "Date/Time of Informed Consent (RFICDTC) should\
+    \ not be after Date/Time of First Study Treatment (RFXSTDTC)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-CT2001 expect=noViolation domain=DM
+#note "Boundary against the sibling extensible check: RACE carries a value outside its codelist, but that codelist is extensible, so this non-extensible-only rule must stay silent."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM RACE codelist=RACE codelist_extensible=true codelist_coded_values="[\"WHITE\",\"ASIAN\"]"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE    type=Char label="Race"
+---
+S1 | DM | 001 | WHITE
+S1 | DM | 002 | MARTIAN

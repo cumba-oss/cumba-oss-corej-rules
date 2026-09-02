@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1097 expect=violation domain=AE
+#note "No Match_Datasets join: record_count reads the whole SUPPAE dataset by name, filtered QNAM='AETRTEM' (exact match). Only a TRTEMFL row is present, the sponsor-variant name does NOT count - the rule's documented overreporting case. $aetrtem_count=0 -> fires once, broadcast onto the AE primary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 "$aetrtem_count"=0
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE
+S1 | AE | 001 | 2 | NAUSEA
+---
+
+dataset SUPPAE
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+col QORIG    type=Char
+---
+S1 | AE | 001 | AESEQ | 1 | TRTEMFL | Treatment Emergent | Y | DERIVED
+S1 | AE | 001 | AESEQ | 2 | AESOSP  | Other SAE          | N | CRF

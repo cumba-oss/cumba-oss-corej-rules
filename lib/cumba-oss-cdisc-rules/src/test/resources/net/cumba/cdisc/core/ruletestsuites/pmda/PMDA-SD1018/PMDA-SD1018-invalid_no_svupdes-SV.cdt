@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1018 expect=violation domain=SV
+#note "SV has no SVUPDES column: the bare empty(SVUPDES) leaf is TRUE on every row (absent = all-missing, EC-43), so every visit counts as planned; row 2's triple is not in TV -> fires. Row 1 matches -> silent. Exercises the column-absent case; Plan B phase 4d' deleted the not var_exists(SVUPDES) disjunct that used to make it a separate branch of an or-tree, and the verdict is unchanged."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISITNUM=3
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING | -7
+CDISCPILOT01 | SV | 01-701-1015 | 3 | WEEK2     | 15
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1
+---

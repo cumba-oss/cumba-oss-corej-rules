@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0773 expect=noViolation domain=ADAE
+# Rule:Description: There is more than one value of SEVGRy for a given value of SEVGRyN, considering only those rows on which both variables are populated
+#note "each SEVGR1N maps to a single SEVGR1 -> noViolation"
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col SEVGR1 type=Char
+col SEVGR1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | MILD | 1
+CDISCPILOT01 | 01-701-1015 | 2 | SEVERE | 2
+---

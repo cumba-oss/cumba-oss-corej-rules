@@ -1,0 +1,22 @@
+#!RuleTest
+#test FDA-SD1117 expect=violation domain=VS
+#note "Rows 1 and 2 agree on USUBJID, VSTESTCD and every natural-key variable (VSPOS, VSORRES, VSDTC) -> duplicate Finding Result, both rows fire. Row 3 differs in VSDTC and stays clean."
+#library standard=sdtmig version=3-4
+#library dataset-class VS FINDINGS
+#library domain-variables VS VSTESTCD:Topic "VSPOS:Record Qualifier" "VSORRES:Result Qualifier" VSDTC:Timing
+#expectViolationCount 2
+#expectViolationAt row=1 VSTESTCD=SYSBP
+#expectViolationAt row=2 VSTESTCD=SYSBP
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ   type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSPOS   type=Char label="Vital Signs Position of Subject"
+col VSORRES type=Char label="Result or Finding in Original Units"
+col VSDTC   type=Char label="Date/Time of Measurements"
+---
+S1 | VS | 001 | 1 | SYSBP | SITTING | 120 | 2020-01-01
+S1 | VS | 001 | 2 | SYSBP | SITTING | 120 | 2020-01-01
+S1 | VS | 001 | 3 | SYSBP | SITTING | 120 | 2020-01-08

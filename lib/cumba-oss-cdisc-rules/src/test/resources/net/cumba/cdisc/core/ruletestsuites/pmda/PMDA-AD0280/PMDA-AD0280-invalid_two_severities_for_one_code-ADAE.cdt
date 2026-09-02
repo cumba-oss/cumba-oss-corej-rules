@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0280 expect=violation domain=ADAE
+#note "KEY = AESEVN, DEPENDENT = AESEV: key 1 carries {MILD, MODERATE} -> rows 1 and 2 both fire; key 3 is single-valued. Record granularity -> exactly 2 violations. The declared structure/subclass beat the columns (carrier = the mandatory #library line); AEDECOD is present so the column heuristic agrees with the declaration rather than contradicting it. M2-D17 / Fix #313: the PMDA sheet marks AD0280 for ADaMIG 1.0 only (1.1-1.3 belong to AD0280B), so the rule left rules-pmda-adamig-1-1.json; this fixture moved from version=1-1 to version=1-0 (same rule, same data, same expectation)."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 AESEV=MILD AESEVN=1
+#expectViolationAt row=2 USUBJID=01-701-1023 AESEV=MODERATE AESEVN=1
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD     | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | MODERATE | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH     | SEVERE   | 3

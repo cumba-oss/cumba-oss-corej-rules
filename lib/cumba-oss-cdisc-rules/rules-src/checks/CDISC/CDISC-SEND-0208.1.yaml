@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-SEND-0208.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one ECG (EG) record exists for the same\
+  \ combination of Test Short Name (EGTESTCD), Unique Subject Identifier (USUBJID),\
+  \ ECG reference (EGREFID), and observation time (EGDTC); the domain should hold\
+  \ one record per test per ECG reference per observation time per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "EG"
+Check:
+  expression: >-
+    not is_unique_set([EGTESTCD, USUBJID, EGREFID, EGDTC])
+Outcome:
+  Message: "More than one EG record exists for the same test (EGTESTCD), subject (USUBJID),\
+    \ ECG reference (EGREFID), and observation time (EGDTC)."
+  Output_Variables:
+  - "EGREFID"
+  - "EGTESTCD"
+  - "EGDTC"
+Source:
+  Class: "FND"
+  Domain: "EG"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per test per ECG reference per observation time\
+    \ per subject, Tabulation."
+  Rule: "One record per test per ECG reference per observation time per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208.1"
+        Version: "1"
+      Version: "5.0"

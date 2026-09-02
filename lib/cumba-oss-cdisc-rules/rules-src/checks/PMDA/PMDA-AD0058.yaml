@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0058"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a date variable whose name ends in 'DT' is not stored\
+  \ as a numeric variable; the SAS data type of a *DT variable must be Num."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    ends_with(varname(), "DT") and var_type("DATA") != "Num"
+Outcome:
+  Message: "A *DT date variable is not a numeric variable."
+  Output_Variables:
+  - "variable_name"
+  - "variable_data_type"
+Source:
+  Message: "*DT is not a numeric variable"
+  Description: "The SAS TYPE for *DT variable must be equal Num."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0058"
+        Version: "1"
+      Version: "6.0"

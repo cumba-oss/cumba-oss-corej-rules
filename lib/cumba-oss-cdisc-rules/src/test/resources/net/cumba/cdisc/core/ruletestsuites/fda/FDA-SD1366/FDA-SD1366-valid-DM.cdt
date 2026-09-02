@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1366 expect=noViolation domain=DM
+#note "Rows 1-2: unassigned subjects (SCREEN FAILURE / NOT ASSIGNED) have an empty RFENDTC. Row 3: an on-study subject has no ARMNRS. Row 4 boundary: an 'ASSIGNED, NOT TREATED' subject was randomised, so SDTMIG keeps RFENDTC populated — outside this rule's ARMNRS list."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |            |            | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1023 |            |            | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-701-1028 | 2020-01-05 | 2020-06-30 |
+CDISCPILOT01 | DM | 01-701-1034 | 2020-01-05 | 2020-02-10 | ASSIGNED, NOT TREATED

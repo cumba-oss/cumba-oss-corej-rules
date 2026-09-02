@@ -1,0 +1,68 @@
+Core:
+  Id: "FDA-SD1376"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Reference End Date/Time (RFENDTC) is empty\
+  \ for a randomized subject, that is a subject whose Actual Arm Code (ACTARMCD) is\
+  \ populated and is not equal to 'SCRNFAIL' or 'NOTASSGN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in ["SCRNFAIL", "NOTASSGN"] and empty(RFENDTC)
+Outcome:
+  Message: "RFENDTC is empty for a randomized subject (ACTARMCD is populated and not\
+    \ equal to 'SCRNFAIL' or 'NOTASSGN')."
+  Output_Variables:
+  - "RFENDTC"
+  - "ACTARMCD"
+Source:
+  FDA_Validator_Rule_Message: "RFENDTC is not provided for a treated subject"
+  FDA_Validator_Rule_Description: "Subject Reference End Date/Time (RFENDTC) should\
+    \ be populated for all treated subjects, those where Actual Arm Code (ACTARMCD)\
+    \ is not equal to 'SCRNFAIL', 'NOTASSGN' or 'NOTTRT' (or null)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1376"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1376"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0142"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0142"
+        Version: "2"
+      Version: "2.0"

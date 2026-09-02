@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0055-B"
+Sheet_Rule_Identifier: "DD0055"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Class"
+Applicable_Versions: ["2.0"]
+Severity: "Error"
+Plain_Text_Rule: "For Define-XML 2.0, the Class attribute must have a value of 'SPECIAL PURPOSE', 'FINDINGS', 'FINDINGS ABOUT', 'EVENTS', 'INTERVENTIONS', 'TRIAL DESIGN', or 'RELATIONSHIP' for SDTM and SEND data and 'SUBJECT LEVEL ANALYSIS DATASET', 'BASIC DATA STRUCTURE', 'OCCURRENCE DATA STRUCTURE' (IG v1.1 and above), or 'ADAM OTHER' for ADaM data. For Define-XML 2.1, the Class attribute must have a value that is found in the GNRLOBSC (C103329) codelist in Define-CT. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+# ADaM leg of PMDA-DD0055 (see the base rule's comment for the deferred 2.1
+# GNRLOBSC half).
+Message: "Invalid Class value"
+Check:
+  kind: "one_of"
+  attribute: "Class"
+  values: ["SUBJECT LEVEL ANALYSIS DATASET", "BASIC DATA STRUCTURE", "OCCURRENCE DATA STRUCTURE", "ADAM OTHER"]
+  when:
+    path: "../@StandardName"
+    equals: "ADaM-IG"

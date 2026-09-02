@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0092B expect=violation domain=ADLBC
+#note "Grouped by TRTP=DRUGA the target TRTPN holds {1,1,2}; the engine flags the MINORITY row only -> row 3 alone. Deliberately 2-vs-1, never 1-vs-1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 TRTP=DRUGA TRTPN=2
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP    type=Char
+col TRTPN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | ALB | DRUGA | 2
+---

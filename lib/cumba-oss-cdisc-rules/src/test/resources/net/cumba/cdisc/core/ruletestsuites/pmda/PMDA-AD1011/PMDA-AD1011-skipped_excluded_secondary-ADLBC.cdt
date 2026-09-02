@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD1011 expect=skipped domain=ADLBC
+#note "PARAMN is listed in the rule's _wildcardExclude, so WildcardExpander drops it as a seed; with no other column ending in N or C there is no capture tuple at all, the expander returns NoMatch and the rule DOES NOT EXECUTE. That is skipped, never noViolation - `no matching column` is an execution-state fact, and noViolation would assert execution. The row deliberately carries a populated PARAMN with an empty PARAM, i.e. data that would fire were PARAMN not excluded, which is what makes this the pin that _wildcardExclude is doing real work."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 |  | 1

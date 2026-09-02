@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0378 expect=violation domain=TT
+#note "The mirror of -invalid_no_ttenrl_column-TT and the arm that already worked before M3-D15: TTDUR is REMOVED, so the authored `not var_exists(\"TTDUR\")` disjunct folds true; row 1's TTENRL is blank -> FIRES, row 2 populates it -> silent. The pair proves both halves now behave the same way on absence."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=1 RSTGCD=ST1
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTENRL  type=Char label="Repro Stage End Rule"
+---
+S1 | TT | ST1 | Premating | 
+S1 | TT | ST2 | Gestation | LAST DOSE
+---

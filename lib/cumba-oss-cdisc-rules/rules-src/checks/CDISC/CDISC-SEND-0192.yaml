@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0192"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Pharmacokinetic Concentrations (PC)\
+  \ record exists for the same combination of Test Short Name (PCTESTCD), subject\
+  \ or pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC); the\
+  \ domain should hold one record per test per specimen per observation time per subject\
+  \ or pool."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Check:
+  expression: >-
+    not is_unique_set([PCTESTCD, USUBJID, POOLID, PCSPEC, PCDTC])
+Outcome:
+  Message: "More than one PC record exists for the same test (PCTESTCD), subject or\
+    \ pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC)."
+  Output_Variables:
+  - "POOLID"
+  - "PCTESTCD"
+  - "PCSPEC"
+  - "PCDTC"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per test per specimen per observation time per\
+    \ subject or pool"
+  Rule: "One record per test per specimen per observation time per subject or pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND192"
+        Version: "1"
+      Version: "5.0"

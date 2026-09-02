@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0098"
+Sheet_Rule_Identifier: "DD0098"
+Rule_Set: "PMDA"
+Element: "ProgrammingCode"
+Attribute: "Context"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "When any arm:Code elements are provided the language or software used for them should be provided in the Context attribute (e.g. SQL or SAS 9.2)."
+Message: "Missing Context value"
+# The Context attribute lives on arm:ProgrammingCode, arm:Code is its child
+# (ARM v1.0 SS5.3.9) - scoped to the ProgrammingCode carrying the Code. New
+# (no CDISC ARM rules).
+Check:
+  kind: "exists"
+  target: "@Context"
+  when:
+    path: "arm:Code"
+    exists: true

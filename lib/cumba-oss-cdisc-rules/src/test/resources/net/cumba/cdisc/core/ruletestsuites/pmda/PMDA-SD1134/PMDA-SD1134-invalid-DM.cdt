@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1134 expect=violation domain=DM
+#note "The CONVERSE direction of SD1133: one ACTARM description is coded two ways (PBO and PLC), one row each. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ACTARM=Placebo ACTARMCD=PBO
+#expectViolationAt row=2 ACTARM=Placebo ACTARMCD=PLC
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | PBO | Placebo
+S1 | DM | 002 | PLC | Placebo
+S1 | DM | 003 | ACT | Active

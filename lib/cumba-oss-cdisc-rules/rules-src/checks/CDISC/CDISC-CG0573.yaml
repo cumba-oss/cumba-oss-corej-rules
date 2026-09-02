@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0573"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISITNUM and --TPTREF are present in the dataset\
+  \ and --TPT and --TPTNUM do not have a one-to-one relationship per unique combination\
+  \ of VISITNUM and --TPTREF values."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("VISITNUM") and var_exists("--TPTREF") and (var_exists("--TPT") and
+    is_inconsistent_across_dataset(--TPT, keys=[--TPTNUM, VISITNUM, --TPTREF]) or
+    var_exists("--TPTNUM") and is_inconsistent_across_dataset(--TPTNUM, keys=[--TPT, VISITNUM,
+    --TPTREF]))
+Outcome:
+  Message: "--TPT and --TPTNUM do not have a one-to-one relationship per unique combination\
+    \ of VISITNUM and --TPTREF values."
+  Output_Variables:
+  - "VISITNUM"
+  - "--TPT"
+  - "--TPTNUM"
+  - "--TPTREF"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--TPT"
+  Condition: "VISITNUM and --TPTREF present in dataset"
+  Rule: "--TPT and --TPTNUM have a one-to-one relationship per unique combination\
+    \ of VISITNUM and –TPTREF values"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0573"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0573"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0028"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Sequence Number (--SEQ), excluding Trial Summary\
+  \ Sequence Number (TSSEQ), is not a unique number per USUBJID per domain, nor a\
+  \ unique number per POOLID per domain, including when the domain is split into multiple\
+  \ files."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "--SEQ"
+Check:
+  expression: >-
+    var_exists("--SEQ") and not empty(USUBJID) and not is_unique_set([--SEQ, DOMAIN, USUBJID]) or
+    var_exists("--SEQ") and var_exists("POOLID") and not empty(POOLID) and not is_unique_set([--SEQ,
+    DOMAIN, POOLID])
+Outcome:
+  Message: "--SEQ is not a unique number per USUBJID per domain, nor a unique number\
+    \ per POOLID per domain, including when the domain is split into multiple files."
+  Output_Variables:
+  - "DOMAIN"
+  - "POOLID"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--SEQ"
+  Condition: "Variable is not TS.TSSEQ"
+  Rule: "--SEQ is a unique number per USUBJID per domain, or a unique number per POOLID\
+    \ per domain, including when the domain is split into multiple files"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0028"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0010 expect=violation domain=ADSL
+#library standard=adamig version=1-1
+#note "Positive control. SAFFN is PRESENT and 0, so the guard passes and the substantive leaf fires; ITTFL/ITTFN agree and must not fire. This also pins the value_is_literal fix: before it the Y compiled as a column reference, no dataset has a column named Y, and the rule was structurally dead on both engines."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+col SAFFN   type=Num
+col ITTFL   type=Char
+col ITTFN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Y | 0 | Y | 1
+CDISCPILOT01 | 01-701-1023 | Y | 1 | Y | 1
+---

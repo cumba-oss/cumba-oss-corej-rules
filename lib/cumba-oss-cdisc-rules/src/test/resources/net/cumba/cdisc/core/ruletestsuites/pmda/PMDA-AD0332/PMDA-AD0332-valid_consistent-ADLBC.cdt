@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0332 expect=noViolation domain=ADLBC
+#note "Same shape as the invalid fixture except row 3 carries CHGCAT1N=1, so each (PARAMCD, CHGCAT1) group holds one distinct CHGCAT1N."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col CHGCAT1  type=Char
+col CHGCAT1N type=Num
+---
+S1 | 001 | GLUC | 5.0 | IMPROVED | 1
+S1 | 002 | GLUC | 5.1 | IMPROVED | 1
+S1 | 003 | GLUC | 5.2 | IMPROVED | 1
+S1 | 004 | ALB  | 4.0 | IMPROVED | 9

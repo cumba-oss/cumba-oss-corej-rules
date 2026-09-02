@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1147 expect=skipped domain=AE
+#note "FRESH - the batch's Domains.Exclude reject pin. AEOCCUR present without AEPRESP is VIOLATING-SHAPED, but AE is in Domains.Exclude, so the rule must not execute. class=EVENTS is load-bearing: AE is a member of the included class and only the domain exclusion silences it."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOCCUR type=Char label="Adverse Event Occurrence"
+---
+S1 | AE | 001 | 1 | HEADACHE | Y

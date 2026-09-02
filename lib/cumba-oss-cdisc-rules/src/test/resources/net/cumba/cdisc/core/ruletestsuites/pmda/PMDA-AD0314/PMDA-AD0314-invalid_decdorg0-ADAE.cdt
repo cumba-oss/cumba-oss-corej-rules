@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0314 expect=violation domain=ADAE
+#note "DECDORG0 matches ^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)\d$ and fails the [1-9] form -> fires; DECDORG1 satisfies both."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt variable_name=DECDORG0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col DECDORG0 type=Char
+col DECDORG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | MIGRAINE | MIGRAINE

@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1084 expect=noViolation domain=AE
+#note "Row 1: complete+populated -> silent. Row 2: partial AEDTC with AEDY empty -> silent. Row 3: subject 002 has partial RFSTDTC -> silent. Every arm silent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDTC   type=Char
+col AEDY    type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-06-15 | 15
+S1 | AE | 001 | 2 | NAUSEA   | 2023-06    |
+S1 | AE | 002 | 1 | FATIGUE  | 2023-06-15 |
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+---
+S1 | DM | 001 | 2023-06-01
+S1 | DM | 002 | 2023-06
+---

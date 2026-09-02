@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0646 expect=violation domain=ADAE
+# Rule:Description: Raise an error when AEACN is populated on at least one matched SDTM AE record (joined on USUBJID+AESEQ), but AEACN is not a column of the ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+#expectViolationCount 1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ type=Num
+col AEACN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | DOSE NOT CHANGED
+---

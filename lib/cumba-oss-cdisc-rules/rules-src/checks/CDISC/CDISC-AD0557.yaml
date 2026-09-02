@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-AD0557"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSEQPGyN is present and TSEQPGy is not present,\
+  \ where y is an integer [1-99, not zero-padded]."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TSEQPGyN") and not var_exists("TSEQPGy")
+Outcome:
+  Message: "TSEQPGyN is present, but TSEQPGy is not present."
+  Output_Variables:
+  - "TSEQPGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TSEQPGyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "TSEQPGyN is present and TSEQPGy is not\
+    \ present"
+  Rule_Failure_Criteria: "TSEQPGy is not present"
+  Condition_Failure: "TSEQPGyN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR557"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR557"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR557"
+        Version: "1"
+      Version: "5.0"

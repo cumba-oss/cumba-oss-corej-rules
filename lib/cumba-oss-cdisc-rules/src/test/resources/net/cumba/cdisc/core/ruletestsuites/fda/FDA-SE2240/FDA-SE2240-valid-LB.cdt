@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2240 expect=noViolation domain=LB
+#note "Latest disposition for subject 001 starts 2020-01-20. Row 1 ends exactly on that date (boundary: equal is allowed), row 2 ends before it, row 3 has an empty LBENDTC (guarded out by non_empty) -> no violation."
+#library standard=sendig version=3-1-1
+#library dataset-class LB FINDINGS
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALT | 2020-01-19 | 2020-01-20
+S1 | LB | 001 | 2 | ALT | 2020-01-14 | 2020-01-15
+S1 | LB | 001 | 3 | ALT | 2020-01-19 |
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY   | RECOVERY            | 2020-01-10
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-20

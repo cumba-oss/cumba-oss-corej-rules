@@ -1,0 +1,58 @@
+Core:
+  Id: "PMDA-AD0376"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a primary analysis variable is populated on a record\
+  \ but its corresponding secondary variable (the same root name with an N or C suffix)\
+  \ is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*) and var_exists(*N) and empty(*N) or not empty(*) and var_exists(*C) and empty(*C)
+Outcome:
+  Message: "A primary analysis variable is populated on a record, but its corresponding\
+    \ secondary variable is not populated."
+  Output_Variables:
+  - "*"
+  - "*N"
+  - "*C"
+wildcardExclude:
+- "*DTC"
+- "*FN"
+- "TRTPN"
+- "TRT01PN"
+- "PARAMN"
+- "AVALC"
+- "BASEC"
+Source:
+  Message: "Primary variable * is populated, but its secondary variable is not populated"
+  Description: "In a pair of corresponding character and numeric variables, the secondary\
+    \ variable must be populated if its primary variable is populated. Exceptions:\
+    \ *DTC, *FN, TRTPN, TRT01PN, PARAMN, AVALC, BASEC. Corresponding character and\
+    \ numeric values must also have a one-to-one mapping consistency when the primary\
+    \ variable is populated, which are addressed in other rules."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0376"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0376"
+        Version: "1"
+      Version: "6.0"

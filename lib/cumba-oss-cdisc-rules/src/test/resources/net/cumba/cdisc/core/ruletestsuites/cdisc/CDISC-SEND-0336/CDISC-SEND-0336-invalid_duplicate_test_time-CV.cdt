@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0336 expect=violation domain=CV
+#note "No label= and no class= anywhere: the rule reads neither, and inventing SEND labels would assert something with no authority behind it. CVDTC is type=Char, NEVER type=Date -- a Date column is parsed to a SAS numeric at load. The key tuple is (CVTESTCD, USUBJID, CVDTC, CVNOMDY, CVTPT, CVTPTNUM, CVSTINT, CVENINT, CVEVLINT); the four widened members are NOT DECLARED here, and GroupSemantics.uniqueSetViolations keeps only column indices >= 0, so they are dropped and the partition is the same one the pre-M3-D15 four-key form used. CVSEQ is not in the tuple, which is why rows 1 and 2 are duplicates despite distinct sequence numbers; `not is_unique_set` flags the first-seen row AND the repeat, so the count is 2. Row 3 differs in CVDTC -> silent. CVSTINT/CVENINT are blank on every row and FOLD_BLANK_KEYS keeps a blank as a real, equal component."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 CVTESTCD=HR
+#expectViolationAt row=2 CVTESTCD=HR
+dataset CV
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CVSEQ    type=Num
+col CVTESTCD type=Char
+col CVDTC    type=Char
+col CVSTINT  type=Char
+col CVENINT  type=Char
+---
+S1 | CV | ANIMAL1 | 1 | HR | 2023-03-20 |  |
+S1 | CV | ANIMAL1 | 2 | HR | 2023-03-20 |  |
+S1 | CV | ANIMAL1 | 3 | HR | 2023-03-21 |  |
+---

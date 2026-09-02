@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0252-D expect=noViolation domain=ADLBC
+#note "Negative control: a conformant BDS dataset carrying NONE of the 16 concrete prohibited names and matching NONE of the 16 template-family regexes (PARAMCD, PARAM, AVAL, AVISIT and AVISITN are all legitimate BDS variables). Since Fix #270 (ruling M2-D3) the wildcard-free Check EXECUTES per variable and stays silent -> the rule's first true noViolation state (pre-#270 it could only report SKIPPED here - expand() returned empty and NoMatch dropped the rule; the recorded no-noViolation carve-out is retired for this family)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Albumin | 30 | WEEK2 | 2
+CDISCPILOT01 | 01-701-1023 | ALB | Albumin | 31 | WEEK4 | 4

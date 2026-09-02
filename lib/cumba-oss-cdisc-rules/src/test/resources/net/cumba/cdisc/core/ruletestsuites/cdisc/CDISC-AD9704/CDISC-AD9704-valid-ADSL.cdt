@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD9704 expect=noViolation domain=ADSL
+#note "Twin of PMDA-AD0047 (Fix #368) — identical Check, so identical scenarios. The library list is the one adamig-1-3 really publishes, keyed by DATA STRUCTURE and carrying the naming template TRTxxP verbatim; the dataset carries the concrete TRT01P, which satisfies it."
+#library standard=adamig version=1-3
+#library required-variables-for-structure "SUBJECT LEVEL ANALYSIS DATASET" STUDYID USUBJID SUBJID SITEID AGE AGEU SEX RACE ARM TRTxxP
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+col RACE    type=Char label="Race"
+col ARM     type=Char label="Description of Planned Arm"
+col TRT01P  type=Char label="Planned Treatment for Period 01"
+---
+CDISCPILOT01 | 01-701-1015 | 1015 | 701 | 63 | YEARS | F | WHITE | Placebo | Placebo

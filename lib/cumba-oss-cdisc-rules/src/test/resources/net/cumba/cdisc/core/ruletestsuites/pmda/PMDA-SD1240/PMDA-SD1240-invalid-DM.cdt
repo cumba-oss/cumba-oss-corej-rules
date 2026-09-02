@@ -1,0 +1,34 @@
+#!RuleTest
+#test PMDA-SD1240 expect=violation domain=DM
+#note "Two ways to miss the informed-consent milestone: subject 002 has a DS record whose DSDECOD is 'RANDOMIZED' (the filtered lookup skips it) and subject 003 has no DS record at all. Subject 001 is conformant."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=002
+#expectViolationAt row=3 USUBJID=003
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+col SEX     type=Char label="Sex"
+col COUNTRY type=Char label="Country"
+---
+CDISCPILOT01 | DM | 001 | 001 | 70 | M | USA
+CDISCPILOT01 | DM | 002 | 002 | 70 | F | USA
+CDISCPILOT01 | DM | 003 | 003 | 71 | M | USA
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 001 | 1 | Informed consent obtained | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | 2020-01-01
+CDISCPILOT01 | DS | 002 | 1 | Randomized | RANDOMIZED | PROTOCOL MILESTONE | 2020-01-05
+---

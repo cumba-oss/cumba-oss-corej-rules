@@ -1,0 +1,66 @@
+Core:
+  Id: "FDA-SD9712"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISIT is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+Check:
+  expression: >-
+    empty(VISIT)
+Outcome:
+  Message: "VISIT is not populated."
+  Output_Variables:
+  - "VISIT"
+Source_Proposed:
+  FDA_Validator_Rule_Message: "Missing value for VISIT"
+  FDA_Validator_Rule_Description: "VISIT should be populated."
+  Domains: "TV"
+Source:
+  FDA_Validator_Rule_Message: "NULL value in variable marked as Required"
+  FDA_Validator_Rule_Description: "Required variables (where Core attribute is 'Req')\
+    \ cannot be NULL for any records."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0002"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0208"
+        Version: "3"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0012"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0257"
+        Version: "1"
+      Version: "2.0"

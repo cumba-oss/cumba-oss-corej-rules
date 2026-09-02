@@ -1,0 +1,35 @@
+#!RuleTest
+#test FDA-SD0075 expect=noViolation domain=RELREC
+#note "Both RELREC rows name an IDVAR that really is a column of their RDOMAIN dataset (AE.AESEQ, CM.CMSEQ) -> no violation."
+#library standard=sdtmig version=3-4
+dataset RELREC class=RELATIONSHIP label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AESEQ | 1 | ONE  | 1
+S1 | CM | 001 | CMSEQ | 1 | MANY | 1
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+---
+S1 | CM | 001 | 1 | ASPIRIN

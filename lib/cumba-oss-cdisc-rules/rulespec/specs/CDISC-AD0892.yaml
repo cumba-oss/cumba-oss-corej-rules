@@ -1,0 +1,46 @@
+name: CDISC-AD0892
+kind: rule
+description: |
+  Wave B7 port - T1b PlainIntermediate.
+  CDISC-AD0892: Raise an error when, within the study, an ADNCA v1.0 dataset has more than one value of COHORT for a given value of COHORTN (considering only rows on which both variables are populated).
+  Record-data rule scoped to BASIC DATA STRUCTURE. Bare-leaf Check (no all/any
+  wrapper) + has_multiple_values_for - both Python gaps: business_rules
+  KeyError: 'name' (Finding #26) and DataframeType lacks has_multiple_values_for
+  (Finding #28). Baselines on Python lane; expected matches Java's per-row
+  output.
+python_source: rules-adamig-1-3.json (CDISC-AD0892)
+rule:
+  coreId: CDISC-AD0892
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    column_types:
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: 'S1', USUBJID: '001', PARAMCD: 'HGB', COHORTN: 'A', COHORT: '0', NFRLT: 0.0, AFRLT: 0.0}
+      - {STUDYID: 'S1', USUBJID: '002', PARAMCD: 'HGB', COHORTN: 'A', COHORT: '1', NFRLT: 0.0, AFRLT: 0.0}
+      - {STUDYID: 'S1', USUBJID: '003', PARAMCD: 'HGB', COHORTN: 'B', COHORT: '2', NFRLT: 0.0, AFRLT: 0.0}
+      - {STUDYID: 'S1', USUBJID: '004', PARAMCD: 'HGB', COHORTN: 'B', COHORT: '2', NFRLT: 0.0, AFRLT: 0.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0892
+    dataset: ADNCA
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COHORT: '0'
+      COHORTN: 'A'
+  - rule_id: CDISC-AD0892
+    dataset: ADNCA
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      COHORT: '1'
+      COHORTN: 'A'
+expected_errors: []

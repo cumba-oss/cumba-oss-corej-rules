@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1033 expect=violation domain=TA
+#note "ARMCD=PBO is described both as 'Placebo' and as 'Placebo Arm', so a single planned-arm code carries two arm descriptions. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ARMCD=PBO ARM=Placebo
+#expectViolationAt row=2 ARMCD=PBO ARM="Placebo Arm"
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | PBO | Placebo      | 1 | SCRN
+S1 | TA | PBO | Placebo Arm  | 2 | TRT
+S1 | TA | ACT | Active       | 1 | SCRN

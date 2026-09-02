@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0277"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SEND dataset file name is not in lowercase (it\
+  \ contains an uppercase letter); SEND dataset file names must be in lowercase."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dataset_location"
+  expression: "extract_metadata(\"dataset_location\")"
+Check:
+  expression: >-
+    $dataset_location =~ /[A-Z]/
+Outcome:
+  Message: "The SEND dataset file name is not in lowercase."
+  Output_Variables:
+  - "$dataset_location"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "SEND dataset file names are in lowercase."
+  Rule: "SEND dataset file name is in lowercase."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND277"
+        Version: "1"
+      Version: "5.0"

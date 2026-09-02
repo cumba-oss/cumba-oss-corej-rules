@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0256 expect=noViolation domain=ADAE
+#note "Both ADAE subjects (01-701-1015, 01-701-1023) are present in ADSL -> 0 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+---
+S1 | 01-701-1015 | HEADACHE
+S1 | 01-701-1023 | NAUSEA
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | 01-701-1015
+S1 | 01-701-1023

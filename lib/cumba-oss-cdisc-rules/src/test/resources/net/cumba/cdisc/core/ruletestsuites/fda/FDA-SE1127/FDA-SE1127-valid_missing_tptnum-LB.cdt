@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE1127 expect=noViolation domain=LB
+#note "Boundary: one record of the '1H POST' group leaves --TPTNUM missing while the others agree. A missing --TPTNUM is not a competing number and the non_empty guard excludes that record, so no inconsistency is reported."
+#library standard=sendig version=3-1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+col LBTPT    type=Char label="Planned Time Point Name"
+col LBTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | LB | 001 | 1 | ALB | CHEMISTRY | 1 | 1H POST | 1
+S1 | LB | 002 | 1 | ALB | CHEMISTRY | 1 | 1H POST |
+S1 | LB | 003 | 1 | ALB | CHEMISTRY | 1 | 1H POST | 1

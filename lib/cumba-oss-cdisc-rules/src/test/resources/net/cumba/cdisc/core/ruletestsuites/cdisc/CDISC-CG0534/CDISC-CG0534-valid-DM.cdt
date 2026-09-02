@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0534 expect=noViolation domain=DM
+#note "Row 1 was treated (ARMNRS empty) so RFSTDTC is expected. Row 2 was never assigned an arm and carries no RFSTDTC. Row 3 is UNPLANNED TREATMENT, the value the rule explicitly excludes, so a populated RFSTDTC is fine."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ARM      type=Char label="Description of Planned Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-01-05 | Placebo |
+CDISCPILOT01 | DM | 01-701-1023 | 1023 |            |         | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1028 | 1028 | 2020-02-11 |         | UNPLANNED TREATMENT

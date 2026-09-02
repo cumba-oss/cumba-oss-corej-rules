@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0088 expect=violation domain=DM
+#note "Row 1 is a randomized subject (ARMCD populated, not SCRNFAIL/NOTASSGN) whose RFENDTC is empty -> fires. Rows 2/3 carry the two excluded arm codes, row 4 has an empty ARMCD, row 5 is randomized and populated."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=A RFENDTC=
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ARMCD    type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 |            | A
+S1 | DM | 002 |            | SCRNFAIL
+S1 | DM | 003 |            | NOTASSGN
+S1 | DM | 004 |            |
+S1 | DM | 005 | 2020-06-30 | B

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1297 expect=violation domain=TS
+#note "TSVAL carries an ISO 21090 null-flavor code (row 2 'UNK') and a null-flavor synonym in mixed case (row 3 'Not asked'); row 1 is a real value."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 TSVAL=UNK
+#expectViolationAt row=3 TSVAL="Not asked"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | TITLE  | Trial Title                     | A Study of Drug X
+CDISCPILOT01 | TS | 2 | AGEMAX | Planned Maximum Age of Subjects | UNK
+CDISCPILOT01 | TS | 3 | PCLAS  | Pharmacologic Class             | Not asked

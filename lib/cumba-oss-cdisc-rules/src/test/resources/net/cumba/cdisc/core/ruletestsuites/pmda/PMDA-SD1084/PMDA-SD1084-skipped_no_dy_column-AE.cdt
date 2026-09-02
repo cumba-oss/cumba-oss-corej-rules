@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1084 expect=skipped domain=AE
+#note "Requirements.Variables.All: [--DTC, --DY] -> AEDY absent -> auditable pre-merge SKIP (twin-matching shape, twin has the same gate)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDTC   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-06-15
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+---
+S1 | DM | 001 | 2023-06-01
+---

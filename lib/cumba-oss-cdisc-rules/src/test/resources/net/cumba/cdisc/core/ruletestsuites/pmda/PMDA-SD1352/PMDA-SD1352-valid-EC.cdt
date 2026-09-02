@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD1352 expect=noViolation domain=EC
+#note "Rows 1/2 share every key except ECTPTNUM (1 vs 2) and row 3 differs in ECSTDTC -> no full-key duplicate, no violation."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECDECOD  type=Char label="Standardized Treatment Name"
+col ECMOOD   type=Char label="Mood"
+col ECCAT    type=Char label="Category of Treatment"
+col ECSCAT   type=Char label="Subcategory of Treatment"
+col ECROUTE  type=Char label="Route of Administration"
+col ECLOC    type=Char label="Location of Dose Administration"
+col ECTRTV   type=Char label="Treatment Vehicle"
+col ECSTDTC  type=Char label="Start Date/Time of Treatment"
+col ECTPT    type=Char label="Planned Time Point Name"
+col ECTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | EC | S1-001 | 1 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-01-01 | DOSE 1 | 1
+S1 | EC | S1-001 | 2 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-01-01 | DOSE 2 | 2
+S1 | EC | S1-001 | 3 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-02-01 | DOSE 1 | 1

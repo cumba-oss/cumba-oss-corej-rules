@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0038"
+Sheet_Rule_Identifier: "DD0038"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Value Level metadata must be defined for QVAL variable in each SUPPQUAL dataset. Define-XML specification represents Value Level metadata as def:ValueListDef element, which is referenced from ItemDef/def:ValueListRef element."
+# SUPPQUAL membership is proxied by Name="QVAL" exactly as CDISC twin 0055 does
+# (QVAL exists only in SUPP-- datasets). The sheet MESSAGE's "<dataset>"
+# placeholder is dropped (presence findings carry no value; the xpath locates
+# the ItemDef).
+Message: "Missing Value Level metadata for QVAL"
+Check:
+  kind: "exists"
+  target: "def:ValueListRef"
+  when:
+    path: "@Name"
+    equals: "QVAL"

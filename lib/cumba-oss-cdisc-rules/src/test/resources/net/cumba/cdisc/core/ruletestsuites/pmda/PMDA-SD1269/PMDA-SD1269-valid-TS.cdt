@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1269 expect=noViolation domain=TS
+#note "D-TA-7c converged shape: 0.5 and the boundary 1 are inside (0,1], and the blank TSVAL on row 3 is exempt (null-exempt guard) -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | RANDQT  | Randomization Quotient     | 0.5
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 1
+S1 | TS | 3 | RANDQT  | Randomization Quotient     |
+S1 | TS | 4 | PLANSUB | Planned Number of Subjects | 306

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1029 expect=violation domain=TS
+#note "Second variable shape: the ..PARM alternative must resolve to TSPARM. TSPARM on row 2 carries a non-breaking hyphen (U+2011), outside printable ASCII, so row 2 fires while the plain-ASCII row 1 does not."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=TSPARM
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | TITLE    | Trial Title          | A Study
+CDISCPILOT01 | TS | 2 | PLANSUB  | Planned Number‑Subj  | 100

@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0009 expect=violation domain=AE
+#note "Only AESDTH of the criteria columns is present (others absent -> not_exists branch); AESER=Y with AESDTH=N -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESER=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESDTH  type=Char label="Results in Death"
+---
+S1 | AE | 001 | 1 | HEADACHE | Y | N
+S1 | AE | 001 | 2 | NAUSEA   | N | N

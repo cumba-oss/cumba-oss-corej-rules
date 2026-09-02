@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-0221"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Order of Element within Arm (TAETORD) is\
+  \ populated with a value that is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Check:
+  expression: >-
+    not empty(TAETORD) and TAETORD !~ /^-?[0-9]+$/
+Outcome:
+  Message: "TAETORD is populated with a value that is not an integer."
+  Output_Variables:
+  - "TAETORD"
+Source:
+  Class: "TDM"
+  Domain: "TA"
+  Variable: "TAETORD"
+  Plain_Text_Explanation: "TAETORD: This value should be an integer."
+  Rule: "TAETORD: This value should be an integer."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND221"
+        Version: "1"
+      Version: "5.0"

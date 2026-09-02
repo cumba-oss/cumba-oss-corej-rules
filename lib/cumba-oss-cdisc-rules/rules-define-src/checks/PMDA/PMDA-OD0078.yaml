@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-OD0078"
+Sheet_Rule_Identifier: "OD0078"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: "SASFormatName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "When CodeList DataType is 'text' the SASFormatName should start with a '$'."
+# CDISC twin 0175-B - AGREE (identical guard and pattern). The general
+# SASFormatName shape is PMDA-OD0019's beat.
+Message: "Invalid SASFormatName value for text Codelist"
+Check:
+  kind: "matches_regex"
+  attribute: "SASFormatName"
+  pattern: '\$.*'
+  when:
+    path: "@DataType"
+    equals: "text"

@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-SEND-0354"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SJSEQ is not in chronological order (based on SJSTDTC)\
+  \ within USUBJID; SJSEQ must be assigned consistently with the chronological order\
+  \ of the actual Repro Stages experienced by the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Check:
+  expression: >-
+    not is_sorted_by(SJSEQ, by=[asc("SJSTDTC")], within=USUBJID)
+Outcome:
+  Message: "SJSEQ is not in chronological order (based on SJSTDTC) within USUBJID."
+  Output_Variables:
+  - "SJSTDTC"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "SJSEQ"
+  Plain_Text_Explanation: "SJSEQ are assigned in chronological order within a subject.\
+    \ SJSTDTC values provide the chronological order of the actual Repro Stages the\
+    \ subject experienced."
+  Rule: "SJSEQ are assigned in chronological order of the actual subject Repro Stages\
+    \ experienced by the subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND354"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND354"
+        Version: "1"
+      Version: "5.0"

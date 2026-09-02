@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0325 expect=violation domain=ADLBC
+# Rule:Description: Within a value of APERIOD, there is more than one value of ASPER for a given value of ASPERC, considering only those rows on which both variables are populated
+#note "EC-44 / Fix #134 absent-within coverage. Same violating data as the sibling CDISC-AD0325-invalid-ADLBC.cdt with the APERIOD column removed entirely -- the shape of an ADaM dataset with no period structure, which is legitimate because APERIOD is Perm or Cond in every ADaM IG that defines it (never Req, never Exp). Before Fix #134 GroupSemantics.partition returned null on the absent within column, has_multiple_values_for yielded an empty BitSet, and the rule reported SUCCESS with no findings -- silently dead rather than skipped. Fix #134 ignores the absent within column: with no period to partition by there is ONE period, so ASPERC='A' mapping to two distinct ASPER values fires on both rows. APERIOD is also an Output_Variable here; an unresolved output variable is simply omitted from the finding."
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=2
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col ASPER type=Char
+col ASPERC type=Char
+---
+Label A | A
+Different Label | A
+Label B | B
+---

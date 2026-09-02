@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0083 expect=violation domain=ADSL
+#library standard=adamig version=1-0
+#note "Positive control. Subject 01-701-1015 has TRTSDT (21915) different from TR01SDT (22281) and must report; 01-701-1023 agrees on both and must not. NOTE this fixture was green BOTH before and after the value_is_reference fix, but before the fix it was green for the WRONG reason - the rule fired on every record regardless of the data, so row 2 would have reported too had it not been added here as the discriminator. The -valid- twin is what actually pins the defect."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDT  type=Num
+col TR01SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 22281
+CDISCPILOT01 | 01-701-1023 | 22281 | 22281
+---

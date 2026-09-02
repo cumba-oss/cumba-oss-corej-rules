@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0734"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a dataset, BASETYPE is populated for at\
+  \ least one record and not populated for at least one other record"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Operations:
+- id: "$bt_pop"
+  expression: "record_count(filter=filter(BASETYPE=\"&\"))"
+- id: "$bt_total"
+  expression: "record_count()"
+Check:
+  expression: >-
+    $bt_pop > 0 and $bt_pop < $bt_total
+Outcome:
+  Message: "BASETYPE is populated on some records and not populated on others within\
+    \ this dataset"
+  Output_Variables:
+  - "BASETYPE"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASETYPE"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, BASETYPE is populated\
+    \ for at least one record and is not populated for at least one record"
+  Rule_Failure_Criteria: "Within a dataset, BASETYPE is populated for at least one\
+    \ record and is not populated for at least one record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR734"
+        Version: "1"
+      Version: "5.0"

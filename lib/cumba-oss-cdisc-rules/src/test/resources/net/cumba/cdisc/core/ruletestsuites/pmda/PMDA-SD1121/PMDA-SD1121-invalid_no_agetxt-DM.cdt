@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1121 expect=violation domain=DM
+#note "No AGETXT column declared (it is a model-level, not IG, DM variable, so its absence is legitimate). Row 1 fires via the bare empty(AGETXT) leaf, TRUE on every row of the absent column (absent = all-missing, EC-43). Row 2: AGE populated -> no fire. STAGE-G CRITICAL 7 is RETIRED by construction: it pinned that empty(AGETXT) was FALSE on an absent column because the derivation fronted it with var_exists(\"AGETXT\"), leaving only the explicit not var_exists arm able to fire. Fix #330 retired that machine guard and Plan B phase 4d' deleted the then-redundant `or not var_exists(\"AGETXT\")` disjunct, so the single empty(AGETXT) leaf now carries the case and the verdict is unchanged. Do NOT add an AGETXT column and do NOT simplify the expectation. ADAPTED-FROM fda/FDA-SD1121/FDA-SD1121-invalid_no_agetxt-DM.cdt (verbatim, pin included)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | .  | A1
+S1 | DM | 002 | 42 | A1

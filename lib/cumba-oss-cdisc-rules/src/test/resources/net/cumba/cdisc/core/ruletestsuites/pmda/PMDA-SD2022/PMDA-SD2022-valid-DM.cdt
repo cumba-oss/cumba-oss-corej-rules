@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2022 expect=noViolation domain=DM
+#note "AGEU is populated wherever AGE (row 1) or AGETXT (row 2) is populated; row 3 has neither, so AGEU may stay empty."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGETXT  type=Char label="Age Range"
+col AGEU    type=Char label="Age Units"
+---
+S1 | DM | 001 | 45 |       | YEARS
+S1 | DM | 002 | .  | 18-65 | YEARS
+S1 | DM | 003 | .  |       |

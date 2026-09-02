@@ -1,0 +1,86 @@
+Core:
+  Id: "FDA-SE2270"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Study Day (--DY) of a necropsy findings record\
+  \ does not equal the subject's Study Day of Disposition (DSSTDY)."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "DD"
+    - "MA"
+    - "MI"
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+- id: "$max_ds_dsstdy"
+  expression: "max(DSSTDY, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ds_usubjid and not empty(--DY) and not empty($max_ds_dsstdy) and --DY !=
+    $max_ds_dsstdy
+Outcome:
+  Message: "--DY does not equal the Study Day of the subject's latest Disposition\
+    \ (DSSTDY)."
+  Output_Variables:
+  - "--DY"
+  - "$max_ds_dsstdy"
+  - "$ds_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "--DY value does not equal DSSTDY value"
+  FDA_Validator_Rule_Description: "For a specimen collected or observed post mortem,\
+    \ the Study Day (--DY) variable value should be the same as the Study Day of Disposition\
+    \ (DSSTDY) variable value in the Disposition (DS) domain."
+  Domains: "DD, MA, MI, TF"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2270"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2270"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2270"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2270"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2270"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0123.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Element Code (ETCD) in SE is populated, does\
+  \ not equal UNPLAN, and does not match any planned Element defined in the Trial\
+  \ Elements (TE) dataset; a period of time that cannot be represented as a planned\
+  \ Element must use ETCD equal to UNPLAN."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "ETCD"
+Operations:
+- id: "$te_etcd"
+  expression: "distinct(ETCD, domain=\"TE\")"
+Check:
+  expression: >-
+    not empty(ETCD) and ETCD != "UNPLAN" and ETCD not in $te_etcd
+Outcome:
+  Message: "SE ETCD is populated with a code that is not among the planned Element\
+    \ codes in TE and is not UNPLAN."
+  Output_Variables:
+  - "ETCD"
+  - "$te_etcd"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "ETCD"
+  Plain_Text_Explanation: "If a particular period of time cannot be represented as\
+    \ one of the planned Elements, then UNPLAN is used as the value for ETCD and ELEMENT\
+    \ is left blank."
+  Condition: "Element occurs that is not one of the planned elements"
+  Rule: "ETCD = UNPLAN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND123.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND123.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND123.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND123.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND123.1"
+        Version: "1"
+      Version: "5.0"

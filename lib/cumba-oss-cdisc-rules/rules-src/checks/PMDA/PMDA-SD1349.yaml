@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-SD1349"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STUDYID does not have a single, consistent value\
+  \ across all records in the DM dataset (DM must describe one study)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "STUDYID"
+Check:
+  expression: >-
+    is_inconsistent_across_dataset(STUDYID, keys=[DOMAIN])
+Outcome:
+  Message: "STUDYID is not the same value across all records in DM."
+  Output_Variables:
+  - "STUDYID"
+  - "DOMAIN"
+Source:
+  Message: "Inconsistent STUDYID"
+  Description: "Study Identifier (STUDYID) values should be consistent for all subjects\
+    \ in the Demographics (DM) domain for one study."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1349"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1349"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1349"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1349"
+        Version: "1"
+      Version: "1.6"

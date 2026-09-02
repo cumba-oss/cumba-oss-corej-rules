@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1070 expect=noViolation domain=TS
+#note "Boundary: one 'Trial Title' record leaves --PARMCD empty while the others agree on TITLE. An empty code is excluded from the consistency computation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE | Trial Title | A Study
+S1 | TS | 2 |       | Trial Title | A Study
+S1 | TS | 3 | TITLE | Trial Title | A Study

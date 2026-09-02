@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG9670 expect=skipped domain=SE
+# Rule:Description: CDISC-CG9670 — the Required key USUBJID is not populated.
+#note "USUBJID is absent from SE, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(USUBJID) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sdtmig version=3-4
+dataset SE
+col STUDYID type=Char
+col DOMAIN type=Char
+col SESEQ type=Char
+col ETCD type=Char
+---
+S1      | SE     | 1     | SCRN
+---

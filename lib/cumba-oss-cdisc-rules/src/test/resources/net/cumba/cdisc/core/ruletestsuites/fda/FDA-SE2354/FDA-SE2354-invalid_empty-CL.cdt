@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2354 expect=violation domain=CL
+#note "Row 2 gives a reason for exclusion while the exclusion flag is present but empty -> the record was not flagged 'Y', so the rule fires."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 CLREASEX="Data entry error"
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLORRES  type=Char label="Result or Finding in Original Units"
+col CLEXCLFL type=Char label="Exclusion Flag"
+col CLREASEX type=Char label="Reason for Exclusion"
+---
+S1 | 001 | 1 | CLSIGN | NORMAL | Y | Animal removed from study
+S1 | 001 | 2 | CLSIGN | NORMAL |   | Data entry error

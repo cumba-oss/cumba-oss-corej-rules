@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1117 expect=skipped domain=MB
+#note "FRESH - the PMDA-only divergence: MB satisfies Classes.Include (class=FINDINGS) but is then knocked out by Domains.Exclude [DA, MB, MS, RS, TR, TU], so the rule never runs. Rows 1 and 2 are a genuine duplicate pair - the firing shape - but the rule stays silent only because it is out of scope -> expect=skipped. On FDA-SD1117 the identical fixture would EXECUTE and fire twice."
+#library standard=sdtmig version=3-4
+#library dataset-class MB FINDINGS
+#library domain-variables MB MBTESTCD:Topic "MBSPEC:Record Qualifier" "MBORRES:Result Qualifier" MBDTC:Timing
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MBSEQ   type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test Short Name"
+col MBSPEC  type=Char label="Specimen Type"
+col MBORRES type=Char label="Result or Finding in Original Units"
+col MBDTC   type=Char label="Date/Time of Specimen Collection"
+---
+S1 | MB | 001 | 1 | ORGANISM | BLOOD | ECOLI | 2020-01-01
+S1 | MB | 001 | 2 | ORGANISM | BLOOD | ECOLI | 2020-01-01

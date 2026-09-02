@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1208 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. Row 1: UNKNOWN start with a valid end. Row 2: a correctly shaped but calendar-impossible start (2020-02-30) with a valid end. Both rows pass the two authored non-empty leaves and the derived var_exists, so the rule EXECUTES and reaches the comparison - and both are SILENT, because a junk token and a calendar-impossible date alike have an UNBOUNDED hull (IsoDateBounds.lower/upper return null) and every one of the six date operators then answers false. Deliberate saturation, not an oversight - 'you cannot compare against a value you do not have' - and the malformed value is another rule's finding (PMDA-SD0003 reports an invalid --DTC). A fire means saturation changed; escalate."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | UNKNOWN    | 2020-06-20
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 2020-02-30 | 2020-06-20

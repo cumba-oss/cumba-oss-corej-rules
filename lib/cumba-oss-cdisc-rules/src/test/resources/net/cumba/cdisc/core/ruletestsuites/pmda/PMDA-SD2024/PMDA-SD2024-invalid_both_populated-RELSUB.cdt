@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2024 expect=violation domain=RELSUB
+#note "Row 1 fires - the record identifies BOTH a subject and a pool. Row 2: subject only. Row 3: pool only. Record-level, so exactly ONE violation on row 1. POOLID is the sole Output_Variable."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 POOLID=P01
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char
+col USUBJID type=Char
+col POOLID  type=Char
+col RSUBJID type=Char
+col SREL    type=Char
+---
+S1 | 001 | P01 | 002 | LITTERMATE
+S1 | 004 | | 005 | MOTHER
+S1 | | P02 | 006 | LITTERMATE

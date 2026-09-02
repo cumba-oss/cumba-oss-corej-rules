@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SE2228"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STRESC is populated with a value other than 'NORMAL'\
+  \ or 'UNREMARKABLE' but Result Category (--RESCAT) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "MI"
+Requirements:
+  Variables:
+    All:
+    - "--STRESC"
+Check:
+  expression: >-
+    not empty(--STRESC) and --STRESC not in ["NORMAL", "UNREMARKABLE"] and empty(--RESCAT)
+Outcome:
+  Message: "--RESCAT is empty for an abnormal finding (--STRESC is populated and is\
+    \ not 'NORMAL' or 'UNREMARKABLE')."
+  Output_Variables:
+  - "--STRESC"
+  - "!--RESCAT"
+Source:
+  FDA_Validator_Rule_Message: "Missing --RESCAT value, when --STRESC is not 'NORMAL',\
+    \ 'UNREMARKABLE', or NULL (--STAT = 'NOT DONE')"
+  FDA_Validator_Rule_Description: "Result Category (--RESCAT) should be populated\
+    \ for all abnormal findings, i.e., when Result or Finding in Standard Format (--STRESC)\
+    \ has a value other than 'NORMAL', 'UNREMARKABLE'  or missing (Completion Status\
+    \ (--STAT) = 'NOT DONE')."
+  Domains: "MI"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2228"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB082"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2228"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB082"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2228"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB082"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2228"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB082"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2228"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB082"
+        Version: "1"
+      Version: "1.5"

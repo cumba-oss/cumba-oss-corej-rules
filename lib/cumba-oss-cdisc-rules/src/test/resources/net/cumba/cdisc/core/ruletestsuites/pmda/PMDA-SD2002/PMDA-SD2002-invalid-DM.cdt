@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD2002 expect=violation domain=DM
+#note "ACTARMCD=XANLO on row 2 is not defined in TA -> fires. Row 1 matches TA; row 3 has an empty ACTARMCD and is guarded out."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002 ACTARMCD=XANLO
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-001 | PBO   | PBO   |
+CDISCPILOT01 | DM | 01-002 | XANHI | XANLO |
+CDISCPILOT01 | DM | 01-003 |       |       | NOT ASSIGNED
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | PBO   | Placebo         | 1 | TRT
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 1 | TRT
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1327 expect=skipped domain=RELSUB
+#note "DELIBERATELY NO POOLID COLUMN (POOLID is Permissible in SDTMIG 3.4 RELSUB, so a pool-less RELSUB is a perfectly conformant dataset). The shipped expression's machine-emitted var_exists(\"POOLID\") conjunct folds FALSE -> no violation, with the rule executing. Column-vs-column comparand arm of the absent-column guard family. FLIP FIXTURE for finding SD1327-F1: if the lane rules that the Permissible-comparand convention owes this rule a Requirements.Variables.All: [POOLID] gate, this file becomes expect=skipped (and the same edit lands on FDA-SD1327). Pins TODAY's shipped behaviour, not that ruling. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset RELSUB label="Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | 01-701-1015 | 01-701-1016 | MOTHER, BIOLOGICAL
+CDISCPILOT01 | 01-701-1023 | 01-701-1024 | SIBLING, BIOLOGICAL

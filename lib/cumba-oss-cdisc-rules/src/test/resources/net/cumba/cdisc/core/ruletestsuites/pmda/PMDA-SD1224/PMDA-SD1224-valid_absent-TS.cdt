@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1224 expect=noViolation domain=TS
+#note "Boundary: TS carries no RANDOM record at all ($random_count = 0). The rule targets duplicates (greater than one), not absence, so zero records must stay silent."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE | Trial Title | A Randomized Study
+S1 | TS | 1 | STOPRULE | Study Stop Rules | NONE

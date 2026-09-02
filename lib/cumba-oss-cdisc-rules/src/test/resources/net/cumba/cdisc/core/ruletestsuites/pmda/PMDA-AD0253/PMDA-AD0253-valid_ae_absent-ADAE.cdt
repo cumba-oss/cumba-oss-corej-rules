@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0253 expect=noViolation domain=ADAE
+#note "Fix #247 flood arm - the arm that pins the defect being fixed: AE is absent entirely, so $ae_keys is the operator's declared empty set, containsAll([]) is true, and the rule passes with no finding. The shipped pre-fix rule iterated SDTM AE against a vacuous $adae_keys and fired on every AE row whenever ADAE was absent; the re-authored direction cannot recreate that flood."
+#library standard=adamig version=1-3
+dataset ADAE label="Adverse Events Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESEQ   type=Num  label="Sequence Number"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1
+---

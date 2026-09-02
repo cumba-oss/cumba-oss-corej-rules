@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-0138"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Sequence Number (--SEQ) is not unique for a\
+  \ subject (USUBJID) within a domain; the same USUBJID and --SEQ combination must\
+  \ not appear on more than one record."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    not is_unique_set([--SEQ, USUBJID, POOLID])
+Outcome:
+  Message: "--SEQ is not unique for a subject within the domain."
+  Output_Variables:
+  - "POOLID"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--SEQ"
+  Plain_Text_Explanation: "Sequence number is assigned to ensure uniqueness of records\
+    \ within a domain for a subject (or pool)."
+  Rule: "--SEQ is unique within a USUBJID OR --SEQ is unique within a POOLID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND138"
+        Version: "1"
+      Version: "5.0"

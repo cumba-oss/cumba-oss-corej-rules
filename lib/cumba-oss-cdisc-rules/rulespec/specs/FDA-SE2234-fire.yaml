@@ -1,0 +1,34 @@
+name: FDA-SE2234-fire
+kind: rule
+description: |
+  Representative fixture for the supp_qnam capability. FDA-SE2234 fires when PCSTRESC is below the
+  limit of quantification (BLQ/BQL) but no SUPPPC record with QNAM=PCCALCN exists for that PC record.
+  PC row 1 (PCSEQ=1) has a SUPPPC PCCALCN record -> no fire; row 2 (PCSEQ=2) has none -> fires.
+python_source: rules-sendig FDA-SE2234
+rule:
+  coreId: FDA-SE2234
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCSTRESC: BLQ}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 2, PCSTRESC: BQL}
+  SUPPPC:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: PC, USUBJID: '001', IDVAR: PCSEQ, IDVARVAL: '1', QNAM: PCCALCN, QVAL: Y}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    findings: [PC]
+expected_violations:
+  - rule_id: FDA-SE2234
+    dataset: PC
+    row_key: {PCSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $calcn_present: 'false'
+      PCSTRESC: BQL
+expected_errors: []

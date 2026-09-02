@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1363 expect=noViolation domain=DM
+#note "Rows 1-2: unassigned subjects (ARMNRS 'SCREEN FAILURE' / 'NOT ASSIGNED') correctly carry empty ARMCD and ARM. Row 3: an assigned subject has no ARMNRS. Row 4 boundary: 'ASSIGNED, NOT TREATED' is outside the rule's ARMNRS list — such a subject WAS assigned an Arm, so ARMCD/ARM stay populated."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col ARMNRS  type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |   |       | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1023 |   |       | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-701-1028 | A | Arm A |
+CDISCPILOT01 | DM | 01-701-1034 | A | Arm A | ASSIGNED, NOT TREATED

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0320 expect=skipped domain=ADSLX
+#note "ADSL negative. SUBJECT LEVEL ANALYSIS DATASET is derived from an EXACT dataset name of ADSL, never from a prefix, so ADSLX is not it — the columns then decide, and PARAMCD/AVAL make it a BASIC DATA STRUCTURE, outside this rule's Data_Structures scope. The label is deliberately wrong, so the rule would fire on this fixture if the structure gate ever admitted an ADSL-prefixed name; expect=skipped asserts the non-execution that expect=noViolation would hide."
+# Rule:Description: A dataset is named ADSL and the dataset label is not "Subject-Level Analysis Dataset"
+dataset ADSLX label="Wrong Label"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+---
+CDISCPILOT01 | 01-701-1015 | HEIGHT | 175
+---

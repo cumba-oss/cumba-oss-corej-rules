@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0377 expect=violation domain=ADSL
+# Rule:Description: On a given record, TRTxxP is populated and TRTxxPN is not populated
+#note "TRT01P populated, TRT01PN empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+col TRT01PN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | VAL | 
+---

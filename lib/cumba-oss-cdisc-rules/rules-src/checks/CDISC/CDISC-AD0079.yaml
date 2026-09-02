@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0079"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTxxP is present but the corresponding TRxxEDT\
+  \ is not present, where xx is an integer [01-99, zero-padded] and is greater than\
+  \ 01"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TRTxxP") and not var_exists("TRxxEDT")
+Outcome:
+  Message: "TRTxxP is present but the corresponding TRxxEDT is not present"
+  Output_Variables:
+  - "TRTxxP"
+wildcards:
+  xx:
+    min: 2
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTxxP where xx is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "At least one TRTxxP is present where xx\
+    \ is greater than 01 and TRxxEDT is not present"
+  Rule_Failure_Criteria: "TRxxEDT is not present"
+  Condition_Failure: "At least one TRTxxP is present where xx is greater than 01"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR79"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR79"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR79"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR79"
+        Version: "1"
+      Version: "5.0"

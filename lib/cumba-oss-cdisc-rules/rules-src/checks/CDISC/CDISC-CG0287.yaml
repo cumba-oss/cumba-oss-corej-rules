@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0287"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset does not contain\
+  \ at least one record for each required Trial Summary Parameter Short Name (TSPARMCD)\
+  \ value defined in the CDISC Trial Summary Codes (Appendix C1)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    var_exists("TSPARMCD") and not contains_all(TSPARMCD, keys=[ADDON, AGEMAX, AGEMIN, LENGTH,
+    PLANSUB, RANDOM, SEXPOP, STOPRULE, TBLIND, TCNTRL, TITLE, TPHASE, TTYPE, OBJPRIM, SPONSOR,
+    REGID, OUTMSPRI, FCNTRY, ADAPT, DCUTDTC, DCUTDESC, NARMS, STYPE, SSTDTC, SENDTC, ACTSUB,
+    HLTSUBJI])
+Outcome:
+  Message: "The Trial Summary dataset is missing one or more required TSPARMCD values."
+  Output_Variables:
+  - "TSPARMCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "GEN"
+  Rule: "A set of records exist with at least one record with TSPARMCD equal to each\
+    \ of the required values in the list of Trial Summary Codes in Appendix C1"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"

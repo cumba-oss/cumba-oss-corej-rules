@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1221 expect=violation domain=TS
+#note "The PLANSUB record spells the planned subject count out in words, so TSVAL is not a number -> fires on row 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=PLANSUB
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects | three hundred six
+CDISCPILOT01 | TS | 1 | TITLE   | Trial Title                | A Phase 3 Study

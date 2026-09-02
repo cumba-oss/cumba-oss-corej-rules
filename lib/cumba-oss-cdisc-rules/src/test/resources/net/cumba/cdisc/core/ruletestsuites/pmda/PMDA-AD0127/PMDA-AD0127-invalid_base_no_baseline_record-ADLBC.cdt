@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0127 expect=violation domain=ADLBC
+#note "Every column the grouped operation names is declared (vacuity trap). Groups by [USUBJID, PARAMCD]: group (001, GLUC) has $ablfl_y_count=0 and BASE populated on rows 1-2 -> FAILING GROUP; group (002, GLUC) has an ABLFL=Y record (row 3) -> conformant. GROUP sensitivity: ONE violation per failing group, anchored at the group's first FLAGGED row -> count 1 at row=1 (two flagged rows collapse into one finding)."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 PARAMCD=GLUC
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col BASE    type=Num
+col BASEC   type=Char
+col ABLFL   type=Char
+---
+S1 | 001 | GLUC | 5.2 | 5.1 |   | N
+S1 | 001 | GLUC | 5.4 | 5.1 |   | N
+S1 | 002 | GLUC | 6.1 | 6.0 |   | Y
+S1 | 002 | GLUC | 6.3 | 6.0 |   | N

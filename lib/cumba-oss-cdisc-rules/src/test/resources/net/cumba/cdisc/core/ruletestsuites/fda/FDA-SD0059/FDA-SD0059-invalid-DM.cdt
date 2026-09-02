@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0059 expect=violation domain=DM
+#note "The Define-XML declares AGE as integer (numeric) but the dataset submits it as a character variable -> fires on AGE. AGEU/SEX agree; STUDYID/USUBJID are not declared in the define so the define_variable_name guard excludes them."
+#library standard=sdtmig version=3-4
+#define variable-metadata DM AGE  name=AGE  simpleDatatype=integer label="Age"
+#define variable-metadata DM AGEU name=AGEU simpleDatatype=text    label="Age Units"
+#define variable-metadata DM SEX  name=SEX  simpleDatatype=text    label="Sex"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGE
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Char label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+---
+S1 | 001 | 56 | YEARS | M

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0289 expect=noViolation domain=ADAE
+#note "Row 1's AREL (the DEPENDENT) is blank while ARELN stays 1: key 1 left with single dependent {NOTRELATED} -> silent. Pin on the blank-DEPENDENT side of D.13."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AREL    type=Char
+col ARELN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE |  | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | NOTRELATED | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | POSSIBLE | 3

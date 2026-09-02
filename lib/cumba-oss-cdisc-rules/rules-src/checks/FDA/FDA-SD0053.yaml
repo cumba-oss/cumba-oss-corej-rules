@@ -1,0 +1,86 @@
+Core:
+  Id: "FDA-SD0053"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Planned Arm (ARM) is not 'Not Assigned'\
+  \ while Planned Arm Code (ARMCD) equals 'NOTASSGN', or when ARMCD is not 'NOTASSGN'\
+  \ while ARM equals 'Not Assigned'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ARM"
+Check:
+  expression: >-
+    ARMCD == "NOTASSGN" and ARM != "Not Assigned" or ARM == "Not Assigned" and ARMCD != "NOTASSGN"
+Outcome:
+  Message: "ARM is not 'Not Assigned' when ARMCD equals 'NOTASSGN', or ARMCD is not\
+    \ 'NOTASSGN' when ARM equals 'Not Assigned'."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+Source:
+  FDA_Validator_Rule_Message: "ARM is not 'Not Assigned', when ARMCD equals 'NOTASSGN',\
+    \ or vice versa"
+  FDA_Validator_Rule_Description: "Description of Arm (ARM) must equal 'Not Assigned',\
+    \ when Arm Code (ARMCD) is 'NOTASSGN', and vice versa."
+  Domains: "DM, TA"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0053"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0053"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0129"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0129"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0129"
+        Version: "1"
+      Version: "2.0"

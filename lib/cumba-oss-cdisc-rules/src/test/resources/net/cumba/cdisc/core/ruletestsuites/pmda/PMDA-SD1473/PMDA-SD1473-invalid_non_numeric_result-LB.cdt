@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1473 expect=violation domain=LB
+#note "Row 2 fires: the STANDARD-units upper limit is populated while the original result is not numeric. The rule reads the ORIGINAL-units result LBORRES against the STANDARD-units limit LBSTNRHI - that is what the sheet Message says and it is correct."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 LBORRES=NEGATIVE LBSTNRHI=6.1
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBSTNRHI type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 6.1      | 6.1
+S1 | LB | 002 | 2 | GLUC | NEGATIVE | 6.1
+---

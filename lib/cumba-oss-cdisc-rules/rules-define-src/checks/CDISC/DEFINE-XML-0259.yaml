@@ -1,0 +1,14 @@
+Rule_Id: "DEFINE-XML-0259"
+Sheet_Rule_Identifier: "259"
+Rule_Set: "CDISC"
+Element: "leaf"
+Attribute: "ID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The value of attribute ID must start with either a letter or underscore (_), and may contain only letters, digits, underscores, hyphens and periods."
+# Detection of a MISSING ID is XSD territory; value-kinds fire only on present values.
+Message: "The value of attribute ID [${value}] does not start with either a letter or underscore (_) or contains characters other than letters, digits, underscores, hyphens and periods."
+Check:
+  kind: "matches_regex"
+  attribute: "ID"
+  pattern: "[A-Za-z_][A-Za-z0-9_.-]*"

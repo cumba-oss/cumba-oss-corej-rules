@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0212 expect=violation domain=ADLBC
+#note "Domains ALL, no scope key. Row 1 = 1 conformant (pins the all-numeric-list-literal membership branch: the Num cell 1 is parsed and matched against member 1); row 2 = 2 fires; row 3 blank silent."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=ANL01FN USUBJID=01-701-1023
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANL01FN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 1
+CDISCPILOT01 | 01-701-1023 | SYSBP | 2
+CDISCPILOT01 | 01-701-1034 | SYSBP |

@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0143"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Parameter Code (PARAMCD) value is not\
+  \ a valid name: it must be a maximum of 8 characters, start with a letter A-Z or\
+  \ an underscore, and contain only letters, numbers or underscore (_)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARAMCD"
+Check:
+  expression: >-
+    not empty(PARAMCD) and PARAMCD !~ /^[A-Z_][A-Za-z0-9_]{0,7}$/
+Outcome:
+  Message: "Illegal PARAMCD value"
+  Output_Variables:
+  - "PARAMCD"
+Source:
+  Message: "Illegal PARAMCD value"
+  Description: "PARAMCD value must be a max of 8 characters, start with a letter A-Z\
+    \ or underscore, and not contain anything other than letters, numbers, or underscore\
+    \ (_)."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0143"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0143"
+        Version: "1"
+      Version: "6.0"

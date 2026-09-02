@@ -1,0 +1,115 @@
+Core:
+  Id: "PMDA-SD1011"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Duration, Elapsed Time, or Interval variable (a\
+  \ variable whose name ends in DUR, ELTM, EVLINT, STINT, ENINT, or is TDSTOFF, TDTGTPAI,\
+  \ TDMINPAI, TDMAXPAI) is populated with a value that does not conform to the ISO\
+  \ 8601 international standard for durations/intervals."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() =~ /(DUR|ELTM|EVLINT|STINT|ENINT|TDSTOFF|TDTGTPAI|TDMINPAI|TDMAXPAI)$/ and not
+    empty(value()) and invalid_duration(value(), negative=false)
+Outcome:
+  Message: "Invalid ISO 8601 value for a Duration, Elapsed Time, or Interval variable."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Invalid ISO 8601 value for variable"
+  Description: "Value of Duration, Elapsed Time, and Interval variables (--DUR, --ELTM,\
+    \ --EVLINT, --STINT, --ENINT, TDSTOFF, TDTGTPAI, TDMINPAI, TDMAXPAI) must conform\
+    \ to the ISO 8601 international standard."
+  Domains: "SPECIAL PURPOSE (-DM), INTERVENTIONS, FINDINGS (-DO), EVENTS, FINDINGS\
+    \ ABOUT, TRIAL DESIGN (-TA, -TI, -TS, -TV)"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1011"
+        Version: "1"
+      Version: "1.6"

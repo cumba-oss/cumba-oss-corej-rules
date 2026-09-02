@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0033"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'RFL' (a record-level\
+  \ flag) has a value other than Y or empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "RFL") and not empty(value()) and value() not in ["Y"]
+Outcome:
+  Message: "A variable whose name ends in 'RFL' has a value that is not Y or empty."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "*RFL value is not Y or null"
+  Description: "A variable with a suffix of RFL must have a value that is Y or null\
+    \ (R = record level flag variable)."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0033"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0033"
+        Version: "1"
+      Version: "6.0"

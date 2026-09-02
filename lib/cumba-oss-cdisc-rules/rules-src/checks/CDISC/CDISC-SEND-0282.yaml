@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0282"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a PPSPEC value listing multiple specimens separated\
+  \ by a semicolon (;) contains a token that is not a submission value in the (SPEC)\
+  \ controlled terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "PPSPEC"
+Operations:
+- id: "$spec_terms"
+  expression: "codelist_terms(codelists=[SPEC], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    not empty(PPSPEC) and contains(PPSPEC, ";") and not contains_all($spec_terms, split_by(PPSPEC,
+    ";"))
+Outcome:
+  Message: "A semicolon-separated PPSPEC token is not a submission value in the (SPEC)\
+    \ controlled terminology codelist."
+  Output_Variables:
+  - "PPSPEC"
+  - "$spec_terms"
+Source:
+  Class: "FND"
+  Domain: "PP"
+  Variable: "PPSPEC"
+  Plain_Text_Explanation: "If multiple specimen types are used for a calculation (e.g.,\
+    \ serum and urine for creatinine clearance), then this field should be populated\
+    \ with values from the (SPEC) Controlled Terminology codelist delimited by a semicolon."
+  Condition: "Multiple specimens are used"
+  Rule: "PPSPEC should consist of values from (SPEC) delimited by \";\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND282"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND282"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND282"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND282"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND282"
+        Version: "1"
+      Version: "5.0"

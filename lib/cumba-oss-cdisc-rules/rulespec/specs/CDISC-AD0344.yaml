@@ -1,0 +1,47 @@
+name: CDISC-AD0344
+kind: rule
+description: |
+  Wave B1 port - T1b PlainIntermediate.
+  CDISC-AD0344: Within a parameter, there is more than one value of ANRHI for a given value of ANRHIC.
+  has_multiple_values_for with within=PARAMCD - ANRHIC must uniquely determine
+  ANRHI per parameter. Bare-leaf Check at root - Python KeyError; baseline
+  Python lane with Java expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0344)
+rule:
+  coreId: CDISC-AD0344
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN, ANRHI, ANRHIC]
+    column_types:
+      AVISITN: LONG
+      ANRHI: DOUBLE
+    rows:
+      # PARAMCD=HGB: ANRHIC='17 g/dL' maps to two distinct ANRHI (17.0 vs 17.5) -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ANRHI: 17.0, ANRHIC: 17 g/dL}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, ANRHI: 17.5, ANRHIC: 17 g/dL}
+      # PARAMCD=HGB: ANRHIC='18 g/dL' consistent
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, ANRHI: 18.0, ANRHIC: 18 g/dL}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0344
+    dataset: ADLB
+    row_key: {ANRHI: 17.0, ANRHIC: 17 g/dL, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ANRHI: '17'
+      ANRHIC: 17 g/dL
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0344
+    dataset: ADLB
+    row_key: {ANRHI: 17.5, ANRHIC: 17 g/dL, AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ANRHI: '17.5'
+      ANRHIC: 17 g/dL
+      PARAMCD: HGB
+expected_errors: []

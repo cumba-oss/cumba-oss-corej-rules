@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0136 expect=violation domain=ADLBC
+#note "Key is SHIFT1, dependent is SHIFT1N: NORMALTOHIGH carries {1,2} -> rows 1 and 2 fire; LOWTONORMAL is single-valued -> row 3 silent. Exact mirror of AD0135's fixture (these rows do NOT fire under AD0135)."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 PARAMCD=GLUC
+#expectViolationAt row=2 USUBJID=01-701-1023 PARAMCD=GLUC
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMALTOHIGH | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | NORMALTOHIGH | 2
+CDISCPILOT01 | 01-701-1034 | GLUC | LOWTONORMAL  | 3
+---

@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-CG0371"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the reference record defined by RDOMAIN, USUBJID,\
+  \ IDVAR and IDVARVAL does not exist in the target domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+Match_Datasets:
+- Child: true
+  Keys:
+  - "USUBJID"
+  - "IDVAR"
+  - "IDVARVAL"
+  Name: "SUPP--"
+- Child: true
+  Keys:
+  - "USUBJID"
+  - "IDVAR"
+  - "IDVARVAL"
+  Name: "CO"
+- Child: true
+  Keys:
+  - "USUBJID"
+  - "IDVAR"
+  - "IDVARVAL"
+  Name: "RELREC"
+Check:
+  expression: >-
+    not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(IDVAR))
+Outcome:
+  Message: "The referenced record defined by RDOMAIN, USUBJID, IDVAR and IDVARVAL\
+    \ does not exist in the target domain."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "IDVARVAL"
+Source:
+  Class: "SPC"
+  Domain: "CO,  SUPP--, RELREC"
+  Variable: "IDVARVAL"
+  Condition: "IDVAR ^= null"
+  Rule: "IDVARVAL = value of variable = IDVAR in domain = RDOMAIN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0371"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0371"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0371"
+        Version: "1"
+      Version: "2.0"

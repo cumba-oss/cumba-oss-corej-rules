@@ -1,0 +1,33 @@
+#!RuleTest
+#test FDA-SD1316 expect=noViolation domain=SS
+#note "Every subject recorded DEAD in SS has a DS record with DSDECOD 'DEATH'; subject 002 is ALIVE and its DS records carry no DEATH term, which must not fire."
+#library standard=sdtmig version=3-4
+dataset SS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSTEST   type=Char label="Subject Status"
+col SSORRES  type=Char label="Result or Finding in Original Units"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC    type=Char label="Date/Time of Assessment"
+---
+CDISCPILOT01 | SS | 001 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-03-01
+CDISCPILOT01 | SS | 002 | 1 | SURVSTAT | Survival Status | Alive | ALIVE | 2020-05-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 001 | 1 | Informed consent obtained | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | 2020-01-01
+CDISCPILOT01 | DS | 001 | 2 | Death | DEATH | DISPOSITION EVENT | 2020-03-02
+CDISCPILOT01 | DS | 002 | 1 | Completed study | COMPLETED | DISPOSITION EVENT | 2020-05-02
+---

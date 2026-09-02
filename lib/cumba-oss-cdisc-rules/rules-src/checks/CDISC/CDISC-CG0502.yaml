@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-CG0502"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Temporal Relation to Milestone Instance (RELMIDS)\
+  \ variable is present in a dataset but the Trial Disease Milestones (TM) dataset\
+  \ is not present in the study."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$RELMIDS_EXISTS"
+  expression: "variable_exists(RELMIDS)"
+Check:
+  expression: >-
+    $RELMIDS_EXISTS == true and not ds_exists("TM")
+Outcome:
+  Message: "TM dataset is not present in the study when the RELMIDS variable is present\
+    \ in a dataset."
+  Output_Variables:
+  - "$RELMIDS_EXISTS"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "RELMIDS"
+  Condition: "RELMIDS present in dataset"
+  Rule: "TM dataset present in study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0502"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0502"
+        Version: "2"
+      Version: "2.0"

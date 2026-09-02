@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0517 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in EDTM must contain "End Datetime" in the label
+#note "AEDTM label "Analysis Datetime" lacks "End Datetime" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Datetime" variable_name=AEDTM
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AEDTM type=Char label="Analysis Datetime"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0112"
+Sheet_Rule_Identifier: "DD0112"
+Rule_Set: "PMDA"
+Element: "Document"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "MedDRA dictionary and version must be specified in Define.xml for regulatory submissions. Define-XML specification represents MedDRA as Dictionary and Version attributes on ExternalCodeList element within CodeList element."
+# Document-level half of the row: fires when NO ExternalCodeList anywhere in
+# the document names the MedDRA dictionary (case-insensitive). The guard walks
+# the full path from the Document scope; the not_exists on the always-present
+# ODM child is the 0124-B fire-always vehicle (a check kind cannot navigate
+# multi-step paths itself). The 'and version' half is PMDA-DD0112-B (a Version
+# on the MedDRA ExternalCodeList). CDISC twins 0203/0204 are per-element
+# presence rules; the PMDA row demands the MedDRA entry itself - stricter,
+# flagged as intentional.
+Message: "Missing MedDRA definition"
+Check:
+  kind: "not_exists"
+  target: "ODM"
+  when:
+    not:
+      path: "ODM/Study/MetaDataVersion/CodeList/ExternalCodeList/@Dictionary"
+      matchesRegex: "(?i)meddra"

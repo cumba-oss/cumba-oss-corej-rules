@@ -1,0 +1,79 @@
+Core:
+  Id: "PMDA-AD0253"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the ADaM ADAE dataset does not contain a record\
+  \ for every combination of Study Identifier (STUDYID), Unique Subject Identifier\
+  \ (USUBJID) and Sequence Number (AESEQ) present in the SDTM AE dataset, so at least\
+  \ one collected adverse event is not traceable to ADAE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Operations:
+- id: "$ae_keys"
+  expression: "distinct([STUDYID, USUBJID, AESEQ], domain=\"AE\")"
+- id: "$adae_keys"
+  expression: "distinct([STUDYID, USUBJID, AESEQ])"
+- id: "$untraceable_ae_keys"
+  expression: "minus($ae_keys, subtract=$adae_keys)"
+Check:
+  expression: >-
+    not contains_all($adae_keys, $ae_keys)
+Outcome:
+  Message: "One or more (STUDYID, USUBJID, AESEQ) combinations present in the SDTM\
+    \ AE dataset have no corresponding record in the ADaM ADAE dataset."
+  Output_Variables:
+  - "$untraceable_ae_keys"
+Source:
+  Message: "Record key from SDTM AE is not traceable to ADaM ADAE (not enough ADAE\
+    \ recs)"
+  Description: "Adverse Events specified in SDTM AE domain must be traceable to ADaM\
+    \ ADAE dataset based on Study Identifier (STUDYID), Unique Subject Identifier\
+    \ (USUBJID) and Sequence Number (AESEQ) variables. The ADAE structure for the\
+    \ standard adverse event safety dataset must have at least one record per each\
+    \ AE recorded in SDTM AE domain. However, subjects not analyzed (e.g., Screen\
+    \ Failures) who have AEs recorded in SDTM AE, but not in ADSL do not need to be\
+    \ included in ADAE. Currently, this check does not take into account the latter.\
+    \ Please check your ADSL file to see if these issues are for Screen Failures."
+  Domains: "AE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0253"
+        Version: "1"
+      Version: "6.0"

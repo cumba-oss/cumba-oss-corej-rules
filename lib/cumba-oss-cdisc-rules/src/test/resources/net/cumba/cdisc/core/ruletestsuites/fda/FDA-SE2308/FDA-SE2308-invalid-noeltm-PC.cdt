@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2308 expect=violation domain=PC
+#note "PCELTM variable not present in the dataset -> the bare empty() leaf on the absent column is TRUE on every row (absent = all-missing, EC-43) and the rule fires (Plan B phase 4d' deleted the redundant not var_exists disjunct this note used to name) on every record even though VISITDY/PCNOMDY are populated."
+#library standard=sendig version=3-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSEQ=1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ   type=Num  label="Sequence Number"
+col VISITDY type=Num  label="Planned Study Day of Visit"
+col PCNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | PC | 001 | 1 | 3 | 1

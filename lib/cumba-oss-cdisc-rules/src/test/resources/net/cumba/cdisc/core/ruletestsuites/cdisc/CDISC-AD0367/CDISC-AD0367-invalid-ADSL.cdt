@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0367 expect=violation domain=ADSL
+# Rule:Description: The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.ACTARM is not equal to DM.ACTARM
+#note "same USUBJID, ADSL.ACTARM != DM.ACTARM -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ACTARM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Xanomeline High Dose
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col ACTARM type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | Placebo
+---

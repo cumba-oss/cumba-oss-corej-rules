@@ -1,0 +1,54 @@
+Core:
+  Id: "PMDA-AD0310"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SMQzzSC variable is not uniquely determined\
+  \ by SMQzzSCN within the dataset: a single value of SMQzzSCN maps to more than one\
+  \ value of SMQzzSC, considering only the records on which SMQzzSC is populated.\
+  \ The PMDA validation sheet's 'inconsistent value across studies' intent is reinterpreted\
+  \ as a within-dataset unique (1-to-1) relationship check between the paired character/numeric\
+  \ variables SMQzzSC and SMQzzSCN; the cross-study scope is not evaluated."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The sheet's 'inconsistent across studies' intent is reinterpreted as a\
+    \ within-dataset unique-relationship check between the char/numeric pair SMQzzSC/SMQzzSCN\
+    \ (has_multiple_values_for); the cross-study scope is not evaluated."
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    not empty(SMQzzSC) and has_multiple_values_for(SMQzzSC, SMQzzSCN)
+Outcome:
+  Message: "There is more than one value of SMQzzSC for a given value of SMQzzSCN\
+    \ (within the dataset)."
+  Output_Variables:
+  - "SMQzzSC"
+  - "SMQzzSCN"
+wildcards:
+  zz:
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for SMQzzSC"
+  Description: "Across studies, all SMQ Scope (SMQzzSC ) variable values must be the\
+    \ same for each unique value of SMQ Scope (N) (SMQzzSCN) variable when the primary\
+    \ variable SMQzzSC is populated. The usual mapping is BROAD=1, NARROW=2."
+  Domains: "ADAE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0310"
+        Version: "1"
+      Version: "6.0"

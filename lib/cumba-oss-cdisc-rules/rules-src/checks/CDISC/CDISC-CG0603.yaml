@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-CG0603"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Findings About record has a parent record whose\
+  \ --DECOD is populated and FAOBJ does not equal the parent record's --DECOD value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FA"
+Match_Datasets:
+- Name: "RELREC"
+Check:
+  expression: >-
+    not empty(RELREC.**DECOD) and FAOBJ != RELREC.**DECOD
+Outcome:
+  Message: "The Findings About record has a parent record with a populated --DECOD,\
+    \ but FAOBJ does not equal the parent record's --DECOD value."
+  Output_Variables:
+  - "FAOBJ"
+  - "RELREC.**DECOD"
+Source:
+  Class: "FND"
+  Domain: "FA"
+  Variable: "--OBJ"
+  Condition: "Parent record exists and DECOD ^= null"
+  Rule: "--OBJ = --DECOD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0603"
+        Version: "1"
+      Version: "2.0"

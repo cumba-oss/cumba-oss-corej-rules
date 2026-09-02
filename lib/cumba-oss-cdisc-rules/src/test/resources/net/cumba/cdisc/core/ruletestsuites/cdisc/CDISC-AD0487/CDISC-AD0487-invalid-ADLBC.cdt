@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0487 expect=violation domain=ADLBC
+# Rule:Description: On a given record, CRITyFN is populated and CRITyFL is not populated
+#note "CRIT1FN populated, CRIT1FL empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1FN type=Char
+col CRIT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X | 
+---

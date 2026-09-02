@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0293"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Planned Time Point Name (--TPT) is populated but\
+  \ the corresponding Planned Time Point Number (--TPTNUM) is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--TPT"
+Check:
+  expression: >-
+    not empty(--TPT) and empty(--TPTNUM)
+Outcome:
+  Message: "--TPTNUM is missing when --TPT is populated."
+  Output_Variables:
+  - "--TPT"
+  - "--TPTNUM"
+Source_Proposed:
+  Sheet_Issue: "#20,#90"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "If --TPT is populated --TPTNUM must be populated."
+  Condition: "--TPT ^=null"
+  Rule: "--TPTNUM ^= null"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "If --TPT is populated --TPTNUM must be populated."
+  Condition: "--TPT ^=null"
+  Rule: "TPTNUM ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND293"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND293"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND293"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND293"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND293"
+        Version: "1"
+      Version: "5.0"

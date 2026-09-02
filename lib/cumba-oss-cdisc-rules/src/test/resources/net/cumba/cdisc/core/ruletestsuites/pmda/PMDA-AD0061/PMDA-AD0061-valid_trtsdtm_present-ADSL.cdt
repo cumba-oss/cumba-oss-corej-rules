@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0061 expect=noViolation domain=ADSL
+#note "Exercises the OTHER arm: the datetime variant alone satisfies the rule -> not var_exists(\"TRTSDTM\") false -> silent."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDTM type=DateTime
+---
+CDISCPILOT01 | 01-701-1015 | 2023-01-05T08:00:00
+---
+
+dataset EX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+---
+CDISCPILOT01 | EX | 01-701-1015 | DRUGA
+---

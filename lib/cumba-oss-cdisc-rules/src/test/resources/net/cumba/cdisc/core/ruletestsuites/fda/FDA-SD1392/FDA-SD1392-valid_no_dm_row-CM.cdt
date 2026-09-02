@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SD1392 expect=noViolation domain=CM
+#note "INTENDED POLARITY FLIP (D-TA-2, 2026-08-17). Subject 001 has no DM record at all. Under the removed Join_Type: left this fixture fired -- DM.RFCSTDTC was null after the left merge and read as 'not provided'. Under the inner join the CM row is dropped and this rule is silent: a subject missing from DM is FDA-SD0064's finding ('USUBJID value is not present in the DM dataset'), and one root cause produces ONE finding. DM is present and non-empty here, so a rule that still left-joined WOULD fire -- the scenario stays a discriminator rather than a vacuous pass. Renamed from FDA-SD1392-invalid_no_dm_row-CM.cdt."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMENDTC  type=Char label="End Date/Time of Medication"
+col CMCHENDY type=Num  label="End Day of Obs Rel to Challenge Agent"
+---
+S1 | CM | 001 | 1 | SALINE | 2020-01-10 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 999 | 2020-01-05
+---

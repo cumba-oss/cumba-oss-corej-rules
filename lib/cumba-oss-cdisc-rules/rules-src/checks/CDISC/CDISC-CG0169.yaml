@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0169"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the overflow comment variable COVAL1 is populated\
+  \ while COVAL contains fewer than 200 characters, indicating a COVALn variable is\
+  \ used when the comment does not exceed 200 characters."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "COVAL"
+Check:
+  expression: >-
+    not empty(COVAL1) and len(COVAL) < 200
+Outcome:
+  Message: "COVAL1 is populated while COVAL is shorter than 200 characters; COVALn\
+    \ variables should be used only when the comment text exceeds 200 characters."
+  Output_Variables:
+  - "COVAL"
+  - "!COVAL1"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "COVAL"
+  Condition: "No comment > 200 characters"
+  Rule: "COVALn not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0169"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0169"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0169"
+        Version: "1"
+      Version: "2.0"

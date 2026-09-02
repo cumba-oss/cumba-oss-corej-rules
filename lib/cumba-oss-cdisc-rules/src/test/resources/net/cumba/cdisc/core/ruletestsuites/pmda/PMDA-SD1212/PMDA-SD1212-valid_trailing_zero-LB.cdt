@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1212 expect=noViolation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD1212/FDA-SD1212-valid_trailing_zero-LB.cdt. Boundary: LBSTRESC='5.50' and LBSTRESN=5.5 are the SAME number written with a different number of decimals. The sheet asks that --STRESN 'be equal' to --STRESC when --STRESC represents a numeric value -- that is a numeric equality, so a trailing zero must not be reported."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.50 | 5.5

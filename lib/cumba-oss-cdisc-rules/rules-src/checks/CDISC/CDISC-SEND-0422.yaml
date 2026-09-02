@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0422"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject's End Date/Time of Repro Stage (SJENDTC)\
+  \ is not on or before the Start Date/Time of Repro Stage (SJSTDTC) of the subject's\
+  \ next Repro Stage in SJSEQ order; Repro Stages have no time gaps, so every stage\
+  \ except the last must end on or immediately before the next stage's start."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The check admits any SJENDTC on or before the next stage's SJSTDTC (relation\
+    \ <=), so a stage that ends strictly earlier than the day immediately before the\
+    \ next stage starts - a real time gap, which the cited guidance forbids - is not\
+    \ reported. Bounding the gap needs day arithmetic on partial ISO dates and is\
+    \ a separate question; the equality-only reading reported every conformant gap-free\
+    \ submission whose stages end the day before the next begins (sheet issue #129)."
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Check:
+  expression: >-
+    not has_next_corresponding_record(SJENDTC, SJSTDTC, keep_missings=false, ordering=SJSEQ,
+    relation="<=", within=USUBJID)
+Outcome:
+  Message: "SJENDTC is not on or before SJSTDTC of the subject's next Repro Stage."
+  Output_Variables:
+  - "SJENDTC"
+  - "SJSTDTC"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "SJSTDTC, SJENDTC"
+  Plain_Text_Explanation: "On a Repro Path (RPATH), if there is more than one Repro\
+    \ Stage (RSTAGE) within a Repro Phase (RPHASE), the end date for an RSTAGE should\
+    \ be equivalent to the start date for the next stage except for the last stage\
+    \ within the RPATH."
+  Condition: "For an RPATH, more than one RSTAGE exists within a RPHASE AND RSTAGE\
+    \ is not the last stage within the RPATH"
+  Rule: "SJENDTC = SJSTDTC for the next stage"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND422"
+        Version: "1"
+      Version: "5.0"

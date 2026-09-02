@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0097 expect=violation domain=ADLBC
+#note "Pool index 1 is captured from TRTPG1N (which does NOT match the TRTPGy pattern - that one cannot absorb the trailing N), TRTPG1 is synthesised absent -> one expansion, one violation at reported row 1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 TRTPG1N=1
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1

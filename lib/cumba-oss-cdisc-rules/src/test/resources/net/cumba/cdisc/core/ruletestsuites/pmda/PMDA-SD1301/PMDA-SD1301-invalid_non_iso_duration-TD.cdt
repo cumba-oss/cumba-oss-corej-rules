@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1301 expect=violation domain=TD
+#note "Row 1 is the negative control (well-formed positive duration). Row 2 omits the ISO 8601 'P' designator and row 3 is negative, so neither matches the pattern and neither equals '0' - both fire. Record granularity, so two findings. Body from the shipped green fda/FDA-SD1301-invalid-TD.cdt."
+#expectViolationCount 2
+#expectViolationAt row=2 TDSTOFF=80Y
+#expectViolationAt row=3 TDSTOFF=-P1D
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TDORDER  type=Num
+col TDANCVAR type=Char
+col TDSTOFF  type=Char
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | P80Y
+CDISCPILOT01 | TD | 2 | RSSTDTC | 80Y
+CDISCPILOT01 | TD | 3 | RSSTDTC | -P1D

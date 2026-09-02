@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0016"
+Sheet_Rule_Identifier: "DD0016"
+Rule_Set: "PMDA"
+Element: "ItemRef"
+Attribute: "MethodOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Referenced Method must first be defined on Methods tab. Define-XML specification represents Methods as MethodDef elements within MetaDataVersion element."
+# Value check fires only on a present MethodOID. CDISC twin 74 (same shape).
+Message: "Referenced Method is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "MethodOID"
+  targetElement: "MethodDef"
+  targetKey: "OID"

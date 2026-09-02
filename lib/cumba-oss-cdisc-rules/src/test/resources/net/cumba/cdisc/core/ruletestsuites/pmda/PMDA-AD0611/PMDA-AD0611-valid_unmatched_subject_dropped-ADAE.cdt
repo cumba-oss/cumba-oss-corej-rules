@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-AD0611 expect=noViolation domain=ADAE
+#note "MECHANISM PIN - inner-join drop under the substitution family. Row 1: matched, PHEDT 23100 == ADSL.PH1EDT 23100 -> silent. Row 2: subject 01-701-9999 NOT in ADSL -> row DROPPED from the expanded table BEFORE evaluation; its APHASEN being populated is irrelevant because dropped rows are never scanned - no crash, no fire."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col APHASEN  type=Num
+col PHEDT    type=Num
+---
+S1 | 01-701-1015 | HEADACHE | 1 | 23100
+S1 | 01-701-9999 | NAUSEA   | 1 | 23110
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1EDT  type=Num
+---
+S1 | 01-701-1015 | 23100

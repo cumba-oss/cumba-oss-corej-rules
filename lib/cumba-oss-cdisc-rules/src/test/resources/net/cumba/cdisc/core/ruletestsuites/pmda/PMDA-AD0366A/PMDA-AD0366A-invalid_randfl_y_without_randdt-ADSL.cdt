@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0366A expect=violation domain=ADSL
+#note "Positive control. Row 1 is randomised (RANDFL=Y) but carries no randomisation date, so it fires. Row 2 is randomised with a populated RANDDT and stays silent; row 3 has a blank RANDDT but RANDFL is not Y, so the RANDFL conjunct keeps it silent. RANDDT is Num (SAS day number), as PMDA-AD0083/AD0152 do. Record granularity -> exactly 1 violation."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 RANDFL=Y
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col RANDFL  type=Char
+col RANDDT  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Y |
+CDISCPILOT01 | 01-701-1023 | Y | 21915
+CDISCPILOT01 | 01-701-1034 | N |

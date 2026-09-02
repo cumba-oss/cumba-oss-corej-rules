@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD1011 expect=violation domain=ADLBC
+#note "Generator-wildcard rule: expansion is COLUMN-DRIVEN, so the column list is load-bearing and deliberately minimal - AVISITN is the ONLY name here matching `*N`/`*C`, and it is not in _wildcardExclude, so there is EXACTLY ONE expansion (root AVISIT, with AVISITC synthesised as an absent column). Any extra column ending in N or C would silently add an expansion and change the count. Scope.Data_Structures is [ALL], so no structure= is needed. Row 1 populates the secondary AVISITN while the primary AVISIT is empty -> fires; row 2 has both -> silent. One expansion x one firing row -> 1 violation."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 AVISITN=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 |       | 1
+CDISCPILOT01 | 01-701-1023 | WEEK2 | 2

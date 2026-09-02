@@ -1,0 +1,44 @@
+name: CDISC-AD0772
+kind: rule
+description: |
+  Wave B5 port — T1b PlainIntermediate.
+  CDISC-AD0772: more than one value of ASEVN for a given value of ASEV.
+  Bare-leaf Check scoped to OCCURRENCE DATA STRUCTURE (primary: ADAE).
+  Uses has_multiple_values_for — Python gap (operator + bare-leaf), so
+  this spec baselines on the Python lane; expected matches Java's output.
+python_source: rules-adamig-1-3.json (CDISC-AD0772)
+rule:
+  coreId: CDISC-AD0772
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      # ASEV='MILD' mapped to two distinct ASEVN (1, 2) -> both rows fire
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, ASEV: 'MILD',   ASEVN: '1'}
+      - {STUDYID: S1, USUBJID: '002', AESEQ: 1, ASEV: 'MILD',   ASEVN: '2'}
+      # ASEV='SEVERE' single-valued -> ok
+      - {STUDYID: S1, USUBJID: '003', AESEQ: 1, ASEV: 'SEVERE', ASEVN: '3'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0772
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      ASEV: 'MILD'
+      ASEVN: '1'
+  - rule_id: CDISC-AD0772
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      ASEV: 'MILD'
+      ASEVN: '2'
+expected_errors: []

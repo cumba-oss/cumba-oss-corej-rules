@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD0021 expect=noViolation domain=AE
+#note "Every row satisfies an End Time-Point or an exception: r1 AEENDTC, r2 AEENRF, r3 AEENRTPT, r4 AESTAT populated, r5 AEDUR populated -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEENDTC  type=Char label="End Date/Time of Adverse Event"
+col AEENRF   type=Char label="End Relative to Reference Period"
+col AEENRTPT type=Char label="End Relative to Reference Time Point"
+col AESTAT   type=Char label="Completion Status"
+col AEDUR    type=Char label="Duration of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE  | 2020-01-05 |        |         |          |
+S1 | AE | 001 | 2 | NAUSEA    |            | AFTER  |         |          |
+S1 | AE | 001 | 3 | DIZZINESS |            |        | ONGOING |          |
+S1 | AE | 001 | 4 | RASH      |            |        |         | NOT DONE |
+S1 | AE | 001 | 5 | FEVER     |            |        |         |          | P1D

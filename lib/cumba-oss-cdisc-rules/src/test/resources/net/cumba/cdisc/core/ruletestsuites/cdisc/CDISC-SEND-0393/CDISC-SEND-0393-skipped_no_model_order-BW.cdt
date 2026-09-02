@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0393 expect=skipped domain=BW
+#note "DISCRIMINATING. Byte-identical to -invalid_model_order-BW (columns still out of order) EXCEPT that the `#library model-column-order` line is REMOVED. getStandardModelVariables returns null for a name it holds no order for and the executor maps null AND empty to LIBRARY_NOT_AVAILABLE, so the whole rule SKIPs before the Check runs -- which is also why the rule's own `not empty($model_order)` guard is unreachable. Together with -invalid_model_order-TS this separates the two skip causes the rule used to have (class axis vs missing library metadata); after M3-D23 only this one remains."
+#library standard=sendig-dart version=1-2
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTEST   type=Char label="Body Weight Test Name"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | BW | 001 | 1 | Body Weight | BW | 250
+S1 | BW | 002 | 1 | Body Weight | BW | 262
+---

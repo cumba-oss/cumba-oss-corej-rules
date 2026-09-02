@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=noViolation domain=PC
+#note "Rows 2 and 3 of the invalid fixture, in that order: a BLQ record with a missing PCSTRESN and an ordinary numeric result."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSTRESC type=Char label="Character Result/Finding in Std Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Std Units"
+---
+S1 | PC | S1-002 | 2 | DRUGX | 0.04 | 0.1 | BLQ  | .
+S1 | PC | S1-003 | 3 | DRUGX | 12.4 | 0.1 | 12.4 | 12.4
+---

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0135 expect=noViolation domain=ADLBC
+#note "SHIFT1N=1 maps to two different SHIFT1 values ACROSS the study, but within=PARAMCD partitions them into two single-valued groups -> silent. Pins finding F1: per parameter, not study-wide."
+#library standard=adamig version=1-0
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMALTOHIGH | 1
+CDISCPILOT01 | 01-701-1023 | ALB  | LOWTONORMAL  | 1
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0815 expect=skipped domain=ADLBC
+#note "BUCKET-3 VALUE HALF (Fix #331, M2-D24 ruling 2026-08-22). SUBJIDN is not declared. Requirements.Variables.All now names both SUBJID and SUBJIDN, so this value rule SKIPS with SUBJIDN named as the reason instead of firing on every populated SUBJID row (which is what the bare empty(SUBJIDN) would do under absent = all-missing, Fix #330). The absence itself is the presence sister CDISC-AD0815-A's one dataset-level finding. If this EXECUTES, the gate was removed -- escalate."
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col SUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1015
+---

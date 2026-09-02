@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0667 expect=violation domain=ADNCA
+#note "DOSPCTDF populated but TRTA empty on row 1 -> fires. Row 2 both populated -> silent. subclass=NCA is INERT here (M2-Q1/ADNCA-Subclasses ruling-neutrality, TRTA IS declared so Requirements.Variables.All is satisfied)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 DOSPCTDF=12.5
+#library standard=adamig version=1-3
+dataset ADNCA structure=BDS subclass=NCA
+col STUDYID   type=Char
+col USUBJID   type=Char
+col PARAMCD   type=Char
+col DOSPCTDF  type=Num
+col TRTA      type=Char
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 |
+CDISCPILOT01 | 01-701-1023 | CONC | 8.0  | PLACEBO
+---

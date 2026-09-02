@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1287 expect=noViolation domain=AE
+#note "Every code maps to one term: two 10019211 records both Headache, one 10028813 Nausea -> consistent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEDECOD type=Char
+col AEPTCD  type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache | 10019211
+S1 | AE | 002 | 1 | HEADACHE | Headache | 10019211
+S1 | AE | 003 | 1 | NAUSEA   | Nausea   | 10028813

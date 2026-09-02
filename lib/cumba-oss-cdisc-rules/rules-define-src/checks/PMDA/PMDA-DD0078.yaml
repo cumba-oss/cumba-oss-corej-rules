@@ -1,0 +1,26 @@
+Rule_Id: "PMDA-DD0078"
+Sheet_Rule_Identifier: "DD0078"
+Rule_Set: "PMDA"
+Element: "MetaDataVersion/leaf"
+Attribute: "ID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Documents that are referenced from a Method or Comment should be included in Define.xml. Define-XML specification represents Documents as def:leaf elements within MetaDataVersion element."
+# Scope: only MetaDataVersion-child leaves (documents) per the sheet's second
+# sentence - dataset-location leaves under ItemGroupDef are out of reach.
+# Referrers: any def:DocumentRef counts, not just the ones inside MethodDef /
+# def:CommentDef. The sheet's "Method or Comment" names the common case, but the
+# spec also references documents from def:Origin, def:AnnotatedCRF,
+# def:SupplementalDoc and arm:Documentation - flagging an aCRF leaf referenced
+# only from def:AnnotatedCRF would be a false positive. def:ArchiveLocationID is
+# included defensively for documents that (illegally but parseably) park a
+# dataset leaf at MDV level.
+Message: "Document ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "ID"
+  by:
+  - element: "DocumentRef"
+    attribute: "leafID"
+  - element: "ItemGroupDef"
+    attribute: "ArchiveLocationID"

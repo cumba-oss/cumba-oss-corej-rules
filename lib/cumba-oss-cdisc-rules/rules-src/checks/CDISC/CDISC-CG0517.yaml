@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0517"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Arm Code (ARMCD) is empty and the Reason\
+  \ Arm and/or Actual Arm is Null (ARMNRS) variable is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    empty(ARMCD) and empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is not populated when ARMCD is empty."
+  Output_Variables:
+  - "ARMCD"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMNRS"
+  Condition: "ARMCD = null"
+  Rule: "ARMNRS^=null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0517"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0517"
+        Version: "1"
+      Version: "2.0"

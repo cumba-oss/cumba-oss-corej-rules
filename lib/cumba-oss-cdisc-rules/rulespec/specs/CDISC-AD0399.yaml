@@ -1,0 +1,44 @@
+name: CDISC-AD0399
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0399: Within a parameter, there is more than one value of ATOXGRH for a given value of ATOXGRHN.
+  Bare-leaf Check (`has_multiple_values_for` with `within: PARAMCD`) scoped to BASIC DATA STRUCTURE.
+  Two rows share the same ATOXGRHN value but distinct ATOXGRH; both fire. A third row is unique and does not fire.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0399)
+rule:
+  coreId: CDISC-AD0399
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ATOXGRH: 'X', ATOXGRHN: 'A'}   # bad
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, ATOXGRH: 'Y', ATOXGRHN: 'A'}   # bad (distinct ATOXGRH for same ATOXGRHN within PARAMCD)
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVISITN: 1, ATOXGRH: 'Z', ATOXGRHN: 'B'}   # ok (unique ATOXGRHN)
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0399
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PARAMCD: 'HGB'
+      ATOXGRH: 'X'
+      ATOXGRHN: 'A'
+  - rule_id: CDISC-AD0399
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PARAMCD: 'HGB'
+      ATOXGRH: 'Y'
+      ATOXGRHN: 'A'
+expected_errors: []

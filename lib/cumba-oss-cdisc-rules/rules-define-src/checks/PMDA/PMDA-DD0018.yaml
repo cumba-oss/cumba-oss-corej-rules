@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0018"
+Sheet_Rule_Identifier: "DD0018"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "ArchiveLocationID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The ItemGroupDef def:ArchiveLocationID should match the ID of the child def:leaf."
+# Deviation (documented, same as CDISC twin 120): the references kind resolves
+# against the document-wide index, so a def:leaf living outside this ItemGroupDef
+# would also satisfy the check. def:leaf IDs are schema-unique (xs:ID), so in
+# schema-valid documents the resolved leaf is the one the sheet means; the
+# child-containment nuance is not enforced.
+Message: "def:ArchiveLocationID/def:leaf mismatch [${value}]"
+Check:
+  kind: "references"
+  attribute: "ArchiveLocationID"
+  targetElement: "leaf"
+  targetKey: "ID"

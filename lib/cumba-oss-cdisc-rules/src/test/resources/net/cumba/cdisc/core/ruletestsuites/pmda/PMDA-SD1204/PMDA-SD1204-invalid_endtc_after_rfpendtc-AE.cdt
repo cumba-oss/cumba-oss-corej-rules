@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1204 expect=violation domain=AE
+#note "Row 1: complete date 2020-07-15 after RFPENDTC 2020-06-30 -> fires. Row 2: AEENDTC=2020-07 MONTH-PARTIAL -> forall-hull lower('2020-07')=Jul 1 IS after upper('2020-06-30') -> fires (the partial-fires side of the hull semantics; SD1202's year-partial pins the non-firing side). Row 3: boundary -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AEENDTC type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-07-15
+S1 | AE | 001 | 2 | NAUSEA   | 2020-07
+S1 | AE | 001 | 3 | RASH     | 2020-06-30
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30

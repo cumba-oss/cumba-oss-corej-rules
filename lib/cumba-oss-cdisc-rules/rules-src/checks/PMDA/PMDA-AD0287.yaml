@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-AD0287"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only records on which AEREL is populated,\
+  \ the AEREL variable is not uniquely determined by AERELN within the dataset: a\
+  \ single value of AERELN maps to more than one value of AEREL."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The sheet's 'inconsistent across studies' intent is reinterpreted as a\
+    \ within-dataset unique-relationship check between the char/numeric pair AEREL/AERELN\
+    \ (has_multiple_values_for); the cross-study scope is not evaluated."
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    not empty(AEREL) and has_multiple_values_for(AEREL, AERELN)
+Outcome:
+  Message: "There is more than one value of AEREL for a given value of AERELN (within\
+    \ the dataset)."
+  Output_Variables:
+  - "AEREL"
+  - "AERELN"
+Source:
+  Message: "Inconsistent value for AEREL"
+  Description: "Across studies, all Causality (AEREL) variable values must be the\
+    \ same for each unique value of Causality (N) (AERELN) variable when the primary\
+    \ variable AEREL is populated."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0287"
+        Version: "1"
+      Version: "6.0"

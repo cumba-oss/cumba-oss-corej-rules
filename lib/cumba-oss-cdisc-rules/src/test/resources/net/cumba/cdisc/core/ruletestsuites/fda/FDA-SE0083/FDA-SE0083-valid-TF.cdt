@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SE0083 expect=noViolation domain=TF
+#note "Boundaries: subject 001 TFDETECT equals the latest Disposition study day (90, not greater) -> silent; subject 002 TFDETECT is missing -> the populated gate is false; subject 003 has no DS records -> the USUBJID containment guard is false."
+#library standard=sendig version=3-1-1
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | TUMEXAM | 90
+S1 | TF | 002 | 1 | TUMEXAM | .
+S1 | TF | 003 | 1 | TUMEXAM | 200
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDY  type=Num  label="Study Day of Disposition"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 90
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 100

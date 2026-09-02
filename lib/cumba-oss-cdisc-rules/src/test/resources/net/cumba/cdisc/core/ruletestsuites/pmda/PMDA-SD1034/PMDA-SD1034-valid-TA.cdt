@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1034 expect=noViolation domain=TA
+#note "Each ARM description is coded by exactly one ARMCD. (Positive control added by PLAN-absent-guard-test-hardening P3: PMDA-SD1034 previously had ONLY an expect=skipped fixture, which asserts non-execution and so proved nothing about the rule ever running. Modelled on its twin FDA-SD1034.)"
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | PBO | Placebo | 1 | SCRN
+S1 | TA | PBO | Placebo | 2 | TRT
+S1 | TA | ACT | Active  | 1 | SCRN

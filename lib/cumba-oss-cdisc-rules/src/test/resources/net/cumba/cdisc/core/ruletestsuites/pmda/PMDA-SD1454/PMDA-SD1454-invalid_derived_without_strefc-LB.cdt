@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1454 expect=violation domain=LB
+#note "LBDRVFL=Y with LBSTREFC empty on row 1 fires; row 2 STREFC populated, row 3 DRVFL not Y, row 4 DRVFL empty -- none of those fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBDRVFL=Y LBTESTCD=GLUC
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBDRVFL  type=Char
+col LBSTREFC type=Char
+---
+S1 | LB | 001 | 1 | GLUC | Y |
+S1 | LB | 001 | 2 | GLUC | Y | NEGATIVE
+S1 | LB | 001 | 3 | GLUC | N |
+S1 | LB | 001 | 4 | GLUC |   |

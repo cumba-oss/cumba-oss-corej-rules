@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-SD1448"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Standardized Result in Numeric Format (--STRESN)\
+  \ is populated while Standardized Result in Character Format (--STRESC) is populated\
+  \ but does not represent a numeric value."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Check:
+  expression: >-
+    not empty(--STRESC) and not is_numeric(--STRESC) and not empty(--STRESN)
+Outcome:
+  Message: "--STRESN is populated when --STRESC value is not numeric"
+  Output_Variables:
+  - "--STRESC"
+  - "--STRESN"
+Source:
+  Message: "--STRESN is populated when --STRESC value is not numeric"
+  Description: "Standardized Result in Numeric Format (--STRESN) variable value should\
+    \ be null when Standardized Result in Character Format (--STRESC) variable value\
+    \ does not represent a numeric value, (e.g., 'BLQ', value contains '<' or '>',\
+    \ etc.)."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1448"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1448"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,44 @@
+name: CDISC-AD0323
+kind: rule
+description: |
+  Wave B1 port - T1b PlainIntermediate.
+  CDISC-AD0323: Within a study, there is more than one value of APHASEN for a given value of APHASE.
+  Global has_multiple_values_for (no within) - APHASE must uniquely determine
+  APHASEN across all rows. Bare-leaf Check at root - Python KeyError; baseline
+  Python lane with Java expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0323)
+rule:
+  coreId: CDISC-AD0323
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, APHASEN, APHASE]
+    column_types:
+      APHASEN: LONG
+    rows:
+      # APHASE='SCREENING' maps to two distinct APHASEN (1 vs 2) -> violation on both rows
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', APHASEN: 1, APHASE: 'SCREENING'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', APHASEN: 2, APHASE: 'SCREENING'}
+      # APHASE='TREATMENT' consistent (single APHASEN=3)
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', APHASEN: 3, APHASE: 'TREATMENT'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0323
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', APHASEN: 1, APHASE: 'SCREENING'}
+    status: SUCCESS
+    output_variables:
+      APHASE: 'SCREENING'
+      APHASEN: '1'
+  - rule_id: CDISC-AD0323
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', APHASEN: 2, APHASE: 'SCREENING'}
+    status: SUCCESS
+    output_variables:
+      APHASE: 'SCREENING'
+      APHASEN: '2'
+expected_errors: []

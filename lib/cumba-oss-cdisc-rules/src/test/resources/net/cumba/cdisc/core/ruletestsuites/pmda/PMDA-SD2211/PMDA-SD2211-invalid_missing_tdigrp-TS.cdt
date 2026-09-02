@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD2211 expect=violation domain=TS
+#note "Aggregation universe = the whole primary TS dataset, filtered row-wise before counting: $hltsubji_n_count counts TSPARMCD=HLTSUBJI AND TSVAL=N rows (=1), $tdigrp_count counts TSPARMCD=TDIGRP rows (=0). Both $-refs broadcast -> dataset-constant Check -> ONE violation at row 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 "$hltsubji_n_count"=1 "$tdigrp_count"=0
+dataset TS label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | TITLE    | Trial Title              | A Phase 3 Study of Drug X in Subjects With Asthma
+S01 | TS | 2 | HLTSUBJI | Healthy Subject Indicator | N
+S01 | TS | 3 | TPHASE   | Trial Phase Classification | PHASE III TRIAL

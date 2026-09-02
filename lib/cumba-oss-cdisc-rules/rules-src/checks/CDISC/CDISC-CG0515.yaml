@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0515"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Description of Actual Arm (ACTARM) is empty\
+  \ but the Reason Arm and/or Actual Arm is Null (ARMNRS) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    empty(ACTARM) and empty(ARMNRS)
+Outcome:
+  Message: "ARMNRS is not populated when ACTARM is empty."
+  Output_Variables:
+  - "ACTARM"
+  - "ARMNRS"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMNRS"
+  Condition: "ACTARM = null"
+  Rule: "ARMNRS^=null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0515"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0515"
+        Version: "1"
+      Version: "2.0"

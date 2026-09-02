@@ -1,0 +1,48 @@
+name: FDA-CT2001
+kind: rule
+description: |
+  Value-Check-against-Library-Metadata (NRI-008). A data value must be a term in the
+  variable's non-extensible CDISC Library codelist. VS.VSPOS is bound to codelist C71148,
+  mocked non-extensible with published submission values {SUPINE, STANDING}. The melted
+  (record x variable) table joins the library codelist accessors, so the rule evaluates
+  var_codelist_extensible("LIBRARY") == false and not empty(var_codelist_coded_values("LIBRARY"))
+  and not empty(value()) and value() not in var_codelist_coded_values("LIBRARY"). Row 1 carries
+  VSPOS='BOGUS' (out of CT) -> fires; row 2 carries VSPOS='SUPINE' (in CT) -> does not fire. The
+  other columns have no library codelist, so the non_empty guard keeps them from firing.
+python_source: rules-sdtmig-3-4.json (FDA-CT2001)
+rule:
+  coreId: FDA-CT2001
+datasets:
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSPOS: 'BOGUS'}
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '002', VSSEQ: 2, VSPOS: 'SUPINE'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+  domain_variables:
+    VS:
+      - {name: VSPOS, ordinal: '1', role: Result Qualifier, simpleDatatype: Char, label: Position of Subject During Observation, codelist: C71148}
+  codelist_terms:
+    C71148: [SUPINE, STANDING]
+  codelist_extensible:
+    C71148: false
+expected_violations:
+  - rule_id: FDA-CT2001
+    dataset: VS
+    row_key: {STUDYID: S1, USUBJID: '001', VSSEQ: 1}
+    status: SUCCESS
+    # PLAN-leaf-scope-domain-inference §3.3 (Fix #345): output enrichment is keyed on what the
+    # Check READS (providerLevelsUsed), not on a rule-type family, so the two library_* values
+    # the Check reads — and OutputVariableDeriver therefore lists as effective outputs — now carry
+    # their values instead of being dropped as unresolved.
+    output_variables:
+      library_variable_codelist_coded_values: '["SUPINE","STANDING"]'
+      library_variable_codelist_extensible: 'false'
+      variable_name: VSPOS
+      variable_value: BOGUS
+expected_errors: []

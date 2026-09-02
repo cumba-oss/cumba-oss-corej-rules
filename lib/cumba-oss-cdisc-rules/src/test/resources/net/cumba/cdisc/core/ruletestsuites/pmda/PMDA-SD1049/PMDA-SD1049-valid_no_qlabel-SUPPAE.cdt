@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1049 expect=noViolation domain=SUPPAE
+#note "FRESH, DISCRIMINATING. No QLABEL column. Row 2 deliberately carries a 22-character value in QNAM, a column the rule does not measure. Predicted: the rule EXECUTES (no Requirements.Variables block) and reports NOTHING -- an absent QLABEL folds to all-missing and the POSITIVE len(QLABEL) > 40 comparison does not fire (guard-matrix class V), with no derived guard involved."
+#library standard=sdtmig version=3-4
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AETRTEM | Y
+S1 | AE | 001 | AESEQ | 2 | AELONGQUALIFIERNAMEHERE | Y

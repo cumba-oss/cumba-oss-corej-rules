@@ -1,0 +1,107 @@
+Core:
+  Id: "FDA-SD1307"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'HLTSUBJI'\
+  \ and TSVAL equal to 'N', but TSVAL is empty for the record where TSPARMCD equals\
+  \ 'TDIGRP'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$HLTSUBJI_N"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"HLTSUBJI\",\
+    \ TSVAL=\"N\"))"
+Check:
+  expression: >-
+    TSPARMCD == "TDIGRP" and $HLTSUBJI_N >= 1 and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty for the TDIGRP Trial Summary Parameter when a record exists\
+    \ with TSPARMCD equal to 'HLTSUBJI' and TSVAL equal to 'N'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$HLTSUBJI_N"
+Source:
+  FDA_Validator_Rule_Message: "TSVAL is missing for the TDIGRP Trial Summary Parameter,\
+    \ when HLTSUBJI parameter equals 'N'"
+  FDA_Validator_Rule_Description: "When the study population is not healthy subjects\
+    \ (TSPARMCD = 'HLTSUBJI' and TSVAL = 'N'), the Diagnosis Group parameter should\
+    \ be provided with Parameter Value populated (TSVAL should not be null when TSPARMCD\
+    \ = 'TDIGRP')."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1307"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1307"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1307"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1307"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0273"
+        Version: "1"
+      Version: "2.0"

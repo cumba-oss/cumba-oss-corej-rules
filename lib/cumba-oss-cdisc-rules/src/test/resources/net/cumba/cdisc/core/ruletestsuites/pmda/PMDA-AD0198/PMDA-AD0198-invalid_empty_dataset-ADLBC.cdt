@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0198 expect=violation domain=ADLBC
+#note "EMPTY-DATASET PIN (STAGE-G CRITICAL 4). Columns declared (neither AVAL nor AVALC - the firing shape), ZERO data rows. Presence is a property of the declared schema, which survives at 0 rows; the var_exists-only Check is decided by BroadcastFold BEFORE the 0-row synthetic table is built: exactly ONE violation, reported at row 1. NO value pin. If this reports 0 violations or SKIPPED, escalate - do not fix."
+#expectViolationCount 1
+#expectViolationAt row=1
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+---
+---

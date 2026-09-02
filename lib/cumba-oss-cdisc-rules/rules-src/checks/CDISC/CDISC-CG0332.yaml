@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0332"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a split dataset (a three- or four-character dataset\
+  \ name not beginning with AP or FA) does not have its two-character parent domain\
+  \ present in the study."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "RELREC"
+    - "RELSUB"
+    - "SUPP--"
+    - "SQ--"
+Operations:
+- id: "$list_dataset_names"
+  expression: "dataset_names()"
+Check:
+  expression: >-
+    ds_name("DATA") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ and prefix(dataset_name, 2) not in ["AP",
+    "FA"] and prefix(dataset_name, 2) not in $list_dataset_names
+Outcome:
+  Message: "The first two characters of the split dataset name do not match a domain\
+    \ present in the study."
+  Output_Variables:
+  - "dataset_name"
+  - "$list_dataset_names"
+Source:
+  Class: "ALL"
+  Domain: "NOT(RELREC, RELSUB, SUPP--)"
+  Variable: "GEN"
+  Condition: "Dataset name length = 3 or 4 and dataset name does not begin with 'AP'\
+    \ or 'FA'"
+  Rule: "The first two characters of the dataset name must equal a domain that is\
+    \ present in the study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0332"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0332"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0332"
+        Version: "1"
+      Version: "2.0"

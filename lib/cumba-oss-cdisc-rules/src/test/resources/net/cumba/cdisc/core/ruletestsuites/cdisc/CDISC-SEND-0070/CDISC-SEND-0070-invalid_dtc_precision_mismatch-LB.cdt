@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0070 expect=violation domain=LB
+#note "The --DTC operation. All three date columns are type=Char, NEVER type=Date -- a Date column is parsed to a SAS numeric at load and these interval strings would be unrepresentable. interval_uncertainty_precision_mismatch splits the cell on the solidus and compares the two halves' ISO precision tiers: row 1 is tier 10 ('2023-01-15') against tier 7 ('2023-01') -> FIRES; row 2 is 10 against 10; row 3 carries no delimiter and returns false by the operator's early return. LBSTDTC and LBENDTC are blank throughout so the other two operations are false everywhere. The rule is load-flagged broadcast but resolves per row at runtime, so a count of 1 is the assertion."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBSTDTC  type=Char label="Start Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2023-01-15/2023-01    |  |
+S1 | LB | 001 | 2 | ALB | 2023-01-15/2023-01-20 |  |
+S1 | LB | 001 | 3 | ALB | 2023-01-15            |  |
+---

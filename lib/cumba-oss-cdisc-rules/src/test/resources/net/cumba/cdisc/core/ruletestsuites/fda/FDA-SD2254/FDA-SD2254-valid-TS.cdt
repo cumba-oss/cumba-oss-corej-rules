@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2254 expect=noViolation domain=TS
+#note "All COMPTRT rows carry a valid UNII code of the dummy UNII dictionary (R16CO5Y76E, WK2XYI10QM); the empty TSVALCD on row 3 does not fire (completeness is another rule's concern) and the non-UNII value on the AGEMAX row is outside the COMPTRT condition."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | COMPTRT | R16CO5Y76E
+S01 | TS | 2 | COMPTRT | WK2XYI10QM
+S01 | TS | 3 | COMPTRT |
+S01 | TS | 4 | AGEMAX  | P70Y

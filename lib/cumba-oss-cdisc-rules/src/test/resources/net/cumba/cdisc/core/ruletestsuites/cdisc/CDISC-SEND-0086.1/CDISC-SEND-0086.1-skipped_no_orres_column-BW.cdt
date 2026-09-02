@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0086.1 expect=skipped domain=BW
+#note "Requirements.Variables SKIP CHANNEL. All is [--STAT, --ORRES] and ScopeMatcher's All leg is a CONJUNCTION that returns on the FIRST failing entry, so removing the SECOND entry proves the iteration gets past the first: --STAT resolves to BWSTAT and passes, --ORRES resolves to BWORRES which is absent, and RuleRunner reports SKIPPED. Untouched by M3-D2, which changes only the literal."
+#library standard=sendig version=3-1-1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWSTAT   type=Char label="Completion Status"
+---
+S1 | BW | 001 | 1 | BW | NOT DONE
+S1 | BW | 001 | 2 | BW |
+---

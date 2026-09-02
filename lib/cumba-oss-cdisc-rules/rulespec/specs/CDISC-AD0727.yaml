@@ -1,0 +1,48 @@
+name: CDISC-AD0727
+kind: rule
+description: |
+  Wave B4 port — T1b PlainIntermediate.
+  CDISC-AD0727: Within PARAMCD, more than one AVISITN for a given AVISIT.
+  Record-data rule scoped to BASIC DATA STRUCTURE / MEDICAL DEVICE BDS.
+  Bare-leaf Check + has_multiple_values_for with within=PARAMCD — Python gaps
+  (Finding #26 + #28). Baselines on Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0727)
+rule:
+  coreId: CDISC-AD0727
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISIT, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # PARAMCD=HGB: AVISIT='Baseline' maps to two AVISITN (1 and 2) -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISIT: 'Baseline', AVISITN: 1}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISIT: 'Baseline', AVISITN: 2}
+      # PARAMCD=HGB: AVISIT='Week 1' consistent
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVISIT: 'Week 1',   AVISITN: 3}
+      # PARAMCD=GLUC: consistent
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: 'GLUC', AVISIT: 'Baseline', AVISITN: 1}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0727
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISIT: 'Baseline', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      AVISIT: 'Baseline'
+      AVISITN: '1'
+      PARAMCD: 'HGB'
+  - rule_id: CDISC-AD0727
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISIT: 'Baseline', AVISITN: 2}
+    status: SUCCESS
+    output_variables:
+      AVISIT: 'Baseline'
+      AVISITN: '2'
+      PARAMCD: 'HGB'
+expected_errors: []

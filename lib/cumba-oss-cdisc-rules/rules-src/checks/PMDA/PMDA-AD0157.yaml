@@ -1,0 +1,75 @@
+Core:
+  Id: "PMDA-AD0157"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Criterion y (CRITy) variable is present in the\
+  \ dataset but its corresponding Criterion y Flag (CRITyFL) variable is not present.\
+  \ Each analysis criterion text variable CRITy (CRIT1 through CRIT9) must be paired\
+  \ with a CRITyFL flag variable that records whether the criterion was met."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("CRIT1") and not var_exists("CRIT1FL") or var_exists("CRIT2") and not
+    var_exists("CRIT2FL") or var_exists("CRIT3") and not var_exists("CRIT3FL") or
+    var_exists("CRIT4") and not var_exists("CRIT4FL") or var_exists("CRIT5") and not
+    var_exists("CRIT5FL") or var_exists("CRIT6") and not var_exists("CRIT6FL") or
+    var_exists("CRIT7") and not var_exists("CRIT7FL") or var_exists("CRIT8") and not
+    var_exists("CRIT8FL") or var_exists("CRIT9") and not var_exists("CRIT9FL")
+Outcome:
+  Message: "CRITy is present, but CRITyFL is not present."
+  Output_Variables:
+  - "CRIT1"
+  - "CRIT2"
+  - "CRIT3"
+  - "CRIT4"
+  - "CRIT5"
+  - "CRIT6"
+  - "CRIT7"
+  - "CRIT8"
+  - "CRIT9"
+Source:
+  Message: "CRITy is present, but CRITyFL is not present"
+  Description: "If Criterion y (CRITy) variable is present, there must also be a corresponding\
+    \ Criterion y Flag (CRITyFL) variable."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0157"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0157"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0157"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0157"
+        Version: "1"
+      Version: "6.0"

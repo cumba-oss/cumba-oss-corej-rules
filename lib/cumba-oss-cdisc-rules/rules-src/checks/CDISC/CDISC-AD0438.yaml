@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0438"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when AVALCAyN is populated but AVALCATy is empty"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "AVALCATy"
+    - "AVALCAyN"
+Check:
+  expression: >-
+    not empty(AVALCAyN) and empty(AVALCATy)
+Outcome:
+  Message: "AVALCAyN is populated, but AVALCATy is empty"
+  Output_Variables:
+  - "AVALCATy"
+  - "AVALCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "AVALCATy where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, AVALCAyN is populated\
+    \ and AVALCATy is not populated"
+  Rule_Failure_Criteria: "AVALCATy is not populated"
+  Condition_Failure: "AVALCAyN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR438"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR438"
+        Version: "2"
+      Version: "5.0"

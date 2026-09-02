@@ -1,0 +1,49 @@
+name: CDISC-SEND-0324
+kind: rule
+description: |
+  SEND324 re-implemented as a genuine LOQ-detection rule (INFO-pass decision, 2026-07-26):
+  a PC result quantifiably outside the limit of quantitation must carry the matching
+  PCSTRESC token — PCORRES < PCLLOQ ⇒ 'BLQ'; PCORRES > PCULOQ (model-permissible, sponsor
+  -provided) ⇒ 'ALQ'. Both engines coerce the comparison numerically (Java
+  evalComparison Double-coerce, Python pd.to_numeric errors='coerce'), so a textual
+  PCORRES (e.g. a literal 'BLQ') skips — the disclosed under-reporting. Rows:
+  001 numeric below limit, token missing (fires); 002 numeric below limit, correct token
+  (no fire); 003 textual PCORRES 'BLQ' (skips, no fire); 004 above PCULOQ, token 'BLQ'
+  instead of 'ALQ' (fires via the upper branch); 005 in-range numeric (no fire);
+  006 PCLLOQ missing (comparison skips, no fire).
+python_source: rules-cdisc-sendig-3-1-1.json (CDISC-SEND-0324)
+rule:
+  coreId: CDISC-SEND-0324
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PCSEQ: 1, PCORRES: '2.5', PCLLOQ: 5, PCULOQ: 100, PCSTRESC: '2.5'}
+      - {STUDYID: S1, USUBJID: '002', PCSEQ: 1, PCORRES: '3.1', PCLLOQ: 5, PCULOQ: 100, PCSTRESC: 'BLQ'}
+      - {STUDYID: S1, USUBJID: '003', PCSEQ: 1, PCORRES: 'BLQ', PCLLOQ: 5, PCULOQ: 100, PCSTRESC: 'BLQ'}
+      - {STUDYID: S1, USUBJID: '004', PCSEQ: 1, PCORRES: '250', PCLLOQ: 5, PCULOQ: 100, PCSTRESC: 'BLQ'}
+      - {STUDYID: S1, USUBJID: '005', PCSEQ: 1, PCORRES: '50', PCLLOQ: 5, PCULOQ: 100, PCSTRESC: '50'}
+      - {STUDYID: S1, USUBJID: '006', PCSEQ: 1, PCORRES: '2.5', PCLLOQ: null, PCULOQ: null, PCSTRESC: '2.5'}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+expected_violations:
+  - rule_id: CDISC-SEND-0324
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '001', PCSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      PCSTRESC: '2.5'
+      PCORRES: '2.5'
+      PCLLOQ: '5'
+      PCULOQ: '100'
+  - rule_id: CDISC-SEND-0324
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '004', PCSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      PCSTRESC: BLQ
+      PCORRES: '250'
+      PCLLOQ: '5'
+      PCULOQ: '100'
+expected_errors: []

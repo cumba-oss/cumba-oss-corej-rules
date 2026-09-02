@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0268"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSSEQ is not unique for a given value of TSPARMCD\
+  \ within the TS dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Check:
+  expression: >-
+    var_exists("TSPARMCD") and not is_unique_set([TSSEQ, TSPARMCD])
+Outcome:
+  Message: "Non-unique value for TSSEQ within TSPARMCD"
+  Output_Variables:
+  - "TSPARMCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSSEQ"
+  Condition: "TSPARMCD not unique"
+  Rule: "TSSEQ is unique for each distinct value of TSPARMCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"

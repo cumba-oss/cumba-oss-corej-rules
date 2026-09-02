@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0539"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has more than one Disposition Event record\
+  \ (DSCAT equals 'DISPOSITION EVENT') per Epoch (EPOCH) and more than one of those\
+  \ records has Subcategory for Disposition Event (DSSCAT) equal to 'STUDY TREATMENT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSSCAT"
+Operations:
+- id: "$disposition_event_count"
+  expression: "record_count(DSCAT, domain=\"DS\", group=[USUBJID, EPOCH], filter=filter(DSCAT=\"\
+    DISPOSITION EVENT\"))"
+Check:
+  expression: >-
+    $disposition_event_count > 1 and DSSCAT == "STUDY TREATMENT" and not is_unique_set([DSSCAT,
+    USUBJID])
+Outcome:
+  Message: "More than one DISPOSITION EVENT record per subject per EPOCH has DSSCAT\
+    \ equal to 'STUDY TREATMENT'."
+  Output_Variables:
+  - "$disposition_event_count"
+  - "DSSCAT"
+  - "EPOCH"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "GEN"
+  Condition: "Subject has more than one record per Epoch with DSCAT = 'DISPOSITION\
+    \ EVENT'"
+  Rule: "No more than 1 record per subject has DSSCAT = 'STUDY TREATMENT'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0539"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0539"
+        Version: "1"
+      Version: "2.0"

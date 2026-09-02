@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-CT2001 expect=noViolation domain=DM
+#note "Every populated SEX value is a term of the non-extensible CDISC codelist SEX (M/F/U) -> no violation."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM SEX codelist=SEX codelist_extensible=false codelist_coded_values="[\"M\",\"F\",\"U\"]"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | M
+S1 | DM | 002 | F
+S1 | DM | 003 | U

@@ -1,0 +1,33 @@
+#!RuleTest
+#test FDA-SE2270 expect=violation domain=MI
+#note "Subject 001's latest disposition is study day 20 (an earlier recovery move on day 10 must not win the max). MI row 1 has MIDY=10 -> differs from 20 -> fires. Row 2 has MIDY=20 -> clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MIDY=10
+dataset MI label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Num  label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Examination Short Name"
+col MISPEC   type=Char label="Specimen Material Type"
+col MIORRES  type=Char label="Result or Finding in Original Units"
+col MIDTC    type=Char label="Date/Time of Collection"
+col MIDY     type=Num  label="Study Day of Collection"
+---
+S1 | MI | 001 | 1 | MIEXAM | LIVER  | NECROSIS | 2020-01-10 | 10
+S1 | MI | 001 | 2 | MIEXAM | KIDNEY | NORMAL   | 2020-01-20 | 20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY  | RECOVERY           | 2020-01-10 | 10
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20 | 20

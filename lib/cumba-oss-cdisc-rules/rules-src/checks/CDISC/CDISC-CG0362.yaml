@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0362"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both the Unique Subject Identifier (USUBJID) and\
+  \ the Pool Identifier (POOLID) variables are populated on the same record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELSUB"
+Requirements:
+  Variables:
+    All:
+    - "POOLID"
+Check:
+  expression: >-
+    not empty(USUBJID) and not empty(POOLID)
+Outcome:
+  Message: "Redundant values for USUBJID and POOLID"
+  Output_Variables:
+  - "POOLID"
+Source:
+  Class: "SPC"
+  Domain: "RELSUB"
+  Variable: "USUBJID"
+  Condition: "POOLID ^= null"
+  Rule: "USUBJID = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0362"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0362"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0362"
+        Version: "1"
+      Version: "2.0"

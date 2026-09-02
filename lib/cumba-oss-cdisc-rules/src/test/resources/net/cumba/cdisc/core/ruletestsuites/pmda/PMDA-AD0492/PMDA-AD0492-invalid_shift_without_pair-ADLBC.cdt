@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0492 expect=violation domain=ADLBC
+#note "Exactly one column matches any wildcard pattern (SHIFT1), so exactly ONE expansion (y=1); the Check is seventeen presence calls, 100% dataset-constant, so BroadcastFold decides it and datasetBroadcastResult emits ONE violation from row 0. PARAMCD matches no pattern and is not a partner."
+#expectViolationCount 1
+#expectViolationAt SHIFT1="NORMAL to HIGH"
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | NORMAL to HIGH

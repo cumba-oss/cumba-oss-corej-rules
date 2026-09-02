@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0100 expect=skipped domain=EC
+#note "H3 (ruled 2026-08-19): ECDOSE, ECDOSTXT, ECSTAT and ECOCCUR are ALL absent - the uniform all-row fire the old shape produced. The per-row rule now stays silent on this configuration (bare ECDOSE <= 0 is false on an absent column); the dataset-level fact is reported ONCE by the minted sister CDISC-CG0100-A. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset EC label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ type=Num label="Sequence Number"
+col ECTRT type=Char label="Name of Treatment"
+col ECSTDTC type=Char label="Start Date/Time of Treatment"
+---
+CDISCPILOT01 | EC | 01-701-1015 | 1 | DRUG A | 2020-02-01
+CDISCPILOT01 | EC | 01-701-1015 | 2 | DRUG A | 2020-02-08

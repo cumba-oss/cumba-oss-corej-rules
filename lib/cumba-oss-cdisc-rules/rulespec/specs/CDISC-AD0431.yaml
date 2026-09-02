@@ -1,0 +1,33 @@
+name: CDISC-AD0431
+kind: rule
+description: |
+  Wave A5 port — T1a PlainSimple.
+  CDISC-AD0431: On a given record, APHASE is populated and APHASEN is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE (+ MD variants) and
+  OCCURRENCE DATA STRUCTURE (+ MD variants); simple non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0431)
+rule:
+  coreId: CDISC-AD0431
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, APHASE: 'SCREENING', APHASEN: '1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, APHASE: 'SCREENING', APHASEN: ''}   # bad — APHASE populated, APHASEN empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0431
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      APHASE: 'SCREENING'
+      APHASEN: null
+expected_errors: []

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0503 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in DT must contain "Date" in the label
+#note "ADT label "Analysis Day" lacks "Date" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Day" variable_name=ADT
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT type=Char label="Analysis Day"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

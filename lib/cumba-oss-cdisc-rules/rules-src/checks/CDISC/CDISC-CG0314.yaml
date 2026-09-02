@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0314"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SUPP--.QNAM is present in the dataset, but the value\
+  \ of SUPP--.QNAM equals a variable name defined in the corresponding SDTM version."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Operations:
+- id: "$model_variables"
+  expression: "get_parent_model_column_order()"
+Check:
+  expression: >-
+    QNAM in $model_variables
+Outcome:
+  Message: "SUPP--.QNAM is present in the dataset, but the value of SUPP--.QNAM equals\
+    \ a variable name defined in the corresponding SDTM version."
+  Output_Variables:
+  - "QNAM"
+  - "$model_variables"
+Source:
+  Class: "ALL"
+  Domain: "SUPP--"
+  Variable: "QNAM"
+  Condition: "SUPP--.QNAM present in dataset"
+  Rule: "Value of SUPP--.QNAM ^= any variable name defined in the corresponding SDTM\
+    \ version"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0314"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0314"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0314"
+        Version: "1"
+      Version: "2.0"

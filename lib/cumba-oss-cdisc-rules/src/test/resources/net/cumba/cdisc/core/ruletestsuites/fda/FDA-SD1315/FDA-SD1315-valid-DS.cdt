@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1315 expect=noViolation domain=DS
+#note "PROTOCOL MILESTONE records repeat DSTERM in DSDECOD; the DISPOSITION EVENT record may legitimately differ."
+#library standard=sdtmig version=3-2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE
+CDISCPILOT01 | DS | 01-701-1015 | 2 | RANDOMIZED | RANDOMIZED | PROTOCOL MILESTONE
+CDISCPILOT01 | DS | 01-701-1015 | 3 | SUBJECT WITHDREW CONSENT | WITHDRAWAL BY SUBJECT | DISPOSITION EVENT

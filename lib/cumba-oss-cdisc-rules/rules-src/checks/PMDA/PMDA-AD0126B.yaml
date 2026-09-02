@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-AD0126B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, a Parameter Category number (PARCATyN)\
+  \ takes more than one value for the same Parameter Category (PARCATy), considering\
+  \ only records on which both variables are populated. Applies across the basic-data-structure\
+  \ and medical-device basic-data-structure ADaM structures."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARCATyN"
+Check:
+  expression: >-
+    var_exists("PARCATy") and not empty(PARCATy) and not empty(PARCATyN) and
+    is_inconsistent_across_dataset(PARCATyN, keys=[PARCATy])
+Outcome:
+  Message: "Inconsistent value for PARCATyN"
+  Output_Variables:
+  - "PARCATy"
+  - "PARCATyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for PARCATyN"
+  Description: "Within a study, all PARCATyN values must be the same for each unique\
+    \ value of PARCATy when both variables are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0126B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0126B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0126B"
+        Version: "1"
+      Version: "6.0"

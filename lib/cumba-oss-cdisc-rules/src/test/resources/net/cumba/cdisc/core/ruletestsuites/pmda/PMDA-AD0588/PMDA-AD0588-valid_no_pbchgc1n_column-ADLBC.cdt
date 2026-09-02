@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0588 expect=noViolation domain=ADLBC
+#note "*** TRIPWIRE. KEY half PBCHGCyN absent. PBCHGCA1 matches the TARGET pattern (y=1), synthesising PBCHGC1N, so the expanded Requirements.Variables.All names PBCHGCA1 which IS present -> the rule EXECUTES. Silent because var_exists(PBCHGC1N) is false. Data is built so a bare drop-and-regroup WOULD fire (EC-44 whole-table collapse: PBCHGCA1={INCREASE,INCREASE,DECREASE}). A violation here would be a real engine detection."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col PBCHGCA1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | INCREASE
+CDISCPILOT01 | 01-701-1023 | GLUC | INCREASE
+CDISCPILOT01 | 01-701-1034 | GLUC | DECREASE

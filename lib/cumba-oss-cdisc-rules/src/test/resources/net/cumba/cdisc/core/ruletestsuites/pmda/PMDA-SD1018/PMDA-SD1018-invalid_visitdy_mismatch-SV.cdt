@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1018 expect=violation domain=SV
+#note "Left join on [VISITNUM, VISIT, VISITDY], TV unique per triple, 1:1-or-null: SV row 1 matches TV row 1; SV row 2 (VISITDY 5 vs TV's 1) matches nothing -> TV.VISITNUM null-filled -> empty(TV.VISITNUM) fires on the planned (SVUPDES-blank) row."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISITNUM=2
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+col SVUPDES  type=Char
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING | -7 |
+CDISCPILOT01 | SV | 01-701-1015 | 2 | BASELINE  | 5  |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1
+---

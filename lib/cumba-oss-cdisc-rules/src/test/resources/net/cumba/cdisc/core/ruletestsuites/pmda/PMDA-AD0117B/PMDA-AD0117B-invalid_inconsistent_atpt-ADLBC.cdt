@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0117B expect=violation domain=ADLBC
+#note "No scope key. Group (SYSBP, 1) holds {PREDOSE, PREDOSE, BEFOREDOSE}, so the minority row 3 fires; group (SYSBP, 2) is a singleton. Exactly one finding - the same data under the CDISC sibling's has_multiple_values_for would yield three."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 ATPT=BEFOREDOSE ATPTN=1 PARAMCD=SYSBP
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+col ATPTN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | PREDOSE    | 1
+CDISCPILOT01 | 01-701-1023 | SYSBP | PREDOSE    | 1
+CDISCPILOT01 | 01-701-1034 | SYSBP | BEFOREDOSE | 1
+CDISCPILOT01 | 01-701-1047 | SYSBP | POSTDOSE   | 2

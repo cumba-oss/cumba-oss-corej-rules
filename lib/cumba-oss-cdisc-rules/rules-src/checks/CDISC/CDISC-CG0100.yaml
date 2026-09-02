@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0100"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ECOCCUR does not equal 'N', ECSTAT is empty, and\
+  \ ECDOSTXT is empty, but ECDOSE is not greater than 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EC"
+Requirements:
+  Variables:
+    All:
+    - "ECDOSE"
+Check:
+  expression: >-
+    (not var_exists("ECOCCUR") or ECOCCUR != "N") and empty(ECSTAT) and empty(ECDOSTXT) and ECDOSE
+    <= 0
+Outcome:
+  Message: "ECDOSE is not greater than 0 when ECOCCUR does not equal 'N', ECSTAT is\
+    \ empty, and ECDOSTXT is empty."
+  Output_Variables:
+  - "ECOCCUR"
+  - "ECDOSE"
+  - "ECSTAT"
+  - "ECDOSTXT"
+Source:
+  Class: "INT"
+  Domain: "EC"
+  Variable: "ECDOSE"
+  Condition: "ECOCCUR ^= 'N' and ECSTAT = null and ECDOSTXT = null"
+  Rule: "ECDOSE > 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0100"
+        Version: "2"
+      Version: "2.0"

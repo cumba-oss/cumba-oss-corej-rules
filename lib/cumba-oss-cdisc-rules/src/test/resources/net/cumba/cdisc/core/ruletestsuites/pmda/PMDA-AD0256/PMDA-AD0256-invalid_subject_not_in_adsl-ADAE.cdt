@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-AD0256 expect=violation domain=ADAE
+#note "Row 1: 01-701-1015 in ADSL -> silent. Row 2: 01-701-9999 NOT in ADSL -> fires. Row 3: USUBJID blank -> the `not empty(USUBJID)` conjunct keeps it silent. distinct over the whole ADSL dataset's USUBJID column (no filter, no grouping) landing as one broadcast list; membership tested per primary row."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-9999
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+---
+S1 | 01-701-1015 | HEADACHE
+S1 | 01-701-9999 | NAUSEA
+S1 |              | RASH
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | 01-701-1015
+S1 | 01-701-1023

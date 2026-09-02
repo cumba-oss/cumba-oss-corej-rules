@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0308 expect=noViolation domain=ADAE
+# Rule:Description: SMQzzSC is populated and SMQzzNAM is not populated
+#note "SMQ01SC and SMQ01NAM both populated -> noViolation"
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col SMQ01SC type=Char
+col SMQ01NAM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | A | B
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0531 expect=noViolation domain=ADAE
+# Rule:Description: SEVGRyN is present and SEVGRy is not present
+#note "both SEVGR1N and SEVGR1 present -> no violation"
+# Declared-tier scope: the class= declaration disagrees with the columns, so #define must
+# carry it to RuleRunner (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE class=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col SEVGR1N type=Char
+col SEVGR1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1 | 1
+---

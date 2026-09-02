@@ -1,0 +1,29 @@
+Core:
+  Id: "DRAFT-900028"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when the date of first exposure (TRTSDT) is after the\
+  \ date of last exposure (TRTEDT)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRTSDT"
+    - "TRTEDT"
+Check:
+  expression: >-
+    not empty(TRTSDT) and not empty(TRTEDT) and TRTSDT > TRTEDT
+Outcome:
+  Message: "TRTSDT (date of first exposure) is after TRTEDT (date of last exposure)."
+  Output_Variables:
+  - "TRTSDT"
+  - "TRTEDT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

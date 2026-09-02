@@ -1,0 +1,73 @@
+Core:
+  Id: "PMDA-AD0165"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Baseline Toxicity Grade (BTOXGR) value does\
+  \ not equal the Analysis Toxicity Grade (ATOXGR) value taken from the baseline record\
+  \ (ABLFL equals Y) for the same USUBJID, PARAMCD and BASETYPE; the baseline toxicity\
+  \ grade must equal the analysis toxicity grade of the baseline record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BTOXGR"
+Operations:
+- id: "$baseline_atoxgr"
+  expression: "max(ATOXGR, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BTOXGR) and BTOXGR != $baseline_atoxgr
+Outcome:
+  Message: "BTOXGR does not equal the baseline-record ATOXGR."
+  Output_Variables:
+  - "ATOXGR"
+  - "BTOXGR"
+  - "ABLFL"
+Source:
+  Message: "ABLFL = Y, but BTOXGR != ATOXGR"
+  Description: "If the record is flagged as the baseline (ABLFL = Y), then the baseline\
+    \ toxicity grade (BTOXGR) value must equal the analysis toxicity grade (ATOXGR)\
+    \ value."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0165"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0165"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0165"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0165"
+        Version: "1"
+      Version: "6.0"

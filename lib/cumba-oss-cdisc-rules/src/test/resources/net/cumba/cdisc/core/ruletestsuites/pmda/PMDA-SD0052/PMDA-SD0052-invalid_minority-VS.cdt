@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0052 expect=violation domain=VS
+#note "FRESH: a strict majority now exists (VISITNUM=2 on two rows), so it is not a tie and ONLY the minority row 3 is flagged - count 1, not 3. This is the half of the operator no twin in the whole group covers: every landed fixture uses a 2-row conflict, which exercises the TIE branch only. Pins that the rule reports the OUTLIER, not the group."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 VISIT="WEEK 2" VISITNUM=3
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | VS | 001 | 1 | SYSBP | 2 | WEEK 2
+S1 | VS | 002 | 1 | SYSBP | 2 | WEEK 2
+S1 | VS | 003 | 1 | SYSBP | 3 | WEEK 2

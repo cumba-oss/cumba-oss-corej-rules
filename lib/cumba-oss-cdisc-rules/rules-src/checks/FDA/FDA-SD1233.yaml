@@ -1,0 +1,67 @@
+Core:
+  Id: "FDA-SD1233"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Sponsor Device Identifier (SPDEVID)\
+  \ value in a device-bearing record is not present as an SPDEVID value in the Device\
+  \ Identifiers (DI) domain; all medical devices must be present in the DI domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "SPDEVID"
+Operations:
+- id: "$di_spdevid"
+  expression: "distinct(SPDEVID, domain=\"DI\")"
+Check:
+  expression: >-
+    not empty(SPDEVID) and SPDEVID not in $di_spdevid
+Outcome:
+  Message: "SPDEVID value is not present in the Device Identifiers (DI) domain."
+  Output_Variables:
+  - "SPDEVID"
+  - "$di_spdevid"
+Source:
+  FDA_Validator_Rule_Message: "Device is not present in DI domain"
+  FDA_Validator_Rule_Description: "All Medical Devices (SPDEVID) must be present in\
+    \ Device Identifier (DI) domain."
+  Domains: "CO, DR, INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1233"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1233"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1233"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1233"
+        Version: "1"
+      Version: "1.6"

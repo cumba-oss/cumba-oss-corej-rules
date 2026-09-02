@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1362 expect=violation domain=DM
+#note "Row 1 has ACTARM without ACTARMCD, row 2 has ACTARMCD without ACTARM -> both branches of the any-tree fire. Rows 3/4 are the paired cases."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=002
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 |   | Treatment A
+S1 | DM | 002 | B |
+S1 | DM | 003 | C | Treatment C
+S1 | DM | 004 |   |

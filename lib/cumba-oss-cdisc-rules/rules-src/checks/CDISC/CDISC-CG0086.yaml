@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0086"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --OCCUR is empty while --PRESP is equal to 'Y' and\
+  \ --STAT is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--PRESP"
+Check:
+  expression: >-
+    --PRESP == "Y" and empty(--STAT) and empty(--OCCUR)
+Outcome:
+  Message: "--OCCUR is empty when --PRESP is equal to 'Y' and --STAT is empty."
+  Output_Variables:
+  - "--PRESP"
+  - "!--OCCUR"
+  - "!--STAT"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(AE, DS, DV, EX)"
+  Variable: "--OCCUR"
+  Condition: "--PRESP = 'Y' and --STAT = null and --OCCUR is present in dataset"
+  Rule: "--OCCUR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0086"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0086"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0086"
+        Version: "1"
+      Version: "2.0"

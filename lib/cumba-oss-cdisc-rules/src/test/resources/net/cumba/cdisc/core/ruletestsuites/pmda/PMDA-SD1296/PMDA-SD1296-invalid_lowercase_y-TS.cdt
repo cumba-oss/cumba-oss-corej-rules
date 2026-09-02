@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1296 expect=violation domain=TS
+#note "FRESH operator-contract boundary: TSVAL not in [\"Y\",\"N\"] lowers to the case-sensitive is_not_contained_by, so lower-case 'y' is not a member -> row 1 fires. Row 2 is the conformant control on the same parameter, so the fixture cannot pass by scoping the rule away."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=ADAPT TSVAL=y
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | ADAPT | Adaptive Design | y
+S1 | TS | 2 | ADAPT | Adaptive Design | Y

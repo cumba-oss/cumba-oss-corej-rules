@@ -1,0 +1,126 @@
+Core:
+  Id: "FDA-SD2285"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a LOINC Code (--LOINC) value is not a valid code\
+  \ in the LOINC dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+    - "MB"
+    - "MS"
+Requirements:
+  Variables:
+    All:
+    - "--LOINC"
+Operations:
+- id: "$loinc_valid"
+  expression: "valid_external_dictionary_code(--LOINC, external_dictionary_type=\"\
+    loinc\", dictionary_term_type=\"LOINC\")"
+Check:
+  expression: >-
+    $loinc_valid == false
+Outcome:
+  Message: "LOINC Code (--LOINC) is not a valid LOINC code."
+  Output_Variables:
+  - "--LOINC"
+Source:
+  FDA_Validator_Rule_Message: "Value for --LOINC not found in LOINC coding system"
+  FDA_Validator_Rule_Description: "Value for the LOINC Code (--LOINC) variable must\
+    \ be populated using a LOINC coding system version specified in the define.xml."
+  Domains: "LB, MB, MS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2285"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0400"
+        Version: "1"
+      Version: "2.0"

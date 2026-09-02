@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0260"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both the Parameter Value (TSVAL) and the Parameter\
+  \ Null Flavor (TSVALNF) variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVALNF"
+Check:
+  expression: >-
+    not empty(TSVAL) and not empty(TSVALNF)
+Outcome:
+  Message: "Both TSVAL and TSVALNF variables are populated"
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALNF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALNF"
+  Condition: "TSVAL ^= null"
+  Rule: "TSVALNF = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0260"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0260"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0260"
+        Version: "1"
+      Version: "2.0"

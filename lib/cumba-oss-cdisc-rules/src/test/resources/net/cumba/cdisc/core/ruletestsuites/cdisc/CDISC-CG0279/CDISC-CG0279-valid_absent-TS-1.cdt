@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0279 expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL' exists in TS but TSVAL is empty for the record where TSPARMCD equals 'PCLAS'.
+#note "Cross-half exclusivity: PCLAS has no record at all. That is CDISC-CG0279-A's case, not this rule's -- the record half must stay silent so the pair neither duplicates nor hides a finding."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | INTERVENTIONAL
+S01 | TS | 2 | INTTYPE | DRUG
+S01 | TS | 3 | TITLE | A Study of Drug X
+---

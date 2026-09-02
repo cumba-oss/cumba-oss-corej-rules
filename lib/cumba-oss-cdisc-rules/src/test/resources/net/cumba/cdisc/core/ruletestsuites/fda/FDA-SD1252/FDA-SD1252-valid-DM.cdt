@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD1252 expect=noViolation domain=DM
+#note "Subject 001: DEAD with DTHFL=Y -> ok. Subject 002: ALIVE with DTHFL=N -> ok. Subject 003: no SS record, DTHFL empty -> ok."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | Y
+S1 | DM | 002 | N
+S1 | DM | 003 |
+---
+
+dataset SS class=FINDINGS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSSTRESC type=Char label="Subject Status Result in Std Format"
+---
+S1 | SS | 001 | 1 | SURVSTAT | DEAD
+S1 | SS | 002 | 1 | SURVSTAT | ALIVE
+---

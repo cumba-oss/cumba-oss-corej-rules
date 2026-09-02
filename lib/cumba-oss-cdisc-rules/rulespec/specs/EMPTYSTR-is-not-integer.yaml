@@ -1,0 +1,59 @@
+name: EMPTYSTR-is-not-integer
+kind: check_operator
+description: |
+  Empty-string parity (PLAN-empty-string-membership-parity, Category J.6).
+  is_not_integer judges "" literally — an empty string is not an integer, so the
+  engine fires on the empty cell.
+
+  BOTH-LANE since EC-33 / Fix #130 (2026-07-30). This spec was previously
+  baselined `lane: python` on both channels because the fork had no
+  is_not_integer operator at all: business_rules raised "Operator is_not_integer
+  does not exist for type DataframeType" (AssertionError) and the rule ERRORed.
+  Read the old fix_ref carefully — "deliberate divergence" described the
+  CONSEQUENCE of the operator being absent, not a decision that it should stay
+  absent; PLAN-empty-string-membership-parity.md:112 lists it as "Java-only",
+  i.e. a gap. The fork now implements it (mirroring
+  ScalarSemantics.isIntegerString via helpers.is_integer_value) and the baseline
+  entry is retired.
+
+  The '' row is the load-bearing one: it pins that a blank FIRES, which is the
+  half of the contract a stricter digits-only implementation would get wrong.
+python_notes: |
+  Implemented 2026-07-30 (EC-33 / Fix #130) as DataframeType.is_not_integer.
+  Semantics mirror coreJ exactly: the cell's string form must parse as a finite
+  number equal to its own floor, so "42"/"10.0"/"1e3"/"-7" are integers and
+  "3.5"/"abc"/"NaN"/"Infinity"/"" are not.
+python_source: PLAN-empty-string-membership-parity.md (J.6)
+check:
+  name: AVAL
+  operator: is_not_integer
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AVAL: '42'}     # integer → no fire
+    - {STUDYID: S1, USUBJID: '002', AESEQ: 1, AVAL: '3.5'}    # not integer → fires
+    - {STUDYID: S1, USUBJID: '003', AESEQ: 1, AVAL: ''}       # empty → fires (literal)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-EMPTYSTR-is-not-integer
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AVAL: '3.5'
+    STUDYID: S1
+    USUBJID: '002'
+- rule_id: AUTO-EMPTYSTR-is-not-integer
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    AVAL:
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1074 expect=violation domain=DM
+#note "FLIPPED by the M2-P6 ruling (option (b'), Fix #306) - the file was authored as expect=noViolation with this exact rename and these exact pins named in its own note. AGETXT is a SEND-only DM variable by the same CDISC-Library metadata test SPECIES/STRAIN/SBSTRAIN satisfy (present on DM in all seven SEND packages, on no dataset of any sdtmig package), so its presence in an SDTM DM is precisely the non-conformance this rule describes; it was silent only because the literal list named three of the six. Variable granularity: one finding per offending column, addressed by variable_name with no row= pin. Cross-read with pmda/PMDA-SD2020/PMDA-SD2020-skipped_no_agetxt-DM.cdt (the other half of the same submission defect) and with the FDA twin's mirror fda/FDA-SD1074/FDA-SD1074-invalid_agetxt-DM.cdt."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=AGETXT
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGETXT  type=Char label="Age Range"
+---
+S1 | DM | 001 | 18-65

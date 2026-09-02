@@ -1,0 +1,70 @@
+Core:
+  Id: "PMDA-AD0169"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Censor (CNSR) value is not a non-negative integer.\
+  \ CNSR defines whether the event was censored; it is strongly recommended to use\
+  \ 0 as an event indicator and positive integers as censoring indicators, so any\
+  \ populated CNSR value must be an integer greater than or equal to 0."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "CNSR"
+Check:
+  expression: >-
+    not empty(CNSR) and (not is_integer(CNSR) or CNSR < 0)
+Outcome:
+  Message: "CNSR is not an integer greater than or equal to 0."
+  Output_Variables:
+  - "CNSR"
+Source:
+  Message: "CNSR is not an integer >= 0"
+  Description: "Censor (CNSR) value must be an integer. Defines whether the event\
+    \ was censored (period of observation truncated prior to event being observed).\
+    \ It is strongly recommended to use 0 as an event indicator and positive integers\
+    \ as censoring indicators. It is also recommended that unique positive integers\
+    \ be used to indicate coded descriptions of censoring reasons. CNSR is required\
+    \ for time-to-event parameters."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0169"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0169"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0169"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0169"
+        Version: "1"
+      Version: "6.0"

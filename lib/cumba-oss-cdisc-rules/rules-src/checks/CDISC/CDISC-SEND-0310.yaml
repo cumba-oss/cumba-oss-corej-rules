@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-SEND-0310"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DM records that share the same value of SETCD do\
+  \ not all have the same value of STRAIN; records with different STRAIN values must\
+  \ have different SETCD values."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "STRAIN"
+Check:
+  expression: >-
+    var_exists("SETCD") and is_inconsistent_across_dataset(STRAIN, keys=[SETCD])
+Outcome:
+  Message: "STRAIN is not consistent across DM records that share the same SETCD value."
+  Output_Variables:
+  - "STRAIN"
+  - "SETCD"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "STRAIN"
+  Plain_Text_Explanation: "Subjects with different values for SPECIES and/or STRAIN\
+    \  cannot have the same SETCD value."
+  Rule: "DM records with different values for DM.STRAIN must have different values\
+    \ for DM.SETCD."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND310"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND310"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND310"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND310"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND310"
+        Version: "1"
+      Version: "5.0"

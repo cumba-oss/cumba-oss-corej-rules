@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0076"
+Sheet_Rule_Identifier: "DD0076"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "Rank"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "If Rank value is provided for any Codelist item (EnumeratedItem or CodeListItem) within a Codelist, it must be provided for all other items as well."
+Message: "Missing Rank value"
+# One sheet row, two item-element legs (EnumeratedItem / CodeListItem) - split
+# into PMDA-DD0076 / -B per the 0165-B convention. The guard matches the row's
+# "provided for ANY Codelist item (EnumeratedItem or CodeListItem) within a
+# Codelist" wording verbatim by looking at both sibling sets (a CodeList only
+# ever carries one item type, so the cross-type clause is a no-op in valid
+# documents). EnumeratedItem leg; CDISC twins 0183/0194.
+Check:
+  kind: "exists"
+  target: "@Rank"
+  when:
+    any:
+    - path: "../EnumeratedItem/@Rank"
+      exists: true
+    - path: "../CodeListItem/@Rank"
+      exists: true

@@ -1,0 +1,107 @@
+Core:
+  Id: "FDA-SE2238"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARMCD equals 'GLPTYP' (Good Laboratory Practice\
+  \ Type) but Parameter Value (TSVAL) is populated with a term from the No Yes Response\
+  \ (NY) codelist in the Trial Summary (TS) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Operations:
+- id: "$ny_terms"
+  expression: "codelist_terms(codelists=[NY], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    TSPARMCD == "GLPTYP" and not empty(TSVAL) and TSVAL in $ny_terms
+Outcome:
+  Message: "TSVAL is populated with a No Yes Response (NY) term when TSPARMCD equals\
+    \ 'GLPTYP'; the NY codelist should be used for GLPFL, not for GLPTYP."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  FDA_Validator_Rule_Message: "Value from NY codelist is populated in TSVAL when TSPARMCD\
+    \ = 'GLPTYP'"
+  FDA_Validator_Rule_Description: "Values from the No Yes Response (NY) codelist should\
+    \ not be populated in Parameter Value (TSVAL) when TSPARMCD = 'GLPTYP' (Good Laboratory\
+    \ Practice Type) in the Trial Summary (TS) domain.  The NY codelist should be\
+    \ used to populate TSVAL when TSPARMCD = 'GLPFL' (GLP Flag) and not when TSPARMCD\
+    \ = 'GLPTYP'."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2238"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2238"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2238"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2238"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2238"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

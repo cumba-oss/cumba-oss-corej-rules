@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0688 expect=violation domain=ADDL
+# Rule:Description: Within ADDL there is more than one record for unique values of USUBJID and SPDEVID
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01
+CDISCPILOT01 | 01-701-1015 | DEV01
+---

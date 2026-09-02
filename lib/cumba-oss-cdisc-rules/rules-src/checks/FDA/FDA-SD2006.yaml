@@ -1,0 +1,86 @@
+Core:
+  Id: "FDA-SD2006"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Qualifier Variable Name (QNAM) in a supplemental\
+  \ qualifier dataset names a MedDRA coding variable (a domain-prefixed --LLT, --LLTCD,\
+  \ --DECOD, --PTCD, --HLT, --HLTCD, --HLGT, --HLGTCD, --BODSYS, --BDSYCD, --SOC or\
+  \ --SOCCD variable)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Check:
+  expression: >-
+    QNAM =~ /^[A-Z]{2}(LLT|LLTCD|DECOD|PTCD|HLT|HLTCD|HLGT|HLGTCD|BODSYS|BDSYCD|SOC|SOCCD)$/
+Outcome:
+  Message: "MedDRA coding variable (QNAM) submitted in a SUPPQUAL dataset instead\
+    \ of the Events General Observation Class dataset."
+  Output_Variables:
+  - "QNAM"
+Source:
+  FDA_Validator_Rule_Message: "Unexpected MedDRA coding in the SUPPQUAL domain"
+  FDA_Validator_Rule_Description: "MedDRA coding info should be populated using variables\
+    \ in the Events General Observation Class, but not in SUPPQUAL domains."
+  Domains: "SUPPQUAL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2006"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2006"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2006"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2006"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB003"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0322 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of TRTP, there is more than one value of TRTPGy, where y is an integer [1-99, not zero-padded]
+#note "each TRTP maps to a single TRTPG1 value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP type=Char
+col TRTPG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | DrugA | G1
+CDISCPILOT01 | 01-701-1023 | ALB | DrugA | G1
+---

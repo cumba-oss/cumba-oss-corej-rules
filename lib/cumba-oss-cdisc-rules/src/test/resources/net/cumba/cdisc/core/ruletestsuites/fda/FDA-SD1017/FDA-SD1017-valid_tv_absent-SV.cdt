@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1017 expect=skipped domain=SV
+#note "H2 (ruled 2026-08-19): the qualified Requirements.Variables entry TV.VISITNUM gates the rule on the FOREIGN dataset the distinct operation reads. TV is absent from the study, so the empty key set would make 'VISITNUM not in $tv-set' vacuously true on every planned visit - the flood the SD1023 guard closed. The gate records one auditable skip naming TV instead; the missing TV itself is reported once by the conditional presence rule (FDA-SD9713)."
+#library standard=sdtmig version=3-4
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+S1 | SV | 001 | 1 | SCREENING |
+S1 | SV | 001 | 2 | WEEK 2    |

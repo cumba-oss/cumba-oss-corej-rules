@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1366 expect=violation domain=DM
+#note "Row 1: reason recorded (ARMNRS=NOT ASSIGNED) and RFENDTC populated -> fires. Row 2: reason recorded but RFENDTC correctly empty -> conformant. Record-level Check, so exactly ONE violation, on row 1. Pin RFENDTC (space-free); do not pin ARMNRS, whose values contain spaces."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RFENDTC=2020-02-10
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+col RFENDTC type=Char
+col ARMNRS  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | | 2020-02-10 | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-701-1023 | | | NOT ASSIGNED

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P2 (duplicates/uniqueness + reference integrity) clean 2.1 fixture:
+     every P2 rule executes with zero findings. Because the batch carries seven
+     is_referenced (orphan) rules, EVERY ItemDef / MDV-level def:leaf / CommentDef /
+     MethodDef / ValueListDef / CodeList / def:Standard here must be referenced:
+       IT.USUBJID/IT.AGE/IT.SEX  - ItemRef'd from IG.DM
+       IT.QVAL                   - ItemRef'd from IG.SUPPAE, carries def:ValueListRef
+       IT.AESER                  - ItemRef'd from VL.QVAL
+       LF.ACRF / LF.SAP          - def:DocumentRef'd (AnnotatedCRF / arm:Documentation)
+       LF.DM                     - ItemGroupDef child (out of DD0078's MDV scope) and
+                                   the def:ArchiveLocationID target (DD0018 clean)
+       COM.DM                    - IG.DM def:CommentOID
+       MT.AGE                    - IG.DM ItemRef MethodOID
+       VL.QVAL                   - IT.QVAL def:ValueListRef
+       CL.SEX                    - IT.SEX CodeListRef; StandardOID -> STD.CT (Type CT,
+                                   DD0125 clean)
+       STD.SDTM / STD.CT         - ItemGroupDef / CodeList def:StandardOID
+     All OIDs, names, KeySequences, OrderNumbers, xml:lang values and terms unique
+     within their respective scopes. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:arm="http://www.cdisc.org/ns/arm/v1.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p2-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP2">
+    <GlobalVariables>
+      <StudyName>PMDAP2-STUDY</StudyName>
+      <StudyDescription>PMDA batch P2 clean fixture study</StudyDescription>
+      <ProtocolName>PMDAP2-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P2 MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+      </def:Standards>
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM"
+                    def:CommentOID="COM.DM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.AGE" OrderNumber="2" Mandatory="No" MethodOID="MT.AGE"/>
+        <ItemRef ItemOID="IT.SEX" OrderNumber="3" Mandatory="No"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Domain="SUPPAE" Repeating="Yes"
+                    SASDatasetName="SUPPAE" Purpose="Tabulation"
+                    def:Structure="One record per qualifier per record"
+                    def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Supplemental Qualifiers for AE</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.QVAL" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <def:Class Name="RELATIONSHIP"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.AGE" Name="AGE" DataType="integer" Length="3" SASFieldName="AGE">
+        <Description>
+          <TranslatedText xml:lang="en">Age</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.SEX" Name="SEX" DataType="text" Length="1" SASFieldName="SEX">
+        <Description>
+          <TranslatedText xml:lang="en">Sex</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.SEX"/>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESER" Name="AESER" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <def:ValueListDef OID="VL.QVAL">
+        <ItemRef ItemOID="IT.AESER" OrderNumber="1" Mandatory="No"/>
+      </def:ValueListDef>
+      <CodeList OID="CL.SEX" Name="Sex" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="M"/>
+        <EnumeratedItem CodedValue="F"/>
+      </CodeList>
+      <MethodDef OID="MT.AGE" Name="Age Derivation" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">AGE = (RFSTDTC - BRTHDTC) / 365.25</TranslatedText>
+        </Description>
+      </MethodDef>
+      <def:CommentDef OID="COM.DM">
+        <Description>
+          <TranslatedText xml:lang="en">Screen failures are excluded.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <arm:AnalysisResultDisplays>
+        <arm:ResultDisplay OID="RD.1" Name="Table 14-1.01">
+          <Description>
+            <TranslatedText xml:lang="en">Summary of Demographics</TranslatedText>
+          </Description>
+          <arm:AnalysisResult OID="AR.1" AnalysisReason="SPECIFIED IN SAP"
+                              AnalysisPurpose="PRIMARY OUTCOME MEASURE">
+            <Description>
+              <TranslatedText xml:lang="en">Primary analysis</TranslatedText>
+            </Description>
+            <arm:AnalysisDatasets>
+              <arm:AnalysisDataset ItemGroupOID="IG.DM">
+                <arm:AnalysisVariable ItemOID="IT.AGE"/>
+              </arm:AnalysisDataset>
+            </arm:AnalysisDatasets>
+            <arm:Documentation>
+              <Description>
+                <TranslatedText xml:lang="en">See SAP section 9.1</TranslatedText>
+              </Description>
+              <def:DocumentRef leafID="LF.SAP"/>
+            </arm:Documentation>
+          </arm:AnalysisResult>
+        </arm:ResultDisplay>
+      </arm:AnalysisResultDisplays>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+      <def:leaf ID="LF.SAP" xlink:href="sap.pdf">
+        <def:title>Statistical Analysis Plan</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

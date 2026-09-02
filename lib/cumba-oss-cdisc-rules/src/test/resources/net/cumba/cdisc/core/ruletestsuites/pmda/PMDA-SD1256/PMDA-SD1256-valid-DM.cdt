@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1256 expect=noViolation domain=DM
+#note "Subject 001: DEATH with DTHFL=Y -> ok. Subject 002: COMPLETED with DTHFL=N -> ok. Subject 003: no DS record -> the inner join drops the row."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | Y
+S1 | DM | 002 | N
+S1 | DM | 003 | N
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | SUBJECT DIED    | DEATH
+S1 | DS | 002 | 1 | STUDY COMPLETED | COMPLETED
+---

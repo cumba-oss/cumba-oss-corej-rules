@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-AD0256 expect=violation domain=ADAE
+#note "FRESH - the SD1316-F3 DISCRIMINATING fixture. Subject 01-701-9998 has TWO ADAE records and 01-701-9999 has one, none of them in ADSL: the ruled per-subject answer is 2 (anchored at each group's first flagged row, ADAE rows 2 and 4), a per-record reading would say 3, and a dataset-level reading would say 1. Row 1 (01-701-1015) is in ADSL -> clean. Row 5 has a blank USUBJID and is guarded by the `not empty(USUBJID)` conjunct."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-9998
+#expectViolationAt row=4 USUBJID=01-701-9999
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+---
+S1 | 01-701-1015 | 1 | HEADACHE
+S1 | 01-701-9998 | 1 | NAUSEA
+S1 | 01-701-9998 | 2 | DIZZINESS
+S1 | 01-701-9999 | 1 | RASH
+S1 |              | 1 | PYREXIA
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | 01-701-1015
+S1 | 01-701-1023
+---

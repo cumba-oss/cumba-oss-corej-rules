@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0126 expect=violation domain=ADLBC
+#note "Mirror of AD0125: key PARCAT1, target PARCAT1N. Group VITALS holds {1 x2, 3 x1} -> row 3 is the minority."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 PARCAT1=VITALS PARCAT1N=3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+col PARCAT1N type=Num
+---
+S1 | 001 | SYSBP | VITALS    | 1
+S1 | 002 | SYSBP | VITALS    | 1
+S1 | 003 | SYSBP | VITALS    | 3
+S1 | 004 | ALB   | CHEMISTRY | 2
+S1 | 005 | ALB   | CHEMISTRY | 2

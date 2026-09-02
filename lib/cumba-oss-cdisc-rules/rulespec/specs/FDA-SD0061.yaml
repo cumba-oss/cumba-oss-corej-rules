@@ -1,0 +1,136 @@
+name: FDA-SD0061
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the first CROSS-ENGINE coverage for `FDA-SD0061`, and
+  the spec that pins **D3** end to end: the `define_xml` block's KEY SET is the Define's dataset
+  list, in BOTH shapes, and it must NEVER leak into the study inventory.
+
+  Rule: three Operations — `$study_datasets = dataset_names()`,
+  `$define_datasets = define_dataset_names()`,
+  `$missing_datasets = minus($define_datasets, subtract=$study_datasets)` — and the Check
+  `not contains_all($study_datasets, $define_datasets)`. Sensitivity **Study**, Output_Variables
+  `[$missing_datasets]`, Rule_Type plain `Dataset Metadata Check` (NOT `... against Define XML`),
+  so the fork frames it with `ContentMetadataDatasetBuilder`, which reads no Define at all. The
+  Define reaches this rule only through the operation, which is why P5b is independent of
+  Fix #132 / EC-41.
+
+  Fixture: the study ships **AE and VS**; the Define declares **FOUR** datasets — AE and VS
+  (which the study ships) plus **ZZ and YY, which it does not**. `$missing_datasets` is therefore
+  `[YY, ZZ]` and the rule fires once. Both lanes byte-identical; no `parity-diff-baseline.json`
+  entry.
+
+  **D5 — the Define-only key is the whole point.** `ZZ` and `YY` have no `datasets:` entry at
+  all. That is legal on both lanes (Q4 / §8.5: neither loader inspects the block against the
+  dataset map, and `pickPrimary` / `inventoryResolver` resolve before `defineProviderFrom` runs)
+  and it is the exact shape this rule exists to catch — a domain referenced in define.xml whose
+  dataset is missing from the submission. A spec for `FDA-SD0061` without one would test nothing.
+
+  **Both block SHAPES are exercised on purpose.** `ZZ` is dataset-level (shape B, an object of
+  `define_dataset_*` attributes); `YY` is variable-level (shape A, an array of
+  `define_variable_*` records). D3 requires every key to register in the Define's name list
+  BEFORE the shape branch, whatever it carries — `SpecRunner.defineProviderFrom` calls
+  `provider.defineDataset(name)` first, and the Python stub emits one `read()` record per key
+  from `define_dataset_records`. Mutation-measured: restricting registration to shape-B keys
+  turns `$missing_datasets` from `[YY, ZZ]` into `[ZZ]` — RED. That is the end-to-end counterpart
+  of P1.1's unit-level `datasetMeta.keySet()` mutation check, run through a real rule, and it is
+  the reason the two Define-only keys carry different shapes instead of being two copies.
+
+  **⚠ The D3 inventory hazard is what this spec guards.** `$study_datasets` must come from the
+  `datasets:` map ONLY: Java `OperationExecutor.evalDatasetNames` -> `inventory.availableDatasets()`,
+  which `SpecRunner.inventoryResolver` backs with a copy of `tables.keySet()` taken at
+  construction (`SpecRunner.java:386`, returned by `availableDatasets()` at `:396`);
+  Python `operations/dataset_names.py` -> `data_service.get_datasets()`, backed by the
+  `DummyDataset` list built from `datasets:`. Folding the `define_xml` keys into either would put
+  ZZ and YY into `$study_datasets`, make `contains_all` TRUE and silently un-fire the rule.
+  Mutation-measured: injecting YY and ZZ into `get_datasets()` takes this spec from 1 violation
+  to 0 — RED. Nothing else in the corpus catches that.
+
+  The same expectation also guards the §3.5 empty-name-list trap from the other side: with the
+  Define name list forced to `[]`, `$missing_datasets` is `[]`, `contains_all` is trivially true
+  and the rule reports nothing — measured 1 -> 0, RED. (`FDA-SD1063` is blind to that mutation;
+  `FDA-SD1063-declared` is the other guard.)
+
+  **`[YY, ZZ]` is HARNESS-canonical order, not engine order — do not read declaration order into
+  it.** The fork's `minus` preserves the minuend's order, which is the block's declaration order
+  (AE, VS, ZZ, YY) and would render `[ZZ, YY]`; `dataset_names` even returns `list({...})` from a
+  set. Both adapters sort the elements of a `$`-keyed list Output_Variable before stringifying
+  (Finding #17 — Python `_engine_value_to_str`, Java `ViolationNormaliser.sortListString`), so
+  the canonical rendering is deterministic and identical on both lanes regardless of either
+  engine's iteration order.
+
+  **Sensitivity: Study — what the harness sees, and what it cannot.** This is the first
+  study-sensitivity rule this plan covers, and the two lanes reach the same reported answer by
+  structurally DIFFERENT routes, neither of which is the production attribution:
+
+  * Java (harness): `SpecRunner` drives `RuleRunner.execute` against the PRIMARY table, below
+    both the study-result collapse and the study-anchor pass, and `RuleRunner` treats Study and
+    Dataset alike (only Record is row-based). One finding, attributed to AE at row 0.
+  * Java (production): `FDA-SD0061` is anchor-eligible — `StudyRuleClassifier.isAnchorEligible`
+    holds (Sensitivity STUDY, unrestricted `Domains.Include: ALL`, and `readsPrimaryDataset` is
+    false because `dataset_names` / `define_dataset_names` / `minus` are all study-level
+    operators). `LibraryValidator.runStudyAnchorPass` therefore executes it ONCE against a
+    synthetic one-row, zero-column `STUDY` anchor table and reports it under the `STUDY`
+    pseudo-domain. The parity lane never reaches that pass.
+  * Fork: `validate_single_rule` loops per dataset (both AE and VS produce the identical
+    `$missing_datasets` finding) and then `_collapse_to_study_result` keeps the FIRST non-skipped
+    result WHOLE — including its `dataset` field, which is a real dataset name (`AE`), not a
+    synthetic `STUDY` bucket. The adapter's second lookup (`entry["dataset"] == primary_domain`)
+    matches it, so the "study" fallback never fires here.
+
+  ⚠ **The expectation names `AE` because `AE` is the FIRST key of `datasets:`** — the fork keeps
+  the first non-skipped per-dataset result, and the Java lane's primary resolves to the first
+  declared dataset for an unrestricted-scope rule. That is a declaration-order property, not a
+  law: swapping the `AE` and `VS` blocks moves the study-level finding to `dataset: VS` with
+  VS's row key (measured). Reorder `datasets:` and this expectation must be updated with it.
+
+  So the lanes agree on the harness's channels while disagreeing on production attribution
+  (`STUDY` pseudo-domain with an empty row key vs. a real dataset's identity and row). That
+  disagreement is invisible to the spec channel by construction and is reported to the plan
+  rather than pinned here.
+
+  Attribute choice: AE, VS and ZZ each declare `define_dataset_label` only, purely to satisfy R3
+  (a shape-B key must carry at least one attribute) — this rule reads no dataset attribute, it
+  reads the KEY SET. `label` is one of the only three attributes with a Java sink
+  (`name`/`label`/`className`); the other eight the fork exposes are Python-lane-only and give
+  OPPOSITE verdicts across lanes. Each label is the key itself, which is also the label both
+  lanes hard-wire for a submitted dataset, so it is inert under any rule.
+  `define_dataset_name` / `define_dataset_location` are deliberately NOT declared, so D4's
+  derivation stays on the execution path; restating a derived default would remove it from the
+  path (Python fills only `if record.get(...) is None`, Java re-assigns the identical value).
+
+  `expected_status: EXECUTED` is explicit but adds no strength (both lanes default to it). The
+  Java status channel is blind to a dead Define channel — it yields EXECUTED with zero findings,
+  not SKIPPED — so the non-zero violation count is the load-bearing assertion.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD0061)
+rule:
+  coreId: FDA-SD0061
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+  ZZ:
+    define_dataset_label: ZZ
+  YY:
+    - {define_variable_name: YYTESTCD}
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: FDA-SD0061
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $missing_datasets: '[YY, ZZ]'
+expected_errors: []

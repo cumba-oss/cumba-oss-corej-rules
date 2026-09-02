@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0514"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable name ends in STMF but its label does\
+  \ not end with 'Imputation Flag' (or 'Imput. Flag') or does not contain 'Start'\
+  \ or does not contain 'Time', unless the variable is TRTSTMF, TRnnSTMF (nn=01-99),\
+  \ or one of the standard library variables."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$library_variables"
+  expression: "get_column_order_from_library()"
+Check:
+  expression: >-
+    ends_with(varname(), "STMF") and varname() !~ /^TR(T|0[1-9]|[1-9][0-9])STMF$/ and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Start") or
+    not contains(var_label("DATA"), "Time")) and varname() not in $library_variables
+Outcome:
+  Message: "A variable ending in STMF has a label that does not end with 'Imputation\
+    \ Flag' (or 'Imput. Flag') or does not contain 'Start' or does not contain 'Time'."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*STMF"
+  Natural_Language_Rule_Failure_Criteria: "A variable ending in STMF must contain\
+    \ \"Start Time Imputation Flag\" in the label"
+  Rule_Failure_Criteria: "*STMF does not contain \"Start Time Imputation Flag\" in\
+    \ the label"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR514"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR514"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR514"
+        Version: "1"
+      Version: "5.0"

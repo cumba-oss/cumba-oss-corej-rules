@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0132"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SSSTRESC in the SS dataset equals 'DEAD' but DTHFL\
+  \ in the DM dataset does not equal 'Y' for the corresponding subject. Note: the\
+  \ cited SDTMIG requirement (4.5.8 item 4; 6.3.11) also names DTHDTC population and\
+  \ a DS final-disposition death record; those conjuncts are enforced by companion\
+  \ rules (CG0435 for DTHDTC/DTHFL consistency, CG0171 for the DTHDTC date, and CG0067\
+  \ for the DS death record), so this rule intentionally verifies only the DTHFL conjunct\
+  \ to match its CORE twin and avoid under-reporting."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "SS"
+Check:
+  expression: >-
+    SS.SSSTRESC == "DEAD" and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when SSSTRESC in the SS dataset equals 'DEAD'."
+  Output_Variables:
+  - "DTHFL"
+  - "SS.SSSTRESC"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "DTHFL"
+  Condition: "SS.SSSTRESC = 'DEAD'"
+  Rule: "DTHFL = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0132"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0132"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0132"
+        Version: "1"
+      Version: "2.0"

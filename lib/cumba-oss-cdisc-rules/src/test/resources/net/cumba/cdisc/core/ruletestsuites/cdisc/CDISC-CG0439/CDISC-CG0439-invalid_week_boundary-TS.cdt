@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0439 expect=violation domain=TS
+#note "FRESH. Row 1: 'P1Y2W' FIRES -- the week designator is an EXCLUSIVE alternation branch in ISO_8601_DURATION_POSITIVE and cannot be combined with Y/M/D/T, so 'one year and two weeks' has no legal single-duration spelling. Row 2: 'P2W' SILENT, the week form on its own is valid. A trial length is the one of the three TS parameters where a sponsor plausibly writes weeks, so this branch belongs on the LENGTH member. No class= (the twins declare none and Scope carries no Classes axis). SIDECAR version=3-3."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=LENGTH TSVAL=P1Y2W
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | LENGTH | Trial Length | P1Y2W
+CDISCPILOT01 | TS | 2 | LENGTH | Trial Length | P2W

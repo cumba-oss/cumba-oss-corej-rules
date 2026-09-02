@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD0021 expect=violation domain=CM
+#note "Interventions branch: row 1 CMOCCUR=Y with no End Time-Point and no exception -> fires; row 2 CMOCCUR=N is excepted; row 3 CMOCCUR empty but CMENRTPT populated -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 CMSEQ=1
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR  type=Char label="CM Occurrence"
+col CMENDTC  type=Char label="End Date/Time of Medication"
+col CMENRTPT type=Char label="End Relative to Reference Time Point"
+col CMSTAT   type=Char label="Completion Status"
+col CMDUR    type=Char label="Duration of Medication"
+---
+S1 | CM | 001 | 1 | ASPIRIN     | Y | |         | |
+S1 | CM | 001 | 2 | IBUPROFEN   | N | |         | |
+S1 | CM | 001 | 3 | PARACETAMOL |   | | ONGOING | |

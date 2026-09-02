@@ -1,0 +1,59 @@
+Core:
+  Id: "PMDA-AD0480"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a stratification factor index w, Strat Fact\
+  \ w Val from Verif Source (N) (STRATwVN) is present and Strat Factor w Value from\
+  \ Verif Source (STRATwV) is present and STRATwV does not have a single value across\
+  \ records sharing the same value of STRATwVN, considering only the records on which\
+  \ both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "STRATwV"
+Check:
+  expression: >-
+    var_exists("STRATwVN") and not empty(STRATwVN) and not empty(STRATwV) and
+    is_inconsistent_across_dataset(STRATwV, keys=[STRATwVN])
+Outcome:
+  Message: "Inconsistent value for STRATwV within STRATwVN."
+  Output_Variables:
+  - "STRATwV"
+  - "STRATwVN"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Message: "Inconsistent value for STRATwV"
+  Description: "There should be only a single value of Strat Factor w Value from Verif\
+    \ Source (STRATwV) variable for a given value of Strat Fact w Val from Verif Source\
+    \ (N) (STRATwVN) variable, considering only those rows on which both variables\
+    \ are populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0480"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0480"
+        Version: "1"
+      Version: "6.0"

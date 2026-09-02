@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0163"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a comment is related to specific domain records\
+  \ (Identifying Variable Value (IDVARVAL) is populated) and the Related Domain Abbreviation\
+  \ (RDOMAIN) is populated and is not equal to 'DM', but the Identifying Variable\
+  \ (IDVAR) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "IDVAR"
+    - "IDVARVAL"
+    - "RDOMAIN"
+Check:
+  expression: >-
+    not empty(RDOMAIN) and RDOMAIN != "DM" and not empty(IDVARVAL) and empty(IDVAR)
+Outcome:
+  Message: "IDVAR must be populated when a comment is related to specific domain records\
+    \ (IDVARVAL is populated) and RDOMAIN is populated and not equal to 'DM'."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "IDVARVAL"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "IDVAR"
+  Condition: "Comment related to Domain Records and RDOMAIN not in (null, 'DM')"
+  Rule: "IDVAR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0163"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0163"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0163"
+        Version: "1"
+      Version: "2.0"

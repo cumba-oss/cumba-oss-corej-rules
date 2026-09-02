@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0032 expect=noViolation domain=LB
+#note "Row 1: LBTPTNUM=1 with LBTPT populated -> clean. Row 2: LBTPTNUM missing, LBTPT empty -> driver empty -> clean."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBTPTNUM type=Num
+col LBTPT    type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 1 | PRE-DOSE
+S1 | LB | 001 | 2 | GLUC | . |

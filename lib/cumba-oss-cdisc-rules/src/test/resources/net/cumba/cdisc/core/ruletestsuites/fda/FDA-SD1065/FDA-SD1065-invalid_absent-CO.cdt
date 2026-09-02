@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1065 expect=violation domain=CO
+#note "RDOMAIN column absent altogether while IDVAR is populated -> the bare empty() leaf on the absent column is TRUE on every row (absent = all-missing, EC-43) and the rule fires (Plan B phase 4d' deleted the redundant not var_exists disjunct this note used to name)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVAR=AESEQ
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 |  | 1 | AESEQ | 1 | Comment on the AE record

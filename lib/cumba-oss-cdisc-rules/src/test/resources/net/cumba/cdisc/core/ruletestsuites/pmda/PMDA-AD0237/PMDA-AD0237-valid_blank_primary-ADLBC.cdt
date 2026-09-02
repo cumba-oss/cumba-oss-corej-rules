@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0237 expect=noViolation domain=ADLBC
+#note "Row 1: TRTPG1 BLANK. Row 1 would make key 1 multi-valued, but its DEPENDENT is blank so it is excluded from the dependency (and the rule's own not empty(TRTPG1) conjunct is false there too), leaving key 1 with {POOLB} -> silent."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTPG1  type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 |       | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLB | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLC | 3

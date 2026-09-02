@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0650 expect=violation domain=ADAE
+#note "Row 1 is the plain case (overall flag says N) and row 2 the BLANK case - ONTRTFL != 'Y' fires on an empty value as well as on a different one. Row 3 is the negative control. Count 2. EXACTLY ONE column may match ^ONTRT\\dFL\$."
+#expectViolationCount 2
+#expectViolationAt row=1 variable_name=ONTRT1FL variable_value=Y
+#expectViolationAt row=2 variable_name=ONTRT1FL variable_value=Y
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ASEQ     type=Num
+col AEDECOD  type=Char
+col ONTRT1FL type=Char
+col ONTRTFL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y | N
+CDISCPILOT01 | 01-701-1015 | 2 | NAUSEA   | Y |
+CDISCPILOT01 | 01-701-1015 | 3 | RASH     | Y | Y

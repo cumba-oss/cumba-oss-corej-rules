@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-SD1342"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when RFXSTDTC is empty but RFXENDTC is populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXSTDTC"
+Check:
+  expression: >-
+    not empty(RFXENDTC) and empty(RFXSTDTC)
+Outcome:
+  Message: "RFXSTDTC is empty but RFXENDTC is populated."
+  Output_Variables:
+  - "RFXSTDTC"
+  - "RFXENDTC"
+Source:
+  Message: "Missing value for RFXSTDTC when RFXENDTC is provided"
+  Description: "Date/Time of First Study Treatment (RFXSTDTC) variable must be populated\
+    \ when Date/Time of Last Study Treatment (RFXENDTC)variable value is provided."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1342"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1342"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1342"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1342"
+        Version: "1"
+      Version: "1.6"

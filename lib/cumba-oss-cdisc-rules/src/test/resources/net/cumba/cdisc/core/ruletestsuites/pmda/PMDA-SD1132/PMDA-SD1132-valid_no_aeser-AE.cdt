@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1132 expect=skipped domain=AE
+#note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. FRESH, DISCRIMINATING. DELIBERATELY NO AESER COLUMN. Predicted SILENT because NonEmptyGuardInliner emitted var_exists(\"AESER\") in front of the final negative comparison (arm 5, a != against a STRING literal), so the conjunction is false. THE CONTRAST WITH invalid-empty-aeser-AE IS THE POINT: a PRESENT-but-blank AESER FIRES (blank != 'Y') while an ABSENT AESER is SILENT. Those two outcomes look identical in the data and are decided by the derivation, not by the values. A fire means arm 5 stopped emitting; escalate, do not rewrite. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESDTH  type=Char label="Results in Death"
+---
+S1 | AE | 001 | 1 | CARDIAC ARREST | Y

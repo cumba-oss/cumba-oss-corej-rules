@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-AD0605 expect=noViolation domain=ADLBC
+#note "MECHANISM PIN - the mask-empty shield. Both rows have APHASEN blank while PHSDT is populated. Conjunct 1 `not empty(APHASEN)` yields an EMPTY mask -> compileAnd breaks BEFORE the substituted comparison is ever evaluated -> rule executes, 0 violations. NOTE (Fix #269 / EC-84): this fixture short-circuits before the substituted leaf, so on its own it says NOTHING about the substitution - the stage-R fixture law it was written under (never mix APHASEN-populated and APHASEN-blank rows, because the mix CRASHED the run) is LIFTED, and the mixed shape is now pinned by the sibling *_mixed_aphasen_population fixtures."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHSDT    type=Num
+---
+S1 | 01-701-1015 | ALB | 30 | . | 23010
+S1 | 01-701-1023 | ALB | 31 | . | 23000
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDT  type=Num
+---
+S1 | 01-701-1015 | 23000
+S1 | 01-701-1023 | 23000

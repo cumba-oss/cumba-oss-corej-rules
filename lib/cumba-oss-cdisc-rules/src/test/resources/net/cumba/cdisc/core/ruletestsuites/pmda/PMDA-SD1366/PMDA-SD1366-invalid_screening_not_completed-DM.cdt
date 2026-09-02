@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1366 expect=violation domain=DM
+#note "NEW with the M2-P9 ruling (option (b), Fix #307) - the CT-currency half, and the pin that separates option (b) from option (a). 'SCREENING NOT COMPLETED' is the FIFTH term of SDTM CT codelist ARMNULRS (C142179), added in the 2025-09-26 package; under M2-D29 coreJ tracks the CURRENT CT package rather than the sheet's vintage. Such a subject did not finish screening, so was never randomised, so by CG0530's Cited Guidance RFENDTC must be null - row 1 fires. Row 2 is the conformant control on the same term (RFENDTC empty) so the fixture cannot pass vacuously. Pin RFENDTC, which is space-free; ARMNRS values contain spaces and are not pinnable. Cross-read with pmda/PMDA-SD1363/PMDA-SD1363-invalid_screening_not_completed-DM.cdt."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RFENDTC=2020-02-10
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+col RFENDTC type=Char
+col ARMNRS  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | | 2020-02-10 | SCREENING NOT COMPLETED
+CDISCPILOT01 | DM | 01-701-1023 | | | SCREENING NOT COMPLETED

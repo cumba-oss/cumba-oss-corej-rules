@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0332 expect=noViolation domain=ADLBC
+#note "CHGCAT1N (the operator's TARGET) is not declared. Expansion is seeded from CHGCATy (y=1) and CHGCATyN is synthesised as the absent CHGCAT1N, so the rule DOES execute: all guards are true on every row, and the operator takes the EC-53 fast path (target column index < 0 -> empty BitSet) and flags nothing. No Requirements.Variables gate on this rule, so this is an executed noViolation, not a skip -- the pin on the absent-TARGET fast path."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CHGCAT1 type=Char
+---
+S1 | 001 | GLUC | 5.0 | IMPROVED
+S1 | 002 | GLUC | 5.1 | IMPROVED
+S1 | 003 | GLUC | 5.2 | IMPROVED

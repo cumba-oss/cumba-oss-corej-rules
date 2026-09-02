@@ -1,0 +1,38 @@
+Core:
+  Id: "DRAFT-900003"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when --HLT is not empty but --HLTCD is missing or not\
+  \ present in dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+  Use_Case: "INDH"
+Requirements:
+  Variables:
+    All:
+    - "--HLT"
+Check:
+  expression: >-
+    not empty(--HLT) and empty(--HLTCD)
+Outcome:
+  Message: "--HLT is not empty but --HLTCD is missing or not present in dataset."
+  Output_Variables:
+  - "--HLT"
+  - "--HLTCD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "TIG"
+    Substandard: "SDTM"
+    Version: "1.0"

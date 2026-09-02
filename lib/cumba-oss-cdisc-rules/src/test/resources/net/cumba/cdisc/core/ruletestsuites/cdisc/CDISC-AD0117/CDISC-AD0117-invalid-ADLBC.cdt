@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0117 expect=violation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of ATPT for a given value of ATPTN
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=2
+dataset ADLBC
+col PARAMCD type=Char label="Parameter Code"
+col ATPTN type=Char label="Planned Time Point Number"
+col ATPT type=Char label="Planned Time Point Name"
+---
+HEIGHT | 1 | Baseline
+HEIGHT | 1 | Different Label
+HEIGHT | 2 | Week 2
+---

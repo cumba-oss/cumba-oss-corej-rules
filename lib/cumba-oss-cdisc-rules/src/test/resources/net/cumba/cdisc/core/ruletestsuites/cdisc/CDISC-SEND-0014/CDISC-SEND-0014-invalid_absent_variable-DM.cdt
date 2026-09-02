@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0014 expect=violation domain=DM
+#note "PROPOSED-RULE scenario (ruling 8). Define declares RFENDTC (Expected, no comment) that is absent from the submitted dataset -- the sheet's own 'data were not collected' case. Proposed rule (define-Item frame; maxValueLength of an absent column is 0) fires once on RFENDTC. CURRENT rule iterates dataset columns only and never visits RFENDTC -> predicted-red: engine reports noViolation instead of this 1 violation."
+#library standard=sendig version=3-0
+#library variable-metadata DM RFENDTC core=Exp
+#define-xml CDISC-SEND-0014-absent-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=RFENDTC
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | S1-001

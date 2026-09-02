@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1463 expect=violation domain=AE
+#note "Both codes Num/Exp in SDTMIG 3.4. Row 1: both populated and differ -> fires. Row 2: equal -> no. Row 3: BDSYCD missing -> no. Row 4: SOCCD missing -> no."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AEBDSYCD=10007541 AESOCCD=10029205
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEDECOD  type=Char
+col AEBDSYCD type=Num
+col AESOCCD  type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | 10007541 | 10029205
+S1 | AE | 001 | 2 | NAUSEA   | 10029205 | 10029205
+S1 | AE | 001 | 3 | RASH     |          | 10029205
+S1 | AE | 001 | 4 | VOMITING | 10029205 |

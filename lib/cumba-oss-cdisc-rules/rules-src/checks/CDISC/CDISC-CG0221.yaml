@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0221"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of Start of Observation (--STDY) is populated\
+  \ but the date portion of Start Date/Time of Observation (--STDTC) or Subject Reference\
+  \ Start Date/Time (RFSTDTC) is not a complete date, i.e. empty, invalid, or only\
+  \ partially specified."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--STDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    (var_exists("--STDTC") and not is_complete_date_part(--STDTC) or not
+    is_complete_date_part(DM.RFSTDTC)) and not empty(--STDY)
+Outcome:
+  Message: "--STDY is populated when the date portion of --STDTC or RFSTDTC is incomplete."
+  Output_Variables:
+  - "--STDTC"
+  - "--STDY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STDY"
+  Condition: "--STDTC or DM.RFSTDTC does not contain complete values in their date\
+    \ portion"
+  Rule: "--STDY = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0221"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0221"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0221"
+        Version: "1"
+      Version: "2.0"

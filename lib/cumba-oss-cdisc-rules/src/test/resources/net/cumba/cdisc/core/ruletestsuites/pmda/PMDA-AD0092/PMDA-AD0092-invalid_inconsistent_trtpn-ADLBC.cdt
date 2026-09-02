@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0092 expect=violation domain=ADLBC
+#note "Group TRTP=DRUGA holds TRTPN {1,1,2}: 1 is the strict majority, so minority row 3 alone is flagged; group DRUGB has one row and is silent. RECORD granularity -> 1 finding."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 TRTP=DRUGA TRTPN=2
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTP    type=Char
+col TRTPN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | ALB | DRUGA | 2
+CDISCPILOT01 | 01-701-1045 | ALB | DRUGB | 3

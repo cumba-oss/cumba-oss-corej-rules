@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0041 expect=violation domain=CM
+#note "Branch 2 of the any-tree: the dataset carries no CMPRESP column at all, so every record with a populated CMOCCUR is unsolicited -> both populated rows fire; row 3 leaves CMOCCUR empty."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMOCCUR=Y
+#expectViolationAt row=2 CMOCCUR=N
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR type=Char label="Occurrence"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | Y
+S1 | CM | 001 | 2 | IBUPROFEN | N
+S1 | CM | 001 | 3 | PARACETAM |

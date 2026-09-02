@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0417 expect=noViolation domain=SUPPAE
+#note "FRESH, DISCRIMINATING. DELIBERATELY NO QNAM COLUMN, and no DOMAIN column. Predicted SILENT, and the mechanism is the AUTHORED 'not empty(QNAM)' conjunct acting as the guard: under the EC-38 all-missing contract an absent column folds to an all-missing vector, Primitives.empty is per-row isEmptyValue and is therefore TRUE on every row, so 'not empty(QNAM)' is FALSE and short-circuits the enclosing and - the second leaf is never reached. That is the corpus's standard authored guard idiom (CORE-RULES-GUARD-MATRIX.md:162-166: 'The not empty(X) idiom is itself a guard ... On an absent column empty(X) is true, so not empty(X) is false and short-circuits the enclosing and'; non_empty( occurs 0 times in rules-src while not empty( opens a depth-0 conjunct on 1 771 rules). This scenario was first authored with the opposite expectation (expect=violation, count 2, named invalid_qnam_column_absent) and was the batch's one red; the executed engine result corrected it - see CG0417-F1's withdrawal. The rule is NOT skipped (CDISC-CG0417 declares no Requirements.Variables): it EXECUTES and reports nothing, which is silence channel (b), not (a). DISCRIMINATING: a FIRE here would mean the not-empty guard idiom stopped short-circuiting - escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | Treatment Emergent Flag | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | Serious Event           | N

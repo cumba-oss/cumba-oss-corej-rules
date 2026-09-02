@@ -1,0 +1,11 @@
+#!RuleTest
+#test FDA-SD0089 expect=skipped domain=TE
+#note "AUTHORED BY Plan B phase 4d -- the 0-row companion of FDA-SD0089-skipped_all_columns_absent-TE, and the FDA mirror of PMDA-SD0089-invalid_empty_dataset-TE. Identical dataset header and columns (no TEENRL, no TEDUR) with ZERO data rows. Requirements.Variables.Any is decided from the DECLARED columns by ScopeMatcher, above and before any row handling, so the leg is unmet and the rule skips whatever the row count is; before 4d this same shape emitted ONE violation at reported row 1. Read with its 3-row sibling: the harness asserts non-execution but not the engine's stated reason, so a 0-row scenario alone could be satisfied by a row-count-driven skip -- it is the 3-row sibling that forces the skip to come from the unmet Any leg, and this file that shows the verdict does not depend on there being rows to project from."
+#library standard=sdtmig version=3-4
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---

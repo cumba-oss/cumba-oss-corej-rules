@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CT batch (P5 CT-gated rules) 2.1 violations fixture. One dedicated violator per
+     2.1-applicable rule; the by-design overlaps are 179 (fires on CL.SEX/X AND
+     CL.UNIT/furlong, the latter shared with 186) and 192 (CL.SEXITEMS/Y AND
+     CL.UNITB/stone, the latter shared with 201) - see CtRulesTest's expected-count map.
+     Codelists resolve against the StubCtProvider: C66731 Sex (non-extensible),
+     C71620 Unit (extensible), C99999 unknown. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/ct-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.CT.VIOL">
+    <GlobalVariables>
+      <StudyName>CT-VIOL</StudyName>
+      <StudyDescription>CT batch violations fixture study</StudyDescription>
+      <ProtocolName>CT-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="CT violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
+        <!-- DD0021-B: FOOIG is not an STDNAM submission value. -->
+        <def:Standard OID="STD.BAD" Name="FOOIG" Type="IG" Version="9.9" Status="Final"/>
+      </def:Standards>
+      <!-- 132 / DD0055-C: WEIRD CLASS is not a GNRLOBSC submission value. -->
+      <ItemGroupDef OID="IG.XX" Name="XX" SASDatasetName="XX" Purpose="Tabulation" def:Structure="One record per thing">
+        <def:Class Name="WEIRD CLASS"/>
+      </ItemGroupDef>
+      <!-- DD0024 + 179: X is not a term of non-extensible C66731; F is a clean member. -->
+      <CodeList OID="CL.SEX" Name="Sex Codes" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="F">
+          <Alias Context="nci:ExtCodeID" Name="C16576"/>
+        </EnumeratedItem>
+        <EnumeratedItem CodedValue="X"/>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- DD0024-B + 192: Y is not a term of non-extensible C66731. -->
+      <CodeList OID="CL.SEXITEMS" Name="Sex Item Codes" DataType="text" def:StandardOID="STD.CT">
+        <CodeListItem CodedValue="Y">
+          <Decode>
+            <TranslatedText xml:lang="en">Wye</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- 187: def:ExtendedValue on an item of a NON-extensible codelist. -->
+      <CodeList OID="CL.SEX2" Name="Sex Marked" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="F" def:ExtendedValue="Yes">
+          <Alias Context="nci:ExtCodeID" Name="C16576"/>
+        </EnumeratedItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- 202: CodeListItem twin of 187. -->
+      <CodeList OID="CL.SEX3" Name="Sex Marked Items" DataType="text">
+        <CodeListItem CodedValue="M" def:ExtendedValue="Yes">
+          <Decode>
+            <TranslatedText xml:lang="en">Male</TranslatedText>
+          </Decode>
+          <Alias Context="nci:ExtCodeID" Name="C20197"/>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- 186 (+179 by design): unmarked extension of extensible C71620. -->
+      <CodeList OID="CL.UNIT" Name="Unit Enum" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="furlong"/>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <!-- 201 (+192 by design): CodeListItem twin of 186. -->
+      <CodeList OID="CL.UNITB" Name="Unit Items" DataType="text" def:StandardOID="STD.CT">
+        <CodeListItem CodedValue="stone">
+          <Decode>
+            <TranslatedText xml:lang="en">Stone</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <!-- DD0028: C28253 is the c-code of submission value "mg", not "milligram".
+           No def:StandardOID, so the 179/186 guards stay off. -->
+      <CodeList OID="CL.UNIT2" Name="Unit Mismatch" DataType="text">
+        <EnumeratedItem CodedValue="milligram">
+          <Alias Context="nci:ExtCodeID" Name="C28253"/>
+        </EnumeratedItem>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <!-- DD0028-B: C28254 is the c-code of submission value "mL", not "millilitre". -->
+      <CodeList OID="CL.UNIT3" Name="Unit Item Mismatch" DataType="text">
+        <CodeListItem CodedValue="millilitre">
+          <Decode>
+            <TranslatedText xml:lang="en">Millilitre</TranslatedText>
+          </Decode>
+          <Alias Context="nci:ExtCodeID" Name="C28254"/>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <!-- DD0032: M is a CT term of C66731 but carries no item-level nci alias. -->
+      <CodeList OID="CL.SEX5" Name="Sex No Term Alias" DataType="text">
+        <EnumeratedItem CodedValue="M"/>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- DD0032-B: CodeListItem twin of DD0032. -->
+      <CodeList OID="CL.SEX6" Name="Sex Items No Term Alias" DataType="text">
+        <CodeListItem CodedValue="F">
+          <Decode>
+            <TranslatedText xml:lang="en">Female</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- DD0033: C99999 is not a CT codelist c-code. -->
+      <CodeList OID="CL.BAD" Name="Unknown Codelist Code" DataType="text">
+        <Alias Context="nci:ExtCodeID" Name="C99999"/>
+      </CodeList>
+      <!-- DD0034: C99998 is not a term c-code of C66731. -->
+      <CodeList OID="CL.SEX7" Name="Sex Unknown Term Code" DataType="text">
+        <EnumeratedItem CodedValue="F">
+          <Alias Context="nci:ExtCodeID" Name="C99998"/>
+        </EnumeratedItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- DD0034-B: CodeListItem twin of DD0034. -->
+      <CodeList OID="CL.SEX8" Name="Sex Items Unknown Term Code" DataType="text">
+        <CodeListItem CodedValue="M">
+          <Decode>
+            <TranslatedText xml:lang="en">Male</TranslatedText>
+          </Decode>
+          <Alias Context="nci:ExtCodeID" Name="C99997"/>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <!-- 153: neither def:IsNonStandard nor an nci:ExtCodeID Alias. -->
+      <CodeList OID="CL.NONSTD" Name="Sponsor Thing" DataType="text"/>
+    </MetaDataVersion>
+  </Study>
+</ODM>

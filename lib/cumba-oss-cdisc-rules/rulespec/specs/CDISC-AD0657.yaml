@@ -1,0 +1,35 @@
+name: CDISC-AD0657
+kind: rule
+description: |
+  Wave D8 port - T3-VMC Variable Metadata Check. BDS/ADNCA: AVISIT not_exists.
+  Baselined on Python lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `not_exists(AVISIT)`
+  resolves against meta-field columns and yields 0 violations. Java
+  fires correctly; expected matches Java's dataset-level violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0657)
+rule:
+  coreId: CDISC-AD0657
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, NFRLT: 0.0, AFRLT: 0.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0657
+    dataset: ADNCA
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

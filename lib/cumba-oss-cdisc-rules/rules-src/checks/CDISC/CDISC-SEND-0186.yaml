@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0186"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Completion Status (MISTAT) is \"NOT DONE\" but Result\
+  \ or Finding in Original Units (MIORRES) is populated; a record for a tissue that\
+  \ was not examined must have MIORRES empty."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "MI"
+Requirements:
+  Variables:
+    All:
+    - "MISTAT"
+Check:
+  expression: >-
+    MISTAT == "NOT DONE" and not empty(MIORRES)
+Outcome:
+  Message: "MIORRES is populated when MISTAT is \"NOT DONE\"; a not-examined tissue\
+    \ record must have MIORRES empty."
+  Output_Variables:
+  - "MIORRES"
+  - "MISTAT"
+Source:
+  Class: "FND"
+  Domain: "MI"
+  Variable: "MIORRES, MISTAT"
+  Plain_Text_Explanation: "If a tissue that was scheduled for examination but not\
+    \ examined was not examined, the record will have a blank value in MIORRES and\
+    \ MISTAT will be \"NOT DONE\"."
+  Condition: "Scheduled tissue was not examined"
+  Rule: "MIORRES = null AND MISTAT = \"NOT DONE\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND186"
+        Version: "1"
+      Version: "5.0"

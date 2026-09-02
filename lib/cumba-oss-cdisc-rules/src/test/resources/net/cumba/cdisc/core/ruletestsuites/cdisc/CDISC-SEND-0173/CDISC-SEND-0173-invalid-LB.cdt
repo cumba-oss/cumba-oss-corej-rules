@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0173 expect=violation domain=LB
+#note "Reads ONLY the DEFINE level (no #dictionaries directive -- batch-premise correction, the rule never contacts a dictionary provider). Define declares USUBJID, LBTESTCD (names outside [LBTOX, LBTOXGR] -> silent) and LBTOXGR -- deliberately NOT a dataset column (universe pin) -- whose ItemDef carries a CodeListRef to a CodeList WITHOUT <ExternalCodeList> -> var_external_dictionary(DEFINE) empty -> fires."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0173-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=LBTOXGR
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 5.5

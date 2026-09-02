@@ -1,0 +1,70 @@
+Core:
+  Id: "CDISC-SEND-0312"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Sequence Number (COSEQ) is not unique within a pool,\
+  \ i.e. the same COSEQ value repeats for a given POOLID in the CO dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Check:
+  expression: >-
+    var_exists("POOLID") and not empty(POOLID) and not is_unique_set([COSEQ, POOLID])
+Outcome:
+  Message: "COSEQ is not unique within POOLID."
+  Output_Variables:
+  - "POOLID"
+  - "COSEQ"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "COSEQ"
+  Plain_Text_Explanation: "The sequence number must be unique for each record within\
+    \ a USUBJID or POOLID, whichever applies for the record."
+  Condition: "POOLID ^= null"
+  Rule: "--SEQ is unique within a POOLID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND312"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND312"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND312"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND312"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND312"
+        Version: "1"
+      Version: "5.0"

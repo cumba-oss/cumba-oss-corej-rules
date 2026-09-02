@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-SD1468"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the EX domain contains the EXVAMT (Vol Amount of\
+  \ Exposure) variable while the EC (Exposure as Collected) dataset is present in\
+  \ the study; when EC is implemented alongside EX, collected dose amounts belong\
+  \ in ECDOSE/ECDOSU and EXVAMT should not be used in EX."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Datasets:
+  - "EC"
+Operations:
+- id: "$exvamt_exists"
+  expression: "variable_exists(EXVAMT)"
+Check:
+  expression: >-
+    $exvamt_exists == true
+Outcome:
+  Message: "EXVAMT is present in the EX dataset while the EC dataset exists; collected\
+    \ dose amounts should be represented in ECDOSE and ECDOSU instead."
+  Output_Variables:
+  - "$exvamt_exists"
+Source:
+  Message: "EXVAMT variable in EX domain is present when EC domain exists"
+  Description: "When the EC domain is implemented in conjunction with the EX domain,\
+    \ EXVAMT and EXVAMTU should not be used in EX; collected values instead would\
+    \ be represented in ECDOSE and ECDOSU."
+  Domains: "EX"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1468"
+        Version: "1"
+      Version: "6.0"

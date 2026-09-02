@@ -1,0 +1,48 @@
+Core:
+  Id: "FDA-SD1427"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Challenge Agent Characterization (AC) dataset\
+  \ contains a record where ACPARMCD equals 'CAGTCAT' and ACVAL equals 'CHEMICAL',\
+  \ but does not contain a record where ACPARMCD equals 'CHMTIDCD' (Chemical Agent\
+  \ Material Ident Code)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AC"
+Operations:
+- id: "$cat_count"
+  expression: "record_count(filter=filter(ACPARMCD=\"CAGTCAT\", ACVAL=\"CHEMICAL\"\
+    ))"
+- id: "$parm_count"
+  expression: "record_count(filter=filter(ACPARMCD=\"CHMTIDCD\"))"
+Check:
+  expression: >-
+    $cat_count >= 1 and $parm_count < 1
+Outcome:
+  Message: "A 'Chemical Agent Material Ident Code' (CHMTIDCD) record is not present\
+    \ in the AC domain when a record exists with ACPARMCD equal to 'CAGTCAT' and ACVAL\
+    \ equal to 'CHEMICAL'."
+  Output_Variables:
+  - "$cat_count"
+  - "$parm_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing CHMTIDCD Challenge Agent Parameter when ACPARMCD\
+    \ = 'CAGTCAT' and ACVAL = 'CHEMICAL'"
+  FDA_Validator_Rule_Description: "'Chemical Agent Material Ident Code' (CHMTIDCD)\
+    \ record is expected in the Challenge Agent Characterization (AC) domain when\
+    \ the Parameter Value (ACVAL) for the 'Challenge Agent Category' (CAGTCAT) parameter\
+    \ is 'CHEMICAL'."
+  Domains: "AC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1427"
+        Version: "1"
+      Version: "1.6"

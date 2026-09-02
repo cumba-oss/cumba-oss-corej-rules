@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1201 expect=violation domain=AE
+#note "Drop-and-regroup branch: the Permissible key columns AEOCCUR, AELAT, AEDIR, VISITDY and AESTTPT are absent from the dataset; the engine drops them from the grouping key and the coarser duplicate check still fires on rows 1 and 2 (identical on the remaining key). ADJUDICATED landed behaviour - if this flips, escalate (key-drop regression)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AECAT    type=Char label="Category for Adverse Event"
+col AESCAT   type=Char label="Subcategory for Adverse Event"
+col AELOC    type=Char label="Location of Event"
+col AESEV    type=Char label="Severity/Intensity"
+col AETOXGR  type=Char label="Standard Toxicity Grade"
+col VISITNUM type=Num  label="Visit Number"
+col AESTDTC  type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | Headache | NEURO | | HEAD | MILD | 1 | 1 | 2020-01-01
+S1 | AE | S1-001 | 2 | HEADACHE | Headache | NEURO | | HEAD | MILD | 1 | 1 | 2020-01-01
+S1 | AE | S1-001 | 3 | HEADACHE | Headache | NEURO | | HEAD | MILD | 1 | 2 | 2020-01-01

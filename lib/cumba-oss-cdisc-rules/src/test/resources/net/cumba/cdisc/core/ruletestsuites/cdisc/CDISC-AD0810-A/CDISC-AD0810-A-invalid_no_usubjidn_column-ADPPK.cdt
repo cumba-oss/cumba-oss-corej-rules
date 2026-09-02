@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0810-A expect=violation domain=ADPPK
+#note "PRESENCE SISTER (minted by Fix #331 under M2-D24 bucket 3, owner ruling 2026-08-22; sheet issue owed for the missing sheet entry). ADPPK (declared subclass POPULATION PHARMACOKINETIC ANALYSIS) carries USUBJID but NO USUBJIDN column at all. The Check is a pure var_exists combination, so it folds at dataset level and the finding is reported ONCE although both rows carry USUBJID; the value rule CDISC-AD0810 takes an auditable SKIP on the same data (its Requirements.Variables.All now names both USUBJID and USUBJIDN). The sister is SCOPED to the popPK subclass (review S1): USUBJIDN/SUBJIDN/SITEIDN exist only in ADPPKIG, so without that gate it would fire on every plain BDS dataset -- see -valid_plain_bds-ADLBC. If this reports 2, the broadcast fold has stopped applying to exists-only Checks -- escalate."
+#expectViolationCount 1
+# Declared-tier scope: structure=/subclass= state the ADaM data structure and the popPK subclass this
+# minimal table stands for; #define is their mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADPPK structure=BDS subclass=POPPK
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+CDISCPILOT01 | 01-701-1023
+---

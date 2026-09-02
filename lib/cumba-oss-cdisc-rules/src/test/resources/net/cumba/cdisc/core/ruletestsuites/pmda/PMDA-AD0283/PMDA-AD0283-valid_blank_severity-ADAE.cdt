@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0283 expect=noViolation domain=ADAE
+#note "Row 1's ASEV (the DEPENDENT) is blank while ASEVN stays 1: excluded from the functional dependency; key 1 left with single dependent {MODERATE} -> silent. Pin on the blank-DEPENDENT side of D.13."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col ASEV    type=Char
+col ASEVN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE |  | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | MODERATE | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | SEVERE | 3

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1217 expect=violation domain=TS
+#note "Row 2 records the age spelled out ('18YEARS') instead of the ISO 8601 period P18Y. No class= (the twins declare none and Scope carries no Classes axis). ADAPTED-FROM fda/FDA-SD1217/FDA-SD1217-invalid-TS.cdt (verbatim, pin included — note the twin's data cell is the space-free 18YEARS even though its #note says '18 YEARS'; kept as 18YEARS here so the pinned value needs no quoting)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=AGEMIN TSVAL=18YEARS
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | P80Y
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | 18YEARS

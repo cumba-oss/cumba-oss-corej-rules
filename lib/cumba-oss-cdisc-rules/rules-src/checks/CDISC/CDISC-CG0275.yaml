@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0275"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'ADDON'\
+  \ and TSVAL equal to 'Y', but TSVAL is empty for the record where TSPARMCD equals\
+  \ 'CURTRT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$ADDON_Y"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"ADDON\", TSVAL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    TSPARMCD == "CURTRT" and $ADDON_Y >= 1 and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty for the CURTRT Trial Summary Parameter when a record exists\
+    \ with TSPARMCD equal to 'ADDON' and TSVAL equal to 'Y'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$ADDON_Y"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'CURTRT' and record exists where TSPARMCD = 'ADDON' and TSVAL\
+    \ = 'Y'"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"

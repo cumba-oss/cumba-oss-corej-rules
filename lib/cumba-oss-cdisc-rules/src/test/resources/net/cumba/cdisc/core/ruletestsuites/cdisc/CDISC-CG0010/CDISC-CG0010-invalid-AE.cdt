@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0010 expect=violation domain=AE
+#note "Per define item: USUBJID Role=Identifier matches the library -> silent. AESEV Role=Identifier vs library Timing -> fires. AEXTRA Role=Timing vs library Identifier -> fires; AEXTRA is deliberately NOT a dataset column, pinning the ItemDef universe. Derived Record sensitivity -> 2 findings."
+#library standard=sdtmig version=3-4
+#library variable-metadata AE AESEV name=AESEV role=Timing
+#library variable-metadata AE AEXTRA name=AEXTRA role=Identifier
+#library variable-metadata AE USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-define.xml
+#expectViolationCount 2
+#expectViolationAt define_variable_name=AESEV define_variable_role=Identifier
+#expectViolationAt define_variable_name=AEXTRA define_variable_role=Timing
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AESEV   type=Char
+---
+S1 | AE | 001 | 1 | MILD

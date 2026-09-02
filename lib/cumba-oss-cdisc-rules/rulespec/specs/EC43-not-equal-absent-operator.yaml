@@ -1,0 +1,69 @@
+name: EC43-not-equal-absent-operator
+kind: check_operator
+description: |
+  EC-43's OPERATOR claim, pinned alone: an ABSENT column folds to all-missing, so an intrinsically
+  negative comparison against a populated literal is TRUE on every row and the leaf fires — on both
+  engines.
+
+  ⚑ ADDED 2026-08-07 (wave 13 lane F) in the same change that re-authored `EC43-not-equal-absent`
+  from `kind: check_operator` to `kind: rule` to retire EC-63. That conversion moved EC-43's claim to
+  the RULE layer and would otherwise have left the operator contract unpinned — and an unpinned
+  contract is how it gets "corrected" later by somebody who has only read the guard. `Fix #166` /
+  `Fix #169` deliberately did NOT retract it: what the operator computes is EC-43's business,
+  whether the enclosing rule reports is the author's, and the two statements are about different
+  layers.
+
+  ⚠⚠ WHY `not_equal_to_case_insensitive` AND NOT `not_equal_to`. X1 / `Fix #166` made
+  `NonEmptyGuardInliner` guard EVERY column-vs-literal negative in `NEGATIVE_BINOPS` (`!=`,
+  `not_matches_regex`, `not in`), and a `kind: check_operator` spec is scaffolded through
+  `RulePackageLoader.installNativeExpr`, which runs that pass — so a bare `not_equal_to` leaf is
+  silenced on the Java lane before the operator's verdict can be observed at all. That is precisely
+  what happened to this spec's sibling, and it is a real loss of expressiveness in the harness, not
+  an accident of this fixture. `not_equal_to_case_insensitive` raises to
+  `Expr.Not(equalsIgnoreCase(...))` (`CheckToExpr:254`) — a `Not` leaf, which
+  `NonEmptyGuardInliner.collectGuardableColumns` leaves unguarded — so the verdict stays observable.
+  Case folding is irrelevant to the claim under test: the target is MISSING, not mis-cased.
+
+  ⚠ Neither engine reaches this through a structural negation. coreJ routes it to
+  `ExprCompiler.compileCaseInsensitiveEquality(negate=true)`, which folds the target (EC-43) and
+  defers to `Primitives.equality`; the fork routes it to `_check_inequality(case_insensitive=True)`.
+  Both implement the same truth table, in which BOTH-missing is "equal" (no fire). Here the value
+  operand is a populated literal and the target is missing, so every row fires on both lanes.
+
+  ⚠ Paired with `EC43-absent-equals-blank-control`, which asserts the same two rows over a column
+  that is PRESENT but blank. Absent and present-all-blank must evaluate identically — that
+  equivalence IS the EC-43 contract. If these two ever disagree, the contract has been broken.
+python_notes: |
+  `not_equal_to_case_insensitive` is not in the fork's `ABSENT_TARGET_AWARE_OPERATORS`, so EC-38 /
+  `Fix #128`'s `_absent_target_as_missing` materialises TSVAL as "" and `_check_inequality` returns
+  True on both rows (`both_null` is false because the comparator is a populated literal; "" is
+  falsy, so the case-folded target becomes None and `None != "planned"`).
+python_source: EC-43 (PLAN-negative-leaf-absent-column.md Phase 2); split out of EC43-not-equal-absent 2026-08-07
+check:
+  name: TSVAL
+  operator: not_equal_to_case_insensitive
+  value: "PLANNED"
+  value_is_literal: true
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+    # TSVAL is declared nowhere: the column is absent from the dataset entirely.
+    - {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
+    - {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+- rule_id: AUTO-EC43-not-equal-absent-operator
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
+  status: SUCCESS
+  output_variables: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: '1'}
+- rule_id: AUTO-EC43-not-equal-absent-operator
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
+  status: SUCCESS
+  output_variables: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: '2'}
+expected_errors: []

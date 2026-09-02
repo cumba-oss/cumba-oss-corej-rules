@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0196"
+Sheet_Rule_Identifier: "196"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute OrderNumber must be provided for the CodeListItem element when there is at least one OrderNumber attribute value provided for the same CodeList."
+# Same guard shape as DEFINE-XML-0185, CodeListItem leg.
+Message: "Attribute OrderNumber is missing for a CodeListItem element in a CodeList which has attribute OrderNumber provided for another CodeListItem."
+Check:
+  kind: "exists"
+  target: "@OrderNumber"
+  when:
+    path: "../CodeListItem/@OrderNumber"
+    exists: true

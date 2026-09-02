@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SD2005"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the subject died (DTHFL equals 'Y') but the Date/Time\
+  \ of Death (DTHDTC) is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Check:
+  expression: >-
+    DTHFL == "Y" and empty(DTHDTC)
+Outcome:
+  Message: "DTHDTC is empty when DTHFL equals 'Y'."
+  Output_Variables:
+  - "DTHDTC"
+  - "DTHFL"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for DTHDTC, when DTHFL is populated"
+  FDA_Validator_Rule_Description: "Date/Time of Death (DTHDTC) should be provided,\
+    \ when subject died (DTHFL=Y)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2005"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2005"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2005"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2005"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"

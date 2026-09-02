@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0141 expect=violation domain=DS
+#note "NEW with Fix #340 - CDISC-SEND-0141 shipped with no scenarios at all, so nothing pinned the rule's own behaviour before its Requirements.Variables gate was removed. Positive control: row 1 has DSTERM populated and DSDECOD blank -> fires. Row 2 maps DSTERM to a DSDECOD value -> silent. Without this the two absent-column pins beside it could pass vacuously."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1 USUBJID=S1-001
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | S1-001 | 1 | TERMINAL SACRIFICE |
+S1 | DS | S1-002 | 2 | TERMINAL SACRIFICE | TERMINAL SACRIFICE
+---

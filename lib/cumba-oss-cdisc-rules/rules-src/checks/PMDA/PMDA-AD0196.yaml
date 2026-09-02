@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-AD0196"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a required ADaM analysis parameter variable that\
+  \ CDISC affirms must be populated is empty. Parameter (PARAM) and Parameter Code\
+  \ (PARAMCD) must always be populated; this rule flags any record where either is\
+  \ empty."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARAM"
+    - "PARAMCD"
+Check:
+  expression: >-
+    empty(PARAM) or empty(PARAMCD)
+Outcome:
+  Message: "A required analysis parameter variable (PARAM or PARAMCD) is empty; both\
+    \ must be populated."
+  Output_Variables:
+  - "PARAM"
+  - "PARAMCD"
+Source:
+  Message: "Required Variable value is null"
+  Description: "Unlike SDTM, only some of ADaM Required variables (where Core attribute\
+    \ is 'Req') must be populated. CDISC ADaM rules affirm that PARAM and PARAMCD\
+    \ must be populated, while others are populated as appropriate. Known Exceptions:\
+    \ TRTP, TRTxxP, AGE, AGEU, RACE, SUBJID, AESER."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"

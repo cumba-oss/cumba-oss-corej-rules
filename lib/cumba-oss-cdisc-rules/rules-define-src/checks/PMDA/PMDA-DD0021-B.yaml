@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0021-B"
+Sheet_Rule_Identifier: "DD0021"
+Rule_Set: "PMDA"
+Element: "def:Standard"
+Attribute: "Name"
+Applicable_Versions: ["2.1"]
+Severity: "Reject"
+Requires: "ct"
+Plain_Text_Rule: "Allowable values of Standard Name are: Values from the STDNAM Codelist in Define-CT for Define-XML v2.1, 'SDTM-IG', 'SEND-IG', 'SEND-IG-AR', 'SEND-IG-DART', 'SEND-IG-GENETOX', 'ADaM-IG', or 'BIMO' for Define-XML v2.0, or 'CDISC SDTM', 'CDISC SEND', or 'CDISC ADaM' for Define-XML v1.0. Values must conform to this list of values. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+# 2.1 leg (CT-gated P5; the 2.0 one_of leg is PMDA-DD0021): def:Standard/@Name
+# must be a submission value of the Define-XML CT 'Standard Name' (STDNAM)
+# codelist, named by its fixed C-Code C170452 (the def:Standard element has no
+# CodeList/alias to resolve from). STDNAM is extensible, but the sheet demands
+# conformance to the published list, so plain membership is checked.
+Message: "Invalid Standard Name value ${value}"
+Check:
+  kind: "term_in_ct_codelist"
+  attribute: "Name"
+  cCode: "C170452"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1269 expect=violation domain=TS
+#note "D-TA-7c boundary: a randomization quotient of exactly 0 is outside the converged (0,1] range -> TSVAL=0 FIRES. This row was previously pinned as valid by FDA-SD1269-valid-TS.cdt; the flip is the ruling's intent (numeric comparison, 0 excluded), not a regression."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=RANDQT TSVAL=0
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | RANDQT  | Randomization Quotient     | 0
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 0.5

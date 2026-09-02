@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1288 expect=noViolation domain=AE
+#note "Every --DECOD maps to exactly one --PTCD. Rows 4-5 add a fresh mechanism boundary: --DECOD is BLANK on both while their --PTCD values conflict - DROP_MISSING_KEYS drops blank-key rows from every group, so the conflict never forms a group and stays silent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AEPTCD  type=Num  label="Preferred Term Code"
+---
+S1 | AE | 001 | 1 | HEADACHE  | Headache | 10019211
+S1 | AE | 002 | 1 | HEAD ACHE | Headache | 10019211
+S1 | AE | 003 | 1 | NAUSEA    | Nausea   | 10028813
+S1 | AE | 004 | 1 | UNCODED A |          | 10099991
+S1 | AE | 005 | 1 | UNCODED B |          | 10099992

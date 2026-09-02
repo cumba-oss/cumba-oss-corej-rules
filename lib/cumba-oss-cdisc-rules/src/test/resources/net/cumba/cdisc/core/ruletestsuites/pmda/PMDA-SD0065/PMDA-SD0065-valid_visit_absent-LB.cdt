@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD0065 expect=skipped domain=LB
+#note "H4 (ruled 2026-08-19): the Requirements.Variables [VISIT] gate makes the absent-VISIT-column case an auditable skip. Before the gate the tuple compiler silently produced no findings here (the absent tuple argument yields an empty plan) - including for rows whose VISITNUM genuinely is not in SV; the skip makes that non-evaluation visible."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+---
+S1 | LB | 001 | 1 | ALB | 9
+---
+
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Visit"
+---
+S1 | SV | 001 | 1 | SCREENING | 2020-01-01

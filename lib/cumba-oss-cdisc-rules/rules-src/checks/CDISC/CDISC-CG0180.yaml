@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0180"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reference Range Lower Limit in Original Units (LBORNRLO)\
+  \ is populated while the Result or Finding in Original Units (LBORRES) is not a\
+  \ quantitative (continuous) measurement value. A numeric LBORRES value (optionally\
+  \ prefixed with a comparator) is used as a data proxy for a continuous result."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Requirements:
+  Variables:
+    All:
+    - "LBORRES"
+Check:
+  expression: >-
+    LBORRES !~ /^(<|>|< |> )?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$/ and not empty(LBORRES) and not
+    empty(LBORNRLO)
+Outcome:
+  Message: "LBORNRLO is populated when LBORRES is not a quantitative measurement value."
+  Output_Variables:
+  - "LBTESTCD"
+  - "LBORRES"
+  - "LBORNRLO"
+Source:
+  Class: "FND"
+  Domain: "LB"
+  Variable: "LBORNRLO"
+  Condition: "LBORRES ^= continuous measurement"
+  Rule: "LBORNRLO = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0180"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0180"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0180"
+        Version: "1"
+      Version: "2.0"

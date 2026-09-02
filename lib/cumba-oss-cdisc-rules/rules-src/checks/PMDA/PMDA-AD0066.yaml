@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0066"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the numeric Planned Pooled Treatment y for Period\
+  \ xx variable TRxxPGyN is present in the dataset but its corresponding character\
+  \ variable TRxxPGy is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TRxxPGyN") and not var_exists("TRxxPGy")
+Outcome:
+  Message: "TRxxPGyN is present, but TRxxPGy is not present."
+  Output_Variables:
+  - "TRxxPGyN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "TRxxPGyN is present, but TRxxPGy is not present"
+  Description: "If Planned Pooled Treatment y for Period xx (TRxxPGyN) numeric variable\
+    \ is present, there must be a corresponding Planned Pooled Treatment y for Period\
+    \ xx (TRxxPGy) character variable."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0066"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0066"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0066"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0066"
+        Version: "1"
+      Version: "6.0"

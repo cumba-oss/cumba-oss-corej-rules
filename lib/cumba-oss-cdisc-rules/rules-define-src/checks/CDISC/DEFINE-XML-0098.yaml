@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0098"
+Sheet_Rule_Identifier: "98"
+Rule_Set: "CDISC"
+Element: "CodeList/EnumeratedItem"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "Missing Alias for Codelist EnumeratedItem element where the ExtendedValue attribute  is not present and the CodeList is referenced by a variable that requires CDISC Controlled Terminology according to the standard."
+# EnumeratedItem leg of 97 (same library-decided trigger); a def:ExtendedValue
+# item is a declared extension and out of reach - the extension-marking rules
+# (CDISC 186/187) own that beat. The CT-decidable slice ships as PMDA-DD0032.
+Message: "Missing EnumeratedItem Alias in a codelist referenced by a variable that requires CDISC Controlled Terminology [${value}]."
+Check:
+  kind: "library_ct_alias_required"
+  level: "enumerated_item"

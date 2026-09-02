@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2264 expect=noViolation domain=TS
+#note "PCLAS rows carry valid MED-RT codes from the dummy dictionary (N0000000181, N0000175553); the blank-TSVALCD PCLAS row does not fire (completeness is another rule's concern) and the garbage TSVALCD on the AGEMAX row is outside the PCLAS condition -> no violation."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | PCLAS  | N0000000181
+S01 | TS | 2 | PCLAS  | N0000175553
+S01 | TS | 3 | PCLAS  |
+S01 | TS | 4 | AGEMAX | BOGUSCODE

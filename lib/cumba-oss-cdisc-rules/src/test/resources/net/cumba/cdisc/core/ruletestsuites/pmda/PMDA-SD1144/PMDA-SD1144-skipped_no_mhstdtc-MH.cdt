@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1144 expect=skipped domain=MH
+#note "FRESH - the batch's Requirements.Variables.All literal-entry pin. MH carries no MHSTDTC column at all -> Requirements.Variables.All [MHSTDTC] rejects; the rule must NOT execute."
+#library standard=sdtmig version=3-4
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+---
+S1 | MH | 001 | 1 | ASTHMA
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

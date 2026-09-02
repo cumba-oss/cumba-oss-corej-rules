@@ -1,0 +1,91 @@
+name: EC21-date-diff-target-from-evaluation-domain
+kind: rule
+description: |
+  EC-21 regression pin — `date_diff_days` resolves its `--DTC` target from the
+  *evaluation* domain (TF -> TFDTC), while `domain: EX` swaps ONLY the foreign frame
+  for the grouped-min EXSTDTC reference. Before the fix the target resolved to `EXDTC`
+  (nonexistent) and the operation raised in _handle_grouped_result(None).
+
+  ⚠ SYNTHETIC INLINE RULE, deliberately. This spec previously referenced the shipped
+  CDISC-SEND-0202 by coreId. That rule is now PARKED (Executability: "Not Executable",
+  wave 9 set C) because it computes from the local TFDTC where its Source requires a
+  cross-domain (CLDTC|PMDTC|DSSTDTC) - EXSTDTC, which needs the parked EC-47 two-hop
+  join. Two consequences drove this conversion:
+    1. SpecLoader.resolveCoreId THROWS for a coreId no rules/ package ships, so the
+       reference would have failed the lane outright.
+    2. More importantly: an ENGINE regression pin must not depend on a corpus rule
+       being semantically correct. The mechanism below is correct and stays live
+       (CDISC-SEND-0401 uses the same --DTC + domain: shape and is unparked); only its
+       former host was wrong.
+  Same pattern as EC18-date-diff-mode3-sided, which is inline for the same reason.
+
+  Rows:
+    - 1001: TFDTC 2020-01-20, min EXSTDTC 2020-01-05 -> computed 16, TFDETECT 16 -> no fire
+    - 1002: TFDTC 2020-02-11, min EXSTDTC 2020-02-01 -> computed 11, TFDETECT 99 -> FIRE
+    - 1003: TFDETECT empty -> no fire (non_empty guard)
+    - 1004: TFDTC "2020" incomplete -> no fire (is_complete_date guard)
+rule:
+  id: ec21-date-diff-target
+  Core: {Id: EC21-DATEDIFF-TARGET}
+  Description: TFDETECT must equal (TFDTC - earliest EXSTDTC for the subject) + 1.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [TF]}
+    Use_Case: NONCLIN
+  Requirements:
+    Variables: {All: ["EX.EXSTDTC"]}
+  Match_Datasets:
+    - Name: EX
+      Keys: [USUBJID]
+  Operations:
+    - id: $days_from_first_dose
+      operator: date_diff_days
+      domain: EX
+      group: [USUBJID]
+      name: "--DTC"
+      offset: "1"
+      reference: EXSTDTC
+  Check:
+    all:
+      - {name: "--DTC", operator: is_complete_date}
+      - {name: TFDETECT, operator: non_empty}
+      - {name: TFDETECT, operator: not_equal_to, value: $days_from_first_dose}
+  Outcome:
+    Message: TFDETECT does not equal the number of days from the earliest EXSTDTC to the detection date plus one.
+    Output_Variables: [$days_from_first_dose, "--DTC", TFDETECT]
+datasets:
+  TF:
+    row_key: [STUDYID, USUBJID, TFSEQ]
+    column_types:
+      TFDETECT: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1001', TFSEQ: 1, TFDTC: '2020-01-20', TFDETECT: '16'}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1002', TFSEQ: 1, TFDTC: '2020-02-11', TFDETECT: '99'}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1003', TFSEQ: 1, TFDTC: '2020-03-06', TFDETECT: ''}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1004', TFSEQ: 1, TFDTC: '2020', TFDETECT: '50'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1001', EXSEQ: 1, EXSTDTC: '2020-01-05'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1002', EXSEQ: 1, EXSTDTC: '2020-02-01'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1003', EXSEQ: 1, EXSTDTC: '2020-03-01'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1004', EXSEQ: 1, EXSTDTC: '2020-04-01'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+expected_violations:
+  - rule_id: EC21-DATEDIFF-TARGET
+    dataset: TF
+    row_key: {STUDYID: S1, TFSEQ: 1, USUBJID: '1002'}
+    status: SUCCESS
+    output_variables:
+      # ⚠ The inline rule declares $days_from_first_dose in Output_Variables and its
+      # Operation is in FIELD form (not inlined), so the engine materialises the
+      # $-variable. The shipped CDISC-SEND-0202 this spec replaced was the INLINED
+      # native form, which materialised none — its expectation was copied here by
+      # mistake during the wave-9 conversion. 2020-02-01 -> 2020-02-11 = 10, +1 = 11.
+      $days_from_first_dose: '11'
+      TFDETECT: '99'
+      TFDTC: '2020-02-11'
+expected_errors: []

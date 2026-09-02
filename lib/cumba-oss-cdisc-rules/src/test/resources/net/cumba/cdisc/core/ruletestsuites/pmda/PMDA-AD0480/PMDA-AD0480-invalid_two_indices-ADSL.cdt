@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0480 expect=violation domain=ADSL
+#note "TWO expansions run (w=1, w=2) and their violations AGGREGATE. Expansion w=1: group STRAT1VN=1 holds {HIGH x2, LOW x1} -> row 3. Expansion w=2: group STRAT2VN=1 holds {A x2, B x1} -> row 2. Different rows, unambiguous bijection."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=3 USUBJID=003 STRAT1V=LOW STRAT1VN=1
+#expectViolationAt row=2 USUBJID=002 STRAT2V=B STRAT2VN=1
+dataset ADSL
+col STUDYID   type=Char
+col USUBJID   type=Char
+col STRAT1V   type=Char
+col STRAT1VN  type=Num
+col STRAT2V   type=Char
+col STRAT2VN  type=Num
+---
+S1 | 001 | HIGH | 1 | A | 1
+S1 | 002 | HIGH | 1 | B | 1
+S1 | 003 | LOW  | 1 | A | 1
+---

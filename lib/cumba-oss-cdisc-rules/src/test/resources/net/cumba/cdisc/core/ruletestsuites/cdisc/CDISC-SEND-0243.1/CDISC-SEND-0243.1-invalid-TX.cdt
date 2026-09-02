@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0243.1 expect=violation domain=TX
+#note "D-TA-5a (guard removed per the T4 reasoning — the sheet's Condition does not exempt NULL): row 1's dosing start date value is BLANK, which is not a valid ISO 8601 date -> fires (under the pre-ruling non-empty guard this row was silent). Row 2's DOSENDTC value is not a date -> fires. Row 3 is a valid ISO date -> silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 TXPARMCD=DOSSTDTC
+#expectViolationAt row=2 TXPARMCD=DOSENDTC
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+STUDY01 | TX | SET1 | 1 | DOSSTDTC | Dosing Start Date |
+STUDY01 | TX | SET1 | 2 | DOSENDTC | Dosing End Date   | NOT A DATE
+STUDY01 | TX | SET2 | 3 | DOSSTDTC | Dosing Start Date | 2026-01-15

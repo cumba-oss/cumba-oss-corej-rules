@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0365 expect=skipped domain=DM
+#note "DM is 2 characters; the AP-- token requires prefix('AP').length()+2 == 4 characters, and the APRELSUB literal does not match either, so the Domains gate rejects DM and the rule never executes -- even though this data WOULD fire if the rule ran (RSUBJID and RDEVID are both populated)."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col RDEVID  type=Char label="Related Device Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 001 | DEV-01

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0382 expect=violation domain=ADLBC
+#note "Key tuple (BTOXGR, PARAMCD)=(GRADE2, GLUC); target BTOXGRN holds {2, 2, 3} -> minority row 3 fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC BTOXGR=GRADE2 BTOXGRN=3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BTOXGR  type=Char
+col BTOXGRN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | GRADE2 | 2
+CDISCPILOT01 | 01-701-1023 | GLUC | GRADE2 | 2
+CDISCPILOT01 | 01-701-1034 | GLUC | GRADE2 | 3

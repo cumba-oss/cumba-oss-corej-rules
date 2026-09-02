@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD2246 expect=violation domain=TS
+#note "Boundary: TSVAL is present but empty on the NARMS record. An empty value is not a number, so the 'TSVAL must be numeric when TSPARMCD=NARMS' requirement is violated and the rule must fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=NARMS
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | NARMS | Planned Number of Arms |

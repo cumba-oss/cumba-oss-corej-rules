@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2325-A expect=violation domain=TS
+#note "Minted completeness sibling of FDA-SE2325 (Fix #239). Row 1 carries a COMPLETE ISO date and must NOT fire -- that is the negative control, and it is the row the parent's own valid scenario also passes. Row 2 is a partial (year-month) ISO date: valid ISO 8601, so the parent FDA-SE2325 stays silent on it, and this sibling is the ONLY rule that reports it. Row 3 is the same partial date under a different --PARMCD, which proves the parameter gate still selects."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=STSTDTC TSVAL=2020-06
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+SEND001 | TS | 1 | STSTDTC | Nonclinical Study Start Date | 2020-01-15
+SEND001 | TS | 2 | STSTDTC | Nonclinical Study Start Date | 2020-06
+SEND001 | TS | 3 | DCUTDTC | Data Cutoff Date | 2020-06

@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SE2311"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SETCD (Set Code) is populated and does not match\
+  \ any SETCD value in the Trial Sets (TX) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "SETCD"
+Operations:
+- id: "$tx_setcd"
+  expression: "distinct(SETCD, domain=\"TX\")"
+Check:
+  expression: >-
+    not empty(SETCD) and SETCD not in $tx_setcd
+Outcome:
+  Message: "SETCD does not match any Set Code (SETCD) value in the Trial Sets (TX)\
+    \ dataset."
+  Output_Variables:
+  - "SETCD"
+  - "$tx_setcd"
+Source:
+  FDA_Validator_Rule_Message: "Invalid SETCD"
+  FDA_Validator_Rule_Description: "Set Code (SETCD) values should match entries in\
+    \ the Trial Sets (TX) dataset."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2311"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB049"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2311"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB049"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2311"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB049"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2311"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB049"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2311"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB049"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.1"

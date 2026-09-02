@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0279.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the planned elapsed time (--ELTM) is populated but\
+  \ the time point reference (--TPTREF) is not populated; --ELTM is expressed relative\
+  \ to --TPTREF."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+Check:
+  expression: >-
+    not empty(--ELTM) and empty(--TPTREF)
+Outcome:
+  Message: "--TPTREF is empty even though --ELTM is populated."
+  Output_Variables:
+  - "--ELTM"
+  - "--TPTREF"
+Source:
+  Class: "INT, FND"
+  Domain: "ALL"
+  Variable: "--TPTREF"
+  Plain_Text_Explanation: "--TPTREF must be populated when --ELTM is populated because\
+    \ --ELTM is in relative to --TPTREF"
+  Condition: "--ELTM ^= null"
+  Rule: "--TPTREF ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND279.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND279.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND279.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND279.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND279.1"
+        Version: "1"
+      Version: "5.0"

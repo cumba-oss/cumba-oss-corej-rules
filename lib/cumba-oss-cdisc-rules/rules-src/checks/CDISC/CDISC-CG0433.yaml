@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0433"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AGEU is populated but AGE is missing or not present\
+  \ and AGETXT is empty or not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(AGEU) and empty(AGETXT) and empty(AGE)
+Outcome:
+  Message: "AGE is missing or not present and AGETXT is empty or not present, when\
+    \ AGEU is populated."
+  Output_Variables:
+  - "AGE"
+  - "AGEU"
+  - "AGETXT"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "AGE"
+  Condition: "AGEU ^= null and AGETXT = null"
+  Rule: "AGE ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0433"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0433"
+        Version: "1"
+      Version: "2.0"

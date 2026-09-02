@@ -1,0 +1,38 @@
+name: CDISC-SEND-0059.1
+kind: rule
+description: |
+  EC-22 regression (both lanes). CDISC-SEND-0059.1 flags --EVLINT/--ELTM/--DUR that are
+  not a valid ISO 8601 duration; the check pins negative: true, so the signed (leading-minus)
+  interval grammar is accepted. On PC (FINDINGS class) the columns resolve to
+  PCEVLINT/PCELTM/PCDUR. All three columns are populated so both engines evaluate every
+  any-branch identically (Python skips the whole rule if any exists-guarded column is absent,
+  Java auto-guards — so the dataset must carry all three to exercise the operator on both
+  lanes). Row 1: all valid (PCELTM "-P1D" signed → valid under negative: true) → no fire.
+  Before EC-22 the native lane dropped the negative= kwarg and over-fired on the signed value.
+  Row 2: PCELTM malformed → fires; the other two stay valid. Java-canonical (Python + Java
+  legacy already accept the signed grammar).
+python_source: rules-sendig-3-1-1.json (CDISC-SEND-0059.1)
+rule:
+  coreId: CDISC-SEND-0059.1
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCEVLINT: 'P1D', PCELTM: '-P1D', PCDUR: 'P2D'}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '002', PCSEQ: 2, PCEVLINT: 'P1D', PCELTM: 'not-a-dur', PCDUR: 'P2D'}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+library_mocks:
+  classes:
+    findings: [PC]
+expected_violations:
+  - rule_id: CDISC-SEND-0059.1
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '002', PCSEQ: 2}
+    status: SUCCESS
+    output_variables:
+      PCDUR: P2D
+      PCELTM: not-a-dur
+      PCEVLINT: P1D
+expected_errors: []

@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0276-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists with TSPARMCD equal to 'STYPE' and\
+  \ TSVAL equal to 'INTERVENTIONAL', but no record with TSPARMCD equal to 'TRT' is\
+  \ present in TS."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$STYPE_INTERVENTIONAL"
+  expression: "record_count(filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"INTERVENTIONAL\"\
+    ))"
+- id: "$TRT_N"
+  expression: "record_count(filter=filter(TSPARMCD=\"TRT\"))"
+Check:
+  expression: >-
+    $STYPE_INTERVENTIONAL >= 1 and $TRT_N == 0
+Outcome:
+  Message: "The required TRT Trial Summary Parameter is not present in TS when a record\
+    \ exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL'."
+  Output_Variables:
+  - "$TRT_N"
+Source_Proposed:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'TRT' and record exists where TSPARMCD = 'STYPE' and TSVAL\
+    \ = 'INTERVENTIONAL'"
+  Rule: "a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL',\
+    \ but no record with TSPARMCD equal to 'TRT' is present in TS"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'TRT' and record exists where TSPARMCD = 'STYPE' and TSVAL\
+    \ = 'INTERVENTIONAL'"
+  Rule: "TSVAL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"

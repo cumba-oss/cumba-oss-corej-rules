@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-OD0080"
+Sheet_Rule_Identifier: "OD0080"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "DataType"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Variable Data Type must match the Data Type of the referenced Codelist. Define-XML specification represents Variable as ItemDef."
+# compare through the CodeListRef deref: the ItemDef's DataType against the
+# DataType of the CodeList its CodeListRef points to. ItemDefs without a
+# CodeListRef (or referencing a CodeList without a DataType) are skipped -
+# either side missing means no finding.
+Message: "Codelist/Variable Data Type mismatch [${value}]"
+Check:
+  kind: "compare"
+  left: "@DataType"
+  right: "CodeListRef/@CodeListOID->CodeList@OID/@DataType"

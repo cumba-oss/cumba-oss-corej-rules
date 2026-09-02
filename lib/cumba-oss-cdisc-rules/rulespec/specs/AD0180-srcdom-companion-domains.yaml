@@ -1,0 +1,48 @@
+name: AD0180-srcdom-companion-domains
+kind: rule
+description: |
+  EC-14 (P7) — the real CDISC-AD0180 re-authored onto the companion `standard_domains` Operation.
+  On an ADaM run `standard_domains` has no SDTM IG product of its own, so it enumerates the
+  COMPANION SDTMIG's domains. Here the companion domain set is supplied directly via
+  `library_mocks.standard_domains: [AE, DM, LB, VS]` — which the Python adapter sets as the
+  container's `companion_dataset_names` and the Java MockLibraryProvider returns verbatim from
+  `getStandardDatasetNames()`. The Check fires when SRCDOM is populated AND is_not_contained_by
+  that companion union:
+    SRCDOM=DM   passes (a companion SDTM domain),
+    SRCDOM=XX   fires  (not an SDTM domain),
+    SRCDOM=''   passes (the non_empty guard),
+    SRCDOM=ADSL fires  (a submitted ADaM dataset name is NOT an SDTM domain).
+  The adamig/1-0 config keeps the model contribution empty, so both engines see exactly the
+  mocked companion domain set. $sdtm_domains is left out of Output_Variables because Python returns
+  a sorted list while Java preserves insertion order — the membership check is order-independent.
+rule:
+  coreId: CDISC-AD0180
+datasets:
+  ADAE:
+    row_key: [USUBJID, SRCDOM]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', SRCDOM: DM}
+      - {STUDYID: S1, USUBJID: '002', SRCDOM: XX}
+      - {STUDYID: S1, USUBJID: '003', SRCDOM: ''}
+      - {STUDYID: S1, USUBJID: '004', SRCDOM: ADSL}
+config:
+  standard: adamig
+  standard_version: '1.0'
+library_mocks:
+  standard_domains: [AE, DM, LB, VS]
+  classes:
+    basic data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0180
+    dataset: ADAE
+    row_key: {SRCDOM: ADSL, USUBJID: '004'}
+    status: SUCCESS
+    output_variables:
+      SRCDOM: ADSL
+  - rule_id: CDISC-AD0180
+    dataset: ADAE
+    row_key: {SRCDOM: XX, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      SRCDOM: XX
+expected_errors: []

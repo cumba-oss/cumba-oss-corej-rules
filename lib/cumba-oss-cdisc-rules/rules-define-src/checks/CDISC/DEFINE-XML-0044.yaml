@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0044"
+Sheet_Rule_Identifier: "44"
+Rule_Set: "CDISC"
+Element: "Origin/DocumentRef"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:PDFPageRef element must be provided when the Origin Type is 'Collected' and the Source is 'Investigator' or 'Subject'."
+Message: "Element def:PDFPageRef is missing for a DocumentRef whose Origin Type is 'Collected' and Source is 'Investigator' or 'Subject'."
+Check:
+  kind: "exists"
+  target: "PDFPageRef"
+  when:
+    all:
+    - path: "../@Type"
+      equals: "Collected"
+    - path: "../@Source"
+      oneOf: ["Investigator", "Subject"]

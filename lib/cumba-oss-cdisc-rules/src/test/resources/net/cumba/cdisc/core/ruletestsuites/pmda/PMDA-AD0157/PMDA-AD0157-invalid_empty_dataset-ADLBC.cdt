@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0157 expect=violation domain=ADLBC
+#note "Batch's only 0-row fixture, pinning SETTLED behaviour. Presence is a property of the DECLARED SCHEMA: CRIT1 declared, CRIT1FL not, so a 0-row dataset is exactly as non-conformant as a populated one. BroadcastFold short-circuits ABOVE the 0-row synthetic-column branch, so datasetBroadcastResult emits ONE violation at internal row 0 = reported row 1. No value pin: extractOutputValues writes empty for row 0 past the end of a 0-row table."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CRIT1   type=Char
+---

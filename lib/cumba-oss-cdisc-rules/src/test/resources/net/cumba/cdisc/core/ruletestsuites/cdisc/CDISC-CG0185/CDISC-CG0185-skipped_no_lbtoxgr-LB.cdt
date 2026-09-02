@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0185 expect=skipped domain=LB
+#note "FRESH. DELIBERATELY NO LBTOXGR COLUMN. Requirements.Variables.All [LBTOXGR] rejects the dataset, so the rule SKIPS. A study that never graded toxicity is the ordinary case here, which is why the auditable zero matters."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | 4.1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 5.6

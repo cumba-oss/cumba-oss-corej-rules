@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0284"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of ASEVN for a given\
+  \ value of ASEV."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ASEVN) and not empty(ASEV) and has_multiple_values_for(ASEVN, ASEV)
+Outcome:
+  Message: "ASEVN has more than one value for the same value of ASEV."
+  Output_Variables:
+  - "ASEV"
+  - "ASEVN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ASEVN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of ASEVN for\
+    \ a given value of ASEV"
+  Rule_Failure_Criteria: "There is more than one value of ASEVN for a given value\
+    \ of ASEV"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR284"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD2269 expect=noViolation domain=TS
+#note "All TDIGRP rows pair TSVALCD and TSVAL from the same dummy-SNOMED concept (25064002=Headache, 422587007=Nausea), in the preferred case that the flag-less rule compares verbatim (D-TA-3 default, Fix #266; since the C1 data repair the pairs decodes carry the levels' preferred form, so the same TSVAL satisfies the membership twin FDA-SD2257/FDA-SD2267 as well); blank-code and blank-term TDIGRP rows do not fire (completeness is another rule's concern) and the mismatched pair on the AGEMAX row is outside the TDIGRP condition."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | TDIGRP | Headache | 25064002
+S01 | TS | 2 | TDIGRP | Nausea   | 422587007
+S01 | TS | 3 | TDIGRP | Headache |
+S01 | TS | 4 | TDIGRP |          | 422587007
+S01 | TS | 5 | AGEMAX | Headache | 422587007

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0077 expect=noViolation domain=MH
+#note "MHCAT distinguishes records (three distinct values) -> has_same_values is false -> silent."
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHCAT type=Char label="Category for Medical History" format=$MHCAT.
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 | PRIMARY DIAGNOSIS
+CDISCPILOT01 | MH | 01-701-1015 | 2 | HISTORICAL DIAGNOSIS
+CDISCPILOT01 | MH | 01-701-1023 | 1 | SIGNIFICANT PRE-EXISTING CONDITION
+---

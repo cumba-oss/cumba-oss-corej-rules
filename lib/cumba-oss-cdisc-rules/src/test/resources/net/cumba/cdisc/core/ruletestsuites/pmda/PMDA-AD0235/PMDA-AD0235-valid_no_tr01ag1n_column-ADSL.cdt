@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0235 expect=noViolation domain=ADSL
+#note "Load-bearing var_exists(\"TRxxAGyN\") pin: TR01AG1N, the operator's KEY, is absent. TRxxAGy seeds (xx=01, y=1) and TRxxAGyN is synthesised as the absent TR01AG1N, so the guard is false and the rule is executed and silent despite data that would fire under the EC-44 whole-table regroup. Requirements.Variables.All: [TRxxAGy] is satisfied, so it does NOT skip -- contrast the mirror PMDA-AD0236-skipped_no_tr01ag1n_column-ADSL.cdt on the identical fixture."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01AG1 type=Char
+---
+S1 | 001 | POOLA
+S1 | 002 | POOLA
+S1 | 003 | POOLAA

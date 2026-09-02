@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0422 expect=noViolation domain=SJ
+#library standard=sendig-dart version=1-2
+#note "Two stages that END EXACTLY when the next starts (rows 1->2) and one that ends the day IMMEDIATELY BEFORE (rows 2->3). Row 2 is the whole point of sheet issue #129 / EC-87: it FIRES on the equality-only reading and must be silent under relation <=. Row 1 is the control - it was silent before and must stay silent, so a relation that narrowed instead of widened would be caught."
+dataset SJ label="Subject Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+STUDY01 | SJ | R-001 | 1 | 2020-01-01 | 2020-01-15
+STUDY01 | SJ | R-001 | 2 | 2020-01-15 | 2020-01-19
+STUDY01 | SJ | R-001 | 3 | 2020-01-20 | 2020-02-01
+---

@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0144"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Result or Finding in Original Units (--ORRES) is\
+  \ empty and Completion Status (--STAT) is also empty; --STAT must be populated when\
+  \ --ORRES is not populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+  Domains:
+    Exclude:
+    - "SC"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+    - "--ORRES"
+Check:
+  expression: >-
+    empty(--ORRES) and empty(--STAT)
+Outcome:
+  Message: "--STAT is empty when --ORRES is empty; --STAT must be populated when --ORRES\
+    \ is not populated."
+  Output_Variables:
+  - "--ORRES"
+  - "--STAT"
+Source:
+  Class: "FND"
+  Domain: "NOT (SC)"
+  Variable: "--STAT"
+  Plain_Text_Explanation: "If --ORRES is not populated, --STAT must be populated"
+  Condition: "--ORRES = null"
+  Rule: "--STAT  ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND144"
+        Version: "1"
+      Version: "5.0"

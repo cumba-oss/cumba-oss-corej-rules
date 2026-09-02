@@ -1,0 +1,42 @@
+name: CDISC-AD0755
+kind: rule
+description: |
+  Wave B5 port — T1b PlainIntermediate.
+  CDISC-AD0755: more than one value of TRTSEQAN for a given value of TRTSEQA.
+  Bare-leaf Check scoped to SUBJECT LEVEL ANALYSIS DATASET. Uses
+  has_multiple_values_for — Python gap (operator + bare-leaf), so this
+  spec baselines on the Python lane; expected matches Java's output.
+python_source: rules-adamig-1-3.json (CDISC-AD0755)
+rule:
+  coreId: CDISC-AD0755
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      # TRTSEQA='A' has two distinct TRTSEQAN values (1, 2) -> both rows fire
+      - {STUDYID: S1, USUBJID: '001', TRTSEQA: 'A', TRTSEQAN: '1'}
+      - {STUDYID: S1, USUBJID: '002', TRTSEQA: 'A', TRTSEQAN: '2'}
+      # TRTSEQA='B' has only one distinct TRTSEQAN -> ok
+      - {STUDYID: S1, USUBJID: '003', TRTSEQA: 'B', TRTSEQAN: '3'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0755
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      TRTSEQA: 'A'
+      TRTSEQAN: '1'
+  - rule_id: CDISC-AD0755
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      TRTSEQA: 'A'
+      TRTSEQAN: '2'
+expected_errors: []

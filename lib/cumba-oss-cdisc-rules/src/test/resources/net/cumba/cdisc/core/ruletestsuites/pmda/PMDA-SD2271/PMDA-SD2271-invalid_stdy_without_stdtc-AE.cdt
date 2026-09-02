@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2271 expect=violation domain=AE
+#note "var_exists(\"--STDY\") and not var_exists(\"--STDTC\") -> broadcast fires ONCE at row=1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESTDY=8
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AESTDY   type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | 8
+---

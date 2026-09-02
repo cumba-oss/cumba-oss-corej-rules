@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0311 expect=violation domain=CO
+#note "Rows 1 and 2 share the key tuple (COSEQ, USUBJID) = (1, 001) and GroupSemantics.uniqueSetViolations flags the first-seen row AND the repeat, so the count is 2. Rows 3 and 4 are unique tuples. Rows 5 and 6 are the DISCRIMINATOR: under FOLD_BLANK_KEYS a blank USUBJID is a real key component so they ARE a duplicate tuple and the operator flags them, but the leading `not empty(USUBJID)` conjunct -- the sheet's own Condition cell 'USUBJID ^= null' -- masks them out of the violation set. Count 2, not 4, is the assertion. M3-D20 added Output_Variables [USUBJID, COSEQ] (the rule previously declared none at all, one of only six rules in the family that omitted the field); no pin depends on it, since #expectViolationAt falls back to the primary table's column at the fired row."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001 COSEQ=1
+#expectViolationAt row=2 USUBJID=001 COSEQ=1
+dataset CO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | 001 | 1 | First
+S1 | CO | 001 | 1 | Duplicate
+S1 | CO | 001 | 2 | Second
+S1 | CO | 002 | 1 | Other subject
+S1 | CO |     | 9 | Unattributed
+S1 | CO |     | 9 | Unattributed again
+---

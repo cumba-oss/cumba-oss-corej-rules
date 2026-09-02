@@ -1,0 +1,96 @@
+name: FDA-SD9999-define-only-leak
+kind: rule
+description: |
+  REGRESSION GUARD for **Fix #132** (EC-41/H5) on `FDA-SD9999` — the rule EC-33 re-typed to
+  `Dataset Metadata Check against Define XML` and thereby routed onto the fork's
+  `DatasetMetadataDefineDatasetBuilder`. This is the spec that verifies EC-33's shipped re-type
+  on the fork lane, which is what `PLAN-parity-open-engine-changes` §31 left open — and that
+  verification now reads GREEN rather than "re-type shipped, builder leaks".
+
+  **Status: GREEN on both lanes since Fix #132.** Written under
+  PLAN-parity-define-dataset-channel P3b as a *measurement* of a live fork defect (Java 0 vs
+  Python 1, baselined `lane: python`), it was converted to a guard in P4 when the fix landed:
+  the fork now agrees at 0 and the `parity-diff-baseline.json` entry was retired. A `1` on the
+  Python lane from here on means Fix #132 has been reverted or regressed.
+
+  Fixture: same as `FDA-SD9999` (three submitted datasets XX/YY/WW plus one Define-only key ZZ,
+  same rows, same non-SDTM dataset names — which is what makes both lanes derive
+  `domain_is_custom=true`, with no `library_mocks` block on either spec); the changes are which
+  key declares a class
+  outside {EVENTS, FINDINGS, INTERVENTIONS}. Here all three SUBMITTED datasets declare a valid
+  general-observation class and only the Define-only ZZ — a dataset the study never shipped —
+  declares `TRIAL DESIGN`.
+
+  What it catches, and by what mechanism:
+
+  * Java: 0 violations, EXECUTED. `RuleRunner.injectDatasetLevel` injects the Define attributes
+    of the dataset under evaluation only, so ZZ's class cannot reach XX's Check. Canonical.
+  * Python, BEFORE Fix #132: 1 violation, EXECUTED, attributed to XX and carrying
+    `define_dataset_class: TRIAL DESIGN` — ZZ's class. `build()` outer-merged the whole study
+    frame (`_get_dataset_dataframe` iterates `data_service.get_datasets()`) with the whole
+    Define frame, synthesising the Define-only row into every dataset's frame;
+    `validate_single_rule` then loops per dataset and emitted THREE findings, one attributed to
+    each of XX, YY and WW, all carrying ZZ's class. The spec channel keeps only the primary
+    domain's bucket and therefore saw 1 of those 3.
+  * Python, AFTER Fix #132: 0 violations, EXECUTED. `build()` narrows the study side to the
+    dataset under evaluation and merges the Define frame onto it with `how="left"`, so an
+    undeclared-in-study Define row can no longer enter any dataset's frame.
+
+  Worth recording explicitly, because it is why a `$domain_is_custom` gate is no defence: the
+  Operation is a scalar computed for the dataset under evaluation and broadcast across the
+  merged frame, so a leaked row inherited the EVALUATED dataset's custom flag rather than its
+  own. A study whose custom dataset is clean and whose Define declares a stray non-standard
+  dataset still got the finding filed against the clean one. Any future frame-widening change
+  will reproduce that, gate or no gate.
+
+  Read together with `FDA-SD9999`, and necessarily so now that both lanes report 0: an
+  expectation of `[]` on both lanes proves nothing alone. That sibling pins the identical
+  fixture to a non-zero count when the primary itself declares the bad class, which is what
+  makes this spec's 0 a genuine "the rule ran and found nothing".
+  ⚠ **That anchor is JAVA-LANE-ONLY.** `FDA-SD9999` carries a `lane: python`,
+  `channels: ["violations"]` baseline entry for its EC-37 `$domain_is_custom` delta, which
+  suppresses the whole violations channel on the Python lane — so the anchor cannot vouch for a
+  Python-side 0 here. What backs the Python half instead is the mutation evidence: reverting
+  Fix #132's `build()` half turns this spec red on the Python lane (measured, four ways). The status channel cannot
+  supply it: the define skip gate keys on the provider merely being non-null and `putIfNonNull`
+  then drops the operand silently, so killing the Java Define channel yields EXECUTED with zero
+  findings, not SKIPPED.
+
+  Note the anchor `FDA-SD9999` retains its OWN baseline entry, under EC-37 / Fix #127
+  (`$domain_is_custom` in the Java-derived effective `Output_Variables`, absent from the fork's
+  verbatim authored list). That is a different cause with a different fix_ref, it was
+  unaffected by Fix #132, and it must not be confused for a residue of EC-41.
+
+  No `parity-diff-baseline.json` entry for THIS spec: both lanes agree on both channels, so
+  both are asserted normally. Do not re-add one.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD9999)
+rule:
+  coreId: FDA-SD9999
+datasets:
+  XX:
+    row_key: [STUDYID, USUBJID, XXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: XX, USUBJID: '001', XXSEQ: 1, XXTERM: FOO}
+  YY:
+    row_key: [STUDYID, USUBJID, YYSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: YY, USUBJID: '001', YYSEQ: 1, YYTERM: BAR}
+  WW:
+    row_key: [STUDYID, USUBJID, WWSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: WW, USUBJID: '001', WWSEQ: 1, WWTERM: BAZ}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  XX:
+    define_dataset_class: EVENTS
+  YY:
+    define_dataset_class: FINDINGS
+  WW:
+    define_dataset_class: INTERVENTIONS
+  ZZ:
+    define_dataset_class: TRIAL DESIGN
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

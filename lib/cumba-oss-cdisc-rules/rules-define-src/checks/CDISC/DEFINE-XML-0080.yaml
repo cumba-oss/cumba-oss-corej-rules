@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0080"
+Sheet_Rule_Identifier: "80"
+Rule_Set: "CDISC"
+Element: "WhereClauseRef"
+Attribute: "WhereClauseOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "Attribute WhereClauseOID must be provided for the def:WhereClauseRef element."
+# The sheet's "in ItemGroupDef[@Name]/ItemRef[@ItemOID]" location placeholders are
+# carried by the finding's xpath instead (the message template only supports
+# ${value}) — and def:WhereClauseRef actually lives under def:ValueListDef/ItemRef
+# per the sheet's own XPaths column.
+Message: "Attribute WhereClauseOID is missing for element def:WhereClauseRef."
+Check:
+  kind: "exists"
+  target: "@WhereClauseOID"

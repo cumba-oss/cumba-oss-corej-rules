@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1008 expect=noViolation domain=CO
+#note "Row 1 is a child-record comment (IDVAR/IDVARVAL populated) and correctly leaves CODTC empty; row 2 is a standalone comment (no parent record) and may carry CODTC."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | AE | 01-701-1015 | 1 | AESEQ | 3 | Related to AE 3 |
+CDISCPILOT01 | CO |    | 01-701-1015 | 2 |       |   | General comment | 2020-01-15

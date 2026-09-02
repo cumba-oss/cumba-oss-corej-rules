@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SE2272 expect=noViolation domain=TS
+#note "Boundary: NO TSPARMCD=SDESIGN record at all. The FDA message is 'Multiple SDESIGN records', so only a count greater than one is a violation; absence is the concern of the separate presence rule and must not fire here."
+#library standard=sendig version=3-1-1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | SSTYP | Study Type | REPEAT DOSE
+S01 | TS | 2 | STCAT | Study Category | TOXICOLOGY

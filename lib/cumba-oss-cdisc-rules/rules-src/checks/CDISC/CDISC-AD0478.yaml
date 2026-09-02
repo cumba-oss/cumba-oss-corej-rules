@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-AD0478"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STRATwV is populated and STRATwVN is missing on\
+  \ the same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(STRATwV) and empty(STRATwVN)
+Outcome:
+  Message: "STRATwV is populated but STRATwVN is missing."
+  Output_Variables:
+  - "STRATwV"
+  - "STRATwVN"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "STRATwVN where w is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, STRATwV is populated\
+    \ and STRATwVN is not populated"
+  Rule_Failure_Criteria: "STRATwVN is not populated"
+  Condition_Failure: "STRATwV is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR478"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR478"
+        Version: "1"
+      Version: "5.0"

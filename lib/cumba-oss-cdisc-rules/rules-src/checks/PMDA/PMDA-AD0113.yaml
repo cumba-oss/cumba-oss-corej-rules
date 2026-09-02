@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0113"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Anchor Time Unit (ARELTMU) variable is present\
+  \ in the dataset but its paired value variable, Time from Anchoring Event (ARELTM),\
+  \ is not present."
+Executability: "Partially Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ARELTMU") and not var_exists("ARELTM")
+Outcome:
+  Message: "ARELTMU is present, but ARELTM is not present"
+  Output_Variables:
+  - "ARELTMU"
+Source:
+  Message: "ARELTMU is present, but ARELTM is not present"
+  Description: "When ARELTM is present, the anchor time variable and ARELTMU must\
+    \ also be included in the dataset, and the anchor time variable must be identified\
+    \ in the metadata for ARELTM."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0113"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0113"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0113"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0113"
+        Version: "1"
+      Version: "6.0"

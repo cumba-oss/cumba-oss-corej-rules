@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2217 expect=noViolation domain=TS
+#note "TS carries a TSPARMCD=OBJPRIM record, so the Trial Primary Objective parameter is present -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE   | Trial Title | A Phase 3 Study of Drug X in Subjects With Condition Y
+S01 | TS | 2 | OBJPRIM | Trial Primary Objective | To evaluate the efficacy of Drug X versus placebo
+S01 | TS | 3 | TPHASE  | Trial Phase Classification | PHASE III TRIAL

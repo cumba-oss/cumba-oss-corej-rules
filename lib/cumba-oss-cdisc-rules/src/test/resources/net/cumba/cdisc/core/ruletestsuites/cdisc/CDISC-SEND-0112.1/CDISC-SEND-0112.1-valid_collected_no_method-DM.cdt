@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0112.1 expect=noViolation domain=DM
+#note "PROPOSED-RULE scenario (ruling 8). As invalid, but AGE declared with def:Origin Type=Collected and no MethodOID: the sheet's Condition is 'AGE ^= null AND AGE def:Origin/@Type = Derived' - a collected AGE needs no algorithm. Proposed rule silent. CURRENT rule fires on any declared AGE/AGEU without a method regardless of Origin -> predicted-red: engine reports exactly 1 violation (variable_name=AGE) where this scenario expects noViolation."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0112.1-collected-define.xml
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col AGEU    type=Char
+---
+S1 | S1-001 | 56 | WEEKS

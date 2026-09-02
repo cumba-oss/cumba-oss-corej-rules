@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0282 expect=noViolation domain=TS
+#note "The TSPARMCD='ADAPT' record carries the allowed value 'Y'; the other parameters are out of scope for this rule -> no violation."
+#library standard=sdtmig version=3-3
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | ADAPT | Adaptive Design | Y
+S1 | TS | 2 | TITLE | Trial Title | A Study Of Drug X

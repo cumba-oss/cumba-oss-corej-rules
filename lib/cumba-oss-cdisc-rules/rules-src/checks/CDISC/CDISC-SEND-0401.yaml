@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-SEND-0401"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a reproductive phase (RPHASE), the collection\
+  \ date (--DTC) is a complete date and the reproductive-phase day (--RPDY) is populated\
+  \ but does not equal the date portion of --DTC minus the date portion of the earliest\
+  \ phase start date (earliest SJSTDTC within the subject's RPHASE) plus the first-phase-day\
+  \ reference (RPRFDY)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "FINDINGS"
+    - "EVENTS"
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DTC"
+    - "--RPDY"
+    - "SJ.SJSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  - "RPHASE"
+  Name: "SJ"
+Operations:
+- id: "$rpref_day"
+  expression: "date_diff_days(--DTC, domain=\"SJ\", reference=\"SJSTDTC\", offset=\"\
+    RPRFDY\", group=[USUBJID, RPHASE])"
+Check:
+  expression: >-
+    is_complete_date(--DTC) and not empty(--RPDY) and --RPDY != $rpref_day
+Outcome:
+  Message: "--RPDY does not equal the reproductive-phase day derived from --DTC, the\
+    \ earliest SJSTDTC within the RPHASE, and RPRFDY."
+  Output_Variables:
+  - "$rpref_day"
+  - "--DTC"
+  - "--RPDY"
+Source:
+  Class: "SPC, FND, EVT, INT"
+  Domain: "All"
+  Variable: "--RPDY"
+  Plain_Text_Explanation: "Within a repro phase, if --DTC is populated and the first\
+    \ SJSTDTC within the repro phase in SJ is populated then --RPDY should be populated\
+    \ using the actual repro phase day algorithm."
+  Condition: "Date portion exists for --DTC and SJSTDTC within the RPHASE and --RPDY\
+    \ is present"
+  Rule: "--RPDY=(date portion of --DTC) - (date portion of earliest SJSTDTC) + RPRFDY"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND401"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND401"
+        Version: "1"
+      Version: "5.0"

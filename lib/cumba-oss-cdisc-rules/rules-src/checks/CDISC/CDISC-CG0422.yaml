@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0422"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STAT is populated and --ORRES is also populated,\
+  \ since --STAT (used to indicate the measurement was not done) must be empty when\
+  \ a result exists in --ORRES."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+Check:
+  expression: >-
+    not empty(--ORRES) and not empty(--STAT)
+Outcome:
+  Message: "--STAT is populated when --ORRES is populated."
+  Output_Variables:
+  - "--ORRES"
+  - "--STAT"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STAT"
+  Condition: "--ORRES ^= null"
+  Rule: "--STAT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0422"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0422"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0422"
+        Version: "1"
+      Version: "2.0"

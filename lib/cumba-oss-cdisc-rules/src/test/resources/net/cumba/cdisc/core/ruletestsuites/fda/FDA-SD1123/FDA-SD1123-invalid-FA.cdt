@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1123 expect=violation domain=FA
+#note "The FINDINGS ABOUT arm of the class scope: FASTAT='NOT DONE' with FAORRES populated -> fires on row 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FAORRES=Y
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAORRES  type=Char label="Result or Finding in Original Units"
+col FASTAT   type=Char label="Completion Status"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | OCCUR | Y | NOT DONE
+CDISCPILOT01 | FA | 01-701-1015 | 2 | OCCUR |   | NOT DONE

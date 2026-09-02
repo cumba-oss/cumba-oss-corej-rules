@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-CG0124"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of Actual Arm Code (ACTARMCD) is not 'SCRNFAIL',\
+  \ 'NOTASSGN', 'NOTTRT', or 'UNPLAN' and does not match an ARMCD value in the Trial\
+  \ Arms (TA) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Operations:
+- id: "$ta_armcd"
+  expression: "distinct(ARMCD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in $ta_armcd and ACTARMCD != "SCRNFAIL" and ACTARMCD !=
+    "NOTASSGN" and ACTARMCD != "NOTTRT" and ACTARMCD != "UNPLAN"
+Outcome:
+  Message: "ACTARMCD (other than 'SCRNFAIL', 'NOTASSGN', 'NOTTRT', or 'UNPLAN') does\
+    \ not match an ARMCD value in the Trial Arms (TA) dataset."
+  Output_Variables:
+  - "ACTARMCD"
+  - "$ta_armcd"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARMCD"
+  Condition: "ACTARMCD not in TA.ARMCD"
+  Rule: "ACTARMCD in ('SCRNFAIL', 'NOTASSGN', 'NOTTRT', 'UNPLAN')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0124"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,68 @@
+Core:
+  Id: "CDISC-AD0168"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is present, BNRIND is populated, and BNRIND\
+  \ does not equal ANRIND where ABLFL equals Y for a given value of PARAMCD and BASETYPE"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BNRIND"
+    - "ANRIND"
+    - "ABLFL"
+Operations:
+- id: "$baseline_anrind"
+  expression: "max(ANRIND, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BNRIND) and BNRIND != $baseline_anrind
+Outcome:
+  Message: "BNRIND does not equal the ANRIND value recorded where ABLFL equals Y,\
+    \ for this PARAMCD and BASETYPE"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASETYPE"
+  - "BNRIND"
+  - "$baseline_anrind"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BNRIND"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is present, BNRIND is populated,\
+    \ and BNRIND is not equal to ANRIND where ABLFL is equal to Y for a given value\
+    \ of PARAMCD and BASETYPE"
+  Rule_Failure_Criteria: "BNRIND is not equal to ANRIND where ABLFL is equal to Y\
+    \ for a given value of PARAMCD and BASETYPE"
+  Condition_Failure: "BASETYPE is present and BNRIND is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR168"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR168"
+        Version: "1"
+      Version: "5.0"

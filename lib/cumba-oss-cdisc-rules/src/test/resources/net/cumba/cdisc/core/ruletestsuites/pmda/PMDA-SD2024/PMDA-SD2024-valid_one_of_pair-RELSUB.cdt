@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2024 expect=noViolation domain=RELSUB
+#note "Both identifier columns are DECLARED on every row - the exclusivity is expressed by leaving one of them empty, which is exactly the state the rule is meant to accept. Present-but-empty case, the CORE-000229 / CORE-000230 fixtures pin the same shape."
+#library standard=sdtmig version=3-4
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char
+col USUBJID type=Char
+col POOLID  type=Char
+col RSUBJID type=Char
+col SREL    type=Char
+---
+S1 | 001 | | 002 | MOTHER
+S1 | | P01 | 003 | LITTERMATE

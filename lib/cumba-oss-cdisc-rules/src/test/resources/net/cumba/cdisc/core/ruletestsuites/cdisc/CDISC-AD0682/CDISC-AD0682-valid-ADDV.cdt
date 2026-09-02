@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0682 expect=noViolation domain=ADDV
+# Rule:Description: There is more than one value of MODELGyN for a given value of MODELGy, considering only those rows on which both variables are populated
+#note "each MODELG1 value maps to a single MODELG1N value -> noViolation"
+dataset ADDV class="DEVICE LEVEL ANALYSIS DATASET"
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col MODELG1N type=Char
+col MODELG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | A1 | K1
+CDISCPILOT01 | 01-701-1023 | DEV01 | A2 | K2
+CDISCPILOT01 | 01-701-1028 | DEV01 | A1 | K1
+---

@@ -1,0 +1,77 @@
+name: EC51-SEND-0306-indeterminate-extreme
+kind: rule
+description: |
+  EC-51 Half B (register §49) / `Fix #145` — `missing_values: "indeterminate"` on the SEND side
+  of the wave-6 migration. Sibling of `EC51-CG0147-indeterminate-extreme`; this one is here
+  because it is a DIFFERENT standard (`sendig` 3.1.1, not `sdtmig`) and carries two gates the
+  SDTMIG twin does not: a `not empty(RFXENDTC)` guard ahead of the extreme, and a
+  `Requirements.Variables.All: ["RFXENDTC"]` rule-selection gate that only coreJ reads
+  (`models/rule.py:52-65` in the fork reads Classes / Domains / Entities / Use_Case /
+  Data_Structures / Subclasses out of `Scope`, never `Variables` — §8).
+
+  WHAT DIVERGES, measured 2026-08-08 on fork `195c7172`. Subject `002` has two EX records; one
+  carries `EXENDTC: ''`.
+
+    - coreJ resolves
+      `max_date(EXENDTC, domain="EX", group=[USUBJID], missing_values="indeterminate")` to NO
+      VALUE for `002` (a missing candidate makes the group undeterminable), and `not_equal_to`
+      is negative polarity, so the leaf FIRES. One violation on `002`.
+    - The fork's `OperationParams` whitelist (`utilities/rule_processor.py`) has no
+      `missing_values` arm, so the key is dropped silently and `max_date` runs `skip`: the blank
+      row is removed by `_drop_blank_candidates` (EC-51 Half A / `Fix #141`), the group survives
+      on its populated row, and the extreme resolves to `2026-02-05`. `RFXENDTC` equals it and
+      the fork reports NOTHING.
+
+  ⚠ Detection divergence, not a reporting one — the fork produces no violation, so there are no
+  decorating columns to disagree about. Baselined `lane: python`, `channels: ["violations"]`.
+  Fork repair is not scheduled under the Java-first direction of 2026-08-03.
+
+  ⚠ The `Requirements.Variables` gate is inert HERE by construction: `RFXENDTC` is present on DM in
+  this fixture, so coreJ does not skip and both lanes execute. It is named only so a future
+  reader does not mistake a Java skip for the disposition.
+
+  Subject `001` is the control: no blank `EXENDTC`, `RFXENDTC` equal to the resolved extreme,
+  nothing reported on either lane.
+
+  NEUTER-AND-WATCH, 2026-08-08. Deleting the `EXENDTC: ''` row makes the JAVA lane report
+  nothing (`- missing` on this spec's expectation), so the Java expectation is pinned on the
+  blank cell reaching the disposition and not on the rule firing generally. Rewriting subject
+  `002`'s `RFXENDTC` from `2026-02-05` to `2026-09-09` makes the PYTHON lane report the same row
+  with `$latest_exendtc: '2026-02-05'` / `$latest_exstdtc: '2026-02-03'` — so the spec is not
+  vacuous on the fork either: it observes the fork resolving the extreme the disposition was
+  supposed to suppress.
+rule:
+  coreId: CDISC-SEND-0306
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXENDTC: '2026-02-05'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-02-01', EXENDTC: '2026-02-05'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2026-02-03', EXENDTC: ''}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: CDISC-SEND-0306
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_subjects: '[001, 002]'
+      $latest_exendtc:
+      $latest_exstdtc: '2026-02-03'
+      RFXENDTC: '2026-02-05'
+expected_errors: []

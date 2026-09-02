@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0157 expect=noViolation domain=ADLBC
+#note "CRIT1/CRIT1FL pair complete, so disjunct 1 false and CRIT2..CRIT9 all absent. Rule executes and stays silent. CRIT1FL values are irrelevant to this rule (populated only for realism)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CRIT1   type=Char
+col CRIT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | AVALGT30 | Y
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | AVALGT30 | N

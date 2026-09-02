@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0277 expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL', but TSVAL is empty for the record where TSPARMCD equals 'INTMODEL'.
+#note "Cross-half exclusivity: INTMODEL has no record at all. That is CDISC-CG0277-A's case, not this rule's -- the record half must stay silent so the split neither duplicates nor hides a finding."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | INTERVENTIONAL
+S01 | TS | 2 | TITLE | A Study of Drug X
+---

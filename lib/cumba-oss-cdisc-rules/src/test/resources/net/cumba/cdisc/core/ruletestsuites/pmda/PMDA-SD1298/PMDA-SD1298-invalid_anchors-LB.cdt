@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1298 expect=violation domain=LB
+#note "FRESH. Five rows pin that the pattern is fully anchored and digit-only. Row 1 (10) is multi-digit, SILENT. Row 2 (0) is SILENT. Row 3 (2A) has a trailing letter, FIRES ($ anchor). Row 4 is a QUOTED field with one leading space, FIRES (^ anchor) - it MUST be written QUOTED: CdtParser strips an unquoted field on both sides, so an unquoted value would arrive stripped and the row would go SILENT. Row 5 (2.0) has a decimal point, FIRES. No twin carries any of these five."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=3 LBSEQ=3
+#expectViolationAt row=4 LBSEQ=4
+#expectViolationAt row=5 LBSEQ=5
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOXGR  type=Char label="Standard Toxicity Grade"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB   | 10
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC  | 0
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | 2A
+CDISCPILOT01 | LB | 01-701-1015 | 4 | ALT   | " 2"
+CDISCPILOT01 | LB | 01-701-1015 | 5 | AST   | 2.0

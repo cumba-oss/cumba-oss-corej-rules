@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG0602"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Findings About record has an Interventions parent\
+  \ record whose --DECOD is empty and FAOBJ does not equal the parent record's --TRT\
+  \ value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FA"
+Match_Datasets:
+- Name: "RELREC"
+Check:
+  expression: >-
+    not empty(RELREC.**TRT) and empty(RELREC.**DECOD) and FAOBJ != RELREC.**TRT
+Outcome:
+  Message: "The Findings About record has an Interventions parent record with an empty\
+    \ --DECOD, but FAOBJ does not equal the parent record's --TRT value."
+  Output_Variables:
+  - "FAOBJ"
+  - "RELREC.**TRT"
+  - "RELREC.**DECOD"
+Source:
+  Class: "FND"
+  Domain: "FA"
+  Variable: "--OBJ"
+  Condition: "Interventions parent record exists and DECOD = null"
+  Rule: "--OBJ = --TRT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0602"
+        Version: "1"
+      Version: "2.0"

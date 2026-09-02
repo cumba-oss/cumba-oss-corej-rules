@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD0071 expect=noViolation domain=DM
+#note "Row 1 ARMCD/ARM matches a TA entry; rows 2/3 are the SCRNFAIL/NOTASSGN exceptions (not in TA, must not fire); row 4 has ARMCD empty (non_empty guard skips)."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A1       | Placebo
+CDISCPILOT01 | DM | 01-701-1016 | SCRNFAIL | Screen Failure
+CDISCPILOT01 | DM | 01-701-1017 | NOTASSGN | Not Assigned
+CDISCPILOT01 | DM | 01-701-1018 |          |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | A1 | Placebo   | 1 | SCRN | Screening
+CDISCPILOT01 | TA | A2 | Drug 10mg | 1 | SCRN | Screening

@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0200"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a subject, a unique RELID is not present\
+  \ on multiple RELREC records."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELREC"
+Check:
+  expression: >-
+    not present_on_multiple_rows_within(RELID, within=USUBJID)
+Outcome:
+  Message: "RELID is not present on multiple RELREC records within a subject."
+  Output_Variables:
+  - "RELID"
+Source:
+  Class: "SPC"
+  Domain: "RELREC"
+  Variable: "RELID"
+  Rule: "Within a subject each unique RELID is present on multiple RELREC records"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0200"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0200"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0200"
+        Version: "1"
+      Version: "2.0"

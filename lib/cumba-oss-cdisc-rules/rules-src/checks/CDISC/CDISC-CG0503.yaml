@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-CG0503"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the MIDSDTC variable is present and the MIDS variable\
+  \ is not present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("MIDSDTC") and not var_exists("MIDS")
+Outcome:
+  Message: "MIDSDTC variable is present when MIDS variable is not present."
+  Output_Variables:
+  - "MIDSDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "MIDSDTC"
+  Condition: "MIDSDTC present in dataset"
+  Rule: "MIDS present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0503"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0503"
+        Version: "1"
+      Version: "2.0"

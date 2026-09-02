@@ -1,0 +1,91 @@
+Core:
+  Id: "PMDA-SD1032"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject in the Demographics (DM) dataset whose\
+  \ Planned Arm Code (ARMCD) equals 'SCRNFAIL' has no record in the Inclusion/Exclusion\
+  \ Criteria Not Met (IE) dataset."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ie_record_count"
+  expression: "record_count(domain=\"IE\", group=[USUBJID])"
+Check:
+  expression: >-
+    ARMCD == "SCRNFAIL" and $ie_record_count < 1
+Outcome:
+  Message: "No Inclusion/Exclusion Criteria Not Met (IE) record is present for the\
+    \ screen-failure (ARMCD equals 'SCRNFAIL') subject."
+  Output_Variables:
+  - "ARMCD"
+  - "$ie_record_count"
+Source:
+  Message: "No records for 'SCRNFAIL' subject are found in IE domain"
+  Description: "All subjects with Planned Arm Code (ARMCD) equals 'SCRNFAIL' should\
+    \ have records in the Inclusion/Exclusion Criteria Not Met (IE) domain."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1032"
+        Version: "1"
+      Version: "1.6"

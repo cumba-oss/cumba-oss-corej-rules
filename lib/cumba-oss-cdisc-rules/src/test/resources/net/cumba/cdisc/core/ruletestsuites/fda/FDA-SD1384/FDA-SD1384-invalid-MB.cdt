@@ -1,0 +1,32 @@
+#!RuleTest
+#test FDA-SD1384 expect=violation domain=MB
+#note "row1 MBCHDY=25 is the value a wrong reference (RFSTDTC) would give, expected 6 vs RFCSTDTC; row2 MBCHDY=0 on the reference day, expected 1 (no day 0); row3 off-by-one on the precedes branch, expected -2."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 3
+#expectViolationAt row=1 USUBJID=001 MBCHDY=25
+#expectViolationAt row=2 USUBJID=001 MBCHDY=0
+#expectViolationAt row=3 USUBJID=001 MBCHDY=-1
+dataset MB class=FINDINGS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MBSEQ   type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test Code"
+col MBDTC type=Char label="Date/Time of Collection"
+col MBCHDY  type=Num  label="Day of Obs Rel to Challenge Agent"
+---
+S1 | MB | 001 | 1 | BACT | 2023-06-25 | 25
+S1 | MB | 001 | 2 | BACT | 2023-06-20 | 0
+S1 | MB | 001 | 3 | BACT | 2023-06-18 | -1
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2023-06-01 | 2023-06-10 | 2023-06-20
+S1 | DM | 002 | 2023-06-01 | 2023-06-10 | 2023-06   

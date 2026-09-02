@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0014-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose Core designation in the SDTMIG\
+  \ is Required is not populated in any record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$required_variables"
+  expression: "required_variables()"
+Check:
+  expression: >-
+    varname() in $required_variables and empty(value())
+Outcome:
+  Message: "A Required variable is not populated."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Variable Core Status = Required"
+  Rule: "a variable whose Core designation in the SDTMIG is Required is not populated\
+    \ in any record"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Variable Core Status = Required"
+  Rule: "Variable present in dataset and ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0014"
+        Version: "1"
+      Version: "2.0"

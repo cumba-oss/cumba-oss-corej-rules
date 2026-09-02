@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0526 expect=violation domain=ADLBC
+# Rule:Description: ANLzzFN is present and ANLzzFL is not present
+#note "ANL01FN present, ANL01FL not present -> violation"
+#expectViolationCount 1
+#expectViolationAt ANL01FN=1
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANL01FN type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1
+---

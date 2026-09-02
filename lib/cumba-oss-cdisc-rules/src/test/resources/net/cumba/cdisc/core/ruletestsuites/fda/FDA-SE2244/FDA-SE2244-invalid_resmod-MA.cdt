@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE2244 expect=violation domain=MA
+#note "Supplemental-qualifier any-branch: no MASEV is populated, but SUPPMA carries a QNAM='MARESMOD' record for MASEQ=1, so row 1's verbatim MASTRESC=MAORRES copy still holds the modifiers -> fires. Row 2 (MASEQ=2) has no SUPPMA record and parses the base finding out -> clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MASTRESC="DARK LIVER"
+dataset MA label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Char label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Finding Short Name"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+col MASTRESC type=Char label="Standardized Result in Character Format"
+col MASEV    type=Char label="Severity"
+---
+S1 | MA | 001 | 1 | GROSSPATH | DARK LIVER | DARK LIVER |
+S1 | MA | 001 | 2 | GROSSPATH | DARK LIVER | LIVER      |
+---
+
+dataset SUPPMA label="Supplemental Qualifiers for MA"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | MA | 001 | MASEQ | 1 | MARESMOD | Result Modifiers | dark

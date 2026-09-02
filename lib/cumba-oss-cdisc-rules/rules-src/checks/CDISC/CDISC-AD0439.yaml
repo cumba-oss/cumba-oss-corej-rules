@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0439"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when BASECATy is populated but BASECAyN is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BASECATy"
+    - "BASECAyN"
+Check:
+  expression: >-
+    not empty(BASECATy) and empty(BASECAyN)
+Outcome:
+  Message: "BASECATy is populated, but BASECAyN is missing"
+  Output_Variables:
+  - "BASECATy"
+  - "BASECAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASECAyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, BASECATy is populated\
+    \ and BASECAyN is not populated"
+  Rule_Failure_Criteria: "BASECAyN is not populated"
+  Condition_Failure: "BASECATy is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR439"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR439"
+        Version: "2"
+      Version: "5.0"

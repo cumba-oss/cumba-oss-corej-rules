@@ -1,0 +1,96 @@
+Core:
+  Id: "FDA-SE2316"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Sets (TX) domain contains no record where\
+  \ TXPARMCD equals 'TCNTRL' (Control Type)."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Operations:
+- id: "$tcntrl_count"
+  expression: "record_count(filter=filter(TXPARMCD=\"TCNTRL\"))"
+Check:
+  expression: >-
+    $tcntrl_count == 0
+Outcome:
+  Message: "No Trial Set with a 'Control Type' (TCNTRL) record is present in the Trial\
+    \ Sets (TX) domain."
+  Output_Variables:
+  - "$tcntrl_count"
+Source:
+  FDA_Validator_Rule_Message: "No Trial Set with TCNTRL Parameter"
+  FDA_Validator_Rule_Description: "'Control Type' (TCNTRL) record should be populated\
+    \ in Trial Sets (TX) domain.   (There must be a record with TXPARMCD = TCNTRL\
+    \ within a set if the study has a control)."
+  Domains: "TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2316"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2316"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2316"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2316"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2316"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.1"

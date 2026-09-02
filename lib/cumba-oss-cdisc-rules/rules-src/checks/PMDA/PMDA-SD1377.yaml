@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD1377"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject with ARMNRS equal to 'SCREEN FAILURE'\
+  \ has no record in the Inclusion/Exclusion Criteria Not Met (IE) dataset."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Operations:
+- id: "$ie_usubjid"
+  expression: "distinct(USUBJID, domain=\"IE\")"
+Check:
+  expression: >-
+    ARMNRS == "SCREEN FAILURE" and USUBJID not in $ie_usubjid
+Outcome:
+  Message: "No IE record found for the SCREEN FAILURE subject."
+  Output_Variables:
+  - "ARMNRS"
+  - "$ie_usubjid"
+Source:
+  Message: "No records for SCREEN FAILURE subject are found in IE domain"
+  Description: "All subjects with Reason Arm and/or Actual Arm is Null (ARMNRS) equal\
+    \ to 'SCREEN FAILURE' should have records in the Inclusion/Exclusion Criteria\
+    \ Not Met (IE) domain."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1377"
+        Version: "1"
+      Version: "1.6"

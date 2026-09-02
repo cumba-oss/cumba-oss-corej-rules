@@ -1,0 +1,49 @@
+Core:
+  Id: "PMDA-AD0005"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'FL' has a value other\
+  \ than Y, N or empty. Exceptions (allowed other values): *RFL, *PFL, ABLFL, ANLzzFL."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    ends_with(varname(), "FL") and varname() !~ /^(.*RFL|.*PFL|ABLFL|ANL(0[1-9]|[1-9][0-9])FL)$/ and
+    not empty(value()) and value() not in ["Y", "N"]
+Outcome:
+  Message: "A variable whose name ends in 'FL' has a value that is not Y, N or empty."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "*FL value is not Y, N or null"
+  Description: "A variable with a suffix of FL must have a value that is Y, N or null\
+    \ (Exception 1: RFL, PFL, ABLFL, ANLzzFL. Exception 2: Population flags COMPLFL,\
+    \ FASFL, ITTFL, PPROTFL, SAFFL, RANDFL, ENRLFL cannot be null and at least 1 must\
+    \ be included in ADSL)."
+  Domains: "ADSL, BDS, OCCDS, ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0005"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0005"
+        Version: "1"
+      Version: "6.0"

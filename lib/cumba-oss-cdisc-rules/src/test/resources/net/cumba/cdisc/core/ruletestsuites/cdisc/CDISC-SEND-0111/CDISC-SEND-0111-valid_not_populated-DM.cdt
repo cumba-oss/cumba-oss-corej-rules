@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-SEND-0111 expect=noViolation domain=DM
+#note "PROPOSED-RULE scenario (ruling 8). BRTHDTC column present but BLANK on every row (sheet: 'If BRTHDTC was not collected this variable should be left blank'; Condition 'BRTHDTC ^= null' -> no requirement when not populated); sidecar (reuse of the missing-origin sidecar) declares BRTHDTC with NO def:Origin. Proposed rule's populated gate keeps it silent. CURRENT rule has no populated gate -> predicted-red: engine reports exactly 1 violation (variable_name=BRTHDTC) where this scenario expects noViolation."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0111-define.xml
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col BRTHDTC type=Char
+---
+S1 | S1-001 |

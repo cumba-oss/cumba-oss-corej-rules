@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch D1 (variables core: ItemRef / ItemDef / ItemDef Description / def:Origin)
+     clean 2.1 fixture: every batch-D1 rule executes with zero findings.
+     Guard-selectivity decoys baked in:
+       - IT.AGE / IT.BMI: Origin Derived, ItemRefs carry MethodOID (73/74 pass)
+       - IT.USUBJID + IT.LBORRES.PH: Origin Collected/Investigator with a
+         def:DocumentRef matching the def:AnnotatedCRF leafID (159/159-B pass)
+       - IT.HND: ItemRef def:HasNoData="Yes" and ItemDef def:CommentOID resolves
+         (77/242/148 pass)
+       - IT.XVAR: def:IsNonStandard="Yes" (75 pass)
+       - IT.LBDTC: DataType datetime without Length (141/143 selectivity)
+       - IT.LBORRES: def:ValueListRef, no def:Origin (154/155 value-list branch);
+         value ItemDef Length 10 <= variable Length 20 (142 pass)
+       - VL.LBORRES ItemRef carries def:WhereClauseRef (79 scope selectivity)
+         and no OrderNumber (238 all-or-none per parent) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-d1-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHD1C">
+    <GlobalVariables>
+      <StudyName>BATCHD1C-STUDY</StudyName>
+      <StudyDescription>Batch D1 clean fixture study</StudyDescription>
+      <ProtocolName>BATCHD1C-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch D1 clean MDV" def:DefineVersion="2.1.0">
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No"
+                    SASDatasetName="DM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="2" Mandatory="Yes" KeySequence="2"/>
+        <ItemRef ItemOID="IT.AGE" OrderNumber="3" Mandatory="No" MethodOID="MT.AGE"/>
+        <ItemRef ItemOID="IT.BMI" OrderNumber="4" Mandatory="No" MethodOID="MT.BMI"/>
+        <ItemRef ItemOID="IT.HND" OrderNumber="5" Mandatory="No" def:HasNoData="Yes"/>
+        <ItemRef ItemOID="IT.XVAR" OrderNumber="6" Mandatory="No" def:IsNonStandard="Yes"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.LB" Name="LB" Domain="LB" Repeating="Yes"
+                    SASDatasetName="LB" Purpose="Tabulation"
+                    def:Structure="One record per lab test per subject"
+                    def:ArchiveLocationID="LF.LB">
+        <Description>
+          <TranslatedText xml:lang="en">Laboratory Test Results</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LBTESTCD" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.LBORRES" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="IT.LBDTC" OrderNumber="3" Mandatory="No"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.LB" xlink:href="lb.xpt">
+          <def:title>lb.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <def:ValueListDef OID="VL.LBORRES">
+        <ItemRef ItemOID="IT.LBORRES.PH" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.PH"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.PH"/>
+      <ItemDef OID="IT.STUDYID" Name="STUDYID" DataType="text" Length="12"
+               SASFieldName="STUDYID">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="30"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AGE" Name="AGE" DataType="integer" Length="3"
+               SASFieldName="AGE">
+        <Description>
+          <TranslatedText xml:lang="en">Age</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.BMI" Name="BMI" DataType="float" Length="6" SignificantDigits="2"
+               SASFieldName="BMI">
+        <Description>
+          <TranslatedText xml:lang="en">Body Mass Index</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.HND" Name="HNDVAR" DataType="text" Length="20"
+               SASFieldName="HNDVAR" def:CommentOID="COM.HND">
+        <Description>
+          <TranslatedText xml:lang="en">Planned variable without data</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.XVAR" Name="XVAR" DataType="text" Length="10"
+               SASFieldName="XVAR">
+        <Description>
+          <TranslatedText xml:lang="en">Non-standard variable</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LBTESTCD" Name="LBTESTCD" DataType="text" Length="8"
+               SASFieldName="LBTESTCD">
+        <Description>
+          <TranslatedText xml:lang="en">Lab Test Short Name</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned" Source="Sponsor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LBORRES" Name="LBORRES" DataType="text" Length="20"
+               SASFieldName="LBORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result in Original Units</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.LBORRES"/>
+      </ItemDef>
+      <ItemDef OID="IT.LBDTC" Name="LBDTC" DataType="datetime"
+               SASFieldName="LBDTC">
+        <Description>
+          <TranslatedText xml:lang="en">Date/Time of Specimen Collection</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Vendor"/>
+      </ItemDef>
+      <ItemDef OID="IT.LBORRES.PH" Name="LBORRES.PH" DataType="text" Length="10">
+        <Description>
+          <TranslatedText xml:lang="en">Result in Original Units for PH</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator">
+          <def:DocumentRef leafID="LF.ACRF"/>
+        </def:Origin>
+      </ItemDef>
+      <MethodDef OID="MT.AGE" Name="Algorithm to derive AGE" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">(RFSTDTC - BRTHDTC) in years, truncated</TranslatedText>
+        </Description>
+      </MethodDef>
+      <MethodDef OID="MT.BMI" Name="Algorithm to derive BMI" Type="Computation">
+        <Description>
+          <TranslatedText xml:lang="en">Weight divided by height squared</TranslatedText>
+        </Description>
+      </MethodDef>
+      <def:CommentDef OID="COM.HND">
+        <Description>
+          <TranslatedText xml:lang="en">No data were collected for this planned variable.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+      <def:leaf ID="LF.ACRF" xlink:href="blankcrf.pdf">
+        <def:title>Annotated Case Report Form</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

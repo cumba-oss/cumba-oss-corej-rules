@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0241 expect=violation domain=ADSL
+#note "The M2-Q1 observable: the rule's Scope.Domains.Include: [ALL] admits every dataset, so it runs and fires on a SUBJECT LEVEL ANALYSIS DATASET -- a structure the sheet's Domains column ('BDS, ADAMOTHER') does not name. If a future decision rules the ADAMOTHER encoding structure-scoped, this fixture becomes expect=skipped."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRTAG1=POOLA TRTAG1N=2
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTAG1  type=Char
+col TRTAG1N type=Num
+---
+S1 | 001 | POOLA | 1
+S1 | 002 | POOLA | 1
+S1 | 003 | POOLA | 2

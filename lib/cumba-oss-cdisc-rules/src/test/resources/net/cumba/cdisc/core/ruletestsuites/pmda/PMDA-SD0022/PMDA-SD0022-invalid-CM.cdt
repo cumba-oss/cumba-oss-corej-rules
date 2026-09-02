@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD0022 expect=violation domain=CM
+#note "Row 1 has no Start Time-Point variable populated (CMSTDTC/CMSTRF/CMSTRTPT all empty), CMOCCUR='Y' (not the 'N' exception) and CMSTAT empty -> fires. Row 2 is excepted by CMOCCUR='N'; row 3 by a populated CMSTAT; row 4 carries CMSTDTC; row 5 (CMOCCUR empty, i.e. not 'N') fires too."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMTRT=ASPIRIN
+#expectViolationAt row=5 CMTRT=IBUPROFEN
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR  type=Char label="CM Occurrence"
+col CMSTAT   type=Char label="Completion Status"
+col CMSTDTC  type=Char label="Start Date/Time of Medication"
+col CMSTRF   type=Char label="Start Relative to Reference Period"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+S1 | CM | 001 | 1 | ASPIRIN     | Y |          |            |        |
+S1 | CM | 001 | 2 | PARACETAMOL | N |          |            |        |
+S1 | CM | 001 | 3 | VITAMIN C   |   | NOT DONE |            |        |
+S1 | CM | 001 | 4 | OMEPRAZOLE  |   |          | 2023-04-01 |        |
+S1 | CM | 001 | 5 | IBUPROFEN   |   |          |            |        |

@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1338 expect=noViolation domain=RS
+#note "Every populated RSLNKGRP is present as a TRLNKGRP in TR for the same subject; the boundary row 3 leaves RSLNKGRP empty and must not fire."
+#library standard=sdtmig version=3-4
+dataset RS label="Disease Response"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RSSEQ    type=Num  label="Sequence Number"
+col RSLNKGRP type=Char label="Link Group ID"
+col RSTESTCD type=Char label="Response Assessment Short Name"
+col RSORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | RS | 001 | 1 | G01 | OVRLRESP | PR
+CDISCPILOT01 | RS | 002 | 1 | G05 | OVRLRESP | CR
+CDISCPILOT01 | RS | 002 | 2 |  | LSTASS | PD
+---
+
+dataset TR label="Tumor Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRSEQ    type=Num  label="Sequence Number"
+col TRLNKGRP type=Char label="Link Group ID"
+col TRTESTCD type=Char label="Tumor Assessment Short Name"
+col TRORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TR | 001 | 1 | G01 | LDIAM | 20
+CDISCPILOT01 | TR | 002 | 1 | G05 | LDIAM | 12
+---

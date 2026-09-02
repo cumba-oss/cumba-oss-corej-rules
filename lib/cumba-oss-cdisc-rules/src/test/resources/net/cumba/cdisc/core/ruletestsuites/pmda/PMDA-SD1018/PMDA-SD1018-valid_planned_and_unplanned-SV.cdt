@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1018 expect=noViolation domain=SV
+#note "Row 1: planned (SVUPDES blank), matches TV -> silent. Row 2: unplanned (SVUPDES populated) and absent from TV, must NOT fire (empty(SVUPDES) is false there). Pins both silent arms."
+#library standard=sdtmig version=3-4
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+col SVUPDES  type=Char
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1   | SCREENING    | -7 |
+CDISCPILOT01 | SV | 01-701-1015 | 1.1 | UNSCHEDULED1 | .  | Subject felt unwell
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1
+---

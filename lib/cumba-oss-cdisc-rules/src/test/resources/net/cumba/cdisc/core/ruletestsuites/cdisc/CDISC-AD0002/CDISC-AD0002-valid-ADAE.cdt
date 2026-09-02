@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0002 expect=noViolation domain=ADAE
+# Rule:Description: A variable is present in ADaM with the same name as a variable present in SDTM but the variables do not have identical labels
+#note "AESEQ has identical labels in ADAE and SDTM AE -> noViolation"
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---

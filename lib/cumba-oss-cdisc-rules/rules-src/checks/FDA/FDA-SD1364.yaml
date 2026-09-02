@@ -1,0 +1,72 @@
+Core:
+  Id: "FDA-SD1364"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject who was not treated (ARMNRS indicates\
+  \ Screen Failure, Not Assigned, or Assigned, Not Treated) has a populated Actual\
+  \ Arm Code (ACTARMCD) or Actual Arm (ACTARM); both must be empty for subjects who\
+  \ were not treated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    ARMNRS in ["SCREEN FAILURE", "NOT ASSIGNED", "ASSIGNED, NOT TREATED"] and (not empty(ACTARMCD)
+    or not empty(ACTARM))
+Outcome:
+  Message: "ACTARMCD and/or ACTARM is populated for a subject who was not treated\
+    \ (ARMNRS indicates Screen Failure, Not Assigned, or Assigned, Not Treated)."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ACTARM"
+  - "ARMNRS"
+Source:
+  FDA_Validator_Rule_Message: "ACTARMCD/ACTARM is populated for a subject who wasn't\
+    \ treated"
+  FDA_Validator_Rule_Description: "Actual Arm Code (ACTARMCD) and Actual Arm (ACTARM)\
+    \ must be null for subjects who weren't treated. This includes Screen Failure\
+    \ subjects, Not Assigned subjects, and Not Treated subjects."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1364"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1364"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0524"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0524"
+        Version: "1"
+      Version: "2.0"

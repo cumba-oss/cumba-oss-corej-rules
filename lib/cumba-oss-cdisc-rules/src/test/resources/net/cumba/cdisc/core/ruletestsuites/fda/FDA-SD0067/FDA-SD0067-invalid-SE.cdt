@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD0067 expect=violation domain=SE
+#note "Row 2 ETCD=FOLLOWUP is not in TE and is not 'UNPLAN' -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=FOLLOWUP
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | SE | 001 | 1 | SCRN     | Screening
+S1 | SE | 001 | 2 | FOLLOWUP | Follow-up
+---
+
+dataset TE class="TRIAL DESIGN" label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TE | SCRN | Screening
+S1 | TE | TRT  | Treatment

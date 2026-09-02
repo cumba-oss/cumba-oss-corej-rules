@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0265"
+Sheet_Rule_Identifier: "265"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "library"
+Plain_Text_Rule: "The value of the English dataset's description must match the one specified in the CDISC standard for an ItemGroupDef element that represents a dataset defined as following an SDTMIG or SENDIG standard."
+# CDISC twin of PMDA-DD0136, same kind and semantics: standard via
+# @def:StandardOID -> def:Standard, SDTMIG/SENDIG family filter, dataset keyed
+# by its own @Name (SUPP--/split datasets have their own IG labels), English
+# TranslatedText per the sheet's xml:lang wording. 2.1-only per the sheet.
+Message: "The English dataset's description does not follow the standard [${value}]."
+Check:
+  kind: "library_dataset_label_matches"

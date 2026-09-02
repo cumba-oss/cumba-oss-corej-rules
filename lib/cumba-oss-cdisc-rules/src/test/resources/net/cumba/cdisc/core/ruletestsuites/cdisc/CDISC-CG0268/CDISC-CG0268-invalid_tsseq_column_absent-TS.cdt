@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0268 expect=violation domain=TS
+#note "FRESH, DISCRIMINATING. DELIBERATELY NO TSSEQ COLUMN. Predicted to FIRE on rows 2 and 3, count 2. Since EC-53 / Fix #143 an ABSENT is_unique_set TARGET is DROPPED and the check REGROUPS on the surviving keys, so the tuple collapses to (TSPARMCD) alone and the two SPONSOR rows become duplicates of one another. The TITLE row is a singleton and stays silent. THIS IS THE OTHER HALF OF THE BATCH'S SHARPEST CONTRAST PAIR: CDISC-CG0247-skipped_no_taetord-TA is the SAME operator with the SAME absence and it SKIPS, because CG0247 declares Requirements.Variables.All [TAETORD] and CG0268 declares no Requirements.Variables at all. Both verdicts are correct. Not a finding: TSSEQ is Required in TS, so section 2's Req/Exp doctrine owes no guard. SILENCE here means EC-53 was reverted; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 TSPARMCD=SPONSOR
+#expectViolationAt row=3 TSPARMCD=SPONSOR
+dataset TS class="TRIAL DESIGN"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | TITLE   | Study of X
+S1 | TS | SPONSOR | Acme
+S1 | TS | SPONSOR | Acme Sub

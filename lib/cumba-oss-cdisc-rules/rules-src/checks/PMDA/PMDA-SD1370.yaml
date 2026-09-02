@@ -1,0 +1,71 @@
+Core:
+  Id: "PMDA-SD1370"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STREFC is populated but --STREFN is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "MK"
+    - "OE"
+Requirements:
+  Variables:
+    All:
+    - "--STREFC"
+    - "--STREFN"
+Check:
+  expression: >-
+    not empty(--STREFC) and empty(--STREFN)
+Outcome:
+  Message: "--STREFN is missing when --STREFC is populated."
+  Output_Variables:
+  - "--STREFC"
+  - "--STREFN"
+Source:
+  Message: "--STREFN is null when --STREFC is populated"
+  Description: "Numeric Reference Result in Std Units (--STREFN) should be populated\
+    \ when Reference Result in Standard Format (--STREFC) is populated."
+  Domains: "FINDINGS (-MK, -OE), FINDINGS ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1370"
+        Version: "1"
+      Version: "1.6"

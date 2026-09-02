@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0006 expect=violation domain=LB
+#note "NEW with the M2-P2 ruling (option (a), Fix #303) - the class of value the fix is ABOUT, pinned so the change is not merely an argument. LBDTC '2020-01-15T09' is 13 characters: a complete DATE carrying a TRUNCATED TIME. ScalarSemantics.isCompleteDate gates on length 10/16/19, so is_complete_date REJECTED it and CG0006 was silent; is_complete_date_part takes the first 10 characters and accepts. The complement rule CDISC-CG0007 was already on the date-portion predicate and is silent here too, so before the fix this record was reported by NEITHER rule - the hole the ruling closes, not just a single rule improved. OperationExecutor.calculateStudyDay already read the date portion (it gates on length < 10), so $value_dy_algorithm computed 15 all along and the Check threw the answer away. LBDY=14 -> fires. Row 2 carries the same truncated-time shape with the CORRECT day and must stay silent, so the fixture cannot pass vacuously."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-15T09 | 14
+S1 | LB | 001 | 2 | ALB | 2020-01-10T09 | 10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

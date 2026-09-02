@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0210 expect=noViolation domain=ADSL
+# Rule:Description: The value of ADSL.USUBJID is equal to the value of DM.USUBJID and ADSL.ARM is not equal to DM.ARM
+#note "same USUBJID, ADSL.ARM == DM.ARM -> noViolation"
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ARM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col ARM type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | Placebo
+---

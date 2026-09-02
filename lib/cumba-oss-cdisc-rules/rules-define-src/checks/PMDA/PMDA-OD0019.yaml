@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-OD0019"
+Sheet_Rule_Identifier: "OD0019"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: "SASFormatName"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Attribute is defined as a sasFormat, but value does not match the SAS Format naming conventions. Allowed string pattern for a sasFormat is '(letter|_|$)(letter|digit|_|.)*'."
+# The only sasFormat-typed attribute in Define-XML is CodeList/@SASFormatName.
+# The sheet prints its own pattern - enforced verbatim ('$' and '.' are
+# literal characters inside the class). DISAGREEMENT with CDISC twin 0175
+# flagged: 0175 additionally enforces the 32-character cap and restricts '$'
+# to the leading position; the PMDA printed pattern has neither.
+Message: "Invalid SASFormatName value"
+Check:
+  kind: "matches_regex"
+  attribute: "SASFormatName"
+  pattern: '[A-Za-z_$][A-Za-z0-9_.]*'

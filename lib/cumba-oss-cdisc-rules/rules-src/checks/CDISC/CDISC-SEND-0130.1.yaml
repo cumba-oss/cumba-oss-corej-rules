@@ -1,0 +1,68 @@
+Core:
+  Id: "CDISC-SEND-0130.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SESEQ is not in chronological order (based on SESTDTC)\
+  \ within USUBJID."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    not is_sorted_by(SESEQ, by=[asc("SESTDTC")], within=USUBJID)
+Outcome:
+  Message: "SESEQ is not in chronological order (based on SESTDTC) within USUBJID."
+  Output_Variables:
+  - "SESTDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SESEQ"
+  Plain_Text_Explanation: "SESEQ values must be assigned in chronological order within\
+    \ a subject."
+  Rule: "SESEQ values are in chronological order within a subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND130.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND130.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND130.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND130.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND130.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,113 @@
+Core:
+  Id: "FDA-SD1344"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Dictionary-Derived Term (--DECOD) value is not\
+  \ a valid term in the WHODrug dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CM"
+Requirements:
+  Variables:
+    All:
+    - "--DECOD"
+Operations:
+- id: "$decod_valid"
+  expression: "valid_external_dictionary_value(--DECOD, external_dictionary_type=\"\
+    whodrug\", dictionary_term_type=\"PT\")"
+Check:
+  expression: >-
+    $decod_valid == false
+Outcome:
+  Message: "Dictionary-Derived Term (--DECOD) is not a valid WHODrug term."
+  Output_Variables:
+  - "--DECOD"
+Source:
+  FDA_Validator_Rule_Message: "Value for --DECOD not found in WHODrug dictionary"
+  FDA_Validator_Rule_Description: "Value for the Standardized Medication Name (--DECOD)\
+    \ variable must be populated using a Drug Name from the WHO Drug dictionary version\
+    \ specified in the define.xml."
+  Domains: "CM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1344"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"

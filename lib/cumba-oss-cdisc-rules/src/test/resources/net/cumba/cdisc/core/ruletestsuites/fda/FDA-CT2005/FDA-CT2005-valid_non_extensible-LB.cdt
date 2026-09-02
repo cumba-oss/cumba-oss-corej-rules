@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-CT2005 expect=noViolation domain=LB
+#note "Boundary against the sibling non-extensible check: the same out-of-codelist value is submitted, but codelist C99901 is non-extensible here, so this extensible-only rule must stay silent."
+#library standard=sdtmig version=3-4
+#library codelist-extensible C99901 false
+#define-xml FDA-CT2005-define.xml
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | PH | ACID
+S1 | LB | 001 | 2 | PH | BASIC

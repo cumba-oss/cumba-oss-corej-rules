@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0020"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Qualifier Variable Name (QNAM) is longer than\
+  \ 8 characters."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Check:
+  expression: >-
+    not empty(QNAM) and len(QNAM) > 8
+Outcome:
+  Message: "QNAM is longer than 8 characters."
+  Output_Variables:
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "QNAM"
+  Plain_Text_Explanation: "QNAM value limited to 8 characters"
+  Rule: "QNAM value length <= 8"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND20"
+        Version: "1"
+      Version: "5.0"

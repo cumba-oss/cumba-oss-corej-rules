@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0363"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Related Subject or Pool Identifier (RSUBJID)\
+  \ is populated and equal to the Unique Subject Identifier (USUBJID)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELSUB"
+Requirements:
+  Variables:
+    All:
+    - "RSUBJID"
+    - "USUBJID"
+Check:
+  expression: >-
+    not empty(RSUBJID) and RSUBJID == USUBJID
+Outcome:
+  Message: "RSUBJID is equal to USUBJID."
+  Output_Variables:
+  - "RSUBJID"
+Source:
+  Class: "SPC"
+  Domain: "RELSUB"
+  Variable: "RSUBJID"
+  Condition: "RSUBJID ^= null"
+  Rule: "RSUBJID ^= USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0363"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0363"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0363"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1241 expect=skipped domain=LB
+#note "SD1241 is Domains.Include-scoped to [AE, CE, MH]; LB is out of scope -> auditable SKIP even though this row's shape (LBBDSYCD populated, no LBBODSYS column) would fire were the domain gate to fail."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBBDSYCD type=Num  label="Body System or Organ Class Code"
+---
+S1 | LB | 001 | 1 | GLUC | 10029205

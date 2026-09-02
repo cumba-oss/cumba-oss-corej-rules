@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0535"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has more than one record per Epoch (EPOCH)\
+  \ with Category for Disposition Event (DSCAT) equal to 'DISPOSITION EVENT' but Subcategory\
+  \ for Disposition Event (DSSCAT) is not present in the dataset."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    not is_unique_set([DSCAT, USUBJID, EPOCH]) and DSCAT == "DISPOSITION EVENT" and not
+    var_exists("DSSCAT")
+Outcome:
+  Message: "DSSCAT is not present when a subject has more than one record per Epoch\
+    \ with DSCAT equal to 'DISPOSITION EVENT'."
+  Output_Variables:
+  - "DSCAT"
+  - "EPOCH"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "GEN"
+  Condition: "Subject has more than one record per Epoch with DSCAT = 'DISPOSITION\
+    \ EVENT'"
+  Rule: "DSSCAT must be present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0535"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0535"
+        Version: "1"
+      Version: "2.0"

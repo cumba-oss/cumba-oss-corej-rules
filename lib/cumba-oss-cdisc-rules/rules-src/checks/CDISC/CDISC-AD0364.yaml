@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0364"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when DOSEON or DOSCUMA is present and DOSEU is not present"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    (var_exists("DOSEON") or var_exists("DOSCUMA")) and not var_exists("DOSEU")
+Outcome:
+  Message: "DOSEON or DOSCUMA is present, but DOSEU is not present."
+  Output_Variables:
+  - "DOSEON"
+  - "DOSCUMA"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "DOSEON; DOSCUMA"
+  Natural_Language_Rule_Failure_Criteria: "DOSEON or DOSCUMA is present and DOSEU\
+    \ is not present"
+  Rule_Failure_Criteria: "DOSEU is not present"
+  Condition_Failure: "DOSEON or DOSCUMA is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR364"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR364"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR364"
+        Version: "2"
+      Version: "5.0"

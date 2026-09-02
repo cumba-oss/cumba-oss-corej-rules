@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1015 expect=noViolation domain=AE
+#note "Every populated EPOCH is in $ta_epoch -> silent with execution."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col EPOCH    type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | SCREENING
+S1 | AE | 001 | 2 | NAUSEA   | TREATMENT
+S1 | AE | 001 | 3 | RASH     |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TAETORD type=Num
+col ETCD    type=Char
+col EPOCH   type=Char
+---
+S1 | TA | A | Drug A | 1 | SCRN | SCREENING
+S1 | TA | A | Drug A | 2 | TRT  | TREATMENT
+---

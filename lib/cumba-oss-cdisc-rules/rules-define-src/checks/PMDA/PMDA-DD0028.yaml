@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0028"
+Sheet_Rule_Identifier: "DD0028"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "Codelist Term must match the value in CDISC Controlled Terminology for corresponding NCI Code. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element. NCI Code is represented as Name attribute on Alias element when Context attribute is \"nci:ExtCodeID\"."
+# CT-gated (P5), EnumeratedItem leg (-B: CodeListItem): the item's CodedValue
+# must equal the CT submission value carried by the item's own nci:ExtCodeID
+# alias c-code, looked up in the CT codelist resolved via the parent
+# CodeList's alias. A c-code absent from that codelist is PMDA-DD0034's
+# finding, not this rule's. The sheet message's <codelist> placeholder is not
+# renderable; the mismatching term is interpolated instead.
+Message: "Term/NCI Code mismatch in Codelist for Term ${value}"
+Check:
+  kind: "term_matches_nci_code"

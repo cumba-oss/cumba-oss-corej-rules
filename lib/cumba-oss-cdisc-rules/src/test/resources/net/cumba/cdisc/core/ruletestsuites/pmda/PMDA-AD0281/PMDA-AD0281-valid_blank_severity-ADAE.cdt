@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0281 expect=noViolation domain=ADAE
+#note "Row 2's AESEV (the KEY) is blank while AESEVN stays 2: excluded from collectKeyToDependents/fire pass (D.13) and by the rule's own not empty(AESEV); key MILD left with single dependent {1} -> silent. Pin on the blank-KEY side of D.13."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA |  | 2
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | SEVERE | 3

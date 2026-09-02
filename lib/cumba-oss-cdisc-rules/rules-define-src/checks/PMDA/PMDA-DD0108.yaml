@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0108"
+Sheet_Rule_Identifier: "DD0108"
+Rule_Set: "PMDA"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Study Identifier (STUDYID) variable should have Origin set to 'Protocol'."
+# Guarded on the owning ItemDef's Name; 'Origin' is read as the def:Origin
+# Type attribute (both Define-XML versions carry it there). Fires only on a
+# present Type - a missing Origin is a presence row's beat.
+Message: "Origin for STUDYID variable is not set to Protocol"
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["Protocol"]
+  when:
+    path: "../@Name"
+    equals: "STUDYID"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1465 expect=skipped domain=CO
+#note "CL-D / §9 Q2 (wave TA-4): RDOMAIN is Permissible in CO, and before the Requirements.Variables gate the Java engine read the absent column as empty - one finding per IDVARVAL-populated row, flooding a dataset for omitting a column it was allowed to omit. With the gate the engine records one auditable skip instead."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | 001 | 1 | AESEQ | 3 | Comment dataset shipped without RDOMAIN

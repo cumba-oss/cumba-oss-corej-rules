@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0345"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record in the Trial Summary (TS) dataset\
+  \ has TSPARMCD equal to 'SSTYP' (Study Type)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$sstyp_count"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"SSTYP\"))"
+Check:
+  expression: >-
+    TSPARMCD == "SSTYP" and $sstyp_count > 1
+Outcome:
+  Message: "More than one record with TSPARMCD equal to 'SSTYP' exists in the Trial\
+    \ Summary (TS) dataset."
+  Output_Variables:
+  - "TSPARMCD"
+  - "$sstyp_count"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "Only a single record for TSPARM Study Type should exist."
+  Rule: "Only one record with TSPARMCD = SSTYP exists"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND345"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND345"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND345"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND345"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND345"
+        Version: "1"
+      Version: "5.0"

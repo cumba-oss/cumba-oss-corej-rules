@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-CG0456"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Trial Summary Parameter Short Name (TSPARMCD) equals\
+  \ 'FCNTRY' but Name of the Reference Terminology (TSVCDREF) is not 'ISO 3166-1 alpha-3'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVCDREF"
+Check:
+  expression: >-
+    TSPARMCD == "FCNTRY" and TSVCDREF != "ISO 3166-1 alpha-3"
+Outcome:
+  Message: "TSPARMCD equals 'FCNTRY' but TSVCDREF is not 'ISO 3166-1 alpha-3'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVCDREF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDREF"
+  Condition: "TSPARMCD = 'FCNTRY'"
+  Rule: "TSVCDREF = 'ISO 3166-1 alpha-3'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0456"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0456"
+        Version: "1"
+      Version: "2.0"

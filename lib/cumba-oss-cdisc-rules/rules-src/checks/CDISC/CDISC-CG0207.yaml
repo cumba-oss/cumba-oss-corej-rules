@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0207"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Element (SEENDTC) is not equal\
+  \ to the Start Date/Time of Element (SESTDTC) of the next Element within the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    not has_next_corresponding_record(SEENDTC, SESTDTC, keep_missings=false, ordering=SESEQ,
+    within=USUBJID)
+Outcome:
+  Message: "SEENDTC is not equal to SESTDTC of the next Element."
+  Output_Variables:
+  - "SESTDTC"
+  - "SEENDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEENDTC"
+  Condition: "Next ELEMENT present in dataset"
+  Rule: "SEENDTC = SESTDTC of next ELEMENT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0207"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0207"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0207"
+        Version: "1"
+      Version: "2.0"

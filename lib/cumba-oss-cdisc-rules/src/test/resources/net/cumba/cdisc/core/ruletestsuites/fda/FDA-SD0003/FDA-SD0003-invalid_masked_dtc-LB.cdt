@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SD0003 expect=violation domain=LB
+#note "PURPOSE-BUILT for PLAN-is-partial-date-masked-forms. Created at Fix #209 (Phase 2b) to pin the PRE-Phase-3 verdict — rows 1-3 then fired, because CalendarDates.isValidDate rejected all three SDTM masked forms. Fix #215 (Phase 3, owner ruling 2026-08-09 option (a): widen ScalarSemantics.isPartialDate in place) FLIPPED exactly that: a legal masked date is a valid partial date, so invalid_date is now SILENT on rows 1-3. This file is the tripwire that made the flip visible instead of silent, and it is rewritten rather than deleted so the before/after is one diff. Rows 4-5 are the unchanged control (truncated partial, complete date). Rows 6-8 are the non-vacuity control and are what keeps expect=violation meaningful: 6 preserves the structural-vs-calendar split (2020-02-30 is correctly SHAPED and calendar-impossible, so it still fires); 7 is the Fix #215 trap in fixture form — a masked MONTH with a present, impossible DAY, which the pre-Fix-#215 'stop at the first ABSENT component' walk would have silently accepted; 8 is plain junk. Verdict: 3 violations, rows 6-8. Neuter check: change row 7 to 2020---31 and the count drops to 2, because some month has 31 days."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=6 LBSEQ=6
+#expectViolationAt row=7 LBSEQ=7
+#expectViolationAt row=8 LBSEQ=8
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB   | 2020-01--
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC  | 2020---15
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | ----01-15
+CDISCPILOT01 | LB | 01-701-1015 | 4 | ALT   | 2020-01
+CDISCPILOT01 | LB | 01-701-1015 | 5 | AST   | 2020-01-15
+CDISCPILOT01 | LB | 01-701-1015 | 6 | BILI  | 2020-02-30
+CDISCPILOT01 | LB | 01-701-1015 | 7 | CHOL  | 2020---32
+CDISCPILOT01 | LB | 01-701-1015 | 8 | SODIUM| UNKNOWN

@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0013"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in a dataset is not among the\
+  \ variables permitted by the SDTM Model list of allowed variables for the dataset's\
+  \ general observation class."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$allowed_variables"
+  expression: "get_model_column_order()"
+Check:
+  expression: >-
+    varname() not in $allowed_variables
+Outcome:
+  Message: "Variable is not listed in the SDTM Model list of allowed variables for\
+    \ the observation class and should be represented in supplemental qualifiers (SUPP--)."
+  Output_Variables:
+  - "variable_name"
+  - "$allowed_variables"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable = Model List of Allowed Variables for Observation Class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"

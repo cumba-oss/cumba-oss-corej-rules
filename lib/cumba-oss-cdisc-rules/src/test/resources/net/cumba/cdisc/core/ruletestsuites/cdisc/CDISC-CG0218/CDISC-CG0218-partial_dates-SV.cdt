@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-CG0218 expect=violation domain=SV
+#runLevel Info
+# Rule:Description: Raise an error when the Epoch (EPOCH) in the Subject Visits (SV) domain does not match the EPOCH value of the corresponding Subject Elements (SE) element whose date range (SESTDTC to SEENDTC) contains the visit start date (SVSTDTC).
+#note "Two-level partial-date fixture (plan C phase 5b, ruling (a) 2026-08-26). Row 1: the SE window 2012-05 .. 2012-07 (both month partials) CERTAINLY contains SVSTDTC=2012-06-20 (every completion of 2012-05 is on/before it, every completion of 2012-07 on/after it) and EPOCH mismatches, so the verbatim ERROR leg fires. Row 2: the window 2012-08 .. 2012-08 only POSSIBLY contains SVSTDTC=2012-08-20 (containment fails under the certainly-reading because 2012-08 has completions after the 20th on the left and before it on the right), so the tagged INFO leg claims it. Row 3 sits certainly inside the first window but its EPOCH matches, so it is silent. Runs at #runLevel Info because the engine default (Warning) never evaluates an INFO level."
+#expectViolationCount 2
+#expectViolationAt row=1 severity=ERROR VISITNUM=1
+#expectViolationAt row=2 severity=INFO VISITNUM=2
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 1 | WEEK 1 | 2012-06-20 | TREATMENT
+CDISCPILOT01 | SV | 01-701-0001 | 2 | WEEK 9 | 2012-08-20 | TREATMENT
+CDISCPILOT01 | SV | 01-701-0001 | 3 | WEEK 2 | 2012-06-25 | SCREENING
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-05 | 2012-07 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-08 | 2012-08 | FOLLOW-UP
+---

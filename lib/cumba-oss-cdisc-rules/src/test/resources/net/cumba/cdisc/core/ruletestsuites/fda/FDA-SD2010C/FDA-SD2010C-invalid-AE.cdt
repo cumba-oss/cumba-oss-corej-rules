@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2010C expect=violation domain=AE
+#note "AEHLT 'HEADACHES NEC' is a valid High Level Term but not in MedDRA's preferred case ('Headaches NEC') -> the case-sensitive check fires on row 2; row 1 matches exactly."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEHLT="HEADACHES NEC"
+dataset AE
+col USUBJID type=Char
+col AEHLT   type=Char
+---
+001 | Headaches NEC
+001 | HEADACHES NEC

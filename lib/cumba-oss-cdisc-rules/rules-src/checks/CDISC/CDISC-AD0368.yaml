@@ -1,0 +1,69 @@
+Core:
+  Id: "CDISC-AD0368"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRxxPGy and TRTxxA are both present and TRxxAGy\
+  \ is not present, where xx is an integer [01-99, zero-padded] and y is an integer\
+  \ [1-99, not zero-padded]"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TRxxPGy") and var_exists("TRTxxA") and not var_exists("TRxxAGy")
+Outcome:
+  Message: "TRxxPGy and TRTxxA are both present, but TRxxAGy is not present."
+  Output_Variables:
+  - "TRTxxA"
+  - "TRxxPGy"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Natural_Language_Rule_Failure_Criteria: "TRxxAGy is not present and both TRxxPGy\
+    \ and TRTxxA are present"
+  Rule_Failure_Criteria: "TRxxAGy is not present, where xx is an integer [01-99, zero-padded]\
+    \ and y is an integer [1-9, not zero-padded]"
+  Condition_Failure: "TRxxPGy and TRTxxA are present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR368"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR368"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR368"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR368"
+        Version: "1"
+      Version: "5.0"

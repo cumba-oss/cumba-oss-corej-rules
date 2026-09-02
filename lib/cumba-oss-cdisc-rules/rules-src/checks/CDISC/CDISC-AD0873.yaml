@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0873"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both SEX and SEXN\
+  \ are populated, more than one value of SEX is present within the dataset for a\
+  \ given value of SEXN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(SEX) and not empty(SEXN) and has_multiple_values_for(SEX, SEXN)
+Outcome:
+  Message: "More than one value of SEX is present for this value of SEXN within the\
+    \ dataset."
+  Output_Variables:
+  - "SEX"
+  - "SEXN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SEX"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of SEX for a given value of SEXN, considering only those rows on which\
+    \ both variables are populated"
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of SEX for\
+    \ a given value of SEXN"
+  Condition_Failure: "On rows where both SEX and SEXN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR873"
+        Version: "1"
+      Version: "5.0"

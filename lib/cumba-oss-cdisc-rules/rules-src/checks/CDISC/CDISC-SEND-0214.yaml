@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0214"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both Element End Rule (TEENRL) and Planned Duration\
+  \ of Element (TEDUR) are empty in a Trial Elements (TE) record; at least one of\
+  \ the two must be populated for each Element."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Requirements:
+  Variables:
+    Any:
+    - "TEENRL"
+    - "TEDUR"
+Check:
+  expression: >-
+    empty(TEENRL) and empty(TEDUR)
+Outcome:
+  Message: "Both TEENRL and TEDUR are empty; at least one must be populated for each\
+    \ Element."
+  Output_Variables:
+  - "TEENRL"
+  - "TEDUR"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL, TEDUR"
+  Plain_Text_Explanation: "Either TEENRL or TEDUR (or both) must be populated for\
+    \ each Element."
+  Rule: "TEENRL ^= null AND/OR TEDUR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0118 expect=violation domain=ADLBC
+#note "Group (GLUC, PREDOSE) holds ATPTN {1, 1, 2} -> minority row 3 fires. The AD0117 fixture with target and key swapped."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC ATPT=PREDOSE ATPTN=2
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATPT    type=Char
+col ATPTN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | PREDOSE | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | PREDOSE | 2

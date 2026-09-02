@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1439 expect=noViolation domain=VS
+#note "Rows 1/2: two VSBLFL='Y' records for the same subject/VSTESTCD/VSCAT but different VSLOC (ARM vs LEG) -> --LOC IS part of the assessment key (per the FDA sheet, even though the rule's Description omits --LOC/--LAT/--DIR), so the tuples are distinct and nothing fires. Rows 3/4: same key but only row 3 has VSBLFL='Y' (row 4 blank) -> no duplicate flagged pair. Absent --SCAT/--METHOD/--SPEC/--LAT/--DIR columns are dropped from the key (drop-and-regroup)."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSCAT    type=Char label="Category for Vital Signs"
+col VSLOC    type=Char label="Location of Vital Signs Measurement"
+col VSBLFL   type=Char label="Baseline Flag"
+---
+S1 | VS | S1-001 | 1 | TEMP  | VITALS | ARM | Y
+S1 | VS | S1-001 | 2 | TEMP  | VITALS | LEG | Y
+S1 | VS | S1-001 | 3 | SYSBP | VITALS | ARM | Y
+S1 | VS | S1-001 | 4 | SYSBP | VITALS | ARM |

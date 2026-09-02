@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0282 expect=violation domain=PP
+#note "Row 1 is the sheet's own worked example (creatinine clearance from serum and urine) and both tokens are declared (SPEC) terms -> silent. Row 2's SPUTUM is not a term -> FIRES. Row 3 is blank -> silent. Row 4 is the case discriminator: the tokens are terms only up to case -> FIRES. `not contains_all($terms, split_by(...))` takes ExprCompiler's per-row T9 branch whenever its second argument is a Call, so the verdict is per row and the count is 2. Deliberately contains NO single-token non-conformant value; that case lives in its own scenario so a surprise there is isolated from this exact-set count."
+#library standard=sendig version=3-1-1
+#library codelist-terms SPEC SERUM URINE PLASMA "WHOLE BLOOD"
+#expectViolationCount 2
+#expectViolationAt row=2 PPSEQ=2
+#expectViolationAt row=4 PPSEQ=4
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPSPEC   type=Char label="Specimen Material Type"
+---
+S1 | PP | 001 | 1 | CLR | SERUM;URINE
+S1 | PP | 002 | 2 | CLR | SERUM;SPUTUM
+S1 | PP | 003 | 3 | CLR |
+S1 | PP | 004 | 4 | CLR | serum;urine
+---

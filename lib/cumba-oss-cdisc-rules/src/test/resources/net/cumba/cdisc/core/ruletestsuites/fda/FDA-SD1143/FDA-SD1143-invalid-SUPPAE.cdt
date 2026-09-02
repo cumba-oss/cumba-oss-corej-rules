@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SD1143 expect=violation domain=SUPPAE
+#note "SUPPAE carries an AESOSP qualifier for AE record 1 of subject 001, but the linked AE record has AESMIE=N -> fires. Conformant SUPP structure (record-level qualifier via IDVAR=AESEQ)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=AESOSP
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Description text
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESMIE  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | N
+---

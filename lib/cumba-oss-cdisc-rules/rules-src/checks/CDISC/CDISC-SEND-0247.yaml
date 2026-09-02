@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-SEND-0247"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset does not contain\
+  \ at least one record for each TSPARMCD value marked \"Yes\" in the \"Should Include\"\
+  \ column of SENDIG Section 7.6.3."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$present"
+  expression: "distinct(TSPARMCD)"
+- id: "$missing"
+  expression: "minus(subtract=$present, value=[AGEU, SDESIGN, DOSDUR, EXPENDTC, EXPSTDTC,\
+    \ GLPTYP, ROUTE, SNDIGVER, SNDCTVER, SPECIES, SPLRNAM, SPREFID, SSPONSOR, STCAT,\
+    \ STDIR, STRAIN, STSTDTC, STITLE, SSTYP, TRT, TFCNTRY, TSTFLOC, TSTFNAM, TRMSAC,\
+    \ TRTCAS, TRTV])"
+Check:
+  expression: >-
+    var_exists("TSPARMCD") and not contains_all(TSPARMCD, keys=[AGEU, SDESIGN, DOSDUR, EXPENDTC,
+    EXPSTDTC, GLPTYP, ROUTE, SNDIGVER, SNDCTVER, SPECIES, SPLRNAM, SPREFID, SSPONSOR, STCAT, STDIR,
+    STRAIN, STSTDTC, STITLE, SSTYP, TRT, TFCNTRY, TSTFLOC, TSTFNAM, TRMSAC, TRTCAS, TRTV])
+Outcome:
+  Message: "The Trial Summary (TS) dataset is missing a record for one or more TSPARMCD\
+    \ values that should be included."
+  Output_Variables:
+  - "$missing"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD, TSPARM"
+  Plain_Text_Explanation: "The parameters listed as \"Yes\" in the \"Should Include\"\
+    \ column should always be included in the Trial Summary dataset, in order to provide\
+    \ proper study definition. (AGEU, SDESIGN, DOSDUR, EXPENDTC, EXPSTDTC, GLPTYP,\
+    \ ROUTE, SNDIGVER, SNDCTVER, SPECIES, SPLRNAM, SPREFID, SSPONSOR, STCAT, STDIR,\
+    \ STRAIN, STSTDTC, STITLE, SSTYP, TRT, TFCNTRY, TSTFLOC, TSTFNAM, TRMSAC, TRTCAS,\
+    \ TRTV)"
+  Rule: "At least one record exists in TS for each TSPARMCD marked \"Yes\" in the\
+    \ \"Should Include\" column in 7.6.3"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND247"
+        Version: "1"
+      Version: "5.0"

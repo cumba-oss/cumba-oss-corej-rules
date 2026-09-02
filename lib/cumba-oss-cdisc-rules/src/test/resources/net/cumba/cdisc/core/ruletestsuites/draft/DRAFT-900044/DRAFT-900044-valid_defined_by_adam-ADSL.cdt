@@ -1,0 +1,11 @@
+#!RuleTest
+#test DRAFT-900044 expect=noViolation domain=ADSL
+#note "The zero-candidate / not-a-carry-over row. Here the run's OWN library defines ADSL.RFSTDTC, so the variable is not carried over and its own definition governs: the name-keyed companion lane must not run at all, even though the dataset label differs from BOTH the ADSL definition and the DM one. Removing the 'library has no definition' gate makes this fire."
+#library-include DRAFT-900044-defined-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="First Exposure Date"
+---
+CDISCPILOT01 | 01-701-1015 | 2026-01-01
+---

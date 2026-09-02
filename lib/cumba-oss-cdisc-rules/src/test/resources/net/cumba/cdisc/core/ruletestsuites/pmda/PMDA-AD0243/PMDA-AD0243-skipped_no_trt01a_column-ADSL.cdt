@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0243 expect=skipped domain=ADSL
+#note "TRT01A, the operator's TARGET and the rule's single Requirements.Variables.All entry, is absent. TRTxxAN matches TRT01AN so the template DOES expand (xx=01) and TRTxxA is synthesised as the absent TRT01A; the expansion rewrites Requirements.Variables.All to ['TRT01A'], which is absent, so the rule is reported not executed. NOT a wildcard NoMatch -- one column matched."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01AN type=Num
+---
+S1 | 001 | 1
+S1 | 002 | 1
+S1 | 003 | 2

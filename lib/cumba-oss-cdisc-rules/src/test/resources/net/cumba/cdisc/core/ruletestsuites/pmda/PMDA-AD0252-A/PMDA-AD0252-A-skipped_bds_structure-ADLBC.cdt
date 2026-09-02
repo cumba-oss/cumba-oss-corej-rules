@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0252-A expect=skipped domain=ADLBC
+#note "AVALCA1N is LEGITIMATE in a BDS dataset, and the Scope.Data_Structures gate (Include OCCDS / MEDICAL DEVICE OCCDS) skips the rule before it ever executes. This fixture is the whole point of the AD0252 A/B/C/D split - it pins that the prohibition is structure-specific. The declared structure=BDS wins over the column heuristic (Fix #154), carried by the mandatory #library block."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col AVALCA1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | 1
+CDISCPILOT01 | 01-701-1023 | ALT | 14.0 | 2

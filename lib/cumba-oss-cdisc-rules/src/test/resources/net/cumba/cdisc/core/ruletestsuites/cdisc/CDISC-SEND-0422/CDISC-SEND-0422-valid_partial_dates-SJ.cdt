@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0422 expect=noViolation domain=SJ
+#library standard=sendig-dart version=1-2
+#note "Both neighbours carry the SAME month-precision value 2020-01. Under IsoDateComparison's forall-hull rule '2020-01 <= 2020-01' is FALSE (upper 2020-01-31 > lower 2020-01-01), so a relation that replaced the identity comparison would newly FIRE on a pair the equality-only rule accepted - a narrowing nobody ruled. D-1's disjunction keeps it silent. This scenario is the regression detector for that, and it must not be 'simplified' to complete dates."
+dataset SJ label="Subject Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+STUDY01 | SJ | R-003 | 1 | 2019-12 | 2020-01
+STUDY01 | SJ | R-003 | 2 | 2020-01 | 2020-03-15
+---

@@ -1,0 +1,85 @@
+Core:
+  Id: "FDA-SE2268"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Disposition (DS) record has DSDECOD indicating\
+  \ an unscheduled death (ACCIDENTAL DEATH, FOUND DEAD, MISSING, MORIBUND SACRIFICE,\
+  \ or NON-MORIBUND SACRIFICE) but the subject has no record in the Death Diagnosis\
+  \ and Details (DD) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSDECOD"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$usubjids_in_dd"
+  expression: "distinct(USUBJID, domain=\"DD\")"
+Check:
+  expression: >-
+    DSDECOD in ["ACCIDENTAL DEATH", "FOUND DEAD", "MISSING", "MORIBUND SACRIFICE",
+    "NON-MORIBUND SACRIFICE"] and USUBJID not in $usubjids_in_dd
+Outcome:
+  Message: "No record is present in the DD domain for a subject whose DSDECOD indicates\
+    \ an unscheduled death."
+  Output_Variables:
+  - "DSDECOD"
+  - "$usubjids_in_dd"
+Source:
+  FDA_Validator_Rule_Message: "No record in DD domain for unscheduled death"
+  FDA_Validator_Rule_Description: "For subjects that have a disposition status in\
+    \ the Disposition (DS) domain that indicates an unscheduled death, the cause of\
+    \ death should be captured in the Death Diagnosis and Details (DD) domain. Standardized\
+    \ Disposition Term (DSDECOD) values for unscheduled death include: ACCIDENTAL\
+    \ DEATH, FOUND DEAD, MISSING, MORIBUND SACRIFICE, or NON-MORIBUND SACRIFICE. For\
+    \ SEND v3.1 and later, Unscheduled Flag (DSUSCHFL) should also be set to 'Y'."
+  Domains: "EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2268"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2268"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2268"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2268"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2268"
+        Version: "1"
+      Version: "1.6"

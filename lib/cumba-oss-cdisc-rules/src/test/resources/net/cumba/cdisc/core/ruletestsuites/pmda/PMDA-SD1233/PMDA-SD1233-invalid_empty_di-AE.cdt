@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1233 expect=violation domain=AE
+#note "DISCRIMINATING empty-foreign near-miss: DI is PRESENT but holds ZERO rows, so distinct(SPDEVID, domain=DI) is the EMPTY SET, not a missing value - every populated SPDEVID in AE fires. Row 3 leaves SPDEVID empty and stays guarded by the authored non_empty leaf."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 SPDEVID=DEV-001
+#expectViolationAt row=2 SPDEVID=DEV-002
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 001 | 1 | DEV-001 | Headache
+CDISCPILOT01 | AE | 001 | 2 | DEV-002 | Device site reaction
+CDISCPILOT01 | AE | 002 | 1 |  | Nausea
+---
+
+dataset DI label="Device Identifiers"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Parameter Short Name"
+col DIPARM   type=Char label="Device Parameter"
+col DIVAL    type=Char label="Device Parameter Value"
+---
+---

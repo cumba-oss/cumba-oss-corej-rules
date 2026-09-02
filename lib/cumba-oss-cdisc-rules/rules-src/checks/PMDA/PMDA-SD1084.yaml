@@ -1,0 +1,131 @@
+Core:
+  Id: "PMDA-SD1084"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --DTC is a complete date and the reference start\
+  \ date DM.RFSTDTC is a complete date, but --DY value is not populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "DO"
+Requirements:
+  Variables:
+    All:
+    - "--DTC"
+    - "--DY"
+Match_Datasets:
+- Name: "DM"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(--DTC) and is_complete_date(--DTC) and not empty(DM.RFSTDTC) and
+    is_complete_date(DM.RFSTDTC) and empty(--DY)
+Outcome:
+  Message: "Collection study day (--DY) value is not populated when collection date\
+    \ (--DTC) and reference start date (RFSTDTC) are complete dates."
+  Output_Variables:
+  - "--DTC"
+  - "DM.RFSTDTC"
+  - "!--DY"
+Source:
+  Message: "--DY variable value is not populated"
+  Description: "Collection Study Day (--DY) variable value should be populated when\
+    \ Collection Study Date/Time (--DTC) and Subject Reference Start Date/Time (RFSTDTC)\
+    \ variables values are provided, and both include complete date part."
+  Domains: "SPECIAL PURPOSE, INTERVENTIONS, FINDINGS (-DO), EVENTS, FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1084"
+        Version: "1"
+      Version: "1.6"

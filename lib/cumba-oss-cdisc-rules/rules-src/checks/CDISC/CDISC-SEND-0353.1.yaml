@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-SEND-0353.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Repro Stage (SJENDTC) is not equal\
+  \ to the Start Date/Time of Repro Stage (SJSTDTC) of the next Repro Stage (ordered\
+  \ by SJSEQ) within the subject; consecutive stages have no time gap, so each stage's\
+  \ end date must equal the next stage's start date."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Check:
+  expression: >-
+    not has_next_corresponding_record(SJENDTC, SJSTDTC, keep_missings=false, ordering=SJSEQ,
+    within=USUBJID)
+Outcome:
+  Message: "SJENDTC is not equal to SJSTDTC of the next Repro Stage for the subject."
+  Output_Variables:
+  - "SJSTDTC"
+  - "SJENDTC"
+Source:
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "SJSTDTC, SJENDTC"
+  Plain_Text_Explanation: "On a Repro Path (RPATH), if there is more than one Repro\
+    \ Stage (RSTAGE) within a Repro Phase (RPHASE), the end date for an RSTAGE should\
+    \ be equivalent to the start date for the next stage."
+  Condition: "For an RPATH, more than one RSTAGE exists within a RPHASE"
+  Rule: "SJENDTC = SJSTDTC for the next stage"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND353.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0289"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVCDREF begins with 'CDISC' (e.g. 'CDISC CT') and\
+  \ TSVCDVER is not a valid published CDISC Controlled Terminology version (date)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$valid_dates"
+  expression: "valid_codelist_dates(ct_package_types=[SDTM])"
+Check:
+  expression: >-
+    prefix(TSVCDREF, 5) == "CDISC" and TSVCDVER not in $valid_dates
+Outcome:
+  Message: "TSVCDVER is not a valid published CDISC Controlled Terminology version\
+    \ (date)."
+  Output_Variables:
+  - "TSVCDREF"
+  - "TSVCDVER"
+  - "$valid_dates"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDVER"
+  Condition: "TSVCDREF = 'CDISC'"
+  Rule: "TSVCDVER = valid published version (date)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0289"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0289"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0289"
+        Version: "1"
+      Version: "2.0"

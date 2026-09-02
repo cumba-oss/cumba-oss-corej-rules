@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1471 expect=noViolation domain=LB
+#note "LBORNRHI populated (6.1) on every row; LBORRES takes four forms all matching ^[><]?=? ?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$. The `.5` row is the counterpart of PMDA-SD1470-invalid_leading_decimal-LB.cdt: identical data, opposite verdict, because SD1471's alternation carries a bare-decimal branch and SD1470's does not (finding SD1470-F1)."
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBORNRHI type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 12.5    | 6.1
+S1 | LB | 002 | 2 | GLUC | -3      | 6.1
+S1 | LB | 003 | 3 | GLUC | <= -1.2 | 6.1
+S1 | LB | 004 | 4 | GLUC | .5      | 6.1
+---

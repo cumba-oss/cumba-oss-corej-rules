@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1014 expect=skipped domain=DO
+#note "DO sits in Classes.Include FINDINGS but is separately excluded by Domains.Exclude [DM, DO] -> skipped despite the violating-shaped TAETORD=9."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DOSEQ    type=Num  label="Sequence Number"
+col DOTESTCD type=Char label="Device Property Short Name"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+---
+S1 | DO | 001 | 1 | ALB | 9
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 2 | TRT
+---

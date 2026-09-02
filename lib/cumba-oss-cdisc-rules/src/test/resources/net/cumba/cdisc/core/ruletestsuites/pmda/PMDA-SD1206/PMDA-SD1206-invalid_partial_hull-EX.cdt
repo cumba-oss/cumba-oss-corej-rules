@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1206 expect=violation domain=EX
+#note "FRESH, DISCRIMINATING: IsoDateComparison strict-> FOR-ALL hull matrix, pinned once for the cluster. Row 1: month-partial 2020-07 hull is entirely after 2020-06-30 (lower 2020-07-01 > 2020-06-30) -> fires. Row 2: month-partial 2020-06 straddles the boundary -> clean. Row 3: year-partial 2019 is entirely before -> clean. Row 4: complete DATETIME 2020-06-30T23:59 vs complete DATE 2020-06-30 compares at the coarser (day) precision -> equal day, strict '>' clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 EXSEQ=1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 2020-07
+S1 | EX | 001 | 2 | DRUG A | 2020-06
+S1 | EX | 001 | 3 | DRUG A | 2019
+S1 | EX | 001 | 4 | DRUG A | 2020-06-30T23:59
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+S1 | DM | 001 | 2020-06-30
+---

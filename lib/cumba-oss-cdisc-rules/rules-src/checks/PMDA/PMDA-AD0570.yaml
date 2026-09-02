@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0570"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when any subject-level subperiod timing variable (PxxSw,\
+  \ PxxSwSDT, PxxSwSTM, PxxSwSDM, PxxSwSDF, PxxSwSTF, PxxSwEDT, PxxSwETM, PxxSwEDM,\
+  \ PxxSwEDF, PxxSwETF) is present for a given period xx but the corresponding Planned\
+  \ Treatment for Period xx (TRTxxP) character variable is not present for the same\
+  \ xx value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    (var_exists("PxxSw") or var_exists("PxxSwSDT") or var_exists("PxxSwSTM") or
+    var_exists("PxxSwSDM") or var_exists("PxxSwSDF") or var_exists("PxxSwSTF") or
+    var_exists("PxxSwEDT") or var_exists("PxxSwETM") or var_exists("PxxSwEDM") or
+    var_exists("PxxSwEDF") or var_exists("PxxSwETF")) and not var_exists("TRTxxP")
+Outcome:
+  Message: "Subperiod timing variable is present, but TRTxxP is not present"
+  Output_Variables:
+  - "PxxSw"
+  - "PxxSwSDT"
+  - "PxxSwSTM"
+  - "PxxSwSDM"
+  - "PxxSwSDF"
+  - "PxxSwSTF"
+  - "PxxSwEDT"
+  - "PxxSwETM"
+  - "PxxSwEDM"
+  - "PxxSwEDF"
+  - "PxxSwETF"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  w:
+    min: 1
+    max: 9
+Source:
+  Message: "Variable is present, but TRTxxP is not present"
+  Description: "If any of the subject-level subperiod timing variables (PxxSw, PxxSwSDT,\
+    \ PxxSwSTM, PxxSwSDM, PxxSwSDF, PxxSwSTF, PxxSwEDT, PxxSwETM, PxxSwEDM, PxxSwEDF,\
+    \ PxxSwETF) are present, there must be a corresponding Planned Treatment for Period\
+    \ xx (TRTxxP) character variable present for the same xx value."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0570"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0570"
+        Version: "1"
+      Version: "6.0"

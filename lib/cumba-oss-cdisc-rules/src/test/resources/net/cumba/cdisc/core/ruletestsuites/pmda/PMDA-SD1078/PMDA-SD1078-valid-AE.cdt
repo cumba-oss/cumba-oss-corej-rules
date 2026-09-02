@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1078 expect=noViolation domain=AE
+#note "AESEV is Permissible (SDTMIG 3.4 AE core=Perm) and populated on at least one record -> no violation. Library metadata is production-faithful (see PMDA-SD1078-library.yaml): SDTM Model variables carry NO core attribute; core exists only at IG level."
+#library-include PMDA-SD1078-library.yaml
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESEV   type=Char label="Severity/Intensity"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | MILD
+CDISCPILOT01 | AE | 01-701-1023 | 1 | NAUSEA   |

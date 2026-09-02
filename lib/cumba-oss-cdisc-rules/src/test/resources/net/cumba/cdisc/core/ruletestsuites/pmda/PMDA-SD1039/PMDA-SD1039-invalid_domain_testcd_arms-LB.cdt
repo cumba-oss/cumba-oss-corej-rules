@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1039 expect=violation domain=LB
+#note "Row 1: LBCAT equalsIgnoreCase DOMAIN ('lb' vs 'LB') -> FIRES via the DOMAIN arm, pinning case-insensitivity on the builtin-column arm. Row 2: LBCAT == LBTESTCD -> FIRES via the --TESTCD arm. Row 3: clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=2 LBSEQ=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBCAT    type=Char
+---
+S1 | LB | 001 | 1 | GLUC | lb
+S1 | LB | 001 | 2 | HDL  | HDL
+S1 | LB | 001 | 3 | ALB  | CHEMISTRY
+---

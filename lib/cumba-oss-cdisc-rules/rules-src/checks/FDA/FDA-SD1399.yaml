@@ -1,0 +1,43 @@
+Core:
+  Id: "FDA-SD1399"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Date/Time of Agent (AGSTDTC) is before Date/Time\
+  \ of First Challenge Agent Admin (RFCSTDTC) in the DM dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AG"
+Requirements:
+  Variables:
+    All:
+    - "AGSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(AGSTDTC) and not empty(DM.RFCSTDTC) and date(AGSTDTC) < DM.RFCSTDTC
+Outcome:
+  Message: "AGSTDTC is before RFCSTDTC."
+  Output_Variables:
+  - "AGSTDTC"
+  - "DM.RFCSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "AGSTDTC date is before RFCSTDTC"
+  FDA_Validator_Rule_Description: "Start Date/Time of Agent (AGSTDTC) variable value\
+    \ must be greater than or equal to Date/Time of First Challenge Agent Admin (RFCSTDTC)."
+  Domains: "AG"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1399"
+        Version: "1"
+      Version: "1.6"

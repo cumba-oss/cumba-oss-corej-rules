@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SE2319 expect=violation domain=VS
+#note "Second scoped domain: subject 003 has VS records whose VSBLFL never equals 'Y' -> one Group-level finding. Subject 001 carries a baseline record."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt USUBJID=003
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSBLFL   type=Char label="Baseline Flag"
+---
+S1 | VS | 001 | 1 | TEMP | Temperature | 37.1 | Y
+S1 | VS | 001 | 2 | TEMP | Temperature | 37.4 |
+S1 | VS | 003 | 1 | TEMP | Temperature | 36.9 | N
+S1 | VS | 003 | 2 | TEMP | Temperature | 37.0 |
+---

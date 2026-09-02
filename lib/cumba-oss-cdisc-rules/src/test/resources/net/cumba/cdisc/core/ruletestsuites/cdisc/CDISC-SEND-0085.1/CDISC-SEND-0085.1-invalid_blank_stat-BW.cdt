@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0085.1 expect=violation domain=BW
+#note "THE CELL THE DEFECT CONTROLLED (Fix #285 / M3-D2). Row 1 has an empty --ORRES and an empty --STAT: with the literal double-quoted, `\"\" != \"NOT DONE\"` is TRUE (ScalarSemantics.equalsNumericAware folds a missing left operand to the empty string and compares as text) and the row FIRES. Before M3-D2 the second disjunct carried var_exists(`NOT DONE`), which is false everywhere, so that whole arm collapsed and only the '--STAT column absent' arm survived -- the rule UNDER-reported its central population (note: the batch record's 'OVER-REPORTS' label is wrong; the analysis under it is right). Row 2 is legitimately not done and row 3 carries a result, so both are silent under either reading; the fixture isolates exactly the one cell."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 BWSEQ=1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWSTAT   type=Char label="Completion Status"
+---
+S1 | BW | 001 | 1 | BW |     |
+S1 | BW | 001 | 2 | BW |     | NOT DONE
+S1 | BW | 001 | 3 | BW | 250 |
+---

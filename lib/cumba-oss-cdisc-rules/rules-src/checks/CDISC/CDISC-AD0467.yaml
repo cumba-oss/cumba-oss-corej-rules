@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0467"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STRATARN is populated and STRATAR is empty on the\
+  \ same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(STRATARN) and empty(STRATAR)
+Outcome:
+  Message: "STRATARN is populated but STRATAR is empty."
+  Output_Variables:
+  - "STRATAR"
+  - "STRATARN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "STRATAR"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, STRATARN is populated\
+    \ and STRATAR is not populated"
+  Rule_Failure_Criteria: "STRATAR is not populated"
+  Condition_Failure: "STRATARN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR467"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR467"
+        Version: "1"
+      Version: "5.0"

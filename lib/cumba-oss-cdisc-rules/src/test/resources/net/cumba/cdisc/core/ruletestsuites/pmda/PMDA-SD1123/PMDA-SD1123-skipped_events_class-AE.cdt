@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1123 expect=skipped domain=AE
+#note "SD1123 is Classes.Include-scoped to [FINDINGS, FINDINGS ABOUT]; EVENTS is out of scope -> auditable SKIP even though this row's shape (AESTAT='NOT DONE' with populated AEORRES) would fire were the class gate to fail. Fix #41 strict-on-null makes class=EVENTS load-bearing."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTAT  type=Char label="Completion Status"
+col AEORRES type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | NOT DONE | Y

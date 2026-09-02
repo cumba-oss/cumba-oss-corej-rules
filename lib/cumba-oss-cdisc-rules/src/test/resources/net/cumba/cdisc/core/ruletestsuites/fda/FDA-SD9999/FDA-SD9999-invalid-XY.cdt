@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9999 expect=violation domain=XY
+#note "XY is a custom (non-standard) dataset and its Define-XML class 'TRIAL DESIGN' is not one of the SDTM general observation classes (EVENTS, FINDINGS, INTERVENTIONS) -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#library custom-domain XY
+#define dataset-class XY "TRIAL DESIGN"
+#expectViolationCount 1
+dataset XY label="Custom Dataset"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XYSEQ   type=Num  label="Sequence Number"
+col XYTERM  type=Char label="Reported Term"
+---
+S1 | XY | 001 | 1 | SOMETHING

@@ -1,0 +1,119 @@
+Core:
+  Id: "PMDA-SD1029"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a variable whose value may be converted into a\
+  \ new variable name or label (--TEST, --TESTCD, --PARM, --PARMCD, QLABEL, QNAM)\
+  \ contains a non-ASCII or non-printable character (a character outside the printable\
+  \ ASCII range 32-126)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+    - "RELATIONSHIP"
+    - "TRIAL DESIGN"
+Check:
+  expression: >-
+    varname() =~ /^(..TESTCD|..TEST|..PARMCD|..PARM|QNAM|QLABEL)$/ and value() =~ /.*[^ -~]/
+Outcome:
+  Message: "The variable value contains a non-ASCII or non-printable character (outside\
+    \ the printable ASCII range 32-126)."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Non-ASCII or non-printable characters in variable"
+  Description: "Variables value must not include non-ASCII or non-printable characters\
+    \ (outside of 32-126 ASCII code range), limited to variables which values may\
+    \ be converted into new variable name or label (--TEST, --TESTCD, --PARM, --PARMCD,\
+    \ QLABEL, QNAM)."
+  Domains: "FINDINGS, FINDINGS ABOUT, SUPPQUAL, TI, TS, STUDY REFERENCE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1029"
+        Version: "1"
+      Version: "1.6"

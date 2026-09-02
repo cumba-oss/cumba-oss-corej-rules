@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0061A expect=noViolation domain=ADSL
+#note "ADSL with TRTEDT populated + the same EX block -> `not var_exists(\"TRTEDT\")` false -> clean. EX-ABSENT IS NOT AUTHORED: on an adamig run EX is cross-standard, and Fix #218 turns the absent case into SKIPPED in production while the harness would report a silent noViolation - the recorded carve-out."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTEDT  type=Num
+---
+S1 | 01-001 | 22000
+---
+
+dataset EX
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+col EXSTDTC type=Char
+---
+S1 | EX | 01-001 | DRUGA | 2020-01-05

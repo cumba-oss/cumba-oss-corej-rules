@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0272"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'HLTSUBJI'\
+  \ and TSVAL equal to 'Y', but TSVAL is populated with a value other than 'HEALTHY\
+  \ SUBJECTS' for the record where TSPARMCD equals 'TDIGRP'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Operations:
+- id: "$HLTSUBJI_Y"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"HLTSUBJI\",\
+    \ TSVAL=\"Y\"))"
+Check:
+  expression: >-
+    TSPARMCD == "TDIGRP" and $HLTSUBJI_Y >= 1 and not empty(TSVAL) and TSVAL != "HEALTHY SUBJECTS"
+Outcome:
+  Message: "TSVAL must be empty or 'HEALTHY SUBJECTS' for the TDIGRP Trial Summary\
+    \ Parameter when a record exists with TSPARMCD equal to 'HLTSUBJI' and TSVAL equal\
+    \ to 'Y'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$HLTSUBJI_Y"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'TDIGRP' and record exists where TSPARMCD = 'HLTSUBJI' and\
+    \ TSVAL = 'Y'"
+  Rule: "TSVAL = null or 'HEALTHY SUBJECTS'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0272"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0272"
+        Version: "2"
+      Version: "2.0"

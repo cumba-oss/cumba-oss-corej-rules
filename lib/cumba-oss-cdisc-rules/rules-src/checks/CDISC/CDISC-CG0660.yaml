@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG0660"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --EVALID is present in a QS or FT dataset. --EVALID\
+  \ must not be used to model QRS (Questionnaires, Ratings, and Scales) data. This\
+  \ also applies to the RS domain for the Clinical Classification Use Case, which\
+  \ is a human-judgement condition not evaluated by this rule."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "QS"
+    - "FT"
+    - "RS"
+Check:
+  expression: >-
+    var_exists("QSEVALID") or var_exists("FTEVALID")
+Outcome:
+  Message: "--EVALID is present. --EVALID must not be used to model QRS data."
+  Output_Variables:
+  - "QSEVALID"
+  - "FTEVALID"
+Source:
+  Class: "FND"
+  Domain: "QS, FT, RS"
+  Variable: "--EVALID"
+  Condition: "Domain in ('QS', 'FT') or (Domain = 'RS' and it's the Clinical Classification\
+    \ Use Case)"
+  Rule: "--EVALID not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0660"
+        Version: "1"
+      Version: "2.0"

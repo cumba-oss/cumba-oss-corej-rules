@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0688 expect=noViolation domain=ADDL
+#note "Three distinct (SPDEVID, USUBJID) tuples - rows 1-2 share a subject, rows 1-3 share a device, proving the key really is the PAIR. Rule executes and stays silent."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | DEV1 | 56
+CDISCPILOT01 | 01-701-1015 | DEV2 | 56
+CDISCPILOT01 | 01-701-1023 | DEV1 | 61

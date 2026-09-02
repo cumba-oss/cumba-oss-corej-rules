@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0284"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Number of Arms parameter (TSPARMCD equal\
+  \ to 'NARMS') has a Parameter Value (TSVAL) that is not an integer greater than\
+  \ 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVAL"
+    - "TSPARMCD"
+Check:
+  expression: >-
+    var_exists("TSVAL") and TSPARMCD == "NARMS" and (not is_integer(TSVAL) or TSVAL <= 0)
+Outcome:
+  Message: "TSVAL is not an integer greater than 0 when TSPARMCD equals 'NARMS'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = NARMS"
+  Rule: "TSVAL is integer and > 0"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0284"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0284"
+        Version: "1"
+      Version: "2.0"

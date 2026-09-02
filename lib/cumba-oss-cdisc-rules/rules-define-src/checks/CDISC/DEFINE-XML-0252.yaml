@@ -1,0 +1,20 @@
+Rule_Id: "DEFINE-XML-0252"
+Sheet_Rule_Identifier: "252"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "Purpose"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The value of the Purpose attribute must be \"Analysis\" for an ItemGroupDef element that represents a dataset defined as following a ADaMIG standard."
+# Sheet: '//ItemGroupDef/@Purpose must be "Analysis" where def:Standard/@Name =
+# "ADaMIG" and ItemGroupDef[@def:StandardOID = def:Standard/@OID].' Unlike sibling
+# rule 106 (begins-with 'ADaM'), the sheet's formal rule pins Name equality to
+# "ADaMIG" — kept verbatim. Value check fires only on a present Purpose.
+Message: "The Purpose attribute for ItemGroupDef is not \"Analysis\" [${value}] but the dataset follows the ADaMIG standard."
+Check:
+  kind: "one_of"
+  attribute: "Purpose"
+  values: ["Analysis"]
+  when:
+    path: "@StandardOID->Standard@OID/@Name"
+    equals: "ADaMIG"

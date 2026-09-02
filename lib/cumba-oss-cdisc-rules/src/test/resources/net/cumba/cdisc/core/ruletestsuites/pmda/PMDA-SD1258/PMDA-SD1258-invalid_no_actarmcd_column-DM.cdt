@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1258 expect=skipped domain=DM
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). Fix #331's escalation clause -- 'If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence' -- FIRED HERE AND WAS NOT HONOURED: PLAN-retire-corpus-transforms phase 4 made this scenario silent again by a DIFFERENT mechanism (an authored Requirements.Variables.All entry, not an injected guard), and the scenario was re-pointed to expect=skipped without the escalation. RE-EXAMINED AND RULED 2026-08-27 (owner): the SKIP stands, on two independent grounds -- (1) ACTARMCD in DM is Req (SDTMIG 3.1.3/3.2) or Exp (3.3/3.4), NEVER Permissible, so CORE-000355/CORE-000334 and their family twins report its absence dataset-wide in every package; (2) with ACTARMCD absent, empty(ACTARMCD) is TRUE on every row and the Check collapses to `not empty(RF*DTC)`, which fires on essentially every subject -- the flood case the scope entry exists for. The escalation clause REMAINS IN FORCE for any future silencing. History, before Fix #330: DELIBERATELY NO ACTARMCD COLUMN. The machine-emitted var_exists(\"ACTARMCD\") guard is inlined into BOTH arms of the or, so both fold FALSE and the whole disjunction collapses -> no violation, with the rule executing: an untreated-subject check that goes silent when the arm column is missing altogether. Or-distributed arm of the absent-column guard family. ACTARMCD is Expected in SDTMIG 3.4 DM, so its absence is a separate conformance failure (SD1258-F1), not a change proposal. PLAN-retire-corpus-transforms phase 4: the absent column now takes the auditable Requirements.Variables.All SKIP instead of the per-row fire (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-2
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | 2020-01-15 | M

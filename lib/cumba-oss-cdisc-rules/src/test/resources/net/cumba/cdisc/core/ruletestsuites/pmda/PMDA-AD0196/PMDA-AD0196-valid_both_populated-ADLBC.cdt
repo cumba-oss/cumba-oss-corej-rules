@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0196 expect=noViolation domain=ADLBC
+#note "Negative control: same columns as the invalid fixture, but both PARAMCD and PARAM are populated on every row, so neither arm of the disjunction fires and the rule executes without violation."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | Alanine   | 2.5
+CDISCPILOT01 | 01-701-1023 | ALT | Alanine   | 7.0
+CDISCPILOT01 | 01-701-1034 | ALB | Albumin   | 9.9

@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1089 expect=noViolation domain=AE
+#note "Pins the NEW inner-join semantics: subject 004 has AESTDY populated and a COMPLETE AESTDTC, but no DM record at all. Under the removed Join_Type: left, DM.RFSTDTC was null after the merge, read as 'not a complete date', and this rule fired claiming an imputed day value; the inner join drops the row instead -- D-TA-2 (inner is the doctrine): a subject absent from DM is PMDA-SD0064's finding, not this rule's -- one root cause, one finding. DM is present and non-empty (subject 001, RFSTDTC complete), so a rule that still left-joined WOULD fire here: this is a discriminator, not a vacuous pass."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AESTDY  type=Num  label="Study Day of Start of Adverse Event"
+---
+S1 | AE | 004 | 1 | HEADACHE | 2023-06-25 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2023-06-01

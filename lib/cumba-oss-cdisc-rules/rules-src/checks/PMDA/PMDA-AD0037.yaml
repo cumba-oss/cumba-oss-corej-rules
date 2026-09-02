@@ -1,0 +1,49 @@
+Core:
+  Id: "PMDA-AD0037"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the numeric grouping variable *GRyN\
+  \ does not have a single consistent value for each unique value of the character\
+  \ grouping variable *GRy. *GRy is a derived character grouping variable (name ends\
+  \ in GRy, y = 1-9) and *GRyN is its numeric equivalent (name ends in GRyN). Rows\
+  \ where *GRy is empty or *GRyN is missing are not considered."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*GRy) and not empty(*GRyN) and has_multiple_values_for(*GRyN, *GRy)
+Outcome:
+  Message: "The numeric grouping variable *GRyN has inconsistent values for a given\
+    \ value of the character grouping variable *GRy."
+  Output_Variables:
+  - "*GRyN"
+  - "*GRy"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Message: "Inconsistent value for *GRyN"
+  Description: "Within a study, all *GRyN values must be the same for each unique\
+    \ value of *GRy when the primary variable *GRy is populated. ADaM IG v1.0 p.11\
+    \ general variable naming conventions #10: If any combining of the SDTM character\
+    \ categories is done, the name of the derived ADaM character grouping variable\
+    \ should end in GRy and the name of its numeric equivalent should end in GRyN\
+    \ where y is an integer from 1-9 representing a grouping scheme. CDISC created\
+    \ 3 new explicit rules for ADAE which were already covered by this general rule."
+  Domains: "ADSL, BDS, ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0037"
+        Version: "1"
+      Version: "6.0"

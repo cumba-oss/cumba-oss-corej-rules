@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-AD0415"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTSEQPN is populated and TRTSEQP is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRTSEQPN"
+    - "TRTSEQP"
+Check:
+  expression: >-
+    not empty(TRTSEQPN) and empty(TRTSEQP)
+Outcome:
+  Message: "TRTSEQPN is populated but TRTSEQP is not populated."
+  Output_Variables:
+  - "TRTSEQP"
+  - "TRTSEQPN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTSEQP"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TRTSEQPN is populated\
+    \ and TRTSEQP is not populated"
+  Rule_Failure_Criteria: "TRTSEQP is not populated"
+  Condition_Failure: "TRTSEQPN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR415"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR415"
+        Version: "1"
+      Version: "5.0"

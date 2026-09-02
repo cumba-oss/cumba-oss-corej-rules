@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-SEND-0358"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Specimen Material Type (ICSPEC) is populated with\
+  \ a value other than 'UTERUS', the controlled terminology SPEC term for uterus."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "IC"
+Requirements:
+  Variables:
+    All:
+    - "ICSPEC"
+Check:
+  expression: >-
+    not empty(ICSPEC) and ICSPEC != "UTERUS"
+Outcome:
+  Message: "ICSPEC is populated with a value other than the controlled terminology\
+    \ term 'UTERUS'."
+  Output_Variables:
+  - "ICSPEC"
+Source:
+  Class: "FND"
+  Domain: "IC"
+  Variable: "ICSPEC"
+  Plain_Text_Explanation: "When ICSPEC is populated, the value is the term for uterus\
+    \ from the Controlled Terminology SPEC codelist."
+  Condition: "ICSPEC ^= null"
+  Rule: "ICSPEC = Controlled Terminology SPEC term for Uterus"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND358"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND358"
+        Version: "1"
+      Version: "5.0"

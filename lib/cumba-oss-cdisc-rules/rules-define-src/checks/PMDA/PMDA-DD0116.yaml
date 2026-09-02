@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0116"
+Sheet_Rule_Identifier: "DD0116"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "library"
+Plain_Text_Rule: "When SDTM Event or Intervention qualifier variable is used as FATESTCD, then FATEST should be the corresponding qualifier variable label."
+# Library-gated. define.xml carries FATESTCD/FATEST pairs as the FATESTCD
+# codelist's CodedValue/Decode - the only footprint of this data-level rule -
+# so the check walks the FATESTCD ItemDef's CodeListRef-resolved CodeList:
+# every CodeListItem whose CodedValue names an Event/Intervention qualifier
+# fragment (qualifierVariableLabel answers) must decode to that qualifier's
+# label. EnumeratedItems carry no Decode and are out of reach. The standard is
+# the document-level SDTMIG/SENDIG (a FATESTCD ItemDef has no dataset anchor).
+Message: "FATESTCD/FATEST mismatch in Codelist [${value}]"
+Check:
+  kind: "library_qualifier_label_decode"
+  when:
+    path: "@Name"
+    equals: "FATESTCD"

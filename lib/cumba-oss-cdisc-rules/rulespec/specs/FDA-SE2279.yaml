@@ -1,0 +1,65 @@
+name: FDA-SE2279
+kind: rule
+description: |
+  P7-B (EC-24 coalesced within grouping key). FDA-SE2279 fires when PCNOMDY takes
+  more than one value for a given PCTPTREF within the same subject — or, for pooled
+  records where USUBJID is blank, within the same POOLID. The Check now groups by
+  the coalesced key within: [[USUBJID, POOLID]] (first populated component per row;
+  "" counts as unpopulated, the approved Q-5 deviation), so pooled rows group per
+  POOLID instead of collapsing into one blank-USUBJID bucket.
+
+  Pool P1 (PCSEQ 2/3, PCTPTREF C1) maps C1 -> {5,6} -> both fire. Pool P2 (PCSEQ 4,
+  PCTPTREF C1 -> {5}) does NOT fire, proving no cross-pool contamination (a flat
+  within:[USUBJID] would pool P1+P2 blank-USUBJID rows into one group and mis-fire).
+  Real subject 001 (PCSEQ 5/6, PCTPTREF R1 -> {1,9}) fires, proving the USUBJID
+  fall-through still groups correctly. Both lanes coalesce identically (no baseline).
+python_source: rules-fda-sendig-3-1-1.json (FDA-SE2279)
+rule:
+  coreId: FDA-SE2279
+datasets:
+  PC:
+    row_key: [STUDYID, PCSEQ]
+    rows:
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '', POOLID: P1, PCSEQ: 1, PCTPTREF: R1, PCNOMDY: '1'}
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '', POOLID: P1, PCSEQ: 2, PCTPTREF: C1, PCNOMDY: '5'}
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '', POOLID: P1, PCSEQ: 3, PCTPTREF: C1, PCNOMDY: '6'}
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '', POOLID: P2, PCSEQ: 4, PCTPTREF: C1, PCNOMDY: '5'}
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', POOLID: '', PCSEQ: 5, PCTPTREF: R1, PCNOMDY: '1'}
+    - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', POOLID: '', PCSEQ: 6, PCTPTREF: R1, PCNOMDY: '9'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+expected_violations:
+- rule_id: FDA-SE2279
+  dataset: PC
+  row_key: {PCSEQ: 2, STUDYID: S1}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '5'
+    PCTPTREF: C1
+    POOLID: P1
+- rule_id: FDA-SE2279
+  dataset: PC
+  row_key: {PCSEQ: 3, STUDYID: S1}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '6'
+    PCTPTREF: C1
+    POOLID: P1
+- rule_id: FDA-SE2279
+  dataset: PC
+  row_key: {PCSEQ: 5, STUDYID: S1}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '1'
+    PCTPTREF: R1
+    POOLID:
+- rule_id: FDA-SE2279
+  dataset: PC
+  row_key: {PCSEQ: 6, STUDYID: S1}
+  status: SUCCESS
+  output_variables:
+    PCNOMDY: '9'
+    PCTPTREF: R1
+    POOLID:
+expected_errors: []

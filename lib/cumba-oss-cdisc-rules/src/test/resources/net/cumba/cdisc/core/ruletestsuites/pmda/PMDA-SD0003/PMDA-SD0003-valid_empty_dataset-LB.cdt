@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0003 expect=noViolation domain=LB
+#note "FRESH, DISCRIMINATING. Zero data rows. Predicted SILENT: the rule is RECORD-sensitivity and value-based, so RuleRunner never substitutes the synthetic 1-row table, and evaluateVariableValueNative's per-column BitSet is empty on a 0-row table. If this fires instead, that is the broadcast-fold shape reaching a rule it should not (see batch STAGE-G CRITICAL 5) — escalate, do not rewrite."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---

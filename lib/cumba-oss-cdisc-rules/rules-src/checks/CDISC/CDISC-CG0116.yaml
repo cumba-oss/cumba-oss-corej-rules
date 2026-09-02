@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0116"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --LOC is not present but --DIR is present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    not var_exists("--LOC") and var_exists("--DIR")
+Outcome:
+  Message: "--DIR is present when --LOC is not present."
+  Output_Variables:
+  - "--DIR"
+Source:
+  Class: "INT, FND, EVT"
+  Domain: "ALL"
+  Variable: "--DIR"
+  Condition: "--LOC not present in dataset"
+  Rule: "--DIR not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0116"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0116"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0116"
+        Version: "2"
+      Version: "2.0"

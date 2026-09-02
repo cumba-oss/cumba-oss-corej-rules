@@ -1,0 +1,48 @@
+name: CDISC-AD0117
+kind: rule
+description: |
+  Wave B1 port - T1b PlainIntermediate.
+  CDISC-AD0117: Within a given value of PARAMCD, there is more than one value of ATPT for a given value of ATPTN.
+  has_multiple_values_for with within=PARAMCD; expects a 1-to-1 ATPTN->ATPT
+  functional dependency per PARAMCD group. Bare-leaf Check at root - Python
+  business-rules KeyError. Expected matches Java's per-row flags.
+python_source: rules-adamig-1-3.json (CDISC-AD0117)
+rule:
+  coreId: CDISC-AD0117
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, ATPTN, ATPT]
+    column_types:
+      ATPTN: LONG
+    rows:
+      # PARAMCD=HGB: ATPTN=1 maps to two distinct ATPT values (Baseline vs Pre-dose) -> violation
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, ATPTN: 1, ATPT: Baseline}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, ATPTN: 1, ATPT: Pre-dose}
+      # PARAMCD=HGB: ATPTN=2 is consistent
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, ATPTN: 2, ATPT: Week 1}
+      # PARAMCD=GLUC: ATPTN=1 consistent
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: GLUC, ATPTN: 1, ATPT: Baseline}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0117
+    dataset: ADLB
+    row_key: {ATPT: Baseline, ATPTN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ATPT: Baseline
+      ATPTN: '1'
+      PARAMCD: HGB
+  - rule_id: CDISC-AD0117
+    dataset: ADLB
+    row_key: {ATPT: Pre-dose, ATPTN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ATPT: Pre-dose
+      ATPTN: '1'
+      PARAMCD: HGB
+expected_errors: []

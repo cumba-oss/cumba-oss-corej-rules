@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-SEND-0167 expect=violation domain=DD
+#note "FRESH, per M3-SEND-T1-K3-01 stage-r. Subjects 001 and 002 are both scheduled, under two DIFFERENT filter terms (so the fixture also pins that the operation filter is a value LIST, not a single value); subject 003 is not. DISCRIMINATING: two offending subjects with two DD records each -> per-subject 2, per-record 4. Ruled per subject (SD1316-F3), anchored at each group's first flagged row = DD rows 1 and 3."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=3 USUBJID=002
+dataset DD label="Death Diagnosis"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DDSEQ    type=Num  label="Sequence Number"
+col DDTESTCD type=Char label="Death Diagnosis Short Name"
+col DDTEST   type=Char label="Death Diagnosis Test Name"
+col DDORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | DD | 001 | 1 | GROSSPATH | Gross Pathology | NO VISIBLE LESIONS
+S1 | DD | 001 | 2 | CAUSDTH   | Cause of Death  | UNDETERMINED
+S1 | DD | 002 | 1 | GROSSPATH | Gross Pathology | PALE LIVER
+S1 | DD | 002 | 2 | CAUSDTH   | Cause of Death  | UNDETERMINED
+S1 | DD | 003 | 1 | CAUSDTH   | Cause of Death  | MORIBUND
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | Terminal sacrifice | TERMINAL SACRIFICE | 2020-03-30
+S1 | DS | 002 | 1 | Interim sacrifice  | INTERIM SACRIFICE  | 2020-02-15
+S1 | DS | 003 | 1 | Found dead         | FOUND DEAD         | 2020-01-20
+---

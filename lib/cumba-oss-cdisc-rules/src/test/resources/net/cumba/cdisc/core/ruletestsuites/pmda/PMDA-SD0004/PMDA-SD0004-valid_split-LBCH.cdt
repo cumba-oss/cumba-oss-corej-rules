@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0004 expect=noViolation domain=LBCH
+#note "Boundary: a legitimate split dataset name must not be reported - only the first TWO characters are compared, prefix('LBCH',2)='LB' == DOMAIN='LB' -> silent. Adapted from the shipped green fda/FDA-SD0004-valid_split-LBCH.cdt."
+#library standard=sdtmig version=3-4
+dataset LBCH label="Laboratory Test Results - Chemistry"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+---
+S1 | LB | 001 | 1 | ALB
+S1 | LB | 001 | 2 | GLUC

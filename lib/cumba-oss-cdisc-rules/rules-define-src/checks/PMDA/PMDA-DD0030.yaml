@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0030"
+Sheet_Rule_Identifier: "DD0030"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The def:ExtendedValue attribute must have a value of 'Yes'."
+# The sheet constrains the attribute wherever it appears (EnumeratedItem and
+# CodeListItem carry it in the schema), so one wildcard-scoped rule replaces
+# the CDISC twins' per-element pair (0178/0197 - AGREE on the value set). The
+# 0230 wildcard precedent; value check fires only on a present attribute.
+Message: "Invalid def:ExtendedValue value"
+Check:
+  kind: "one_of"
+  attribute: "ExtendedValue"
+  values: ["Yes"]

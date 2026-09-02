@@ -1,0 +1,90 @@
+Core:
+  Id: "CDISC-SEND-0001"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SEND dataset (other than a Supplemental Qualifier,\
+  \ Related Records, or Pool Definition dataset) has a dataset name whose first two\
+  \ characters do not equal the Domain Abbreviation (DOMAIN) value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+    - "POOLDEF"
+    - "AP--"
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    prefix(dataset_name, 2) != DOMAIN
+Outcome:
+  Message: "The dataset name does not begin with the DOMAIN value; a SEND dataset\
+    \ name must be consistent with its domain code."
+  Output_Variables:
+  - "dataset_name"
+  - "DOMAIN"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "NA"
+  Plain_Text_Explanation: "SEND datasets are named to be consistent with the domain\
+    \ code (xpt file name is the domain abbreviation); exceptions to this rule are\
+    \ RELREC, SUPP, and POOLDEF."
+  Condition: "not SUPP OR RELREC OR POOLDEF"
+  Rule: "SEND dataset file name is the domain abbreviation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND1"
+        Version: "1"
+      Version: "5.0"

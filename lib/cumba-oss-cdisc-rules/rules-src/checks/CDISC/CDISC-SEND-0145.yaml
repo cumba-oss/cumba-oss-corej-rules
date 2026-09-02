@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0145"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Result or Finding in Original Units (--ORRES) is\
+  \ populated and Completion Status (--STAT) is also populated; --STAT must be empty\
+  \ when --ORRES is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+Check:
+  expression: >-
+    not empty(--ORRES) and not empty(--STAT)
+Outcome:
+  Message: "--STAT is populated when --ORRES is populated; --STAT must be empty when\
+    \ --ORRES is populated."
+  Output_Variables:
+  - "--ORRES"
+  - "--STAT"
+Source:
+  Class: "FND"
+  Domain: "NOT (SC)"
+  Variable: "--STAT"
+  Plain_Text_Explanation: "If --ORRES is populated, --STAT must not be populated"
+  Condition: "--ORRES ^= null"
+  Rule: "--STAT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND145"
+        Version: "1"
+      Version: "5.0"

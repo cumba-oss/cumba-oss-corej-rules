@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0224 expect=violation domain=DM
+#note "DISTINCT-ON-EMPTY PIN. TA keeps its dataset line and all seven col lines but has ZERO data rows; OperationType.DISTINCT declares EmptyResult.SET and the tuple evaluation over a 0-row table yields an empty set, so the one populated DM pair is not a member and fires. The blank-pair row stays silent through the `not empty` conjuncts, which keeps the count at 1. Green under BOTH the pre- and post-M3-D14 shapes -- an empty tuple set contains no pair either. A TA that is ENTIRELY ABSENT is a different case and is deliberately not authored (AbsentDatasetSkip walks Operation domains and production reports SKIPPED)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 ARMCD=A
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | 001 | M | A | Arm A
+S1 | DM | 003 | 003 | M |   |
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---

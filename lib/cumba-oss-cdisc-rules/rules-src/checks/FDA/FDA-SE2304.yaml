@@ -1,0 +1,99 @@
+Core:
+  Id: "FDA-SE2304"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a SETCD in the Trial Sets (TX) domain does not contain\
+  \ a record where TXPARMCD equals 'TRTDOSU' (Dose Units)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Grouping:
+  Variables:
+  - "SETCD"
+Operations:
+- id: "$trtdosu_count"
+  expression: "record_count(group=[SETCD], filter=filter(TXPARMCD=\"TRTDOSU\"))"
+Check:
+  expression: >-
+    not empty(SETCD) and $trtdosu_count < 1
+Outcome:
+  Message: "Missing TRTDOSU Trial Set Parameter: a 'Dose Units' (TRTDOSU) record is\
+    \ not present for the SETCD in the Trial Sets (TX) domain."
+  Output_Variables:
+  - "SETCD"
+  - "$trtdosu_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing TRTDOSU Trial Set Parameter within SETCD"
+  FDA_Validator_Rule_Description: "'Dose Units' (TRTDOSU) records should be populated\
+    \ for each SETCD in Trial Sets (TX) domain."
+  Domains: "TX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2304"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2304"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2304"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2304"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2304"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB046"
+        Version: "1"
+      Version: "1.5"
+    Version: "1.1"

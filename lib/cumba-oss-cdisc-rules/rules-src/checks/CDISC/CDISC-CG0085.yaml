@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0085"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --PRESP is populated with a value that is not equal\
+  \ to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--PRESP"
+Check:
+  expression: >-
+    not empty(--PRESP) and --PRESP != "Y"
+Outcome:
+  Message: "--PRESP is populated with a value other than 'Y'."
+  Output_Variables:
+  - "--PRESP"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(DS, DV, EX)"
+  Variable: "--PRESP"
+  Rule: "--PRESP in ('Y', null)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0085"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0085"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0085"
+        Version: "1"
+      Version: "2.0"

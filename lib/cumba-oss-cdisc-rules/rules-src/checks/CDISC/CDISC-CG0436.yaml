@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0436"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a System Organ Class (--SOC) value is not a valid\
+  \ System Organ Class in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "MH"
+    - "CE"
+Requirements:
+  Variables:
+    All:
+    - "--SOC"
+Operations:
+- id: "$soc_valid"
+  expression: "valid_external_dictionary_value(--SOC, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOC\", case_sensitive=false)"
+Check:
+  expression: >-
+    $soc_valid == false
+Outcome:
+  Message: "System Organ Class (--SOC) is not a valid MedDRA System Organ Class."
+  Output_Variables:
+  - "--SOC"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--SOC"
+  Rule: "--SOC = MedDRA primary system organ class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0436"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0436"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0436"
+        Version: "1"
+      Version: "2.0"

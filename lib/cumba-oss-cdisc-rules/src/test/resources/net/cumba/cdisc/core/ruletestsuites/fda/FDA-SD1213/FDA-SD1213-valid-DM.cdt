@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1213 expect=noViolation domain=DM
+#note "Every treated subject (ACTARMCD populated and not SCRNFAIL/NOTTRT/NOTASSGN) carries a populated RFSTDTC -> no violation."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | 2020-01-15 | A
+S1 | DM | 002 |            | SCRNFAIL
+S1 | DM | 003 |            | NOTTRT
+S1 | DM | 004 |            | NOTASSGN
+S1 | DM | 005 |            |

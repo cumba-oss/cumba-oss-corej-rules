@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1128 expect=violation domain=RELREC
+#note "Row 3 carries a populated RELTYPE ('BOTH') that is neither 'ONE' nor 'MANY' -> fires. Rows 1/2 use the two allowed terms; row 4 leaves RELTYPE empty (record-level relationship), which this rule does not flag."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 RELTYPE=BOTH
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE type=Char label="Relationship Type"
+col RELID   type=Char label="Relationship Identifier"
+---
+S1 | AE |  | AESEQ |  | ONE  | R01
+S1 | CM |  | CMSEQ |  | MANY | R01
+S1 | LB |  | LBSEQ |  | BOTH | R02
+S1 | VS | 001 | VSSEQ | 1 |  | R03

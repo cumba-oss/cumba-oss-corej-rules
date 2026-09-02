@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0019 expect=violation domain=TS
+#note "TSPARM on row 2 is 41 characters, one past the 40-character limit -> fires; row 1 sits exactly on the boundary and does not."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARM="Trial summary parameter of exactly 41 chs"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+---
+S1 | TS | 1 | OKP | Trial summary parameter of exactly 40 ch
+S1 | TS | 2 | BADP | Trial summary parameter of exactly 41 chs

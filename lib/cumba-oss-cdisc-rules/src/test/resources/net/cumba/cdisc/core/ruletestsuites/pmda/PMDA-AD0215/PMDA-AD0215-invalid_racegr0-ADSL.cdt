@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0215 expect=violation domain=ADSL
+#note "RACEGR0 matches ^RACEGR\d+N?$ and fails ^RACEGR[1-9]N?$ -> fires; RACEGR1 matches both -> silent; STUDYID/USUBJID match neither. One finding per offending COLUMN."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt variable_name=RACEGR0
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col RACEGR0  type=Char
+col RACEGR1  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | WHITE | WHITE

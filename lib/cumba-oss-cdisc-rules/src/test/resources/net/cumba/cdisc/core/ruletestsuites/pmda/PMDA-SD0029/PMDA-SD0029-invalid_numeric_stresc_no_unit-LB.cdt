@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0029 expect=violation domain=LB
+#note "Row 1: present-but-empty unit on a numeric result -> fires. Row 2: unit populated -> clean. Row 3: non-numeric result -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTRESC=7.2 LBSTRESU=
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+col LBSTRESU type=Char
+---
+S1 | LB | 001 | 1 | GLUC  | 7.2      |
+S1 | LB | 001 | 2 | ALB   | 7.2      | mmol/L
+S1 | LB | 001 | 3 | HBSAG | NEGATIVE |

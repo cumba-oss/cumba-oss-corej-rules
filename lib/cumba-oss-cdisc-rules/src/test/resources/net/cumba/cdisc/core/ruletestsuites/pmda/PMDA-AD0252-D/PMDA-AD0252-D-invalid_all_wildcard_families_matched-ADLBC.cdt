@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-AD0252-D expect=violation domain=ADLBC
+#note "Five columns, five template families: AOCC01FL matches ^AOCC(0[1-9]|[1-9]\d)FL$, TRTEM1FL matches ^TRTEM[1-9]FL$, TREM01FL matches ^TREM(0[1-9]|[1-9]\d)FL$, ACAT1 matches ^ACAT([1-9]|[1-9][0-9])$ and LBORG1 matches ^.+ORG[1-9]$. Since Fix #270 (ruling M2-D3) each family is its own varname() regex disjunct evaluated per variable, so the expander's Step-5 five-capture-group cross-join (finding AD0252-D-F1's second half) is GONE and each column fires INDEPENDENTLY -> FIVE violations (pre-#270 the cross-join required every group to match with agreeing indices and emitted ONE dataset-level violation; the owner ruled the independent reading correct, M2-D3 sub-decision 2). PARAMCD and AVAL are legitimate BDS variables and stay silent. LBORG1's *ORGw arm - previously missing from Output_Variables (AD0252-D-F2, retired by Output_Variables -> [variable_name]) - is pinned for the first time."
+#library standard=adamig version=1-3
+#expectViolationCount 5
+#expectViolationAt variable_name=AOCC01FL
+#expectViolationAt variable_name=TRTEM1FL
+#expectViolationAt variable_name=TREM01FL
+#expectViolationAt variable_name=ACAT1
+#expectViolationAt variable_name=LBORG1
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col AOCC01FL type=Char
+col TRTEM1FL type=Char
+col TREM01FL type=Char
+col ACAT1    type=Char
+col LBORG1   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | Y | Y | Y | CAT1 | ORGA
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | Y | Y | Y | CAT1 | ORGA

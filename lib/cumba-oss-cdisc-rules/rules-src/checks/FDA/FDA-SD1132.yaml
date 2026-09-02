@@ -1,0 +1,124 @@
+Core:
+  Id: "FDA-SD1132"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when any of AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP,\
+  \ AESLIFE or AESMIE is equal to 'Y' but AESER is not equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESER"
+Check:
+  expression: >-
+    (var_exists("AESCAN") and AESCAN == "Y" or var_exists("AESCONG") and AESCONG == "Y" or
+    var_exists("AESDISAB") and AESDISAB == "Y" or var_exists("AESDTH") and AESDTH == "Y" or
+    var_exists("AESHOSP") and AESHOSP == "Y" or var_exists("AESLIFE") and AESLIFE == "Y" or
+    var_exists("AESMIE") and AESMIE == "Y") and AESER != "Y"
+Outcome:
+  Message: "At least one seriousness criterion (AESCAN, AESCONG, AESDISAB, AESDTH,\
+    \ AESHOSP, AESLIFE or AESMIE) equals 'Y', but AESER does not equal 'Y'."
+  Output_Variables:
+  - "AESER"
+  - "AESCAN"
+  - "AESCONG"
+  - "AESDISAB"
+  - "AESDTH"
+  - "AESHOSP"
+  - "AESLIFE"
+  - "AESMIE"
+Source:
+  FDA_Validator_Rule_Message: "AESER is not 'Y'"
+  FDA_Validator_Rule_Description: "Serious Event (AESER) variable value is expected\
+    \ to be 'Y', when either of Seriousness Criteria variables (AESCAN, AESCONG, AESDISAB,\
+    \ AESDTH, AESHOSP, AESLIFE, AESMIE) has value 'Y'."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1132"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1132"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1132"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1132"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1132"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0041"
+        Version: "1"
+      Version: "2.0"

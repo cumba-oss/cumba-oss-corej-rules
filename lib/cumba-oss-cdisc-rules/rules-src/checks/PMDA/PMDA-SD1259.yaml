@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-SD1259"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the length of SETCD is greater than 8 characters."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    len(SETCD) > 8
+Outcome:
+  Message: "SETCD value length is greater than 8 characters."
+  Output_Variables:
+  - "SETCD"
+Source:
+  Message: "Invalid value for SETCD exceeding 8 characters"
+  Description: "The value of Set Code (SETCD) should be no more than 8 characters\
+    \ in length."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1259"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1259"
+        Version: "1"
+      Version: "1.6"

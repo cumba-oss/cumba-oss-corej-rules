@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1344 expect=violation domain=CM
+#note "Row 2: CMDECOD=NOTADRUG is not a WHODrug PT term in the dummy dictionary -> fires. Row 1 is a valid PT in its preferred case (the D-TA-3 sensitive default, Fix #266); row 3 is blank (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 CMSEQ=2 CMDECOD=NOTADRUG
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | Aspirin
+S01 | CM | 001 | 2 | Mystery pill  | NOTADRUG
+S01 | CM | 002 | 1 | Unknown med   |

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0365 expect=violation domain=APAE
+#note "RSUBJID and RDEVID are both populated on the same APAE record. APAE is a FOUR-character name, pinning that the `AP--` token (prefix + exactly two characters) reaches datasets the APRELSUB literal cannot."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RSUBJID=01-701-1015
+dataset APAE label="Associated Persons Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col APID type=Char label="Associated Persons Identifier"
+col AESEQ type=Num label="Sequence Number"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col RDEVID type=Char label="Related Device Identifier"
+---
+CDISCPILOT01 | APAE | AP-701-1015 | 1 | 01-701-1015 | DEV-001

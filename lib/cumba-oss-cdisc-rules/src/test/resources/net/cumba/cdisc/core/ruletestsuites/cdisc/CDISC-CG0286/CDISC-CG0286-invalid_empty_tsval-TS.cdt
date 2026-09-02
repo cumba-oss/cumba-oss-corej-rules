@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0286 expect=violation domain=TS
+#note "Boundary: empty TSVAL on a SENDTC record. The sheet Rule text grants no null exemption and the Check deliberately carries no non-empty leaf, so a blank TSVAL is flagged."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=SENDTC TSVAL=
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | SENDTC | Clinical Study End Date |
+CDISCPILOT01 | TS | 1 | SSTDTC | Study Start Date        | 2020-01-01

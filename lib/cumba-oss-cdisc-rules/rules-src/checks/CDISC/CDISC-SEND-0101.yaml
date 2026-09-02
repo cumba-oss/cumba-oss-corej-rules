@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-SEND-0101"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the RFENDTC variable in the DM dataset has no definition\
+  \ in the Define-XML document."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    varname() == "RFENDTC" and empty(var_name("DEFINE"))
+Outcome:
+  Message: "RFENDTC is not defined in the Define-XML document."
+  Output_Variables:
+  - "variable_name"
+  - "define_variable_name"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFENDTC"
+  Plain_Text_Explanation: "There must be an explanation in the Define-XML document\
+    \ that explains how RFENDTC was populated."
+  Rule: "RFENDTC definition must be in the Define-XML document"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND101"
+        Version: "1"
+      Version: "5.0"

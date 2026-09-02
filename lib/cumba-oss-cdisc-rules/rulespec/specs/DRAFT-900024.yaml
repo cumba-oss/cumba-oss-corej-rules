@@ -1,0 +1,82 @@
+name: DRAFT-900024
+kind: rule
+description: |
+  C-code twin of DRAFT-900021 — the first consumer of the ADaM code accessor
+  var_codelist_coded_codes("LIBRARY"). Every term NCI C-code the define.xml declares
+  (Alias Context="nci:ExtCodeID") for a variable's non-extensible library codelist must be a
+  published term C-code of that codelist: var_codelist_extensible("LIBRARY") == false and
+  non_empty(var_codelist_coded_codes("LIBRARY")) and not contains_all(
+  var_codelist_coded_codes("LIBRARY"), var_codelist_coded_codes("DEFINE")).
+  VS.VSPOS is bound to C71148 (non-extensible, published term codes C62167/C62166 via the
+  codelist_term_codes mock); the define declares {C62167, C99999} — C99999 is not published, so
+  the VSPOS ItemDef fires even though its submission VALUES are all correct (the case 900021
+  misses). VSLAT is bound to C99074 whose loaded terms carry NO C-codes (absent from
+  codelist_term_codes) — the non_empty guard excludes it despite a bogus define code.
+  VSTESTCD has no library codelist, so the extensible guard excludes it. VSLOC is a SECOND
+  offender (C74456, published codes C32141/C32226, define declares C77777) so the Record
+  sensitivity is observable — under the former Dataset sensitivity only the first offending
+  ItemDef survived.
+python_source: rules-draft-sdtmig-3-4.json (DRAFT-900024)
+rule:
+  coreId: DRAFT-900024
+datasets:
+  VS:
+    row_key: [variable_name]
+    rows:
+    - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSPOS: SUPINE, VSLAT: LEFT, VSLOC: ARM, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [VS]
+  domain_variables:
+    VS:
+    - {name: VSPOS, ordinal: '1', role: Result Qualifier, simpleDatatype: Char, label: Position of Subject During Observation, codelist: C71148}
+    - {name: VSLAT, ordinal: '2', role: Result Qualifier, simpleDatatype: Char, label: Laterality, codelist: C99074}
+    - {name: VSLOC, ordinal: '3', role: Result Qualifier, simpleDatatype: Char, label: Location of Vital Signs Measurement, codelist: C74456}
+    - {name: VSTESTCD, ordinal: '4', role: Topic, simpleDatatype: Char, label: Vital Signs Test Short Name}
+  codelist_terms:
+    C71148: [SUPINE, STANDING]
+    C99074: [LEFT, RIGHT]
+    C74456: [ARM, LEG]
+  codelist_term_codes:
+    C71148: {SUPINE: C62167, STANDING: C62166}
+    C74456: {ARM: C32141, LEG: C32226}
+  codelist_extensible:
+    C71148: false
+    C99074: false
+    C74456: false
+define_xml:
+  VS:
+  - {define_variable_name: VSPOS, define_variable_ccode: C71148, define_variable_codelist_coded_values: [SUPINE, STANDING], define_variable_codelist_coded_codes: [C62167, C99999]}
+  - {define_variable_name: VSLAT, define_variable_ccode: C99074, define_variable_codelist_coded_values: [LEFT, RIGHT], define_variable_codelist_coded_codes: [C88888]}
+  - {define_variable_name: VSLOC, define_variable_ccode: C74456, define_variable_codelist_coded_values: [ARM, LEG], define_variable_codelist_coded_codes: [C32141, C77777]}
+    # coded_codes must be a list on EVERY record (production's define reader emits [] when no
+    # term carries an nci:ExtCodeID alias) — a missing key becomes "" after the builder's
+    # fillna and knocks Python's contains_all off its column-of-iterables branch.
+  - {define_variable_name: VSTESTCD, define_variable_codelist_coded_values: [SYSBP], define_variable_codelist_coded_codes: []}
+expected_violations:
+- rule_id: DRAFT-900024
+  dataset: VS
+  row_key:
+    variable_name:
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_coded_codes: '[C62167, C99999]'
+    define_variable_name: VSPOS
+    library_variable_codelist_coded_codes: '["C62167","C62166"]'
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSPOS
+- rule_id: DRAFT-900024
+  dataset: VS
+  row_key:
+    variable_name:
+  status: SUCCESS
+  output_variables:
+    define_variable_codelist_coded_codes: '[C32141, C77777]'
+    define_variable_name: VSLOC
+    library_variable_codelist_coded_codes: '["C32141","C32226"]'
+    library_variable_codelist_extensible: 'false'
+    variable_name: VSLOC
+expected_errors: []

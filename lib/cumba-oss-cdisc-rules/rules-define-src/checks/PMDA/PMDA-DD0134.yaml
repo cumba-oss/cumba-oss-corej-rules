@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0134"
+Sheet_Rule_Identifier: "DD0134"
+Rule_Set: "PMDA"
+Element: "ItemRef"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The def:CommentOID attribute is required for an ItemDef when its ItemOID is referenced in an ItemRef that has the def:HasNoData attribute value 'Yes'. A comment must be included to explain why no data is present for the dataset's variables that were planned for use in the study."
+Message: "Missing required def:CommentOID for Variable"
+# Reverse join, exactly CDISC twin 0242's encoding (0124-B fire-always vehicle):
+# the guard states the violation (HasNoData='Yes' ItemRef, resolvable ItemOID,
+# resolved ItemDef without def:CommentOID). The finding sits on the ItemRef
+# (its ItemOID names the ItemDef).
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@HasNoData"
+      equals: "Yes"
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/@CommentOID"
+      exists: false

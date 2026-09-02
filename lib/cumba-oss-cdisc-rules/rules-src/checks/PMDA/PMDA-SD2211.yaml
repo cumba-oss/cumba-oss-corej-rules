@@ -1,0 +1,122 @@
+Core:
+  Id: "PMDA-SD2211"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the study population is unhealthy subjects (the\
+  \ Trial Summary (TS) dataset contains a record where TSPARMCD equals 'HLTSUBJI'\
+  \ and TSVAL equals 'N') but the TS dataset does not contain a record where TSPARMCD\
+  \ equals 'TDIGRP' (Diagnosis Group)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$hltsubji_n_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"HLTSUBJI\", TSVAL=\"N\"))"
+- id: "$tdigrp_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"TDIGRP\"))"
+Check:
+  expression: >-
+    $hltsubji_n_count > 0 and $tdigrp_count == 0
+Outcome:
+  Message: "Missing TDIGRP Trial Summary Parameter: a 'Diagnosis Group' (TDIGRP) record\
+    \ must be populated in the Trial Summary (TS) domain when the study population\
+    \ is unhealthy subjects (HLTSUBJI equals 'N')."
+  Output_Variables:
+  - "$hltsubji_n_count"
+  - "$tdigrp_count"
+Source:
+  Message: "Missing TDIGRP Trial Summary Parameter"
+  Description: "'Diagnosis Group' (TDIGRP) record must be populated in Trial Summary\
+    \ (TS) domain when study population is unhealthy subjects (HLTSUBJI = 'N'). It\
+    \ is expected for SDTM IG v3.1.2 data and required for data in all more recent\
+    \ SDTM versions."
+  Domains: "TS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"

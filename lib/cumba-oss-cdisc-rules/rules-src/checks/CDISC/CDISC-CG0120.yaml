@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-CG0120"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Description of Planned Arm (ARM) is not 'Screen\
+  \ Failure' or 'Not Assigned' and does not match an ARM value in the Trial Arms (TA)\
+  \ dataset."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Operations:
+- id: "$ta_arm"
+  expression: "distinct(ARM, domain=\"TA\")"
+Check:
+  expression: >-
+    ARM not in ["Screen Failure", "Not Assigned"] and ARM not in $ta_arm
+Outcome:
+  Message: "ARM (other than 'Screen Failure' or 'Not Assigned') does not match an\
+    \ ARM value in the Trial Arms (TA) dataset."
+  Output_Variables:
+  - "ARM"
+  - "$ta_arm"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARM"
+  Condition: "ARM not in TA.ARM"
+  Rule: "ARM in ('Screen Failure', 'Not Assigned')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0120"
+        Version: "1"
+      Version: "2.0"

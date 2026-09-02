@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0106B expect=violation domain=ADLBC
+#note "PERIOD1 maps to both 1 and 2; 1 is the strict majority so row 3 alone fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 APERIOD=2 APERIODC=PERIOD1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col APERIODC type=Char
+col APERIOD type=Num
+---
+S1 | 001 | SYSBP | PERIOD1 | 1
+S1 | 002 | SYSBP | PERIOD1 | 1
+S1 | 003 | SYSBP | PERIOD1 | 2
+S1 | 001 | SYSBP | PERIOD2 | 2
+S1 | 002 | SYSBP | PERIOD2 | 2

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0026 expect=skipped domain=QS
+#note "Boundary: QSORRESU is Permissible in QS and this study never collected it, so the column is absent. Absent is not 'empty' — the rule must skip (Requirements.Variables.All --ORRESU), not report every numeric QSORRES."
+#library standard=sdtmig version=3-4
+dataset QS class=FINDINGS label="Questionnaires"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSTESTCD type=Char label="Question Short Name"
+col QSORRES  type=Char label="Finding in Original Units"
+---
+CDISCPILOT01 | QS | 01-701-1015 | 1 | ADAS01 | 3
+CDISCPILOT01 | QS | 01-701-1015 | 2 | ADAS02 | 5

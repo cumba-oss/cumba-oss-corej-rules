@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2229 expect=noViolation domain=MI
+#note "Rows 1/2: MISTRESC terms whose dummy-neoplasm malignancy attribute matches MIRESCAT (Carcinoma=MALIGNANT, Adenoma=BENIGN) - the terms carry the NEOPLASM preferred case, which is what the flag-less rule compares verbatim against the attributes keys (D-TA-3 default, Fix #266; C1 data repair) -> paired. Row 3: MIRESCAT outside BENIGN/MALIGNANT -> condition not met. Row 4: blank MISTRESC with MIRESCAT=MALIGNANT -> blank code is a valid pair (completeness is another rule's concern). Row 5: blank MIRESCAT -> condition not met."
+#library standard=sendig version=3-1-1
+#dictionaries dummy
+dataset MI class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MISEQ    type=Num
+col MITESTCD type=Char
+col MISTRESC type=Char
+col MIRESCAT type=Char
+---
+S01 | MI | 001 | 1 | GHISTXQL | Carcinoma | MALIGNANT
+S01 | MI | 001 | 2 | GHISTXQL | Adenoma   | BENIGN
+S01 | MI | 002 | 1 | GHISTXQL | FIBROSIS  | NON-NEOPLASTIC
+S01 | MI | 002 | 2 | GHISTXQL |           | MALIGNANT
+S01 | MI | 003 | 1 | GHISTXQL | Carcinoma |

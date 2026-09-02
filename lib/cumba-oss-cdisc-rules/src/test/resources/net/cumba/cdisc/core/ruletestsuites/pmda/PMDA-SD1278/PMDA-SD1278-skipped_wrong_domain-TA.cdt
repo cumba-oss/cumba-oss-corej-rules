@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1278 expect=skipped domain=TA
+#note "FRESH. Two rows carry a broken TSVAL/TSVALCD mapping the rule would report, on a domain it must not reach. TA is deliberately chosen from the SAME class as TS so the fixture isolates the DOMAIN axis rather than a class axis."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+col TSVAL   type=Char label="Parameter Value"
+col TSVALCD type=Char label="Parameter Value Code"
+---
+S1 | TA | A | Arm A | BOTH | C49636
+S1 | TA | B | Arm B | BOTH | C99999

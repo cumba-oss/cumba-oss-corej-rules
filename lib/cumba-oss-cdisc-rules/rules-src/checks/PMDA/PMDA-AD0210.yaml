@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0210"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the same subject (USUBJID), the Description\
+  \ of Planned Arm (ARM) in ADSL does not match the Description of Planned Arm (ARM)\
+  \ of the same subject in the SDTM DM dataset; ADaM must be traceable to SDTM."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    var_exists(DM.ARM) and not empty(ARM) and ARM != DM.ARM
+Outcome:
+  Message: "For the same USUBJID, the ADSL ARM does not equal the DM ARM."
+  Output_Variables:
+  - "ARM"
+  - "DM.ARM"
+Source:
+  Message: "For the same USUBJID, the ADSL.ARM != DM.ARM"
+  Description: "The same subject in ADSL and DM must have the same value for Arm (ARM).\
+    \ There must be traceability between ADaM and SDTM."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0210"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0210"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0210"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0210"
+        Version: "1"
+      Version: "6.0"

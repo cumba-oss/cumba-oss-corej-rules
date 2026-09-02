@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CT batch (P5 CT-gated rules) clean fixture: with the StubCtProvider every CT rule
+     executes and produces no findings. Coverage: def:Standards whose Names are STDNAM
+     members (DD0021-B); a def:Class Name from GNRLOBSC (132 / DD0055-C); a non-extensible
+     CT codelist (Sex, C66731) whose EnumeratedItems are members carrying matching
+     item-level nci:ExtCodeID aliases (DD0024/DD0028/DD0032/DD0033/DD0034, 179); an
+     extensible CT codelist (Unit, C71620) with a member CodeListItem and a legally
+     marked def:ExtendedValue="Yes" extension (186/187/201/202, 192, DD0024-B); and a
+     sponsor codelist with def:IsNonStandard and no alias (153; unknown to CT by name, so
+     DD0031 stays quiet on a 2.0 evaluation of this document too). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/ct-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.CT.CLEAN">
+    <GlobalVariables>
+      <StudyName>CT-CLEAN</StudyName>
+      <StudyDescription>CT batch clean fixture study</StudyDescription>
+      <ProtocolName>CT-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="CT clean MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.IG" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.AE" Name="AE" SASDatasetName="AE" Purpose="Tabulation" def:Structure="One record per event">
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <CodeList OID="CL.SEX" Name="Sex" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="F">
+          <Alias Context="nci:ExtCodeID" Name="C16576"/>
+        </EnumeratedItem>
+        <EnumeratedItem CodedValue="M">
+          <Alias Context="nci:ExtCodeID" Name="C20197"/>
+        </EnumeratedItem>
+        <Alias Context="nci:ExtCodeID" Name="C66731"/>
+      </CodeList>
+      <CodeList OID="CL.UNIT" Name="Unit" DataType="text" def:StandardOID="STD.CT">
+        <CodeListItem CodedValue="mg">
+          <Decode>
+            <TranslatedText xml:lang="en">Milligram</TranslatedText>
+          </Decode>
+          <Alias Context="nci:ExtCodeID" Name="C28253"/>
+        </CodeListItem>
+        <CodeListItem CodedValue="bucket" def:ExtendedValue="Yes">
+          <Decode>
+            <TranslatedText xml:lang="en">Bucket</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <Alias Context="nci:ExtCodeID" Name="C71620"/>
+      </CodeList>
+      <CodeList OID="CL.CUSTOM" Name="Sponsor Yes/No" DataType="text" def:IsNonStandard="Yes">
+        <EnumeratedItem CodedValue="YEP"/>
+      </CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>

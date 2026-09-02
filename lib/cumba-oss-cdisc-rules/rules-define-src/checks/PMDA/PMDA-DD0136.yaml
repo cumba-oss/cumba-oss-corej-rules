@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0136"
+Sheet_Rule_Identifier: "DD0136"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "library"
+Plain_Text_Rule: "The value of the English dataset's description must match the one specified in the CDISC standard for an ItemGroupDef element that represents a dataset defined as following an SDTMIG or SENDIG standard."
+# Library-gated (plan define-library-provider): the IG dataset-label catalogue
+# comes from the caller-supplied LibraryProvider; without one the rule SKIPs.
+# The governing standard resolves via @def:StandardOID -> def:Standard (2.1),
+# else the MetaDataVersion's def:StandardName/def:StandardVersion (2.0), and
+# only SDTMIG/SENDIG standards are in reach (sheet wording; hyphen-insensitive,
+# 2.0 spells them SDTM-IG/SEND-IG). Dataset name is the ItemGroupDef's own
+# @Name - NOT @Domain, so a SUPP--/split dataset is compared against its own
+# IG label, never the parent domain's. Datasets the library does not know, and
+# ItemGroupDefs without an English Description, are out of reach (presence is
+# other rules' beat).
+Message: "Invalid dataset label value [${value}]"
+Check:
+  kind: "library_dataset_label_matches"

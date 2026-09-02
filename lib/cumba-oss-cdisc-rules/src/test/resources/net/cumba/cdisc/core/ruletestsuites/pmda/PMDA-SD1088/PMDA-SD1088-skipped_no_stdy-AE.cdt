@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1088 expect=skipped domain=AE
+#note "FRESH. AE class=EVENTS WITHOUT the AESTDY column, one row with complete AESTDTC 2020-01-10; DM block with complete RFSTDTC 2020-01-01 (both blocks fenced). Requirements.Variables.All [--STDTC, --STDY] names the absent --STDY -> SKIPPED (the r2 review's stated skip contract for this pair, pinned here for the first time). The shipped machine guard var_exists(\"--STDY\") would silence execution anyway - the pin is the auditable skip."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

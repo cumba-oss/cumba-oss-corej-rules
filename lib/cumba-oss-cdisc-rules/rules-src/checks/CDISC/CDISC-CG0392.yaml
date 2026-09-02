@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0392"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AESHOSP is populated and its value is not 'Y' or\
+  \ 'N'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESHOSP"
+Check:
+  expression: >-
+    not empty(AESHOSP) and AESHOSP not in ["Y", "N"]
+Outcome:
+  Message: "AESHOSP is populated, but its value is not 'Y' or 'N'."
+  Output_Variables:
+  - "AESHOSP"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "--SHOSP"
+  Condition: "--SHOSP ^= null"
+  Rule: "--SHOSP in ('Y','N')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0392"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0392"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0392"
+        Version: "1"
+      Version: "2.0"

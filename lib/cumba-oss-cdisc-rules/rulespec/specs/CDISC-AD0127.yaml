@@ -1,0 +1,42 @@
+name: CDISC-AD0127
+kind: rule
+description: |
+  Wave C3 port — T2-Grouping (Sensitivity=Group). BDS class scope.
+  CDISC-AD0127: within a (USUBJID, PARAMCD) group, when BASE is populated
+  and there is no record with ABLFL=Y, fire. Operation `record_count`
+  with filter ABLFL=Y and group by (USUBJID, PARAMCD). Check is
+  all: [BASE non_empty; $ablfl_y_count equal_to 0]. Java's
+  RuleRunner.executeGrouped emits one violation per failing group (the
+  group's first row).
+python_source: rules-adamig-1-3.json (CDISC-AD0127)
+rule:
+  coreId: CDISC-AD0127
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # Subject 001, HGB — has ABLFL=Y somewhere → OK (no violation)
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 0, ABLFL: Y, BASE: '13.5'}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASE: '13.5'}
+      # Subject 002, HGB — no ABLFL=Y in the group, BASE populated → violation at group's first row
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 0, ABLFL: '', BASE: '14.0'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASE: '14.0'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0127
+    dataset: ADLB
+    row_key: {AVISITN: 0, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ablfl_y_count: '0'
+      ABLFL:
+      BASE: '14.0'
+      PARAMCD: HGB
+expected_errors: []

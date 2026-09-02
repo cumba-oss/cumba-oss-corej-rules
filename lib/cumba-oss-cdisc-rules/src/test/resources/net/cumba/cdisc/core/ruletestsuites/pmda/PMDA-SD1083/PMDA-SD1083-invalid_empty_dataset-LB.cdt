@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1083 expect=violation domain=LB
+#note "Presence is a property of the DECLARED columns: LBDTC declared, LBDY not -> the BroadcastFold decides the check above the 0-row synthetic-table branch and emits ONE violation at reported row 1 (AD0170/SD2287 law). NO value pin on a 0-row table. Authored ONCE for the whole ten-rule presence family (batch note economy)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB class=FINDINGS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+col LBDTC   type=Char
+---

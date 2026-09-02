@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0484 expect=violation domain=ADLBC
+#note "PBCHGCA1 populated but numeric secondary PBCHGC1N missing on row 1 -> fires. Row 2 both populated -> silent. Patterns ^PBCHGCA(\d+)$ and ^PBCHGC(\d+)N$ cannot cross-match, ONE expansion (y=1). structure=BDS inert (ruling-neutrality)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 PBCHGCA1=DECREASED
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col PBCHGCA1   type=Char
+col PBCHGC1N   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DECREASED |
+CDISCPILOT01 | 01-701-1023 | GLUC | INCREASED | 2
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD2024 expect=noViolation domain=RELSUB
+#note "Row 1 identifies a subject (USUBJID only), row 2 identifies a pool (POOLID only) -> never both, no violation."
+#library standard=sdtmig version=3-4
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+S1 | 001 |     | 002 | MOTHER, BIOLOGICAL
+S1 |     | P01 | 003 | LITTERMATE

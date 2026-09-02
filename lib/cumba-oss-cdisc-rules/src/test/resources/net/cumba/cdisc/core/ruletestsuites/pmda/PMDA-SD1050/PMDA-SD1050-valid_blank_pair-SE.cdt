@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1050 expect=noViolation domain=SE
+#note "BOUNDARY: row 2 has ETCD empty. GroupSemantics.relationshipNotUniqueViolations' participation mask is participates[r] = a instanceof KeyPart.Present && b instanceof KeyPart.Present, so a row whose ETCD is blank takes NO part in the relation. Among participants, ELEMENT 'Screen' maps only to {SCRN1} and ETCD SCRN1 maps only to {'Screen'} -- the relation is 1:1 and nothing fires. If the blank row participated, 'Screen' would map to {SCRN1, blank} and rows 1, 2 and 3 would all fire."
+#library standard=sdtmig version=3-4
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN1 | Screen    | 2020-01-01
+S1 | SE | 002 | 1 |       | Screen    | 2020-02-01
+S1 | SE | 003 | 1 | SCRN1 | Screen    | 2020-03-01
+S1 | SE | 001 | 2 | TRT   | Treatment | 2020-01-15

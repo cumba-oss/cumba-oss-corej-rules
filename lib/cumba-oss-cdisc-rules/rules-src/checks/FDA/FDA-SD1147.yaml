@@ -1,0 +1,130 @@
+Core:
+  Id: "FDA-SD1147"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Occurrence (--OCCUR) variable is present in\
+  \ the dataset but the Pre-specified (--PRESP) variable is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Check:
+  expression: >-
+    not var_exists("--PRESP") and var_exists("--OCCUR")
+Outcome:
+  Message: "--PRESP variable is not present when --OCCUR variable is present."
+  Output_Variables:
+  - "--OCCUR"
+Source:
+  FDA_Validator_Rule_Message: "Missing --PRESP variable, when --OCCUR variable is\
+    \ present"
+  FDA_Validator_Rule_Description: "Pre-specified (--PRESP) variable should be included\
+    \ into dataset, when Occurrence (--OCCUR) variable is present. (--PRESP/Events)\
+    \ Used to indicate whether the event describe by --TERM was pre-specified on a\
+    \ CRF.  Value is Y for pre-specified events, null for spontaneously reported events.\
+    \ (--PRESP/Interventions) Used when a specific intervention is pre-specified on\
+    \ a CRF. Values should be 'Y' or null. (--OCCUR) Used to record whether a pre-specified\
+    \ event occurred when information about the occurrence of a specific event is\
+    \ solicited."
+  Domains: "INTERVENTIONS, EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1147"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0088"
+        Version: "1"
+      Version: "2.0"

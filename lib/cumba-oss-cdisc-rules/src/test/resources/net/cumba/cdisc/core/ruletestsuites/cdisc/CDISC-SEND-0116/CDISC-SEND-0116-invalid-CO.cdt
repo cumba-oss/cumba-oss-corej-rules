@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-SEND-0116 expect=violation domain=CO
+#note "FRESH (shape ADAPTED-FROM fda/FDA-SD0072-invalid-SUPPAE.cdt, re-cut SUPPAE->CO). Row 1: RDOMAIN=BW is a registered study dataset -> clean. Rows 2 and 3: RDOMAIN=ZZ names no study dataset -> BOTH fire, PER RECORD. *** AUTHORED ON THE stage-r FALLBACK, NOT THE PER-SUBJECT PIN. *** M3-SEND-T2-K3-01 listed this scenario as an SD1316-F3 D9 predicted red, gating on the primary being CO rather than DM; but the ruling's own corrected test is on the membership LEFT OPERAND, which here is RDOMAIN - a domain abbreviation, named explicitly in the M2 false-positive list. CDISC-SEND-0116 is therefore NOT in the SD1316-F3 population, gets no Grouping block, and reports per record. This file is the instruction's documented one-edit fallback: count 2 with the two per-record at-pins."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=2 RDOMAIN=ZZ
+#expectViolationAt row=3 RDOMAIN=ZZ
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | BW | 001 | 1 | Comment on body weight
+S1 | CO | ZZ | 002 | 1 | First bad reference
+S1 | CO | ZZ | 002 | 2 | Second bad reference
+---
+
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | BW | 001 | 1 | BW | 250
+---

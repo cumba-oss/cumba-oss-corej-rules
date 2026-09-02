@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0096"
+Sheet_Rule_Identifier: "DD0096"
+Rule_Set: "PMDA"
+Element: "AnalysisResult"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "At least one analysis variable element must be available for any given analysis result. If there are more than one analysis dataset specified for a specific result, the analysis variable element may be available for one of the respective datasets only."
+Message: "Missing required arm:AnalysisVariable element"
+# arm:AnalysisVariable sits two levels down
+# (arm:AnalysisDatasets/arm:AnalysisDataset/arm:AnalysisVariable, ARM v1.0
+# SS5.3.7.2) - the exists kind targets direct children only, so the 0124-B
+# fire-always vehicle (anchored on the ARM-required OID) demands at least one
+# descendant variable per analysis result; the row's second sentence (variable
+# may live under any one of several datasets) is exactly the any-match
+# semantics of the path. New (no CDISC ARM rules).
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "AnalysisDatasets/AnalysisDataset/AnalysisVariable"
+      exists: false

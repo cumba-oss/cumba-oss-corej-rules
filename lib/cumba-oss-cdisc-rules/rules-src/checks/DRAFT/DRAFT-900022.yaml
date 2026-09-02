@@ -1,0 +1,38 @@
+Core:
+  Id: "DRAFT-900022"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when the codelist bound to a variable in the define.xml\
+  \ (NCI C-code) is not the codelist the CDISC Library expects for that variable."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Requires both a define.xml (the bound codelist's NCI C-code) and CDISC\
+    \ Library metadata (the expected codelist C-code); a run without either skips\
+    \ or under-reports. Variables without a library codelist expectation or without\
+    \ a define codelist C-code are excluded by the non_empty guards."
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Variable_Universe: "Define"
+Check:
+  expression: >-
+    not empty(var_ccode("LIBRARY")) and not empty(var_ccode("DEFINE")) and var_ccode("DEFINE") !=
+    var_ccode("LIBRARY")
+Outcome:
+  Message: "The codelist bound to the variable in the define.xml does not match the\
+    \ codelist the CDISC Library expects for this variable."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_ccode"
+  - "library_variable_ccode"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

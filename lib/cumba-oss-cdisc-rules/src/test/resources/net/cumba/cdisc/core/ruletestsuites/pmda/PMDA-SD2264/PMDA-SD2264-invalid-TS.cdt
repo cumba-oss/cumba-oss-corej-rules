@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD2264 expect=violation domain=TS
+#note "Row 2: TSPARMCD=PCLAS with TSVALCD=BOGUSCODE, which is not a MED-RT code in the dummy dictionary -> fires. Row 1 is a valid MED-RT code; row 3 has the same garbage code under AGEMAX (outside the PCLAS condition); row 4 is a blank TSVALCD (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVALCD=BOGUSCODE
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | PCLAS  | N0000000181
+S01 | TS | 2 | PCLAS  | BOGUSCODE
+S01 | TS | 3 | AGEMAX | BOGUSCODE
+S01 | TS | 4 | PCLAS  |

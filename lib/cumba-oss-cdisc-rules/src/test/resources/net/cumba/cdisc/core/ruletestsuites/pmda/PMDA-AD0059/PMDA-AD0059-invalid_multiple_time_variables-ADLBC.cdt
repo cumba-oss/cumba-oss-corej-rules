@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0059 expect=violation domain=ADLBC
+#note "ASTTM and AENTM are both Char *TM variables -> TWO findings, one per offending VARIABLE; ASTDTM is excluded by the DTM conjunct. Pins the per-variable reporting granularity together with the carve-out."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=ASTTM variable_data_type=Char
+#expectViolationAt variable_name=AENTM variable_data_type=Char
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTTM   type=Char
+col AENTM   type=Char
+col ASTDTM  type=Char
+---
+S1 | 001 | ALB | 13:30 | 14:45 | 2020-01-15T13:30:00
+---

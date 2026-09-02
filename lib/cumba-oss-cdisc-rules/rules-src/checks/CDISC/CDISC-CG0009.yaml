@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0009"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when EPOCH is populated but does not match any EPOCH\
+  \ value in the TA dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
+Operations:
+- id: "$ta_epoch"
+  expression: "distinct(EPOCH, domain=\"TA\")"
+Check:
+  expression: >-
+    EPOCH not in $ta_epoch and not empty(EPOCH)
+Outcome:
+  Message: "EPOCH value does not match any EPOCH value in the TA dataset."
+  Output_Variables:
+  - "EPOCH"
+  - "$ta_epoch"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "EPOCH"
+  Rule: "EPOCH in TA.EPOCH"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0009"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0009"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0009"
+        Version: "1"
+      Version: "2.0"

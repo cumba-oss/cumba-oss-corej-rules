@@ -1,0 +1,115 @@
+Core:
+  Id: "PMDA-SD1322"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Country (COUNTRY) variable is populated with\
+  \ a value that is not a term in the non-extensible CDISC COUNTRY controlled terminology\
+  \ codelist (ISO 3166-1 alpha-3)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    varname() == "COUNTRY" and var_codelist_extensible("LIBRARY") == false and not
+    empty(var_codelist_coded_values("LIBRARY")) and not empty(value()) and value() not in
+    var_codelist_coded_values("LIBRARY")
+Outcome:
+  Message: "COUNTRY is populated with a value that is not found in the ISO 3166 (CDISC\
+    \ COUNTRY) codelist."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "Value for COUNTRY not found in GENC"
+  Description: "Value for the Country (COUNTRY) variable must be populated using terms\
+    \ found in Geopolitical Entities, Names, and Codes (GENC) dictionary. Note that\
+    \ country codes in GENC and ISO 3166 are the same for most cases."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1322"
+        Version: "1"
+      Version: "1.6"

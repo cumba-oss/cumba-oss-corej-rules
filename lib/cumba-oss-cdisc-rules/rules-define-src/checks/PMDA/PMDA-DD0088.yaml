@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0088"
+Sheet_Rule_Identifier: "DD0088"
+Rule_Set: "PMDA"
+Element: "ResultDisplay"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The OID for an arm:ResultDisplay element must be unique within the arm:AnalysisResultDisplays element."
+# arm:ResultDisplay elements share their arm:AnalysisResultDisplays parent, so
+# the per-parent sibling scope IS the sheet's scope.
+Message: "Duplicate arm:ResultDisplay OID [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OID"

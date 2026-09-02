@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD0070 expect=noViolation domain=DM
+#note "Every DM subject that is not a screen failure / not-assigned / not-treated has at least one EX record, so no violation. 002/003/004 carry the excluded codes and legitimately have no EX record. 005 has two EX records - multiple records still count >= 1."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | A        | Drug A         | A        | Drug A
+S1 | DM | 002 | SCRNFAIL | Screen Failure | SCRNFAIL | Screen Failure
+S1 | DM | 003 | NOTASSGN | Not Assigned   | NOTASSGN | Not Assigned
+S1 | DM | 004 | A        | Drug A         | NOTTRT   | Not Treated
+S1 | DM | 005 | A        | Drug A         | A        | Drug A
+---
+
+dataset EX label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A
+S1 | EX | 005 | 1 | DRUG A
+S1 | EX | 005 | 2 | DRUG A
+---

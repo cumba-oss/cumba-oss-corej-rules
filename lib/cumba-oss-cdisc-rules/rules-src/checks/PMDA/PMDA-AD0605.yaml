@@ -1,0 +1,54 @@
+Core:
+  Id: "PMDA-AD0605"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a BDS or OCCDS record where APHASEN is populated,\
+  \ PHSDT does not equal the ADSL variable PHwSDT for the same USUBJID (where w equals\
+  \ the record's APHASEN value)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(APHASEN) and not empty(PHSDT) and PHSDT != ADSL.PH${APHASEN:%d}SDT
+Outcome:
+  Message: "On a given record, APHASEN is populated and the value of PHSDT is not\
+    \ equal to the value of variable PHwSDT where w equals the value of APHASEN"
+  Output_Variables:
+  - "APHASEN"
+  - "PHSDT"
+  - "ADSL.PH${*}SDT"
+Source:
+  Message: "APHASEN w has a PHSDT != ADSL.PHwSDT"
+  Description: "When analysis Phase (APHASE) variable is defined, the Phase Start\
+    \ Date (PHSDT) variable value must equal ADSL Phase w Start Date (PHwSDT) variable\
+    \ value for that phase defined by the value in Phase (N) (APHASEN) variable. APHASEN\
+    \ = w."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0605"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0605"
+        Version: "1"
+      Version: "6.0"

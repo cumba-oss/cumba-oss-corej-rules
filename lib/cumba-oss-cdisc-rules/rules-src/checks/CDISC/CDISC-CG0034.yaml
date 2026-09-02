@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0034"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISITNUM is populated but its value does not match\
+  \ any VISITNUM value for the subject in the Subject Visits (SV) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SV"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+Operations:
+- id: "$sv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"SV\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(VISITNUM) and VISITNUM not in $sv_visitnum
+Outcome:
+  Message: "VISITNUM does not match any VISITNUM value for the subject in the SV dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "$sv_visitnum"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISITNUM"
+  Condition: "VISITNUM ^= null"
+  Rule: "VISITNUM in SV.VISITNUM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0034"
+        Version: "2"
+      Version: "2.0"

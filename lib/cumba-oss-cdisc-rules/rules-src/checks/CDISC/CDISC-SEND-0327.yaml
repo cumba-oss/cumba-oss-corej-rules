@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0327"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a pre-dose Pharmacokinetic Concentrations (PC) specimen\
+  \ collected for time-concentration-profile analysis is not anchored at the PT0H\
+  \ baseline. Fires when the specimen collection date/time (PCDTC) is at or before\
+  \ the reference-point date/time (PCRFTDTC) — both carrying a time component — and\
+  \ the Planned Elapsed Time from Time Point Reference (PCELTM) is not 'PT0H'. A negative\
+  \ elapsed time on a pre-dose profile sample would corrupt the AUC."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The 'pre-dose sample used to build a time-concentration profile' population\
+    \ is approximated by 'specimen collected at or before the populated reference\
+    \ point' (PCDTC <= PCRFTDTC), using the ACTUAL collection/reference times as a\
+    \ proxy for the PLANNED pre-dose designation. Records whose PCDTC/PCRFTDTC lack\
+    \ a time component are excluded (the comparison is not meaningful). Known limitation:\
+    \ when PCDTC and PCRFTDTC differ in ISO-8601 precision (e.g. seconds vs minutes),\
+    \ the engine truncates both operands to the coarser precision before comparing,\
+    \ so a specimen drawn shortly after the reference within the same coarser time\
+    \ unit can compare equal and fire (a cross-precision false-positive intrinsic\
+    \ to the actual-time comparison). Twin of FDA-SE2280."
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCDTC"
+    - "PCRFTDTC"
+    - "PCELTM"
+Check:
+  expression: >-
+    not empty(PCDTC) and not empty(PCRFTDTC) and PCDTC =~ /.*T[0-9]/ and PCRFTDTC =~ /.*T[0-9]/ and
+    date(PCDTC) <= PCRFTDTC and PCELTM != "PT0H"
+Outcome:
+  Message: "The PC specimen was collected at or before its reference point but PCELTM\
+    \ is not 'PT0H'; a pre-dose profile sample must be anchored at PT0H."
+  Output_Variables:
+  - "PCDTC"
+  - "PCELTM"
+  - "PCRFTDTC"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCELTM"
+  Plain_Text_Explanation: "Specimen concentrations (e.g., plasma) used to calculate\
+    \ a time concentration profile with a predose sample should have PCELTM populated\
+    \ with \"PT0H\"."
+  Condition: "Predose specimen concentration is collected AND specimen concentration\
+    \ (e.g., plasma) was used to calculate a time concentration profile"
+  Rule: "PCELTM = \"PT0H\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND327"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND327"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND327"
+        Version: "1"
+      Version: "5.0"

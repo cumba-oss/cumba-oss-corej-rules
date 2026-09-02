@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0709 expect=violation domain=ADSL
+# Rule:Description: Variable label does not match the standard (Library) label for the variable.
+#note "Synthetic: AGE carries label 'Wrong Label' while the Library label is 'Age' -> violation"
+#expectViolationCount 1
+#expectViolationAt library_variable_label=Age variable_label="Wrong Label" variable_name=AGE
+#library standard=adamig version=1-3
+#library variable-metadata ADSL AGE label="Age" simpleDatatype=Num
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE type=Num label="Wrong Label"
+---
+CDISCPILOT01 | 01-701-1015 | 56
+---

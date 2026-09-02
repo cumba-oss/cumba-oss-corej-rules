@@ -1,0 +1,78 @@
+Core:
+  Id: "FDA-SE2338"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL is populated with a value that is not a term\
+  \ in the SNDIGVER (SEND Implementation Guide Version) controlled terminology codelist\
+  \ for a record where TSPARMCD equals 'SNDIGVER'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$sndigver_terms"
+  expression: "codelist_terms(codelists=[SNDIGVER], level=\"term\", returntype=\"\
+    value\")"
+Check:
+  expression: >-
+    TSPARMCD == "SNDIGVER" and not empty(TSVAL) and TSVAL not in $sndigver_terms
+Outcome:
+  Message: "Invalid TSVAL value for SNDIGVER: TSVAL must be a valid term from the\
+    \ SNDIGVER (SEND Implementation Guide Version) codelist when TSPARMCD equals 'SNDIGVER'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$sndigver_terms"
+Source:
+  FDA_Validator_Rule_Message: "Invalid TSVAL value for SNDIGVER"
+  FDA_Validator_Rule_Description: "TSVAL for SNDIGVER record must be a valid term\
+    \ from (SNDIGVER) CT codelist."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2338"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2338"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2338"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2338"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2338"
+        Version: "1"
+      Version: "1.6"

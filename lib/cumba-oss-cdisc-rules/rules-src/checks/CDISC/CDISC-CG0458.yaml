@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-CG0458"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARMCD equals 'INDIC' or 'TDIGRP' but TSVCDREF\
+  \ is not equal to 'SNOMED'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVCDREF"
+Check:
+  expression: >-
+    TSPARMCD in ["INDIC", "TDIGRP"] and TSVCDREF != "SNOMED"
+Outcome:
+  Message: "TSPARMCD equals 'INDIC' or 'TDIGRP' but TSVCDREF is not equal to 'SNOMED'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVCDREF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDREF"
+  Condition: "TSPARMCD in ('INDIC', 'TDIGRP')"
+  Rule: "TSVCDREF = 'SNOMED'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0458"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0458"
+        Version: "1"
+      Version: "2.0"

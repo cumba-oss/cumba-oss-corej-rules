@@ -1,0 +1,25 @@
+Core:
+  Id: "DRAFT-900029"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when CHG (Change from Baseline) is present in a Basic\
+  \ Data Structure dataset but BASE (Baseline Value) is not; BASE is required when\
+  \ CHG exists."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("CHG") and not var_exists("BASE")
+Outcome:
+  Message: "CHG (Change from Baseline) is present but BASE (Baseline Value) is not.\
+    \ BASE is required when CHG exists."
+  Output_Variables:
+  - "CHG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

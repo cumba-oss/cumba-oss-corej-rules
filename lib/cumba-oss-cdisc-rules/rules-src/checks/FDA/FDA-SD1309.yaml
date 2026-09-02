@@ -1,0 +1,123 @@
+Core:
+  Id: "FDA-SD1309"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'STYPE'\
+  \ and TSVAL equal to 'INTERVENTIONAL', but TSVAL is empty for the record where TSPARMCD\
+  \ equals 'TRT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$STYPE_INTERVENTIONAL"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"\
+    INTERVENTIONAL\"))"
+Check:
+  expression: >-
+    TSPARMCD == "TRT" and $STYPE_INTERVENTIONAL >= 1 and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty for the TRT Trial Summary Parameter when a record exists\
+    \ with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$STYPE_INTERVENTIONAL"
+Source:
+  FDA_Validator_Rule_Message: "TSVAL is missing for the TRT Trial Summary Parameter,\
+    \ when STYPE parameter equals 'INTERVENTIONAL'"
+  FDA_Validator_Rule_Description: "When the study type is interventional (TSPARMCD\
+    \ = 'STYPE' and TSVAL = 'INTERVENTIONAL'), the Investigational Therapy or Treatment\
+    \ parameter should be provided with Parameter Value populated (TSVAL should not\
+    \ be null when TSPARMCD = 'TRT')."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1309"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1309"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1309"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1309"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1309"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0276"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-AD0604"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a BDS or OCCDS record where APHASEN is not present,\
+  \ PHSDT does not equal any ADSL variable PHwSDT (for any w) for the same USUBJID."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not var_exists("APHASEN") and not empty(PHSDT) and PHSDT not in ADSL.PH${*}SDT
+Outcome:
+  Message: "On a given record, APHASEN is not present and the value of PHSDT is not\
+    \ equal to the value of at least one PHwSDT variable"
+  Output_Variables:
+  - "PHSDT"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "PHSDT"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, APHASEN is not present\
+    \ and the value of PHSDT is not equal to the value of at least one PHwSDT variable"
+  Rule_Failure_Criteria: "On a given record, APHASEN is not present and the value\
+    \ of PHSDT is not equal to the value of at least one PHwSDT variable"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR604"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR604"
+        Version: "1"
+      Version: "5.0"

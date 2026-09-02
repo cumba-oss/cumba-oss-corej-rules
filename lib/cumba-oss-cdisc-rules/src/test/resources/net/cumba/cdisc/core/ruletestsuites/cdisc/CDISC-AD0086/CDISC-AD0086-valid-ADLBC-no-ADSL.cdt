@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-AD0086 expect=noViolation domain=ADLBC
+# Rule:Description: A variable is present with the same name as a variable present in ADSL but the variables do not have identical formats
+#note "No ADSL in the study: the label probe $adsl_label has no value, the not empty($adsl_label) gate folds false, and the format comparison is never reached. Pins the absent-ADSL disposition of the cross-dataset probe."
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDT type=Num format=DATE9.
+---
+CDISCPILOT01 | 01-701-1015 | 22000
+---

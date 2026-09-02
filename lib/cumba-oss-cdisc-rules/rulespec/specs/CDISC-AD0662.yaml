@@ -1,0 +1,33 @@
+name: CDISC-AD0662
+kind: rule
+description: |
+  Wave A8 port — T1a PlainSimple.
+  CDISC-AD0662: TMPCTDF is populated but ARRLT and NRRLT are not populated (ADNCA v1.0).
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty + empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0662)
+rule:
+  coreId: CDISC-AD0662
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, TMPCTDF: '', ARRLT: '', NRRLT: ''}      # ok (TMPCTDF empty)
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, TMPCTDF: Y, ARRLT: '', NRRLT: ''}       # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0662
+    dataset: ADNCA
+    row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ARRLT:
+      NRRLT:
+      TMPCTDF: Y
+expected_errors: []

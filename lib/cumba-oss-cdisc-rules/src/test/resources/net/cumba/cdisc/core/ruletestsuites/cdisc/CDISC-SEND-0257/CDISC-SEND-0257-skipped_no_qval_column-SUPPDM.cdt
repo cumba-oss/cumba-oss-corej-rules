@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0257 expect=skipped domain=SUPPDM
+#note "THE QVAL ALL-FACET GATE (Fix #331 bucket 2, M2-D24 / M3-D18; pin owed by review S9 and authored by Fix #340). FRESH FIXTURE - this rule shipped with no scenarios at all. The SUPPDM dataset deliberately declares no QVAL column, so Requirements.Variables.All [QVAL] rejects the dataset and the rule is SKIPPED naming QVAL. Remove the All entry and the rule EXECUTES: since Fix #330 retired the injected var_exists guard, a bare empty(QVAL) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so it would fire on EVERY row -- the flood the gate exists for. If this scenario EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite the pin."
+#library standard=sendig version=3-1-1
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QORIG    type=Char label="Origin"
+---
+S1 | DM | S1-001 |  |  | STRAIN | Strain | CRF
+S1 | DM | S1-002 |  |  | STRAIN | Strain | CRF
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1269 expect=violation domain=TS
+#note "Row 2 states a randomisation quotient of 1.5 (above 1) and row 3 of -0.2 (below 0); both are outside the 0..1 range -> both fire. Row 1 is a different parameter whose value is irrelevant here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 TSPARMCD=RANDQT TSVAL=1.5
+#expectViolationAt row=3 TSPARMCD=RANDQT TSVAL=-0.2
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | PLANSUB | Planned Number of Subjects | 306
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 1.5
+S1 | TS | 3 | RANDQT  | Randomization Quotient     | -0.2

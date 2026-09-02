@@ -1,0 +1,10 @@
+#!RuleTest
+#test CDISC-AD0885 expect=skipped domain=ADPPT
+#note "The negative half of CDISC-AD0885-invalid-ADPPT-declared-scope.cdt: identical columns, no structure=/subclass= declaration. Nothing detects BASIC DATA STRUCTURE or POPULATION PHARMACOKINETIC ANALYSIS, so the rule never runs. This is the KNOWN trade D21 accepts: before the swap the Domains glob ADPPT* selected this dataset by name; after it, a dataset whose columns carry no popPK signature is reachable only through a declared Define-XML subclass. Fix #154's last-resort name tier does not rescue it either: that tier requires BASIC DATA STRUCTURE, and STUDYID/USUBJID alone detect ADAM OTHER."
+# Rule:Description: Raise an error when USUBJIDN is not present in an ADPPKIG v1.0 dataset.
+dataset ADPPT
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---

@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD0166"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Baseline Reference Range Indicator (BNRIND)\
+  \ variable is present in the dataset but the Analysis Reference Range Indicator\
+  \ (ANRIND) variable is not present; when BNRIND is used, the analysis reference\
+  \ range indicator it is derived from must also be present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("BNRIND") and not var_exists("ANRIND")
+Outcome:
+  Message: "BNRIND is present, but ANRIND is not present."
+  Output_Variables:
+  - "BNRIND"
+Source:
+  Message: "BNRIND is present, but ANRIND is not present"
+  Description: "If Baseline Reference Range Indicator (BNRIND) variable is present,\
+    \ then Analysis Reference Range Indicator (ANRIND) and Baseline Record Flag (ABLFL)\
+    \ variables must be present."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0166"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0166"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0166"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0166"
+        Version: "1"
+      Version: "6.0"

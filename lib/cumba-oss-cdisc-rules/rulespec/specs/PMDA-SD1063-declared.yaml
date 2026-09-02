@@ -1,0 +1,56 @@
+name: PMDA-SD1063-declared
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the NON-FIRING arm of the `PMDA-SD1063` A/B pair,
+  and the PMDA half of the §3.5 guard. Byte-identical to `PMDA-SD1063` apart from the
+  `define_xml` block, which here declares BOTH submitted datasets, so nothing is missing from
+  the Define and the correct answer is zero violations.
+
+  **Why this spec exists.** Its firing sibling `PMDA-SD1063` is blind to the one input shape
+  that produces a silently WRONG verdict rather than a skip: an EMPTY Define dataset-name list.
+  `ds_name("DATA") not in $define_datasets` fires on every dataset when `$define_datasets` is
+  `[]`, so the sibling — whose expectation IS a violation on AE — stays green under exactly the
+  mutation that matters, while this spec goes 0 -> 1 and turns RED. Measured on the FDA twin,
+  which shares the shape: with the Define name list forced to `[]`, `FDA-SD1063-declared` goes
+  RED while `FDA-SD1063` stays green.
+
+  Without this file the PMDA half of that pair was missing: `PMDA-SD1063` deferred to
+  `FDA-SD1063.yaml` for "what this shape does NOT pin", but the partner named there resolves the
+  FDA corpus entry, not the PMDA one — so `PMDA-SD1063` had no guard of its own. Added after an
+  adversarial review measured it green under `getDatasetNames() -> List.of()` on the Java lane
+  and under `DefineDatasetNames._execute_operation -> []` on the Python lane.
+
+  **This is why an empty expectation is legitimate here.** The plan treats a bare
+  `expected_violations: []` as untrustworthy on its own — it is indistinguishable from a dead
+  fixture. This one is anchored two ways: its byte-identical partner `PMDA-SD1063` reports
+  exactly 1 on the same fixture, and its own mutation behaviour is the assertion. It is a guard,
+  not a measurement.
+
+  Attribute choice, D4 and the status channel: identical to `PMDA-SD1063`'s. Only the
+  sink-backed `define_dataset_label` is declared (the rule reads the KEY SET, not any dataset
+  attribute, but R3 requires a shape-B key to carry at least one attribute), and
+  `define_dataset_name` / `define_dataset_location` are left to D4's derivation so the defaults
+  stay on the execution path.
+python_source: rules-pmda-sdtmig-3-4.json (PMDA-SD1063)
+rule:
+  coreId: PMDA-SD1063
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: AE
+  VS:
+    define_dataset_label: VS
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

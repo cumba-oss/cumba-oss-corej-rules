@@ -1,0 +1,30 @@
+name: CDISC-AD0159
+kind: rule
+description: |
+  A2 port — T1a PlainSimple. BDS: AWTDIFF populated but AWTARGET empty.
+python_source: rules-adamig-1-3.json (CDISC-AD0159)
+rule:
+  coreId: CDISC-AD0159
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, AWTDIFF: '5', AWTARGET: '100'}  # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, AWTDIFF: '5', AWTARGET: ''}      # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0159
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      AWTDIFF: '5'
+      AWTARGET: null
+expected_errors: []

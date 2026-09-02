@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1039 expect=violation domain=CM
+#note "Row 1: CMCAT equalsIgnoreCase CMTRT (case-folded) -> FIRES via the --TRT arm. Row 2: CMCAT == CMDECOD -> FIRES via the --DECOD arm, the PMDA-ONLY arm (FDA-SD1039's five-arm Check would not fire on a CAT==DECOD-only row; here CMTRT also equals, so this row fires under both authorities). Row 3: no arm matches -> clean. Absent arms (--TERM, --TESTCD, --BODSYS not declared) are defeated by their authored var_exists guards."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMSEQ=1
+#expectViolationAt row=2 CMSEQ=2
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMDECOD  type=Char
+col CMCAT    type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN     | ACETYLSALICYLIC ACID | aspirin
+S1 | CM | 001 | 2 | PARACETAMOL | PARACETAMOL           | PARACETAMOL
+S1 | CM | 001 | 3 | IBUPROFEN   | IBUPROFEN             | PAIN RELIEF
+---

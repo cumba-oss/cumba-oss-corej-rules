@@ -1,0 +1,42 @@
+name: FDA-SD1012
+kind: rule
+description: |
+  EC-32(a) / Fix #126 pin — absent JOIN-KEY half. FDA-SD1012: every SE record's
+  (ETCD, ELEMENT) must match a TE entry; the Check is `TE.ETCD empty` over a
+  left join keyed on [ETCD, ELEMENT]. TE is PRESENT but the Permissible ELEMENT
+  column is absent from SE (the LEFT side), so the merge itself KeyErrors: the
+  fork used to re-raise ("COLUMN_NOT_FOUND_IN_DATA") and skip the rule; it now
+  keeps the SE dataset and materialises TE.ETCD as null. coreJ REGISTERS the
+  lookup for a left-side-missing key (only a right-side-missing key or an
+  absent dataset fails DatasetLookup.build): every row's key resolves null,
+  TE.ETCD renders "" -> canonical null, and the non-UNPLAN row fires even
+  though TE carries a matching ETCD — identical verdict AND rendering in both
+  lanes.
+python_source: rules-sdtmig-3-4.json (FDA-SD1012)
+rule:
+  coreId: FDA-SD1012
+datasets:
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, ETCD: SCRN}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 2, ETCD: UNPLAN}
+  TE:
+    row_key: [STUDYID, ETCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TE, ETCD: SCRN, ELEMENT: Screening, TEDUR: P7D}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [SE]
+expected_violations:
+  - rule_id: FDA-SD1012
+    dataset: SE
+    row_key: {SESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ETCD: SCRN
+      TE.ETCD:
+expected_errors: []

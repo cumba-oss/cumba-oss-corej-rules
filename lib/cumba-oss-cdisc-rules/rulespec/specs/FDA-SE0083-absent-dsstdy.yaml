@@ -1,0 +1,34 @@
+name: FDA-SE0083-absent-dsstdy
+kind: rule
+description: |
+  EC-35 / Fix #126 — the absent-aggregate-target shape: DS is present but carries
+  no DSSTDY column, so the grouped max has nothing to aggregate. coreJ folds the
+  absent column to no-value (evalMaxGrouped returns null) and the rule EXECUTES
+  with zero findings; the fork now degrades identically ($max_dsstdy is a null
+  column, `greater_than` does not fire) instead of dying on a later KeyError and
+  skipping. NOTE (G18): the harness cannot distinguish "executes, zero findings"
+  from "skipped" — both lanes assert zero violations here; the executes-not-skips
+  half of the contract is pinned in the fork unit tests
+  (test_absent_target_aggregates.py) and would become assertable via
+  PLAN-parity-expected-status.
+python_source: rules-sendig FDA-SE0083
+rule:
+  coreId: FDA-SE0083
+datasets:
+  TF:
+    row_key: [STUDYID, USUBJID, TFSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '001', TFSEQ: 1, TFDETECT: 15}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: RECOVERED}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    findings: [TF]
+    events: [DS]
+expected_violations: []
+expected_errors: []

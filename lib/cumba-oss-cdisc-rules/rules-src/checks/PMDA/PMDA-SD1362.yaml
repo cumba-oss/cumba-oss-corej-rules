@@ -1,0 +1,64 @@
+Core:
+  Id: "PMDA-SD1362"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when exactly one of Actual Arm Code (ACTARMCD) and Description\
+  \ of Actual Arm (ACTARM) is populated while the other is empty; both must be populated\
+  \ together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and empty(ACTARM) or empty(ACTARMCD) and not empty(ACTARM)
+Outcome:
+  Message: "ACTARM is populated but ACTARMCD is empty, or ACTARMCD is populated but\
+    \ ACTARM is empty."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ACTARM"
+Source:
+  Message: "ACTARM is populated, but ACTARMCD is null, or vice versa"
+  Description: "Description of Actual Arm (ACTARM) must be populated when Actual Arm\
+    \ Code (ACTARMCD) is populated, and vice versa."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "1.6"

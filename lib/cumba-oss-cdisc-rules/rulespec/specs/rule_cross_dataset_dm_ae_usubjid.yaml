@@ -1,0 +1,46 @@
+name: rule_cross_dataset_dm_ae_usubjid
+kind: rule
+description: |
+  M2 pilot: cross-dataset shape via Match_Datasets.
+  Synthetic rule fires when DM.USUBJID does not appear in AE — i.e. the subject has no
+  adverse-event records. Demonstrates the join-lookup path without needing library access.
+rule:
+  id: pilot-cross-dataset
+  Core: {Id: PILOT-DM-AE-USUBJID}
+  Description: Every subject must have at least one AE record.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [DM]}
+  Operations:
+    - id: $ae_subjects
+      operator: distinct
+      name: USUBJID
+      domain: AE
+  Check:
+    all:
+      - {name: USUBJID, operator: is_not_contained_by, value: $ae_subjects}
+  Outcome:
+    Message: Subject has no AE records.
+    Output_Variables: [STUDYID, USUBJID]
+datasets:
+  DM:
+    rows:
+      - {STUDYID: "S1", USUBJID: "001"}
+      - {STUDYID: "S1", USUBJID: "002"}
+      - {STUDYID: "S1", USUBJID: "003"}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: "S1", USUBJID: "001", AESEQ: 1, AETERM: "Headache"}
+      - {STUDYID: "S1", USUBJID: "003", AESEQ: 1, AETERM: "Nausea"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+expected_violations:
+  - rule_id: PILOT-DM-AE-USUBJID
+    dataset: DM
+    row_key: {STUDYID: "S1", USUBJID: "002"}
+    status: SUCCESS
+    output_variables: {STUDYID: "S1", USUBJID: "002"}
+expected_errors: []

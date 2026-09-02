@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0124 expect=noViolation domain=ADLBC
+# Rule:Description: There is more than one value of PARCATy for a given value of PARAMCD
+#note "each PARAMCD maps to a single PARCAT1 value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | CHEM
+CDISCPILOT01 | 01-701-1023 | ALB | CHEM
+---

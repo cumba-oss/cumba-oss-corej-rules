@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1240 expect=noViolation domain=DM
+#note "Both DM subjects have a DS record with DSDECOD 'INFORMED CONSENT OBTAINED'; the extra non-milestone DS records for 001 do not disturb the filtered lookup."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+col SEX     type=Char label="Sex"
+col COUNTRY type=Char label="Country"
+---
+CDISCPILOT01 | DM | 001 | 001 | 70 | M | USA
+CDISCPILOT01 | DM | 002 | 002 | 70 | F | USA
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 001 | 1 | Informed consent obtained | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | 2020-01-01
+CDISCPILOT01 | DS | 001 | 2 | Completed | COMPLETED | DISPOSITION EVENT | 2020-06-01
+CDISCPILOT01 | DS | 002 | 1 | Informed consent obtained | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | 2020-01-05
+---

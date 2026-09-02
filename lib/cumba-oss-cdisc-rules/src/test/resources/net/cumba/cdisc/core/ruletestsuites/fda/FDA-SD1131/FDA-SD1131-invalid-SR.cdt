@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1131 expect=violation domain=SR
+#note "The FINDINGS ABOUT arm of the class scope: SRBLFL='Y' with an empty SRSTRESC -> fires on row 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 SRBLFL=Y
+dataset SR class="FINDINGS ABOUT" label="Skin Response"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SRSEQ    type=Num  label="Sequence Number"
+col SRTESTCD type=Char label="Skin Response Test Short Name"
+col SRSTRESC type=Char label="Character Result/Finding in Std Format"
+col SRBLFL   type=Char label="Baseline Flag"
+---
+CDISCPILOT01 | SR | 01-701-1015 | 1 | DIAMETER |    | Y
+CDISCPILOT01 | SR | 01-701-1015 | 2 | DIAMETER | 12 |

@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-AD0700"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when CHG is populated and does not equal AVAL minus BASE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(CHG) and CHG != (AVAL - BASE)
+Outcome:
+  Message: "CHG is populated but does not equal AVAL minus BASE for this record."
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "BASE"
+  - "CHG"
+Source:
+  Class: "MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "CHG"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination\
+    \ of device and subject, CHG is populated and is not equal to AVAL - BASE"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD for a combination of device\
+    \ and subject, CHG is not equal to AVAL - BASE"
+  Condition_Failure: "USUBJID and SPDEVID are present and CHG is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR700"
+        Version: "1"
+      Version: "5.0"

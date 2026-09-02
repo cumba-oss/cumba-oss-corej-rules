@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1036 expect=violation domain=LB
+#note "Row 1 names a toxicity but leaves the toxicity grade empty -> 'Toxicity Grade (--TOXGR) should be provided, when Toxicity (--TOX) is populated'."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBTOX=Hepatotoxicity LBTOXGR=
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOX    type=Char label="Toxicity"
+col LBTOXGR  type=Char label="Standard Toxicity Grade"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALT  | Hepatotoxicity |
+CDISCPILOT01 | LB | 01-701-1015 | 2 | CREAT| Nephrotoxicity | 1

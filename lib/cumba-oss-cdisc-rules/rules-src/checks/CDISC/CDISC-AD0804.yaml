@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-AD0804"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STUDYIDN is present and STUDYID is not present"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("STUDYIDN") and not var_exists("STUDYID")
+Outcome:
+  Message: "STUDYIDN is present in the dataset, but STUDYID is not present."
+  Output_Variables:
+  - "STUDYIDN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "STUDYIDN"
+  Natural_Language_Rule_Failure_Criteria: "STUDYIDN is present and STUDYID is not\
+    \ present"
+  Rule_Failure_Criteria: "STUDYID is not present"
+  Condition_Failure: "STUDYIDN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR804"
+        Version: "1"
+      Version: "5.0"

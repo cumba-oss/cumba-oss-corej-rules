@@ -1,0 +1,24 @@
+Rule_Id: "DEFINE-XML-0175"
+Sheet_Rule_Identifier: "175"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "SASFormatName"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Codelist SASFormatName attribute must contain a valid SAS format name. It needs to start with a $ character in case the CodeList DataType is text."
+# One sheet row, two rules: this rule checks the "valid SAS format name" shape
+# (optional leading $, then a letter or underscore, then letters/digits/
+# underscores, 32 characters max); the DataType="text" $-prefix leg is the
+# companion DEFINE-XML-0175-B. Deviations (documented): (1) SAS's
+# "must not end in a digit" restriction is NOT enforced — the spec's own
+# examples (SASFormatName="$FMT0049", SS "ARM codelist") end in digits;
+# (2) the sheet Message names ItemDef, an obvious copy slip for CodeList —
+# corrected here.
+Message: "The CodeList has an invalid SASFormatName attribute value [${value}]."
+Check:
+  kind: "matches_regex"
+  attribute: "SASFormatName"
+  # Two alternatives (review-batch-e WARN 2): character formats "$" + <=31 chars,
+  # numeric formats <=32 chars — the single \$?-prefix form off-by-one'd the
+  # numeric cap at 31.
+  pattern: '(\$[A-Za-z_][A-Za-z0-9_]{0,30}|[A-Za-z_][A-Za-z0-9_]{0,31})'

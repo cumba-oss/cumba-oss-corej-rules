@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P4 violations fixture (2.1): one dedicated violator per 2.1-applicable
+     P4 rule, each isolated so every rule fires exactly once:
+       ODM         - FileType=Transactional (DD0019)
+       MDV.1       - def:DefineVersion=2.1 (DD0020B)
+       Standards   - one bad Version per DD0022 leg (base/-B/-C/-D/-E) plus a
+                     Status=Retired standard (DD0141)
+       IG.DM       - SDTM + Purpose=Analysis (DD0053); ItemRef Mandatory=Y (OD0074)
+       IG.AE       - SASDatasetName AE vs ea.xpt (DD0052); IG Alias Context=Other (DD0064)
+       IG.BADDS    - SASDatasetName=1BAD (DD0048); Repeating=Y (OD0072)
+       IG.REF      - IsReferenceData=Yes + Repeating=Yes (DD0135)
+       IG.REFBAD   - IsReferenceData=Reference (OD0073)
+       IG.NONSTD   - def:IsNonStandard=No (DD0130)
+       IG.SEND/IG.ADSL/IG.ADAE - SEND CRF origin (DD0073-B), ADaM Tabulation
+                     (DD0053-B), ADaM Collected origin (DD0073-C)
+       ItemDefs    - AESEV Origin=Other in SDTM (DD0073), DOMAIN=Collected (DD0106),
+                     RDOMAIN=Derived (DD0107), STUDYID=Assigned (DD0108), second
+                     USUBJID/VISITNUM deviating (DD0109/DD0110), AEDECOD without a
+                     MedDRA reference (DD0113), LBORRES DataType=string (OD0075),
+                     AVAL float vs text codelist (OD0080), BASE Predecessor text
+                     without a dot (DD0148)
+       VL.QVAL     - value Origin Collected vs variable Derived (DD0074); value
+                     Length 300 over variable 200 (DD0123)
+       WC.1        - RangeCheck SoftHard=Medium (DD0044)
+       CodeLists   - MEDDRA Version=26 (DD0025), MEDDRA2 without Version (DD0112-B),
+                     integer term ABC (OD0077), float term 1.2.3 (OD0077-B),
+                     DataType=boolean (OD0076), SASFormatName=9FMT (OD0019), text
+                     codelist SASFormatName without $ (OD0078), ExtendedValue=No
+                     (DD0030), codelist/item aliases with wrong Context
+                     (DD0064-B/-C/-D), xml:lang=en_US decode (OD0021)
+       MT.BAD      - MethodDef Type=Derivation (DD0104)
+     DD0112 cannot fire here (a MedDRA codelist exists by design); its violator
+     lives in pmda-p4-violations-20.xml. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p4-violations"
+     FileType="Transactional"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP4V">
+    <GlobalVariables>
+      <StudyName>PMDAP4V-STUDY</StudyName>
+      <StudyDescription>PMDA batch P4 violations fixture study</StudyDescription>
+      <ProtocolName>PMDAP4V-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P4 violations MDV" def:DefineVersion="2.1">
+      <def:Standards>
+        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.ADAM" Name="ADaMIG" Type="IG" Version="1.3" Status="Final"/>
+        <def:Standard OID="STD.SDTM.BAD" Name="SDTMIG" Type="IG" Version="3.1.1"
+                      Status="Final"/>
+        <def:Standard OID="STD.SEND.BAD" Name="SENDIG" Type="IG" Version="3.2"
+                      Status="Final"/>
+        <def:Standard OID="STD.ADAM.BAD" Name="ADaMIG" Type="IG" Version="2.0"
+                      Status="Final"/>
+        <def:Standard OID="STD.AR.BAD" Name="SENDIG-AR" Type="IG" Version="1.1"
+                      Status="Final"/>
+        <def:Standard OID="STD.DART.BAD" Name="SENDIG-DART" Type="IG" Version="1.0"
+                      Status="Final"/>
+        <def:Standard OID="STD.RETIRED" Name="SDTMIG" Type="IG" Version="3.3"
+                      Status="Retired"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM"
+                      Version="2023-12-15" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No" IsReferenceData="No"
+                    SASDatasetName="DM" Purpose="Analysis"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DM" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Demographics</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes" KeySequence="1"/>
+        <ItemRef ItemOID="IT.DOMAIN" OrderNumber="2" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.USUBJID" OrderNumber="3" Mandatory="Yes" KeySequence="2"/>
+        <ItemRef ItemOID="IT.AESEV" OrderNumber="4" Mandatory="Y"/>
+        <ItemRef ItemOID="IT.VISITNUM" OrderNumber="5" Mandatory="No"/>
+        <def:Class Name="SPECIAL PURPOSE"/>
+        <def:leaf ID="LF.DM" xlink:href="dm.xpt">
+          <def:title>dm.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="AE" Purpose="Tabulation"
+                    def:Structure="One record per event"
+                    def:ArchiveLocationID="LF.AE" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.AEDECOD" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="IT.AELLT" OrderNumber="2" Mandatory="No"/>
+        <Alias Context="Other" Name="Adverse Events"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.AE" xlink:href="ea.xpt">
+          <def:title>ea.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.BADDS" Name="XD" Domain="XD" Repeating="Y"
+                    SASDatasetName="1BAD" Purpose="Tabulation"
+                    def:Structure="One record per finding" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Bad dataset name host</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LBORRES" OrderNumber="1" Mandatory="No"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.REF" Name="REF" Repeating="Yes" IsReferenceData="Yes"
+                    SASDatasetName="REF" Purpose="Tabulation"
+                    def:Structure="One record per code" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Reference data with bad Repeating</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="TRIAL DESIGN"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.REFBAD" Name="REFB" Repeating="No" IsReferenceData="Reference"
+                    SASDatasetName="REFB" Purpose="Tabulation"
+                    def:Structure="One record per code" def:StandardOID="STD.SDTM">
+        <Description>
+          <TranslatedText xml:lang="en">Bad IsReferenceData host</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="TRIAL DESIGN"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.NONSTD" Name="XS" Repeating="No" def:IsNonStandard="No"
+                    SASDatasetName="XS" Purpose="Tabulation"
+                    def:Structure="One record per subject">
+        <Description>
+          <TranslatedText xml:lang="en">Bad IsNonStandard host</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.SEND" Name="LB" Domain="LB" Repeating="Yes"
+                    IsReferenceData="No" SASDatasetName="LB" Purpose="Tabulation"
+                    def:Structure="One record per measurement"
+                    def:StandardOID="STD.SEND.BAD">
+        <Description>
+          <TranslatedText xml:lang="en">Laboratory Test Results</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.LBSPEC" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="FINDINGS"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No" IsReferenceData="No"
+                    SASDatasetName="ADSL" Purpose="Tabulation"
+                    def:Structure="One record per subject" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Subject Level Analysis Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.BASE" OrderNumber="1" Mandatory="No"/>
+        <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.ADAE" Name="ADAE" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="ADAE" Purpose="Analysis"
+                    def:Structure="One record per event" def:StandardOID="STD.ADAM">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Event Analysis Dataset</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.TRTSDT" OrderNumber="1" Mandatory="No"/>
+        <def:Class Name="OCCURRENCE DATA STRUCTURE"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.STUDYID" Name="STUDYID" DataType="text" Length="12"
+               SASFieldName="STUDYID">
+        <Description>
+          <TranslatedText xml:lang="en">Study Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+      </ItemDef>
+      <ItemDef OID="IT.DOMAIN" Name="DOMAIN" DataType="text" Length="2"
+               SASFieldName="DOMAIN">
+        <Description>
+          <TranslatedText xml:lang="en">Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.RDOMAIN" Name="RDOMAIN" DataType="text" Length="2"
+               SASFieldName="RDOMAIN">
+        <Description>
+          <TranslatedText xml:lang="en">Related Domain Abbreviation</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.USUBJID2" Name="USUBJID" DataType="text" Length="20"
+               SASFieldName="USUBJID">
+        <Description>
+          <TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.VISITNUM" Name="VISITNUM" DataType="integer" Length="3"
+               SASFieldName="VISITNUM">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.VISITNUM2" Name="VISITNUM" DataType="integer" Length="3"
+               SASFieldName="VISITNUM">
+        <Description>
+          <TranslatedText xml:lang="en">Visit Number</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.AESEV" Name="AESEV" DataType="text" Length="8"
+               SASFieldName="AESEV">
+        <Description>
+          <TranslatedText xml:lang="en">Severity/Intensity</TranslatedText>
+        </Description>
+        <def:Origin Type="Other"/>
+      </ItemDef>
+      <ItemDef OID="IT.AEDECOD" Name="AEDECOD" DataType="text" Length="200"
+               SASFieldName="AEDECOD">
+        <Description>
+          <TranslatedText xml:lang="en">Dictionary-Derived Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+        <CodeListRef CodeListOID="CL.DECOD"/>
+      </ItemDef>
+      <ItemDef OID="IT.AELLT" Name="AELLT" DataType="text" Length="200"
+               SASFieldName="AELLT">
+        <Description>
+          <TranslatedText xml:lang="en">Lowest Level Term</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+        <CodeListRef CodeListOID="CL.MEDDRA"/>
+      </ItemDef>
+      <ItemDef OID="IT.LBSPEC" Name="LBSPEC" DataType="text" Length="20"
+               SASFieldName="LBSPEC">
+        <Description>
+          <TranslatedText xml:lang="en">Specimen Type</TranslatedText>
+        </Description>
+        <def:Origin Type="CRF"/>
+      </ItemDef>
+      <ItemDef OID="IT.TRTSDT" Name="TRTSDT" DataType="integer" Length="8"
+               SASFieldName="TRTSDT">
+        <Description>
+          <TranslatedText xml:lang="en">Treatment Start Date</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.BASE" Name="BASE" DataType="float" Length="8" SignificantDigits="2"
+               SASFieldName="BASE">
+        <Description>
+          <TranslatedText xml:lang="en">Baseline Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Predecessor">
+          <Description>
+            <TranslatedText xml:lang="en">ADSL BASE</TranslatedText>
+          </Description>
+        </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.LBORRES" Name="LBORRES" DataType="string" Length="40"
+               SASFieldName="LBORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result as Collected</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.AVAL" Name="AVAL" DataType="float" Length="8"
+               SASFieldName="AVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Value</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.TEXTFMT"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:Origin Type="Derived"/>
+        <def:ValueListRef ValueListOID="VL.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL.AESER" Name="AESER" DataType="text" Length="1">
+        <Description>
+          <TranslatedText xml:lang="en">Serious Event Flag</TranslatedText>
+        </Description>
+        <def:Origin Type="Collected" Source="Investigator"/>
+      </ItemDef>
+      <ItemDef OID="IT.QVAL.LONG" Name="AELOC" DataType="text" Length="300">
+        <Description>
+          <TranslatedText xml:lang="en">Location of Event</TranslatedText>
+        </Description>
+      </ItemDef>
+      <def:ValueListDef OID="VL.QVAL">
+        <ItemRef ItemOID="IT.QVAL.AESER" OrderNumber="1" Mandatory="No"/>
+        <ItemRef ItemOID="IT.QVAL.LONG" OrderNumber="2" Mandatory="No"/>
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.1">
+        <RangeCheck SoftHard="Medium" Comparator="EQ" def:ItemOID="IT.AESEV">
+          <CheckValue>MILD</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <CodeList OID="CL.MEDDRA" Name="MedDRA Dictionary" DataType="text">
+        <ExternalCodeList Dictionary="MEDDRA" Version="26"/>
+      </CodeList>
+      <CodeList OID="CL.MEDDRA2" Name="MedDRA Preferred Term" DataType="text">
+        <ExternalCodeList Dictionary="MEDDRA"/>
+      </CodeList>
+      <CodeList OID="CL.DECOD" Name="AE Dictionary Terms" DataType="text">
+        <CodeListItem CodedValue="HEADACHE">
+          <Decode>
+            <TranslatedText xml:lang="en_US">Headache</TranslatedText>
+          </Decode>
+          <Alias Context="Wrong" Name="C1"/>
+        </CodeListItem>
+        <Alias Context="DomainDescription" Name="AE Terms"/>
+      </CodeList>
+      <CodeList OID="CL.INT" Name="Integer Codes" DataType="integer">
+        <EnumeratedItem CodedValue="1">
+          <Alias Context="Bad" Name="C2"/>
+        </EnumeratedItem>
+        <EnumeratedItem CodedValue="ABC"/>
+      </CodeList>
+      <CodeList OID="CL.FLOAT" Name="Float Codes" DataType="float">
+        <EnumeratedItem CodedValue="1.5"/>
+        <EnumeratedItem CodedValue="1.2.3"/>
+      </CodeList>
+      <CodeList OID="CL.BADTYPE" Name="Flags" DataType="boolean">
+        <EnumeratedItem CodedValue="Y"/>
+      </CodeList>
+      <CodeList OID="CL.FMT" Name="Integer Format Codes" DataType="integer"
+                SASFormatName="9FMT">
+        <EnumeratedItem CodedValue="1"/>
+        <EnumeratedItem CodedValue="2"/>
+      </CodeList>
+      <CodeList OID="CL.TEXTFMT" Name="Text Format Codes" DataType="text"
+                SASFormatName="FMT">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.EXT" Name="Extended Codes" DataType="text">
+        <EnumeratedItem CodedValue="X" def:ExtendedValue="No"/>
+      </CodeList>
+      <MethodDef OID="MT.BAD" Name="Bad Method" Type="Derivation">
+        <Description>
+          <TranslatedText xml:lang="en">Some derivation</TranslatedText>
+        </Description>
+      </MethodDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

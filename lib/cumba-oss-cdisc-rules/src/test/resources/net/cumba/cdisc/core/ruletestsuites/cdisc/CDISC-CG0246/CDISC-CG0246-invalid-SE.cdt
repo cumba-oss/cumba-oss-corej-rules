@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0246 expect=violation domain=SE
+#note "ADAPTED-FROM fda/FDA-SD1009/FDA-SD1009-invalid-SE.cdt (data and pins verbatim). ETCD on row 2 is 9 characters, one past the 8-character limit -> fires; the 8-character row 1 is the passing boundary."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=RUNINPBOX
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+---
+S1 | SE | 001 | 1 | RUNINPBO
+S1 | SE | 001 | 2 | RUNINPBOX

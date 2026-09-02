@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1073-A expect=violation domain=TR
+#note "The OTHER THREE prohibited qualifiers (TRLAT, TRDIR, TRPORTOT) present, deliberately NO TRLOC. Predicted VIOLATION with count EXACTLY 1, NOT 3: the whole four-way or-tree is a single dataset-level constant (BroadcastFold), so three matching disjuncts still yield one finding. Pins disjuncts 2-4, which the twin leaves entirely untested, and pins the count semantics at the same time."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TR label="Tumor Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col TRSEQ    type=Num
+col TRTESTCD type=Char
+col TRLAT    type=Char label="Laterality"
+col TRDIR    type=Char label="Directionality"
+col TRPORTOT type=Char label="Portion or Totality"
+---
+S1 | TR | 001 | 1 | LDIAM | LEFT | PROXIMAL | ENTIRE
+---

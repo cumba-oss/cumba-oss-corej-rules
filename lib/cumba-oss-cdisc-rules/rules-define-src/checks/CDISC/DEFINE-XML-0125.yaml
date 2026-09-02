@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0125"
+Sheet_Rule_Identifier: "125"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "HasNoData"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute def:HasNoData must be provided when def:ArchiveLocationID is not provided in the context of a regulatory submission."
+Message: "Attribute def:HasNoData is missing for ItemGroupDef when def:ArchiveLocationID is not provided in the context of a regulatory submission."
+Check:
+  kind: "exists"
+  target: "@HasNoData"
+  when:
+    all:
+    - path: "../../../@Context"
+      equals: "Submission"
+    - path: "@ArchiveLocationID"
+      exists: false

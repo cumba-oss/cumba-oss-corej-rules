@@ -1,0 +1,25 @@
+Core:
+  Id: "DRAFT-900032"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when ADY (Analysis Relative Day) is present in a Basic\
+  \ Data Structure dataset but ADT (Analysis Date) is not; ADT is conditionally required\
+  \ when ADY exists."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ADY") and not var_exists("ADT")
+Outcome:
+  Message: "ADY (Analysis Relative Day) is present but ADT (Analysis Date) is not.\
+    \ ADT is conditionally required when ADY exists."
+  Output_Variables:
+  - "ADY"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

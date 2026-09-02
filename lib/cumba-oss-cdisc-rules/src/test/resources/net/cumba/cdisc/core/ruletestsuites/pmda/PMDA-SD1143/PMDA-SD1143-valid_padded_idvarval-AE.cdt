@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1143 expect=noViolation domain=AE
+#note "H1 (ruled 2026-08-19): the distinct key set normalises IDVARVAL with the join-token semantics the Match_Datasets path uses (ChildMatchIndex.normalizeJoinToken). Row 1's description is keyed ' 1' (SAS padding) and row 2's '2.0' (float rendering); both now compare equal to the numeric AESEQ probes '1' and '2' -> every flagged record is described, no violation. Before the fix both rows fired although the descriptions exist."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESMIE  type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | CHEST PAIN | Y
+S1 | AE | 001 | 2 | SYNCOPE    | Y
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | " 1" | AESOSP | Chest pain, hospitalised overnight
+S1 | AE | 001 | AESEQ | 2.0  | AESOSP | Recurrent syncope requiring intervention

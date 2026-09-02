@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-SEND-0333"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Nominal Study Day (PPNOMDY) and\
+  \ Time Point Reference (PPTPTREF) is populated but does not match any combination\
+  \ of PCNOMDY and PCTPTREF in the Pharmacokinetics Concentrations (PC) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Operations:
+- id: "$pc_nomdy_tptref"
+  expression: "distinct([PCNOMDY, PCTPTREF], domain=\"PC\")"
+Check:
+  expression: >-
+    not empty(PPNOMDY) and not empty(PPTPTREF) and tuple(PPNOMDY, PPTPTREF) not in $pc_nomdy_tptref
+Outcome:
+  Message: "The combination of PPNOMDY and PPTPTREF does not match any combination\
+    \ of PCNOMDY and PCTPTREF in the Pharmacokinetics Concentrations (PC) dataset."
+  Output_Variables:
+  - "PPNOMDY"
+  - "PPTPTREF"
+  - "$pc_nomdy_tptref"
+Source:
+  Class: "FND"
+  Domain: "PC, PP"
+  Variable: "PCNOMDY, PCTPTREF, PPNOMDY, PPTPTREF"
+  Plain_Text_Explanation: "For PC records contributing to a single time concentration\
+    \ profile, the PCNOMDY and PCTPTREF pair must be the same as the PPNOMDY and PPTPTREF\
+    \ pair for that same profile."
+  Condition: "PC records contribute to a single time concentration profile in PP"
+  Rule: "PCNOMDY & PCTPTREF  = PPNOMDY & PPTPTREF"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND333"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND333"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND333"
+        Version: "1"
+      Version: "5.0"

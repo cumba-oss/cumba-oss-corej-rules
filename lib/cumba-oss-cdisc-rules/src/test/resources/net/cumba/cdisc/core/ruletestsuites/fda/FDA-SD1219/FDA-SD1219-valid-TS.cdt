@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1219 expect=noViolation domain=TS
+#note "Sheet: 'TSVAL must be either ISO 8601 format for time period (e.g. P80Y) or null, when TSPARMCD=LENGTH'. Row 1 is a valid period, row 2 the explicitly allowed empty TSVAL, row 3 carries a non-period value under a different parameter (PLANSUB)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | LENGTH  | Trial Length              | P2Y6M
+CDISCPILOT01 | TS | 2 | LENGTH  | Trial Length              |
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects | 300

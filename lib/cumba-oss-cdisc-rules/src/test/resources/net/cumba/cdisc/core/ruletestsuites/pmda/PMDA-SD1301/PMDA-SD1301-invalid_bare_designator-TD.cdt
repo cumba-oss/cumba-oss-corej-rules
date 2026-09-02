@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1301 expect=violation domain=TD
+#note "Pins the (?!\$) lookaheads, the ONLY thing in PMDA's pattern that rejects a designator with no components: 'P' fails the first lookahead outright, and 'PT' passes it but then leaves the trailing 'T' unmatched. Both fire. This is the fixture that distinguishes PMDA's spelling from a naive ^P.*\$."
+#expectViolationCount 2
+#expectViolationAt row=1 TDSTOFF=P
+#expectViolationAt row=2 TDSTOFF=PT
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TDORDER  type=Num
+col TDANCVAR type=Char
+col TDSTOFF  type=Char
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | P
+CDISCPILOT01 | TD | 2 | RSSTDTC | PT

@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0570"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Planned Arm (ARM) is 'Screen Failure',\
+  \ 'Not Assigned', 'Unplanned Treatment', or 'Not Treated', which are not valid planned\
+  \ arm descriptions."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+    - "TA"
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Check:
+  expression: >-
+    upper(ARM) in ["SCREEN FAILURE", "NOT ASSIGNED", "UNPLANNED TREATMENT", "NOT TREATED"]
+Outcome:
+  Message: "ARM cannot be equal to 'Screen Failure', 'Not Assigned', 'Unplanned Treatment',\
+    \ or 'Not Treated'."
+  Output_Variables:
+  - "ARM"
+Source:
+  Class: "TDM, SPC"
+  Domain: "DM, TA, TV"
+  Variable: "ARM"
+  Rule: "ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not\
+    \ Treated')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0570"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0570"
+        Version: "1"
+      Version: "2.0"

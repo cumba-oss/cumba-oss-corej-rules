@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD9702 expect=violation domain=ADAE
+#note "PRESENCE half of the ONTRTFL pair: the indexed flag ONTR01FL is in the dataset but the overall ONTRTFL column is not present at all. The value rules (ONTRTFL in Requirements.Variables.All) take a dataset SKIP here, so without this rule the absence goes unreported -- that is why this rule was minted."
+#expectViolationCount 1
+#library standard=adamig version=1-3
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ASEQ     type=Num
+col AEDECOD  type=Char
+col ONTR01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y

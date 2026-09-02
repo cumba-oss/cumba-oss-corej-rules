@@ -1,0 +1,22 @@
+Rule_Id: "PMDA-DD0105"
+Sheet_Rule_Identifier: "DD0105"
+Rule_Set: "PMDA"
+Element: "ItemDef/Origin"
+Attribute: "Type"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "In SDTM, all --DY, --STDY, and --ENDY variables must have Origin set to 'Derived'."
+# Scoped to the def:Origin of an ItemDef whose Name is a Study Day variable
+# (a domain prefix followed by a DY/STDY/ENDY suffix). The one_of check fires
+# when the Origin's Type is present and is anything other than "Derived".
+# Deviation: the sheet message's <define variable> placeholder is the variable
+# name, but a one_of finding interpolates the offending value (the Origin
+# Type); the finding's xpath names the ItemDef/Origin so the location is exact.
+Message: "Origin for Study Day variable is not set to Derived (found ${value})"
+Check:
+  kind: "one_of"
+  attribute: "Type"
+  values: ["Derived"]
+  when:
+    path: "../@Name"
+    matchesRegex: "[A-Z]{2,}(STDY|ENDY|DY)"

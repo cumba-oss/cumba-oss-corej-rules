@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1331 expect=noViolation domain=MH
+#note "Sheet: '--STDTC must be less or equal to --DTC'. Row 1 the medical-history event started before it was collected, row 2 started on the collection date (less-OR-EQUAL is conformant), row 3 has no collection date and row 4 no start date -- both outside the condition."
+#library standard=sdtmig version=3-4
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHDTC   type=Char label="Date/Time of History Collection"
+col MHSTDTC type=Char label="Start Date/Time of Medical History Event"
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 | ASTHMA       | 2020-02-01 | 2019-05-01
+CDISCPILOT01 | MH | 01-701-1015 | 2 | HYPERTENSION | 2020-02-01 | 2020-02-01
+CDISCPILOT01 | MH | 01-701-1023 | 1 | MIGRAINE     |            | 2019-07-01
+CDISCPILOT01 | MH | 01-701-1023 | 2 | ECZEMA       | 2020-03-01 |

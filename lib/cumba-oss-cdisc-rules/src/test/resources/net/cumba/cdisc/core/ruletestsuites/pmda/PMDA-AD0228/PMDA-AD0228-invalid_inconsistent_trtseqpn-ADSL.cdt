@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0228 expect=violation domain=ADSL
+#note "Group TRTSEQP=AB holds TRTSEQPN {1,1,2}; minority row 3 fires. RECORD granularity -> 1 violation. ADSL is one record per subject, so the 'group' is the set of subjects sharing a planned sequence."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQP=AB TRTSEQPN=2
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTSEQP  type=Char
+col TRTSEQPN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | AB | 1
+CDISCPILOT01 | 01-701-1023 | AB | 1
+CDISCPILOT01 | 01-701-1034 | AB | 2
+CDISCPILOT01 | 01-701-1045 | BA | 3

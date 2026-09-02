@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0117"
+Sheet_Rule_Identifier: "DD0117"
+Rule_Set: "PMDA"
+Element: "Documentation"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "When an Analysis Results Metadata references an External Document, a description for that document is required. The Document Description is represented as a Description element inside the arm:Documentation element."
+Message: "Incomplete Documentation for Analysis Results Metadata"
+# arm:Documentation children are Description and def:DocumentRef (ARM v1.0
+# SS5.3.8): a Documentation referencing an external document (DocumentRef
+# present) must also carry the Description. New (no CDISC ARM rules).
+Check:
+  kind: "exists"
+  target: "Description"
+  when:
+    path: "DocumentRef"
+    exists: true

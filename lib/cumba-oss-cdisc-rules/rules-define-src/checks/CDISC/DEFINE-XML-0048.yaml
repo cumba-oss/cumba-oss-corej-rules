@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0048"
+Sheet_Rule_Identifier: "48"
+Rule_Set: "CDISC"
+Element: "PDFPageRef"
+Attribute: "FirstPage"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute FirstPage must be provided for the def:PDFPageRef element when PageRefs is missing and Type is PhysicalRef."
+Message: "Attribute FirstPage is missing for element def:PDFPageRef, when attribute PageRefs is missing and Type is PhysicalRef."
+Check:
+  kind: "exists"
+  target: "@FirstPage"
+  when:
+    all:
+    - path: "@PageRefs"
+      exists: false
+    - path: "@Type"
+      equals: "PhysicalRef"

@@ -1,0 +1,53 @@
+name: CDISC-AD0414
+kind: check_operator
+description: |
+  EC-1 (has_multiple_values_for excludes empty key/dependent), modelled on
+  CDISC-AD0414 (reverse of AD0413: more than one ANLzzFL for a given ANLzzFN).
+  Concrete instance ANL01FN/ANL01FL. KEY = ANL01FN (the `value:` operand),
+  DEPENDENT = ANL01FL (the `name:` operand). ANL01FN='1' maps to two distinct
+  ANL01FL {Y,N} → both rows fire. ANL01FN='2' would look multi-valued only via a
+  blank-ANL01FL row — post-EC-1 that row is excluded, so the populated '2' row
+  does NOT fire. The blank-key row is excluded too. Both engines agree (parity
+  spec, no baseline entry). Rendered as a check_operator spec because the Python
+  lane does not expand the ANLzz wildcard in the full rule.
+python_notes: |
+  Both lanes exclude empty key/dependent rows and flag the two ANL01FN='1' rows.
+python_source: rules-adamig-1-3.json (CDISC-AD0414), EC-1
+check:
+  name: ANL01FL
+  operator: has_multiple_values_for
+  value: ANL01FN
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, ANLSEQ]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', ANLSEQ: 1, ANL01FN: '1', ANL01FL: Y}      # key 1 -> {Y,N} fires
+    - {STUDYID: S1, USUBJID: '001', ANLSEQ: 2, ANL01FN: '1', ANL01FL: N}      # key 1 multiple fires
+    - {STUDYID: S1, USUBJID: '001', ANLSEQ: 3, ANL01FN: '2', ANL01FL: Y}      # key 2 single, no fire
+    - {STUDYID: S1, USUBJID: '001', ANLSEQ: 4, ANL01FN: '2', ANL01FL: ''}     # blank dependent excluded
+    - {STUDYID: S1, USUBJID: '001', ANLSEQ: 5, ANL01FN: '', ANL01FL: Y}       # blank key excluded
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+- rule_id: AUTO-CDISC-AD0414
+  dataset: ADLB
+  row_key: {ANLSEQ: 1, STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    ANL01FL: Y
+    ANL01FN: '1'
+    ANLSEQ: '1'
+    STUDYID: S1
+    USUBJID: '001'
+- rule_id: AUTO-CDISC-AD0414
+  dataset: ADLB
+  row_key: {ANLSEQ: 2, STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    ANL01FL: N
+    ANL01FN: '1'
+    ANLSEQ: '2'
+    STUDYID: S1
+    USUBJID: '001'
+expected_errors: []

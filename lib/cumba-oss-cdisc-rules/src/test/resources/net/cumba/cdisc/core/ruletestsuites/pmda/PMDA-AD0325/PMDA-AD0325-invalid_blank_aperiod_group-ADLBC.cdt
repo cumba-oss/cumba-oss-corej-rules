@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0325 expect=violation domain=ADLBC
+#note "THE keep_missings=true PIN (finding AD0325-F1). All three rows carry a BLANK APERIOD key component. Under the shipped DROP_MISSING_KEYS default this group would be dropped and the rule would report zero, but AD0325's is_inconsistent_across_dataset call sets keep_missings=true, so the three blanks form ONE group (APERIOD=<missing>, ASPERC=A) holding ASPER {1, 1, 2} and the minority row 3 fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 ASPER=2 ASPERC=A
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col APERIOD type=Num
+col ASPER   type=Num
+col ASPERC  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.5 |  | 1 | A
+CDISCPILOT01 | 01-701-1023 | GLUC | 5.6 |  | 1 | A
+CDISCPILOT01 | 01-701-1034 | GLUC | 5.7 |  | 2 | A

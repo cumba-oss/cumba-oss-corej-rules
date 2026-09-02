@@ -1,0 +1,61 @@
+Core:
+  Id: "PMDA-AD1024"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ADaM data are being validated (the ADSL dataset\
+  \ is present) but the SDTM Demographics (DM) dataset is absent from the study; DM\
+  \ must be included so the ADaM-to-SDTM traceability rules can run."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    ds_exists("ADSL") and not ds_exists("DM")
+Outcome:
+  Message: "Traceability rules not executed due to missing DM dataset."
+Source:
+  Message: "Traceability rules not executed due to missing DM dataset"
+  Description: "When validating ADaM datasets, the DM dataset must also be included\
+    \ to ensure traceability. Note: For the final submission the eCTD structure should\
+    \ be maintained. Therefore, the SDTM and ADaM datasets should be submitted in\
+    \ their appropriate locations. Do not include the DM dataset in the ../analysis/adam/datasets\
+    \ folder."
+  Domains: "GLOBAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1024"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD1024"
+        Version: "1"
+      Version: "6.0"

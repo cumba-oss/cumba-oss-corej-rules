@@ -1,0 +1,74 @@
+Core:
+  Id: "CDISC-AD0134"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when AVAL, AyHI, and R2AyHI are all populated, AyHI does\
+  \ not equal 0, and R2AyHI does not equal AVAL divided by AyHI."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "R2AyHI"
+    - "AyHI"
+    - "AVAL"
+Check:
+  expression: >-
+    not empty(AVAL) and not empty(AyHI) and AyHI != 0 and not empty(R2AyHI) and R2AyHI != (AVAL /
+    AyHI)
+Outcome:
+  Message: "R2AyHI does not equal AVAL divided by AyHI."
+  Output_Variables:
+  - "AVAL"
+  - "R2AyHI"
+  - "AyHI"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "R2AyHI where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "R2AyHI is not equal to AVAL divided by\
+    \ AyHI"
+  Rule_Failure_Criteria: "R2AyHI is not equal to AVAL divided by AyHI"
+  Condition_Failure: "AVAL and AyHI are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR134"
+        Version: "2"
+      Version: "5.0"

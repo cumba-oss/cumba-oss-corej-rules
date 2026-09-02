@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1038 expect=violation domain=TS
+#note "FRESH, DISCRIMINATING. The TSSEQ TARGET is blank on rows 1 and 2, written IDENTICALLY (both left empty - do NOT write one as empty and the other as '.'). Predicted to FIRE on both, count 2: is_unique_set runs under GroupKeyPolicy.FOLD_BLANK_KEYS, where a blank is KEPT as a real tuple component, so (\"\", SPONSOR) appears twice and both rows are duplicates. Since W38-A1 / Fix #249 each blank FLAVOUR carries its own KeyPart identity, which is exactly why both rows must be authored the same way. This is the direct counterpart of the is_inconsistent_across_dataset blank-key fixture on PMDA-SD1033, which is SILENT: the two operator families take OPPOSITE blank-component policies (FOLD_BLANK_KEYS here, DROP_MISSING_KEYS there) and no fixture anywhere pins the pair. SILENCE here means the policy flipped; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 TSPARMCD=SPONSOR
+#expectViolationAt row=2 TSPARMCD=SPONSOR
+dataset TS class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS |   | SPONSOR | Acme
+S1 | TS |   | SPONSOR | Acme Sub
+S1 | TS | 1 | TITLE   | Study of X

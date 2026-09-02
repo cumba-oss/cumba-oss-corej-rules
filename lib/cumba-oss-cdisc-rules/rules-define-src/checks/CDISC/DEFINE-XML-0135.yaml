@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0135"
+Sheet_Rule_Identifier: "135"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "No more than one child element CodeListRef must be provided for the ItemDef element."
+# Scoped to ItemDef (the parent counted over) per the sheet's XPaths column;
+# the sheet's ItemDef[@Name] placeholder is carried by the finding's xpath.
+Message: "Child element CodeListRef is provided more than once for element ItemDef."
+Check:
+  kind: "cardinality_at_most"
+  target: "CodeListRef"
+  max: 1

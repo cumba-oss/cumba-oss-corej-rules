@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0007 expect=violation domain=ADLBC
+#note "DISCRIMINATING (empty-dataset semantics on a COLUMN-DRIVEN template). Same header and columns as the invalid fixture but ZERO data rows. Expansion reads the declared column names, not the rows, so the SAF root is still captured; the presence Check is dataset-constant so BroadcastFold decides it above the 0-row synthetic-table branch -> exactly one violation at reported row 1. NO value pin: extractOutputValues on a 0-row table yields an empty string. If this reports 0 violations or SKIPPED, ESCALATE to stage R."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFFN   type=Num
+---

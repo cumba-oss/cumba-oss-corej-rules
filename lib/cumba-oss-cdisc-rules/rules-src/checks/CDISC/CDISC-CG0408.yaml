@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0408"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset has no records; a dataset should have\
+  \ at least one record."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$records_in_dataset"
+  expression: "record_count()"
+Check:
+  expression: >-
+    $records_in_dataset == 0
+Outcome:
+  Message: "Dataset has no records."
+  Output_Variables:
+  - "$records_in_dataset"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Dataset planned for submission"
+  Rule: "Dataset > 0 records"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0408"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0408"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0408"
+        Version: "1"
+      Version: "2.0"

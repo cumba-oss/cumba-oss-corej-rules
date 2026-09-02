@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0279-A expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL' and the intervention type is one for which pharmacological class is applicable, but no record with TSPARMCD equal to 'PCLAS' is present in TS.
+#note "THE APPLICABILITY GATE. Interventional and PCLAS is absent, but INTTYPE=DEVICE is not a type for which pharmacological class applies ($INTTYPE_PHARM == 0), so the rule must stay silent. This is the conjunct SDTMIG Appendix C1 requires and the reason CDISC-CG0279 alone carries 'Partially Executable - Possible Overreporting'. Without this gate the rule would fire here -- as CORE-000741 still does."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | INTERVENTIONAL
+S01 | TS | 2 | INTTYPE | DEVICE
+S01 | TS | 3 | TITLE | A Study of Device X
+---

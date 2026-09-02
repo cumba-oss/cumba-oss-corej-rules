@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0047 expect=violation domain=ADLB
+#note "FRESH for Fix #368 — the SILENT MISS, and the reason the defect was invisible. ADLB carries PARAMCD, so it detects as BASIC DATA STRUCTURE and the rule's Scope admits it; PARAM is Required for that structure and is absent. Before Fix #368 the operation keyed the library by DOMAIN (ADLB), which matches no ADaM structure name, so it got an empty list, contains_all was vacuously true and the rule reported SUCCESS with the defect in the data. ADSL was the only dataset name where domain and structure coincided, which is why every fixture that existed was an ADSL one."
+#library standard=adamig version=1-3
+#library required-variables-for-structure "BASIC DATA STRUCTURE" PARAM PARAMCD STUDYID USUBJID
+#expectViolationCount 1
+dataset ADLB structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12

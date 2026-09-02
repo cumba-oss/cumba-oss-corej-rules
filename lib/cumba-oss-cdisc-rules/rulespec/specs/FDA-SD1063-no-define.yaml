@@ -1,0 +1,63 @@
+name: FDA-SD1063-no-define
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — **D7 made executable**: with NO `define_xml` block at
+  all, a define-dependent OPERATION makes the two lanes disagree on the STATUS channel. Java
+  SKIPs; the fork reports an execution error.
+
+  This is the only spec in the P5b set that is expected to diverge, and it is baselined
+  accordingly — `parity-diff-baseline.json`, `lane: python`, `channels: ["status"]`. The
+  `channels` key is MANDATORY here: an entry without one defaults to `["violations"]` and would
+  not suppress a status failure while silently exempting the violation channel instead. Both
+  lanes agree on violations (`[]`), so that channel is asserted normally.
+
+  Mechanism, both halves verified in code and by execution:
+
+  * **Java — SKIPPED.** `SpecRunner.defineProviderFrom` returns null for an absent block, and
+    `RuleRunner`'s define-dependent skip gate (`RuleRunner.java:554-568`) skips the rule before
+    the Operation runs.
+    ⚠ **Known limitation of this assertion:** `SKIPPED` is not specific to the define gate.
+    `SpecRunner` returns the same `RuleExecutionStatus.SKIPPED` from its scope pre-gate
+    (`SpecRunner.java:199-220`), so a fixture that drifted out of scope would satisfy the Java
+    half identically. The Java assertion pins the OUTCOME, not the mechanism; what pins the
+    mechanism is the Python half plus the sibling specs, where the same rule with a Define
+    block executes and fires. Do not read a green here as proof that the define gate ran.
+  * **Fork — "execution error".** `operations/define_dataset_names.py:19` calls
+    `DefineXMLReaderFactory.get_define_xml_reader` with no `define_xml_path`, which raises
+    `DefineXMLNotProvidedError` (`define_xml_reader_factory.py:119-126`);
+    `perform_rule_operations` wraps it into `OperationError`; and
+    `handle_validation_exceptions` tests `OperationError` (`rules_engine.py:532`) BEFORE
+    `DefineXMLNotProvidedError` (`:618`), so the skip branch is unreachable. The observed
+    engine error is `rule evaluation error - operation failed`. This contradicts the operation's
+    own docstring (`define_dataset_names.py:16-18`, "the rule is SKIPPED (never PASS/FAIL)"), so
+    it is an engine defect, not a harness gap, and is filed rather than fixed here.
+
+  **Why this spec earns its keep rather than leaving D7 as prose.** Java's SKIP is the only thing
+  standing between production and the §3.5 failure mode. A real submission without a define.xml
+  would otherwise give `$define_datasets = []`, and `ds_name("DATA") not in []` is TRUE for every
+  dataset in the study — `DEFINE_DATASET_NAMES` has no empty-to-`LIBRARY_NOT_AVAILABLE` demotion
+  (`OperationExecutor.java:1192` vs `DEFINE_KEY_VARIABLES` at `:1193-1201`), so the result would
+  be a false positive on every dataset rather than a skip. Nothing else in the corpus pins that
+  gate for the `define_dataset_names` route, and `FDA-SD1063` / `FDA-SD1063-declared` cannot: both
+  declare a block, so both take the non-null-provider path.
+
+  Note the sibling group-A rules do NOT reach this divergence: with no block the fork
+  short-circuits inside the dataset builder and both lanes report SKIPPED (measured in P3). The
+  asymmetry is specific to the Operation route, which is why it surfaces first in P5b.
+
+  ONE dataset deliberately: with no `define_xml` block there is no key set to model, and a second
+  dataset would only add noise to a spec whose whole content is the status channel.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD1063)
+rule:
+  coreId: FDA-SD1063
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

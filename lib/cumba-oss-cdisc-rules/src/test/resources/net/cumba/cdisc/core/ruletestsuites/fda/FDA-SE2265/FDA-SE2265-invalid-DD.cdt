@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2265 expect=violation domain=DD
+#note "Subject 001's latest DS disposition starts 2020-01-20 (an earlier recovery move on 2020-01-10 must not win). DD row 1 is collected 2020-01-10 -> before the latest disposition -> fires. Row 2 is collected on the disposition date and stays clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DDDTC=2020-01-10
+dataset DD label="Death Diagnosis"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DDSEQ    type=Num  label="Sequence Number"
+col DDTESTCD type=Char label="Death Diagnosis Short Name"
+col DDORRES  type=Char label="Result or Finding in Original Units"
+col DDDTC    type=Char label="Date/Time of Collection"
+---
+S1 | DD | 001 | 1 | DTHCAUS | HEPATIC NECROSIS | 2020-01-10
+S1 | DD | 001 | 2 | DTHCAUS | HEPATIC NECROSIS | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY | RECOVERY     | 2020-01-10
+S1 | DS | 001 | 2 | FOUND DEAD        | DEAD         | 2020-01-20

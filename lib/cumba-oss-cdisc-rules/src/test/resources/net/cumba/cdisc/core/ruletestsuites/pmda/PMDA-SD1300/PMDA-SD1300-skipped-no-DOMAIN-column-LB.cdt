@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1300 expect=skipped domain=LB
+#note "Pins `Requirements.Variables.All: [DOMAIN]`, which `PMDA-SD1300` already carried but which only became LOAD-BEARING with the wave-15 `dataset_domain` migration: `dataset_domain` falls back to the raw DATASET NAME when no `DOMAIN` cell is readable, so without the guard a `DOMAIN`-less dataset with a non-two-character name would be reported on conformant data. ⚑ The neuter-and-watch is UNMASKED: this rule has NO `Scope.Classes` block at all, and `LB` matches none of the nine `Domains.Exclude` entries (`AP--`, `APRELSUB`, `POOLDEF`, `RELREC`, `RELSPEC`, `RELSUB`, `SQ--`, `SUPP--`, `SUPPQUAL`), so the `Variables` block is the only filter that can reject this dataset."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results (DOMAIN variable omitted)"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | 01-701-1015 | ALB
+S1 | 01-701-1023 | ALT
+---

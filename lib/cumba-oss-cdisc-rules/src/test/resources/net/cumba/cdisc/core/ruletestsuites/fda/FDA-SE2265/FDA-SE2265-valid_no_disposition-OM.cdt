@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SE2265 expect=noViolation domain=OM
+#note "Boundary: subject 002 has no DS record, so there is no latest disposition date to compare against and the rule cannot judge the collection -> no violation, even though its OMDTC precedes subject 001's disposition (which proves the per-USUBJID grouping)."
+#library standard=sendig version=3-1-1
+dataset OM label="Organ Measurements"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col OMSEQ    type=Num  label="Sequence Number"
+col OMTESTCD type=Char label="Organ Measurement Short Name"
+col OMDTC    type=Char label="Date/Time of Collection"
+---
+S1 | OM | 002 | 1 | WEIGHT | 2020-01-05
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20

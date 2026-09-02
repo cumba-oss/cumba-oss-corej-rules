@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0253.1 expect=noViolation domain=RELREC
+#note "Rows 3 and 4 of the invalid fixture, in that order: a clean domain-to-domain link and a record-to-record link whose RELTYPE is empty."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | MA |        |  | MASEQ |   | ONE | R3
+S1 | MI | S1-002 |  | MISEQ | 2 |     | R4
+---

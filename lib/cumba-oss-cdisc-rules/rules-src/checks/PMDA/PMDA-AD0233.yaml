@@ -1,0 +1,76 @@
+Core:
+  Id: "PMDA-AD0233"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Planned Pooled Trt y for Period\
+  \ xx (N) (TRxxPGyN) variable does not hold a single consistent value for each unique\
+  \ populated value of the Planned Pooled Treatment y for Period xx (TRxxPGy) variable."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRxxPGyN"
+Check:
+  expression: >-
+    var_exists("TRxxPGy") and not empty(TRxxPGy) and is_inconsistent_across_dataset(TRxxPGyN,
+    keys=[TRxxPGy])
+Outcome:
+  Message: "Inconsistent value for TRxxPGyN"
+  Output_Variables:
+  - "TRxxPGy"
+  - "TRxxPGyN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for TRxxPGyN"
+  Description: "Within a study, all Planned Pooled Trt y for Period xx (N) (TRxxPGyN)\
+    \ variable values must be the same for each unique value of Planned Pooled Treatment\
+    \ y for Period xx (TRxxPGy) variable when the primary variable TRxxPGy is populated.\
+    \ analogous rule for AD0236."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0233"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0233"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0233"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0233"
+        Version: "1"
+      Version: "6.0"

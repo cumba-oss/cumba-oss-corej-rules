@@ -1,0 +1,105 @@
+Core:
+  Id: "PMDA-SD2013"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a High Level Group Term Code (--HLGTCD) value is\
+  \ not a valid High Level Group Term code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLGTCD"
+Operations:
+- id: "$hlgtcd_valid"
+  expression: "valid_external_dictionary_code(--HLGTCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"HLGTCD\")"
+Check:
+  expression: >-
+    $hlgtcd_valid == false
+Outcome:
+  Message: "High Level Group Term Code (--HLGTCD) is not a valid MedDRA High Level\
+    \ Group Term code."
+  Output_Variables:
+  - "--HLGTCD"
+Source:
+  Message: "Value for --HLGTCD not found in MedDRA dictionary"
+  Description: "Value for High Level Group Term Code (--HLGTCD) variable must be populated\
+    \ using a High Level Group Term Code of the MedDRA dictionary of a version specified\
+    \ in the define.xml."
+  Domains: "AE, CE, MH"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2013"
+        Version: "1"
+      Version: "1.6"

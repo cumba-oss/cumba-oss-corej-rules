@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1300 expect=noViolation domain=LB
+#note "The conformant control. After the wave-15 `dataset_domain` migration `dataset_domain` reads the ROW-0 `DOMAIN` cell verbatim (`OperationExecutor.unsplitNameFromData`), which here is the two-character `LB` — the only conformant length — so neither Check branch fires. ⚠ Green before and after the migration, so on its own it pins nothing about the migration; the positive controls are the `invalid_too_long` / `invalid_too_short` siblings."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+---
+S1 | LB | 001 | 1
+S1 | LB | 001 | 2

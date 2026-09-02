@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-SD1379"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when an Element Code (ETCD) value defined in Trial Elements\
+  \ (TE) is not assigned to any subject in the Subject Elements (SE) dataset."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Operations:
+- id: "$se_etcd"
+  expression: "distinct(ETCD, domain=\"SE\")"
+Check:
+  expression: >-
+    not empty(ETCD) and ETCD not in $se_etcd
+Outcome:
+  Message: "ETCD value not present in SE"
+  Output_Variables:
+  - "ETCD"
+  - "$se_etcd"
+Source:
+  Message: "ETCD value does not present in SE"
+  Description: "Element Code (ETCD) values defined in Trial Elements (TE) should be\
+    \ assigned to at least one subject (USUBJID) in Subject Elements (SE)."
+  Domains: "TE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1379"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1379"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1379"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1379"
+        Version: "1"
+      Version: "1.6"

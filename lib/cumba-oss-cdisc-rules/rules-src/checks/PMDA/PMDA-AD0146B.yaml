@@ -1,0 +1,56 @@
+Core:
+  Id: "PMDA-AD0146B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the character Parameter (PARAM) does not have a\
+  \ single consistent value for each unique value of the numeric Parameter (PARAMN),\
+  \ evaluated on rows where both PARAM and PARAMN are populated; within a study each\
+  \ PARAMN value must map to one PARAM value. Applies across the basic-data-structure,\
+  \ non-compartmental-analysis and medical-device basic-data-structure ADaM structures."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAM) and not empty(PARAMN) and is_inconsistent_across_dataset(PARAM, keys=[PARAMN])
+Outcome:
+  Message: "Inconsistent value for PARAM"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMN"
+Source:
+  Message: "Inconsistent value for PARAM"
+  Description: "Within a study, all PARAM values must be the same for each unique\
+    \ value of PARAMN when both variables PARAM and PARAMN are populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0146B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0146B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0146B"
+        Version: "1"
+      Version: "6.0"

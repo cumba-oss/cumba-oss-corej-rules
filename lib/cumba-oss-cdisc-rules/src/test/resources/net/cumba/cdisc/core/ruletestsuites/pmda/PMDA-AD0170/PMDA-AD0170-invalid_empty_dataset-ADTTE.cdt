@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0170 expect=violation domain=ADTTE
+#note "Empty-dataset pin (the batch's only 0-row fixture). Presence is a property of the dataset's DECLARED COLUMNS, not of its rows: STARTDT is declared, CNSR is not, so a 0-row dataset is exactly as non-conformant as a populated one. An exists-only Check is decided by the BroadcastFold short-circuit (RuleRunner.java:1040-1050), which sits ABOVE the 0-row synthetic-table branch (:1155-1157) and never reaches it, so datasetBroadcastResult emits ONE violation at internal row 0 = reported row 1. STARTDT is deliberately NOT pinned by value: extractOutputValues writes an empty string for an output variable when row 0 is past the end of a 0-row table, and `STARTDT=` would read as an assertion about data rather than about metadata. If this reports 0 violations or SKIPPED, escalate to stage R - that is a real detection about the two evaluation paths, not a fixture to fix."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+---

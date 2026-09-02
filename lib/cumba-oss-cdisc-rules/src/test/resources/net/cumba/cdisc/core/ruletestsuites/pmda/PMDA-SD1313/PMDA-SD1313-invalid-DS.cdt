@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1313 expect=violation domain=DS
+#note "Row 2 is a DISPOSITION EVENT record whose EPOCH is empty -> fires. Adapted verbatim from FDA-SD1313 (byte-identical Check/Scope)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 DSSEQ=2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | COMPLETED | COMPLETED | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1023 | 2 | ADVERSE EVENT | ADVERSE EVENT | DISPOSITION EVENT |

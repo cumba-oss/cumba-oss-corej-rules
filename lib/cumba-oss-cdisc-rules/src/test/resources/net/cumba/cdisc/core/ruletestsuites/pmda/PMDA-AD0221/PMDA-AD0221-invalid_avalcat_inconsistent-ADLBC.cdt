@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0221 expect=violation domain=ADLBC
+#note "Disjunct 1 (AVAL:AVALCATy) live; AVALCAT1 seeds {y=1}, other four *CATy pairs absent. Group (ALB,30) holds LOW,LOW,HIGH -> HIGH minority fires; group (ALB,50) single-valued -> silent."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=ALB AVAL=30 AVALCAT1=HIGH
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col AVALCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | LOW
+CDISCPILOT01 | 01-701-1023 | ALB | 30 | LOW
+CDISCPILOT01 | 01-701-1034 | ALB | 30 | HIGH
+CDISCPILOT01 | 01-701-1045 | ALB | 50 | HIGH

@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-AD0600"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a BDS or OCCDS record, ASPRSDTM does not equal\
+  \ the ADSL variable PxxSwSDM for the same USUBJID (where xx equals the record's\
+  \ APERIOD value and w equals the record's ASPER value)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(ASPRSDTM) and not empty(ADSL.P${APERIOD:%02d}S${ASPER:%d}SDM) and ASPRSDTM !=
+    ADSL.P${APERIOD:%02d}S${ASPER:%d}SDM
+Outcome:
+  Message: "On a given record, the value of ASPRSDTM is not equal to the value of\
+    \ variable PxxSwSDM where xx equals the value of APERIOD and w equals the value\
+    \ of ASPER"
+  Output_Variables:
+  - "APERIOD"
+  - "ASPER"
+  - "ASPRSDTM"
+  - "ADSL.P${*}S${*}SDM"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ASPRSDTM"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, the value of ASPRSDTM\
+    \ is not equal to the value of variable PxxSwSDM where xx equals the value of\
+    \ APERIOD and w equals the value of ASPER"
+  Rule_Failure_Criteria: "On a given record, the value of ASPRSDTM is not equal to\
+    \ the value of variable PxxSwSDM where xx equals the value of APERIOD and w equals\
+    \ the value of ASPER"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR600"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR600"
+        Version: "1"
+      Version: "5.0"

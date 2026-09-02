@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0095"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTAN and TRTA are both populated and there is more\
+  \ than one value of TRTAN for a given value of TRTA"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "TRTA"
+    - "TRTAN"
+Check:
+  expression: >-
+    not empty(TRTAN) and not empty(TRTA) and has_multiple_values_for(TRTAN, TRTA)
+Outcome:
+  Message: "More than one value of TRTAN was found for the same value of TRTA"
+  Output_Variables:
+  - "TRTA"
+  - "TRTAN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "TRTAN"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of TRTAN for\
+    \ a given value of TRTA"
+  Rule_Failure_Criteria: "There is more than one value of TRTAN for a given value\
+    \ of TRTA"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR95"
+        Version: "1"
+      Version: "5.0"

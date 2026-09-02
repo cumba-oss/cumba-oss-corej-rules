@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0047 expect=violation domain=FA
+#note "FRESH (explicit-list second-class-token pin: Scope.Classes.Include lists FINDINGS ABOUT literally - distinct from the T3-K3-01 SD1272 subsumption arm). No FASTAT/FADRVFL columns. Row 1: FAORRES empty -> '--ORRES' resolves to FAORRES via the FA prefix, or-arms hold -> FIRES. Row 2: FAORRES populated -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FASEQ=1
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ   type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAOBJ   type=Char label="Object of the Observation"
+col FAORRES type=Char label="Result or Finding in Original Units"
+---
+S1 | FA | 001 | 1 | SEV | RASH  |
+S1 | FA | 001 | 2 | SEV | FEVER | MODERATE

@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0148"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Exclusion Flag (--EXCLFL) is populated with a\
+  \ value other than \"Y\"; --EXCLFL must be either \"Y\" or empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--EXCLFL"
+Check:
+  expression: >-
+    not empty(--EXCLFL) and --EXCLFL != "Y"
+Outcome:
+  Message: "--EXCLFL is populated with a value other than \"Y\"."
+  Output_Variables:
+  - "--EXCLFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--EXCLFL"
+  Plain_Text_Explanation: "--EXCLFL value must either be \"Y\" or null"
+  Condition: "--EXCLFL ^= null"
+  Rule: "--EXCLFL = \"Y\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND148"
+        Version: "1"
+      Version: "5.0"

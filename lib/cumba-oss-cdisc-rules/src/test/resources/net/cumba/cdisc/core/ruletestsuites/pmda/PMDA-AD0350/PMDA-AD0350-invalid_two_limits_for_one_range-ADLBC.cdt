@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0350 expect=violation domain=ADLBC
+#note "Within (SYSBP, HIGH) A1HI holds {160,160,180}; 160 is the strict majority so row 3 alone fires. The (DIABP, HIGH) group stays consistent, proving the grouping is per (PARAMCD, A1HIC) pair, not the whole column."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARAMCD=SYSBP A1HI=180 A1HIC=HIGH
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col A1HIC type=Char
+col A1HI type=Num
+---
+S1 | 001 | SYSBP | SystolicBP | HIGH | 160
+S1 | 002 | SYSBP | SystolicBP | HIGH | 160
+S1 | 003 | SYSBP | SystolicBP | HIGH | 180
+S1 | 001 | DIABP | DiastolicBP | HIGH | 100
+S1 | 002 | DIABP | DiastolicBP | HIGH | 100

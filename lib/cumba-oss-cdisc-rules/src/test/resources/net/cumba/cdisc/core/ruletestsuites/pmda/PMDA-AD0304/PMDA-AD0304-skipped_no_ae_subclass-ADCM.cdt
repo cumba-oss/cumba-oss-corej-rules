@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0304 expect=skipped domain=ADCM
+#note "The only fixture in this batch that pins the Subclasses gate. The data would fire (SMQ01NAM present, the other three siblings absent), but the dataset is OCCDS carrying no ADVERSE EVENT signal - CMDECOD is not AEDECOD/AETERM - and declares NO subclass, so Scope.Subclasses.Include [ADVERSE EVENT], which requires a POSITIVELY DETECTED subclass, skips the rule. The structure=OCCDS declaration is kept deliberately so the skip is attributable to the subclass axis and not to the structure axis; the mandatory #library line is its carrier. Predicted green."
+#library standard=adamig version=1-0
+dataset ADCM structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col CMDECOD  type=Char
+col SMQ01NAM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ASPIRIN | MIGRAINE
+CDISCPILOT01 | 01-701-1023 | IBUPROFEN | MIGRAINE

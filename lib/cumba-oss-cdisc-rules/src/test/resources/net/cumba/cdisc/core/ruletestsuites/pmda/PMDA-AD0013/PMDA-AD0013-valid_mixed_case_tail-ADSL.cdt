@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0013 expect=noViolation domain=ADSL
+#note "AgeGrp (6 characters, upper-case FIRST letter, lower-case letters after it). The ADaM rule's character class after the first position is [A-Za-z0-9_], so a mixed-case tail is CONFORMANT here. This is the deliberate discriminator against PMDA-SD1474, whose is_valid_name is upper-case-only and WOULD fire on the same column shape - see PMDA-SD1474-invalid_lowercase_name-LB.cdt."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AgeGrp  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ADULT

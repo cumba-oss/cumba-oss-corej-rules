@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0451 expect=noViolation domain=ADLBC
+#note "Both MCRIT1MN and MCRIT1ML populated on every row -> silent."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col MCRIT1MN   type=Num
+col MCRIT1ML   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2 | PARTIAL
+CDISCPILOT01 | 01-701-1023 | ALT | 1 | COMPLETE
+---

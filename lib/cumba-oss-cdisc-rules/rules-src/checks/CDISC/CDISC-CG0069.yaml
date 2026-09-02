@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-CG0069"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Disposition (DS) record with Standardized Disposition\
+  \ Term (DSDECOD) equal to 'DEATH' has a Start Date/Time of Event (DSSTDTC) that\
+  \ is not equal to the subject's Date/Time of Death (DTHDTC) in the Demographics\
+  \ (DM) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSDECOD"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(DSSTDTC) and DSDECOD == "DEATH" and not empty(DM.DTHDTC) and date(DSSTDTC) !=
+    DM.DTHDTC
+Outcome:
+  Message: "DSDECOD equals 'DEATH' but DSSTDTC is not equal to DTHDTC in the DM dataset."
+  Output_Variables:
+  - "DSDECOD"
+  - "DSSTDTC"
+  - "DM.DTHDTC"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSSTDTC"
+  Condition: "DSDECOD = 'DEATH'"
+  Rule: "DSSTDTC = DM.DTHDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0069"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0069"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0069"
+        Version: "1"
+      Version: "2.0"

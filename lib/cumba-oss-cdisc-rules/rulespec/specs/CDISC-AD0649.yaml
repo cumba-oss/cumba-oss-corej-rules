@@ -1,0 +1,43 @@
+name: CDISC-AD0649
+kind: rule
+description: |
+  EC-6 — Python VMC melt now merges the rule-referenced concrete column back onto
+  each melted row (narrow merge-back on row_number), so a Value-Check-with-Variable-
+  Metadata rule can test a concrete sibling flag on the same record without the
+  whole rule being SKIPPED (KeyError → COLUMN_NOT_FOUND_IN_DATA). AD0649: an
+  ONTRxxFL variable is 'Y' but the overall on-treatment flag ONTRTFL is not 'Y' on
+  the same record. Before the fix the Python lane SKIPPED (ONTRTFL dropped by melt);
+  the Java lane already resolves the raw column. Both lanes now fire exactly once
+  (USUBJID 001: ONTR01FL=Y, ONTRTFL=N). ONTRTFL is present in the fixture — a
+  genuinely-absent concrete column still KeyErrors → SKIP in Python (a residual
+  micro-divergence).
+python_source: rules-adamig-1-3.json (CDISC-AD0649)
+rule:
+  coreId: CDISC-AD0649
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, ONTR01FL: 'Y', ONTRTFL: 'N'}   # bad: ONTR01FL=Y, ONTRTFL!=Y
+      - {STUDYID: S1, USUBJID: '002', AESEQ: 1, ONTR01FL: 'Y', ONTRTFL: 'Y'}   # ok: both Y
+      - {STUDYID: S1, USUBJID: '003', AESEQ: 1, ONTR01FL: 'N', ONTRTFL: 'N'}   # ok: ONTR01FL!=Y
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+# EC-6 discharge: this rule must RUN, not just fire — see PLAN-parity-expected-status P3
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: CDISC-AD0649
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      variable_name: ONTR01FL
+      variable_value: 'Y'
+      ONTRTFL: 'N'
+expected_errors: []

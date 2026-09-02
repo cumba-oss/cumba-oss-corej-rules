@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0005B expect=violation domain=ADSL
+#note "DELIBERATE CONTRAST to PMDA-AD0005-valid_period_population_flag-ADSL.cdt, and it is GREEN. Byte-for-byte same data, but AD0005B's own sheet row DROPPED RFL/PFL from Exception 1, so SAFRFL is NOT excepted here -- firing is correct. Whatever the decision lane rules on AD0005-F1, THIS stays green; do not harmonise the two."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=SAFRFL variable_value=X
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFRFL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X

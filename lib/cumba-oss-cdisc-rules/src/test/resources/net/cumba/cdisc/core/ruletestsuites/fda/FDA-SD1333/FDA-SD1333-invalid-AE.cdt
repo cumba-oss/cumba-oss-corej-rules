@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1333 expect=violation domain=AE
+#note "Row 2 reports the event as RECOVERED/RESOLVED but leaves both AEENDTC and the present AEDUR column empty -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+col AEDUR   type=Char label="Duration of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | RECOVERED/RESOLVED | 2020-01-09 | 
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA   | RECOVERED/RESOLVED |            | 

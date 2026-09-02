@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD0069-A expect=violation domain=DM
+#note "SEND twin of FDA-SD0069 - 'There are no exceptions for SEND': subject S2 has no DS record and fires although its ARMCD is empty, which the SDTMIG parent would exempt."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=S1-002
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | S1-001 | TRT01
+S1 | DM | S1-002 |
+---
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | S1-001 | TERMINAL SACRIFICE
+---

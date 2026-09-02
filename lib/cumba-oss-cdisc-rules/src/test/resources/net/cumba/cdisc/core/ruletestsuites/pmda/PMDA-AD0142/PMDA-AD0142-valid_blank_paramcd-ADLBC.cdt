@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0142 expect=noViolation domain=ADLBC
+#note "Row 3's PARAMCD is blank. The blank target is excluded from the Albumin group's distinct-value count and from the flag pass (D.2 emptiness exception), and independently the row's own not empty(PARAMCD) conjunct is false. Isolates the emptiness exception on the TARGET column."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+S1 | 001 | ALB | Albumin | 40
+S1 | 002 | ALB | Albumin | 41
+S1 | 003 |     | Albumin | 42

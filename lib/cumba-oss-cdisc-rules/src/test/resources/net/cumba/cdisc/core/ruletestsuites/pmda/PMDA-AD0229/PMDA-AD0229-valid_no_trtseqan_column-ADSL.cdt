@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0229 expect=noViolation domain=ADSL
+#note "Load-bearing var_exists(\"TRTSEQAN\") pin: TRTSEQAN, the operator's KEY, is absent. Without the guard the absent key would be dropped, EC-44 would collapse the table into one group and row 3 would fire; the guard is false so the rule is executed and silent. Sibling PMDA-AD0229B reaches the same verdict on the same fixture through not empty(TRTSEQAN) instead."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSEQA type=Char
+---
+S1 | 001 | A-B
+S1 | 002 | A-B
+S1 | 003 | B-A

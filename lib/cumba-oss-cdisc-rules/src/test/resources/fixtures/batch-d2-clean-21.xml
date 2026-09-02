@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch D2 (value-level metadata / range checks: sheet ids 55, 80-83, 85-92,
+     162-164, 235-237) clean 2.1 fixture: every batch-D2 rule executes with zero
+     findings. Modeled on spec examples 4.5.1.1 / 4.5.2.3.1:
+       IT.SUPPLB.QVAL      - Name="QVAL" WITH def:ValueListRef (55 passes)
+       IT.DM.COUNTRY       - Name!="QVAL", no def:ValueListRef (proves the 55 guard
+                             rejects non-QVAL ItemDefs)
+       VL.SUPPLB.QVAL      - OID + one Description + ItemRef (235/236/237 pass);
+                             its ItemRef carries a resolvable def:WhereClauseRef
+                             (80/81 pass)
+       WC.SUPPLB.QNAM.LBCLSIG - OID + resolvable def:CommentOID + one EQ RangeCheck
+                             with SoftHard/def:ItemOID/CheckValue (82/83/85-92 pass)
+       WC.DM.COUNTRY.METRIC - no def:CommentOID (83 fires only on present values);
+                             an IN RangeCheck with two CheckValues (spec 4.5.1.1) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-d2-clean"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHD2">
+    <GlobalVariables>
+      <StudyName>BATCHD2-STUDY</StudyName>
+      <StudyDescription>Batch D2 clean fixture study</StudyDescription>
+      <ProtocolName>BATCHD2-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch D2 MDV" def:DefineVersion="2.1.0">
+      <def:ValueListDef OID="VL.SUPPLB.QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Value definitions for SUPPLB QVAL</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.SUPPLB.QVAL.LBCLSIG" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.SUPPLB.QNAM.LBCLSIG"/>
+        </ItemRef>
+      </def:ValueListDef>
+      <def:WhereClauseDef OID="WC.SUPPLB.QNAM.LBCLSIG" def:CommentOID="COM.WCJOIN">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SUPPLB.QNAM" Comparator="EQ">
+          <CheckValue>LBCLSIG</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.DM.COUNTRY.METRIC">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.DM.COUNTRY" Comparator="IN">
+          <CheckValue>CAN</CheckValue>
+          <CheckValue>MEX</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <ItemDef OID="IT.SUPPLB.QVAL" Name="QVAL" DataType="text" Length="200"
+               SASFieldName="QVAL">
+        <Description>
+          <TranslatedText xml:lang="en">Data Value</TranslatedText>
+        </Description>
+        <def:ValueListRef ValueListOID="VL.SUPPLB.QVAL"/>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QNAM" Name="QNAM" DataType="text" Length="8"
+               SASFieldName="QNAM">
+        <Description>
+          <TranslatedText xml:lang="en">Qualifier Variable Name</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.SUPPLB.QVAL.LBCLSIG" Name="LBCLSIG" DataType="text" Length="1"
+               SASFieldName="LBCLSIG">
+        <Description>
+          <TranslatedText xml:lang="en">Clinically Significant</TranslatedText>
+        </Description>
+      </ItemDef>
+      <ItemDef OID="IT.DM.COUNTRY" Name="COUNTRY" DataType="text" Length="3"
+               SASFieldName="COUNTRY">
+        <Description>
+          <TranslatedText xml:lang="en">Country</TranslatedText>
+        </Description>
+      </ItemDef>
+      <def:CommentDef OID="COM.WCJOIN">
+        <Description>
+          <TranslatedText xml:lang="en">Join with the Demographics dataset on USUBJID.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

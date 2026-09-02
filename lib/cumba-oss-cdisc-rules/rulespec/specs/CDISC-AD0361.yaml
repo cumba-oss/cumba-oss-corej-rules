@@ -1,0 +1,26 @@
+name: CDISC-AD0361
+kind: rule
+description: |
+  Wave A3 port — T1a PlainSimple.
+  CDISC-AD0361: ASTDT must not be greater than AENDT.
+  Record-data rule scoped to ALL classes; single bare-leaf Check (no outer all/any wrapper).
+  Rule-body quirk: uses 'greater_than' (numeric compare) on date strings; Java's numeric
+  operator rejects unparseable strings, Python's business_rules bare-leaf path raises
+  KeyError: 'name'. Both engines emit zero violations, so expected_violations = [].
+python_source: rules-adamig-1-3.json (CDISC-AD0361)
+rule:
+  coreId: CDISC-AD0361
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ASTDT: '2026-01-01', AENDT: '2026-01-02'}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ASTDT: '2026-02-02', AENDT: '2026-02-01'}   # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations: []
+expected_errors: []

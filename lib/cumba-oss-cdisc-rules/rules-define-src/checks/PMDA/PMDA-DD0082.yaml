@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0082"
+Sheet_Rule_Identifier: "DD0082"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Only Codelists that are referenced from a Variable or Value Level metadata should be included in Define.xml. Define-XML specification represents Codelists as CodeList elements within MetaDataVersion element."
+# CodeListRef (a child of ItemDef) is the only legal reference vehicle; ItemDefs
+# used at dataset level and in VLM alike carry it = the sheet's list.
+Message: "Codelist ${value} is not referenced"
+Check:
+  kind: "is_referenced"
+  key: "OID"
+  by:
+  - element: "CodeListRef"
+    attribute: "CodeListOID"

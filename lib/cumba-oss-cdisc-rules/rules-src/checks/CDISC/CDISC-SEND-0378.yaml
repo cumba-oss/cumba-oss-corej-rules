@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0378"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both Reproductive Stage End Rule (TTENRL) and Reproductive\
+  \ Stage Duration (TTDUR) are empty in a Trial Repro Stages (TT) record; at least\
+  \ one must be populated for each Stage."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Requirements:
+  Variables:
+    Any:
+    - "TTENRL"
+    - "TTDUR"
+Check:
+  expression: >-
+    empty(TTENRL) and empty(TTDUR)
+Outcome:
+  Message: "Both TTENRL and TTDUR are empty; at least one must be populated for each\
+    \ Stage."
+  Output_Variables:
+  - "TTENRL"
+  - "TTDUR"
+Source:
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "TTENRL, TTDUR"
+  Plain_Text_Explanation: "Either TTENRL or TTDUR (or both) must be populated for\
+    \ each Repro Stage."
+  Rule: "TTENRL ^= null AND/OR TTDUR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND378"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND378"
+        Version: "1"
+      Version: "5.0"

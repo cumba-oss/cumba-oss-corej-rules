@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1021 expect=violation domain=LB
+#note "BOTH offending cells are quoted - the loader trims a bare leading space and reads a bare '.' as the SAS missing sentinel, so an unquoted fixture would be vacuous. Row 1 exercises the '^ ' arm on LBTESTCD and row 2 the '^\\.\$' arm on LBORRES; two per-(variable,row) findings. Body from the shipped green fda/FDA-SD1021-invalid-LB.cdt, whose #note says the same thing."
+#expectViolationCount 2
+#expectViolationAt row=1 variable_name=LBTESTCD
+#expectViolationAt row=2 variable_name=LBORRES
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | " ALB" | 40
+CDISCPILOT01 | LB | 01-701-1015 | GLUC   | "."

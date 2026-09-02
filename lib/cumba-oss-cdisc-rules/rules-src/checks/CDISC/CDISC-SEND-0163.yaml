@@ -1,0 +1,80 @@
+Core:
+  Id: "CDISC-SEND-0163"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Death Diagnosis (DD) record exists\
+  \ for the same combination of Test Short Name (DDTESTCD), Unique Subject Identifier\
+  \ (USUBJID), and diagnosis result (DDORRES); the domain should hold one record per\
+  \ diagnosis per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DD"
+Check:
+  expression: >-
+    not is_unique_set([DDTESTCD, USUBJID, DDORRES])
+Outcome:
+  Message: "More than one DD record exists for the same diagnosis (DDTESTCD/DDORRES)\
+    \ and subject (USUBJID)."
+  Output_Variables:
+  - "DDTESTCD"
+  - "DDORRES"
+Source:
+  Class: "FND"
+  Domain: "DD"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per diagnosis per subject (for unscheduled deaths\
+    \ only)"
+  Rule: "One record per diagnosis per subject (for unscheduled deaths only)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND163"
+        Version: "1"
+      Version: "5.0"

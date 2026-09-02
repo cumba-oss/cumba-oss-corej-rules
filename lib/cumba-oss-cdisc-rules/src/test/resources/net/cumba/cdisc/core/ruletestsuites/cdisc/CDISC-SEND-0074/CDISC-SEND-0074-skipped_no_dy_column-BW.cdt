@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-SEND-0074 expect=skipped domain=BW
+#note "NEW with Fix #340 - the gated third of the trio. Requirements.Variables.All carries [--DTC, --DY]; BW declares BWDTC but no BWDY column, ScopeMatcher resolves the -- prefix (EC-36) and the rule is SKIPPED naming BWDY. This is the auditable disposition for a dataset that simply has no study-day variable; it is NOT a bucket-2 flood gate (the rule's leading not empty(--DY) conjunct already restricts). Drop --DY from All and the rule EXECUTES and reports nothing, which is a silent pass -- escalate rather than accept it."
+#library standard=sendig version=3-1-1
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWDTC    type=Char label="Date/Time of Measurement"
+---
+S1 | BW | 001 | 1 | BW | 2019-12-20
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

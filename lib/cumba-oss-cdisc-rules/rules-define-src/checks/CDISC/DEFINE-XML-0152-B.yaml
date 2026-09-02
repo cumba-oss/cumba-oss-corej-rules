@@ -1,0 +1,28 @@
+Rule_Id: "DEFINE-XML-0152-B"
+Sheet_Rule_Identifier: "152"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+# Companion of DEFINE-XML-0152 (one sheet row, two rules): 0152's references
+# kind catches dangling def:StandardOID values; this rule adds the sheet's
+# Type="CT" refinement via a when-deref guard — it fires when the reference
+# RESOLVES but the target def:Standard's Type is not "CT" (the not_exists
+# check is the fire-always vehicle under a guard that already encodes the
+# violation; DEFINE-XML-0124-B precedent).
+Plain_Text_Rule: "The def:StandardOID attribute on the CodeList element must reference a def:Standard element of Type 'CT'."
+Message: "The CodeList def:StandardOID attribute references a def:Standard whose Type is not 'CT'."
+Check:
+  kind: "not_exists"
+  target: "@StandardOID"
+  when:
+    all:
+    # Anchored on the target's @OID (not @Type) so a RESOLVING def:Standard that
+    # merely lacks @Type is still flagged (review-batch-e WARN 1); a dangling
+    # StandardOID stays 0152's finding (this clause short-circuits the all).
+    - path: "@StandardOID->Standard@OID/@OID"
+      exists: true
+    - not:
+        path: "@StandardOID->Standard@OID/@Type"
+        equals: "CT"

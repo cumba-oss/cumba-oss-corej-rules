@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1125 expect=noViolation domain=VS
+#note "Boundary (D-TA-7a shape): one record of the VISITNUM/--TPTREF/--TPT time point leaves --ELTM empty while the others agree on PT1H. What this arm pins is the OPERATOR's blank-target rule: is_inconsistent_across_dataset excludes a blank target from both the distinct-value count and the flag pass (the D.2 emptiness-exception — GroupSemantics.flagInconsistentGroupMinority / participatingTarget), so the group stays single-valued (PT1H) and the blank row is never a candidate. TA-6 (ruled 2026-08-19) DROPPED the provably-redundant `not empty(--TPT)` / `not empty(--ELTM)` conjuncts from the SD1125 twins — this arm's verdict is unchanged by the drop, exactly as the mechanical lane's measurement predicted (findings-diff zero)."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VSTPTREF type=Char label="Time Point Reference"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+col VSTPT    type=Char label="Planned Time Point Name"
+col VSELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST |
+S1 | VS | 003 | 1 | SYSBP | 1 | DOSE | 1 | 1H POST | PT1H

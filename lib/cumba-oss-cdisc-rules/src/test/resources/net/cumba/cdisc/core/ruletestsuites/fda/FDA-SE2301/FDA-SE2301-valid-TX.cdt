@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2301 expect=noViolation domain=TX
+#note "Every trial set (SET01, SET02) carries a TXPARMCD=SPGRPCD record, so the 'Sponsor-Defined Group Code' parameter is present for each SETCD -> no violation."
+#library standard=sendig version=3-1-1
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S01 | TX | SET01 | Control | 1 | GRPLBL | Group Label | Control
+S01 | TX | SET01 | Control | 2 | SPGRPCD | Sponsor-Defined Group Code | 1
+S01 | TX | SET02 | High Dose | 3 | GRPLBL | Group Label | High Dose
+S01 | TX | SET02 | High Dose | 4 | SPGRPCD | Sponsor-Defined Group Code | 2

@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-AD0527"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRTSEQPN is present but TRTSEQP is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    var_exists("TRTSEQPN") and not var_exists("TRTSEQP")
+Outcome:
+  Message: "TRTSEQPN is present but TRTSEQP is not present."
+  Output_Variables:
+  - "TRTSEQPN"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRTSEQPN"
+  Natural_Language_Rule_Failure_Criteria: "TRTSEQPN is present and TRTSEQP is not\
+    \ present"
+  Rule_Failure_Criteria: "TRTSEQP is not present"
+  Condition_Failure: "TRTSEQPN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR527"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR527"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR527"
+        Version: "1"
+      Version: "5.0"

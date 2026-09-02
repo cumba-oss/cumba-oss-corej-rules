@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-SEND-0417"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Repro Phase (RPHASE) is populated but none of the\
+  \ additional timing variables (RPPLDY, DPDTC, DPDY, DPRPDY) is populated; at least\
+  \ one timing variable must accompany RPHASE."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DP"
+Check:
+  expression: >-
+    not empty(RPHASE) and empty(RPPLDY) and empty(DPDTC) and empty(DPDY) and empty(DPRPDY)
+Outcome:
+  Message: "RPHASE is populated but no additional timing variable (RPPLDY, DPDTC,\
+    \ DPDY, or DPRPDY) is populated."
+  Output_Variables:
+  - "RPHASE"
+  - "RPPLDY"
+  - "DPDTC"
+  - "DPDY"
+  - "DPRPDY"
+Source:
+  Class: "FND"
+  Domain: "DP"
+  Variable: "RPPLDY, DPDTC, DPDY, DPRPDY"
+  Plain_Text_Explanation: "RPHASE must be populated.  An additional timing variable\
+    \ (RPPLDY, DPDTC, DPDY, or DPRPDY) must also be populated."
+  Condition: "RPHASE ^= null"
+  Rule: "RPPLDY ^= null OR DPDTC ^= null OR DPDY ^= null OR DPRPDY ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND417"
+        Version: "1"
+      Version: "5.0"

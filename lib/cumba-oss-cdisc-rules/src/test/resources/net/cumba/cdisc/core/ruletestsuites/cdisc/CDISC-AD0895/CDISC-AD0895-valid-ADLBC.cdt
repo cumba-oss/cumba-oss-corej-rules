@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0895 expect=noViolation domain=ADLBC
+# Rule:Description: A variable with a prefix of CRIT, a suffix of FL and containing either a one-digit or two-digit number (CRITyFL) is present and a variable with the same root without a suffix of FL (CRITy) is not present
+#note "CRIT1FL and CRIT1 both present -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1FL type=Char
+col CRIT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | Y | Threshold met
+---

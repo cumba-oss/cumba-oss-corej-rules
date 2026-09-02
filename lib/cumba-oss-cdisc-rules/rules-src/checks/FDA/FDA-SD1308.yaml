@@ -1,0 +1,123 @@
+Core:
+  Id: "FDA-SD1308"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record exists in TS with TSPARMCD equal to 'ADDON'\
+  \ and TSVAL equal to 'Y', but TSVAL is empty for the record where TSPARMCD equals\
+  \ 'CURTRT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$ADDON_Y"
+  expression: "record_count(group=[STUDYID], filter=filter(TSPARMCD=\"ADDON\", TSVAL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    TSPARMCD == "CURTRT" and $ADDON_Y >= 1 and empty(TSVAL)
+Outcome:
+  Message: "TSVAL is empty for the CURTRT Trial Summary Parameter when a record exists\
+    \ with TSPARMCD equal to 'ADDON' and TSVAL equal to 'Y'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$ADDON_Y"
+Source:
+  FDA_Validator_Rule_Message: "TSVAL is missing for the CURTRT Trial Summary Parameter,\
+    \ when ADDON parameter equals 'Y'"
+  FDA_Validator_Rule_Description: "When test product is added to existing treatment\
+    \ (TSPARMCD = 'ADDON' and TSVAL = 'Y'), the Current Therapy or Treatment parameter\
+    \ should be provided with Parameter Value populated (TSVAL should not be null\
+    \ when TSPARMCD = 'CURTRT')."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1308"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1308"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1308"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1308"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1308"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0275"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,34 @@
+name: CDISC-AD0252
+kind: rule
+description: |
+  Wave D2 port — T3-VMC. OCCDS/ADAE: any(AVAL exists, AVALC exists).
+  Baselined on Python lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection and yields 0 violations.
+  Java fires correctly; expected matches Java's 1 dataset-level violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0252)
+rule:
+  coreId: CDISC-AD0252
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+      AVAL: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AVAL: 1.0}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0252
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AVAL: '1'
+expected_errors: []

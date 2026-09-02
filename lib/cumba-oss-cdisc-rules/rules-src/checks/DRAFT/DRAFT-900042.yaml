@@ -1,0 +1,27 @@
+Core:
+  Id: "DRAFT-900042"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when AGEU is populated with a value that is not from\
+  \ the age-unit controlled terminology (YEARS, MONTHS, WEEKS, DAYS, HOURS)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "AGEU"
+Check:
+  expression: >-
+    not empty(AGEU) and AGEU not in ["YEARS", "MONTHS", "WEEKS", "DAYS", "HOURS"]
+Outcome:
+  Message: "AGEU has a value not in the expected controlled terminology for age units."
+  Output_Variables:
+  - "AGEU"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

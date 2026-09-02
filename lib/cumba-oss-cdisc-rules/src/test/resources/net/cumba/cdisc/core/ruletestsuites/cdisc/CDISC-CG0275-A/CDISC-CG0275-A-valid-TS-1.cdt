@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0275-A expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'ADDON' and TSVAL equal to 'Y', but no record with TSPARMCD equal to 'CURTRT' is present in TS.
+#note "The CURTRT record is present, so the absence check cannot fire."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | ADDON | Y
+S01 | TS | 2 | CURTRT | SOME VALUE
+---

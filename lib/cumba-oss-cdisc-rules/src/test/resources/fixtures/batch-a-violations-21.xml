@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Batch A violations 2.1 fixture. Per-rule triggers (expected finding counts in
+  BatchARulesTest):
+  ODM: FileOID missing (9); FileType blank (255 exists + 8 one_of); ODMVersion
+  wrong (7); CreationDateTime blank (13 exists + 254 regex); AsOfDateTime not
+  ISO 8601 (5). def:Context="Submission" deliberately valid so the
+  Submission-guarded rules 31/131 can fire - rule 16 therefore cannot fire here
+  (single-document conflict), and rule 3/10 cannot fire on any well-formed
+  document that also exercises Study-level rules.
+-->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     FileType=""
+     ODMVersion="1.3.0"
+     CreationDateTime=""
+     AsOfDateTime="20260701T000000"
+     def:Context="Submission">
+  <Study OID="ST.A">
+    <!-- GV: StudyName missing (18); StudyDescription twice (21); ProtocolName twice (23) -->
+    <GlobalVariables>
+      <StudyDescription>First description</StudyDescription>
+      <StudyDescription>Second description</StudyDescription>
+      <ProtocolName>PROT-1</ProtocolName>
+      <ProtocolName>PROT-2</ProtocolName>
+    </GlobalVariables>
+    <!-- MDV: OID missing (26); Name missing (27); def:DefineVersion invalid (28);
+         dangling def:CommentOID (30); two def:Standards children (32) -->
+    <MetaDataVersion def:DefineVersion="3.0.0" def:CommentOID="COM.MISSING">
+      <def:Standards>
+        <!-- Name missing (33); Status not in codelist (264) -->
+        <def:Standard OID="STD.1" Type="IG" Version="3.4" Status="Bogus"/>
+        <!-- OID missing (257); PublishingSet missing while Type='CT' (35);
+             Version missing (36); dangling def:CommentOID (256) -->
+        <def:Standard Name="CDISC/NCI" Type="CT" def:CommentOID="COM.GONE"/>
+        <!-- Type missing (34) -->
+        <def:Standard OID="STD.3" Name="SDTMIG" Version="3.3" Status="Final"/>
+      </def:Standards>
+      <!-- empty def:Standards: no def:Standard child (233, 258) -->
+      <def:Standards/>
+      <!-- def:Class missing while def:Context='Submission' (131) -->
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" Purpose="Tabulation">
+        <ItemRef ItemOID="IT.X" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" Purpose="Tabulation">
+        <ItemRef ItemOID="IT.X" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS">
+          <!-- def:SubClass Name missing (134) -->
+          <def:SubClass/>
+        </def:Class>
+      </ItemGroupDef>
+      <!-- IsNonStandard dataset without def:Class: exempt per spec pp. 17/79 —
+           the 0131 carve-out keeps this SILENT even under Context='Submission'
+           (review-batch-a WARN 2). -->
+      <ItemGroupDef OID="IG.NS" Name="NS" Repeating="No" Purpose="Tabulation"
+                    def:IsNonStandard="Yes">
+        <ItemRef ItemOID="IT.X" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+    </MetaDataVersion>
+  </Study>
+  <!-- second Study: two GlobalVariables (15); two MetaDataVersions (25) -->
+  <Study OID="ST.B">
+    <!-- StudyName twice (19); StudyDescription missing (20); ProtocolName missing (22) -->
+    <GlobalVariables>
+      <StudyName>NAME-1</StudyName>
+      <StudyName>NAME-2</StudyName>
+    </GlobalVariables>
+    <GlobalVariables>
+      <StudyName>NAME-3</StudyName>
+      <StudyDescription>Second GV description</StudyDescription>
+      <ProtocolName>PROT-3</ProtocolName>
+    </GlobalVariables>
+    <!-- def:DefineVersion missing (29); def:Standards missing under Submission (31, twice) -->
+    <MetaDataVersion OID="MDV.B1" Name="B one"/>
+    <MetaDataVersion OID="MDV.B2" Name="B two" def:DefineVersion="2.1.0"/>
+  </Study>
+  <!-- third Study: OID missing (12); GlobalVariables missing (14); MetaDataVersion missing (24) -->
+  <Study/>
+</ODM>

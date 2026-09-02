@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0061A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SDTM Exposure (EX) dataset is present in the\
+  \ study but neither the Treatment End Date (TRTEDT) nor the Treatment End Datetime\
+  \ (TRTEDTM) variable is present in ADSL; when there is an investigational product\
+  \ (evidenced by EX), ADSL must carry a treatment end date/datetime."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Datasets:
+  - "EX"
+Operations:
+- id: "$TRTEDT_EXISTS"
+  expression: "variable_exists(TRTEDT)"
+- id: "$TRTEDTM_EXISTS"
+  expression: "variable_exists(TRTEDTM)"
+Check:
+  expression: >-
+    $TRTEDT_EXISTS == false and $TRTEDTM_EXISTS == false
+Outcome:
+  Message: "SDTM.EX is present, but neither ADSL TRTEDT nor TRTEDTM are present."
+Source:
+  Message: "SDTM.EX is present, but neither ADSL TRTEDT nor TRTEDTM are present"
+  Description: "The presence of SDTM.EX (Exposure) domain implies that there should\
+    \ be a Treatment End Date (TRTEDT) / Datetime (TRTEDTM) variable present in the\
+    \ ADaM data. ADaM rule AD0061 corresponds to Start Date and Times. ADaM IG requires\
+    \ it if there is an investigational product."
+  Domains: "GLOBAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0061A"
+        Version: "1"
+      Version: "6.0"

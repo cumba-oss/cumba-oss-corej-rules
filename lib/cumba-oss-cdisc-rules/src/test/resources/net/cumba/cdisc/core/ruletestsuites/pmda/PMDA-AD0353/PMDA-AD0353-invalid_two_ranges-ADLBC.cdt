@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0353 expect=violation domain=ADLBC
+#note "TWO index pairs are declared (A1IND/B1IND and A2IND/B2IND), so wildcard expansion produces TWO expanded rules (y=1 and y=2). The single data row mismatches on BOTH pairs, and the harness aggregates across expansions, so the total is 2 violations AT THE SAME ROW (expansions x firing rows). This pins the per-index expansion arithmetic; one #expectViolationAt line per violation is required because the match is an exact multiset."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 B1IND=HIGH A1IND=NORMAL
+#expectViolationAt row=1 B2IND=LOW A2IND=NORMAL
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ABLFL   type=Char
+col A1IND   type=Char
+col B1IND   type=Char
+col A2IND   type=Char
+col B2IND   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | Y | NORMAL | HIGH | NORMAL | LOW

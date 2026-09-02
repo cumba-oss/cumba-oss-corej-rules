@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0351 expect=noViolation domain=ADLBC
+#note "Blank A1HI is a blank KEY component -> DROP_MISSING_KEYS removes row 3's group; contrast PMDA-AD0350-valid_blank_a1hi_target, which pins the blank TARGET branch on the same pair."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col A1HIC type=Char
+col A1HI type=Num
+---
+S1 | 001 | SYSBP | SystolicBP | HIGH | 160
+S1 | 002 | SYSBP | SystolicBP | HIGH | 160
+S1 | 003 | SYSBP | SystolicBP | VERYHIGH | 

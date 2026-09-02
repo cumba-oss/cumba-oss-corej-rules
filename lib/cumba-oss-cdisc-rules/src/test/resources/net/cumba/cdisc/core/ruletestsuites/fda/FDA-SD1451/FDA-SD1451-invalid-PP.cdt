@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1451 expect=violation domain=PP
+#note "PPENINT is present but PPSTINT is not -> the assessment interval has an end and no start -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPENINT  type=Char label="Planned End of Assessment Interval"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | AUCALL | PT24H
+---

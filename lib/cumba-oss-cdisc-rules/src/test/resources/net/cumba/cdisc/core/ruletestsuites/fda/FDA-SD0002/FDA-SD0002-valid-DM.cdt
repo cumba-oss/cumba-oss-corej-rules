@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0002 expect=noViolation domain=DM
+#note "Every Required variable (STUDYID, DOMAIN, USUBJID, SUBJID, SITEID, SEX) is populated on every record; AGE (Exp, Num) is missing on row 2 but is not in the Required list -> no violation."
+#library standard=sdtmig version=3-4
+#library required-variables DM STUDYID DOMAIN USUBJID SUBJID SITEID SEX
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SITEID  type=Char label="Study Site Identifier"
+col SEX     type=Char label="Sex"
+col AGE     type=Num  label="Age"
+---
+S1 | DM | S1-001 | 001 | 01 | M | 56
+S1 | DM | S1-002 | 002 | 01 | F | .

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0047 expect=skipped domain=ADAE
+#note "FRESH for Fix #368 — an unresolvable structure SKIPS, it does not pass. ADAE carries AEDECOD so it detects as OCCURRENCE DATA STRUCTURE, which the rule's Scope admits; but the occurrence structures live in the OCCDS supplement, and an adamig-1-x run's product does not define one, so the library here declares no such structure. The honest verdict is 'could not evaluate', not 'nothing wrong'. Green-passing this case is exactly how ADaM stayed invisible: the run reports SUCCESS and no instrument anywhere records that the rule never had a list to compare against. Whether a supplement may be consulted for such a rule is the open R2 question and is deliberately NOT decided here."
+#library standard=adamig version=1-3
+#library required-variables-for-structure "BASIC DATA STRUCTURE" PARAM PARAMCD STUDYID USUBJID
+dataset ADAE structure=OCCDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AESEQ   type=Num  label="Sequence Number"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1

@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2279 expect=violation domain=PC
+#note "Within subject 001 the time point reference 'DOSE 1' is used on two different nominal study days (1 and 8), so PCTPTREF does not identify a unique dose. Both records of the offending reference are reported; subject 002 reuses 'DOSE 1' on its own day 1 and is not affected."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 PCTPTREF="DOSE 1" PCNOMDY=1
+#expectViolationAt row=2 PCTPTREF="DOSE 1" PCNOMDY=8
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY  type=Num  label="Nominal Study Day for Tabulations"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 |  | 1 | DRUGX | 1 | DOSE 1
+S1 | PC | 001 |  | 2 | DRUGX | 8 | DOSE 1
+S1 | PC | 002 |  | 1 | DRUGX | 1 | DOSE 1

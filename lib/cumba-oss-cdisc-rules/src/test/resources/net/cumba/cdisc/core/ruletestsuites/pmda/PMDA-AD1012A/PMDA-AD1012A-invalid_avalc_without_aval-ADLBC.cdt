@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD1012A expect=violation domain=ADLBC
+#note "Isolates the `*C` arm. AVALC is a catalogued secondary whose root is AVAL, so the `*C` half seeds one expansion and `var_exists(\"AVALC\") and not var_exists(\"AVAL\")` fires. Nothing else in the column list ends in N or C, so the expansion count stays at one. The expanded rule id is suffixed with the `*N` name (AVALN) even though the `*C` half seeded it - cosmetic, and it does not affect the count. Dataset granularity -> 1 violation, bare row=1 pin (the Output_Variable resolves to the absent primary and is omitted from the value map)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | POSITIVE
+CDISCPILOT01 | 01-701-1023 | ALB | NEGATIVE

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0141 expect=violation domain=ADLBC
+#note "The group has two distinct target values with EQUAL counts, so there is no majority and the engine flags ALL non-blank rows -> two findings. Pins the D.2 tie contract for the whole cluster."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 PARAMCD=GLUC PARAM=Glucose
+#expectViolationAt row=2 USUBJID=01-701-1023 PARAMCD=GLUC PARAM=GlucoseSI
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | Glucose
+CDISCPILOT01 | 01-701-1023 | GLUC | GlucoseSI
+---

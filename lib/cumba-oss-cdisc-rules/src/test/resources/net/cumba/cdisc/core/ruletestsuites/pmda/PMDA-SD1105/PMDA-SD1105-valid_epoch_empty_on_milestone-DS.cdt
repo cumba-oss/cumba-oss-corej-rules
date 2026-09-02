@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1105 expect=noViolation domain=DS
+#note "Row 1: milestone record correctly leaves EPOCH empty. Row 2: disposition event record, EPOCH populated. The two rows exercise the two independent ways the conjunction can be false."
+#library standard=sdtmig version=3-2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSTERM  type=Char
+col DSDECOD type=Char
+col DSCAT   type=Char
+col EPOCH   type=Char
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE |
+CDISCPILOT01 | DS | 01-701-1015 | 2 | COMPLETED | COMPLETED | DISPOSITION EVENT | TREATMENT

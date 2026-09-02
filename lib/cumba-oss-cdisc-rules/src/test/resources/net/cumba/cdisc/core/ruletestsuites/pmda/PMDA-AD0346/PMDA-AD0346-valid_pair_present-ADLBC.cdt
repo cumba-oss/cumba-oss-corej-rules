@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0346 expect=noViolation domain=ADLBC
+#note "dataset ADLBC structure=BDS. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), R2A1LO(Num), A1LO(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | 1.25 | 0.5`. Both halves of the pair are declared, so the second conjunct `not var_exists('A1LO')` is FALSE and the rule is silent. The two wildcard patterns are disjoint, so this still yields exactly one expansion (y=1), not two."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col R2A1LO type=Num
+col A1LO type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 1.25 | 0.5

@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-CG0114 expect=violation domain=CM
+#note "ADAPTED-FROM fda/FDA-SD0035/FDA-SD0035-invalid-CM.cdt. CMDOSU is present but empty while a dose is provided: row 1 via CMDOSE, row 2 via CMDOSTXT, row 3 via CMDOSTOT -> all three fire. Row 4 carries units; row 5 has no dose information at all -> neither fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=1 CMTRT=ASPIRIN
+#expectViolationAt row=2 CMTRT=PARACETAMOL
+#expectViolationAt row=3 CMTRT=IBUPROFEN
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDOSE   type=Num  label="Dose per Administration"
+col CMDOSTXT type=Char label="Dose Description"
+col CMDOSU   type=Char label="Dose Units"
+col CMDOSTOT type=Num  label="Total Daily Dose"
+---
+S1 | CM | 001 | 1 | ASPIRIN     | 100 |          |    |
+S1 | CM | 001 | 2 | PARACETAMOL |     | 1 TABLET |    |
+S1 | CM | 001 | 3 | IBUPROFEN   |     |          |    | 600
+S1 | CM | 001 | 4 | OMEPRAZOLE  | 20  |          | mg |
+S1 | CM | 001 | 5 | VITAMIN C   |     |          |    |

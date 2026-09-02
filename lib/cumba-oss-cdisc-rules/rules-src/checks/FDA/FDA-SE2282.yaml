@@ -1,0 +1,70 @@
+Core:
+  Id: "FDA-SE2282"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record exists for the same USUBJID\
+  \ within a POOLID in the Pool Definition (POOLDEF) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "POOLDEF"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Check:
+  expression: >-
+    not empty(POOLID) and not is_unique_set([USUBJID, POOLID])
+Outcome:
+  Message: "USUBJID is not unique within POOLID in the Pool Definition (POOLDEF) domain."
+  Output_Variables:
+  - "POOLID"
+Source:
+  FDA_Validator_Rule_Message: "Duplicate USUBJID within a POOLID"
+  FDA_Validator_Rule_Description: "There should be only one record per subject (USUBJID)\
+    \ within Pool Identifier (POOLID) in the Pool Definition (POOLDEF) domain."
+  Domains: "POOLDEF"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2282"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2282"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2282"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2282"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2282"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.1"

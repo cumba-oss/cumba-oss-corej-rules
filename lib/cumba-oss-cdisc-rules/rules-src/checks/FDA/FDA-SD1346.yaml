@@ -1,0 +1,114 @@
+Core:
+  Id: "FDA-SD1346"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Medication Class Code (--CLASCD) value is not\
+  \ a valid ATC code in the WHODrug dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CM"
+Requirements:
+  Variables:
+    All:
+    - "--CLASCD"
+Operations:
+- id: "$clascd_valid"
+  expression: "valid_external_dictionary_code(--CLASCD, external_dictionary_type=\"\
+    whodrug\", dictionary_term_type=\"ATCCD\")"
+Check:
+  expression: >-
+    $clascd_valid == false
+Outcome:
+  Message: "Medication Class Code (--CLASCD) is not a valid ATC code in the WHODrug\
+    \ dictionary."
+  Output_Variables:
+  - "--CLASCD"
+Source:
+  FDA_Validator_Rule_Message: "Value for --CLASCD not found in WHODrug dictionary"
+  FDA_Validator_Rule_Description: "Value for the Medication Class Code (--CLASCD)\
+    \ variable must be populated using ATC Code from the WHO Drug dictionary version\
+    \ specified in the define.xml."
+  Domains: "CM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1346"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB017"
+        Version: "1"
+      Version: "1.5"

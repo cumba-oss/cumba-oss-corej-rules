@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0112"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Dose Description (--DOSTXT) value is numeric."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DOSTXT"
+Check:
+  expression: >-
+    --DOSTXT =~ /^\\d*\\.?\\d*$/ and not empty(--DOSTXT)
+Outcome:
+  Message: "--DOSTXT value is numeric."
+  Output_Variables:
+  - "--DOSTXT"
+Source:
+  Class: "INT"
+  Domain: "ALL"
+  Variable: "--DOSTXT"
+  Rule: "--DOSTXT value is non-numeric"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0112"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0112"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0112"
+        Version: "1"
+      Version: "2.0"

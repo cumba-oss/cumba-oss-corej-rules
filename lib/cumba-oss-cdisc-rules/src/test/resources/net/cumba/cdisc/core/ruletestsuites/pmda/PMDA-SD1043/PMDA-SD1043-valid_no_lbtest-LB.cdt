@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1043 expect=noViolation domain=LB
+#note "FRESH, DISCRIMINATING (guard-vs-scope, pinned once for the cluster). LB WITH LBTESTCD but WITHOUT the LBTEST column. Scope variable --TESTCD present -> rule EXECUTES; authored guard var_exists(\"--TEST\") answers false -> noViolation. ESCALATE if it comes back SKIPPED (scope-vs-guard misread)."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+S1 | LB | 002 | 1 | GLUCOSE

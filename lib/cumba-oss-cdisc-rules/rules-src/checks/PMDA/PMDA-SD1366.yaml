@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-SD1366"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject was not assigned to treatment (ARMNRS\
+  \ is SCREEN FAILURE, NOT ASSIGNED or SCREENING NOT COMPLETED) but Subject Reference\
+  \ End Date/Time (RFENDTC) is populated; RFENDTC must be empty for such subjects."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Check:
+  expression: >-
+    ARMNRS in ["SCREEN FAILURE", "NOT ASSIGNED", "SCREENING NOT COMPLETED"] and not empty(RFENDTC)
+Outcome:
+  Message: "RFENDTC is populated for a subject who was not assigned to treatment."
+  Output_Variables:
+  - "RFENDTC"
+  - "ARMNRS"
+Source:
+  Message: "RFENDTC is populated when ARMNRS is not null"
+  Description: "Subject Reference End Date/Time (RFENDTC) should be null for screen\
+    \ failures or unassigned subjects. Therefore, when the Reason Arm and/or Actual\
+    \ Arm is Null (ARMNRS) variable is populated, RFENDTC should be null."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1366"
+        Version: "1"
+      Version: "1.6"

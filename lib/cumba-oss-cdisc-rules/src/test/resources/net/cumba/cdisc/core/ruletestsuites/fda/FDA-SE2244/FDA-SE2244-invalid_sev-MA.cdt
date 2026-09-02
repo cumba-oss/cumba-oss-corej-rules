@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2244 expect=violation domain=MA
+#note "First any-branch (--SEV): row 1 copies MAORRES verbatim into MASTRESC while MASEV carries the severity modifier -> MASTRESC still holds the modifiers -> fires. Row 2 parses the base finding out, row 3 is NORMAL, row 4 is UNREMARKABLE -> all clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MASTRESC="DARK RED FOCI"
+dataset MA label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Char label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Finding Short Name"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+col MASTRESC type=Char label="Standardized Result in Character Format"
+col MASEV    type=Char label="Severity"
+---
+S1 | MA | 001 | 1 | GROSSPATH | DARK RED FOCI | DARK RED FOCI | MODERATE
+S1 | MA | 001 | 2 | GROSSPATH | DARK RED FOCI | FOCI          | MODERATE
+S1 | MA | 001 | 3 | GROSSPATH | NORMAL        | NORMAL        |
+S1 | MA | 001 | 4 | GROSSPATH | UNREMARKABLE  | UNREMARKABLE  | MILD

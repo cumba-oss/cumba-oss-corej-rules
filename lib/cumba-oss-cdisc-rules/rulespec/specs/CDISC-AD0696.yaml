@@ -1,0 +1,41 @@
+name: CDISC-AD0696
+kind: rule
+description: |
+  Wave C3 port — T2-Grouping (Sensitivity=Group). MDBDS class scope.
+  CDISC-AD0696: within (USUBJID, SPDEVID, PARAMCD, BASETYPE), >1 record
+  with ABLFL='Y'. Check uses is_not_unique_set on ABLFL with key
+  [USUBJID, SPDEVID, PARAMCD, BASETYPE] (no Operations). Sensitivity=Group
+  aggregates to one violation per failing group.
+python_source: rules-adamig-1-3.json (CDISC-AD0696)
+rule:
+  coreId: CDISC-AD0696
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, SPDEVID, PARAMCD, BASETYPE, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # Group OK: exactly one ABLFL=Y
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, BASETYPE: LAST, AVISITN: 0, ABLFL: Y}
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, BASETYPE: LAST, AVISITN: 1, ABLFL: N}
+      # Group BAD: two ABLFL=Y rows → violation at group first row
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, BASETYPE: AVG, AVISITN: 0, ABLFL: Y}
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, BASETYPE: AVG, AVISITN: 1, ABLFL: Y}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    medical device basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0696
+    dataset: ADLB
+    row_key: {AVISITN: 0, BASETYPE: AVG, PARAMCD: HGB, SPDEVID: D2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ablfl_y_count: '2'
+      ABLFL: Y
+      BASETYPE: AVG
+      PARAMCD: HGB
+      SPDEVID: D2
+expected_errors: []

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0312 expect=violation domain=ADAE
+#note "No class/structure/subclass key - detection alone must satisfy both gates. AETERM ends with TERM -> OCCURRENCE DATA STRUCTURE; literal AETERM column -> ADVERSE EVENT subclass. Row 1 fires (WIDE), row 2 conformant (BROAD)."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=SMQ01SC USUBJID=01-701-1015
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AETERM   type=Char
+col SMQ01NAM type=Char
+col SMQ01SC  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | CARDIACDISORDERS | WIDE
+CDISCPILOT01 | 01-701-1023 | NAUSEA   | CARDIACDISORDERS | BROAD

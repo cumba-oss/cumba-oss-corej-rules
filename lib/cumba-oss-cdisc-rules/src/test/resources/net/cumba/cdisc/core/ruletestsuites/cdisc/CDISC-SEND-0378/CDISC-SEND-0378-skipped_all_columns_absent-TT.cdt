@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0378 expect=skipped domain=TT
+#note "AUTHORED BY Plan B phase 4d -- the twin half FDA-SE2253 already had. CDISC-SEND-0378's Check is BYTE-IDENTICAL to FDA-SE2253's -- `(not var_exists(\"TTENRL\") or empty(TTENRL)) and (not var_exists(\"TTDUR\") or empty(TTDUR))` -- and both now declare Requirements.Variables.Any [TTENRL, TTDUR], but only FDA-SE2253 carried an all-absent scenario (invalid_columns_absent-TT) for 4d to flip; this copy shipped the semantic change with NOTHING witnessing it. NEITHER listed column is declared here, so the Any leg is unmet and the rule SKIPS instead of folding dataset-constant TRUE and firing per Stage. That is the deliberate change the adoption exists for -- the all-absent case is nothing-to-check, not a defect (M2-D24 / M3-F.1). DIRECTION PIN: read this together with -invalid_no_ttenrl_column-TT (TTENRL withheld, count 2) and -invalid_no_ttdur_column-TT (TTDUR withheld, count 1), both still expect=violation. Were the Any leg ever wired as a conjunction (skip as soon as ANY entry is absent) BOTH of those would go SKIPPED and RED; were the leg dropped altogether this scenario would fire and go RED. That trio, not this file alone, pins the direction -- and it also re-states the M3-D15(ii) symmetry pin: the two halves of an either-or pair of EQUAL standing must still behave alike on single-column absence, which is precisely what Any leaves untouched. SEND rules have no rows in either findings snapshot, so this is Gate C evidence and nothing else can see it."
+#library standard=sendig-dart version=1-2
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+---
+S1 | TT | ST1 | Premating
+S1 | TT | ST2 | Gestation
+---

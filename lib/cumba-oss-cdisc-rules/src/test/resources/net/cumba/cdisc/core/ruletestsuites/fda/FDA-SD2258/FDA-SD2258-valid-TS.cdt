@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD2258 expect=noViolation domain=TS
+#note "All INDIC rows carry a valid dummy-SNOMED concept ID (25064002=Headache, 422587007=Nausea). The blank-TSVALCD INDIC row does not fire (completeness is another rule's concern) and the bogus code on the AGEMAX row is outside the INDIC condition."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | INDIC  | 25064002
+S01 | TS | 2 | INDIC  | 422587007
+S01 | TS | 3 | INDIC  |
+S01 | TS | 4 | AGEMAX | 99999999

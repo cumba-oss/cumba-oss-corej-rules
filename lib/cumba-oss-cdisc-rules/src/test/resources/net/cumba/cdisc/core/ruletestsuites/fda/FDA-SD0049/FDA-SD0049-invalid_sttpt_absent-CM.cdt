@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0049 expect=violation domain=CM
+#note "CMSTTPT is not present in the dataset while CMSTRTPT is populated on row 1 -> the reference the relative start refers to is missing. Encodes the column-absent case: the Check carries a bare empty(--STTPT) leaf, which under absent = all-missing (EC-43) is TRUE on every row of a column that is not there. Plan B phase 4d' deleted the redundant not var_exists(--STTPT) disjunct that used to spell this out; the verdict is unchanged."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMSTRTPT=BEFORE
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN   | BEFORE
+CDISCPILOT01 | CM | 01-701-1015 | 2 | IBUPROFEN |

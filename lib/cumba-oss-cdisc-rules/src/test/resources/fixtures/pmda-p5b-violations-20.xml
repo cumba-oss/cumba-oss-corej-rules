@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PMDA batch P5b violations 2.0 fixture, exercising the 2.0-shaped legs:
+       DD0049 - the 2.0 standard-family guard (MetaDataVersion def:StandardName
+                SDTM-IG); IG.VS is alone in Domain VS with SASDatasetName VSX
+       DD0075 - the 2.0 Type='CRF' leg AND the absent-DocumentRef shape
+                (review-pmda-p3 W1): IT.VSORRES' CRF origin has no DocumentRef
+       DD0114 - the 2.0 def:Class ATTRIBUTE branch: split pair EG, IG.EG2
+                carries def:Class='TRIAL DESIGN'
+     Everything else is clean: EG split parts have QS-style prefixes and
+     Aliases (DD0050/DD0063 silent), no unsplit EG twin (DD0115 silent), the
+     AnnotatedCRF leaf's href basename is acrf.pdf (DD0102 silent). -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.0"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/pmda-p5b-violations-20"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.PMDAP5BV20">
+    <GlobalVariables>
+      <StudyName>PMDAP5BV20-STUDY</StudyName>
+      <StudyDescription>PMDA batch P5b 2.0 violations fixture study</StudyDescription>
+      <ProtocolName>PMDAP5BV20-01</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="PMDA P5b 2.0 MDV"
+                     def:DefineVersion="2.0.0"
+                     def:StandardName="SDTM-IG"
+                     def:StandardVersion="3.2">
+      <def:AnnotatedCRF>
+        <def:DocumentRef leafID="LF.ACRF"/>
+      </def:AnnotatedCRF>
+      <ItemGroupDef OID="IG.VS" Name="VS" Domain="VS" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="VSX" Purpose="Tabulation" def:Class="FINDINGS"
+                    def:Structure="One record per measurement"
+                    def:ArchiveLocationID="LF.VS">
+        <Description>
+          <TranslatedText xml:lang="en">Vital Signs</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.VSORRES" OrderNumber="1" Mandatory="Yes"/>
+        <def:leaf ID="LF.VS" xlink:href="vs.xpt">
+          <def:title>vs.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.EG1" Name="EG1" Domain="EG" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="EG1" Purpose="Tabulation" def:Class="FINDINGS"
+                    def:Structure="One record per ECG observation"
+                    def:ArchiveLocationID="LF.EG1">
+        <Description>
+          <TranslatedText xml:lang="en">ECG (1)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.VSORRES" OrderNumber="1" Mandatory="Yes"/>
+        <Alias Context="DomainDescription" Name="ECG"/>
+        <def:leaf ID="LF.EG1" xlink:href="eg1.xpt">
+          <def:title>eg1.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.EG2" Name="EG2" Domain="EG" Repeating="Yes" IsReferenceData="No"
+                    SASDatasetName="EG2" Purpose="Tabulation" def:Class="TRIAL DESIGN"
+                    def:Structure="One record per ECG observation"
+                    def:ArchiveLocationID="LF.EG2">
+        <Description>
+          <TranslatedText xml:lang="en">ECG (2)</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.VSORRES" OrderNumber="1" Mandatory="Yes"/>
+        <Alias Context="DomainDescription" Name="ECG"/>
+        <def:leaf ID="LF.EG2" xlink:href="eg2.xpt">
+          <def:title>eg2.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <ItemDef OID="IT.VSORRES" Name="VSORRES" DataType="text" Length="40"
+               SASFieldName="VSORRES">
+        <Description>
+          <TranslatedText xml:lang="en">Result or Finding in Original Units</TranslatedText>
+        </Description>
+        <def:Origin Type="CRF"/>
+      </ItemDef>
+      <def:leaf ID="LF.ACRF" xlink:href="acrf.pdf">
+        <def:title>Annotated CRF</def:title>
+      </def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0299 expect=violation domain=ADAE
+#note "Pins the four-way alternation AND the per-column granularity at 4 - one finding per offending COLUMN. SMQ00SCN is read by the SCN alternative, not by SC plus a stray N: the regex is anchored with $, so only the full-name alternative can match."
+#library standard=adamig version=1-1
+#expectViolationCount 4
+#expectViolationAt variable_name=SMQ00NAM
+#expectViolationAt variable_name=SMQ00CD
+#expectViolationAt variable_name=SMQ00SC
+#expectViolationAt variable_name=SMQ00SCN
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col SMQ00NAM type=Char
+col SMQ00CD  type=Num
+col SMQ00SC  type=Char
+col SMQ00SCN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | MIGRAINE | 20000105 | NARROW | 1

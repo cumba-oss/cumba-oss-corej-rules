@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1220 expect=violation domain=TS
+#note "TS carries two LENGTH records ($length_count = 2 > 1) -> exactly one dataset-level violation. The single TITLE record is ignored by the TSPARMCD=LENGTH filter."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | LENGTH | Trial Length | P24W
+S1 | TS | 2 | LENGTH | Trial Length | P12W
+S1 | TS | 1 | TITLE | Trial Title | A Randomized Study

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0021 expect=noViolation domain=CM
+#note "Covers the three exception arms the violation fixtures leave absent. Row 1: CMENRTPT populated -> clean. Row 2: CMSTAT populated -> clean. Row 3: CMDUR populated -> clean."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMENRTPT type=Char
+col CMSTAT   type=Char
+col CMDUR    type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN     | ONGOING  |          |
+S1 | CM | 001 | 2 | IBUPROFEN   |          | NOT DONE |
+S1 | CM | 001 | 3 | PARACETAMOL |          |          | P1D

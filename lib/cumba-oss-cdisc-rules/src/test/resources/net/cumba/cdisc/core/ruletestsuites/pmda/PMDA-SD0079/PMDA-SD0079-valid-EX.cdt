@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD0079 expect=noViolation domain=EX
+#note "001 is assigned to an arm; 002 (NOTASSGN) has only a RUN-IN record, which is exempt -> no violation."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | EX | 001 | 1 | DRUG A | TREATMENT
+S1 | EX | 002 | 1 | DRUG A | RUN-IN
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | ARM1     | Arm 1
+S1 | DM | 002 | NOTASSGN | Not Assigned
+---

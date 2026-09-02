@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1233 expect=noViolation domain=AE
+#note "Every populated SPDEVID is registered in DI; the boundary row 3 leaves SPDEVID empty, which must not fire (the non_empty leaf)."
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 001 | 1 | DEV-001 | Headache
+CDISCPILOT01 | AE | 001 | 2 | DEV-002 | Device site reaction
+CDISCPILOT01 | AE | 002 | 1 |  | Nausea
+---
+
+dataset DI label="Device Identifiers"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Parameter Short Name"
+col DIPARM   type=Char label="Device Parameter"
+col DIVAL    type=Char label="Device Parameter Value"
+---
+CDISCPILOT01 | DI | DEV-001 | 1 | DEVTYPE | Device Type | Infusion Pump
+CDISCPILOT01 | DI | DEV-002 | 1 | DEVTYPE | Device Type | Infusion Pump
+---

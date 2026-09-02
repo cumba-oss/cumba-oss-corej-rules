@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0223"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of End of Observation (--ENDY) is populated\
+  \ but the date portion of End Date/Time of Observation (--ENDTC) or Subject Reference\
+  \ Start Date/Time (RFSTDTC) is not a complete date, i.e. empty, invalid, or only\
+  \ partially specified."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    (var_exists("--ENDTC") and not is_complete_date_part(--ENDTC) or not
+    is_complete_date_part(DM.RFSTDTC)) and not empty(--ENDY)
+Outcome:
+  Message: "--ENDY is populated when the date portion of --ENDTC or RFSTDTC is incomplete."
+  Output_Variables:
+  - "--ENDTC"
+  - "--ENDY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENDY"
+  Condition: "--ENDTC or DM.RFSTDTC does not contain complete values in their date\
+    \ portion"
+  Rule: "--ENDY = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0223"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0223"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0223"
+        Version: "1"
+      Version: "2.0"

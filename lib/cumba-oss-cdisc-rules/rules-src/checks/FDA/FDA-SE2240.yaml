@@ -1,0 +1,77 @@
+Core:
+  Id: "FDA-SE2240"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Observation (--ENDTC) is after\
+  \ the start date of the subject's latest Disposition Event (DSSTDTC in the DS dataset)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+Operations:
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(--ENDTC) and date(--ENDTC) > $max_ds_dsstdtc
+Outcome:
+  Message: "--ENDTC is after the latest Disposition (DS) start date (DSSTDTC) for\
+    \ the subject."
+  Output_Variables:
+  - "--ENDTC"
+  - "$max_ds_dsstdtc"
+Source:
+  FDA_Validator_Rule_Message: "--ENDTC is after the latest Disposition date"
+  FDA_Validator_Rule_Description: "End Date/Time of Observation (--ENDTC) for an animal's\
+    \ live-phase findings should be less than or equal to the Start Date/Time of the\
+    \ latest Disposition Event (DSSTDTC)."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2240"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2240"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2240"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2240"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2240"
+        Version: "1"
+      Version: "1.6"

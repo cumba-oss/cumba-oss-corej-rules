@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1285 expect=violation domain=RE
+#note "REDIR is present while RELOC is absent -> Directionality without a Location -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset RE class=FINDINGS label="Respiratory System Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RESEQ    type=Num  label="Sequence Number"
+col RETESTCD type=Char label="Respiratory Test or Examination Short Name"
+col REDIR    type=Char label="Directionality"
+---
+CDISCPILOT01 | RE | 01-701-1015 | 1 | FEV1 | UPPER
+---

@@ -1,0 +1,41 @@
+Core:
+  Id: "PMDA-SD2287"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Trial Summary (TS) dataset does not contain\
+  \ a record where TSPARMCD equals 'ONGOSIND' (Ongoing Study Indicator)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$ongosind_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"ONGOSIND\"))"
+Check:
+  expression: >-
+    $ongosind_count == 0
+Outcome:
+  Message: "Missing ONGOSIND Trial Summary Parameter: an 'Ongoing Study Indicator'\
+    \ (ONGOSIND) record must be present in the Trial Summary (TS) domain."
+  Output_Variables:
+  - "$ongosind_count"
+Source:
+  Message: "Missing ONGOSIND Trial Summary Parameter"
+  Description: "'Ongoing Study Indicator' (ONGOSIND) record must be populated in Trial\
+    \ Summary (TS) domain. It is an 'FDA Desired' parameter listed in the Technical\
+    \ Conformance Guide (TCG)."
+  Domains: "TS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2287"
+        Version: "1"
+      Version: "6.0"

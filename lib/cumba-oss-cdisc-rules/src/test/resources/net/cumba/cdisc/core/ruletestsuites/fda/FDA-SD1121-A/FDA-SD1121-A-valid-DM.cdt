@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1121-A expect=noViolation domain=DM
+#note "AGE is populated on row 1 and AGETXT covers row 2 -> no violation."
+#library standard=sendig version=3-1-1
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGETXT  type=Char label="Age Range"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | S1-001 | 12 |          | TRT01
+S1 | DM | S1-002 | .  | 10-14    |
+---

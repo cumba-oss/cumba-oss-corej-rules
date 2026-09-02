@@ -1,0 +1,68 @@
+Core:
+  Id: "FDA-SE2269"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DSDECOD indicates a scheduled death (INTERIM SACRIFICE,\
+  \ TERMINAL SACRIFICE, RECOVERY SACRIFICE, or REMOVED FROM STUDY ALIVE) but DSUSCHFL\
+  \ is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSDECOD"
+Check:
+  expression: >-
+    DSDECOD in ["INTERIM SACRIFICE", "TERMINAL SACRIFICE", "RECOVERY SACRIFICE",
+    "REMOVED FROM STUDY ALIVE"] and not empty(DSUSCHFL)
+Outcome:
+  Message: "DSUSCHFL is populated when DSDECOD indicates a scheduled death."
+  Output_Variables:
+  - "DSDECOD"
+  - "DSUSCHFL"
+Source:
+  FDA_Validator_Rule_Message: "Unscheduled flag is populated for scheduled death"
+  FDA_Validator_Rule_Description: "For subjects that have a disposition status in\
+    \ the Disposition (DS) domain that indicates a scheduled death, the Unscheduled\
+    \ Flag (DSUSCHFL) should not be populated. Standardized Disposition Term (DSDECOD)\
+    \ values for scheduled death include: INTERIM SACRIFICE, TERMINAL SACRIFICE, RECOVERY\
+    \ SACRIFICE, and REMOVED FROM STUDY ALIVE."
+  Domains: "EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2269"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2269"
+        Version: "1"
+      Version: "1.6"

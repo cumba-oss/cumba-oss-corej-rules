@@ -1,0 +1,30 @@
+name: CDISC-AD0028
+kind: rule
+description: |
+  Wave A1 port — T1a PlainSimple.
+  CDISC-AD0028: ITTFN must be 0 or 1 when populated on ADSL.
+python_source: rules-adamig-1-3.json (CDISC-AD0028)
+rule:
+  coreId: CDISC-AD0028
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    column_types:
+      ITTFN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', ITTFN: 1}
+      - {STUDYID: S1, USUBJID: '002', ITTFN: 2}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0028
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ITTFN: '2'
+expected_errors: []

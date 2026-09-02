@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0017"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a split dataset (excluding Supplemental Qualifier,\
+  \ Related Records, and Associated Persons datasets) has a name whose length is not\
+  \ 3 or 4 characters."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+    - "AP--"
+    - "APRELSUB"
+    include_split_datasets: true
+Check:
+  expression: >-
+    len(dataset_name) < 3 or len(dataset_name) > 4
+Outcome:
+  Message: "Split dataset name is not 3 or 4 characters in length."
+  Output_Variables:
+  - "dataset_name"
+Source:
+  Class: "NOT (AP)"
+  Domain: "ALL"
+  Variable: "GEN"
+  Condition: "Non-Supplemental Qualifier datasets"
+  Rule: "Split dataset names length > 2 and <= 4"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0017"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0017"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0017"
+        Version: "2"
+      Version: "2.0"

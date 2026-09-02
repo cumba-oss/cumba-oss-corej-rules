@@ -1,0 +1,120 @@
+Core:
+  Id: "PMDA-SD1023"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a (VISIT, VISITNUM) combination does not match\
+  \ any combination defined in the Trial Visits (TV) dataset, excluding unscheduled\
+  \ or unplanned visits."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Operations:
+- id: "$tv_visit_keys"
+  expression: "distinct([VISIT, VISITNUM], domain=\"TV\")"
+Check:
+  expression: >-
+    var_exists(TV.VISIT) and not empty(VISIT) and not empty(VISITNUM) and not contains(upper(VISIT),
+    upper("UNSCHEDUL")) and not contains(upper(VISIT), upper("UNPLAN")) and tuple(VISIT, VISITNUM)
+    not in $tv_visit_keys
+Outcome:
+  Message: "The (VISIT, VISITNUM) combination does not match any planned visit defined\
+    \ in the Trial Visits (TV) dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "$tv_visit_keys"
+Source:
+  Message: "VISIT/VISITNUM values do not match TV domain data"
+  Description: "Combination of Visit Name (VISIT) and Visit Number (VISITNUM) in subject-level\
+    \ domains should match that in the TV domain except for Unscheduled and Unplanned\
+    \ visits."
+  Domains: "SPECIAL PURPOSE, INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"

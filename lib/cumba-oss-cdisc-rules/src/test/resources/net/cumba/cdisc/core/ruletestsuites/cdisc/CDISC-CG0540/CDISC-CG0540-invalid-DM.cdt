@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0540 expect=violation domain=DM
+#note "Subject 01-002 has ACTARMCD populated but no DS record -> fires on row 2. Row 1 has a DS record; row 3 has an empty ACTARMCD (the sheet's permitted exception) and is guarded out."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002 ACTARMCD=XANHI
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+CDISCPILOT01 | DM | 01-001 | PBO   | PBO   | Placebo
+CDISCPILOT01 | DM | 01-002 | XANHI | XANHI | Xanomeline High
+CDISCPILOT01 | DM | 01-003 |       |       |
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+CDISCPILOT01 | DS | 01-001 | 1 | COMPLETED | COMPLETED
+---

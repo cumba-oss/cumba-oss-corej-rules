@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1378 expect=noViolation domain=TE
+#note "Every TE.ETCD (SCRN, TRT) is used by at least one TA record -> no violation."
+#library standard=sdtmig version=3-4
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent
+CDISCPILOT01 | TE | TRT  | Treatment | First dose
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | PBO | Placebo | 1 | SCRN | SCREENING
+CDISCPILOT01 | TA | PBO | Placebo | 2 | TRT  | TREATMENT
+---

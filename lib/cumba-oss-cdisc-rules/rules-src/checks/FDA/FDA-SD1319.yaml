@@ -1,0 +1,125 @@
+Core:
+  Id: "FDA-SD1319"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STDTC in the Disposition (DS) or Protocol Deviations\
+  \ (DV) domains is earlier than the subject's Date/Time of Informed Consent (RFICDTC)\
+  \ in the Demographics (DM) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+    - "DV"
+Requirements:
+  Variables:
+    All:
+    - "--STDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--STDTC) and date(--STDTC) < DM.RFICDTC
+Outcome:
+  Message: "--STDTC is before RFICDTC."
+  Output_Variables:
+  - "--STDTC"
+  - "DM.RFICDTC"
+Source:
+  FDA_Validator_Rule_Message: "--STDTC is before RFICDTC"
+  FDA_Validator_Rule_Description: "All records in the Disposition (DS) and Protocol\
+    \ Deviations (DV) domains should have the Start Date/Time of Event (--STDTC) equal\
+    \ to or after a subject's Date/Time of Informed Consent (RFICDTC) in the Demographics\
+    \ (DM) domain."
+  Domains: "DS, DV"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1319"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0068"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"

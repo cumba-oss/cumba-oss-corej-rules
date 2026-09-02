@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0325 expect=noViolation domain=TE
+#note "EMPTY-DATASET PIN. Full column block declared and ZERO data rows -- the fixture is about zero ROWS, not missing columns. PREDICTED SILENT twice over: rowBased is TRUE (deriveRuleType returns RECORD_DATA, value-based), so the row loop runs zero times; and even on the synthetic table GroupSemantics.uniqueSetViolations early-returns an empty BitSet when rowCount <= 0, since a single row can never be a duplicate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset TE class="TRIAL DESIGN" label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---

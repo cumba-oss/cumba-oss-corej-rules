@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0200 expect=violation domain=ADSL
+# Rule:Description: A variable shares a name with an ADaM IG variable but has a different data type.
+#note "Synthetic: AGE Char vs YAML-sidecar Library simpleDatatype Num -> violation"
+#expectViolationCount 1
+#expectViolationAt library_variable_data_type=Num variable_data_type=Char variable_name=AGE
+#library-include CDISC-AD0200-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE type=Char label="Age"
+---
+CDISCPILOT01 | 01-701-1015 | 56
+---

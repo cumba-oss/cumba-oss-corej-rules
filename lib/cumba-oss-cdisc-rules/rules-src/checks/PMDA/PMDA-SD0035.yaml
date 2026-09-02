@@ -1,0 +1,117 @@
+Core:
+  Id: "PMDA-SD0035"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Dose Units (--DOSU) is empty but Dose per Administration\
+  \ (--DOSE), Dose Description (--DOSTXT) or Total Daily Dose (--DOSTOT) is provided."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+Requirements:
+  Variables:
+    All:
+    - "--DOSU"
+Check:
+  expression: >-
+    empty(--DOSU) and (var_exists("--DOSE") and not empty(--DOSE) or var_exists("--DOSTXT") and not
+    empty(--DOSTXT) or var_exists("--DOSTOT") and not empty(--DOSTOT))
+Outcome:
+  Message: "--DOSU is empty when --DOSE, --DOSTXT or --DOSTOT is provided."
+  Output_Variables:
+  - "--DOSE"
+  - "--DOSTXT"
+  - "--DOSU"
+  - "--DOSTOT"
+Source:
+  Message: "Missing value for --DOSU when --DOSE, --DOSTXT or --DOSTOT is provided"
+  Description: "Dose Units (--DOSU) must be populated when Dose per Administration\
+    \ (--DOSE), Dose Description (--DOSTXT) or Total Daily Dose (--DOSTOT) is provided."
+  Domains: "INTERVENTIONS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0035"
+        Version: "1"
+      Version: "1.6"

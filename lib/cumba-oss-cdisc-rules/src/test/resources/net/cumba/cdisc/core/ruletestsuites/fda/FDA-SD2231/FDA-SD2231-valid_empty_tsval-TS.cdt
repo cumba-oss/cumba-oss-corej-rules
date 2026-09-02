@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD2231 expect=noViolation domain=TS
+#note "Study type is INTERVENTIONAL and a TSPARMCD=INTTYPE record exists with an empty TSVAL: the rule checks record presence, not value population -> no violation."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE    | Study Type                             | INTERVENTIONAL
+S01 | TS | 2 | INTTYPE  | Intervention Type                      | 
+S01 | TS | 3 | TITLE    | Trial Title                            | A Study of Drug X in Condition Y
+S01 | TS | 4 | TPHASE   | Trial Phase Classification             | PHASE III TRIAL
+S01 | TS | 5 | SPONSOR  | Clinical Study Sponsor                 | ACME PHARMA

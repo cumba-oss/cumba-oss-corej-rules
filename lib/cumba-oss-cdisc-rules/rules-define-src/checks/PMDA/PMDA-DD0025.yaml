@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0025"
+Sheet_Rule_Identifier: "DD0025"
+Rule_Set: "PMDA"
+Element: "CodeList/ExternalCodeList"
+Attribute: "Version"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Reject"
+Plain_Text_Rule: "MedDRA version must be set to decimal value ending with 0 or 1, for example '9.0' or '14.1'. Define-XML specification represents MedDRA version as Version attribute on ExternalCodeList element within CodeList element."
+# Guarded on the Dictionary attribute naming MedDRA (case-insensitive: 'MEDDRA'
+# and 'MedDRA' both occur in the wild). Uses the canned 'meddra-version' format
+# (a decimal ending in .0 or .1). A missing Version on a MedDRA ExternalCodeList
+# is PMDA-DD0112-B's beat; value checks fire only on present values.
+Message: "Invalid MedDRA Version ${value}"
+Check:
+  kind: "matches_regex"
+  attribute: "Version"
+  format: "meddra-version"
+  when:
+    path: "@Dictionary"
+    matchesRegex: "(?i)meddra"

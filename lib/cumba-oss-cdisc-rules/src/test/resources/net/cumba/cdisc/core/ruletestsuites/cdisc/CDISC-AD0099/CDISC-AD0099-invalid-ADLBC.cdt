@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0099 expect=violation domain=ADLBC
+# Rule:Description: On a given record, a variable with a suffix of STDY has a value greater than a value of a variable with the same root and a suffix of ENDY, and both variables are populated
+#note "ASTDY 10 > AENDY 5 -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTDY type=Num
+col AENDY type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 10 | 5
+---

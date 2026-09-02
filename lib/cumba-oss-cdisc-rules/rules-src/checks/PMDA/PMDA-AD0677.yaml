@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-AD0677"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pooled Device Type Group (DEVTYGy) and its numeric\
+  \ counterpart (DEVTYGyN) are both present and DEVTYGy does not have the same value\
+  \ across all records that share the same value of DEVTYGyN within the study, considering\
+  \ only the records on which both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DEVTYGy"
+Check:
+  expression: >-
+    var_exists("DEVTYGyN") and not empty(DEVTYGy) and not empty(DEVTYGyN) and
+    is_inconsistent_across_dataset(DEVTYGy, keys=[DEVTYGyN])
+Outcome:
+  Message: "DEVTYGy has inconsistent values for the same value of DEVTYGyN."
+  Output_Variables:
+  - "DEVTYGy"
+  - "DEVTYGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for DEVTYGy"
+  Description: "Within a study, All DEVTYGy values must be the same for each unique\
+    \ value of DEVTYGyN, when both variables are populated. Analogous rule for AD0678."
+  Domains: "ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0677"
+        Version: "1"
+      Version: "6.0"

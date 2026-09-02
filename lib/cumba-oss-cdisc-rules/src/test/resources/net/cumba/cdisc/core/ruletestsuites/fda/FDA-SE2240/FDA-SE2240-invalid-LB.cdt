@@ -1,0 +1,32 @@
+#!RuleTest
+#test FDA-SE2240 expect=violation domain=LB
+#note "Subject 001's latest DS disposition starts 2020-01-20; LB row 1 ends 2020-01-21 (after) -> fires. Row 2 (subject 002, same end date) stays clean because 002's latest disposition is 2020-01-25 -> proves the per-USUBJID max."
+#library standard=sendig version=3-1-1
+#library dataset-class LB FINDINGS
+#expectViolationCount 1
+#expectViolationAt row=1 LBENDTC=2020-01-21
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALT | 2020-01-19 | 2020-01-21
+S1 | LB | 002 | 1 | ALT | 2020-01-19 | 2020-01-21
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY   | RECOVERY            | 2020-01-10
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-20
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-25

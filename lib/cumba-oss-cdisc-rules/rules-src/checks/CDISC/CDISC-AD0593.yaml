@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-AD0593"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a BDS or OCCDS record, APERSTM does not equal\
+  \ the ADSL variable APxxSTM for the same USUBJID (where xx equals the record's APERIOD\
+  \ value)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(APERSTM) and not empty(ADSL.AP${APERIOD:%02d}STM) and APERSTM !=
+    ADSL.AP${APERIOD:%02d}STM
+Outcome:
+  Message: "On a given record, the value of APERSTM is not equal to the value of variable\
+    \ APxxSTM where xx equals the value of APERIOD"
+  Output_Variables:
+  - "APERIOD"
+  - "APERSTM"
+  - "ADSL.AP${*}STM"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "APERSTM"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, the value of APERSTM\
+    \ is not equal to the value of variable APxxSTM where xx equals the value of APERIOD"
+  Rule_Failure_Criteria: "On a given record, the value of APERSTM is not equal to\
+    \ the value of variable APxxSTM where xx equals the value of APERIOD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR593"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR593"
+        Version: "1"
+      Version: "5.0"

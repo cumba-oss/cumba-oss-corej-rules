@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0058"
+Sheet_Rule_Identifier: "DD0058"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Label field is required for each Variable and must be included in Define.xml and cannot be empty. However, Label field is optional for Value Level metadata. Define-XML specification represents Label as Description/TranslatedText element within ItemDef element."
+Message: "Missing Label value"
+# "Variable" = an ItemDef referenced from ItemGroupDef/ItemRef; scoping to the
+# referencing ItemRef (the 0124-B fire-always vehicle, CDISC twin 0168's shape
+# minus its Submission gate) organically grants the row's own Value-Level
+# exemption - value-level ItemDefs are referenced from def:ValueListDef, not
+# ItemGroupDef. Deviations (as documented on twin 0168): the finding sits on
+# the ItemRef (its ItemOID names the ItemDef); deref is first-referrer-only.
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Description/TranslatedText"
+      exists: false

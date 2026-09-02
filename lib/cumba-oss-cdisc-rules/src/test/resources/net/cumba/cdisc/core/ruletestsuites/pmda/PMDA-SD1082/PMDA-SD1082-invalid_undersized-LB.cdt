@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1082 expect=violation domain=LB
+#note "FRESH - the FDA twin only ever pinned the OVER-sized direction; this pins the other arm of the '!=': LBTESTCD is declared length=2 while its longest stored value 'GLUC' is 4 characters. CdtLoader never truncates a value, so max_value_length(LBTESTCD)=4 and 2 != 4 -> fires once on LBTESTCD."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=LBTESTCD
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=2  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=3  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  | 4.1

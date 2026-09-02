@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1125 expect=violation domain=VS
+#note "Group key = (VISITNUM, VSTPTREF, VSTPT): rows 1/2 share it and disagree on VSELTM (PT1H vs PT2H) -> a 1:1 tie has no majority -> BOTH rows fire. Row 3 is its own group. VSTPTNUM deliberately differs (1 vs 2) across the firing pair - it is NOT a key."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSTPT=POST1H VSELTM=PT1H
+#expectViolationAt row=2 VSTPT=POST1H VSELTM=PT2H
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VISITNUM type=Num
+col VSTPTREF type=Char
+col VSTPTNUM type=Num
+col VSTPT    type=Char
+col VSELTM   type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | 1 | DOSE | 1 | POST1H | PT1H
+S1 | VS | 002 | 1 | SYSBP | 1 | DOSE | 2 | POST1H | PT2H
+S1 | VS | 001 | 2 | SYSBP | 1 | DOSE | 3 | POST2H | PT2H

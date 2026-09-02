@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-AD0352"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Range y Indicator (AyIND) variable\
+  \ is present in a dataset but none of its supporting analysis-range variables --\
+  \ Analysis Range y Lower Limit (AyLO), Analysis Range y Upper Limit (AyHI), Analysis\
+  \ Range y Lower Limit (C) (AyLOC), or Analysis Range y Upper Limit (C) (AyHIC) --\
+  \ is present. AyIND expresses the relationship of AVAL/AVALC to those range limits,\
+  \ so at least one of them (same range index y) must be present for AyIND to be meaningful."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("AyIND") and not var_exists("AyLO") and not var_exists("AyHI") and not
+    var_exists("AyLOC") and not var_exists("AyHIC")
+Outcome:
+  Message: "None of AyLO, AyHI, AyLOC, or AyHIC variables is present when AyIND is\
+    \ present"
+  Output_Variables:
+  - "AyIND"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "None of AyLO, AyHI, AyLOC, or AyHIC variables is present when AyIND is\
+    \ present"
+  Description: "Analysis Range y Indicator (AyIND) variable indicates the relationship\
+    \ of Analysis Value (AVAL) to the analysis range variables Analysis Range y Lower\
+    \ Limit (AyLO) and/or Analysis Range y Upper Limit (AyHI), or the relationship\
+    \ of Analysis Value (C) (AVALC) variable to the analysis range variables Analysis\
+    \ Range y Lower Limit (C) (AyLOC) and/or Analysis Range y Upper Limit (C) AyHIC.\
+    \ At least one of AyLO, AyHI, AyLOC, and AyHIC is expected to be present for use\
+    \ of AyIND variable."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0352"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0352"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0352"
+        Version: "1"
+      Version: "6.0"

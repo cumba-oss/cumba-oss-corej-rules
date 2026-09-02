@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1464 expect=noViolation domain=EX
+#note "None of these EXDOSTXT values is a pure numeric per the strict is_numeric scan -> no fire."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col EXSEQ    type=Num
+col EXTRT    type=Char
+col EXDOSTXT type=Char
+---
+S1 | EX | 001 | 1 | DRUGA | TWO TABLETS
+S1 | EX | 001 | 2 | DRUGA | 500 mg
+S1 | EX | 001 | 3 | DRUGA |
+S1 | EX | 001 | 4 | DRUGA | +1
+S1 | EX | 001 | 5 | DRUGA | 1e5

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0150 expect=violation domain=DM
+#note "BOUNDARY, D.1 keep axis. SUBJID is present but empty on all three rows, all STUDYID=S1. is_(not_)unique_set's shipped GroupKeyPolicy is FOLD_BLANK_KEYS: '' is a real key component, so all three rows carry the identical (\"\", S1) tuple and ALL THREE fire. This is the present-but-all-blank twin of the absent-target case pinned by PMDA-SD1001-invalid_absent_subjid-DM -- EC-53 argues the two are the same partition. NEUTER CHECK: give row 3 a real SUBJID and the count drops to 2."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=1 STUDYID=S1
+#expectViolationAt row=2 STUDYID=S1
+#expectViolationAt row=3 STUDYID=S1
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+---
+S1 | DM | S1-001 |
+S1 | DM | S1-002 |
+S1 | DM | S1-003 |

@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0620"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SEQ is not in a consistent chronological order\
+  \ (based on --STDTC) within USUBJID."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SM"
+    - "SE"
+Check:
+  expression: >-
+    not is_sorted_by(--SEQ, by=[asc("--STDTC")], within=USUBJID)
+Outcome:
+  Message: "--SEQ is not in a consistent chronological order (based on --STDTC) within\
+    \ USUBJID."
+  Output_Variables:
+  - "--STDTC"
+Source:
+  Class: "SPC"
+  Domain: "SM, SE"
+  Variable: "--SEQ"
+  Rule: "--SEQ is in a consistent chronological order"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0620"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0620"
+        Version: "1"
+      Version: "2.0"

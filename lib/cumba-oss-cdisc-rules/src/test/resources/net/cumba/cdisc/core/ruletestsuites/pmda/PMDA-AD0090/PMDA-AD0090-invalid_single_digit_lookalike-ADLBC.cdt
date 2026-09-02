@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0090 expect=violation domain=ADLBC
+#note "MECHANISM PIN - anchored FULL match and the two-digit arithmetic. Column TRT1P is populated (DRUGA) but `TRT\\d\\d[PA]` requires exactly TWO digits, and no other alternation admits TRT1P (TRT[PA] needs no digits, TRT[PA]G\\d+ needs a G) -> count still 0 -> fires. The variable CONTENT is irrelevant - the operation reads column NAMES only."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt "$treatment_variable_count"=0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRT1P   type=Char
+---
+S1 | 01-701-1015 | ALB | 30 | DRUGA
+S1 | 01-701-1023 | ALB | 31 | DRUGA

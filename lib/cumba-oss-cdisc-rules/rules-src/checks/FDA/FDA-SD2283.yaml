@@ -1,0 +1,85 @@
+Core:
+  Id: "FDA-SD2283"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVALNF is populated with a value that is not a\
+  \ term in the ISO 21090 null flavor codelist."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVALNF"
+Check:
+  expression: >-
+    not empty(TSVALNF) and upper(TSVALNF) not in ["NI", "INV", "DER", "OTH", "NINF", "PINF", "UNC",
+    "MSK", "NA", "UNK", "ASKU", "NAV", "NASK", "QS", "TRC", "NP"]
+Outcome:
+  Message: "Value for TSVALNF not found in ISO 21090: the Null Flavor (TSVALNF) variable\
+    \ must be populated using a term from the ISO 21090 null flavor codelist."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVALNF"
+Source:
+  FDA_Validator_Rule_Message: "Value for TSVALNF not found in ISO 21090"
+  FDA_Validator_Rule_Description: "Value for the Null Flavor (TSVALNF) variable must\
+    \ be populated using terms found in ISO 21090."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2283"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2283"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2283"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2283"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

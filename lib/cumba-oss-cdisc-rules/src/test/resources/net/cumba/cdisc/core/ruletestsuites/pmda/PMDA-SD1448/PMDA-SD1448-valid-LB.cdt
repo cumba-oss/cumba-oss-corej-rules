@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1448 expect=noViolation domain=LB
+#note "Row 1: numeric pair. Row 2: non-numeric 'BLQ' with LBSTRESN correctly empty. Row 3: empty LBSTRESC."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | 5.5 | 5.5
+S1 | LB | 001 | 2 | HCG  | BLQ |
+S1 | LB | 001 | 3 | TSH  |     |

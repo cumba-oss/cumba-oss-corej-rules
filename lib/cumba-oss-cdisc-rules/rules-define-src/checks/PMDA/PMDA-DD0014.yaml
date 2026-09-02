@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0014"
+Sheet_Rule_Identifier: "DD0014"
+Rule_Set: "PMDA"
+Element: "ValueListDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The OID attribute for def:ValueListDef element must be unique within a single MetaDataVersion."
+# def:ValueListDef elements are direct MetaDataVersion children, so the per-parent
+# sibling scope IS the sheet's per-MDV scope.
+Message: "Duplicate ValueListDef OID [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OID"

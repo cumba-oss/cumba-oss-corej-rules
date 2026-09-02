@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1142 expect=violation domain=DM
+#note "dataset_size table metadata read by extract_metadata name=dataset_size; 6000000000 > 5368709120 -> the $-scalar comparison folds to a dataset constant -> ONE violation at reported row 1 regardless of the two rows."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 "$dataset_size"=6000000000
+dataset DM label="Demographics" dataset_size=6000000000
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023

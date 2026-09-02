@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0842"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a dataset, there is more than one value\
+  \ of ALQFN for a given value of ALQFL, considering only records where both variables\
+  \ are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ALQFL) and not empty(ALQFN) and has_multiple_values_for(ALQFN, ALQFL)
+Outcome:
+  Message: "Within this dataset, more than one value of ALQFN is present for the same\
+    \ populated value of ALQFL"
+  Output_Variables:
+  - "ALQFL"
+  - "ALQFN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "ALQFN"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of ALQFN for a given value of ALQFL, considering only those rows on which\
+    \ both variables are populated."
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of ALQFN\
+    \ for a given value of ALQFL"
+  Condition_Failure: "On rows where both ALQFN and ALQFL are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR842"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,102 @@
+Core:
+  Id: "PMDA-SD1256"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DSDECOD in the DS dataset is equal to 'DEATH' and\
+  \ DTHFL does not equal 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DS"
+Check:
+  expression: >-
+    DS.DSDECOD == "DEATH" and DTHFL != "Y"
+Outcome:
+  Message: "DTHFL does not equal 'Y' when DSDECOD in the DS dataset is equal to 'DEATH'."
+  Output_Variables:
+  - "DTHFL"
+  - "DS.DSDECOD"
+Source:
+  Message: "DTHFL does not equal 'Y' when DS.DSDECOD = 'DEATH'"
+  Description: "DTHFL must equal 'Y' when there is a record in the Disposition (DS)\
+    \ domain with DSDECOD = 'DEATH'."
+  Domains: "DS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1256"
+        Version: "1"
+      Version: "1.6"

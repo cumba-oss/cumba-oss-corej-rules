@@ -1,0 +1,89 @@
+name: EC46-offset-and-masked-selection
+kind: rule
+description: |
+  EC-46 Defects C and D — the two families that break MIN even on values the old plan called
+  "sound". Both are selection-order defects, and neither involves a right-truncated partial.
+
+  DEFECT C — UTC OFFSETS ARE NEVER NORMALISED. `ScalarSemantics.normalizeToUtc` exists and
+  `compareIso` uses it, but no extreme selector ever called it. Subject 001 carries
+  `2012-06-15T00:00:00Z` and `2012-06-15T01:00:00+02:00`. Lexically the `Z` value sorts first,
+  but `+02:00` is `2012-06-14T23:00:00Z` — the EARLIER instant. coreJ (after EC-46) bounds AFTER
+  normalising and picks the offset value; the fork still picks the `Z` value. THE DIVERGENCE.
+
+  DEFECT D — MASKED COMPONENTS SORT BEFORE EVERY DIGIT. `-` (0x2D) precedes every digit (0x30+),
+  and `CalendarDates.isPartialDate` rejects all three masked shapes, so nothing in the engine
+  ever read them as dates. Subject 002 carries `2012---15` (month masked, day known: a hull of
+  twelve dates, `[2012-01-15, 2012-12-15]`) beside `2012-01-10`. The masked value's hull OPENS on
+  2012-01-15, which is AFTER 2012-01-10, so no completion of it can precede the complete date and
+  the minimum IS determinate: `2012-01-10`. coreJ resolves it and reports nothing.
+  ⚠ The fork returns `2012---15` because it sorts first, and fires. THE DIVERGENCE.
+
+  ⚠ Note the direction carefully — a masked value does NOT automatically make a group
+  indeterminate. It is bounded (only a YEAR-masked value is unpositionable, see
+  EC46-unpositionable-value-wins), so it obeys the same test as any partial: it matters only when
+  its hull actually reaches past the complete candidate. An earlier draft of this spec asserted a
+  violation here on the assumption that any mask poisons the group; the engine disagreed and the
+  engine was right.
+
+  003 is the conformant all-complete control. 004 is a GENUINE violation on both lanes, so the
+  spec cannot pass vacuously if the rule ever stops running.
+
+  Rule: CORE-000239, `RFXSTDTC != min_date(EX.EXSTDTC grouped by USUBJID)`.
+python_notes: |
+  The fork's `min_date` is pandas `.min()` over raw text — no offset normalisation and no mask
+  awareness. Subject 001: fork keeps '2012-06-15T00:00:00Z' where coreJ selects the +02:00 value
+  (the earlier instant), so RFXSTDTC matches on coreJ and differs on the fork. Subject 002: fork
+  returns '2012---15' (hyphens sort below every digit) where coreJ determines the minimum is
+  '2012-01-10'; RFXSTDTC matches on coreJ and differs on the fork. The fork therefore reports TWO
+  violations coreJ does not. Java-canonical, by the Java-first direction (2026-08-03).
+python_source: rules-sdtmig-3-4.json (CORE-000239)
+rule:
+  coreId: CORE-000239
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      # matches the EARLIER INSTANT, which only an offset-aware engine selects
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2012-06-15T01:00:00+02:00'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2012-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXSTDTC: '2012-05-05'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '004', RFXSTDTC: '2012-11-11'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      # 001 — DEFECT C: +02:00 is 23:00Z the previous day, i.e. the earlier instant.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-06-15T00:00:00Z', EXENDTC: '2012-06-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-06-15T01:00:00+02:00', EXENDTC: '2012-06-25'}
+      # 002 — DEFECT D: '2012---15' hulls [2012-01-15, 2012-12-15]; it may start after 2012-01-10
+      # but its hull opens before it, so the minimum cannot be determined.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012---15', EXENDTC: '2012-02-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-01-10', EXENDTC: '2012-01-25'}
+      # 003 — all-complete control, unchanged by EC-46 (RFXSTDTC matches the true earliest).
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-05-05', EXENDTC: '2012-05-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-05-20', EXENDTC: '2012-05-25'}
+      # 004 — GENUINE violation on BOTH lanes: all complete, and RFXSTDTC disagrees with the
+      # earliest EXSTDTC. Without this the Java expectation would be empty and could pass vacuously.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '004', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-10-01', EXENDTC: '2012-10-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '004', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-10-20', EXENDTC: '2012-10-25'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_violations:
+  # 004 only. 001 matches the correctly-selected earlier instant (Defect C fixed); 002's minimum
+  # is determinate at 2012-01-10 and RFXSTDTC matches it (Defect D fixed); 003 is conformant.
+  # The fork additionally fires on 001 and 002 — that is the baselined divergence.
+  - rule_id: CORE-000239
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '004'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004]'
+      $min_ex_exstdtc: '2012-10-01'
+      RFXSTDTC: '2012-11-11'
+expected_errors: []

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0432 expect=skipped domain=AE
+#note "Scope.Domains.Include: [DM] rejects the primary at the AE domain -> the rule never runs, skipped. The AGEU column is present and blank on purpose so the fixture proves the SCOPE gate rather than the data."
+#library standard=sdtmig version=3-3
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AGEU    type=Char label="Age Units"
+---
+S1 | AE | 001 | 1 | HEADACHE |

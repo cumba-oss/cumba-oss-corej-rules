@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD0332"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and a parameter, the Change from\
+  \ Baseline Category y (N) (CHGCATyN) variable does not have a single consistent\
+  \ value across all records sharing the same combination of Parameter Code (PARAMCD)\
+  \ and a populated Change from Baseline Category y (CHGCATy) value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and not empty(CHGCATy) and not empty(PARAMCD) and
+    is_inconsistent_across_dataset(CHGCATyN, keys=[PARAMCD, CHGCATy])
+Outcome:
+  Message: "Inconsistent value for CHGCATyN within a unique CHGCATy."
+  Output_Variables:
+  - "PARAMCD"
+  - "CHGCATy"
+  - "CHGCATyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for CHGCAT*N"
+  Description: "Within a Study and a Parameter, all Change from Baseline Category\
+    \ y (N) (CHGCATyN) variable values must be the same for each unique value of Change\
+    \ from Baseline Category y (CHGCATy) variable when the primary variable CHGCATy\
+    \ is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0332"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0332"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0332"
+        Version: "1"
+      Version: "6.0"

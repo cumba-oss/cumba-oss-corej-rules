@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0191"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Palpable Masses (PM) record exists\
+  \ for the same combination of subject (USUBJID), test (PMTESTCD), palpable mass\
+  \ location/identity (PMLOC, PMSPID), and observation time (PMDTC, PMNOMDY); the\
+  \ PM domain expects one record per test per palpable mass per observation time per\
+  \ subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "PM"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, PMTESTCD, PMLOC, PMSPID, PMDTC, PMNOMDY])
+Outcome:
+  Message: "More than one PM record exists for the same test, palpable mass, and observation\
+    \ time within a subject."
+  Output_Variables:
+  - "PMSPID"
+  - "PMTESTCD"
+  - "PMLOC"
+  - "PMDTC"
+  - "PMNOMDY"
+Source:
+  Class: "FND"
+  Domain: "PM"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per test per palpable mass per observation time\
+    \ per subject"
+  Rule: "One record per test per palpable mass per observation time per subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND191"
+        Version: "1"
+      Version: "5.0"

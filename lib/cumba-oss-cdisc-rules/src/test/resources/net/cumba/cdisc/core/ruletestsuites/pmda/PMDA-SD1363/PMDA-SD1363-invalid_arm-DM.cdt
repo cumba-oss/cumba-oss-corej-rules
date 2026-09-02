@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1363 expect=violation domain=DM
+#note "any-branch 2: an unassigned subject (ARMNRS='NOT ASSIGNED') has an empty ARMCD but a populated ARM -> fires on row 1. RE-PINNED by M2-D25 (exact, case-sensitive CT comparison): the rows carried 'Not Assigned' in mixed case while the Check normalised with upper(); with upper() retired the mixed-case spelling no longer matches the ARMNULRS submission value, so the data now carries the exact term and the any-branch-2 coverage this fixture exists for is preserved. Casing is owned by CT2001."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ARM="Arm A"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col ARMNRS  type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 |  | Arm A | NOT ASSIGNED
+CDISCPILOT01 | DM | 01-701-1023 |  |       | NOT ASSIGNED

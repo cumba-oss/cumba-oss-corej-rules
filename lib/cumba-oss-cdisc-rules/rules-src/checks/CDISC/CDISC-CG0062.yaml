@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0062"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Relative to Reference Time Point (--STRTPT)\
+  \ is present in the dataset but Start Reference Time Point (--STTPT) is not present\
+  \ in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--STRTPT") and not var_exists("--STTPT")
+Outcome:
+  Message: "--STTPT variable is not present when --STRTPT variable is present."
+  Output_Variables:
+  - "--STRTPT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STTPT"
+  Condition: "--STRTPT present in dataset"
+  Rule: "--STTPT present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0062"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0062"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0062"
+        Version: "1"
+      Version: "2.0"

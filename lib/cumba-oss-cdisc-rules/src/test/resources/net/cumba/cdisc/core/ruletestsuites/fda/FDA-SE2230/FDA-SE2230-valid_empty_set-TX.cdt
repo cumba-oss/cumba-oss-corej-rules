@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2230 expect=noViolation domain=TX
+#note "Boundary: one CTRL record leaves SET empty while the others agree. An empty SET is not a competing description and the non_empty guard excludes that record, so no inconsistency is reported."
+#library standard=sendig version=3-1-1
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S1 | TX | CTRL | Control Group | 1 | TRTDOS | Treatment Dose | 0
+S1 | TX | CTRL |               | 2 | GRPLBL | Group Label    | Control
+S1 | TX | CTRL | Control Group | 3 | SPGRPCD| Sponsor Group Code | C1

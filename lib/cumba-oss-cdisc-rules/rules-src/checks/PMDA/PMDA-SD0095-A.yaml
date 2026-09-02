@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-SD0095-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Supplemental Qualifiers dataset (SUPP--) references,\
+  \ through RDOMAIN, a domain whose class is not a general-observation class (Events,\
+  \ Interventions, Findings, Findings About) and is not Demographics (DM)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Operations:
+- id: "$rdomain_class"
+  expression: "referenced_domain_class(RDOMAIN)"
+Check:
+  expression: >-
+    $rdomain_class not in ["EVENTS", "INTERVENTIONS", "FINDINGS", "FINDINGS ABOUT"] and RDOMAIN !=
+    "DM"
+Outcome:
+  Message: "SUPP-- references a domain that is not a general-observation-class domain\
+    \ or DM."
+  Output_Variables:
+  - "RDOMAIN"
+Source_Proposed:
+  Message: "SUPP-- references a domain that is not a general-observation-class domain\
+    \ or DM."
+  Description: "A Supplemental Qualifiers dataset (SUPP--) references, through RDOMAIN,\
+    \ a domain whose class is not a general-observation class (Events, Interventions,\
+    \ Findings, Findings About) and is not Demographics (DM)."
+  Domains: "SUPP--, SQ--"
+  Severity: "Error"
+Source:
+  Message: "Invalid usage of SUPPQUAL for non-general-observation-class Domain"
+  Description: "Supplemental Qualifiers special purpose dataset (SUPP--) can only\
+    \ be used to capture non-standard variables and their association to parent records\
+    \ in general-observation-class datasets (Events, Findings, Interventions) and\
+    \ Demographics. Another exception is Subject Visits domain in SDTM-IG prior v3.4."
+  Domains: "SUPPQUAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0095"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0095"
+        Version: "1"
+      Version: "1.6"

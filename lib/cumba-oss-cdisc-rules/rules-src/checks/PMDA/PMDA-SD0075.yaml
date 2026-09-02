@@ -1,0 +1,118 @@
+Core:
+  Id: "PMDA-SD0075"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Identifying Variable (IDVAR) is populated but does\
+  \ not represent a variable present in the dataset referenced by RDOMAIN."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "RELREC"
+    - "SUPP--"
+    - "SQ--"
+Operations:
+- id: "$rdomain_variables"
+  expression: "distinct(IDVAR, value_is_reference=true)"
+Check:
+  expression: >-
+    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables
+Outcome:
+  Message: "IDVAR does not represent a variable present in the dataset referenced\
+    \ by RDOMAIN."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "$rdomain_variables"
+Source:
+  Message: "Invalid IDVAR"
+  Description: "Identifying Variable (IDVAR) must have a valid value of variables\
+    \ from a referenced Domain."
+  Domains: "CO, RELREC, SUPPQUAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0075"
+        Version: "1"
+      Version: "1.6"

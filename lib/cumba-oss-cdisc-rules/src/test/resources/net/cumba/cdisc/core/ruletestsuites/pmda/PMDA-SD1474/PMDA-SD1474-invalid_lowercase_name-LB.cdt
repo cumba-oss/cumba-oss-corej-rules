@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1474 expect=violation domain=LB
+#note "is_valid_name is UPPER-CASE ONLY (Primitives.isValidIdentifier with upperOnly=true: first char [A-Z_], rest [A-Z0-9_]), so a mixed-case name (LbTest) fires here. Deliberate mirror of PMDA-AD0013's valid_mixed_case_tail fixture, whose ADaM regex ACCEPTS the same shape - the two rules genuinely differ because their two sheet rows differ."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=LbTest
+dataset LB
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+col LbTest  type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | X

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0012 expect=noViolation domain=BW
+#note "BWORRES is absent from the dataset, but it is not among the SENDIG's Required variables for BW -> an absent column is only a finding when the library declares it Required. Guards the polarity of the check: not_contains_all is over the Required list, not over the column order."
+#library standard=sendig version=3-1-1
+#library required-variables BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWSTRESU type=Char label="Unit of the Standardized Result"
+---
+S1 | BW | 001 | 1 | BW | g

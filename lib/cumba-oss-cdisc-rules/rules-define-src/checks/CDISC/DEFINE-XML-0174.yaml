@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0174"
+Sheet_Rule_Identifier: "174"
+Rule_Set: "CDISC"
+Element: "CodeList"
+Attribute: "DataType"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the DataType attribute must be one of \"text\", \"float\", \"integer\"."
+# The spec's attribute table (SS5.3.13) prints the last value as "Integer"; the
+# sheet's normative rule text and the ODM datatype vocabulary are lowercase —
+# the sheet spelling is enforced.
+Message: "The value of DataType [${value}] is not one of \"text\", \"float\", \"integer\" for the Codelist element."
+Check:
+  kind: "one_of"
+  attribute: "DataType"
+  values: ["text", "float", "integer"]

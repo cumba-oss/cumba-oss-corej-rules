@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0440 expect=violation domain=ADLBC
+# Rule:Description: On a given record, BASECAyN is populated and BASECATy is not populated
+#note "BASECA1N populated, BASECAT1 empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASECA1N type=Char
+col BASECAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X | 
+---

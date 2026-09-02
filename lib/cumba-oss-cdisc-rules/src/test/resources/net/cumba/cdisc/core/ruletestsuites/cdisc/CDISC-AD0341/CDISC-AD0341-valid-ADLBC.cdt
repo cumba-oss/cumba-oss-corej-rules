@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0341 expect=noViolation domain=ADLBC
+# Rule:Description: Within a parameter, there is more than one value of MCRITyMN for a given value of MCRITyML, considering only those rows on which both variables are populated
+#note "each MCRIT1ML value maps to a single MCRIT1MN value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col MCRIT1MN type=Char
+col MCRIT1ML type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | A1 | G
+CDISCPILOT01 | 01-701-1015 | GLUC | A2 | H
+---

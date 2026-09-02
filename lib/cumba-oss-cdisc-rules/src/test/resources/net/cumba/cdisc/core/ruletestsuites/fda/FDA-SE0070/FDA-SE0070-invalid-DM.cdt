@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE0070 expect=violation domain=DM
+#note "Subject 00A2 has ARMCD populated but no EX record -> fires on row 2. Row 1 has an EX record; row 3 has an empty ARMCD (the sheet's permitted exception) and is guarded out."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=00A2 ARMCD=2
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col SETCD   type=Char label="Set Code"
+---
+STUDY01 | DM | 00A1 | A1 | M | 1 | S1
+STUDY01 | DM | 00A2 | A2 | F | 2 | S2
+STUDY01 | DM | 00A3 | A3 | M |   | S3
+---
+
+dataset EX label="Exposure"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col EXSEQ    type=Num  label="Sequence Number"
+col EXTRT    type=Char label="Name of Actual Treatment"
+col EXDOSFRQ type=Char label="Dosing Frequency Per Interval"
+col EXROUTE  type=Char label="Route of Administration"
+---
+STUDY01 | EX | 00A1 | 1 | VEHICLE | QD | ORAL
+---

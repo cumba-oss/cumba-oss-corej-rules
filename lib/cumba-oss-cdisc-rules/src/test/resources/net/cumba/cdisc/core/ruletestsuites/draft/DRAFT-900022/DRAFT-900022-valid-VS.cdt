@@ -1,0 +1,18 @@
+#!RuleTest
+#test DRAFT-900022 expect=noViolation domain=VS
+#note "Same as invalid but the define binds the expected codes: VSPOS ccode=C71148, VSLAT ccode=C99074. Match on every guarded variable -> no violation."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 ccode=C71148
+#library variable-metadata VS VSLAT codelist=C99074 ccode=C99074
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS ccode=C71148
+#define variable-metadata VS VSLAT ccode=C99074
+#define variable-metadata VS VSTESTCD ccode=C66741
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

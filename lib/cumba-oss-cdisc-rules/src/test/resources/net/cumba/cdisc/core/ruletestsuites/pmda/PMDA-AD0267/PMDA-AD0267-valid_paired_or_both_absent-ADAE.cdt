@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0267 expect=noViolation domain=ADAE
+#note "Negative control for the paired-population shape. Both columns are declared, so the rule executes; two rows carry ADURN and ADURU together and one carries neither. Neither arm of `not empty(A) and empty(B) or not empty(B) and empty(A)` holds on any row, so the rule stays silent."
+#library standard=adamig version=1-0
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AEDECOD type=Char
+col ADURN   type=Num
+col ADURU   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 5 | DAYS
+CDISCPILOT01 | 01-701-1023 | NAUSEA   | 3 | DAYS
+CDISCPILOT01 | 01-701-1034 | RASH     |   |

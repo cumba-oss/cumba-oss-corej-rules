@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2012 expect=violation domain=AE
+#note "AEHLGT 'Cranial disorders' is not a High Level Group Term of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid HLGT (membership stays case-folded via the rule's authored case_sensitive: false, D-TA-3 / Fix #266)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEHLGT="Cranial disorders"
+dataset AE
+col USUBJID type=Char
+col AEHLGT  type=Char
+---
+001 | Headaches
+001 | Cranial disorders

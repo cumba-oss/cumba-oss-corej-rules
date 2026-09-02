@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-SEND-0126"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Date/Time of Element (SEENDTC) is not equal\
+  \ to the Start Date/Time of Element (SESTDTC) of the next Element within the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Check:
+  expression: >-
+    not has_next_corresponding_record(SEENDTC, SESTDTC, keep_missings=false, ordering=SESEQ,
+    within=USUBJID)
+Outcome:
+  Message: "SEENDTC is not equal to SESTDTC of the next Element for the subject."
+  Output_Variables:
+  - "SESTDTC"
+  - "SEENDTC"
+Source:
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEENDTC"
+  Plain_Text_Explanation: "Because there are no time gaps between Elements, the SEENDTC\
+    \ value for one element will always be the same as the SESTDTC value for the next\
+    \ Element."
+  Condition: "Element is not the last Element for the subject"
+  Rule: "SEENDTC = SESTDTC for the next Element"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND126"
+        Version: "1"
+      Version: "5.0"

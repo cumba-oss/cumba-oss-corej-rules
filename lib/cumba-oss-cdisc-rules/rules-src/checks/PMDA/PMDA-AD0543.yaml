@@ -1,0 +1,58 @@
+Core:
+  Id: "PMDA-AD0543"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Value Category y (N) (AVALCAyN) variable\
+  \ is present in a dataset but its corresponding Analysis Value Category y (AVALCATy)\
+  \ variable (sharing the same y index) is not present. AVALCAyN cannot be present\
+  \ unless AVALCATy is also present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("AVALCAyN") and not var_exists("AVALCATy")
+Outcome:
+  Message: "AVALCAyN is present and AVALCATy is not present."
+  Output_Variables:
+  - "AVALCAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "AVALCAyN is present and AVALCATy is not present"
+  Description: "If Analysis Value Category y (N) (AVALCAyN) variable is used in a\
+    \ dataset, Analysis Value Category y (AVALCATy) variable must also be present\
+    \ in that dataset."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0543"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0543"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0543"
+        Version: "1"
+      Version: "6.0"

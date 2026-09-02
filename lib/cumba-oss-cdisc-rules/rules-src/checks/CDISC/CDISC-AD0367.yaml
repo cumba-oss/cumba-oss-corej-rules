@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-AD0367"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DM.ACTARM is present and ACTARM does not equal DM.ACTARM\
+  \ for the same subject"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Name: "DM"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    var_exists(DM.ACTARM) and ACTARM != DM.ACTARM
+Outcome:
+  Message: "ACTARM does not equal DM.ACTARM for this subject."
+  Output_Variables:
+  - "ACTARM"
+  - "DM.ACTARM"
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "ACTARM"
+  Natural_Language_Rule_Failure_Criteria: "The value of ADSL.USUBJID is equal to the\
+    \ value of DM.USUBJID and ADSL.ACTARM is not equal to DM.ACTARM"
+  Rule_Failure_Criteria: "ADSL.ACTARM is not equal to DM.ACTARM"
+  Condition_Failure: "The value of ADSL.USUBJID is equal to the value of DM.USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR367"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR367"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR367"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,21 @@
+#!RuleTest
+#test DRAFT-900023 expect=violation domain=VS
+#note "Sponsor-extended terms flagged on non-extensible library codelists -> two findings. VSTESTCD has no library codelist, so the extensibility guard excludes it despite an (empty) define extended-values list being declared."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 codelist_extensible=false
+#library variable-metadata VS VSLAT codelist=C99074 codelist_extensible=false
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS name=VSPOS codelist_extended_values="[\"BOGUS\"]"
+#define variable-metadata VS VSLAT name=VSLAT codelist_extended_values="[\"BOGUS2\"]"
+#define variable-metadata VS VSTESTCD name=VSTESTCD codelist_extended_values="[]"
+#expectViolationCount 2
+#expectViolationAt variable_name=VSPOS define_variable_name=VSPOS
+#expectViolationAt variable_name=VSLAT define_variable_name=VSLAT
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

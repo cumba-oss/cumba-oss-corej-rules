@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1467 expect=violation domain=CM
+#note "Row 1: CMOCCUR populated (Y) + CMPRESP EMPTY -> branch 1 fires. Row 2: CMOCCUR populated (N) + CMSTAT='NOT DONE' -> branch 2 fires (the value NOT DONE has a space - data cell only). Row 3: prespecified, answered (PRESP=Y, OCCUR=Y, STAT blank) -> silent. Row 4: CMOCCUR blank -> conjunct 1 silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=001 CMOCCUR=Y
+#expectViolationAt row=2 USUBJID=002 CMOCCUR=N
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMPRESP type=Char
+col CMOCCUR type=Char
+col CMSTAT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN | | Y |
+S1 | CM | 002 | 1 | ASPIRIN | Y | N | NOT DONE
+S1 | CM | 003 | 1 | ASPIRIN | Y | Y |
+S1 | CM | 004 | 1 | ASPIRIN | | |

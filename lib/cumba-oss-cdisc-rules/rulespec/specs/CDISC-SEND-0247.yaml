@@ -1,0 +1,52 @@
+name: CDISC-SEND-0247
+kind: rule
+description: |
+  EC-7 (P7) — CDISC-SEND-0247 re-authored to report WHICH expected TSPARMCD values are missing.
+  distinct(TSPARMCD) -> $present; minus(value=[26 should-include params], subtract=$present) ->
+  $missing; Output_Variables=[$missing]. The fire condition is unchanged
+  (TSPARMCD not_contains_all [the 26 literals]) — a dataset-level (Sensitivity: Dataset) check.
+  Here TS carries 24 of the 26; DOSDUR and GLPTYP are absent, so the rule fires once and reports
+  $missing = [DOSDUR, GLPTYP]. Both engines share the distinct+minus surface (minus value= literal
+  minuend), so the lanes agree.
+rule:
+  coreId: CDISC-SEND-0247
+datasets:
+  TS:
+    row_key: [TSSEQ, TSPARMCD]
+    rows:
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '1', TSPARMCD: AGEU}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '2', TSPARMCD: SDESIGN}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '3', TSPARMCD: EXPENDTC}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '4', TSPARMCD: EXPSTDTC}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '5', TSPARMCD: ROUTE}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '6', TSPARMCD: SNDIGVER}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '7', TSPARMCD: SNDCTVER}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '8', TSPARMCD: SPECIES}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '9', TSPARMCD: SPLRNAM}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '10', TSPARMCD: SPREFID}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '11', TSPARMCD: SSPONSOR}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '12', TSPARMCD: STCAT}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '13', TSPARMCD: STDIR}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '14', TSPARMCD: STRAIN}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '15', TSPARMCD: STSTDTC}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '16', TSPARMCD: STITLE}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '17', TSPARMCD: SSTYP}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '18', TSPARMCD: TRT}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '19', TSPARMCD: TFCNTRY}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '20', TSPARMCD: TSTFLOC}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '21', TSPARMCD: TSTFNAM}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '22', TSPARMCD: TRMSAC}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '23', TSPARMCD: TRTCAS}
+    - {STUDYID: S1, DOMAIN: TS, TSSEQ: '24', TSPARMCD: TRTV}
+config:
+  standard: sendig
+  standard_version: '3.0'
+expected_violations:
+- rule_id: CDISC-SEND-0247
+  dataset: TS
+  row_key: {TSPARMCD: AGEU, TSSEQ: '1'}
+  status: SUCCESS
+  output_variables:
+    $missing: '[DOSDUR, GLPTYP]'
+    TSPARMCD: AGEU
+expected_errors: []

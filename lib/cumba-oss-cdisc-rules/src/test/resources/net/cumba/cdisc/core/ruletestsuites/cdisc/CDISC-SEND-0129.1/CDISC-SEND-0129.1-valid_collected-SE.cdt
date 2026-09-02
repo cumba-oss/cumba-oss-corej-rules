@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0129.1 expect=noViolation domain=SE
+#note "PROPOSED-RULE scenario (ruling 8). As invalid, but SESTDTC declared with def:Origin Type=Collected and no method: the sheet conditions the requirement on 'was not directly collected', so a directly-collected SESTDTC needs no method. Proposed rule silent. CURRENT rule ignores the Origin condition -> predicted-red: engine reports exactly 1 violation (variable_name=SESTDTC) where this scenario expects noViolation."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0129.1-collected-define.xml
+dataset SE
+col STUDYID type=Char
+col USUBJID type=Char
+col ETCD    type=Char
+col SESTDTC type=Char
+---
+S1 | S1-001 | SCRN | 2020-01-01

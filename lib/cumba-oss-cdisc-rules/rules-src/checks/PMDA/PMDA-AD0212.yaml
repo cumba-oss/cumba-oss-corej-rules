@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0212"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Analyzed Record Flag zz Numeric (ANLzzFN) variable\
+  \ has a populated value other than 1. For these parameter-level / record-level numeric\
+  \ population flags, 1 indicates the record is included; a missing value is allowed."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    varname() =~ /^ANL(0[1-9]|[1-9][0-9])FN$/ and not empty(value()) and value() not in [1]
+Outcome:
+  Message: "ANLzzFN value is populated but not equal to 1."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "ANLzzFN value is not 1 or null"
+  Description: "ANLzzFN (Analyzed Record Flag zz Numeric) must be 1 or null. For Parameter-Level\
+    \ and Record-Level Numeric Population Flag variables: 1 = yes (included). Null\
+    \ values are allowed."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0212"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0212"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0212"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0212"
+        Version: "1"
+      Version: "6.0"

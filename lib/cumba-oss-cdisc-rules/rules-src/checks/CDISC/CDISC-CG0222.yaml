@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-CG0222"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Study Day of End of Observation (--ENDY) is\
+  \ populated and both the date portion of --ENDTC and the date portion of RFSTDTC\
+  \ are complete dates, but --ENDY does not equal the value computed by the SDTM study\
+  \ day algorithm (a non-zero integer)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+    - "--ENDY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_endy_algorithm"
+  expression: "dy(--ENDTC)"
+Check:
+  expression: >-
+    not empty(--ENDY) and is_complete_date(--ENDTC) and is_complete_date(DM.RFSTDTC) and --ENDY !=
+    $value_endy_algorithm
+Outcome:
+  Message: "--ENDY does not equal the value derived by the SDTM study day algorithm\
+    \ even though the date portions of --ENDTC and RFSTDTC are complete dates and\
+    \ --ENDY is populated."
+  Output_Variables:
+  - "$value_endy_algorithm"
+  - "--ENDTC"
+  - "--ENDY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENDY"
+  Condition: "--ENDTC and DM.RFSTDTC both contain complete values in their date portion"
+  Rule: "--ENDY is properly calculated per study day algorithm"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0222"
+        Version: "1"
+      Version: "2.0"

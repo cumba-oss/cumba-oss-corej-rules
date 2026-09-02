@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0067"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a date/time variable (a variable whose name ends\
+  \ in DTC) contains five or more consecutive digits, indicating the ISO 8601 basic\
+  \ (undelimited) format was used instead of the required ISO 8601 Extended format\
+  \ with hyphen and colon delimiters."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DTC") and not empty(value()) and value() =~ /.*[0-9][0-9][0-9][0-9][0-9]/
+Outcome:
+  Message: "A date/time (DTC) variable value contains a run of five or more consecutive\
+    \ digits, indicating the ISO 8601 basic (undelimited) format rather than the required\
+    \ Extended format."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DTC, --RFTDTC, --STDTC, --ENDTC, RFSTDTC, RFENDTC, BRTHDTC"
+  Plain_Text_Explanation: "ISO 8601 Extended format, which requires hyphen delimiters\
+    \ for the date components and colon delimiters for the time components, must be\
+    \ used for SDTM and SENDIG."
+  Rule: "ISO 8601 format in SEND must = ISO 8601 Extended format; hyphen delimiters\
+    \ in date components and colon delimiters in time components"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND67"
+        Version: "1"
+      Version: "5.0"

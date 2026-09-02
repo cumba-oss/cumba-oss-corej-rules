@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0120"
+Sheet_Rule_Identifier: "120"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "ArchiveLocationID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The def:ArchiveLocationID attribute on the ItemGroupDef element must reference an existing def:leaf element within the same ItemGroupDef."
+Message: "There is no def:leaf within ItemGroupDef with an ID attribute that matches the def:ArchiveLocationID value [${value}]."
+# Deviation (documented): the references kind resolves against the document-wide
+# index, so a def:leaf living outside this ItemGroupDef would also satisfy the
+# check. def:leaf IDs are schema-unique (xs:ID), so in schema-valid documents the
+# resolved leaf is the one the sheet means; the same-parent containment nuance is
+# not enforced.
+Check:
+  kind: "references"
+  attribute: "ArchiveLocationID"
+  targetElement: "leaf"
+  targetKey: "ID"

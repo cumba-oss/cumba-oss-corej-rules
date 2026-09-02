@@ -1,0 +1,127 @@
+Core:
+  Id: "PMDA-SD0042"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when --PRESP is equal to 'Y' and --OCCUR is empty but\
+  \ --STAT is not equal to 'NOT DONE'."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--OCCUR"
+    - "--PRESP"
+    - "--STAT"
+Check:
+  expression: >-
+    --PRESP == "Y" and empty(--OCCUR) and --STAT != "NOT DONE"
+Outcome:
+  Message: "--STAT does not equal 'NOT DONE' when --PRESP equals 'Y' and --OCCUR is\
+    \ empty."
+  Output_Variables:
+  - "--PRESP"
+  - "!--OCCUR"
+  - "--STAT"
+Source:
+  Message: "--STAT does not equal 'NOT DONE' when --PRESP='Y' and --OCCUR is null"
+  Description: "When no response is provided for Occurrence (--OCCUR) for a pre-specified\
+    \ Intervention or Event (--PRESP = 'Y'), then Status (--STAT) should be set to\
+    \ 'NOT DONE'."
+  Domains: "INTERVENTIONS (-EX), EVENTS (-AE, -DS, -DV)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0042"
+        Version: "1"
+      Version: "1.6"

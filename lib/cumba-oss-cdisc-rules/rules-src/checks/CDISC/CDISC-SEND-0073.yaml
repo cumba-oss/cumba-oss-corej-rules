@@ -1,0 +1,98 @@
+Core:
+  Id: "CDISC-SEND-0073"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the collection Study Day (--DY) is populated, the\
+  \ date portions of --DTC and RFSTDTC are both complete dates, --DTC is on or after\
+  \ RFSTDTC, but --DY does not equal the value computed by the SDTM study day algorithm\
+  \ (date portion of --DTC minus date portion of RFSTDTC plus 1)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--DTC"
+    - "--DY"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_dy_algorithm"
+  expression: "dy(--DTC)"
+Check:
+  expression: >-
+    not empty(--DY) and is_complete_date_part(--DTC) and is_complete_date_part(DM.RFSTDTC) and
+    date(--DTC) >= DM.RFSTDTC and --DY != $value_dy_algorithm
+Outcome:
+  Message: "--DY does not equal the value derived by the SDTM study day algorithm\
+    \ even though the date portions of --DTC and RFSTDTC are complete dates, --DTC\
+    \ is on or after RFSTDTC, and --DY is populated."
+  Output_Variables:
+  - "$value_dy_algorithm"
+  - "--DTC"
+  - "--DY"
+  - "DM.RFSTDTC"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DY, --STDY, --ENDY"
+  Plain_Text_Explanation: "If --DTC is on or after RFSTDTC then --DY = (date portion\
+    \ of --DTC) - (date portion of RFSTDTC) + 1"
+  Condition: "--DTC is on or after RFSTDTC"
+  Rule: "--DY = (date portion of --DTC) - (date portion of RFSTDTC) + 1 if --DTC is\
+    \ on or after RFSTDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND73"
+        Version: "1"
+      Version: "5.0"

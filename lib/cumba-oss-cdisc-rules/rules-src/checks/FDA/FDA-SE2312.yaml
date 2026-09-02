@@ -1,0 +1,110 @@
+Core:
+  Id: "FDA-SE2312"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Pool ID (POOLID) value does not match\
+  \ any POOLID value defined in the Pool Definition (POOLDEF) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "EX"
+    - "CL"
+    - "FW"
+    - "LB"
+    - "PC"
+    - "PP"
+    - "RELREC"
+    - "SUPP--"
+    - "SQ--"
+    - "AP--"
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "POOLID"
+Operations:
+- id: "$pooldef_poolid"
+  expression: "distinct(POOLID, domain=\"POOLDEF\", group=[STUDYID])"
+Check:
+  expression: >-
+    not empty(POOLID) and POOLID not in $pooldef_poolid
+Outcome:
+  Message: "POOLID does not match any POOLID value in the POOLDEF dataset."
+  Output_Variables:
+  - "POOLID"
+  - "$pooldef_poolid"
+Source:
+  FDA_Validator_Rule_Message: "Invalid POOLID"
+  FDA_Validator_Rule_Description: "Pool ID (POOLID) values should match entries in\
+    \ the Pool Definition (POOLDEF) dataset."
+  Domains: "CO, INTERVENTIONS, CL, FW, LB, PC, PP, RELREC, SUPPQUAL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2312"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB054"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2312"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB054"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2312"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB054"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2312"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB054"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2312"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB054"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2247 expect=violation domain=TS
+#note "FRESH, DISCRIMINATING. DELIBERATELY NO TSVAL COLUMN. Predicted to FIRE once, at row 1 only. invalid_date is a class-V leaf that no derivation arm guards, so under the EC-38 all-missing contract the absent column is blank on every row and Primitives.invalidDateCalendar fires on a blank - on exactly the rows the TSPARMCD gate admits. TSVAL is in Output_Variables but absent from the data, so it is omitted from the value map: pin only row=1 TSPARMCD=SSTDTC. This is the SAME verdict the landed pmda/PMDA-SD2247A/PMDA-SD2247A-invalid_tsval_column_absent-TS.cdt records for the completeness sibling, reached by a different route. Not a new finding: TSVAL is Req/Exp in every governing version. SILENCE here means the all-missing contract changed; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=SSTDTC
+dataset TS label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+---
+CDISCPILOT01 | TS | 1 | SSTDTC  | Study Start Date
+CDISCPILOT01 | TS | 2 | DCUTDTC | Data Cutoff Date

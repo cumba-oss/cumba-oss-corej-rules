@@ -1,0 +1,32 @@
+#!RuleTest
+#test CDISC-AD0898 expect=noViolation domain=ADLB
+#note "Fix #358: the parent LB ships SPLIT (LBCH/LBHE). Every ADLB.LBSEQ matches a record in SOME member — row 2's LBSEQ=9 lives only in LBHE, so the pass proves the union reaches past the lexicographically-first member. Differs from the invalid sibling only by dropping the orphan row."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+dataset ADLB
+col STUDYID type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+col PARAM   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | ALT
+CDISCPILOT01 | 01-701-1015 | 9 | HGB
+---
+
+dataset LBCH label="Laboratory Test Results (Chemistry)"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1
+---
+
+dataset LBHE label="Laboratory Test Results (Hematology)"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 9
+---

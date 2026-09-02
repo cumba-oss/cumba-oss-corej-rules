@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-SD1473"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the upper limit of the reference range in standard\
+  \ units (LBSTNRHI) is populated but the original result (LBORRES) is not a numeric\
+  \ value, in the Laboratory Test Results (LB) domain. The standard-units reference\
+  \ range upper bound applies only to continuous (numeric) results."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Requirements:
+  Variables:
+    All:
+    - "LBORRES"
+Check:
+  expression: >-
+    not empty(LBSTNRHI) and not empty(LBORRES) and LBORRES !~ /^[><]?=?
+    ?(-?((\\d+(\\.\\d+)?)|(\\.\\d+)))$/
+Outcome:
+  Message: "LBORRES is not a numeric value when LBSTNRHI is populated."
+  Output_Variables:
+  - "LBORRES"
+  - "LBSTNRHI"
+Source:
+  Message: "--ORRES is not numeric value, when --STNRHI is populated"
+  Description: "Upper end of reference range for continuous measurement in standard\
+    \ units (--ORNRHI) should be populated only for continuous results (--ORRES is\
+    \ numeric value). Allowed \"numeric\" values may include optional >, <, =, a space\
+    \ and - leading symbols in the listed order. For example, \"<= -1.2\"."
+  Domains: "LB"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1473"
+        Version: "1"
+      Version: "6.0"

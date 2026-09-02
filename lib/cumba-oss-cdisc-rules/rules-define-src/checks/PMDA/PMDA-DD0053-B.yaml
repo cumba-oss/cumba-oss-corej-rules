@@ -1,0 +1,22 @@
+Rule_Id: "PMDA-DD0053-B"
+Sheet_Rule_Identifier: "DD0053"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: "Purpose"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Purpose attribute must have a value of 'Tabulation' for SDTM and SEND data and 'Analysis' for ADaM data. Note: Refer to the data standards catalog by the relevant Regulatory Agency for acceptance of standards and their versions."
+# ADaM leg of PMDA-DD0053 (see the base rule's comment): datasets following an
+# ADaM standard must carry Purpose='Analysis' (CDISC twin 0252 pins Name to
+# 'ADaMIG'; the begins-with form also admits the 2.0 'ADaM-IG' spelling).
+Message: "Invalid Purpose value"
+Check:
+  kind: "one_of"
+  attribute: "Purpose"
+  values: ["Analysis"]
+  when:
+    any:
+    - path: "../@StandardName"
+      equals: "ADaM-IG"
+    - path: "@StandardOID->Standard@OID/@Name"
+      matchesRegex: "ADaM.*"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0369 expect=violation domain=ADSL
+#note "Expansion: ^(.+)DTF$ -> TRTSDTF root 'TRTS'; ^(.+)DT$ -> TRTSDT root 'TRTS'; ^(.+)DTM$ -> TRTSDTM root 'TRTS'; ONE tuple, ONE expansion, ONE violation at row 1. TRTSDT/TRTSDTM/TRTSDTF are real ADaMIG ADSL 'Treatment Timing' variables (ordinals 1/3/4) - the most common real occurrence of this defect. The shipped Scope.Data_Structures carries the six tokens the rule's own sheet Domains cell names, the list sibling PMDA-AD0121/AD0122 already used (Fix #273, ruling M2-D6), so SUBJECT LEVEL ANALYSIS DATASET is in scope; under the previous [BDS, OCCDS] pair the harness reported the structure out of scope. CDISC-AD0369 is deliberately untouched - its own catalogue row says BDS + OCCDS."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 TRTSDTF=D
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSDTF type=Char
+col TRTSDT  type=Num
+col TRTSDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | D | |

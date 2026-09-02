@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0123 expect=violation domain=ADLBC
+#note "NEW with the M2-P3 ruling (Fix #304): the {DERIVED, <blank>} tie shape. Under include_empty=true group GLUC carries {DERIVED:1, EMPTY:1}; two values tie for maxCount, and flagInconsistentGroupMinority's tie branch flags EVERY participating row, so ONE parameter yields TWO findings at RECORD granularity. Row 3 is a different PARAMCD with a single consistent value and stays silent, which keeps the fixture from asserting 'everything fires'."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=GLUC
+#expectViolationAt row=2 PARAMCD=GLUC
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col PARAMTYP type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DERIVED
+CDISCPILOT01 | 01-701-1023 | GLUC |
+CDISCPILOT01 | 01-701-1034 | ALB  | IMPUTED

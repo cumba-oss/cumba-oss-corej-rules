@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0513 expect=noViolation domain=ADLBC
+# Rule:Description: A variable ending in SDTF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Start" and "Date"
+#note "CDISC's own ADaMIG labels: ASDTF spells Imputation in full; APERSDTF, ASPRSDTF and the expanded AP01SDTF abbreviate to "Imput." -> all accepted"
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDTF type=Char label="Analysis Start Date Imputation Flag"
+col APERSDTF type=Char label="Period Start Date Imput. Flag"
+col ASPRSDTF type=Char label="Subperiod Start Date Imput. Flag"
+col AP01SDTF type=Char label="Period 01 Start Date Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x
+---

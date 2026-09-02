@@ -1,0 +1,113 @@
+Core:
+  Id: "FDA-SD1318"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has a Disposition (DS) record with DSDECOD\
+  \ equal to 'PROTOCOL VIOLATION' or 'PROTOCOL DEVIATION' but the subject has no supportive\
+  \ record in the Protocol Deviations (DV) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_pv_count"
+  expression: "record_count(DSDECOD, domain=\"DS\", group=[USUBJID], filter=filter(DSDECOD=\"\
+    PROTOCOL VIOLATION\"))"
+- id: "$ds_pd_count"
+  expression: "record_count(DSDECOD, domain=\"DS\", group=[USUBJID], filter=filter(DSDECOD=\"\
+    PROTOCOL DEVIATION\"))"
+- id: "$dv_count"
+  expression: "record_count(domain=\"DV\", group=[USUBJID])"
+- id: "$study_datasets"
+  expression: "dataset_names()"
+Check:
+  expression: >-
+    ($ds_pv_count >= 1 or $ds_pd_count >= 1) and (not shares_elements_with($study_datasets,
+    keys=[DV]) or $dv_count < 1)
+Outcome:
+  Message: "Subject has a DS record with DSDECOD equal to 'PROTOCOL VIOLATION' or\
+    \ 'PROTOCOL DEVIATION' but no supportive record exists in the DV (Protocol Deviations)\
+    \ domain for that subject."
+  Output_Variables:
+  - "$ds_pv_count"
+  - "$ds_pd_count"
+  - "$dv_count"
+Source:
+  FDA_Validator_Rule_Message: "No records for subject are found in DV domain"
+  FDA_Validator_Rule_Description: "Subjects who have DSDECOD = 'PROTOCOL VIOLATION'\
+    \ or DSDECOD = 'PROTOCOL DEVIATION' records in the Disposition (DS) domain should\
+    \ have supportive records with details in the Protocol Deviations (DV) domain."
+  Domains: "DS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1318"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1318"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1318"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1318"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0072"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0072"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0072"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0072"
+        Version: "1"
+      Version: "2.0"

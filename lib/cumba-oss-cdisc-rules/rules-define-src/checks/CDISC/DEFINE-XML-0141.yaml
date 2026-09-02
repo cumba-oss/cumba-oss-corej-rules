@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0141"
+Sheet_Rule_Identifier: "141"
+Rule_Set: "CDISC"
+Element: "ItemDef"
+Attribute: "Length"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The ItemDef element must have the Length attribute present when the DataType attribute has the value text, integer or float."
+Message: "Length attribute must be present for the ItemDef element when DataType is one of 'text', 'integer' or 'float'."
+Check:
+  kind: "exists"
+  target: "@Length"
+  when:
+    path: "@DataType"
+    oneOf: ["text", "integer", "float"]

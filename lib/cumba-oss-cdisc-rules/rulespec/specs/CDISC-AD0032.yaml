@@ -1,0 +1,30 @@
+name: CDISC-AD0032
+kind: rule
+description: |
+  Wave A1 port — T1a PlainSimple.
+  CDISC-AD0032: ENRLFN must be 0 or 1 when populated on ADSL.
+python_source: rules-adamig-1-3.json (CDISC-AD0032)
+rule:
+  coreId: CDISC-AD0032
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    column_types:
+      ENRLFN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', ENRLFN: 1}
+      - {STUDYID: S1, USUBJID: '002', ENRLFN: 2}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0032
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ENRLFN: '2'
+expected_errors: []

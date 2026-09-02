@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0434"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Age Units (AGEU) is populated but neither Age (AGE)\
+  \ nor Age Range (AGETXT) is provided (AGE is missing and AGETXT is empty or not\
+  \ present in the dataset)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    not empty(AGEU) and empty(AGE) and empty(AGETXT)
+Outcome:
+  Message: "AGEU is populated, but AGE is missing and AGETXT is empty or not present\
+    \ in the dataset."
+  Output_Variables:
+  - "AGE"
+  - "AGEU"
+  - "AGETXT"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "AGETXT"
+  Condition: "AGEU ^= null and AGE = null"
+  Rule: "AGETXT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0434"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0434"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0434"
+        Version: "1"
+      Version: "2.0"

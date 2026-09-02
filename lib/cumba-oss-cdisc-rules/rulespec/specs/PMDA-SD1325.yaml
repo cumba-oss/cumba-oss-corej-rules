@@ -1,0 +1,71 @@
+name: PMDA-SD1325
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5a — group-A backfill. `PMDA-SD1325` is the PMDA
+  twin of `FDA-SD1325`: byte-identical in every executable field (same two Check leaves,
+  same `Output_Variables`, same `Domains.Include: ALL` scope, same native expression
+  `not empty(ds_label("DEFINE")) and ds_label("DATA") != ds_label("DEFINE")`), differing
+  only in `Core.Id`, the `Authorities` block and the `Source` prose. It carried **no `.cdt`
+  scenario and no other executable coverage anywhere in the tree** before this spec, so the
+  parity lane is its first and only pin.
+
+  The two rules are NOT the same corpus entry, which is why a twin spec is not redundant:
+  the Java lane resolves `coreId:` from the shipped native `rules/` bundle and the Python
+  lane from `rules-legacy/`, and both lanes reach the **PMDA** family file
+  (`rules-pmda-sdtmig-3-4.json`) here, not the FDA one. A regeneration that dropped or
+  mis-derived the PMDA copy would leave `FDA-SD1325` green and only this spec red.
+
+  Fixture logic is `FDA-SD1325`'s, unchanged and for its reasons: both lanes hard-wire a
+  spec dataset's label to its key (Java `OverlayDataTable.empty(domain, domain, ...)` in
+  FixtureLoader, Python `DummyDataset({"label": domain})` in engine_adapter), and there is
+  no spec key for a submitted dataset's label — so the disagreement can only be built from
+  the Define side. Submitted label `AE` vs declared `Adverse Events` => exactly one
+  violation.
+
+  Authoring constraints honoured (each one exists because something went wrong without it):
+
+  * `define_dataset_label` is the ONLY attribute declared — the only one the rule reads,
+    and one of the three with a Java sink (`RuleRunner.injectDatasetLevel` serves
+    `name`/`label`/`className` alone). The other eight allowed sub-keys are Python-lane-only
+    and give opposite verdicts across the lanes.
+  * `define_dataset_name` / `define_dataset_location` are deliberately NOT restated, so D4's
+    derivation from the block key (`AE` => name `AE`, location `ae.xpt`) stays on the
+    execution path. Restating them un-tests D4: Python's fill branches are
+    `if record.get(...) is None` and Java re-assigns the identical value. The location
+    default is load-bearing on the Python lane — the fork merges the Define frame onto the
+    study frame on (`dataset_name`, `dataset_location`) and `DummyDataset.filename` is
+    `f"{domain.lower()}.xpt"`, so a mismatch silently drops the Define row.
+  * Every `define_dataset_*` attribute in `Output_Variables` is declared, so neither lane
+    renders an absent key (Java) against a `null` (Python).
+  * `expected_status` is hand-authored — capture is status-blind. It adds no assertion
+    strength (both lanes default an absent value to `EXECUTED`), and note the Java status
+    channel is BLIND to a dead Define channel: killing it yields `EXECUTED` with zero
+    findings, not `SKIPPED`. Only `expected_violations` catches that, which is why the
+    non-zero Java count below is the precondition for reading this spec at all.
+
+  Both lanes agree on both channels — no `parity-diff-baseline.json` entry. (Contrast
+  `PMDA-SD9999`, whose Operation-gated Check trips EC-37 and does need one.)
+python_source: rules-pmda-sdtmig-3-4.json (PMDA-SD1325)
+rule:
+  coreId: PMDA-SD1325
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  AE:
+    define_dataset_label: Adverse Events
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: PMDA-SD1325
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      dataset_label: AE
+      define_dataset_label: Adverse Events
+expected_errors: []

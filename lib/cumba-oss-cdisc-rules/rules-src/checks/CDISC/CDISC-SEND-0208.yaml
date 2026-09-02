@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-SEND-0208"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one ECG (EG) record exists for the same\
+  \ combination of Test Short Name (EGTESTCD), Unique Subject Identifier (USUBJID),\
+  \ and observation time (EGDTC); the domain should hold one record per test per observation\
+  \ time per subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EG"
+Check:
+  expression: >-
+    not is_unique_set([EGTESTCD, USUBJID, EGDTC])
+Outcome:
+  Message: "More than one EG record exists for the same test (EGTESTCD), subject (USUBJID),\
+    \ and observation time (EGDTC)."
+  Output_Variables:
+  - "EGTESTCD"
+  - "EGDTC"
+Source:
+  Class: "FND"
+  Domain: "EG"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per test per observation time per subject"
+  Rule: "One record per test per observation time per subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND208"
+        Version: "1"
+      Version: "5.0"

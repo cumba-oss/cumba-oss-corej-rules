@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1299 expect=noViolation domain=LB
+#note "LB carries LBDTC, a Timing-role variable per the model metadata -> at least one timing variable present -> no violation."
+#library standard=sdtmig version=3-4
+#library model-variables LB --DTC:Timing --DY:Timing
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 4.1 | 2020-02-01
+S1 | LB | 001 | 2 | ALT | 22  | 2020-02-01

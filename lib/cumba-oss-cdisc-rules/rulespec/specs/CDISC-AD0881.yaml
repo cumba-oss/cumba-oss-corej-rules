@@ -1,0 +1,30 @@
+name: CDISC-AD0881
+kind: rule
+description: |
+  Wave A11 port - T1a PlainSimple.
+  CDISC-AD0881: COUNTRYL is populated and COUNTRY is not populated.
+  Record-data rule scoped to BASIC DATA STRUCTURE; non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0881)
+rule:
+  coreId: CDISC-AD0881
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', COUNTRYL: '', COUNTRY: ''}                           # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', COUNTRYL: 'United States', COUNTRY: ''}              # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0881
+    dataset: ADLB
+    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      COUNTRY: null
+      COUNTRYL: 'United States'
+expected_errors: []

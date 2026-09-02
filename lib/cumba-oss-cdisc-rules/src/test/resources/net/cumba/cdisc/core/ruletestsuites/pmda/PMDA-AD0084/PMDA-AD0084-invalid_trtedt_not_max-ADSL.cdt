@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0084 expect=violation domain=ADSL
+#note "Row 1: row_max over the two TRxxEDT cells = 22010 != TRTEDT 22000 -> fires. Row 2: TRTEDT equals the max -> clean. The $trxx_max GroupedResult is keyed by the matched columns' VALUES and both rows share the same tuple - same stored extreme (22010), correct for both. All values Num -> numeric extreme branch + numeric !=."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-001
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTEDT   type=Num
+col TR01EDT  type=Num
+col TR02EDT  type=Num
+---
+S1 | 01-001 | 22000 | 22010 | 21990
+S1 | 01-002 | 22010 | 22010 | 21990

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0616 expect=violation domain=ADSL
+#note "O-3 (Fix #336): was `skipped_index_ten_filtered` pinning `_wildcards: y: {min: 1, max: 9}`. The owner ruled y = 1-99 on EVERY _wildcards entry (ADaMIG v1.1+ §3.1.1 'an integer [1-99, not zero-padded]'; only ADaMIG-1.0-only rules keep 1-9), so index 10 is now INSIDE the filter: TRCMPG10/TRCMPG10N match, and the deliberately inconsistent data (HIGH and LOW both coded 1) fires on both rows. The upper bound is pinned by the sibling `skipped_index_hundred_filtered`."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID    type=Char
+col USUBJID    type=Char
+col TRCMPG10   type=Char
+col TRCMPG10N  type=Num
+---
+S1 | 001 | HIGH | 1
+S1 | 002 | LOW  | 1
+---
+#expectViolationCount 2

@@ -1,0 +1,52 @@
+name: FDA-SD1381-fire
+kind: rule
+description: |
+  Representative fixture for the dy (study-day reference) capability. FDA-SD1381 fires when --XDY is
+  populated, both --DTC and DM.RFXSTDTC have complete date portions, and --XDY does not equal the
+  study-day algorithm value relative to RFXSTDTC. Both AE rows carry a genuinely wrong AEXDY (the
+  algorithm day is 5 for AEDTC 2020-01-05 vs RFXSTDTC 2020-01-01), so both fire on both engines.
+  (A "correct value" no-fire row is intentionally omitted: the two engines coerce the string --XDY
+  against the numeric algorithm day differently, a divergence tracked separately.)
+python_source: rules-sendig-ar FDA-SD1381
+rule:
+  coreId: FDA-SD1381
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEDTC: '2020-01-05', AEXDY: '3'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEDTC: '2020-01-05', AEXDY: '10'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2020-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2020-01-01'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1381
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $value_xdy_algorithm: '5'
+      AEDTC: '2020-01-05'
+      AEXDY: '3'
+      DM.RFXSTDTC: '2020-01-01'
+      RFXSTDTC: '2020-01-01'
+  - rule_id: FDA-SD1381
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $value_xdy_algorithm: '5'
+      AEDTC: '2020-01-05'
+      AEXDY: '10'
+      DM.RFXSTDTC: '2020-01-01'
+      RFXSTDTC: '2020-01-01'
+expected_errors: []

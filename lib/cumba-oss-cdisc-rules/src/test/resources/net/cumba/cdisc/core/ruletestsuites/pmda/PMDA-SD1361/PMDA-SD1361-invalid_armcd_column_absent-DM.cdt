@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1361 expect=violation domain=DM
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: FRESH: DM deliberately carries no ARMCD column. ARM is populated. Predicted silent in BOTH disjuncts: disjunct 1 requires var_exists(\"ARMCD\") which is false; disjunct 2 requires empty(ARM) which is also false. Pins the absent-column doctrine on a paired-population rule."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | Treatment A

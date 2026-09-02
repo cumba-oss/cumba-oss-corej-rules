@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0265"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL and TSVALCD are populated but do not have\
+  \ a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVAL"
+    - "TSVALCD"
+Check:
+  expression: >-
+    not empty(TSVAL) and not empty(TSVALCD) and not is_unique_relationship(TSVAL, TSVALCD)
+Outcome:
+  Message: "TSVALCD and TSVAL do not have a one-to-one relationship."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALCD"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALCD"
+  Condition: "TSVAL ^= null and TSVALCD ^= null"
+  Rule: "TSVALCD and TSVAL have a one-to-one relationship."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0265"
+        Version: "1"
+      Version: "2.0"

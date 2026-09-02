@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0075"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Start Date/Time of Deviation (DVSTDTC) in the\
+  \ Protocol Deviations (DV) dataset is earlier than the subject's Date/Time of Informed\
+  \ Consent (RFICDTC) in the Demographics (DM) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DV"
+Requirements:
+  Variables:
+    All:
+    - "DVSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(DVSTDTC) and date(DVSTDTC) < DM.RFICDTC
+Outcome:
+  Message: "DVSTDTC is before RFICDTC."
+  Output_Variables:
+  - "DVSTDTC"
+  - "DM.RFICDTC"
+Source:
+  Class: "EVT"
+  Domain: "DV"
+  Variable: "DVSTDTC"
+  Rule: "DVSTDTC >= DM.RFICDTC"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0075"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,51 @@
+Core:
+  Id: "PMDA-SD2288"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject (USUBJID) in the Demographics (DM) domain\
+  \ has no record in the Disposition (DS) domain with Disposition Category (DSCAT)\
+  \ equal to 'DISPOSITION EVENT'. Subjects whose Planned Arm Code (ARMCD) is empty,\
+  \ 'SCRNFAIL', or 'NOTASSGN' are excluded."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Operations:
+- id: "$subjects_with_disposition_event"
+  expression: "distinct(USUBJID, domain=\"DS\", filter=filter(DSCAT=\"DISPOSITION\
+    \ EVENT\"))"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD not in ["SCRNFAIL", "NOTASSGN"] and not empty(USUBJID) and USUBJID
+    not in $subjects_with_disposition_event
+Outcome:
+  Message: "The subject has no DS record with DSCAT equal to 'DISPOSITION EVENT'."
+  Output_Variables:
+  - "ARMCD"
+  - "$subjects_with_disposition_event"
+Source:
+  Message: "No DISPOSITION EVENT record found for subject"
+  Description: "All subjects (USUBJID) should have at least one record in the Disposition\
+    \ (DS) domain with Disposition Category (DSCAT) equal to DISPOSITION EVENT. Subjects\
+    \ with ARMCD='SCRNFAIL', ARMCD = null, or ARMCD='NOTASSGN' are excluded from this\
+    \ check.  If the study is ongoing, Parameter Value (TSVAL) for the 'ONGOSIND/Ongoing\
+    \ Study Indicator' parameter should be set to 'Y' in the Trial Summary (TS) domain."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2288"
+        Version: "1"
+      Version: "6.0"

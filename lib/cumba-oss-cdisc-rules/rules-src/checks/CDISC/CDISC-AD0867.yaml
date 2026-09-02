@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0867"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both RACEN and RACE\
+  \ are populated, more than one value of RACEN is present within the dataset for\
+  \ a given value of RACE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(RACE) and not empty(RACEN) and has_multiple_values_for(RACEN, RACE)
+Outcome:
+  Message: "More than one value of RACEN is present for this value of RACE within\
+    \ the dataset."
+  Output_Variables:
+  - "RACE"
+  - "RACEN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "RACEN"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of RACEN for a given value of RACE, considering only those rows on which\
+    \ both variables are populated."
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of RACEN\
+    \ for a given value of RACE"
+  Condition_Failure: "On rows where both RACEN and RACE are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR867"
+        Version: "1"
+      Version: "5.0"

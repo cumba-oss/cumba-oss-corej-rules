@@ -1,0 +1,41 @@
+name: PMDA-AD0227-absent
+kind: rule
+description: |
+  EC-25 pin (Fix #116): PMDA-AD0227 checks TRTSEQP consistency per TRTSEQPN via
+  is_inconsistent_across_dataset, guarded by a faithful `TRTSEQPN exists` leaf
+  (R-4.11a: unique-set/inconsistency comparator guards stay in the Check). On a
+  conformant dataset where the Perm TRTSEQPN column is entirely ABSENT, the guard
+  is false — but business-rules `all` evaluates every leaf, so before Fix #116 the
+  operator died on pandas groupby([]) (ValueError → rule execution error).
+
+  UPDATED by EC-44 / Fix #134: an empty grouping list no longer yields all-False. An
+  absent comparator cannot tell two rows apart, so all rows form ONE consistency class
+  and the minority TRTSEQP ('B-A') is inconsistent within it — on BOTH lanes
+  (GroupSemantics.inconsistentAcrossDatasetViolations no longer short-circuits;
+  _check_inconsistency iterates a single group). The EC-25 reason for the original
+  guard still holds and is still satisfied: iterating one group keeps pandas away from
+  groupby([]), so the operator still cannot die on conformant data.
+
+  The EXPECTATION IS UNCHANGED — ZERO findings and ZERO errors — because the faithful
+  `TRTSEQPN exists` guard is false and one false leaf kills the `all:`. That is what
+  makes this spec stronger after Fix #134 than before: it now proves the GUARD does the
+  masking, where previously the operator's own early return did it and the guard was
+  never tested.
+python_source: rules-pmda-adamig-1-3.json (PMDA-AD0227)
+rule:
+  coreId: PMDA-AD0227
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', TRTSEQP: 'A-B'}
+      - {STUDYID: S1, USUBJID: '002', TRTSEQP: 'A-B'}
+      - {STUDYID: S1, USUBJID: '003', TRTSEQP: 'B-A'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations: []
+expected_errors: []

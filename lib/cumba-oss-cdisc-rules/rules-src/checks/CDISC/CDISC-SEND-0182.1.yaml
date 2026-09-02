@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-SEND-0182.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Specimen Usability for the Test (--SPCUFL) is populated\
+  \ with a value other than \"N\"."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+    - "MA"
+    - "MI"
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "--SPCUFL"
+Check:
+  expression: >-
+    not empty(--SPCUFL) and --SPCUFL != "N"
+Outcome:
+  Message: "--SPCUFL is populated with a value other than \"N\"."
+  Output_Variables:
+  - "--SPCUFL"
+Source:
+  Class: "FND"
+  Domain: "LB, MA, MI, PC"
+  Variable: "--SPCUFL"
+  Plain_Text_Explanation: "--SPCUFL should be \"N\" or null."
+  Condition: "--SPCUFL ^=null"
+  Rule: "--SPCUFL = \"N\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND182.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND182.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND182.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND182.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND182.1"
+        Version: "1"
+      Version: "5.0"

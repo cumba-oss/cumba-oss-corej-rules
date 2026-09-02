@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0195"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Pharmacokinetics Parameters (PP) record\
+  \ exists for the same combination of subject or pool (USUBJID, POOLID), pharmacokinetic\
+  \ parameter (PPTESTCD), time-concentration profile (PPTPTREF, PPRFTDTC), and specimen\
+  \ (PPSPEC); the PP domain expects one record per pharmacokinetic parameter per time-concentration\
+  \ profile per specimen per subject or pool."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, POOLID, PPTESTCD, PPTPTREF, PPRFTDTC, PPSPEC])
+Outcome:
+  Message: "More than one PP record exists for the same pharmacokinetic parameter,\
+    \ time-concentration profile, and specimen within a subject or pool."
+  Output_Variables:
+  - "POOLID"
+  - "PPTESTCD"
+  - "PPSPEC"
+  - "PPTPTREF"
+  - "PPRFTDTC"
+Source:
+  Class: "FND"
+  Domain: "PP"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per pharmacokinetic parameter per time-concentration\
+    \ profile per specimen per subject or pool."
+  Rule: "One record per pharmacokinetic parameter per time-concentration profile per\
+    \ specimen per subject or pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND195"
+        Version: "1"
+      Version: "5.0"

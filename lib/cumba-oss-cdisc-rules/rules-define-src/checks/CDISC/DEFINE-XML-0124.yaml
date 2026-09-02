@@ -1,0 +1,19 @@
+Rule_Id: "DEFINE-XML-0124"
+Sheet_Rule_Identifier: "124"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The def:StandardOID attribute on the ItemGroupDef element must reference an existing def:Standard element with Type=\"IG\"."
+Message: "There is no def:Standard of type 'IG' with an OID attribute that matches the ItemGroupDef def:StandardOID value [${value}]."
+# Deviation (documented): the references kind cannot constrain attributes of the
+# resolved target, so the Type="IG" refinement is not enforced — a def:StandardOID
+# resolving to a def:Standard of another Type (e.g. "CT") passes. Dangling
+# references (the common defect) are caught. Flagged for the DSL discussion
+# (references-with-target-filter, same gap family as the deferred 105/106/251/252).
+Check:
+  kind: "references"
+  attribute: "StandardOID"
+  targetElement: "Standard"
+  targetKey: "OID"

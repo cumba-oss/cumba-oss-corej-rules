@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-AD0607 expect=violation domain=ADLBC
+#note "Row 1: driver APHASEN=1 -> ADSL.PH1STM=43200, PHSTM 43260 != 43200 -> fires. Row 2: driver APHASEN=1 -> ADSL.PH1STM=43200, PHSTM 43200 == 43200 -> silent. Join ADSL on Keys=[USUBJID], loader-default inner, 1:1. Scope correctly authored as Data_Structures [BDS, OCCDS]."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 APHASEN=1 PHSTM=43260
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col APHASEN  type=Num
+col PHSTM    type=Num
+---
+S1 | 01-701-1015 | ALB | 30 | 1 | 43260
+S1 | 01-701-1023 | ALB | 31 | 1 | 43200
+---
+
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1STM  type=Num
+---
+S1 | 01-701-1015 | 43200
+S1 | 01-701-1023 | 43200

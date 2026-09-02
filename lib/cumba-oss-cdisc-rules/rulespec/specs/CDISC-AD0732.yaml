@@ -1,0 +1,55 @@
+name: CDISC-AD0732
+kind: rule
+description: |
+  Fix #25 — multi-column `within` on `has_multiple_values_for`. Within a
+  (USUBJID, PARAMCD) group, BASE must have a consistent value for the
+  same BASEC value. Pre-fix the rule had `within: "PARAMCD"` only —
+  partitioning by PARAMCD across all subjects would over-flag (different
+  subjects can legitimately have different mappings); now the rule uses
+  `within: ["USUBJID", "PARAMCD"]`.
+
+  USUBJID=001 has two HGB rows with BASEC='Normal' but different BASE
+  values (13.0 vs 14.0) → both rows fire. USUBJID=002 has a consistent
+  HGB mapping. USUBJID=001's GLUC group is single-row → no fire.
+python_notes: |
+  Baselined on Python lane: Python's `dataframe_operators` lacks
+  `has_multiple_values_for` entirely (Fix #25 Python-side track).
+  Will un-baseline once the operator lands on Python.
+python_source: rules-adamig-1-3.json (CDISC-AD0732)
+rule:
+  coreId: CDISC-AD0732
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      BASE: DOUBLE
+      AVISITN: LONG
+    rows:
+    - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, BASE: 13.0, BASEC: 'Normal'}
+    - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 2, BASE: 14.0, BASEC: 'Normal'}
+    - {STUDYID: S1, USUBJID: '001', PARAMCD: 'GLUC', AVISITN: 1, BASE: 5.0, BASEC: 'Normal'}
+    - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, BASE: 16.0, BASEC: 'High'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+- rule_id: CDISC-AD0732
+  dataset: ADLB
+  row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+  status: SUCCESS
+  output_variables:
+    BASE: '13'
+    BASEC: Normal
+    PARAMCD: HGB
+- rule_id: CDISC-AD0732
+  dataset: ADLB
+  row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 2}
+  status: SUCCESS
+  output_variables:
+    BASE: '14'
+    BASEC: Normal
+    PARAMCD: HGB
+expected_errors: []

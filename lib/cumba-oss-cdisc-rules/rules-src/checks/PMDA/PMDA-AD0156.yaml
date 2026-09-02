@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0156"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Criterion y Evaluation Result Flag (CRITyFL)\
+  \ variable is present in the dataset but the corresponding Analysis Criterion y\
+  \ (CRITy) variable is not present; whenever CRITyFL is present, its companion CRITy\
+  \ must also be present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("CRITyFL") and not var_exists("CRITy")
+Outcome:
+  Message: "CRITyFL is present, but CRITy is not present"
+  Output_Variables:
+  - "CRITyFL"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "CRITyFL is present, but CRITy is not present"
+  Description: "If Criterion y Flag (CRITyFL) variable is present, there must also\
+    \ be a corresponding Criterion y (CRITy) variable."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0156"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0156"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0156"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0156"
+        Version: "1"
+      Version: "6.0"

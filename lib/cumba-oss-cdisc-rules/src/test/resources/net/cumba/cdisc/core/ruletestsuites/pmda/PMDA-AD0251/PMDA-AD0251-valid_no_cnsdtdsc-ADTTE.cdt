@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0251 expect=noViolation domain=ADTTE
+#note "Isolates the leading `var_exists(\"CNSDTDSC\")` conjunct: CNSDTDSC and CNSR are both absent while EVNTDESC is present, so this rule executes and stays silent. This is exactly the dataset on which the broader PMDA-AD0250 DOES fire (via its EVNTDESC arm) - the discriminating pair for the subsumption note."
+#library standard=adamig version=1-3
+dataset ADTTE structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col STARTDT  type=Num
+col EVNTDESC type=Char
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 120 | 21915 | DEATH
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 300 | 21915 | DEATH

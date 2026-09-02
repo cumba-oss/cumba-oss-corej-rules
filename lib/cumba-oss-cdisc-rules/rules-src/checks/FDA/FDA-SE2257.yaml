@@ -1,0 +1,34 @@
+Core:
+  Id: "FDA-SE2257"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TPSTGORD (Order of Repro Stage within Repro Path)\
+  \ is populated with a value that is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Check:
+  expression: >-
+    not empty(TPSTGORD) and not is_integer(TPSTGORD)
+Outcome:
+  Message: "TPSTGORD is not an integer value."
+  Output_Variables:
+  - "TPSTGORD"
+Source:
+  FDA_Validator_Rule_Message: "Invalid value for TPSTGORD"
+  FDA_Validator_Rule_Description: "Order of Repro Stage within Repro Path (TPSTGORD)\
+    \ variable value must be an integer."
+  Domains: "TP"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2257"
+        Version: "1"
+      Version: "1.6"

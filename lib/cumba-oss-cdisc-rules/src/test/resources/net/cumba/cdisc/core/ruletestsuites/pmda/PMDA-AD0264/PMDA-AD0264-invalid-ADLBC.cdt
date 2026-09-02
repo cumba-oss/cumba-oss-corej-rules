@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0264 expect=violation domain=ADLBC
+#note "ASTTMF populated, ASTTM missing -> fires. ASTTM is Num (SAS seconds since midnight), plain integers not ISO times."
+#expectViolationCount 1
+#expectViolationAt row=1 ASTTMF=H
+#library standard=adamig version=1-1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASTTM   type=Num
+col ASTTMF  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT |  | H
+CDISCPILOT01 | 01-701-1023 | ALT | 30600 | H
+---

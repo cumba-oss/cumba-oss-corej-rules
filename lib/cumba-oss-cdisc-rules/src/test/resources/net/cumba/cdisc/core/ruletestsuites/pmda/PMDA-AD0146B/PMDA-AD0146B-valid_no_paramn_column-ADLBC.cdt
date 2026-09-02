@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0146B expect=noViolation domain=ADLBC
+#note "PARAMN is not declared, so not empty(PARAMN) is false on every row (an absent column folds to all-missing) and the rule is EXECUTED-and-silent even though the degraded key would otherwise collapse the dataset into one group and flag row 3. No Requirements.Variables block on this rule, so noViolation, NOT skipped -- the observable difference from sibling PMDA-AD0147B."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+S1 | 001 | ALB | Albumin
+S1 | 002 | ALB | Albumin
+S1 | 003 | ALB | Bilirubin

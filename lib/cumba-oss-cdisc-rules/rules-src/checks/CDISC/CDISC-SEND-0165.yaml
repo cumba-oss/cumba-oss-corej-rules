@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-SEND-0165"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Test Name (DDTEST) is not \"Death Diagnosis\"\
+  \ in the Death Diagnosis and Details (DD) domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DD"
+Requirements:
+  Variables:
+    All:
+    - "DDTEST"
+Check:
+  expression: >-
+    DDTEST != "Death Diagnosis"
+Outcome:
+  Message: "DDTEST is not \"Death Diagnosis\"."
+  Output_Variables:
+  - "DDTEST"
+Source:
+  Class: "FND"
+  Domain: "DD"
+  Variable: "DDTEST"
+  Plain_Text_Explanation: "The value in DDTEST should always be \"Death Diagnosis\"\
+    ."
+  Rule: "DDTEST = \"Death Diagnosis\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND165"
+        Version: "1"
+      Version: "5.0"

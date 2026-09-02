@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2225 expect=violation domain=TS
+#note "No TSPARMCD=TRMSAC record anywhere in TS -> the 'Time to Terminal Sacrifice' parameter is missing, one dataset-level finding. Note the TR-prefixed parameters TRT and TRTV are present but neither is TRMSAC."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TRT | Investigational Therapy or Treatment | COMPOUND X
+S01 | TS | 2 | TRTV | Treatment Vehicle | SALINE
+S01 | TS | 3 | STSTDTC | Study Start Date | 2023-06-01

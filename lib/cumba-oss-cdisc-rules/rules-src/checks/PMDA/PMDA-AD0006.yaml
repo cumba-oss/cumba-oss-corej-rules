@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-AD0006"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'FN' (a numeric flag)\
+  \ has a value other than 0, 1 or missing. Exceptions (allowed other values): *RFN,\
+  \ *PFN, ABLFN, ANLzzFN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    ends_with(varname(), "FN") and varname() !~ /^(.*RFN|.*PFN|ABLFN|ANL(0[1-9]|[1-9][0-9])FN)$/ and
+    not empty(value()) and value() not in [0, 1]
+Outcome:
+  Message: "A variable whose name ends in 'FN' has a value that is not 0, 1 or missing."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "*FN value is not 0, 1 or null"
+  Description: "A variable with a suffix of FN has a value that is not 0, 1 or null\
+    \ (Exception: RFN, PFN, ABLFN, ANLzzFN and population flags Numeric COMPLFN, FASFN,\
+    \ ITTFN, PPROTFN, SAFFN, RANDFN, ENRLFN cannot be null and at least 1 must be\
+    \ included in ADSL)."
+  Domains: "ADSL, BDS, OCCDS, ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0006"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0006"
+        Version: "1"
+      Version: "6.0"

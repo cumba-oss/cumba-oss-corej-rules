@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1326 expect=violation domain=APLB
+#note "DECISION-LANE FLIP FIXTURE for finding SD1326-F1 - pins TODAY'S behaviour. APLB is a 4-character AP dataset that the PMDA sheet row (DOMAINS = 'APDM, APAE, APMH, APRELSUB') never lists, yet the shipped AP-- token (prefix + exactly two characters) matches it, so the rule EXECUTES and FIRES today. If the M2 lane narrows the Include to the sheet's four domains, this file flips to expect=skipped (drop the count/at lines, rename to skipped_aplb_out_of_scope-APLB)."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 RSUBJID=001
+dataset APLB label="Associated Persons Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col RDEVID  type=Char label="Related Device Identifier"
+---
+S1 | APLB | AP-001 | 1 | 001 | DEV-01

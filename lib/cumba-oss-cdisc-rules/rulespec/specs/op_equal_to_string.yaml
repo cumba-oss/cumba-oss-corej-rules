@@ -1,0 +1,40 @@
+name: op_equal_to_string
+kind: check_operator
+description: |
+  Hand-authored Milestone-1 pilot spec for the check_operator scaffold.
+  Fires for every row where SEX == "M".
+check:
+  name: SEX
+  operator: equal_to
+  value: "M"
+  value_is_literal: true
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: "S1", USUBJID: "001", AESEQ: 1, SEX: "M"}
+    - {STUDYID: "S1", USUBJID: "002", AESEQ: 1, SEX: "F"}
+    - {STUDYID: "S1", USUBJID: "003", AESEQ: 1, SEX: "M"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+expected_violations:
+- rule_id: AUTO-op_equal_to_string
+  dataset: AE
+  row_key: {STUDYID: "S1", USUBJID: "001", AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    SEX: M
+    STUDYID: S1
+    USUBJID: '001'
+- rule_id: AUTO-op_equal_to_string
+  dataset: AE
+  row_key: {STUDYID: "S1", USUBJID: "003", AESEQ: 1}
+  status: SUCCESS
+  output_variables:
+    AESEQ: '1'
+    SEX: M
+    STUDYID: S1
+    USUBJID: '003'
+expected_errors: []

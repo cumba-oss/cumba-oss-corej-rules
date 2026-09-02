@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0807"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a dataset, there is more than one value\
+  \ of SUBJTYPC for a given value of SUBJTYP, considering only records where both\
+  \ variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(SUBJTYP) and not empty(SUBJTYPC) and has_multiple_values_for(SUBJTYPC, SUBJTYP)
+Outcome:
+  Message: "Within this dataset, more than one value of SUBJTYPC is present for the\
+    \ same populated value of SUBJTYP"
+  Output_Variables:
+  - "SUBJTYP"
+  - "SUBJTYPC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SUBJTYPC"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of SUBJTYPC for a given value of SUBJTYP, considering only those rows\
+    \ on which both variables are populated."
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of SUBJTYPC\
+    \ for a given value of SUBJTYP"
+  Condition_Failure: "On rows where both SUBJTYPC and SUBJTYP are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR807"
+        Version: "1"
+      Version: "5.0"

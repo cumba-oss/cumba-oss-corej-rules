@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0001 expect=violation domain=LB
+#note "Non-custom LB domain: the define's DOMAIN item is bound to the SDTM Domain Abbreviations codelist (ccode C66734), whose declared CodedValue LB carries alias C99999 -- not among the library's published domain codes {C11111, C22222} -> fires. Authored Sensitivity Dataset caps the finding at one."
+#library standard=sdtmig version=3-4
+#library codelist-terms DOMAIN C11111 C22222
+#define-xml CDISC-CG0001-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_ccode=C66734
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+---
+S1 | LB | 001 | 1 | GLUC

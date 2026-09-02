@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0537 expect=violation domain=DS
+#note "Neither EPOCH nor DSSCAT is present. DSSCAT not_exists is satisfied (this is the DSSCAT-absent half of the sheet pair) and the EPOCH exists guard was REMOVED, so the key degrades to (DSCAT, USUBJID) and the duplicate subject is flagged. Pinned at 1 finding. This rule groups on [USUBJID, EPOCH]; EPOCH is absent and is dropped, leaving two USUBJID groups, so the fixture's ceiling is 2 - the pin discriminates 1 from 2, not from 3."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT
+CDISCPILOT01 | DS | 01-701-1023 | 3 | DISPOSITION EVENT
+---

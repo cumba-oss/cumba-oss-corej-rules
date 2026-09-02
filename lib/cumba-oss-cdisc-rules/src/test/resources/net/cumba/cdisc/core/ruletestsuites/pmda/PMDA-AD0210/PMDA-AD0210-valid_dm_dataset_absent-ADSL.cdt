@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0210 expect=noViolation domain=ADSL
+#note "MECHANISM PIN - authored dotted applicability guard. NO DM block at all. With DM absent the KeyMatchRowExpander skips the join entry (rows kept) and `var_exists(DM.ARM)` resolves FALSE via the DatasetResolver -> the rule EXECUTES and reports nothing (noViolation, NOT skipped). This is the guard the machine derivation does not supply (dotted operand) - the author wrote it, and this fixture is what it buys."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ARM     type=Char
+---
+S1 | 01-701-1015 | DRUGA
+S1 | 01-701-1023 | PLACEBO

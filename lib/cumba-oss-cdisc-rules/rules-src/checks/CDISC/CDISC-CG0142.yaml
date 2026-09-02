@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-CG0142"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Reference End Date/Time (RFENDTC) is empty\
+  \ for a randomized subject, that is a subject whose Actual Arm Code (ACTARMCD) is\
+  \ populated and is not equal to 'SCRNFAIL' or 'NOTASSGN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in ["SCRNFAIL", "NOTASSGN"] and empty(RFENDTC)
+Outcome:
+  Message: "RFENDTC is empty for a randomized subject (ACTARMCD is populated and not\
+    \ equal to 'SCRNFAIL' or 'NOTASSGN')."
+  Output_Variables:
+  - "RFENDTC"
+  - "ACTARMCD"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFENDTC"
+  Condition: "Milestone associated with RFENDTC is end of treatment and ACTARM not\
+    \ in (‘Screen Failure’, ‘Not Assigned’, ‘Not Treated’)"
+  Rule: "RFENDTC ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0142"
+        Version: "2"
+      Version: "2.0"

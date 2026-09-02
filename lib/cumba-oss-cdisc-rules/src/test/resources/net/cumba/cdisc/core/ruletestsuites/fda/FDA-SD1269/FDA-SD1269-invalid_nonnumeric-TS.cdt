@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1269 expect=violation domain=TS
+#note "The FDA text requires the randomisation quotient to 'always be a number between 0 and 1'. Row 1 spells the ratio out in words and row 2 gives an allocation ratio, so neither is a number in 0..1 -> both must be reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 TSPARMCD=RANDQT
+#expectViolationAt row=2 TSPARMCD=RANDQT
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | RANDQT  | Randomization Quotient     | ONE HALF
+S1 | TS | 2 | RANDQT  | Randomization Quotient     | 2:1
+S1 | TS | 3 | PLANSUB | Planned Number of Subjects | 306

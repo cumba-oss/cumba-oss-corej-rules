@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0342 expect=noViolation domain=TS
+#note "One SDESIGN record: $sdesign_count is 1, `1 > 1` is false, the rule executes and reports nothing."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SDESIGN | Study Design | PARALLEL
+S1 | TS | 2 | TITLE   | Trial Title  | Study X
+---

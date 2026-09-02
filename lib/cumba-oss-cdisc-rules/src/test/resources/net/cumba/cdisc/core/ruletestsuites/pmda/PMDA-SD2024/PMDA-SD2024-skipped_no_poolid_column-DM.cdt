@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD2024 expect=skipped domain=DM
+#note "REQUIREMENTS.VARIABLES skip: the rule is Scope.Domains.Include [ALL] so the domain axis admits DM, but Requirements.Variables.All [POOLID] skips any dataset that does not carry POOLID and the skip row names the absent variable. USUBJID is populated here, so without that gate the rule would simply have been silent - the scenario proves the gate converts that silence into an auditable skip."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | DM | 01-701-1015 | 56

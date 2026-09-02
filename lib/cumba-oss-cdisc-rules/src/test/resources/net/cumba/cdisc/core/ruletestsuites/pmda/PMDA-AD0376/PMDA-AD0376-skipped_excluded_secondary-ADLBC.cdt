@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0376 expect=skipped domain=ADLBC
+#note "Columns EXACTLY STUDYID/USUBJID/PARAM/PARAMN - and NOTHING else ending in N or C (deliberately NO PARAMCD here, and PARAM ends in M). Data that WOULD fire were PARAMN not excluded. PARAMN is listed in the rule's _wildcardExclude, so isExcludedSecondary drops it as a seed; with no other candidate the expansion set is empty -> NoMatch -> the rule does NOT execute. This is the fixture that pins _wildcardExclude doing real work and it MUST be expect=skipped."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Glucose |

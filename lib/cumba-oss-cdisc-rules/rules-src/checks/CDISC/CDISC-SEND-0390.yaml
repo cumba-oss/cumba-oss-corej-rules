@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-SEND-0390"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Repro Phase Day of First Exposure (RPRFDY)\
+  \ is populated with a value other than 0 or 1."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Check:
+  expression: >-
+    not empty(RPRFDY) and RPRFDY not in [0, 1]
+Outcome:
+  Message: "RPRFDY is populated with a value other than 0 or 1."
+  Output_Variables:
+  - "RPRFDY"
+Source:
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "RPRFDY"
+  Plain_Text_Explanation: "RPRFDY must be 0 or 1."
+  Rule: "RPRFDY = \"0\" OR RPRFDY = \"1\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND390"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND390"
+        Version: "1"
+      Version: "5.0"

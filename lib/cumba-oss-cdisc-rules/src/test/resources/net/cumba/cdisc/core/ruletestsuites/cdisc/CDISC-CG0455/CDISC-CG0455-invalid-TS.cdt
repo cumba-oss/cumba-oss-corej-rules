@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0455 expect=violation domain=TS
+#note "D-TA-6d: the rule requires the CURRENT pharmacological-class terminology MED-RT; row 1 cites the retired NDF-RT -> fires. This KNOWINGLY deviates from the CDISC sheet's literal 'NDF-RT' (superseded terminology; sheet issue #111 records the deviation). Row 2 is a non-PCLAS parameter -> silent."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=PCLAS TSVCDREF=NDF-RT
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+---
+S1 | TS | 1 | PCLAS   | Pharmacological Class of Invest. Therapy | ANTICOAGULANTS | NDF-RT
+S1 | TS | 2 | PLANSUB | Planned Number of Subjects               | 306            |

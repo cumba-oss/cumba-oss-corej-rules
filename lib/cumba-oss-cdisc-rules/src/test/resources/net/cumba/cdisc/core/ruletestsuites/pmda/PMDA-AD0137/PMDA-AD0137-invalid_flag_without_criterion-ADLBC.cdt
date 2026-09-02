@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0137 expect=violation domain=ADLBC
+#note "CRIT1FL populated but parent CRIT1 empty on row 1 -> fires. Row 2 both populated -> silent. ONE expansion (y=1), no extra CRIT2*/CRIT1FN column."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 CRIT1FL=Y
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1   type=Char
+col CRIT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT |            | Y
+CDISCPILOT01 | 01-701-1023 | ALT | AGE-GT-60   | Y
+---

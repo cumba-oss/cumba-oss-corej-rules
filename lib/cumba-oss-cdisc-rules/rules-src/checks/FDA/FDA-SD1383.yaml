@@ -1,0 +1,60 @@
+Core:
+  Id: "FDA-SD1383"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Day of Obs Relative to Exposure (--XENDY) is\
+  \ populated and both the date portion of --ENDTC and the date portion of RFXSTDTC\
+  \ are complete dates, but --XENDY does not equal the value computed by the study\
+  \ day algorithm relative to the Date/Time of First Study Treatment (RFXSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--XENDY"
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Operations:
+- id: "$value_xendy_algorithm"
+  expression: "dy(--ENDTC, reference=\"RFXSTDTC\")"
+Check:
+  expression: >-
+    not empty(--XENDY) and is_complete_date(--ENDTC) and is_complete_date(DM.RFXSTDTC) and --XENDY
+    != $value_xendy_algorithm
+Outcome:
+  Message: "End Day of Obs Relative to Exposure (--XENDY) does not equal the value\
+    \ derived by the study day algorithm against RFXSTDTC even though the date portions\
+    \ of --ENDTC and RFXSTDTC are complete dates and --XENDY is populated."
+  Output_Variables:
+  - "$value_xendy_algorithm"
+  - "--ENDTC"
+  - "--XENDY"
+  - "DM.RFXSTDTC"
+Source:
+  FDA_Validator_Rule_Message: "Incorrect value for --XENDY variable"
+  FDA_Validator_Rule_Description: "End Day of Obs Relative to Exposure (--XENDY) variable\
+    \ value should be populated as defined by CDISC standards: --XENDY = (date portion\
+    \ of --ENDTC) - (date portion of RFXSTDTC) +1 if --ENDTC is on or after RFXSTDTC;\
+    \ --XENDY = (date portion of --DTC) - (date portion of RFXSTDTC) if --ENDTC precedes\
+    \ RFXSTDTC."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1383"
+        Version: "1"
+      Version: "1.6"

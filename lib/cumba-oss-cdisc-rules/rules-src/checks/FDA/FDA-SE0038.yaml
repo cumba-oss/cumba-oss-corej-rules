@@ -1,0 +1,39 @@
+Core:
+  Id: "FDA-SE0038"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Study Day variable (a variable whose name ends\
+  \ in DY) is populated with a value equal to 0. Study Day values are non-zero by\
+  \ definition (there is no study day 0)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "EVENTS"
+    - "FINDINGS ABOUT"
+Check:
+  expression: >-
+    ends_with(varname(), "DY") and not empty(value()) and value() == 0
+Outcome:
+  Message: "Study Day (DY) variable value equals 0."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  FDA_Validator_Rule_Message: "Value of Study Day variable equals 0"
+  FDA_Validator_Rule_Description: "Study Day variables (*DY) value should not equal\
+    \ 0."
+  Domains: "INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0038"
+        Version: "1"
+      Version: "1.6"

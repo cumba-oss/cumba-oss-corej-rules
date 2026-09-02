@@ -1,0 +1,61 @@
+Core:
+  Id: "PMDA-AD0492"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Shift y (SHIFTy) is present in a dataset but none\
+  \ of the variable pairs it can describe are present. A SHIFTy must be based on the\
+  \ change in value of at least one of the pairs (BASECATy/AVALCATy), (BNRIND/ANRIND),\
+  \ (ByIND/AyIND), (BTOXGR/ATOXGR), (BTOXGRL/ATOXGRL), (BTOXGRH/ATOXGRH), (BASE/AVAL)\
+  \ or (BASEC/AVALC), so at least one of those variables must be present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("SHIFTy") and not var_exists("BASECATy") and not var_exists("AVALCATy") and not
+    var_exists("BNRIND") and not var_exists("ANRIND") and not var_exists("ByIND") and not
+    var_exists("AyIND") and not var_exists("BTOXGR") and not var_exists("ATOXGR") and not
+    var_exists("BTOXGRL") and not var_exists("ATOXGRL") and not var_exists("BTOXGRH") and not
+    var_exists("ATOXGRH") and not var_exists("BASE") and not var_exists("AVAL") and not
+    var_exists("BASEC") and not var_exists("AVALC")
+Outcome:
+  Message: "SHIFTy is present and all of the following variable pairs (BASECATy, AVALCATy),\
+    \ (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR, ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH,\
+    \ ATOXGRH), (BASE, AVAL) and (BASEC, AVALC) are not present."
+  Output_Variables:
+  - "SHIFTy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "SHIFTy is present and all of the following variable pairs (BASECATy, AVALCATy),\
+    \ (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR, ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH,\
+    \ ATOXGRH), (BASE, AVAL) and (BASEC, AVALC) are not present"
+  Description: "If Shift $y (SHIFTy) variable is present, the variable pair it is\
+    \ describing should also be present. Pairs include (BASECATy/ AVALCATy), (BNRIND/ANRIND),\
+    \ (ByIND/AyIND), (BTOXGR/ATOXGR), (BTOXGRL/ATOXGRL), (BTOXGRH/ATOXGRH), (BASE/AVAL)\
+    \ and (BASEC/AVALC)."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0492"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0492"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,28 @@
+Rule_Id: "PMDA-DD0111"
+Sheet_Rule_Identifier: "DD0111"
+Rule_Set: "PMDA"
+Element: "Origin/DocumentRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "For Define-XML v2.0, the Pages field must be empty when Origin Type is not 'CRF'. For Define-XML v2.1, the Pages field is required when Origin Type is 'Collected' and Source is 'Investigator' or 'Subject'. Define-XML specification represents Pages as def:PDFPageRef elements within def:DocumentRef element."
+Message: "Invalid use of Pages"
+# The negative leg of PMDA-DD0035: pages provided where the origin does not
+# call for them. The row's 2.1 sentence merely restates DD0035; its negative
+# reading (pages must be empty when NOT Collected+Investigator/Subject) is
+# applied here (judgment, documented). Version legs dispatch organically via
+# the Origin Type vocabulary as in PMDA-DD0035. No direct CDISC twin (0044 is
+# the positive leg).
+Check:
+  kind: "not_exists"
+  target: "def:PDFPageRef"
+  when:
+    not:
+      any:
+      - path: "../@Type"
+        equals: "CRF"
+      - all:
+        - path: "../@Type"
+          equals: "Collected"
+        - path: "../@Source"
+          oneOf: ["Investigator", "Subject"]

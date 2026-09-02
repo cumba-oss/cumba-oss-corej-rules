@@ -1,0 +1,78 @@
+name: EC18-date-diff-mode3-sided
+kind: rule
+description: |
+  EC-18 / P5c capability demonstration — `date_diff_days` Mode 3 (foreign minuend) driven by a
+  sided `--SPID` per-record match, exercised end-to-end on BOTH engines with a SYNTHETIC inline
+  rule (NOT the shipped CDISC-SEND-0202, whose authoring is HELD pending the soft-`--SPID`-key
+  decision, Q-20b iii). The operation reads the minuend PMDTC from the PM record whose PMSPID
+  matches each TF row's TFSPID (the `--SPID` mass linkage, resolved per side: TF->TFSPID,
+  PM->PMSPID), then subtracts the per-subject earliest EXSTDTC (Mode-2 grouped-min sourced from
+  EX by USUBJID) and adds the +1 offset. Check fires when a populated TFDETECT differs from that
+  computed interval.
+
+  Rows:
+    - 1001/M1: PMDTC 2020-01-20, min EXSTDTC 2020-01-05 -> (15)+1 = 16, TFDETECT 16 -> no fire
+    - 1002/M2: PMDTC 2020-02-11, min EXSTDTC 2020-02-01 -> (10)+1 = 11, TFDETECT 99 -> FIRE
+    - 1003/M3: PMDTC 2020-03-06, min EXSTDTC 2020-03-01 -> (5)+1  = 6,  TFDETECT ''  -> no fire (guard)
+rule:
+  id: ec18-date-diff-mode3
+  Core: {Id: EC18-DATEDIFF-MODE3}
+  Description: TFDETECT must equal the days from earliest EXSTDTC to the SPID-matched PMDTC, plus one.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [TF]}
+    Use_Case: NONCLIN
+  Match_Datasets:
+    - Name: EX
+      Keys: [USUBJID]
+  Operations:
+    - id: $days
+      operator: date_diff_days
+      name: PMDTC
+      minuend_domain: PM
+      minuend_match: [USUBJID, "--SPID"]
+      domain: EX
+      group: [USUBJID]
+      reference: EXSTDTC
+      offset: "1"
+  Check:
+    all:
+      - {name: TFDETECT, operator: non_empty}
+      - {name: TFDETECT, operator: not_equal_to, value: $days}
+  Outcome:
+    Message: TFDETECT does not equal (SPID-matched PMDTC - earliest EXSTDTC) + 1.
+    Output_Variables: [$days, TFDETECT]
+datasets:
+  TF:
+    row_key: [STUDYID, USUBJID, TFSEQ]
+    column_types:
+      TFDETECT: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1001', TFSEQ: 1, TFSPID: M1, TFDETECT: '16'}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1002', TFSEQ: 1, TFSPID: M2, TFDETECT: '99'}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '1003', TFSEQ: 1, TFSPID: M3, TFDETECT: ''}
+  PM:
+    row_key: [STUDYID, USUBJID, PMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PM, USUBJID: '1001', PMSEQ: 1, PMSPID: M1, PMDTC: '2020-01-20'}
+      - {STUDYID: S1, DOMAIN: PM, USUBJID: '1002', PMSEQ: 1, PMSPID: M2, PMDTC: '2020-02-11'}
+      - {STUDYID: S1, DOMAIN: PM, USUBJID: '1003', PMSEQ: 1, PMSPID: M3, PMDTC: '2020-03-06'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1001', EXSEQ: 1, EXSTDTC: '2020-01-05'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1002', EXSEQ: 1, EXSTDTC: '2020-02-01'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '1003', EXSEQ: 1, EXSTDTC: '2020-03-01'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+expected_violations:
+  - rule_id: EC18-DATEDIFF-MODE3
+    dataset: TF
+    row_key: {STUDYID: S1, TFSEQ: 1, USUBJID: '1002'}
+    status: SUCCESS
+    output_variables:
+      $days: '11'
+      TFDETECT: '99'
+expected_errors: []

@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0127 expect=noViolation domain=SE
+#note "JOIN PIN. SE carries subject 002 only and DS carries subject 001 only, so the two share no join key. Match_Datasets [{Keys:[USUBJID], Name:DS}] declares no Join_Type, RulePackageLoader.normalizeJoinTypes stamps INNER, and the unmatched SE rows are dropped before the Check runs -- silent under BOTH the pre-M3-D1 == form and the shipped != form, the only 0127 scenario that is. NOT vacuous for want of data: is_last_in_group resolves over the two SE rows and DSSTDTC is populated; only the join partner is missing. ESCALATE if the harness reports SKIPPED rather than executed-with-no-violation."
+#library standard=sendig version=3-0
+#expectViolationCount 0
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 002 | 1 | SCRN | 2020-02-01 | 2020-02-10
+S1 | SE | 002 | 2 | TRT | 2020-02-10 | 2020-02-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-02-15
+---

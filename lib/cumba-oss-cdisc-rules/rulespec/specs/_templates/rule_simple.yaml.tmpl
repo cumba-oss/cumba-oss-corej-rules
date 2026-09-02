@@ -1,0 +1,28 @@
+name: "{{name}}"
+kind: rule
+description: "{{description}}"
+rule:
+  id: "{{rule_uuid}}"
+  Core: {Id: "{{rule_core_id}}"}
+  Description: "{{rule_description}}"
+  Rule_Type: Record Data
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [{{domain}}]}
+  Check:
+    all:
+      - {name: "{{column}}", operator: "{{operator}}", value: "{{value}}"}
+  Outcome:
+    Message: "{{message}}"
+    Output_Variables: [STUDYID, USUBJID, "{{column}}"]
+datasets:
+  {{domain}}:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: "S1", USUBJID: "001", {{column}}: "example"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+expected_violations: []
+expected_errors: []

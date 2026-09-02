@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1344 expect=noViolation domain=CM
+#note "All populated CMDECOD values match WHODrug PT terms of the dummy dictionary in their preferred case (Aspirin, Ibuprofen) - the flag-less rule compares case-sensitively per the D-TA-3 default (Fix #266); the blank CMDECOD row does not fire (completeness is another rule's concern) -> no violation."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | Aspirin 100mg | Aspirin
+S01 | CM | 001 | 2 | Brufen        | Ibuprofen
+S01 | CM | 002 | 1 | Unknown med   |

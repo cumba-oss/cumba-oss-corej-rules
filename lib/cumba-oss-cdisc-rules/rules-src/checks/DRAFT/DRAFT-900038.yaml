@@ -1,0 +1,28 @@
+Core:
+  Id: "DRAFT-900038"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when EOSSTT is populated with a value that is not from\
+  \ the subject-status controlled terminology (COMPLETED, DISCONTINUED, ONGOING)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "EOSSTT"
+Check:
+  expression: >-
+    not empty(EOSSTT) and EOSSTT not in ["COMPLETED", "DISCONTINUED", "ONGOING"]
+Outcome:
+  Message: "EOSSTT has a value not in the expected controlled terminology (COMPLETED,\
+    \ DISCONTINUED, ONGOING)."
+  Output_Variables:
+  - "EOSSTT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

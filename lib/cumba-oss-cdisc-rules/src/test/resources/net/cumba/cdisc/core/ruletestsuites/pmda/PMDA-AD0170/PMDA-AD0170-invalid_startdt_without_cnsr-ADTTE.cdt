@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0170 expect=violation domain=ADTTE
+#note "STARTDT is declared but CNSR is not, so a time-to-event dataset owes a censoring variable it does not carry. The Check is exists-only, so BroadcastFold decides it at dataset granularity and emits exactly one violation at internal row 0 (reported row 1), independent of the row count. STARTDT is the rule's single Output_Variable and its value is materialised from data row 1, so it can be pinned; CNSR must not be pinned because it is absent by construction and is silently omitted from the value map."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 STARTDT=21915
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 120 | 21915
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 300 | 21915

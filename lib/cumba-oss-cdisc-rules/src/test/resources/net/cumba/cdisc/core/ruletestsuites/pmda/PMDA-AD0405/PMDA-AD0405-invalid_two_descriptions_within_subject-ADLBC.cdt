@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0405 expect=violation domain=ADLBC
+#note "Group (001, GLUC) holds ATOXDSCH {GRADE1 x2, GRADE2 x1} -> row 3 is the lone minority; row 4 is a different subject and forms its own single-valued group. No wildcards."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=001 PARAMCD=GLUC ATOXDSCH=GRADE2
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVISITN  type=Num
+col AVAL     type=Num
+col ATOXDSCH type=Char
+---
+S1 | 001 | GLUC | 1 | 5.0 | GRADE1
+S1 | 001 | GLUC | 2 | 5.1 | GRADE1
+S1 | 001 | GLUC | 3 | 5.2 | GRADE2
+S1 | 002 | GLUC | 1 | 4.9 | GRADE3

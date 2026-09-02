@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0020B-B"
+Sheet_Rule_Identifier: "DD0020B"
+Rule_Set: "PMDA"
+Element: "MetaDataVersion"
+Attribute: "DefineVersion"
+Applicable_Versions: ["2.0"]
+Severity: "Reject"
+# Companion of PMDA-DD0020B (one sheet row, two version-gated legs): the
+# Define-XML 2.0 half - the only allowed value is the literal '2.0.0'.
+Plain_Text_Rule: "The def:DefineVersion should have a value of '2.0.0' for Define-XML v2.0 or '2.1.n' for Define-XML v2.1. The n in '2.1.n' reflects updates to the schema."
+Message: "Invalid def:DefineVersion value"
+Check:
+  kind: "matches_regex"
+  attribute: "DefineVersion"
+  pattern: '2\.0\.0'

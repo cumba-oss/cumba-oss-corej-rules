@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0680 expect=violation domain=ADDV
+# Rule:Description: On a given record, DEVTYGyN is populated and DEVTYGy is not populated
+#note "DEVTYG1N populated, DEVTYG1 empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADDV class="DEVICE LEVEL ANALYSIS DATASET"
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col DEVTYG1N type=Char
+col DEVTYG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01 | V1 | 
+---

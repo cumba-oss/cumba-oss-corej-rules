@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0247 expect=violation domain=ADTTE
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: The ADT and ADTM columns are ABSENT. The shipped third disjunct is `var_exists(\"ADT\") and empty(ADT) and var_exists(\"ADTM\") and empty(ADTM)` (the loader's derived guards), so an absent pair keeps the rule SILENT even though no analysis date is available anywhere. This fixture is the tell for finding AD0247-F1 and the discriminator the decision lane needs if it ever rules the other way; today it is green as written."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 30 | 22000 | 1

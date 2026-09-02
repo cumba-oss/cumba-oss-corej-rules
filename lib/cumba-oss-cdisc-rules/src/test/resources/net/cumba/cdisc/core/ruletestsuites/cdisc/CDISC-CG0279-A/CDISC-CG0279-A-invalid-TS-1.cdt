@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0279-A expect=violation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'STYPE' and TSVAL equal to 'INTERVENTIONAL' and the intervention type is one for which pharmacological class is applicable, but no record with TSPARMCD equal to 'PCLAS' is present in TS.
+#note "Interventional, INTTYPE=DRUG (pharmacological class applies), but no PCLAS record exists ($PCLAS_N == 0) -> one dataset-level finding."
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | STYPE | INTERVENTIONAL
+S01 | TS | 2 | INTTYPE | DRUG
+S01 | TS | 3 | TITLE | A Study of Drug X
+---

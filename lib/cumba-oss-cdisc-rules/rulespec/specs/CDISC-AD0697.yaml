@@ -1,0 +1,38 @@
+name: CDISC-AD0697
+kind: rule
+description: |
+  Wave C3 port — T2-Grouping (Sensitivity=Group). MDBDS class scope.
+  CDISC-AD0697: within (USUBJID, PARAMCD, SPDEVID), >1 record with
+  ABLFL=Y AND BASETYPE not present. Output_Variables: ABLFL.
+python_source: rules-adamig-1-3.json (CDISC-AD0697)
+rule:
+  coreId: CDISC-AD0697
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, SPDEVID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      # Group OK: exactly one ABLFL=Y
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, AVISITN: 0, ABLFL: Y}
+      - {STUDYID: S1, USUBJID: '001', SPDEVID: D1, PARAMCD: HGB, AVISITN: 1, ABLFL: ''}
+      # Group BAD: two ABLFL=Y, BASETYPE absent → violation at group first row
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, AVISITN: 0, ABLFL: Y}
+      - {STUDYID: S1, USUBJID: '002', SPDEVID: D2, PARAMCD: HGB, AVISITN: 1, ABLFL: Y}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    medical device basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0697
+    dataset: ADLB
+    row_key: {AVISITN: 0, PARAMCD: HGB, SPDEVID: D2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ablfl_y_count: '2'
+      ABLFL: Y
+      PARAMCD: HGB
+      SPDEVID: D2
+expected_errors: []

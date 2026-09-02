@@ -1,0 +1,67 @@
+Core:
+  Id: "PMDA-SD1335"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Date/Time of Informed Consent (RFICDTC) is\
+  \ after the Date/Time of First Study Treatment (RFXSTDTC)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXSTDTC"
+Check:
+  expression: >-
+    not empty(RFICDTC) and date(RFICDTC) > RFXSTDTC
+Outcome:
+  Message: "RFICDTC is after RFXSTDTC"
+  Output_Variables:
+  - "RFXSTDTC"
+  - "RFICDTC"
+Source:
+  Message: "RFICDTC is after RFXSTDTC"
+  Description: "Date/Time of Informed Consent (RFICDTC) should not be after Date/Time\
+    \ of First Study Treatment (RFXSTDTC)."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1335"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0192"
+Sheet_Rule_Identifier: "192"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "ct"
+Plain_Text_Rule: "For NCI/CDISC Controlled Terminology, CodedValue must exactly match the CDISC Submission Value from the published Controlled Terminology."
+# CodeListItem twin of DEFINE-XML-0179 (see there). Twin: PMDA-DD0024-B.
+Message: "CodeList[@Name]/CodeListItem[@CodedValue]/@CodedValue [${value}] does not match CDISC Submission Value for CDISC Controlled Terminology with C-Code CodeList[@Name]/Alias[@Name]."
+Check:
+  kind: "term_in_ct_codelist"
+  exemptExtendedValues: true
+  when:
+    path: "../@def:StandardOID"
+    exists: true

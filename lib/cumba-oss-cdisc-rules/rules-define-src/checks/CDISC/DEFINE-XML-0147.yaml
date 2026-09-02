@@ -1,0 +1,31 @@
+Rule_Id: "DEFINE-XML-0147"
+Sheet_Rule_Identifier: "147"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: "SASFieldName"
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The SASFieldName attribute must be provided for the ItemDef element when the Context is 'Submission' and the associated dataset is provided as SAS v5 XPT."
+# The sheet conditions an ItemDef attribute on the dataset that references it — a
+# reverse join the exists kind cannot navigate, so the rule is scoped to the
+# referencing ItemGroupDef/ItemRef and encoded with the 0124-B fire-always
+# vehicle: the guard states the violation (Submission context, the dataset's
+# def:ArchiveLocationID leaf href ends in .xpt, the ItemOID resolves, and the
+# resolved ItemDef has no SASFieldName), and the not_exists check on the
+# guard-guaranteed @ItemOID fires once per offending variable reference. The
+# finding therefore sits on the ItemRef, not the ItemDef (deviation, documented;
+# the ItemDef's OID is the ItemRef's ItemOID in the xpath).
+Message: "The SASFieldName attribute for the referenced ItemDef must be provided when ODM def:Context is 'Submission' and the dataset is provided as SAS v5 XPT."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "../../../../@Context"
+      equals: "Submission"
+    - path: "../@ArchiveLocationID->leaf@ID/@href"
+      matchesRegex: "(?i).*\\.xpt"
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/@SASFieldName"
+      exists: false

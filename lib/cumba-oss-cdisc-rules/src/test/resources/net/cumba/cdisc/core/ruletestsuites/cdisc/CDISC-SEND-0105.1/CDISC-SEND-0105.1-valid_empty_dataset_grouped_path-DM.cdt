@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-SEND-0105.1 expect=noViolation domain=DM
+#note "GROUPED-PATH ZERO-ROW PIN (PLAN-leaf-scope-domain-inference.md Q12 ruling (c), 2026-08-22). A Group-sensitivity rule returns into RuleRunner.executeGrouped BEFORE the rowBased gate, and executeGrouped builds NO synthetic 1-row zero-column table: a 0-row DM has no group to evaluate, so the rule is EXECUTED with zero findings even though SPECIES is blank-by-absence everywhere (DM declares the column with no rows; TS and TX carry no SPECIES parameter). This is the cell the Fix #330 bare-emptiness retirement could NOT reach: `empty(SPECIES)` would fold TRUE on the synthetic table, but no Group rule ever sees that table. Written from the OBSERVED run, not the expectation; re-adjudicate under PLAN-zero-row-routing-rekey.md if the grouped path's zero-row behaviour is ever re-keyed."
+#library standard=sendig version=3-1-1
+dataset DM label="Demographics" class="SPECIAL PURPOSE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SETCD   type=Char label="Set Code"
+col SPECIES type=Char label="Species"
+col SEX     type=Char label="Sex"
+---
+---
+
+dataset TS label="Trial Summary" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | TITLE  | Trial Title      | Study X
+---
+
+dataset TX label="Trial Sets" class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Parameter Value"
+---
+S1 | TX | SET01 | 1 | GRPLBL | Group Label | Control
+---

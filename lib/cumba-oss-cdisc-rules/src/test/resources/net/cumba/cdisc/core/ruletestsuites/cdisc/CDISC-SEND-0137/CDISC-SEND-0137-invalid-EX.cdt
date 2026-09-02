@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0137 expect=violation domain=EX
+#note "STUDYID/USUBJID/EXTRT carry def:CommentOID (+ CommentDefs); EXDOSE declared with NO def:CommentOID -> the required explanation of intended-vs-actual dose levels is missing -> 1 violation."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0137-define.xml
+#expectViolationCount 1
+#expectViolationAt variable_name=EXDOSE
+dataset EX
+col STUDYID type=Char
+col USUBJID type=Char
+col EXTRT   type=Char
+col EXDOSE  type=Num
+---
+S1 | S1-001 | DRUG A | 10

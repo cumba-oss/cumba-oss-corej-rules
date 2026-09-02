@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0492 expect=noViolation domain=ADLBC
+# Rule:Description: SHIFTy is present and all of the following variable pairs (BASECATy, AVALCATy), (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR, ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH, ATOXGRH), (BASE, AVAL) and (BASEC, AVALC) are not present
+#note "SHIFT1 present but AVAL also present, so the not-present condition fails -> no violation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1 type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | NORMAL to HIGH | 5
+---

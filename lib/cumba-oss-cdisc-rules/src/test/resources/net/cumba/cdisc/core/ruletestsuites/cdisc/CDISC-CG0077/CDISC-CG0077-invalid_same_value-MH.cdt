@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0077 expect=violation domain=MH
+# Rule:Description: Raise an error when MHCAT is populated with the same value for all records.
+#note "MHCAT holds a single value across all records. has_same_values has Dataset sensitivity, so the engine emits ONE dataset-level finding, collapsed to the first violating row (0-identical twin of CORE-000365, TG-0027 -- same Check byte-for-byte)."
+#expectViolationCount 1
+#expectViolationAt row=1 MHCAT=GENERAL USUBJID=01-701-1015
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHCAT type=Char label="Category for Medical History" format=$MHCAT.
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 | GENERAL
+CDISCPILOT01 | MH | 01-701-1015 | 2 | GENERAL
+CDISCPILOT01 | MH | 01-701-1023 | 1 | GENERAL
+---

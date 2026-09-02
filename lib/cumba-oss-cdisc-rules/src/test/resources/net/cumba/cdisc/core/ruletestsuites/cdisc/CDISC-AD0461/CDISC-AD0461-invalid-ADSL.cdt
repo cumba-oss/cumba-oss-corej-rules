@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0461 expect=violation domain=ADSL
+# Rule:Description: On a given record, TSEQPGyN is populated and TSEQPGy is not populated
+#note "TSEQPG1N populated, TSEQPG1 empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TSEQPG1N type=Char
+col TSEQPG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X | 
+---

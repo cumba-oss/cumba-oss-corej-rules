@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0076B expect=violation domain=ADDL
+#note "ADDL + SPDEVID detects DEVICE LEVEL ANALYSIS DATASET - the second Include token of this rule's Scope block."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 TRT01P=PLACEBO TRT01PN=1
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+col TRT01P type=Char
+col TRT01PN type=Num
+---
+S1 | 001 | DEV01 | PLACEBO | 0
+S1 | 002 | DEV01 | PLACEBO | 0
+S1 | 003 | DEV02 | PLACEBO | 1

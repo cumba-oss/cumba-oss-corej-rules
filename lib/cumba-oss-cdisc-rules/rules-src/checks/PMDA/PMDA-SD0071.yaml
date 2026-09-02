@@ -1,0 +1,126 @@
+Core:
+  Id: "PMDA-SD0071"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Planned Arm Code (ARMCD) and\
+  \ Description of Planned Arm (ARM) does not match an entry in the Trial Arms (TA)\
+  \ dataset, except for subjects who failed screening (ARMCD is 'SCRNFAIL') or were\
+  \ not assigned to an arm (ARMCD is 'NOTASSGN')."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "ARMCD"
+  - "ARM"
+  Name: "TA"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD != "SCRNFAIL" and ARMCD != "NOTASSGN" and empty(TA.ARMCD)
+Outcome:
+  Message: "The combination of ARMCD and ARM does not match any entry in the Trial\
+    \ Arms (TA) dataset."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+  - "TA.ARMCD"
+Source:
+  Message: "Invalid ARM/ARMCD"
+  Description: "The combination of Description of Planned Arm (ARM) and Planned Arm\
+    \ Code (ARMCD) values must match entries in the Trial Arms (TA) dataset, except\
+    \ for subjects who failed screening (ARMCD = 'SCRNFAIL') or were not fully assigned\
+    \ to an Arm (ARMCD = 'NOTASSGN')."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0071"
+        Version: "1"
+      Version: "1.6"

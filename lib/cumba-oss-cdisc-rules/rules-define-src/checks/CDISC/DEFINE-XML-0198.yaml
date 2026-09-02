@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0198"
+Sheet_Rule_Identifier: "198"
+Rule_Set: "CDISC"
+Element: "CodeListItem"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "No more than one child element Decode may be provided for the CodeListItem element."
+# Scoped to CodeListItem (the parent counted over); the sheet's
+# CodeList[@Name]/CodeListItem[@CodedValue] placeholders are carried by the
+# finding's xpath.
+Message: "Child element Decode is provided more than once for the CodeListItem element."
+Check:
+  kind: "cardinality_at_most"
+  target: "Decode"
+  max: 1

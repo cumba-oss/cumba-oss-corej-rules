@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0230 expect=skipped domain=ADSL
+#note "TRTSEQAN, the operator's TARGET and the rule's single Requirements.Variables.All entry, is absent. Without it the absent target would take the EC-53 fast path (nameIdx < 0 -> empty BitSet) and the rule would be silently no-violation; with it the run reports an auditable skip naming TRTSEQAN. Not a template, so no wildcard rewrite is involved."
+#library standard=adamig version=1-0
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSEQA type=Char
+---
+S1 | 001 | A-B
+S1 | 002 | A-B
+S1 | 003 | B-A

@@ -1,0 +1,36 @@
+name: CDISC-AD0635
+kind: rule
+description: |
+  Wave D7 port - T3-VMC Variable Metadata Check (bare-leaf `not_exists`).
+  OCCURRENCE DATA STRUCTURE: fires when ASTDT is absent. Baselined on
+  Python lane under Finding #9 (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `not_exists(ASTDT)`
+  resolves against meta-field columns and yields 0 violations. Java fires
+  correctly; expected matches Java's dataset-level violation. Bare-leaf
+  Check may also hit the Python business_rules `KeyError: 'name'` quirk
+  documented in plan §0b.4.
+python_source: rules-adamig-1-3.json (CDISC-AD0635)
+rule:
+  coreId: CDISC-AD0635
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE, AEDECOD: Headache}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+expected_violations:
+  - rule_id: CDISC-AD0635
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

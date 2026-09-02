@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD9704"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable that the ADaM standard designates as\
+  \ Required for the dataset's structure is not present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Operations:
+- id: "$required_variables"
+  expression: "required_variables()"
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$missing_required_variables"
+  expression: "minus($required_variables, subtract=$dataset_variables)"
+Check:
+  expression: >-
+    not contains_all($dataset_variables, $required_variables)
+Outcome:
+  Message: "A Required ADaM variable is not present in the dataset."
+  Output_Variables:
+  - "$missing_required_variables"
+Source_Proposed:
+  Sheet_Issue: "#170"
+  Class: "SUBJECT LEVEL ANALYSIS DATASET; BASIC DATA STRUCTURE; OCCURRENCE DATA STRUCTURE;\
+    \ DEVICE LEVEL ANALYSIS DATASET; MEDICAL DEVICE BASIC DATA STRUCTURE; MEDICAL\
+    \ DEVICE OCCURRENCE DATA STRUCTURE"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: ""
+  Natural_Language_Rule_Failure_Criteria: "a variable whose Core attribute is Req\
+    \ for the dataset's data structure is not present in the dataset"
+  Rule_Failure_Criteria: "a Required variable is not present"
+  Condition_Failure: ""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+  - Name: "ADaMIG"
+    Version: "1.2"
+  - Name: "ADaMIG"
+    Version: "1.3"

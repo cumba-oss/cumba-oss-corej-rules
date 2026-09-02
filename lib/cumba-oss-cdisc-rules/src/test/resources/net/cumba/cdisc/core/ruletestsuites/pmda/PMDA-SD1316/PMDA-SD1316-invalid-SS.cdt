@@ -1,0 +1,36 @@
+#!RuleTest
+#test PMDA-SD1316 expect=violation domain=SS
+#note "Subject 001 is recorded DEAD in SS but its DS records only carry 'COMPLETED' -> fires. Subject 002 is DEAD and has a DS 'DEATH' record; subject 003 is ALIVE."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001 SSSTRESC=DEAD
+dataset SS label="Subject Status"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SSSEQ    type=Num  label="Sequence Number"
+col SSTESTCD type=Char label="Subject Status Short Name"
+col SSTEST   type=Char label="Subject Status"
+col SSORRES  type=Char label="Result or Finding in Original Units"
+col SSSTRESC type=Char label="Character Result/Finding in Std Format"
+col SSDTC    type=Char label="Date/Time of Assessment"
+---
+CDISCPILOT01 | SS | 001 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-03-01
+CDISCPILOT01 | SS | 002 | 1 | SURVSTAT | Survival Status | Dead | DEAD | 2020-04-01
+CDISCPILOT01 | SS | 003 | 1 | SURVSTAT | Survival Status | Alive | ALIVE | 2020-05-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+CDISCPILOT01 | DS | 001 | 1 | Completed study | COMPLETED | DISPOSITION EVENT | 2020-03-02
+CDISCPILOT01 | DS | 002 | 1 | Death | DEATH | DISPOSITION EVENT | 2020-04-02
+CDISCPILOT01 | DS | 003 | 1 | Completed study | COMPLETED | DISPOSITION EVENT | 2020-05-02
+---

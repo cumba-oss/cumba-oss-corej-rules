@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0146B expect=noViolation domain=ADLBC
+#note "Row 3's PARAMN (the grouping key) is blank, so DROP_MISSING_KEYS removes it from grouping entirely and it can never be flagged; the surviving PARAMN=1 group holds one distinct PARAM. Independently the row's own not empty(PARAMN) conjunct is false. Pin on the blank-KEY branch (contrast PMDA-AD0147B's blank-TARGET pin on the same column)."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+S1 | 001 | ALB | Albumin   | 1
+S1 | 002 | ALB | Albumin   | 1
+S1 | 003 | ALB | Bilirubin |

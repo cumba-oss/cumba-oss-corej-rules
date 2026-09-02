@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2266 expect=violation domain=LB
+#note "LBEXCLFL variable not present: negative LBSTRESN -> fires via the --EXCLFL not_exists branch."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | LB | 001 | 1 | -1.5
+S1 | LB | 001 | 2 | 3.2

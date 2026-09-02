@@ -1,0 +1,21 @@
+#!RuleTest
+#test DRAFT-900022 expect=violation domain=VS
+#note "Define binds the wrong codelist NCI C-code on both library-bound variables (VSPOS: define C99999 vs library C71148; VSLAT: define C88888 vs library C99074) -> two findings. VSTESTCD carries no library ccode expectation, so the not-empty(LIBRARY) guard excludes it despite a define ccode being declared."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148 ccode=C71148
+#library variable-metadata VS VSLAT codelist=C99074 ccode=C99074
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS ccode=C99999
+#define variable-metadata VS VSLAT ccode=C88888
+#define variable-metadata VS VSTESTCD ccode=C66741
+#expectViolationCount 2
+#expectViolationAt variable_name=VSPOS define_variable_ccode=C99999 library_variable_ccode=C71148
+#expectViolationAt variable_name=VSLAT define_variable_ccode=C88888 library_variable_ccode=C99074
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

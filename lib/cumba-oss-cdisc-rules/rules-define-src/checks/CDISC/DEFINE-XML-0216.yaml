@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0216"
+Sheet_Rule_Identifier: "216"
+Rule_Set: "CDISC"
+Element: "leaf"
+Attribute: "ID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "ID attribute value must be unique within the set of def:leaf elements."
+# unique_in_document, not unique_among_siblings: def:leaf elements live under both
+# MetaDataVersion and ItemGroupDef, and the sheet's "within the set of def:leaf
+# elements" is the whole document's set.
+Message: "More than one def:leaf element found with the same ID attribute value [${value}]."
+Check:
+  kind: "unique_in_document"
+  attribute: "ID"

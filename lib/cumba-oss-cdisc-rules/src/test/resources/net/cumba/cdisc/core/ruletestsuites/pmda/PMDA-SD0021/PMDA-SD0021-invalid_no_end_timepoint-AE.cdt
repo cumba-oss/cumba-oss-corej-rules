@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0021 expect=violation domain=AE
+#note "Row 1: no End Time-Point variable populated (AEENDTC and AEENRF empty; AEENRTPT/AEOCCUR/AESTAT/AEDUR columns deliberately absent - AEOCCUR is carried by its SURVIVING authored `not var_exists(--OCCUR) or` arm and the other three by their bare empty() leaves, TRUE on an absent column (absent = all-missing, EC-43)) and none of the three exceptions holds -> fires. Row 2: AEENDTC populated -> clean. Row 3: AEENRF populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1
+dataset AE class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEENDTC  type=Char
+col AEENRF   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE |            |
+S1 | AE | 001 | 2 | NAUSEA   | 2020-06-30 |
+S1 | AE | 001 | 3 | RASH     |            | DURING

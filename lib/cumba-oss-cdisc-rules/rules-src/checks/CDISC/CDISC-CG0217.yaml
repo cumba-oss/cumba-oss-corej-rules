@@ -1,0 +1,67 @@
+Core:
+  Id: "CDISC-CG0217"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Order of Element within Arm (TAETORD)\
+  \ in the Subject Visits (SV) domain does not match the TAETORD value of the corresponding\
+  \ Subject Elements (SE) element whose date range (SESTDTC to SEENDTC) contains the\
+  \ visit start date (SVSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "SE"
+Check:
+  expression: >-
+    date(SVSTDTC) >= SE.SESTDTC and date(SVSTDTC) <= SE.SEENDTC and var_exists(SE.TAETORD) and
+    TAETORD != SE.TAETORD
+Outcome:
+  Message: "TAETORD in SV does not match TAETORD of the corresponding element in the\
+    \ SE dataset."
+  Output_Variables:
+  - "TAETORD"
+  - "SVSTDTC"
+  - "SE.SESTDTC"
+  - "SE.SEENDTC"
+  - "SE.TAETORD"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "TAETORD"
+  Condition: "TAETORD present in dataset and SESTDTC <= SVSTDTC and SVSTDTC <= SEENDTC"
+  Rule: "TAETORD = SE.TAETORD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0217"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0217"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0217"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-OD0021"
+Sheet_Rule_Identifier: "OD0021"
+Rule_Set: "PMDA"
+Element: "TranslatedText"
+Attribute: "lang"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Attribute is defined as a language tag, but value does not match the language tag format. Allowed values are specified in IETF RFC 3066: Tags for the Identification of Languages."
+# The language-tag-typed attribute in Define-XML is TranslatedText/@xml:lang
+# (the tree strips the xml: prefix). RFC 3066 grammar: a 1-8 ALPHA primary
+# subtag plus any number of 1-8 alphanumeric subtags separated by hyphens.
+# Fires only on a present xml:lang (the attribute is optional).
+Message: "Invalid Language value"
+Check:
+  kind: "matches_regex"
+  attribute: "lang"
+  pattern: '[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*'

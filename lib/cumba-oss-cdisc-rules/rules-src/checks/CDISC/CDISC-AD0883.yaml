@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0883"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both COUNTRY and\
+  \ COUNTRYL are populated, more than one value of COUNTRY is present within the dataset\
+  \ for a given value of COUNTRYL."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "COUNTRY"
+    - "COUNTRYL"
+Check:
+  expression: >-
+    not empty(COUNTRY) and not empty(COUNTRYL) and has_multiple_values_for(COUNTRY, COUNTRYL)
+Outcome:
+  Message: "More than one value of COUNTRY is present for this value of COUNTRYL within\
+    \ the dataset."
+  Output_Variables:
+  - "COUNTRY"
+  - "COUNTRYL"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "COUNTRY"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of COUNTRY for a given value of COUNTRYL, considering only those rows\
+    \ on which both variables are populated"
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of COUNTRY\
+    \ for a given value of COUNTRYL"
+  Condition_Failure: "On rows where both COUNTRY and COUNTRYL are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR883"
+        Version: "1"
+      Version: "5.0"

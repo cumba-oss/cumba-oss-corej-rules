@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-SEND-0201"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Relationship to Death (TFDTHREL) is populated with\
+  \ a value that is not \"Y\", \"N\", or \"U\"."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "TFDTHREL"
+Check:
+  expression: >-
+    not empty(TFDTHREL) and TFDTHREL not in ["Y", "N", "U"]
+Outcome:
+  Message: "TFDTHREL is populated with a value other than \"Y\", \"N\", or \"U\"."
+  Output_Variables:
+  - "TFDTHREL"
+Source:
+  Class: "FND"
+  Domain: "TF"
+  Variable: "TFDTHREL"
+  Plain_Text_Explanation: "TFDTHREL must be \"Y\", \"N\", or \"U\""
+  Rule: "TFDTHREL = \"Y\" OR TFDTHREL = \"N\" OR TFDTHREL = \"U\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND201"
+        Version: "1"
+      Version: "5.0"

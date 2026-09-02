@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1077 expect=skipped domain=DM
+#note "FRESH. No EPOCH column, so the rule WOULD fire if it ran -- the skip is a real assertion. Scope.Domains has only an Exclude list and DM is not in it, so the domain axis passes; the SDTM class axis then rejects because Scope.Classes.Include is [INTERVENTIONS, FINDINGS, EVENTS] and this fixture declares SPECIAL PURPOSE. class=\"SPECIAL PURPOSE\" is mandatory on the dataset line for the class axis to be judged at all."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col AGE     type=Num  label="Age"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 56

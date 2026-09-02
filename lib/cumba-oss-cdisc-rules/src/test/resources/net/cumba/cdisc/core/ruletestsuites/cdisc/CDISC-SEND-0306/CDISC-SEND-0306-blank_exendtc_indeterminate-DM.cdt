@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-SEND-0306 expect=violation domain=DM
+#note "$latest_exendtc declares missing_values: indeterminate, which implements this rule's own Source verbatim: 'If EXENDTC is not populated RFXENDTC is equal to the latest value of EXSTDTC if EXENDTC was not collected or is missing.' Subject 001's second exposure has a BLANK EXENDTC, so the EXENDTC branch yields no value and the Source routes the check onto the EXSTDTC branch -- where RFXENDTC (2020-01-16) disagrees with the latest EXSTDTC (2020-01-17), so the rule reports. Under the default `skip` the extreme would come out as the latest POPULATED EXENDTC (2020-01-16), a value the Source does not endorse in this situation, that conjunct would be false and the rule would stay silent: this scenario is red exactly when the declaration is absent. EXSTDTC is populated on both rows, so the EXSTDTC extreme cannot influence the verdict."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM label=Demographics
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+S1 | DM | 001 | 2020-01-16
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | 001 | 2020-01-02 | 2020-01-16
+S1 | EX | 001 | 2020-01-17 |
+---

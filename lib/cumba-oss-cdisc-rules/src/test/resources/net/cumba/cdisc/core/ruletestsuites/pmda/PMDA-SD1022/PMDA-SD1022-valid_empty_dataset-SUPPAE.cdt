@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1022 expect=noViolation domain=SUPPAE
+#note "FRESH, DISCRIMINATING - the batch's sharpest 0-row tripwire. Zero data rows. Predicted SILENT because the rule is on the rowBased path (RuleRunner.java:1152) and therefore never gets the synthetic 1-row table. Unlike every other rule in this batch, this one would answer DIFFERENTLY on the other path: the synthetic table carries ZERO columns, and with no var_exists conjunct anywhere in the shipped expression both 'not empty(QNAM)' and 'not is_valid_name(QNAM)' would be true, so the rule would fire at row 1. A FIRE here means the rule is NOT on the rowBased path - a stage-R classification (methodology step 4), NOT a scenario to rewrite. Escalate."
+#library standard=sdtmig version=3-4
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1371 expect=noViolation domain=LB
+#note "Full-column LB. Row 1: LOBXFL=Y + ORRES populated -> clean. Row 2: LOBXFL=Y + ORRES empty + DRVFL=Y -> clean. Row 3: LOBXFL=N + ORRES empty -> clean."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBLOBXFL type=Char
+col LBDRVFL  type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 5.2 | Y |
+S1 | LB | 001 | 2 | ALB  |     | Y | Y
+S1 | LB | 001 | 3 | CHOL |     | N |

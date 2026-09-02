@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-AD0289"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of AREL for a given\
+  \ value of ARELN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(AREL) and not empty(ARELN) and has_multiple_values_for(AREL, ARELN)
+Outcome:
+  Message: "AREL has more than one value for the same value of ARELN."
+  Output_Variables:
+  - "AREL"
+  - "ARELN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AREL"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of AREL for\
+    \ a given value of ARELN"
+  Rule_Failure_Criteria: "There is more than one value of AREL for a given value of\
+    \ ARELN"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR289"
+        Version: "1"
+      Version: "5.0"

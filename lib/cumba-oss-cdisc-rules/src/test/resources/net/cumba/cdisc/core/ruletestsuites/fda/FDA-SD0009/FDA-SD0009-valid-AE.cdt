@@ -1,0 +1,23 @@
+#!RuleTest
+#test FDA-SD0009 expect=noViolation domain=AE
+#note "Row 1 serious with AESDTH=Y criterion; row 2 not serious; row 3 AESER empty (guard not met) -> no violation."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AESER    type=Char label="Serious Event"
+col AESCAN   type=Char label="Involves Cancer"
+col AESCONG  type=Char label="Congenital Anomaly or Birth Defect"
+col AESDISAB type=Char label="Persist or Signif Disability/Incapacity"
+col AESDTH   type=Char label="Results in Death"
+col AESHOSP  type=Char label="Requires or Prolongs Hospitalization"
+col AESLIFE  type=Char label="Is Life Threatening"
+col AESOD    type=Char label="Occurred with Overdose"
+col AESMIE   type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | HEADACHE   | Y | N | N | N | Y | N | N | N | N
+S1 | AE | 001 | 2 | NAUSEA     | N | N | N | N | N | N | N | N | N
+S1 | AE | 001 | 3 | DIZZINESS  |   |   |   |   |   |   |   |   |

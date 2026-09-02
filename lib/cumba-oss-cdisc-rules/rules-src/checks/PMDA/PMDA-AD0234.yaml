@@ -1,0 +1,76 @@
+Core:
+  Id: "PMDA-AD0234"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Actual Pooled Treatment y for\
+  \ Period xx (TRxxAGy) variable does not hold a single consistent value for each\
+  \ unique populated value of the Actual Treatment for Period xx (TRTxxA) variable."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRxxAGy"
+Check:
+  expression: >-
+    var_exists("TRTxxA") and not empty(TRTxxA) and is_inconsistent_across_dataset(TRxxAGy,
+    keys=[TRTxxA])
+Outcome:
+  Message: "Inconsistent value for TRxxAGy within a unique TRTxxA"
+  Output_Variables:
+  - "TRTxxA"
+  - "TRxxAGy"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for TRxxAGy within a unique TRTxxA"
+  Description: "Within a study, all Actual Pooled Treatment y for Period xx (TRxxAGy)\
+    \ variable values must be the same for each unique value of Actual Treatment for\
+    \ Period xx (TRTxxA) when TRTxxA is populated. TRxxAGy is a more general pooled\
+    \ treatment for TRTxxA, therefore it may be used for many TRTxxA."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0234"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0234"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0234"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0234"
+        Version: "1"
+      Version: "6.0"

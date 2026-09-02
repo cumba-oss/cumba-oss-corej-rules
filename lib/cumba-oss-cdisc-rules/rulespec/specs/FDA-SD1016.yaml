@@ -1,0 +1,44 @@
+name: FDA-SD1016
+kind: rule
+description: |
+  EC-32(a) / Fix #126 pin — absent Match_Dataset half. FDA-SD1016: every IE
+  record's (IETESTCD, IETEST, IECAT) must match a TI entry; the Check is
+  `TI.IETESTCD empty` over a left join. The TI dataset is GENUINELY ABSENT from
+  this study: the fork used to KeyError on the first `TI.IETESTCD` read and skip
+  the rule; it now materialises the referenced column as null
+  (coreJ registers no lookup — RuleRunner.buildJoinedDatasets — and `empty`
+  fires on an absent column, ExprCompiler.FIRES_ON_ABSENT_COLUMN), so BOTH IE
+  rows fire. FDA-SD0071 shares this shape and rides on it.
+python_source: rules-sdtmig-3-4.json (FDA-SD1016)
+rule:
+  coreId: FDA-SD1016
+datasets:
+  IE:
+    row_key: [STUDYID, USUBJID, IESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '001', IESEQ: 1, IETESTCD: INCL01, IETEST: Age >= 18, IECAT: INCLUSION}
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '002', IESEQ: 1, IETESTCD: EXCL05, IETEST: Pregnant, IECAT: EXCLUSION}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [IE]
+expected_violations:
+  - rule_id: FDA-SD1016
+    dataset: IE
+    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IECAT: INCLUSION
+      IETEST: Age >= 18
+      IETESTCD: INCL01
+  - rule_id: FDA-SD1016
+    dataset: IE
+    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      IECAT: EXCLUSION
+      IETEST: Pregnant
+      IETESTCD: EXCL05
+expected_errors: []

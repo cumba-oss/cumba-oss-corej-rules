@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0074"
+Sheet_Rule_Identifier: "74"
+Rule_Set: "CDISC"
+Element: "ItemRef"
+Attribute: "MethodOID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The MethodOID attribute on the ItemRef element must reference an existing MethodDef element."
+# Value check fires only on a present MethodOID (conditional presence is sheet id 73).
+Message: "There is no MethodDef with an OID attribute that matches ItemRef/@MethodOID [${value}]."
+Check:
+  kind: "references"
+  attribute: "MethodOID"
+  targetElement: "MethodDef"
+  targetKey: "OID"

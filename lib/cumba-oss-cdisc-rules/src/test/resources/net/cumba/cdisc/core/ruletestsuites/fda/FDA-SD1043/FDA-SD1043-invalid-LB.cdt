@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1043 expect=violation domain=LB
+#note "The test name 'Glucose' is coded twice, as GLUC and as GLUCOSE, so --TESTCD is not constant for a given --TEST. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBTESTCD=GLUC LBTEST=Glucose
+#expectViolationAt row=2 LBTESTCD=GLUCOSE LBTEST=Glucose
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+---
+S1 | LB | 001 | 1 | GLUC    | Glucose
+S1 | LB | 002 | 1 | GLUCOSE | Glucose
+S1 | LB | 001 | 2 | ALB     | Albumin

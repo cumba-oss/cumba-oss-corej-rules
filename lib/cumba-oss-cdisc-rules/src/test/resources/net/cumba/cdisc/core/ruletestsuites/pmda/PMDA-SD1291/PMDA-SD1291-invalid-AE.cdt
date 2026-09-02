@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1291 expect=violation domain=AE
+#note "Row 1: AEENTPT populated with AEENRTPT empty -> fires. Row 2: both populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AEENTPT=2020-03-15
+dataset AE class=EVENTS
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col AESEQ     type=Num
+col AETERM    type=Char
+col AEENRTPT  type=Char
+col AEENTPT   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | | 2020-03-15
+S1 | AE | 001 | 2 | NAUSEA   | AFTER | 2020-04-01

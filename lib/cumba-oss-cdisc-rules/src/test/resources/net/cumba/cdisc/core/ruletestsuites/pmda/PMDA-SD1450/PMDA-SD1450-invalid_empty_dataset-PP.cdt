@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1450 expect=violation domain=PP
+#note "THE BATCH'S ONLY 0-ROW FIXTURE. Presence is a property of the declared column schema, which survives at 0 rows: the exists-only Check is dataset-constant, so BroadcastFold sits above the 0-row synthetic zero-column-table branch and never reaches it, and datasetBroadcastResult emits ONE violation at internal row 0 = reported row 1. NO VALUE PIN - extractOutputValues yields an empty string past the end of a 0-row table."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPSTINT  type=Char
+---

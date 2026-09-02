@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0034 expect=violation domain=LB
+#note "No LBTPTREF column at all; the bare empty(--TPTREF) leaf decides, TRUE on every row of the absent column (absent = all-missing, EC-43). Row 1: LBELTM=PT1H -> fires. Row 2: LBELTM empty -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBELTM=PT1H
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBELTM   type=Char
+---
+S1 | LB | 001 | 1 | GLUC | PT1H
+S1 | LB | 001 | 2 | GLUC |

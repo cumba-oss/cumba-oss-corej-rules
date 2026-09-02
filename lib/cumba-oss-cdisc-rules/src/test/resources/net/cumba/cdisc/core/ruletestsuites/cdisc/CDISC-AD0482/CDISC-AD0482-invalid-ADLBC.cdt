@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0482 expect=violation domain=ADLBC
+# Rule:Description: On a given record, BCHGCATy is populated and BCHGCAyN is not populated
+#note "BCHGCAT1 populated, BCHGCA1N empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BCHGCAT1 type=Char
+col BCHGCA1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | X | 
+---

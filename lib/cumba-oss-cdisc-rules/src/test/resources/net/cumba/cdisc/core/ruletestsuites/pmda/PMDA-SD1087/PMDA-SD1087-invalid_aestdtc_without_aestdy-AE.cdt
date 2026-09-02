@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1087 expect=violation domain=AE
+#note "Shipped Check var_exists(\"--STDTC\") and not var_exists(\"--STDY\") resolves per the EC-36 prefix rule to AESTDTC/AESTDY; both leaves are dataset constants -> BroadcastFold -> exactly ONE violation reported at row=1 regardless of row count."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESTDTC=2020-01-10
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AESTDTC type=Char
+---
+S1 | AE | 001 | 1 | 2020-01-10

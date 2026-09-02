@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2221 expect=violation domain=TS
+#note "No TSPARMCD=REGID record anywhere in TS -> $regid_count (ungrouped filtered record_count, universe = the whole TS) = 0 -> dataset-broadcast: exactly ONE finding regardless of the 3 rows. Count-only pin per the in-tree broadcast convention."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | TITLE  | Trial Title         | A Phase 3 Study of Drug X in Subjects With Condition Y
+S01 | TS | 2 | TTYPE  | Trial Type          | EFFICACY
+S01 | TS | 3 | SEXPOP | Sex of Participants | BOTH

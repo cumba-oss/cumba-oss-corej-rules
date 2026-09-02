@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-SEND-0387 expect=noViolation domain=DM
+#note "Both DM rows populate RPATHCD, so the unconditional Check is silent. M3-D22 corrected the metadata rather than the Check: the Description said RPATHCD 'should be populated when Reproductive Paths have been defined in the Trial Repro Paths (TP) dataset' and the Executability said 'Partially Executable - Possible Overreporting', but sheet rows 1894-1895 carry an EMPTY Condition cell, a flatly unconditional Plain Text ('RPATHCD must be populated in DM') and Rule 'DM.RPATHCD ^= null'. Since the sheet states no condition, nothing is under-implemented and there is nothing to over-report; the Check was already right and is UNCHANGED. The TP block is present so the fixture is valid under a hypothetical TP-gated reading too."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 0
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SPECIES type=Char label="Species"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col RPATHCD type=Char label="Reproductive Path Code"
+col SETCD   type=Char label="Set Code"
+---
+S1 | DM | S1-001 | 001 | RAT | F | HD | P1 | SET1
+S1 | DM | S1-002 | 002 | RAT | F | HD | P1 | SET1
+---
+
+dataset TP label="Trial Repro Paths"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col RPATHCD type=Char label="Reproductive Path Code"
+col RPATH   type=Char label="Reproductive Path"
+col RPRFDY  type=Num  label="Planned Repro Phase Day of First Exposure"
+---
+S1 | TP | P1 | F0 Female | 0
+---

@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1018 expect=violation domain=SV
+#note "Row 2 is a planned visit (SVUPDES empty) with VISITDY=5 while TV defines BASELINE as VISITNUM=2/VISITDY=1 -> the VISITNUM/VISIT/VISITDY triple matches no TV entry. Row 1 matches and must not fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISITNUM=2
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING | -7 |
+CDISCPILOT01 | SV | 01-701-1015 | 2 | BASELINE  | 5  |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1

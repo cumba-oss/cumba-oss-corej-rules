@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2338 expect=noViolation domain=TS
+#note "Synthetic SNDIGVER codelist terms taken verbatim from SEND CT C89982. Row 1: the SNDIGVER record carries the exact CT submission value -> clean. Row 2: a different parameter (SSPONSOR) whose value is not a SNDIGVER term -> outside the TSPARMCD guard. Row 3: SNDIGVER with an empty TSVAL (null flavour carried elsewhere) -> guarded out by non_empty. Paired with FDA-SE2338-invalid-TS.cdt so a missing codelist cannot make this pass vacuously."
+#library standard=sendig version=3-1-1
+#library codelist-terms SNDIGVER "SEND IMPLEMENTATION GUIDE VERSION 3.0" "SEND IMPLEMENTATION GUIDE VERSION 3.1" "SEND ANIMAL RULE IMPLEMENTATION GUIDE VERSION 1.0"
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SNDIGVER | SEND Implementation Guide Version | SEND IMPLEMENTATION GUIDE VERSION 3.1
+S1 | TS | 1 | SSPONSOR | Study Sponsor                     | ACME LABS
+S1 | TS | 2 | SNDIGVER | SEND Implementation Guide Version |

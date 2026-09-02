@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0566 expect=violation domain=ADLBC
+#note "PBCHGC1N present, PBCHGCA1 absent -> ^PBCHGC(\d+)N$ matches PBCHGC1N (y=1); ^PBCHGCA(\d+)$ matches nothing. ONE expansion, ONE violation at row 1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 PBCHGC1N=1
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col PBCHGC1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 3.5 | 1

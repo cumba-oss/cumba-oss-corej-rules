@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=violation domain=DM
+#note "SEX binds the non-extensible SEX codelist (M/F/U) and SPECIES the extensible SPECIES codelist (RAT/MOUSE). Row 2 submits X and HAMSTER, neither a term of its own codelist and neither a semicolon combination -> both cells fire. Row 1 uses declared coded values; row 3 leaves SEX empty and MOUSE is a term."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM SEX codelist=SEX codelist_extensible=false codelist_coded_values="[\"M\",\"F\",\"U\"]"
+#library variable-metadata DM SPECIES codelist=SPECIES codelist_extensible=true codelist_coded_values="[\"RAT\",\"MOUSE\"]"
+#expectViolationCount 2
+#expectViolationAt variable_name=SEX variable_value=X
+#expectViolationAt variable_name=SPECIES variable_value=HAMSTER
+dataset DM class="SPECIAL PURPOSE" label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+---
+S1 | DM | 001 | M | RAT
+S1 | DM | 002 | X | HAMSTER
+S1 | DM | 003 |   | MOUSE

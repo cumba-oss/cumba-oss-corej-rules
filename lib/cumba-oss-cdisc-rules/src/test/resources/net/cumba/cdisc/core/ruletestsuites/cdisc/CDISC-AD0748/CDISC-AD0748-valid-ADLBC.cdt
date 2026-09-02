@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0748 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of AVALCATy for a given value of AVAL and y, where y is a single-digit integer [1-9]
+#note "within PARAMCD=GLUC, each AVAL maps to a single AVALCAT1 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col AVALCAT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 10 | HIGH
+CDISCPILOT01 | 01-701-1023 | GLUC | 5 | NORMAL
+---

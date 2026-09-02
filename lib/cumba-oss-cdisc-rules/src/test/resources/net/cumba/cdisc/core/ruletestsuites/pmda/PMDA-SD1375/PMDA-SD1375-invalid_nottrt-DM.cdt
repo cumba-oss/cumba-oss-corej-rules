@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1375 expect=violation domain=DM
+#note "THE CROSS-FAMILY DISCRIMINATOR - mirror of the shipped-green fda/FDA-SD1375/FDA-SD1375-valid-DM.cdt row 4, where the same record state is asserted NOT to fire. PMDA's Check lists NOTTRT in the membership set (faithful to its own sheet row). Row 1: ACTARMCD=NOTTRT, RFENDTC populated -> fires under PMDA. Row 2: a treated subject keeps RFENDTC -> silent. Predicted GREEN, NOT a D9 red - this is the evidence for the open SHEET-ISSUES-CDISC.md #9 question."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 ACTARMCD=NOTTRT
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFSTDTC  type=Char
+col RFENDTC  type=Char
+col ACTARMCD type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-05 | 2020-02-10 | NOTTRT
+CDISCPILOT01 | DM | 01-701-1023 | 2020-01-05 | 2020-06-30 | A
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0347 expect=noViolation domain=ADLBC
+#note "A1LO is not declared. The expansion still seeds y=1 from A1LOC and resolves the partner to the absent A1LO; the absent column is the operator's TARGET, so the verdict short-circuits to no violations while the guard not empty(A1LOC) stays true. EXECUTED and silent."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col A1LOC   type=Char
+---
+S1 | 001 | ALB | LOWNORMAL
+S1 | 002 | ALB | LOWNORMAL
+S1 | 003 | ALB | BELOWNORMAL

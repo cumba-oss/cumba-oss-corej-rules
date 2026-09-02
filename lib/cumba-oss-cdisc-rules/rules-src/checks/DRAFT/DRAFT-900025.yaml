@@ -1,0 +1,41 @@
+Core:
+  Id: "DRAFT-900025"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when a coded value and its paired decoded value do not\
+  \ match the coded-value/decode mapping of the codelist the Define-XML binds to the\
+  \ coded variable. The decode variable is resolved generically: a candidate is proposed\
+  \ by stripping a trailing 'NUM', 'CD' or 'N' from the coded variable's name and\
+  \ confirmed against the metadata, and where no such candidate confirms, the single\
+  \ other variable whose terms match is used. Variables with no decode-carrying Define-XML\
+  \ codelist, with no confirmable decode partner, or whose value is not a term of\
+  \ that codelist are not evaluated."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(value()) and define_variable_decode_matches(variable_name) == false
+Outcome:
+  Message: "The coded value and its decode do not match the coded-value/decode mapping\
+    \ of the codelist the Define-XML binds to the coded variable."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "ADaMIG"
+    Version: "1.3"
+  - Name: "ADaMIG"
+    Version: "1.2"

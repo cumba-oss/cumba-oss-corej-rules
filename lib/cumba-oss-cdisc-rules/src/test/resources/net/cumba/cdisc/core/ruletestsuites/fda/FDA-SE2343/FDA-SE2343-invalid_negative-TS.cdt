@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2343 expect=violation domain=TS
+#note "The negative:false parameter on the invalid_duration leaf: '-P28D' is a negative ISO 8601 duration, which the leaf rejects; the positive duration on row 1 is accepted."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=INTSAC TSVAL=-P28D
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+SEND001 | TS | 1 | INTSAC | Interim Sacrifice Period | P28D
+SEND001 | TS | 2 | INTSAC | Interim Sacrifice Period | -P28D

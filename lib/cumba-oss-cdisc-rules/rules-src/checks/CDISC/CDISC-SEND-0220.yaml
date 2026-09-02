@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-SEND-0220"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Trial Arms (TA) record exists for\
+  \ the same combination of Planned Arm Code (ARMCD) and Element Code (ETCD); the\
+  \ TA domain expects one record per planned Element per Arm."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "TA"
+Check:
+  expression: >-
+    not is_unique_set([ARMCD, ETCD])
+Outcome:
+  Message: "More than one TA record exists for the same ARMCD and ETCD combination."
+  Output_Variables:
+  - "ARMCD"
+  - "ETCD"
+Source:
+  Class: "TDM"
+  Domain: "TA"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per planned Element per Arm"
+  Rule: "One record per planned Element per Arm"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND220"
+        Version: "1"
+      Version: "5.0"

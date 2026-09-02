@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0229 expect=violation domain=ADSL
+#note "The literal name ADSL detects SUBJECT LEVEL ANALYSIS DATASET. No wildcard marker, so the rule runs once unexpanded. Key TRTSEQAN=1 holds TRTSEQA {A-B x2, B-A x1} -> row 3 is the minority. Group 2 holds one distinct value and deliberately reuses B-A, proving the check is keyed per TRTSEQAN rather than over the whole dataset."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRTSEQA=B-A TRTSEQAN=1
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSEQA type=Char
+col TRTSEQAN type=Num
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | B-A | 1
+S1 | 004 | B-A | 2
+S1 | 005 | B-A | 2

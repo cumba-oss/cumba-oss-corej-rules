@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0448"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary Parameter Value (TSVAL) for an\
+  \ INDIC or TDIGRP trial-summary parameter is not a valid term from SNOMED CT."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$snomed_term_valid"
+  expression: "valid_external_dictionary_value(TSVAL, external_dictionary_type=\"\
+    snomed\", dictionary_term_type=\"SNOMED\")"
+Check:
+  expression: >-
+    TSPARMCD in ["INDIC", "TDIGRP"] and $snomed_term_valid == false
+Outcome:
+  Message: "TSVAL is not a valid SNOMED CT term for the INDIC or TDIGRP parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD in ('INDIC', 'TDIGRP')"
+  Rule: "TSVAL is a valid term from SNOMED CT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0448"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0448"
+        Version: "1"
+      Version: "2.0"

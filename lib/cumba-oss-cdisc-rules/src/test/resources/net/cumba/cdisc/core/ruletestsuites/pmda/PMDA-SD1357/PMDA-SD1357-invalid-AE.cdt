@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1357 expect=violation domain=AE
+#note "MIDSDTC is present while MIDS is absent -> the milestone date has no milestone name to attach to -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col MIDSDTC  type=Char label="Disease Milestone Instance Date/Time"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 2020-01-15

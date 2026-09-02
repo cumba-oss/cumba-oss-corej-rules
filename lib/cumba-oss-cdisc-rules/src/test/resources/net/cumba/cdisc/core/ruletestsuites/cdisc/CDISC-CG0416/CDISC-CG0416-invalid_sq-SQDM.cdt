@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0416 expect=violation domain=SQDM
+#note "FRESH. Copies pmda/PMDA-SD1365/PMDA-SD1365-invalid_sq_dataset-SQDM.cdt exactly (no class= key, no DOMAIN column). Pins the SECOND Domains.Include token: SQDM is 4 characters beginning SQ, the only shape the strict SQ-- contract admits. A DM supplemental qualifier is subject-level, so it carries no identifying variable -- IDVAR/IDVARVAL are left EMPTY on every row, proving an empty IDVAR/IDVARVAL does not disturb the rule. Row 1 QLABEL is 49 characters and fires; row 2 is short and silent. The location pin uses QNAM, an Output_Variable, because IDVAR / IDVARVAL are blank on the firing row."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=RACEOTH
+dataset SQDM label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 |  |  | RACEOTH | Race, Other — collected verbatim from the CRF page | ASIAN-INDIAN
+CDISCPILOT01 | DM | 01-701-1023 |  |  | SAFFL   | Safety Population Flag                              | Y

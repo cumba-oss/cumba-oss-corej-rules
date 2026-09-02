@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-SD1356"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Temporal Relation to Milestone Instance (RELMIDS)\
+  \ variable is present in a dataset but the Trial Disease Milestones (TM) dataset\
+  \ is not present in the study."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$RELMIDS_EXISTS"
+  expression: "variable_exists(RELMIDS)"
+Check:
+  expression: >-
+    $RELMIDS_EXISTS == true and not ds_exists("TM")
+Outcome:
+  Message: "TM dataset is not present in the study when the RELMIDS variable is present\
+    \ in a dataset."
+  Output_Variables:
+  - "$RELMIDS_EXISTS"
+Source:
+  Message: "Missing TM dataset when variable RELMIDS is present in a dataset"
+  Description: "When the Temporal Relation to Milestone Instance (RELMIDS) variable\
+    \ is used in any dataset, the Trial Disease Milestones (TM) dataset must be present\
+    \ for the study."
+  Domains: "TM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1356"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0213"
+Sheet_Rule_Identifier: "213"
+Rule_Set: "CDISC"
+Element: "CommentDef"
+Attribute: "OID"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "There must be only one def:CommentDef element for a given OID attribute value."
+# unique_among_siblings, not unique_in_document: the sheet's Rule column scopes the
+# uniqueness to Study/MetaDataVersion, and def:CommentDef elements are direct
+# MetaDataVersion children — per-parent sibling scope IS the sheet's per-MDV scope
+# (and keeps two MetaDataVersions' comment OIDs independent).
+Message: "There is more than one def:CommentDef element with the OID attribute [${value}]."
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OID"

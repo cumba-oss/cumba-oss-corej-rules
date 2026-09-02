@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-OD0075"
+Sheet_Rule_Identifier: "OD0075"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "DataType"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The Data Type attribute for Variable must have a value of 'text', 'integer', 'float', 'datetime', 'date', or 'time' for Define-XML v1.0, and 'text', 'integer', 'float', 'datetime', 'date', 'time', 'partialDate', 'partialTime', 'partialDatetime', 'incompleteDatetime', or 'durationDatetime' for Define-XML v2.0 and v2.1."
+# The sheet prescribes the same 11-value set for BOTH 2.0 and 2.1.
+# DISAGREEMENT with CDISC twin 0140 flagged: the CDISC 2.1 set additionally
+# admits 'intervalDatetime' (2.1 spec SS4.3.1); the PMDA row omits it even for
+# 2.1 - the PMDA wording wins for the PMDA rule set. The 1.0 value set is out
+# of scope (the validator handles 2.0/2.1 documents only).
+Message: "Invalid Data Type value for variable"
+Check:
+  kind: "one_of"
+  attribute: "DataType"
+  values: ["text", "integer", "float", "datetime", "date", "time", "partialDate", "partialTime", "partialDatetime", "incompleteDatetime", "durationDatetime"]

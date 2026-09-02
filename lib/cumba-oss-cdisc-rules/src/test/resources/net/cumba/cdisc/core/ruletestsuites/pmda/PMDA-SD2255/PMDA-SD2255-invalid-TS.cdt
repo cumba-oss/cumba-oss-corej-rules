@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD2255 expect=violation domain=TS
+#note "Row 2: TSPARMCD=COMPTRT with TSVALCD=WK2XYI10QM (IBUPROFEN's UNII in the dummy dictionary) but TSVAL=ASPIRIN -> code and decode come from different SRS records -> fires. Row 1 is a correctly paired record; row 3 has the same mismatch under another parameter (out of the COMPTRT condition); rows 4/5 have a blank code or blank term (completeness is another rule's concern -> no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVAL=ASPIRIN TSVALCD=WK2XYI10QM
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | COMPTRT | IBUPROFEN | WK2XYI10QM
+S01 | TS | 2 | COMPTRT | ASPIRIN   | WK2XYI10QM
+S01 | TS | 3 | AGEMAX  | ASPIRIN   | WK2XYI10QM
+S01 | TS | 4 | COMPTRT | ASPIRIN   |
+S01 | TS | 5 | COMPTRT |           | WK2XYI10QM

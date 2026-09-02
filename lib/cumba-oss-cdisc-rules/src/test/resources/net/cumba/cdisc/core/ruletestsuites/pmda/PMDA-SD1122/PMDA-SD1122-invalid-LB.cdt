@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1122 expect=violation domain=LB
+#note "CL-A A.12 (wave TA-4): the hand-authored numeric regex became the native is_numeric predicate FDA/CORE already use. Rows 1-2 (plain and leading-zero decimals) carry numeric LBSTRESC with LBSTRESN empty -> fire. Row 3's scientific notation '1.23E-4' was accepted by the replaced regex but is REJECTED by is_numeric (probe delta of record, resolution toward is_numeric by ruling) -> no longer fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSTRESC=5.5
+#expectViolationAt row=2 LBSTRESC=007
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | 5.5     |
+S1 | LB | 001 | 2 | ALB  | 007     |
+S1 | LB | 001 | 3 | TSH  | 1.23E-4 |

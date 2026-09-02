@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0282 expect=violation domain=TS
+#note "Row 1 is the TSPARMCD='ADAPT' (Adaptive Design) record and carries TSVAL='YES', which is neither 'Y' nor 'N' -> fires. Row 2 is a different parameter whose free-text value is untouched by this rule."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=ADAPT TSVAL=YES
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | ADAPT | Adaptive Design | YES
+S1 | TS | 2 | TITLE | Trial Title | A Study Of Drug X

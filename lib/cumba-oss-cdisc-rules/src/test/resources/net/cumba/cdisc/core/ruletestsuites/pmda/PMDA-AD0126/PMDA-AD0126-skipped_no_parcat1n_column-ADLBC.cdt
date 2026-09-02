@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0126 expect=skipped domain=ADLBC
+#note "Mirror-asymmetry pin: the same missing column that leaves PMDA-AD0125 executed-and-silent SKIPS this rule. PARCATy matches PARCAT1 so the template expands (y=1) and Requirements.Variables.All rewrites to ['PARCAT1N'], which is absent -> reported not executed with the Requirements.Variables reason. NOT a wildcard NoMatch -- one column did match."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+---
+S1 | 001 | SYSBP | VITALS
+S1 | 002 | SYSBP | VITALS
+S1 | 003 | SYSBP | VITALSIGNS

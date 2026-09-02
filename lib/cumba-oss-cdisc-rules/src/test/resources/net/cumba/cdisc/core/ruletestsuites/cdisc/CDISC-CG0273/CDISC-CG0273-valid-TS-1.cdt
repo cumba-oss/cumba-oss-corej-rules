@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0273 expect=noViolation domain=TS
+# Rule:Description: Raise an error when a record exists with TSPARMCD equal to 'HLTSUBJI' and TSVAL equal to 'N', but TSVAL is empty for the record where TSPARMCD equals 'TDIGRP'.
+#note "HLTSUBJI=N and the TDIGRP record is present with a populated TSVAL -> no violation."
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S01 | TS | 1 | HLTSUBJI | N
+S01 | TS | 2 | TDIGRP | SOME VALUE
+---

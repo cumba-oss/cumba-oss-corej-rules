@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1078 expect=violation domain=AE
+#note "Regression pin for the T7 Operations fix: get_dataset_filtered_variables(core=Perm) serves IG-level core metadata, so the present-but-all-empty Permissible AESEV fires once (variable_name=AESEV)."
+#library-include FDA-SD1078-library.yaml
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=AESEV
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESEV   type=Char label="Severity/Intensity"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE |
+CDISCPILOT01 | AE | 01-701-1023 | 1 | NAUSEA   |

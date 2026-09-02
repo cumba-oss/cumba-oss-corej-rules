@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0247 expect=noViolation domain=ADTTE
+#note "Row 1: AVAL, STARTDT, ADT, ADTM and CNSR ALL blank. Row 2: fully populated except CNSR blank. The leading not empty(CNSR) is false on both rows, so the record is not evaluated at all even though row 1's companions are empty. Pins that the rule is conditioned on CNSR, not on the companions."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col STARTDT type=Num
+col ADT     type=Num
+col ADTM    type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH |    |       |       |       |
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 30 | 22000 | 22100 | 22100 |

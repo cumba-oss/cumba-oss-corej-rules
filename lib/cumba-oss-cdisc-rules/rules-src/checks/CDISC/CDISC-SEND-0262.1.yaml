@@ -1,0 +1,69 @@
+Core:
+  Id: "CDISC-SEND-0262.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one POOLDEF record exists for the same\
+  \ combination of pool (POOLID) and subject (USUBJID); the POOLDEF dataset expects\
+  \ one record per subject per pool."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "POOLDEF"
+Check:
+  expression: >-
+    not is_unique_set([POOLID, USUBJID])
+Outcome:
+  Message: "More than one POOLDEF record exists for the same pool (POOLID) and subject\
+    \ (USUBJID)."
+  Output_Variables:
+  - "POOLID"
+Source:
+  Class: "REL"
+  Domain: "POOLDEF"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per subject per pool, Tabulation."
+  Rule: "One record per subject per pool"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND262.1"
+        Version: "1"
+      Version: "5.0"

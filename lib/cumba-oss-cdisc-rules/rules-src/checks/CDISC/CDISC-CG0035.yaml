@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0035"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when VISITNUM is present in TV.VISITNUM but VISIT and\
+  \ VISITNUM do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+    - "VISITNUM"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    VISITNUM in $tv_visitnum and not is_unique_relationship(VISIT, VISITNUM)
+Outcome:
+  Message: "VISIT and VISITNUM do not have a one-to-one relationship."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "$tv_visitnum"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISITNUM"
+  Condition: "VISITNUM in TV.VISITNUM"
+  Rule: "VISIT and VISITNUM have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0035"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0035"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0035"
+        Version: "1"
+      Version: "2.0"

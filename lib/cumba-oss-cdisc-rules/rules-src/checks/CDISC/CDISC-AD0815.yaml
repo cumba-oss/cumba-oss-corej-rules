@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0815"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SUBJID is populated and SUBJIDN is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "SUBJID"
+    - "SUBJIDN"
+Check:
+  expression: >-
+    not empty(SUBJID) and empty(SUBJIDN)
+Outcome:
+  Message: "SUBJID is populated, but SUBJIDN is not populated."
+  Output_Variables:
+  - "SUBJID"
+  - "SUBJIDN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "SUBJIDN"
+  Natural_Language_Rule_Failure_Criteria: "SUBJID is populated and SUBJIDN is not\
+    \ populated"
+  Rule_Failure_Criteria: "SUBJIDN is not populated"
+  Condition_Failure: "SUBJID is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR815"
+        Version: "1"
+      Version: "5.0"

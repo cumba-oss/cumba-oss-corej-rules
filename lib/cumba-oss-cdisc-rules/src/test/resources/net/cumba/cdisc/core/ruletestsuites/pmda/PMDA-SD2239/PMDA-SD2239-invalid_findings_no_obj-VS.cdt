@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD2239 expect=violation domain=VS
+#note "No VSOBJ column at all (--OBJ is a Findings-About-only class variable and does not exist for VS). The shipped Check is the guard-free is_inconsistent_across_dataset(--TPT, keys=[USUBJID, VISITNUM, --OBJ, --DTC]) (Fix #276, ruling M2-D9): the absent --OBJ key is silently DROPPED and the operator regroups on the survivors - the corpus's class-D drop-and-regroup ruling (EC-44 / Fix #134) and the sheet's intended coarser check - so group (001,1,2020-06-01) disagrees 1:1 (PRE vs POST) and rows 1+2 fire, count 2. The four deleted leading var_exists conjuncts folded the whole Check silent on EVERY plain-FINDINGS domain the sheet's own Domains cell includes. On FA nothing changes: all four keys are present."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSTPT=PRE
+#expectViolationAt row=2 VSTPT=POST
+dataset VS class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VISITNUM type=Num
+col VSDTC    type=Char
+col VSTPT    type=Char
+---
+S1 | VS | 001 | 1 | 1 | 2020-06-01 | PRE
+S1 | VS | 001 | 2 | 1 | 2020-06-01 | POST
+S1 | VS | 001 | 3 | 2 | 2020-06-15 | PRE

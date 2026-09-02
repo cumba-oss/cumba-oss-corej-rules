@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0141 expect=noViolation domain=ADLBC
+#note "The blank target is excluded from both the count and the flag pass and by the rule's own not empty(PARAM) conjunct -> the group has the single value {Glucose} and nothing fires. Contrast with the tie fixture: a blank is NOT a third value here (unlike has_same_values, D.3)."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | Glucose
+CDISCPILOT01 | 01-701-1023 | GLUC | Glucose
+CDISCPILOT01 | 01-701-1034 | GLUC |
+---

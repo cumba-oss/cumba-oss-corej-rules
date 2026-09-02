@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1256 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING: the joined-dataset PRESENT-BUT-EMPTY near-miss for the INNER-join cluster (DS-entirely-absent is the standing harness carve-out, no fixture). DS is declared with its full column set and zero data rows -> the inner join drops EVERY DM row and the rule executes over zero rows, reporting nothing. expect=noViolation asserts executed."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | N
+S1 | DM | 002 | Y
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---

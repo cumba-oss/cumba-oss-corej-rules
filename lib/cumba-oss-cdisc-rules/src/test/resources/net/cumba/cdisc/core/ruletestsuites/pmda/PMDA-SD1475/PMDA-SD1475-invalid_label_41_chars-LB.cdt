@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1475 expect=violation domain=LB
+#note "Over-long label on the LAST column, proving the loop does not stop at the first column. label is exactly 41 characters, one past the limit. len(41) > 40 fires for that ONE variable. Pin by variable, not by row: this is a per-variable metadata rule."
+#expectViolationCount 1
+#expectViolationAt variable_name=LONGLBL variable_label=ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJX
+#library standard=sdtmig version=3-4
+dataset LB
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LONGLBL type=Char label="ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJX"
+---
+CDISCPILOT01 | 01-701-1015 | x

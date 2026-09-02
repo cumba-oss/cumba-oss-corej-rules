@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2342 expect=noViolation domain=TS
+#note "Sheet: 'TSVAL/TXVAL value must be either ISO 8601 format for time period (e.g. P80Y) or null, when TSPARMCD/TXPARMCD=DOSDUR'. Row 1 is a valid ISO 8601 duration, row 2 leaves TSVAL empty (explicitly permitted by the sheet), row 3 carries a non-duration value under a different parameter."
+#library standard=sendig version=3-1-1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+SEND001 | TS | 1 | DOSDUR | Duration of Dosing | P28D
+SEND001 | TS | 2 | DOSDUR | Duration of Dosing |
+SEND001 | TS | 1 | STSTDTC | Nonclinical Study Start Date | 2020-01-01

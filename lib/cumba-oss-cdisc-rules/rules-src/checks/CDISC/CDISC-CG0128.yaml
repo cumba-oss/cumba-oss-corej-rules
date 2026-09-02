@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0128"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ARMCD is populated and does not match any ARMCD\
+  \ value in the Trial Arms (TA) dataset, excluding subjects who failed screening\
+  \ (ARMCD equals 'SCRNFAIL') or were not assigned to an Arm (ARMCD equals 'NOTASSGN')."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Operations:
+- id: "$ta_armcd"
+  expression: "distinct(ARMCD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ARMCD) and ARMCD not in ["SCRNFAIL", "NOTASSGN"] and ARMCD not in $ta_armcd
+Outcome:
+  Message: "ARMCD does not match any ARMCD value in the TA dataset."
+  Output_Variables:
+  - "ARMCD"
+  - "$ta_armcd"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMCD"
+  Condition: "ARMCD not in TA.ARMCD"
+  Rule: "ARMCD in ('SCRNFAIL', 'NOTASSGN')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0128"
+        Version: "1"
+      Version: "2.0"

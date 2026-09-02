@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1337 expect=skipped domain=RS
+#note "FRESH - the batch's Requirements.Variables.All literal-entry pin. RS has no RSLNKID column, and the populated TR block is present so only the variable axis can reject. Requirements.Variables.All [RSLNKID] requires the column -> the rule must not execute."
+#library standard=sdtmig version=3-4
+dataset RS label="Disease Response"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RSSEQ    type=Num  label="Sequence Number"
+col RSTESTCD type=Char label="Response Assessment Short Name"
+col RSORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | RS | 001 | 1 | LSTASS | PR
+---
+
+dataset TR label="Tumor Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRSEQ    type=Num  label="Sequence Number"
+col TRLNKID  type=Char label="Link ID"
+col TRTESTCD type=Char label="Tumor Assessment Short Name"
+col TRORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TR | 001 | 1 | T01 | LDIAM | 20
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0403 expect=noViolation domain=ADLBC
+#note "Row 3's ATOXDSCL is blank. A blank TARGET is the D.2 emptiness exception: neither counted toward the group's distinct values nor ever flagged, so the (001, GLUC) group is left with one distinct value and nothing fires; independently row 3's own not empty(ATOXDSCL) conjunct is false. Pins the blank-TARGET exception."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVISITN  type=Num
+col AVAL     type=Num
+col ATOXDSCL type=Char
+---
+S1 | 001 | GLUC | 1 | 5.0 | GRADE1
+S1 | 001 | GLUC | 2 | 5.1 | GRADE1
+S1 | 001 | GLUC | 3 | 5.2 |

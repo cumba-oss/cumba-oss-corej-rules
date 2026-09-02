@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0032"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the second character of the two-character domain\
+  \ code (DOMAIN) is not an uppercase letter A to Z or a digit 0 to 9."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "DOMAIN"
+Check:
+  expression: >-
+    DOMAIN =~ /^.[^A-Z0-9]/
+Outcome:
+  Message: "The second character of the domain code (DOMAIN) is not an uppercase letter\
+    \ A to Z or a digit 0 to 9."
+  Output_Variables:
+  - "DOMAIN"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Two character domain identifier used as a prefix in the\
+    \ variable is limited to A to Z, 0-9 for the second character"
+  Rule: "Two character domain identifier used as a prefix in the variable is limited\
+    \ to A to Z, 0-9 for the second character"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND32"
+        Version: "1"
+      Version: "5.0"

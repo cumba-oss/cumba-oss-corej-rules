@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-SEND-0174"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Standard Toxicity Grade (LBTOXGR) is populated\
+  \ with a value that is not a valid integer number."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Requirements:
+  Variables:
+    All:
+    - "LBTOXGR"
+Check:
+  expression: >-
+    not empty(LBTOXGR) and LBTOXGR !~ /^-?[0-9]+$/
+Outcome:
+  Message: "LBTOXGR is populated with a value that is not a valid integer number."
+  Output_Variables:
+  - "LBTOXGR"
+Source:
+  Class: "FND"
+  Domain: "LB"
+  Variable: "LBTOXGR"
+  Plain_Text_Explanation: "LBTOXGR should be populated with valid numbers from a standard\
+    \ toxicity scale (such as the NCI CTCAE)."
+  Condition: "LBTOXGR ^= null"
+  Rule: "LBTOXGR = valid number from a standard toxicity scale"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND174"
+        Version: "1"
+      Version: "5.0"

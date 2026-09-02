@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0029"
+Sheet_Rule_Identifier: "DD0029"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "The def:ExtendedValue attribute is required when the CodedValue is an extended value."
+# CT-gated, EnumeratedItem leg (-B: CodeListItem). PMDA twin of CDISC 186/201.
+# Fires when the parent CodeList resolves (via its nci:ExtCodeID alias) to an
+# EXTENSIBLE CT codelist, the CodedValue is not one of that codelist's
+# submission values (i.e. it IS an extended value), and the item carries no
+# def:ExtendedValue="Yes" marking. Unlike CDISC 186 there is no @def:StandardOID
+# when-guard: the sheet conditions only on "the CodedValue is an extended
+# value", which the extended_value_marking required-mode already encodes.
+Message: "Required attribute def:ExtendedValue is missing or empty for CodedValue [${value}]"
+Check:
+  kind: "extended_value_marking"
+  mode: "required"

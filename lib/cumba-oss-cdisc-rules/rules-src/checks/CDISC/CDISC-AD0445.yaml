@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0445"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when PARCATy is populated but PARCATyN is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARCATy) and empty(PARCATyN)
+Outcome:
+  Message: "PARCATy is populated, but PARCATyN is missing"
+  Output_Variables:
+  - "PARCATy"
+  - "PARCATyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "PARCATyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, PARCATy is populated\
+    \ and PARCATyN is not populated"
+  Rule_Failure_Criteria: "PARCATyN is not populated"
+  Condition_Failure: "PARCATy is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR445"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR445"
+        Version: "2"
+      Version: "5.0"

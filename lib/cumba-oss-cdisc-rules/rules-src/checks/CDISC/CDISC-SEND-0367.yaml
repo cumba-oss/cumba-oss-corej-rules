@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-SEND-0367"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Character Result/Finding in Std Format (PYSTRESC)\
+  \ or Result Category (PYRESCAT) is \"UNDETERMINED\" while the Completion/Reason\
+  \ Not Done (PYSTAT) is \"NOT DONE\"; UNDETERMINED must only be used when an examination\
+  \ was conducted and a result was collected, not to indicate the examination was\
+  \ not done."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PY"
+Requirements:
+  Variables:
+    All:
+    - "PYSTAT"
+Check:
+  expression: >-
+    (var_exists("PYSTRESC") and PYSTRESC == "UNDETERMINED" or var_exists("PYRESCAT") and PYRESCAT ==
+    "UNDETERMINED") and PYSTAT == "NOT DONE"
+Outcome:
+  Message: "PYSTRESC or PYRESCAT is \"UNDETERMINED\" but PYSTAT indicates the examination\
+    \ was not done (\"NOT DONE\")."
+  Output_Variables:
+  - "PYSTRESC"
+  - "PYRESCAT"
+  - "PYSTAT"
+Source:
+  Class: "FND"
+  Domain: "PY"
+  Variable: "PYSTRESC, PYRESCAT"
+  Plain_Text_Explanation: "Submission value of UNDETERMINED for PYSTRESC and / or\
+    \ PYRESCAT indicates an examination occurred and a result was collected. UNDETERMINED\
+    \ must not be used in PYSTRESC or PYRESCAT to indicate the exam was not done."
+  Condition: "PYSTRESC = \"UNDETERMINED\" OR PYRESCAT = \"UNDETERMINED\""
+  Rule: "Examination was conducted and a result was collected"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND367"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND367"
+        Version: "1"
+      Version: "5.0"

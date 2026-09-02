@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1088 expect=noViolation domain=AE
+#note "Row 1: complete AESTDTC + complete RFSTDTC and AESTDY populated -> ok. Row 2: partial AESTDTC with AESTDY empty -> ok (condition not met)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AESTDY  type=Num  label="Study Day of Start of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01-10 | 10
+S1 | AE | 001 | 2 | NAUSEA   | 2020-02    |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

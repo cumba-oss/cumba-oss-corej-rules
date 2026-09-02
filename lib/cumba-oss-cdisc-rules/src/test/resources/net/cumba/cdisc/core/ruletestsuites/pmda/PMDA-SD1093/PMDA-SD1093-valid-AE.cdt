@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1093 expect=noViolation domain=AE
+#note "Row 1: AEENDY populated with both AEENDTC and DM.RFSTDTC complete -> the day value is derivable, no finding. Row 2 leaves AEENDY empty, which the not-empty conjunct skips even though its AEENDTC is partial."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+col AEENDY  type=Num  label="Study Day of End of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-06-25 | 5
+S1 | AE | 002 | 1 | HEADACHE | 2023-06     | .
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2023-06-01
+S1 | DM | 002 | 2023-06-01

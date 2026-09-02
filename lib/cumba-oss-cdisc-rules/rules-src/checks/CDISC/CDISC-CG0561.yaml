@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0561"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Verbatim Examination Finding (PEORRES) is empty\
+  \ but Character Result/Finding in Std Format (PESTRESC) is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PE"
+Check:
+  expression: >-
+    empty(PEORRES) and not empty(PESTRESC)
+Outcome:
+  Message: "PESTRESC is populated when PEORRES is empty."
+  Output_Variables:
+  - "PEORRES"
+  - "PESTRESC"
+Source:
+  Class: "FND"
+  Domain: "PE"
+  Variable: "PESTRESC"
+  Condition: "PEORRES =  null"
+  Rule: "PESTRESC = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0561"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0561"
+        Version: "1"
+      Version: "2.0"

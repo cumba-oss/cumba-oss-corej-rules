@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-CG0444"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARMCD equals 'COMPTRT' or 'TRT' and TSVCDREF\
+  \ is not equal to 'UNII'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVCDREF"
+Check:
+  expression: >-
+    (TSPARMCD == "COMPTRT" or TSPARMCD == "CURTRT" or TSPARMCD == "TRT") and TSVCDREF != "UNII"
+Outcome:
+  Message: "TSPARMCD equals 'COMPTRT' or 'TRT' but TSVCDREF is not equal to 'UNII'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVCDREF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVCDREF"
+  Condition: "TSPARMCD in ('COMPTRT', 'CURTRT', 'TRT')"
+  Rule: "TSVCDREF = 'UNII'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0444"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0444"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1319 expect=noViolation domain=DS
+#note "Row 1: DSSTDTC equal to RFICDTC -> boundary, strict less-than does not fire. Row 2: DSSTDTC after RFICDTC -> ok. Row 3: DSSTDTC empty -> ok. Row 4: subject with empty RFICDTC -> no comparand, no fire."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | INFORMED CONSENT OBTAINED | 2020-01-01
+S1 | DS | 001 | 2 | RANDOMIZED                | 2020-01-15
+S1 | DS | 001 | 3 | COMPLETED                 |
+S1 | DS | 002 | 1 | RANDOMIZED                | 2019-01-01
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFICDTC type=Char label="Date/Time of Informed Consent"
+---
+S1 | DM | 001 | 2020-01-01
+S1 | DM | 002 |
+---

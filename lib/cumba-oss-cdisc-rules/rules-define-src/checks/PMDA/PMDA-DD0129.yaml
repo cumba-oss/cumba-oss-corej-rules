@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0129"
+Sheet_Rule_Identifier: "DD0129"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "An NCI code must be provided if the def:StandardOID attribute is set on the CodeList in order to verify that CodeList exists in the terminology."
+Message: "Missing required Alias"
+# 0124-B fire-always vehicle: fires on a def:StandardOID-bound CodeList with no
+# Alias child carrying Context 'nci:ExtCodeID' (the NCI-code carrier). Partial
+# overlap with CDISC 0249 (custom exactly-one check): PMDA only demands
+# presence, not the count(...)=1 form, so duplicated Aliases pass here.
+Check:
+  kind: "not_exists"
+  target: "@OID"
+  when:
+    all:
+    - path: "@OID"
+      exists: true
+    - path: "@StandardOID"
+      exists: true
+    - not:
+        path: "Alias/@Context"
+        equals: "nci:ExtCodeID"

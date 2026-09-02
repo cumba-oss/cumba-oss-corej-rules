@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0252 expect=violation domain=ADAE
+#note "PARAM, PARAMCD, AVAL and BASE are four names from the rule's 28-name concrete membership list and exactly the contamination the Source sentence names ('for ADAE, there is no need for AVAL, AVALC and Parameter variables'). Since Fix #270 (ruling M2-D3) the Check tests the variable NAME - varname() in [...] plus one regex per template family, no wildcards left - so it routes as Variable Metadata Check / Record via evaluateMetadataNative, iterates every column and emits ONE finding per offending variable -> FOUR violations, pinned by variable_name only (no row= pin: Violation.row carries the colIndex and a row= pin would resolve colIndex+1 against data rows). The dataset carries AEDECOD and declares structure=OCCDS, keeping it inside the parent's scope partition (Fix #154). Formerly the D9 PREDICTED-RED pin of finding AD0252-F1 - as shipped pre-#270, the wildcard-carrying Check was routed whole through WildcardExpander and a NoMatch dropped the rule with its concrete arms; the ruling removed that failure by construction and this scenario flipped green."
+#library standard=adamig version=1-3
+#expectViolationCount 4
+#expectViolationAt variable_name=PARAM
+#expectViolationAt variable_name=PARAMCD
+#expectViolationAt variable_name=AVAL
+#expectViolationAt variable_name=BASE
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col PARAM    type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col BASE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | Glucose | GLUC | 30 | 28
+CDISCPILOT01 | 01-701-1023 | NAUSEA | Glucose | GLUC | 31 | 28

@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0861"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when COHORTC is populated and COHORT is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "COHORT"
+    - "COHORTC"
+Check:
+  expression: >-
+    not empty(COHORTC) and empty(COHORT)
+Outcome:
+  Message: "COHORTC is populated, but COHORT is not populated."
+  Output_Variables:
+  - "COHORT"
+  - "COHORTC"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "COHORT"
+  Natural_Language_Rule_Failure_Criteria: "COHORTC is populated and COHORT is not\
+    \ populated"
+  Rule_Failure_Criteria: "COHORT is not populated"
+  Condition_Failure: "COHORTC is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR861"
+        Version: "1"
+      Version: "5.0"

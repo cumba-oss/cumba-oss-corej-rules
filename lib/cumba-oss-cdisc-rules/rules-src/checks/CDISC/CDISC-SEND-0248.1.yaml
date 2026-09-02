@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0248.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVAL for a date/duration TSPARMCD is neither a\
+  \ valid ISO 8601 date or duration nor an SDTM masked date, in which an unknown component\
+  \ is written as a hyphen placeholder."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Check:
+  expression: >-
+    TSPARMCD in ["DOSDUR", "EXPENDTC", "EXPSTDTC", "STSTDTC", "TRMSAC", "DOSENDTC", "DOSSTDTC",
+    "INTSAC", "SLENGTH", "RECSAC", "STENDTC"] and invalid_date(TSVAL) and invalid_duration(TSVAL,
+    negative=false)
+Outcome:
+  Message: "TSVAL for a date or duration TSPARMCD is neither a valid ISO 8601 date\
+    \ or duration nor an SDTM masked date."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Plain_Text_Explanation: "Dates or durations represented in TSVAL must be in the\
+    \ appropriate ISO 8601 format."
+  Condition: "TSPARMCD In (DOSDUR, EXPENDTC, EXPSTDTC, STSTDTC, TRMSAC, DOSENDTC,\
+    \ DOSSTDTC, INTSAC, SLENGTH, RECSAC, STENDTC)"
+  Rule: "TSVAL in ISO 8601 format"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND248.1"
+        Version: "1"
+      Version: "5.0"

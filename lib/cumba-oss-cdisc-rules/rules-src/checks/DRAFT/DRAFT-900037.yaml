@@ -1,0 +1,34 @@
+Core:
+  Id: "DRAFT-900037"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when DTYPE is populated with a value that is not from\
+  \ the ADaM controlled terminology for derivation type."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The allowed-value list is a snapshot of the ADaM derivation-type controlled\
+    \ terminology hardcoded at authoring time; the codelist is extensible and evolves,\
+    \ so sponsor extensions and newer published terms report as violations."
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "DTYPE"
+Check:
+  expression: >-
+    not empty(DTYPE) and DTYPE not in ["AVERAGE", "ENDPOINT", "LOD", "LOCF", "MINIMUM", "MAXIMUM",
+    "MEDIAN", "MOD", "WOCF", "WORST CASE"]
+Outcome:
+  Message: "DTYPE value is not from the ADaM controlled terminology for derivation\
+    \ type."
+  Output_Variables:
+  - "DTYPE"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

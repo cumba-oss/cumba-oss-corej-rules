@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD1019 expect=noViolation domain=ADSL
+#note "Two things pinned at once: boundary indices 01, 10 and 99 are accepted, AND the unindexed ADSL trial dates TRTSDT/TRTEDT do not match the first regex at all (finding AD1019-F1(a)). Declares no column with a non-digit index: this fixture must stay neutral under finding AD1018-F1."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTSDT   type=Num
+col TRTEDT   type=Num
+col TR01SDT  type=Num
+col AP99EDTM type=Num
+col TR10STMF type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 21916 | 22000 | 21916 | 22000 | Y

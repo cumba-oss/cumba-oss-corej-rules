@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0320 expect=violation domain=ADSUBJ
+#note "Pins the DECLARED-TIER reach of the structure gate: since Fix #154 (corej.defineFirst defaults true) a declared def:Class - which structure= stands in for - overrides the name/column heuristic, so a dataset not named ADSL is in scope when it declares the ADSL structure, and the rule then demands the ADSL label of it. Recorded as an INFO refinement of the AD0320B Scope note; pins today's behaviour."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt dataset_name=ADSUBJ
+dataset ADSUBJ structure=ADSL label="Wrong Label"
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 56

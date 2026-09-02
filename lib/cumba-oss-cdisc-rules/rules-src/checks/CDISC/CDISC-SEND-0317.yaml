@@ -1,0 +1,74 @@
+Core:
+  Id: "CDISC-SEND-0317"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Date/Time of Disposition Event (DSSTDTC) contains\
+  \ an ISO 8601 interval of uncertainty, indicated by a solidus (\"/\") separating\
+  \ two date/time bounds."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSSTDTC"
+Check:
+  expression: >-
+    DSSTDTC =~ /.*\//
+Outcome:
+  Message: "DSSTDTC contains an interval of uncertainty (a \"/\" separating two date/time\
+    \ bounds), which is not permitted."
+  Output_Variables:
+  - "DSSTDTC"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSSTDTC"
+  Plain_Text_Explanation: "The use of an interval of uncertainty, as described in\
+    \ Section 4.4.2, cannot be used for DSSTDTC."
+  Rule: "DSSTDTC cannot contain an interval of uncertainty"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND317"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND317"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND317"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND317"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND317"
+        Version: "1"
+      Version: "5.0"

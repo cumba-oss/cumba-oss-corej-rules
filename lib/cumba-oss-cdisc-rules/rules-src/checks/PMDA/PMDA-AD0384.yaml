@@ -1,0 +1,51 @@
+Core:
+  Id: "PMDA-AD0384"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a parameter (PARAMCD), the numeric Baseline\
+  \ Toxicity Grade Low (N) (BTOXGRLN) does not have a single consistent value for\
+  \ a given value of the character Baseline Toxicity Grade Low (BTOXGRL), evaluated\
+  \ only on rows where both BTOXGRLN and BTOXGRL are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BTOXGRLN) and var_exists("BTOXGRL") and var_exists("PARAMCD") and not empty(BTOXGRL)
+    and not empty(PARAMCD) and is_inconsistent_across_dataset(BTOXGRLN, keys=[BTOXGRL, PARAMCD])
+Outcome:
+  Message: "BTOXGRLN has inconsistent values for the same BTOXGRL within a parameter."
+  Output_Variables:
+  - "PARAMCD"
+  - "BTOXGRL"
+  - "BTOXGRLN"
+Source:
+  Message: "Inconsistent value for BTOXGRLN within a unique PARAMCD"
+  Description: "Within a parameter, there should be only a single value of Baseline\
+    \ Toxicity Grade Low (N) (BTOXGRLN) variable for a given value of Baseline Toxicity\
+    \ Grade Low (BTOXGRL) variable, considering only those rows on which both variables\
+    \ are populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0384"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0384"
+        Version: "1"
+      Version: "6.0"

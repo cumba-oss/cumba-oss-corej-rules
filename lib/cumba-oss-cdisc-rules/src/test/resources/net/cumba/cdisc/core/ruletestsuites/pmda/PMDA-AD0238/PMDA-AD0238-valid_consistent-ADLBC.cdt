@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0238 expect=noViolation domain=ADLBC
+#note "Each TRTPG1 maps to exactly one TRTPG1N -> executes and stays silent."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTPG1  type=Char
+col TRTPG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | POOLA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLA | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLB | 2

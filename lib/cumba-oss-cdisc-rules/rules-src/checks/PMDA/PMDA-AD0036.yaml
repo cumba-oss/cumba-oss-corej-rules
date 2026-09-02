@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0036"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable whose name ends in 'PFN' (a parameter-level\
+  \ flag number) has a value other than 1 or missing."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "PFN") and not empty(value()) and value() not in [1]
+Outcome:
+  Message: "A variable whose name ends in 'PFN' has a value that is not 1 or missing."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "*PFN value is not 1 or null"
+  Description: "A variable with a suffix of PFN must have a value that is 1 or null\
+    \ (P = parameter level flag variable)."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0036"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0036"
+        Version: "1"
+      Version: "6.0"

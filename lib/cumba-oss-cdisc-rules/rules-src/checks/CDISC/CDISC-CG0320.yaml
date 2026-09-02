@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-CG0320"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a custom domain in the Findings general observation\
+  \ class does not include the topic variable --TESTCD."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Operations:
+- id: "$domain_is_custom"
+  expression: "domain_is_custom()"
+Check:
+  expression: >-
+    $domain_is_custom == true and not var_exists("--TESTCD")
+Outcome:
+  Message: "A custom Findings-class domain does not include the topic variable --TESTCD."
+  Output_Variables:
+  - "$domain_is_custom"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--TESTCD"
+  Condition: "Custom domain present in study"
+  Rule: "--TESTCD present in custom findings dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0320"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0320"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0320"
+        Version: "2"
+      Version: "2.0"

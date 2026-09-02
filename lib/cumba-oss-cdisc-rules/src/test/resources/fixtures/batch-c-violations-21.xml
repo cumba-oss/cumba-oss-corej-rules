@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch C (datasets / ItemGroupDef family) violations 2.1 fixture: each
+     ItemGroupDef carries exactly one engineered defect (named by its comment)
+     and is otherwise clean, so every batch-C rule fires exactly once - with two
+     deliberate double-duty datasets:
+       * IG.NOLOC violates both 119 (def:ArchiveLocationID missing) and 125
+         (def:HasNoData missing) - the two sides of the either-or rule pair
+         cannot be separated without a def:HasNoData='No' side effect on 126;
+       * IG.NSNODESC violates both 57 (non-standard dataset without Description)
+         and 128 (Description missing under Submission) - any Description
+         missing in a Submission-context document necessarily fires 128.
+     The trailing empty MetaDataVersion MDV.EMPTY fires 93. -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-c-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHC.V">
+    <GlobalVariables>
+      <StudyName>BATCHC-VIOLATIONS</StudyName>
+      <StudyDescription>Batch C violations fixture study</StudyDescription>
+      <ProtocolName>BATCHC-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch C violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.1" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+      </def:Standards>
+      <!-- 94: OID missing -->
+      <ItemGroupDef Name="NOOID" Repeating="No" SASDatasetName="NOOID"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOOID" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without OID</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOOID" xlink:href="nooid.xpt">
+          <def:title>nooid.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 104: Name missing (110 skips: one side absent) -->
+      <ItemGroupDef OID="IG.NONAME" Repeating="No" SASDatasetName="NONAME"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NONAME" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without Name</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NONAME" xlink:href="noname.xpt">
+          <def:title>noname.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 108: SASDatasetName missing under Submission (109/110/112 skip) -->
+      <ItemGroupDef OID="IG.NOSAS" Name="NOSAS" Repeating="No"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOSAS" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without SASDatasetName</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOSAS" xlink:href="nosas.xpt">
+          <def:title>nosas.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 109: SAS dataset name 9 characters long (Name and href kept equal so
+           110/112 stay silent) -->
+      <ItemGroupDef OID="IG.LONGSAS" Name="LONGNAME9" Repeating="No"
+                    SASDatasetName="LONGNAME9" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.LONGSAS" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with over-long SAS name</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.LONGSAS" xlink:href="longname9.xpt">
+          <def:title>longname9.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 110: SASDatasetName 'AEX' differs from Name 'AE' (href matches the
+           SASDatasetName so 112 stays silent) -->
+      <ItemGroupDef OID="IG.SASMIS" Name="AE" Repeating="No" SASDatasetName="AEX"
+                    Purpose="Tabulation" def:Structure="One record per adverse event per subject"
+                    def:ArchiveLocationID="LF.SASMIS" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Adverse Events</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.SASMIS" xlink:href="aex.xpt">
+          <def:title>aex.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 112: archive file egg.xpt does not match SASDatasetName 'EG' -->
+      <ItemGroupDef OID="IG.BADFILE" Name="EG" Repeating="No" SASDatasetName="EG"
+                    Purpose="Tabulation" def:Structure="One record per ECG observation per subject"
+                    def:ArchiveLocationID="LF.BADFILE" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">ECG Test Results</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="FINDINGS"/>
+        <def:leaf ID="LF.BADFILE" xlink:href="egg.xpt">
+          <def:title>egg.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 113: Repeating missing (114 skips) -->
+      <ItemGroupDef OID="IG.NOREP" Name="NOREP" SASDatasetName="NOREP"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOREP" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without Repeating</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOREP" xlink:href="norep.xpt">
+          <def:title>norep.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 114: Repeating outside the Yes/No enumeration -->
+      <ItemGroupDef OID="IG.BADREP" Name="BADREP" Repeating="Maybe"
+                    SASDatasetName="BADREP" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BADREP" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with bad Repeating</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BADREP" xlink:href="badrep.xpt">
+          <def:title>badrep.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 115: IsReferenceData outside the Yes/No enumeration (260 guard is
+           'Yes' only, so it stays silent) -->
+      <ItemGroupDef OID="IG.BADREF" Name="BADREF" Repeating="No"
+                    IsReferenceData="Unknown" SASDatasetName="BADREF"
+                    Purpose="Tabulation" def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BADREF" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with bad IsReferenceData</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BADREF" xlink:href="badref.xpt">
+          <def:title>badref.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 116: Purpose outside the Tabulation/Analysis enumeration -->
+      <ItemGroupDef OID="IG.BADPURP" Name="BADPURP" Repeating="No"
+                    SASDatasetName="BADPURP" Purpose="Bogus"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BADPURP" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with bad Purpose</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BADPURP" xlink:href="badpurp.xpt">
+          <def:title>badpurp.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 117: Purpose missing (116 skips) -->
+      <ItemGroupDef OID="IG.NOPURP" Name="NOPURP" Repeating="No"
+                    SASDatasetName="NOPURP"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOPURP" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without Purpose</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOPURP" xlink:href="nopurp.xpt">
+          <def:title>nopurp.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 118: def:Structure missing -->
+      <ItemGroupDef OID="IG.NOSTRUCT" Name="NOSTRUCT" Repeating="No"
+                    SASDatasetName="NOSTRUCT" Purpose="Tabulation"
+                    def:ArchiveLocationID="LF.NOSTRUCT" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without Structure</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOSTRUCT" xlink:href="nostruct.xpt">
+          <def:title>nostruct.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 119 + 125: neither def:ArchiveLocationID nor def:HasNoData under
+           Submission (the inseparable either-or pair; 112/120 skip) -->
+      <ItemGroupDef OID="IG.NOLOC" Name="NOLOC" Repeating="No"
+                    SASDatasetName="NOLOC" Purpose="Tabulation"
+                    def:Structure="One record per subject" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without archive location</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <!-- 120: def:ArchiveLocationID does not resolve to any def:leaf (112
+           skips: the deref resolves nothing) -->
+      <ItemGroupDef OID="IG.DANGLOC" Name="DANGLOC" Repeating="No"
+                    SASDatasetName="DANGLOC" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.MISSING" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with dangling archive location</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <!-- 121: def:IsNonStandard provided although def:StandardOID is present
+           (123 passes: value is 'Yes') -->
+      <ItemGroupDef OID="IG.BOTHSTD" Name="BOTHSTD" Repeating="No"
+                    SASDatasetName="BOTHSTD" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BOTHSTD" def:StandardOID="STD.1"
+                    def:IsNonStandard="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset flagged both standard and non-standard</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BOTHSTD" xlink:href="bothstd.xpt">
+          <def:title>bothstd.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 122: neither def:StandardOID nor def:IsNonStandard -->
+      <ItemGroupDef OID="IG.NOSTD" Name="NOSTD" Repeating="No"
+                    SASDatasetName="NOSTD" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOSTD">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without standard designation</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOSTD" xlink:href="nostd.xpt">
+          <def:title>nostd.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 123: def:IsNonStandard 'No' (122 passes: attribute is present) -->
+      <ItemGroupDef OID="IG.BADNS" Name="BADNS" Repeating="No"
+                    SASDatasetName="BADNS" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BADNS" def:IsNonStandard="No">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with bad IsNonStandard value</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BADNS" xlink:href="badns.xpt">
+          <def:title>badns.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 124: def:StandardOID does not resolve to any def:Standard -->
+      <ItemGroupDef OID="IG.DANGSTD" Name="DANGSTD" Repeating="No"
+                    SASDatasetName="DANGSTD" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DANGSTD" def:StandardOID="STD.MISSING">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with dangling standard reference</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.DANGSTD" xlink:href="dangstd.xpt">
+          <def:title>dangstd.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 126: def:HasNoData 'No' (with an archive location so 119/125 pass) -->
+      <ItemGroupDef OID="IG.BADHND" Name="BADHND" Repeating="No"
+                    SASDatasetName="BADHND" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.BADHND" def:StandardOID="STD.1"
+                    def:HasNoData="No">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with bad HasNoData value</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.BADHND" xlink:href="badhnd.xpt">
+          <def:title>badhnd.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 127: def:CommentOID does not resolve to any def:CommentDef -->
+      <ItemGroupDef OID="IG.DANGCOM" Name="DANGCOM" Repeating="No"
+                    SASDatasetName="DANGCOM" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.DANGCOM" def:StandardOID="STD.1"
+                    def:CommentOID="COM.MISSING">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset with dangling comment reference</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.DANGCOM" xlink:href="dangcom.xpt">
+          <def:title>dangcom.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 57 + 128: non-standard dataset without Description (any missing
+           Description also fires the unconditional-under-Submission 128) -->
+      <ItemGroupDef OID="IG.NSNODESC" Name="NSNODESC" Repeating="No"
+                    SASDatasetName="NSNODESC" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NSNODESC" def:IsNonStandard="Yes">
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:leaf ID="LF.NSNODESC" xlink:href="nsnodesc.xpt">
+          <def:title>nsnodesc.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 129: two Description children (128 passes: at least one present) -->
+      <ItemGroupDef OID="IG.TWODESC" Name="TWODESC" Repeating="No"
+                    SASDatasetName="TWODESC" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.TWODESC" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">First description</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second description</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.TWODESC" xlink:href="twodesc.xpt">
+          <def:title>twodesc.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 239: TRIAL DESIGN class with IsReferenceData 'No' (115 passes: 'No'
+           is in the schema enumeration) -->
+      <ItemGroupDef OID="IG.TDNOREF" Name="TDNOREF" Repeating="No"
+                    IsReferenceData="No" SASDatasetName="TDNOREF"
+                    Purpose="Tabulation" def:Structure="One record per arm"
+                    def:ArchiveLocationID="LF.TDNOREF" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Trial Arms</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="TRIAL DESIGN"/>
+        <def:leaf ID="LF.TDNOREF" xlink:href="tdnoref.xpt">
+          <def:title>tdnoref.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 240: def:HasNoData 'Yes' without def:CommentOID (119/125 pass via
+           HasNoData; 126 passes: value is 'Yes') -->
+      <ItemGroupDef OID="IG.NODATA" Name="NODATA" Repeating="No"
+                    SASDatasetName="NODATA" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:StandardOID="STD.1" def:HasNoData="Yes">
+        <Description>
+          <TranslatedText xml:lang="en">Empty dataset without comment</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+      </ItemGroupDef>
+      <!-- 241: no ItemRef child -->
+      <ItemGroupDef OID="IG.NOITEMS" Name="NOITEMS" Repeating="No"
+                    SASDatasetName="NOITEMS" Purpose="Tabulation"
+                    def:Structure="One record per subject"
+                    def:ArchiveLocationID="LF.NOITEMS" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Dataset without variable references</TranslatedText>
+        </Description>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.NOITEMS" xlink:href="noitems.xpt">
+          <def:title>noitems.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+      <!-- 260: IsReferenceData 'Yes' with Repeating 'Yes' (114/115 pass:
+           both values are in the schema enumerations) -->
+      <ItemGroupDef OID="IG.REPREF" Name="REPREF" Repeating="Yes"
+                    IsReferenceData="Yes" SASDatasetName="REPREF"
+                    Purpose="Tabulation" def:Structure="One record per parameter"
+                    def:ArchiveLocationID="LF.REPREF" def:StandardOID="STD.1">
+        <Description>
+          <TranslatedText xml:lang="en">Repeating reference data</TranslatedText>
+        </Description>
+        <ItemRef ItemOID="IT.STUDYID" OrderNumber="1" Mandatory="Yes"/>
+        <def:Class Name="EVENTS"/>
+        <def:leaf ID="LF.REPREF" xlink:href="repref.xpt">
+          <def:title>repref.xpt</def:title>
+        </def:leaf>
+      </ItemGroupDef>
+    </MetaDataVersion>
+    <!-- 93: MetaDataVersion without any ItemGroupDef under Submission -->
+    <MetaDataVersion OID="MDV.EMPTY" Name="Empty MDV" def:DefineVersion="2.1.0"/>
+  </Study>
+</ODM>

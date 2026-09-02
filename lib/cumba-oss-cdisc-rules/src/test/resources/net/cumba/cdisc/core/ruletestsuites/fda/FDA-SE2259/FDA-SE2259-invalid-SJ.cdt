@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE2259 expect=violation domain=SJ
+#note "Row 2 pairs a TT-declared code ST1 with the wrong stage description 'Gestation', so the (RSTGCD, RSTAGE) tuple is not a TT row -> fires. Row 1 matches TT exactly, row 3 is the exempt UNPLAN, row 4 has an empty RSTGCD."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 RSTAGE=Gestation
+dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+---
+S1 | SJ | 001 | 1 | ST1    | Premating       | 2020-01-01
+S1 | SJ | 002 | 1 | ST1    | Gestation       | 2020-02-01
+S1 | SJ | 003 | 1 | UNPLAN | Unplanned stage | 2020-03-01
+S1 | SJ | 004 | 1 |        |                 | 2020-04-01
+---
+
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Repro Stage Start Rule"
+---
+S1 | TT | ST1 | Premating | FIRST DOSE
+S1 | TT | ST2 | Gestation | GD 0
+---

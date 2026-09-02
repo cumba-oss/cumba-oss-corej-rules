@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0176 expect=violation domain=ADLBC
+#note "ABLFL, when populated, must be Y. Row 1 (N) and row 4 (NA) are populated and outside the permitted set, so both fire; row 2 (Y) passes the membership test and row 3 (blank) is disarmed by the leading `not empty(ABLFL)`. structure=BDS is declared explicitly so the scope verdict is deterministic (the declaration wins over the column heuristic since Fix #154), with the mandatory #library line as its carrier. No lower-case y appears anywhere - this fixture makes no claim about the case sensitivity of `not in`. Record granularity -> 2 violations."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 ABLFL=N
+#expectViolationAt row=4 USUBJID=01-701-1045 ABLFL=NA
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ABLFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | N
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 | Y
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 |
+CDISCPILOT01 | 01-701-1045 | ALT | 1.1 | NA

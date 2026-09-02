@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1133 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. DELIBERATELY NO ACTARMCD COLUMN. Predicted SILENT because the AUTHORED var_exists(\"ACTARMCD\") conjunct is false - and that is the load-bearing point: without it the operator would NOT be silent here (GroupSemantics.inconsistentAcrossDatasetViolations drops an absent grouping column and, since EC-44 / Fix #134, answers an all-absent comparator set with ONE WHOLE-TABLE group, in which the three ACTARM values would be a tie flagging all three rows). The rule is NOT skipped: Requirements.Variables.All names ACTARM, which is present. A FIRE means the authored guard stopped working; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ACTARM  type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 | Placebo
+S1 | DM | 002 | Placebo Arm
+S1 | DM | 003 | Active

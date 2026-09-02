@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD2011 expect=violation domain=AE
+#note "AEHLTCD 1234567 is not a High Level Term code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid HLT code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEHLTCD=1234567
+dataset AE
+col USUBJID type=Char
+col AEHLT   type=Char
+col AEHLTCD type=Num
+---
+001 | Headaches NEC | 10019231
+001 | Headaches NEC | 1234567

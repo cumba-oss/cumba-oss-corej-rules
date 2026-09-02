@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0005 expect=noViolation domain=LB
+#note "LBSEQ unique per USUBJID within the domain; the same LBSEQ value on different subjects is allowed -> no violation."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+---
+S1 | LB | 001 | 1 | ALB
+S1 | LB | 001 | 2 | ALB
+S1 | LB | 002 | 1 | ALB
+S1 | LB | 002 | 2 | GLUC

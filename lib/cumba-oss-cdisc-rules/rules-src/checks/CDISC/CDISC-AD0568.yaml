@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-AD0568"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ONTRTFN is present and ONTRTFL is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ONTRTFN") and not var_exists("ONTRTFL")
+Outcome:
+  Message: "ONTRTFN is present, but ONTRTFL is not present."
+  Output_Variables:
+  - "ONTRTFN"
+Source_Proposed:
+  Sheet_Issue: "#61"
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "ONTRTFN"
+  Natural_Language_Rule_Failure_Criteria: "ONTRTFN is present and ONTRTFL is not present"
+  Rule_Failure_Criteria: "ONTRTFL is not present"
+  Condition_Failure: "ONTRTFN is present"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ONTRTFN"
+  Natural_Language_Rule_Failure_Criteria: "ONTRTFN is present and ONTRTFL is not present"
+  Rule_Failure_Criteria: "NTRTFL is not present"
+  Condition_Failure: "ONTRTFN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR568"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR568"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR568"
+        Version: "2"
+      Version: "5.0"

@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SD1204"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ENDTC is populated and is after DM.RFPENDTC (Date/Time\
+  \ of End of Participation)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ENDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    not empty(--ENDTC) and not empty(DM.RFPENDTC) and date(--ENDTC) > DM.RFPENDTC
+Outcome:
+  Message: "--ENDTC is after DM.RFPENDTC (Date/Time of End of Participation)."
+  Output_Variables:
+  - "--ENDTC"
+  - "DM.RFPENDTC"
+Source:
+  FDA_Validator_Rule_Message: "--ENDTC date is after RFPENDTC"
+  FDA_Validator_Rule_Description: "End Date/Time (--ENDTC) variable value must be\
+    \ less than or equal to Date/Time of End of Participation (RFPENDTC)."
+  Domains: "DI, DM, DR, SE, SM, SV, INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1204"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1204"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1204"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1204"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1204"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

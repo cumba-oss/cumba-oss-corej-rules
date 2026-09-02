@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0678 expect=violation domain=ADDL
+#note "Mirror of PMDA-AD0677: key DEVTYG1, target DEVTYG1N. Group PUMP holds {1 x2, 2 x1} -> the minority row fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 DEVTYG1=PUMP DEVTYG1N=2
+dataset ADDL
+col STUDYID   type=Char
+col USUBJID   type=Char
+col SPDEVID   type=Char
+col DEVTYG1   type=Char
+col DEVTYG1N  type=Num
+---
+S1 | 001 | DEV01 | PUMP | 1
+S1 | 002 | DEV01 | PUMP | 1
+S1 | 003 | DEV02 | PUMP | 2
+---

@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0431"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when APHASE is populated but APHASEN is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(APHASE) and empty(APHASEN)
+Outcome:
+  Message: "APHASE is populated, but APHASEN is missing"
+  Output_Variables:
+  - "APHASE"
+  - "APHASEN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "APHASEN"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, APHASE is populated\
+    \ and APHASEN is not populated"
+  Rule_Failure_Criteria: "APHASEN is not populated"
+  Condition_Failure: "APHASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR431"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR431"
+        Version: "2"
+      Version: "5.0"

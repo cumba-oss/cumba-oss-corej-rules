@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0358"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SBSTRAIN variable is present in the Demographics\
+  \ (DM) dataset, since SBSTRAIN is defined for use in non-clinical (SEND) studies\
+  \ and must never be used in the Demographics domain for human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    var_exists("SBSTRAIN")
+Outcome:
+  Message: "SBSTRAIN is present in the DM dataset; this variable must never be used\
+    \ in the Demographics domain for human clinical trials."
+  Output_Variables:
+  - "SBSTRAIN"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "SBSTRAIN"
+  Rule: "SBSTRAIN not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0358"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0358"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0358"
+        Version: "1"
+      Version: "2.0"

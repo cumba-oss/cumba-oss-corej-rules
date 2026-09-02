@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0153 expect=noViolation domain=BG
+#note "One BGTEST group of 3 rows with BGSTRESU = g, g, blank. A blank target is excluded from both the distinct-count and the flag pass unless include_empty=true (operator-examples D.2; the rule authors no include_empty), so the group has at most 1 distinct non-blank value and stays silent. Pins the emptiness exception."
+dataset BG label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGTEST   type=Char label="Body Weight Gain Test Name"
+col BGSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | BG | 001 | 1 | BODY WEIGHT GAIN | g
+CDISCPILOT01 | BG | 002 | 2 | BODY WEIGHT GAIN | g
+CDISCPILOT01 | BG | 003 | 3 | BODY WEIGHT GAIN |
+---

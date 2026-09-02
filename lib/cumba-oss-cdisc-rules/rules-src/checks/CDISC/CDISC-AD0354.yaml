@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-AD0354"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is not present, ByIND is populated, and\
+  \ ByIND does not equal the AyIND value where ABLFL equals Y, for the same subject\
+  \ and parameter"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Operations:
+- id: "$baseline_ayind"
+  expression: "max(\"AyIND\", group=[USUBJID, PARAMCD], filter=filter(ABLFL=\"Y\"\
+    ))"
+Check:
+  expression: >-
+    not var_exists("BASETYPE") and not empty(ByIND) and ByIND != $baseline_ayind
+Outcome:
+  Message: "BASETYPE is not present and ByIND is populated, but ByIND does not equal\
+    \ the AyIND value where ABLFL equals Y, for this subject and parameter."
+  Output_Variables:
+  - "PARAMCD"
+  - "ByIND"
+  - "$baseline_ayind"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "ByIND where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is not present, ByIND is populated,\
+    \ and ByIND is not equal to AyIND where ABLFL is equal to Y for a given value\
+    \ of PARAMCD for a subject"
+  Rule_Failure_Criteria: "ByIND is not equal to AyIND where ABLFL is equal to Y for\
+    \ a given value of PARAMCD for a subject"
+  Condition_Failure: "BASETYPE is not present and ByIND is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR354"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR354"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR354"
+        Version: "1"
+      Version: "5.0"

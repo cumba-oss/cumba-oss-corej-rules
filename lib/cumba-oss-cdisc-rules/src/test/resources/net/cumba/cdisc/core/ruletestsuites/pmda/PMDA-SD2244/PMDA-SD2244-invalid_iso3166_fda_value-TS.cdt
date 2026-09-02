@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD2244 expect=violation domain=TS
+#note "DISCRIMINATING (family divergence, finding SD2244-F1). Row 1 carries the same 'wrong' reference but a DIFFERENT TSPARMCD, so the gate must leave it alone; row 2 is the FCNTRY record carrying the value the FDA sheet permits and the PMDA sheet does not -> FIRES. Row 1 pins the TSPARMCD gate; row 2 pins the PMDA/FDA divergence. The pinned value contains a space and must be quoted."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=FCNTRY TSVCDREF="ISO 3166"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+col TSVCDREF type=Char
+---
+S1 | TS | 1 | SPLNCTRY | Planned Country of Investigational Sites | USA | USA | ISO 3166
+S1 | TS | 2 | FCNTRY   | Planned Country of Investigational Sites | USA | USA | ISO 3166

@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-CG0601"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Findings About record has an Events parent record\
+  \ whose --DECOD is empty and FAOBJ does not equal the parent record's --TERM value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "FA"
+Match_Datasets:
+- Name: "RELREC"
+Check:
+  expression: >-
+    not empty(RELREC.**TERM) and empty(RELREC.**DECOD) and FAOBJ != RELREC.**TERM
+Outcome:
+  Message: "The Findings About record has an Events parent record with an empty --DECOD,\
+    \ but FAOBJ does not equal the parent record's --TERM value."
+  Output_Variables:
+  - "FAOBJ"
+  - "RELREC.**TERM"
+  - "RELREC.**DECOD"
+Source:
+  Class: "FND"
+  Domain: "FA"
+  Variable: "--OBJ"
+  Condition: "Events parent record exists and DECOD = null"
+  Rule: "--OBJ = --TERM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0601"
+        Version: "1"
+      Version: "2.0"

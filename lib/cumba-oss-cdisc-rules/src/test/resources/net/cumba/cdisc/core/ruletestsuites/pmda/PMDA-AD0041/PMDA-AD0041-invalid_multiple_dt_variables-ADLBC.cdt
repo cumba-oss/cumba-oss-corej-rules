@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0041 expect=violation domain=ADLBC
+#note "ADT is conformant (YYMMDD in list, 10. is width tail); ASTDT and AENDT are not -> two findings, one per offending variable."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=ASTDT variable_format=8.
+#expectViolationAt variable_name=AENDT variable_format=BEST12.
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT     type=Num format=YYMMDD10.
+col ASTDT   type=Num format=8.
+col AENDT   type=Num format=BEST12.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1 | 1 | 1
+---

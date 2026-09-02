@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SE2241 expect=skipped domain=OM
+#note "Regression pin for the T1 Scope fix (ERROR lane): the post-mortem domains DD/MA/MI/OM/TF are excluded, so a conformant day-after post-mortem OM record is not judged by this rule."
+#library standard=sendig version=3-1-1
+#library dataset-class OM FINDINGS
+dataset OM class=FINDINGS label="Organ Measurements"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col OMSEQ    type=Num  label="Sequence Number"
+col OMTESTCD type=Char label="Organ Measurement Short Name"
+col OMDTC    type=Char label="Date/Time of Collection"
+---
+S1 | OM | 001 | 1 | WEIGHT | 2020-01-21
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20

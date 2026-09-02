@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0071"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DSTERM is empty in a record where DSCAT is 'DISPOSITION\
+  \ EVENT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    DSCAT == "DISPOSITION EVENT" and empty(DSTERM)
+Outcome:
+  Message: "DSTERM is empty when DSCAT is 'DISPOSITION EVENT'; it must be 'COMPLETED'\
+    \ or the reason for discontinuation."
+  Output_Variables:
+  - "DSTERM"
+  - "DSCAT"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSTERM"
+  Condition: "DSCAT = 'DISPOSITION EVENT'"
+  Rule: "DSTERM = 'COMPLETED' or the reason for discontinuation"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0071"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0071"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0071"
+        Version: "1"
+      Version: "2.0"

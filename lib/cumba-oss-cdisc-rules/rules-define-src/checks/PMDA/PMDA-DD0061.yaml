@@ -1,0 +1,21 @@
+Rule_Id: "PMDA-DD0061"
+Sheet_Rule_Identifier: "DD0061"
+Rule_Set: "PMDA"
+Element: "ItemDef/Origin"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Predecessor field is required when Origin is Predecessor. Define-XML specification represents Predecessors as Description/TranslatedText elements within def:Origin element."
+Message: "Missing Predecessor value"
+# 0124-B fire-always vehicle anchored on @Type (guaranteed by the guard's own
+# equals clause): fires once per Predecessor def:Origin without a
+# Description/TranslatedText. No CDISC-sheet twin in the corpus.
+Check:
+  kind: "not_exists"
+  target: "@Type"
+  when:
+    all:
+    - path: "@Type"
+      equals: "Predecessor"
+    - path: "Description/TranslatedText"
+      exists: false

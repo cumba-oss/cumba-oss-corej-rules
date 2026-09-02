@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1317 expect=noViolation domain=DS
+#note "Row 1: DEATH with DSSTDTC equal to DTHDTC -> ok. Row 2: non-DEATH record with date differing from DTHDTC -> condition not met. Row 3: DEATH with DSSTDTC empty -> guard DSSTDTC non_empty blocks."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | DEATH             | 2020-05-10
+S1 | DS | 001 | 2 | RANDOMIZED        | 2020-01-01
+S1 | DS | 002 | 1 | DEATH             |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHDTC  type=Char label="Date/Time of Death"
+---
+S1 | DM | 001 | 2020-05-10
+S1 | DM | 002 | 2020-06-01
+---

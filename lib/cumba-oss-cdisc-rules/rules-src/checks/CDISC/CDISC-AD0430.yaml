@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-AD0430"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when APERIODC is populated but APERIOD is missing"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(APERIODC) and empty(APERIOD)
+Outcome:
+  Message: "APERIODC is populated, but APERIOD is missing"
+  Output_Variables:
+  - "APERIOD"
+  - "APERIODC"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "APERIOD"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, APERIODC is populated\
+    \ and APERIOD is not populated"
+  Rule_Failure_Criteria: "APERIOD is not populated"
+  Condition_Failure: "APERIODC is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR430"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR430"
+        Version: "2"
+      Version: "5.0"

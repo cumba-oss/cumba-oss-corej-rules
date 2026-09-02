@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1208 expect=violation domain=DM
+#note "Subject 2's first study treatment (2020-06-21) is after the last study treatment (2020-06-20)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 RFXSTDTC=2020-06-21 RFXENDTC=2020-06-20
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-01-05 | 2020-06-20
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 2020-06-21 | 2020-06-20

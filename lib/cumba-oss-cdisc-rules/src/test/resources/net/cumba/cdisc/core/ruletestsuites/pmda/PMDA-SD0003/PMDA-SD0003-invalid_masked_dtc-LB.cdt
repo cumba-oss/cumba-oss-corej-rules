@@ -1,0 +1,24 @@
+#!RuleTest
+#test PMDA-SD0003 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD0003/FDA-SD0003-invalid_masked_dtc-LB.cdt (data and verdict verbatim). Pins the boundary the fixture exercises: since Fix #215 the three SDTM masked forms (rows 1-3, an unknown component written as a hyphen placeholder) are valid partial dates and are SILENT. Rows 4/5 are the unchanged control (truncated partial, complete date), also silent. Rows 6-8 are what keeps expect=violation meaningful: row 6 is correctly SHAPED but calendar-impossible (2020-02-30), still fires; row 7 is a masked MONTH with a present, impossible DAY (2020---32) — the trap a 'stop at the first absent component' walk would accept, still fires; row 8 is plain junk (UNKNOWN), fires. Verdict: 3 violations, rows 6-8. Neuter check: change row 7 to 2020---31 and the count drops to 2, because some month has 31 days."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=6 LBSEQ=6
+#expectViolationAt row=7 LBSEQ=7
+#expectViolationAt row=8 LBSEQ=8
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB   | 2020-01--
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC  | 2020---15
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | ----01-15
+CDISCPILOT01 | LB | 01-701-1015 | 4 | ALT   | 2020-01
+CDISCPILOT01 | LB | 01-701-1015 | 5 | AST   | 2020-01-15
+CDISCPILOT01 | LB | 01-701-1015 | 6 | BILI  | 2020-02-30
+CDISCPILOT01 | LB | 01-701-1015 | 7 | CHOL  | 2020---32
+CDISCPILOT01 | LB | 01-701-1015 | 8 | SODIUM| UNKNOWN

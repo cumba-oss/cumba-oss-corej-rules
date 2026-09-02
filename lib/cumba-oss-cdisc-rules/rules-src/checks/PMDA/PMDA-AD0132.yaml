@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0132"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Ratio to Base (R2BASE), Analysis Value (AVAL) and\
+  \ Baseline Value (BASE) are all populated and BASE does not equal 0, but R2BASE\
+  \ does not equal AVAL divided by BASE."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    BASE != 0 and R2BASE != (AVAL / BASE)
+Outcome:
+  Message: "R2BASE does not equal AVAL divided by BASE."
+  Output_Variables:
+  - "AVAL"
+  - "BASE"
+  - "R2BASE"
+Source:
+  Message: "Calculation issue: R2BASE != AVAL / BASE"
+  Description: "When all 3 variables are populated and BASE does not equal 0, Ratio\
+    \ to Base (R2BASE) must equal Analysis Value (AVAL) / Baseline Value (BASE). AD0132A\
+    \ will raise errors when BASE equals 0. AD0132B also complements this check."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0132"
+        Version: "1"
+      Version: "6.0"

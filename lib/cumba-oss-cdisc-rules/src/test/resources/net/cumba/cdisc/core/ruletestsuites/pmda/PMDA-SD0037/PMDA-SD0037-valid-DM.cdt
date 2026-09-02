@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0037 expect=noViolation domain=DM
+#note "Track B: adapted from FDA-SD0037-valid-DM.cdt. Every populated ARMCD value is a term of the codelist the Define-XML associates with it; COUNTRY carries no codelist so it is not checked -> no violation."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD0037-define.xml
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col COUNTRY type=Char label="Country"
+---
+S1 | DM | 001 | A        | USA
+S1 | DM | 002 | B        | DEU
+S1 | DM | 003 | SCRNFAIL | JPN

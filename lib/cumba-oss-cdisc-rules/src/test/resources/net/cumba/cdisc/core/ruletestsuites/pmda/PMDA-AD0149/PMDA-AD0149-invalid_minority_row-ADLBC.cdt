@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0149 expect=violation domain=ADLBC
+#note "Group (GLUC, 1) holds AVALC {LOW, LOW, HIGH} - strict 2-vs-1, so only the minority row 3 fires. AVAL=1 pins numerically against the Num cell stored as 1.0."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC AVAL=1 AVALC=HIGH
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1034 | GLUC | 1 | HIGH

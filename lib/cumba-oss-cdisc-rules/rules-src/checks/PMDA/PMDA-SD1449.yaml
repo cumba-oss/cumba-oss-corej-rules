@@ -1,0 +1,74 @@
+Core:
+  Id: "PMDA-SD1449"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Reported Term for the Adverse Event (AETERM)\
+  \ is populated but one or more of the MedDRA coding variables AELLT, AELLTCD, AEDECOD,\
+  \ AEPTCD, AEHLT, AEHLTCD, AEHLGT, AEHLGTCD, AEBODSYS, AEBDSYCD, AESOC, AESOCCD is\
+  \ not present or has no value."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AETERM"
+Check:
+  expression: >-
+    not empty(AETERM) and (empty(AELLT) or empty(AELLTCD) or empty(AEDECOD) or empty(AEPTCD) or
+    empty(AEHLT) or empty(AEHLTCD) or empty(AEHLGT) or empty(AEHLGTCD) or empty(AEBODSYS) or
+    empty(AEBDSYCD) or empty(AESOC) or empty(AESOCCD))
+Outcome:
+  Message: "One or more MedDRA coding variables (AELLT, AELLTCD, AEDECOD, AEPTCD,\
+    \ AEHLT, AEHLTCD, AEHLGT, AEHLGTCD, AEBODSYS, AEBDSYCD, AESOC, AESOCCD) are not\
+    \ present or have no value for a reported AETERM."
+  Output_Variables:
+  - "AETERM"
+  - "AELLT"
+  - "AELLTCD"
+  - "AEDECOD"
+  - "AEPTCD"
+  - "AEHLT"
+  - "AEHLTCD"
+  - "AEHLGT"
+  - "AEHLGTCD"
+  - "AEBODSYS"
+  - "AEBDSYCD"
+  - "AESOC"
+  - "AESOCCD"
+Source:
+  Message: "Missing values for one or more variables subject to MedDRA: --LLT, --LLTCD,\
+    \ --DECOD, --PTCD, --HLT, --HLTCD, --HLGT, --HLGTCD, --BODSYS, --BDSYCD, --SOC,\
+    \ --SOCCD"
+  Description: "Reported Term for the Adverse Event (AETERM) is expected to be coded\
+    \ using the Medical Dictionary for Regulatory Affairs (MedDRA). Sponsors should\
+    \ code each term to the MedDRA-specified hierarchy of terms. These terms/codes\
+    \ are represented in SDTM variables that are subject to MedDRA: AELLT, AELLTCD,\
+    \ AEDECOD, AEPTCD, AEHLT, AEHLTCD, AEHLGT, AEHLGTCD, AEBODSYS, AEBDSYCD, AESOC,\
+    \ AESOCCD."
+  Domains: "AE"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1449"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1449"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,14 @@
+Rule_Id: "PMDA-DD0024-B"
+Sheet_Rule_Identifier: "DD0024"
+Rule_Set: "PMDA"
+Element: "CodeListItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "If the allowed values for a variable are restricted by a non-extensible CDISC controlled terminology, the Codelist referenced in Define.xml must not contain Terms that are not part of CDISC controlled terminology. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element."
+# CodeListItem leg of PMDA-DD0024 (see there).
+Message: "Invalid Term ${value} in codelist"
+Check:
+  kind: "term_in_ct_codelist"
+  nonExtensibleOnly: true

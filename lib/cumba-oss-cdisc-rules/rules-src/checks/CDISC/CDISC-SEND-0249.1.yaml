@@ -1,0 +1,75 @@
+Core:
+  Id: "CDISC-SEND-0249.1"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when STUDYID does not have a single consistent value\
+  \ across all records within a dataset; STUDYID must be the same for all records\
+  \ in the study."
+Sensitivity: "Dataset"
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "STUDYID"
+Check:
+  expression: >-
+    var_exists("DOMAIN") and is_inconsistent_across_dataset(STUDYID, keys=[DOMAIN])
+Outcome:
+  Message: "STUDYID is not the same across all records in the dataset."
+  Output_Variables:
+  - "STUDYID"
+  - "DOMAIN"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "STUDYID"
+  Plain_Text_Explanation: "The STUDYID in all domains must be the same in all records\
+    \ across the study."
+  Rule: "STUDYID is the same for all records within the study"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND249.1"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0242 expect=violation domain=ADSL
+#note "One index (xx=01); both patterns carry the capture set {xx} so both seed and the tuples dedupe. Key TRT01A=DRUGX holds TRT01AN {1 x2, 2 x1} -> row 3 is the minority."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 TRT01A=DRUGX TRT01AN=2
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01A  type=Char
+col TRT01AN type=Num
+---
+S1 | 001 | DRUGX   | 1
+S1 | 002 | DRUGX   | 1
+S1 | 003 | DRUGX   | 2
+S1 | 004 | PLACEBO | 3
+S1 | 005 | PLACEBO | 3

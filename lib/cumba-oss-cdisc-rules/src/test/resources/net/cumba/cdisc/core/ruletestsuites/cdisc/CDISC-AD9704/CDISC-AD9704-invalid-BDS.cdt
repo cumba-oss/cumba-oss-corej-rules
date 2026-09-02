@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD9704 expect=violation domain=ADLB
+#note "The non-ADSL case, which is the one the pre-Fix-#368 engine could not see: ADLB carries PARAMCD so it detects as BASIC DATA STRUCTURE, and PARAM is Required for that structure and absent. Keying the library by DOMAIN (ADLB) matched no ADaM structure name and returned an empty list, so the rule passed green with the defect in the data."
+#library standard=adamig version=1-3
+#library required-variables-for-structure "BASIC DATA STRUCTURE" PARAM PARAMCD STUDYID USUBJID
+#expectViolationCount 1
+dataset ADLB structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12

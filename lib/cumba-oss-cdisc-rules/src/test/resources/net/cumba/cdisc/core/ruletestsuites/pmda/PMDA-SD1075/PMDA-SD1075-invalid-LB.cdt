@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1075 expect=violation domain=LB
+#note "LB is a Findings dataset carrying LBSTDTC; SDTMIG 3.4 s4.4.8 says --STDTC is not to be used in the Findings class -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTDTC  type=Char label="Start Date/Time of Specimen Collection"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-15 | 2020-01-15
+S1 | LB | 001 | 2 | GLUC | 2020-01-16 | 2020-01-16

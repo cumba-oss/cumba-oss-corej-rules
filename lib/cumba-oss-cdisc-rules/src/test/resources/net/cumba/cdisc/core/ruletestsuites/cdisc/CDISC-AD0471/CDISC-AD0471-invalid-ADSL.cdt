@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0471 expect=violation domain=ADSL
+# Rule:Description: On a given record, STRATwRN is populated and STRATwR is not populated
+#note "STRAT1RN populated, STRAT1R empty -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col STRAT1RN type=Char
+col STRAT1R type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X | 
+---

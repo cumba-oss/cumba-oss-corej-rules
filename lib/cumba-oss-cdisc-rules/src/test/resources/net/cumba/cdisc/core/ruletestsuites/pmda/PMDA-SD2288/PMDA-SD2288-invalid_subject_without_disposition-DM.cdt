@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD2288 expect=violation domain=DM
+#note "Row 1: 001 covered by a DISPOSITION EVENT DS row -> silent. Row 2: 002 has only a non-disposition DS row -> FIRES. Row 3: 003 ARMCD=SCRNFAIL excluded. Row 4: 004 ARMCD=NOTASSGN excluded. Row 5: 005 ARMCD blank -> excluded. Row 6: USUBJID blank -> excluded. distinct over DS filtered to {DSCAT: DISPOSITION EVENT} -> $subjects_with_disposition_event=[001]. (DSCAT values contain spaces - data cells only; pins stay space-free.)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 ARMCD=A01
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+---
+S1 | DM | 001 | A01
+S1 | DM | 002 | A01
+S1 | DM | 003 | SCRNFAIL
+S1 | DM | 004 | NOTASSGN
+S1 | DM | 005 |
+S1 | DM |     | A01
+---
+
+dataset DS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSCAT   type=Char
+---
+S1 | DS | 001 | DISPOSITION EVENT
+S1 | DS | 002 | ADVERSE EVENT

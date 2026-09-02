@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2282 expect=violation domain=POOLDEF
+#note "Rows 1/2: ANIMAL1 listed twice in POOL1 -> both fire. Row 3: ANIMAL1 in POOL2 -> clean (same subject in a different pool is allowed). Row 4: ANIMAL2 in POOL1 -> clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 POOLID=POOL1
+#expectViolationAt row=2 POOLID=POOL1
+dataset POOLDEF
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | ANIMAL1
+S1 | POOL1 | ANIMAL1
+S1 | POOL2 | ANIMAL1
+S1 | POOL1 | ANIMAL2

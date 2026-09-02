@@ -1,0 +1,47 @@
+Core:
+  Id: "PMDA-SD1451"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned End of Assessment Interval (--ENINT)\
+  \ variable is present in the dataset but the Planned Start of Assessment Interval\
+  \ (--STINT) variable is not present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Check:
+  expression: >-
+    var_exists("--ENINT") and not var_exists("--STINT")
+Outcome:
+  Message: "--ENINT variable is present, but --STINT variable is not present."
+  Output_Variables:
+  - "--ENINT"
+Source:
+  Message: "Missing --STINT variable when --ENINT variable is present"
+  Description: "Planned Start of Assessment Interval (--STINT) variable must be included\
+    \ in the domain when Planned End of Assessment Interval (--ENINT) variable is\
+    \ present."
+  Domains: "PP"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1451"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1451"
+        Version: "1"
+      Version: "1.6"

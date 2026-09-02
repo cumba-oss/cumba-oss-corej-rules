@@ -1,0 +1,106 @@
+Core:
+  Id: "PMDA-SD2012C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a High Level Group Term (--HLGT) value does not\
+  \ match the case of its MedDRA High Level Group Term."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLGT"
+Operations:
+- id: "$hlgt_case_valid"
+  expression: "valid_external_dictionary_value(--HLGT, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"HLGT\", case_sensitive=true)"
+Check:
+  expression: >-
+    $hlgt_case_valid == false
+Outcome:
+  Message: "High Level Group Term (--HLGT) does not match the MedDRA High Level Group\
+    \ Term case."
+  Output_Variables:
+  - "--HLGT"
+Source:
+  Message: "Value for --HLGT is in incorrect case"
+  Description: "Case for High Level Group Term (--HLGT) variable must be sentence\
+    \ case using a High Level Group Term of the MedDRA dictionary of a version specified\
+    \ in the define.xml (Case-sensitive)."
+  Domains: "AE, CE, MH"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2012C"
+        Version: "1"
+      Version: "1.6"

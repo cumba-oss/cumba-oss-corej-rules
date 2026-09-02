@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-DD0126"
+Sheet_Rule_Identifier: "DD0126"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: "IsNonStandard"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The IsNonStandard attribute must not be populated when the codelist is standard."
+Message: "Invalid use of IsNonStandard for Codelist"
+# CodeList analogue of PMDA-DD0120 ("standard" = carries def:StandardOID, per
+# the sibling row DD0128's parenthetical). No CDISC twin authored in the corpus.
+Check:
+  kind: "not_exists"
+  target: "@IsNonStandard"
+  when:
+    path: "@StandardOID"
+    exists: true

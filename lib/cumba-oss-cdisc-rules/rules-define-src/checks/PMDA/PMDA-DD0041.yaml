@@ -1,0 +1,15 @@
+Rule_Id: "PMDA-DD0041"
+Sheet_Rule_Identifier: "DD0041"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef/ItemRef"
+Attribute: "KeySequence"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The KeySequence attribute for ItemRef element must be unique within a single ItemGroupDef."
+# unique_among_siblings groups by parent, so the uniqueness scope is one
+# ItemGroupDef exactly as the sheet demands; the parent-qualified selector keeps
+# def:ValueListDef/ItemRef out. CDISC twin 71 (same shape).
+Message: "Duplicate KeySequence [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "KeySequence"

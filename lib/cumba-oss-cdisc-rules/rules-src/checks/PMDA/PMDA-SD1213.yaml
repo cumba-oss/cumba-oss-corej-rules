@@ -1,0 +1,102 @@
+Core:
+  Id: "PMDA-SD1213"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when RFSTDTC is empty for a treated subject, that is\
+  \ a subject whose ACTARMCD is populated and is not equal to 'SCRNFAIL', 'NOTTRT'\
+  \ or 'NOTASSGN'."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and ACTARMCD not in ["SCRNFAIL", "NOTTRT", "NOTASSGN"] and empty(RFSTDTC)
+Outcome:
+  Message: "RFSTDTC is empty for a treated subject (ACTARMCD is populated and not\
+    \ equal to 'SCRNFAIL', 'NOTTRT' or 'NOTASSGN')."
+  Output_Variables:
+  - "RFSTDTC"
+  - "ACTARMCD"
+Source:
+  Message: "RFSTDTC is not provided for a treated subject"
+  Description: "Subject Reference Start Date/Time (RFSTDTC) should be populated for\
+    \ all treated subjects, those where Actual Arm Code (ACTARMCD) is not equal to\
+    \ 'SCRNFAIL', 'NOTASSGN', 'NOTTRT', or null."
+  Domains: "DM"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1213"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0077 expect=noViolation domain=MH
+#note "MHCAT=GENERAL, GENERAL, blank. A blank is a REAL distinct value to has_same_values (GroupSemantics.hasSameValuesViolations, operator-examples D.3 / Fix #249), so the column has 2 distinct values and the operator is false -- silent even though every POPULATED record holds the same value. Pins the D.3 contract on this rule."
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHCAT type=Char label="Category for Medical History" format=$MHCAT.
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 | GENERAL
+CDISCPILOT01 | MH | 01-701-1015 | 2 | GENERAL
+CDISCPILOT01 | MH | 01-701-1023 | 1 |
+---

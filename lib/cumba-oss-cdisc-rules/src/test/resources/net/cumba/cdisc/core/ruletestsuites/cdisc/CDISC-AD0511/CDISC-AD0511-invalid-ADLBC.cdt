@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0511 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in SDTM must contain "Start Datetime" in the label
+#note "ASDTM label "Analysis Datetime" lacks "Start Datetime" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Analysis Datetime" variable_name=ASDTM
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ASDTM type=Char label="Analysis Datetime"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

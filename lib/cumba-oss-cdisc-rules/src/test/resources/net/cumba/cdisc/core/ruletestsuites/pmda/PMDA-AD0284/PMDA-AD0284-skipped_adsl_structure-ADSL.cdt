@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0284 expect=skipped domain=ADSL
+#note "Declared ADSL structure, deliberately NO class= key (a class= would set dataset_class and route the pre-gate to the raw SDTM arm instead of the ADaM Classes arm this rule uses -- Fix #206 describeAdamClassMismatch). Declared ADSL not in [BDS,OCCDS] -> skipped. DISCRIMINATING: the audit tell for finding AD0284-F1 (Scope.Classes vs Data_Structures); stays green regardless of that finding's resolution."
+#library standard=adamig version=1-0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEV    type=Char
+col ASEVN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | MILD | 1
+CDISCPILOT01 | 01-701-1023 | MILD | 2
+CDISCPILOT01 | 01-701-1034 | SEVERE | 3

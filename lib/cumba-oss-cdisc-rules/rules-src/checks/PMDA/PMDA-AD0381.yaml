@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-AD0381"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a parameter (PARAMCD), a character toxicity-grade\
+  \ primary variable does not have a single consistent value for a given value of\
+  \ its numeric (N) secondary variable, evaluated only on rows where both variables\
+  \ are populated. Covers the variable pairs BTOXGR/BTOXGRN, BTOXGRL/BTOXGRLN, BTOXGRH/BTOXGRHN,\
+  \ ATOXGRL/ATOXGRLN and ATOXGRH/ATOXGRHN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BTOXGR) and var_exists("BTOXGRN") and var_exists("PARAMCD") and
+    is_inconsistent_across_dataset(BTOXGR, keys=[BTOXGRN, PARAMCD]) or not empty(BTOXGRL) and
+    var_exists("BTOXGRLN") and var_exists("PARAMCD") and is_inconsistent_across_dataset(BTOXGRL,
+    keys=[BTOXGRLN, PARAMCD]) or not empty(BTOXGRH) and var_exists("BTOXGRHN") and
+    var_exists("PARAMCD") and is_inconsistent_across_dataset(BTOXGRH, keys=[BTOXGRHN, PARAMCD]) or
+    not empty(ATOXGRL) and var_exists("ATOXGRLN") and var_exists("PARAMCD") and
+    is_inconsistent_across_dataset(ATOXGRL, keys=[ATOXGRLN, PARAMCD]) or not empty(ATOXGRH) and
+    var_exists("ATOXGRHN") and var_exists("PARAMCD") and is_inconsistent_across_dataset(ATOXGRH,
+    keys=[ATOXGRHN, PARAMCD])
+Outcome:
+  Message: "A toxicity-grade variable has inconsistent values for the same numeric\
+    \ (N) grade within a parameter."
+  Output_Variables:
+  - "PARAMCD"
+  - "BTOXGR"
+  - "BTOXGRN"
+  - "ATOXGRL"
+  - "ATOXGRLN"
+  - "ATOXGRH"
+  - "ATOXGRHN"
+  - "BTOXGRL"
+  - "BTOXGRLN"
+  - "BTOXGRH"
+  - "BTOXGRHN"
+Source:
+  Message: "Inconsistent value for Variable within a unique PARAMCD"
+  Description: "Within a parameter, there should be only a single value of a primary\
+    \ variable (*) for a given value of secondary variable (*N), considering only\
+    \ those rows on which both variables are populated. Covers variable pairs: BTOXGR/BTOXGRN,\
+    \ BTOXGRL/BTOXGRLN, BTOXGRH/BTOXGRHN, ATOXGRL/ATOXGRLN, ATOXGRH/ATOXGRHN."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0381"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0381"
+        Version: "1"
+      Version: "6.0"

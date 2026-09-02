@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0043 expect=violation domain=ADLBC
+# Rule:Description: A numeric variable with a suffix of DTM does not have a datetime format
+#note "ADTM is numeric with non-date format 8. -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Num variable_format=8. variable_name=ADTM
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+---

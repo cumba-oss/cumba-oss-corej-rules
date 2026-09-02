@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0392"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ATOXGRN is populated and ATOXGR is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ATOXGRN"
+    - "ATOXGR"
+Check:
+  expression: >-
+    not empty(ATOXGRN) and empty(ATOXGR)
+Outcome:
+  Message: "ATOXGRN is populated but ATOXGR is not populated."
+  Output_Variables:
+  - "ATOXGR"
+  - "ATOXGRN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "ATOXGR"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, ATOXGRN is populated\
+    \ and ATOXGR is not populated"
+  Rule_Failure_Criteria: "ATOXGR is not populated"
+  Condition_Failure: "ATOXGRN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR392"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR392"
+        Version: "2"
+      Version: "5.0"

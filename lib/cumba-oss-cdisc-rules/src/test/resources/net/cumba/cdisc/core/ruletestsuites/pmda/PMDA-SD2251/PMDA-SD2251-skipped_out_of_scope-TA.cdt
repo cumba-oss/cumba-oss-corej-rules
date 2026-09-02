@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2251 expect=skipped domain=TA
+#note "FRESH: the batch's Domains.Include reject pin (Include [TS]; once per batch, on the dominant cluster's PMDA head). #dictionaries dummy IS declared so the only skip cause is scope. TA is out of scope. The row's CURTRT|BADCODE123 shape would fire were the domain in scope, so the skip is discriminating."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset TA
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TA | 1 | CURTRT | BADCODE123

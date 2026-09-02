@@ -1,0 +1,43 @@
+Core:
+  Id: "PMDA-AD0240"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Actual Pooled Treatment y (TRTAGy)\
+  \ variable does not hold a single consistent value for each unique value of the\
+  \ Actual Pooled Treatment y (N) (TRTAGyN) variable, evaluated over the records where\
+  \ the primary variable TRTAGy is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(TRTAGy) and has_multiple_values_for(TRTAGy, TRTAGyN)
+Outcome:
+  Message: "Inconsistent value for TRTAGy"
+  Output_Variables:
+  - "TRTAGy"
+  - "TRTAGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Message: "Inconsistent value for TRTAGy"
+  Description: "Within a study, all Actual Pooled Treatment y (TRTAGy) variable values\
+    \ must be the same for each unique value of Actual Pooled Treatment y (N) (TRTAGyN)\
+    \ variable when the primary variable TRTAGy is populated. Analogous rule for AD0237."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0240"
+        Version: "1"
+      Version: "6.0"

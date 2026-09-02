@@ -1,0 +1,43 @@
+name: CDISC-AD0726
+kind: rule
+description: |
+  Wave B4 port — T1b PlainIntermediate.
+  CDISC-AD0726: more than one APERIOD for a given APERIODC.
+  Record-data rule scoped to ALL classes; fixture attaches ADLB to BDS class mock.
+  Bare-leaf Check + has_multiple_values_for — Python gaps (Finding #26 + #28).
+  Baselines on Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0726)
+rule:
+  coreId: CDISC-AD0726
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD]
+    column_types:
+      APERIOD: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', APERIOD: 1, APERIODC: 'Period1'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', APERIOD: 2, APERIODC: 'Period1'}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', APERIOD: 3, APERIODC: 'Period3'}
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: 'HGB', APERIOD: 3, APERIODC: 'Period3'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0726
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      APERIOD: '1'
+      APERIODC: 'Period1'
+  - rule_id: CDISC-AD0726
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      APERIOD: '2'
+      APERIODC: 'Period1'
+expected_errors: []

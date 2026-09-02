@@ -1,0 +1,117 @@
+Core:
+  Id: "FDA-SD2211"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the study population is unhealthy subjects (HLTSUBJI\
+  \ is 'N') and the Trial Summary (TS) dataset does not contain a record where TSPARMCD\
+  \ equals 'TDIGRP' (Diagnosis Group)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$hltsubji_n_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"HLTSUBJI\", TSVAL=\"N\"))"
+- id: "$tdigrp_count"
+  expression: "record_count(filter=filter(TSPARMCD=\"TDIGRP\"))"
+Check:
+  expression: >-
+    $hltsubji_n_count >= 1 and $tdigrp_count == 0
+Outcome:
+  Message: "Missing TDIGRP Trial Summary Parameter: a 'Diagnosis Group' (TDIGRP) record\
+    \ must be present in the Trial Summary (TS) domain."
+  Output_Variables:
+  - "$tdigrp_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing TDIGRP Trial Summary Parameter"
+  FDA_Validator_Rule_Description: "'Diagnosis Group' (TDIGRP) record must be populated\
+    \ in Trial Summary (TS) domain, when study population is unhealthy subjects (HLTSUBJI\
+    \ = 'N'). It is expected for SDTM IG v3.1.2 data and required for data in all\
+    \ more recent SDTM versions."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2211"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0287"
+        Version: "1"
+      Version: "2.0"

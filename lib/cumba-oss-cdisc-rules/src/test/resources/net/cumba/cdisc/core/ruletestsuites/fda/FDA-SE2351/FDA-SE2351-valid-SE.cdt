@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE2351 expect=noViolation domain=SE
+#note "Subject 001's latest disposition starts 2020-01-20. Row 1: element ends before it -> clean. Row 2: element ends exactly on it (boundary: 'less than or equal to' is allowed) -> clean. Row 3: SEENDTC empty (open element) -> guarded out by non_empty. Row 4: subject 002 has no DS record -> guarded out by is_contained_by $ds_usubjid."
+#library standard=sendig version=3-1-1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | Screening      | 2020-01-01 | 2020-01-04
+S1 | SE | 001 | 2 | TRT  | Treatment      | 2020-01-05 | 2020-01-20
+S1 | SE | 001 | 3 | FUP  | Follow-up      | 2020-01-20 |
+S1 | SE | 002 | 1 | TRT  | Treatment      | 2020-01-05 | 2020-06-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY  | RECOVERY           | 2020-01-05
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20

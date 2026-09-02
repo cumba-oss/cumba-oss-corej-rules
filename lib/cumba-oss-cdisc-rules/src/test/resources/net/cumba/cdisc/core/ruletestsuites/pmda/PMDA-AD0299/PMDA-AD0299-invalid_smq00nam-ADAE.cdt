@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0299 expect=violation domain=ADAE
+#note "SMQ00NAM matches ^SMQ\d\d(NAM|CD|SC|SCN)$ and fails the 01-99 form -> fires; SMQ01NAM satisfies both."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt variable_name=SMQ00NAM
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col SMQ00NAM type=Char
+col SMQ01NAM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | MIGRAINE | MIGRAINE

@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2266 expect=violation domain=BW
+#note "Negative BWSTRESN with BWEXCLFL empty (row 1) or 'N' (row 2) -> fires; zero (row 3) and excluded (row 4) do not."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 BWSEQ=1
+#expectViolationAt row=2 BWSEQ=2
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+col BWEXCLFL type=Char label="Exclude from Statistics"
+---
+S1 | BW | 001 | 1 | -5   |
+S1 | BW | 001 | 2 | -0.4 | N
+S1 | BW | 001 | 3 | 0    |
+S1 | BW | 001 | 4 | -9   | Y

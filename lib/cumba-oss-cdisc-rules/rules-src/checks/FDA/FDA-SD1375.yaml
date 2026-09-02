@@ -1,0 +1,72 @@
+Core:
+  Id: "FDA-SD1375"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subject Reference End Date/Time (RFENDTC) is populated\
+  \ for a screen-failure or unassigned subject, that is a subject whose Actual Arm\
+  \ Code (ACTARMCD) is empty or equal to 'SCRNFAIL' or 'NOTASSGN'. RFENDTC is required\
+  \ for all randomized subjects (including ACTARMCD 'NOTTRT') and is empty only for\
+  \ screen failures or unassigned subjects."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    not empty(RFENDTC) and (empty(ACTARMCD) or ACTARMCD in ["SCRNFAIL", "NOTASSGN"])
+Outcome:
+  Message: "RFENDTC is populated for a screen-failure or unassigned subject (ACTARMCD\
+    \ is empty or equal to 'SCRNFAIL' or 'NOTASSGN')."
+  Output_Variables:
+  - "RFENDTC"
+  - "ACTARMCD"
+Source:
+  FDA_Validator_Rule_Message: "RFENDTC is populated for subject who did not receive\
+    \ treatment"
+  FDA_Validator_Rule_Description: "RFENDTC must be null when actual arm indicates\
+    \ that the subject is a screen failure ('Screen Failure'), was not assigned to\
+    \ an arm ('Not Assigned'), or was not treated ('NOTTRT') (or null). This rule\
+    \ applies to studies where RFENDTC is associated with a treatment date."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1375"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1375"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0141"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0141"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1097 expect=violation domain=AE
+#note "No SUPPAE dataset in the scenario at all. record_count over the absent domain returns the EmptyResult 0 (Q17-a) -> fires once. Production-faithful: no `not ds_exists(\"SUPPAE\")` presence rule ships in any pmda-sdtmig package, so the Fix #222 reported-absence SKIP arm has nothing to key on."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 "$aetrtem_count"=0
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE
+S1 | AE | 001 | 2 | NAUSEA

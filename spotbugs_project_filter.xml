@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Project-wide SpotBugs exclude filter. Applied to every module in
+    addition to that module's own spotbugs_ignore.xml (if any). Wired
+    via the parent pom's `<excludeFilterFile>` reference in
+    pluginManagement and the `spotbugs-module-ignore` profile.
+
+    Only categories that are structurally false-positive in this
+    project belong here. Module-specific suppressions (a single
+    class/field tuple) stay in the per-module spotbugs_ignore.xml.
+-->
+<FindBugsFilter>
+
+    <Match>
+        <!-- The project does not use Java Object Serialization anywhere.
+             Persisted state is Jackson JSON end-to-end (config files,
+             remote-RPC wire format, validation reports, etc.). Swing
+             components and Jackson types inherit Serializable transitively
+             but no class is ever written via ObjectOutputStream.
+
+             Non-Serializable instance fields are marked `transient` to
+             silence the javac [serial] lint. SpotBugs then flags those
+             transient fields as "not restored on deserialisation" — true
+             but irrelevant: the deserialisation path is never exercised. -->
+        <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
+    </Match>
+
+</FindBugsFilter>

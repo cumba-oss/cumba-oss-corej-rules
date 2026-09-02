@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0108"
+Sheet_Rule_Identifier: "108"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "SASDatasetName must be provided in the context of a submission."
+Message: "ItemGroupDef must have a SASDatasetName attribute when @def:Context is 'Submission'."
+Check:
+  kind: "exists"
+  target: "@SASDatasetName"
+  when:
+    path: "../../../@Context"
+    equals: "Submission"

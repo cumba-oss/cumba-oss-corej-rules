@@ -1,0 +1,77 @@
+Core:
+  Id: "CDISC-AD0794"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a given record, a variable with a suffix of\
+  \ SDTM has a value greater than the value of the variable with the same root and\
+  \ a suffix of EDTM, and both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(*SDTM) and not empty(*EDTM) and *SDTM > *EDTM
+Outcome:
+  Message: "A variable with a suffix of SDTM has a greater value than the variable\
+    \ with the same root and a suffix of EDTM on this record."
+  Output_Variables:
+  - "*SDTM"
+  - "*EDTM"
+Source_Proposed:
+  Sheet_Issue: "#93"
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: ""
+  SEND_SDTM_Domain: ""
+  Variable_or_Item: "*SDTM"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, a variable with a suffix\
+    \ of SDTM has a value greater than a value of a variable with the same root and\
+    \ a suffix of EDTM, and both variables are populated"
+  Rule_Failure_Criteria: "A variable with a suffix of SDTM has a value greater than\
+    \ a value of a variable with the same root and a suffix of EDTM"
+  Condition_Failure: "On rows where *SDTM and *EDTM are both populated"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "*SDT"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, a variable with a suffix\
+    \ of SDTM has a value greater than a value of a variable with the same root and\
+    \ a suffix of EDTM, and both variables are populated"
+  Rule_Failure_Criteria: "A variable with a suffix of SDTM has a value greater than\
+    \ a value of a variable with the same root and a suffix of EDTM"
+  Condition_Failure: "On rows where *SDTM and *EDTM are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR794"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR794"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR794"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR794"
+        Version: "1"
+      Version: "5.0"

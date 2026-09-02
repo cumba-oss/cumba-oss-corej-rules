@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1294 expect=noViolation domain=CM
+#note "Boundary: CMPRESP present but CMSTAT absent -> the guard leaf (--STAT exists) is false -> no violation."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN | Y
+---

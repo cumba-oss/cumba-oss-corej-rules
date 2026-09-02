@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1449 expect=violation domain=AE
+#note "AELLT column not present in the dataset -> the bare empty() leaf on the absent column is TRUE on every row (absent = all-missing, EC-43) and the rule fires (Plan B phase 4d' deleted the redundant not var_exists disjunct this note used to name) on every record with a reported AETERM (both rows)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AELLTCD  type=Num  label="Lowest Level Term Code"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEPTCD   type=Num  label="Preferred Term Code"
+col AEHLT    type=Char label="High Level Term"
+col AEHLTCD  type=Num  label="High Level Term Code"
+col AEHLGT   type=Char label="High Level Group Term"
+col AEHLGTCD type=Num  label="High Level Group Term Code"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+col AESOC    type=Char label="Primary System Organ Class"
+col AESOCCD  type=Num  label="Primary System Organ Class Code"
+---
+S1 | AE | 001 | 1 | HEADACHE | 10019211 | Headache | 10019211 | Headaches NEC | 10019231 | Headaches | 10019233 | Nervous system disorders | 10029205 | Nervous system disorders | 10029205
+S1 | AE | 001 | 2 | NAUSEA   | 10028813 | Nausea   | 10028813 | Nausea and vomiting symptoms | 10028817 | Gastrointestinal signs and symptoms | 10017977 | Gastrointestinal disorders | 10017947 | Gastrointestinal disorders | 10017947

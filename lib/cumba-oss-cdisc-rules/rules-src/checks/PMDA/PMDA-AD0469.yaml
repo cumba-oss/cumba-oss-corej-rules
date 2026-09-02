@@ -1,0 +1,53 @@
+Core:
+  Id: "PMDA-AD0469"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Strata Used for Randomization (STRATAR) is present\
+  \ and Strata Used for Randomization (N) (STRATARN) is present and STRATARN does\
+  \ not have a single value across records sharing the same value of STRATAR, considering\
+  \ only the records on which both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "STRATARN"
+Check:
+  expression: >-
+    var_exists("STRATAR") and not empty(STRATAR) and not empty(STRATARN) and
+    is_inconsistent_across_dataset(STRATARN, keys=[STRATAR])
+Outcome:
+  Message: "Inconsistent value for STRATARN within STRATAR."
+  Output_Variables:
+  - "STRATAR"
+  - "STRATARN"
+Source:
+  Message: "Inconsistent value for STRATARN"
+  Description: "There should be only a single value of Strata Used for Randomization\
+    \ (N) (STRATARN) variable for a given value of Strata Used for Randomization (STRATAR)\
+    \ variable, considering only those rows on which both variables are populated."
+  Domains: "ADSL, ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0469"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0469"
+        Version: "1"
+      Version: "6.0"

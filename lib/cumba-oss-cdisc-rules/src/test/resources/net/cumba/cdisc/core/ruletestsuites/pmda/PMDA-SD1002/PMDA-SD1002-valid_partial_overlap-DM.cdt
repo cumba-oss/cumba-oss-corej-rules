@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1002 expect=noViolation domain=DM
+#note "FRESH, DISCRIMINATING. ONE row: the start is a June partial and the end is 30 June, so SOME candidate start days are after the end and some are not - lower('2020-06') = 2020-06-01 is NOT greater than upper('2020-06-30') = 2020-06-30, and the universal test therefore answers FALSE. Predicted SILENT. This is the exact companion of invalid_partial_start and the pair is what makes the forall semantics visible: an AMBIGUOUS partial does not fire, a DEFINITE one does. A fire means the comparison became existential rather than universal; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-06 | 2020-06-30

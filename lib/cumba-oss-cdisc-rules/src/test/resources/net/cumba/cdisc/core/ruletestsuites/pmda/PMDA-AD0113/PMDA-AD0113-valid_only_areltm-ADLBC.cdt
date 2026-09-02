@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0113 expect=noViolation domain=ADLBC
+#note "DIRECTION DISCRIMINATOR for the AD0111/AD0113 pair, and the scenario-level expression of finding AD0113-F1. ARELTMU is NOT declared. This is BYTE-EQUIVALENT to the data that makes PMDA-AD0111 fire, and AD0113 must stay SILENT on it. If AD0113 ever fires here, the two rules have collapsed into one - which is exactly what the defective workbook DESCRIPTION would have produced. ESCALATE, do not rewrite, if this lands otherwise."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTM  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.4 | 24

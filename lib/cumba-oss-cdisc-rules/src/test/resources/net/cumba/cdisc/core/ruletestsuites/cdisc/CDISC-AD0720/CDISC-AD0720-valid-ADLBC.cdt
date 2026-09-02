@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0720 expect=noViolation domain=ADLBC
+# Rule:Description: A non-missing value of TRTP is not equal to at least one value of the character planned treatment variables in ADSL defined in the IG
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col TRT01P type=Char label="Planned Treatment for Period 01" format=$ARM.
+---
+CDISCPILOT01 | 01-701-1015 | Placebo
+---

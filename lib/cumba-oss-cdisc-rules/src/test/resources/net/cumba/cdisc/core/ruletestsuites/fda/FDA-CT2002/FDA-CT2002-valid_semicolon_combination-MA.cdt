@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-CT2002 expect=noViolation domain=MA
+#note "O-8 (Fix #339): the CDISC-SEND-0049 semicolon allow-list is mirrored onto the FDA extensible-codelist arm so an FDA SEND run agrees with a CDISC SEND run. MALAT = LEFT;RIGHT (both LAT terms, --LAT is IG-named for combination) is silent; before the mirror it produced an informational finding on every FDA SEND run (Fix #329 residual F-1r). MASPEC = LIVER is a single term and silent."
+#library standard=sendig version=3-1-1
+#library variable-metadata MA MALAT codelist=LAT codelist_extensible=true codelist_coded_values="[\"LEFT\",\"RIGHT\",\"BILATERAL\"]"
+#library variable-metadata MA MASPEC codelist=SPEC codelist_extensible=true codelist_coded_values="[\"LIVER\",\"KIDNEY\",\"SPLEEN\"]"
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASPEC   type=Char label="Specimen Material Type"
+col MALAT    type=Char label="Laterality"
+---
+S1 | MA | 001 | 1 | GMACROS | LIVER | LEFT;RIGHT

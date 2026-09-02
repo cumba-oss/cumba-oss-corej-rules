@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0280"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Randomization Quotient parameter (TSPARMCD equal\
+  \ to 'RANDQT') has a populated Parameter Value (TSVAL) that is not a number greater\
+  \ than 0 and less than or equal to 1."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+    - "TSVAL"
+Check:
+  expression: >-
+    TSPARMCD == "RANDQT" and not empty(TSVAL) and (TSVAL <= 0 or TSVAL > 1 or TSVAL !~
+    /^[+-]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)$/)
+Outcome:
+  Message: "TSVAL is populated but is not a number greater than 0 and less than or\
+    \ equal to 1 when TSPARMCD equals 'RANDQT'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'RANDQT' and TSVAL ^= null"
+  Rule: "TSVAL > 0 and TSVAL <= 1"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0280"
+        Version: "1"
+      Version: "2.0"

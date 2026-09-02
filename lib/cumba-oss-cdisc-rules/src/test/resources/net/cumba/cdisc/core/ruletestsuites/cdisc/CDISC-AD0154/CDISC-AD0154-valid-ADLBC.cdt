@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0154 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given PARAMCD and BASETYPE for a subject, more than one record has ABLFL equal to Y
+#note "only one ABLFL=Y record in the group -> count == 1 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | N
+---

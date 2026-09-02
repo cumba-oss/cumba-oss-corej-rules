@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SD0080 expect=noViolation domain=AE
+#note "S1: AESTDTC before / equal to the subject's latest DSSTDTC (2023-06-01); S2: empty AESTDTC guarded; S3: no DS record -> no per-subject maximum -> no fire"
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-05-10
+S1 | AE | 001 | 2 | NAUSEA   | 2023-06-01
+S1 | AE | 002 | 1 | FATIGUE  |
+S1 | AE | 003 | 1 | RASH     | 2023-07-01
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | 2023-05-01
+S1 | DS | 001 | 2 | COMPLETED  | 2023-06-01
+S1 | DS | 002 | 1 | COMPLETED  | 2023-06-30

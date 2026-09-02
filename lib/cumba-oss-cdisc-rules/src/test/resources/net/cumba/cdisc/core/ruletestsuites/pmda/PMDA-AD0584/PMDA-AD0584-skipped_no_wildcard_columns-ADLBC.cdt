@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0584 expect=skipped domain=ADLBC
+#note "No column matches ^BCHGCAT(\d+)$ or ^BCHGCA(\d+)N$ -> WildcardExpander.tryExpand returns NoMatch, the rule DID NOT EXECUTE (SKIPPED). PARAMCD and AVAL keep the dataset in BASIC DATA STRUCTURE scope, so this is the wildcard NoMatch route, not the structure gate."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5
+CDISCPILOT01 | 01-701-1023 | GLUC | 6

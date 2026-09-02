@@ -1,0 +1,39 @@
+Core:
+  Id: "CDISC-SEND-0010"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a timing variable is present in a SUPP-- or RELREC\
+  \ dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+    - "RELREC"
+Check:
+  expression: >-
+    varname() in ["VISIT", "VISITNUM", "VISITDY", "TAETORD", "EPOCH", "MIDS", "RELMIDS", "MIDSDTC"]
+Outcome:
+  Message: "A timing variable is present in a SUPP-- or RELREC dataset."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--, RELREC"
+  Variable: "TIMING"
+  Plain_Text_Explanation: "Timing variables cannot be added to SUPP-- datasets or\
+    \ to RELREC"
+  Condition: "Domain = SUPP-- or RELREC"
+  Rule: "Timing variables not present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND10"
+        Version: "1"
+      Version: "5.0"

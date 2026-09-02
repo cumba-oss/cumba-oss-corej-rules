@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1121-A expect=violation domain=DM
+#note "SEND twin of FDA-SD1121 - 'There are no exceptions for SEND': row 2 has neither AGE nor an AGETXT column and fires although ARMCD is empty, which the SDTMIG parent would exempt."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=S1-002
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | S1-001 | 12 | TRT01
+S1 | DM | S1-002 | .  |
+---

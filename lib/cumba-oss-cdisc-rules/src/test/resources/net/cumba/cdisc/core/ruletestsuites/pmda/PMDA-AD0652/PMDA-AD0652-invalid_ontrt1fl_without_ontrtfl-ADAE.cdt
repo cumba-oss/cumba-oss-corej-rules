@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0652 expect=violation domain=ADAE
+#note "w compiles to (\d) - exactly one digit - so ^ONTRT(\d)FL$ matches ONTRT1FL (w=1) and would not match ONTRT12FL. ONE expansion, ONE violation at row 1. ONTR01FL deliberately not added here; it belongs to AD0651's pattern and does not match this rule's regex."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 ONTRT1FL=Y
+dataset ADAE class=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ASEQ     type=Num
+col AEDECOD  type=Char
+col ONTRT1FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | Y

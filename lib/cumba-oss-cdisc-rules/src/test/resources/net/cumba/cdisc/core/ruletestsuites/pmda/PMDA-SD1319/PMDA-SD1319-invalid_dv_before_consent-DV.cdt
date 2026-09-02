@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1319 expect=violation domain=DV
+#note "Second Domains.Include member. Row 1: DVSTDTC 2019-12-20 before consent -> fires. Row 2: after consent -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 DVSEQ=1
+dataset DV class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DVSEQ   type=Num
+col DVTERM  type=Char
+col DVSTDTC type=Char
+---
+S1 | DV | 001 | 1 | VISIT OUT OF WINDOW | 2019-12-20
+S1 | DV | 001 | 2 | MISSED ASSESSMENT   | 2020-02-01
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFICDTC  type=Char
+---
+S1 | DM | 001 | 2020-01-01

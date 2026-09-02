@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0033"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of RFL is populated with\
+  \ a value that is not Y"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    ends_with(varname(), "RFL") and not empty(value()) and value() != "Y"
+Outcome:
+  Message: "A variable with a suffix of RFL has a value other than Y"
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "*RFL"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of RFL has a value\
+    \ that is not Y or null"
+  Rule_Failure_Criteria: "Value is not Y or null"
+  Condition_Failure: "Variable with a suffix of RFL is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR33"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR33"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0085 expect=violation domain=ADLBC
+# Rule:Description: A variable is present with the same name as a variable present in ADSL but the variables do not have identical labels
+#note "AGE present in ADLBC and ADSL with different labels -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Age in Years" variable_name=AGE
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE type=Num label="Age in Years"
+---
+CDISCPILOT01 | 01-701-1015 | 63
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col AGE type=Num label="Age"
+---
+63
+---

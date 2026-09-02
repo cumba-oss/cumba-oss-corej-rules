@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0022"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Link Group ID (--LNKGRP) is present in a domain\
+  \ but is not present in any other domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$variable_count"
+  expression: "variable_count(--LNKGRP)"
+Check:
+  expression: >-
+    var_exists("--LNKGRP") and $variable_count < 2
+Outcome:
+  Message: "--LNKGRP is present in this domain but is not present in any other domain."
+  Output_Variables:
+  - "--LNKGRP"
+  - "$variable_count"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--LNKGRP"
+  Condition: "--LNKGRP present in a domain"
+  Rule: "--LNKGRP present in another domain"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0022"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0022"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0022"
+        Version: "1"
+      Version: "2.0"

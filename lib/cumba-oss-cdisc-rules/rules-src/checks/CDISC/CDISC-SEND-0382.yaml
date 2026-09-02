@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0382"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of Reproductive Stage (RSTAGE),\
+  \ Reproductive Stage Start Rule (TTSTRL), Reproductive Stage End Rule (TTENRL),\
+  \ and Reproductive Stage Duration (TTDUR) is not unique across Trial Repro Stages\
+  \ (TT) records; each Stage must have a unique combination of RSTAGE, TTSTRL, and\
+  \ either TTENRL or TTDUR."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Check:
+  expression: >-
+    not is_unique_set([RSTAGE, TTSTRL, TTENRL, TTDUR])
+Outcome:
+  Message: "The combination of RSTAGE, TTSTRL, TTENRL, and TTDUR is not unique across\
+    \ TT records."
+  Output_Variables:
+  - "RSTAGE"
+  - "TTSTRL"
+  - "TTENRL"
+  - "TTDUR"
+Source:
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "RSTAGE, TTSTRL,TTENRL, TTDUR"
+  Plain_Text_Explanation: "Repro Stages that have different planned durations are\
+    \ different Stages."
+  Rule: "Each record must have a unique combination of values for RSTAGE, TTSTRL,\
+    \ and (TTENRL OR TTDUR)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND382"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND382"
+        Version: "1"
+      Version: "5.0"

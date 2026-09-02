@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1099 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD1099/FDA-SD1099-invalid-LB.cdt. LBSCAT (subcategory) is present but its parent category LBCAT is absent -> fires once for the dataset."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBSCAT   type=Char label="Subcategory for Lab Test"
+---
+S1 | LB | 001 | 1 | LIVER FUNCTION

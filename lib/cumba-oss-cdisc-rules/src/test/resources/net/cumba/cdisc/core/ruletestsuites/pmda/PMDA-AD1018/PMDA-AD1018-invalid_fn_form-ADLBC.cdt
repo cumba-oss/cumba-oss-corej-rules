@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD1018 expect=violation domain=ADLBC
+#note "Isolates the FN alternative of the suffix group, which the FL fixture does not exercise."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ANL00FN
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ANL00FN type=Num
+col ANL01FN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.5 | 0 | 1

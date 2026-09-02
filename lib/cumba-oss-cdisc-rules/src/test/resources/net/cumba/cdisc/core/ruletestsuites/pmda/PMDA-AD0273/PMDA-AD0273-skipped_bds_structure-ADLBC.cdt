@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0273 expect=skipped domain=ADLBC
+#note "Data that WOULD fire, but PARAMCD/AVAL detect BASIC DATA STRUCTURE and the rule's Data_Structures Include is [OCCURRENCE DATA STRUCTURE, MEDICAL DEVICE OCCURRENCE DATA STRUCTURE], whose supertype relation runs MD-OCCDS -> OCCDS and never BDS -> OCCDS, so the pre-gate reports the rule out of scope and it never executes."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col AOCC00FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.5 | Y

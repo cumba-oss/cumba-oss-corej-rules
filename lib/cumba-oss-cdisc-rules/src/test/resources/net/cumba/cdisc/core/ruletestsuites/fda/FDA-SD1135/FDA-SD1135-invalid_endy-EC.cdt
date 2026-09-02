@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1135 expect=violation domain=EC
+#note "Second branch: ECENDY=-1 on row 1 is a negative collected-exposure end study day -> fires. The EC domain is in scope alongside EX."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECENDY=-1
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECSTDY  type=Num  label="Study Day of Start of Treatment"
+col ECENDY  type=Num  label="Study Day of End of Treatment"
+---
+S1 | EC | 001 | 1 | DRUG A | 1 | -1
+S1 | EC | 001 | 2 | DRUG A | 2 | 5

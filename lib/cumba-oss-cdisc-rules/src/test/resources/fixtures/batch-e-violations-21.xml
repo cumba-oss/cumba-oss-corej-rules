@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Batch E (codelists) violations fixture: one dedicated violator per batch-E rule
+     (DEFINE-XML-0249 has two — the zero-alias and the two-alias leg), everything else
+     kept compliant so counts are exact. Violator inventory (rule -> location):
+       135  IT.V135 (two CodeListRef children, both resolving so 151 stays at one)
+       151  IT.V151/CodeListRef (CL.MISSING)
+       152  CL.V152 (def:StandardOID dangling; 152-B quiet, no resolution)
+       152B CL.V152B (def:StandardOID resolves to a Type="IG" def:Standard)
+       165  CL.V165 (no EnumeratedItem/CodeListItem/ExternalCodeList at all)
+       165B CL.V165B (EnumeratedItem and CodeListItem mixed)
+       165C CL.V165C (ExternalCodeList alongside an EnumeratedItem)
+       166  the OID-less CodeList; 167 CL.V167 (def:IsNonStandard="No");
+       171  CL.V171 (no Name; 172 skips missing values)
+       172  CL.V172B (second CodeList named "Duplicate Name")
+       173  CL.V173 (no DataType); 174 CL.V174 (DataType="string")
+       175  CL.V175 (SASFormatName="9BAD"); 175B CL.V175B (text without $)
+       176  CL.V176 (nci:ExtCodeID Alias but no def:StandardOID; 249 guard off)
+       177  CL.V177 (def:CommentOID dangling)
+       178/180/182/184  CL.ENUM (Rank+OrderNumber on every item so 183/185 stay off)
+       183  CL.ENUMRANK; 185 CL.ENUMORD
+       191/193/195/197/198/199  CL.ITEM (Rank+OrderNumber everywhere so 194/196 stay off)
+       194  CL.ITEMRANK; 196 CL.ITEMORD
+       203  CL.EXT1 (no Dictionary); 204 CL.EXT2 (no Version); 250 CL.EXT3 (two externals)
+       244  CL.V244; 245 CL.V245/EnumeratedItem; 246 CL.V246/CodeListItem
+       249  CL.V249 (no nci:ExtCodeID Alias) and CL.V249B (two of them) -->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileOID="www.example.org/define/batch-e-violations"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-07-03T10:15:30"
+     def:Context="Submission">
+  <Study OID="ST.BATCHE.VIOL">
+    <GlobalVariables>
+      <StudyName>BATCHE-VIOL</StudyName>
+      <StudyDescription>Batch E violations fixture study</StudyDescription>
+      <ProtocolName>BATCHE-02</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.1" Name="Batch E violations MDV" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.IG1" Name="SDTMIG" Type="IG" Version="3.4" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SDTM" Version="2024-03-29" Status="Final"/>
+      </def:Standards>
+      <ItemDef OID="IT.V135" Name="V135" DataType="text">
+        <CodeListRef CodeListOID="CL.ENUM"/>
+        <CodeListRef CodeListOID="CL.ITEM"/>
+      </ItemDef>
+      <ItemDef OID="IT.V151" Name="V151" DataType="text">
+        <CodeListRef CodeListOID="CL.MISSING"/>
+      </ItemDef>
+      <CodeList OID="CL.V152" Name="V152 dangling standard" DataType="text" def:StandardOID="STD.MISSING">
+        <EnumeratedItem CodedValue="A"/>
+        <Alias Context="nci:ExtCodeID" Name="C00001"/>
+      </CodeList>
+      <CodeList OID="CL.V152B" Name="V152B wrong standard type" DataType="text" def:StandardOID="STD.IG1">
+        <EnumeratedItem CodedValue="A"/>
+        <Alias Context="nci:ExtCodeID" Name="C00002"/>
+      </CodeList>
+      <CodeList OID="CL.V165" Name="V165 empty" DataType="text"/>
+      <CodeList OID="CL.V165B" Name="V165B mixed items" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+        <CodeListItem CodedValue="B">
+          <Decode>
+            <TranslatedText xml:lang="en">B decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="CL.V165C" Name="V165C external plus items" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+        <ExternalCodeList Dictionary="MEDDRA" Version="27.0"/>
+      </CodeList>
+      <CodeList Name="V166 no oid" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V167" Name="V167 wrong isnonstandard" DataType="text" def:IsNonStandard="No">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V171" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V172A" Name="Duplicate Name" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V172B" Name="Duplicate Name" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V173" Name="V173 no datatype">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V174" Name="V174 bad datatype" DataType="string">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V175" Name="V175 bad sasformatname" DataType="float" SASFormatName="9BAD">
+        <EnumeratedItem CodedValue="1"/>
+      </CodeList>
+      <CodeList OID="CL.V175B" Name="V175B no dollar" DataType="text" SASFormatName="NODOLLAR">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V176" Name="V176 nci without standard" DataType="text">
+        <EnumeratedItem CodedValue="A"/>
+        <Alias Context="nci:ExtCodeID" Name="C00003"/>
+      </CodeList>
+      <CodeList OID="CL.V177" Name="V177 dangling comment" DataType="text" def:CommentOID="COM.MISSING">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.ENUM" Name="V enum defects" DataType="text">
+        <EnumeratedItem CodedValue="A" Rank="1.5" OrderNumber="1"/>
+        <EnumeratedItem CodedValue="B" Rank="2" OrderNumber="2.5"/>
+        <EnumeratedItem CodedValue="C" Rank="3" OrderNumber="3" def:ExtendedValue="No"/>
+        <EnumeratedItem Rank="4" OrderNumber="4"/>
+      </CodeList>
+      <CodeList OID="CL.ENUMRANK" Name="V enum rank gap" DataType="text">
+        <EnumeratedItem CodedValue="A" Rank="1"/>
+        <EnumeratedItem CodedValue="B"/>
+      </CodeList>
+      <CodeList OID="CL.ENUMORD" Name="V enum ordernumber gap" DataType="text">
+        <EnumeratedItem CodedValue="A" OrderNumber="1"/>
+        <EnumeratedItem CodedValue="B"/>
+      </CodeList>
+      <CodeList OID="CL.ITEM" Name="V item defects" DataType="text">
+        <CodeListItem CodedValue="A" Rank="a" OrderNumber="1">
+          <Decode>
+            <TranslatedText xml:lang="en">A decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="B" Rank="2" OrderNumber="x9">
+          <Decode>
+            <TranslatedText xml:lang="en">B decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="C" Rank="3" OrderNumber="3" def:ExtendedValue="Maybe">
+          <Decode>
+            <TranslatedText xml:lang="en">C decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem Rank="4" OrderNumber="4">
+          <Decode>
+            <TranslatedText xml:lang="en">D decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="E" Rank="5" OrderNumber="5">
+          <Decode>
+            <TranslatedText xml:lang="en">E decode one</TranslatedText>
+          </Decode>
+          <Decode>
+            <TranslatedText xml:lang="en">E decode two</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="F" Rank="6" OrderNumber="6"/>
+      </CodeList>
+      <CodeList OID="CL.ITEMRANK" Name="V item rank gap" DataType="text">
+        <CodeListItem CodedValue="A" Rank="1">
+          <Decode>
+            <TranslatedText xml:lang="en">A decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="B">
+          <Decode>
+            <TranslatedText xml:lang="en">B decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="CL.ITEMORD" Name="V item ordernumber gap" DataType="text">
+        <CodeListItem CodedValue="A" OrderNumber="1">
+          <Decode>
+            <TranslatedText xml:lang="en">A decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="B">
+          <Decode>
+            <TranslatedText xml:lang="en">B decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="CL.EXT1" Name="V ext no dictionary" DataType="text">
+        <ExternalCodeList Version="27.0"/>
+      </CodeList>
+      <CodeList OID="CL.EXT2" Name="V ext no version" DataType="text">
+        <ExternalCodeList Dictionary="MEDDRA"/>
+      </CodeList>
+      <CodeList OID="CL.EXT3" Name="V ext twice" DataType="text">
+        <ExternalCodeList Dictionary="MEDDRA" Version="27.0"/>
+        <ExternalCodeList Dictionary="WHODD" Version="2024-03"/>
+      </CodeList>
+      <CodeList OID="CL.V244" Name="V244 two descriptions" DataType="text">
+        <Description>
+          <TranslatedText xml:lang="en">First description</TranslatedText>
+        </Description>
+        <Description>
+          <TranslatedText xml:lang="en">Second description</TranslatedText>
+        </Description>
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V245" Name="V245 item two descriptions" DataType="text">
+        <EnumeratedItem CodedValue="A">
+          <Description>
+            <TranslatedText xml:lang="en">First description</TranslatedText>
+          </Description>
+          <Description>
+            <TranslatedText xml:lang="en">Second description</TranslatedText>
+          </Description>
+        </EnumeratedItem>
+      </CodeList>
+      <CodeList OID="CL.V246" Name="V246 item two descriptions" DataType="text">
+        <CodeListItem CodedValue="A">
+          <Description>
+            <TranslatedText xml:lang="en">First description</TranslatedText>
+          </Description>
+          <Description>
+            <TranslatedText xml:lang="en">Second description</TranslatedText>
+          </Description>
+          <Decode>
+            <TranslatedText xml:lang="en">A decode</TranslatedText>
+          </Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="CL.V249" Name="V249 no nci alias" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="A"/>
+      </CodeList>
+      <CodeList OID="CL.V249B" Name="V249B two nci aliases" DataType="text" def:StandardOID="STD.CT">
+        <EnumeratedItem CodedValue="A"/>
+        <Alias Context="nci:ExtCodeID" Name="C00004"/>
+        <Alias Context="nci:ExtCodeID" Name="C00005"/>
+      </CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>

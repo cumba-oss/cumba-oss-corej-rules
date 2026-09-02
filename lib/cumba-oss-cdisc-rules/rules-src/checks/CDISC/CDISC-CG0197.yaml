@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-CG0197"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Character Result/Finding in Standard Format\
+  \ (PESTRESC) is populated but neither equals the Verbatim Examination Finding (PEORRES)\
+  \ nor is a valid MedDRA preferred term."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PE"
+Requirements:
+  Variables:
+    All:
+    - "PESTRESC"
+    - "PEORRES"
+Operations:
+- id: "$pe_pt_valid"
+  expression: "valid_external_dictionary_value(PESTRESC, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"PT\", case_sensitive=false)"
+Check:
+  expression: >-
+    not empty(PESTRESC) and PESTRESC != PEORRES and $pe_pt_valid == false
+Outcome:
+  Message: "PESTRESC does not equal PEORRES and is not a valid MedDRA preferred term."
+  Output_Variables:
+  - "PEORRES"
+  - "PESTRESC"
+Source:
+  Class: "FND"
+  Domain: "PE"
+  Variable: "PESTRESC"
+  Condition: "PESTRESC ^= null"
+  Rule: "PESTRESC = PEORRES OR a dictionary coded preferred term"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0197"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0197"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0197"
+        Version: "1"
+      Version: "2.0"

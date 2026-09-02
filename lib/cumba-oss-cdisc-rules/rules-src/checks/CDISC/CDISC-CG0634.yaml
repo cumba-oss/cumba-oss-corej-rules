@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-CG0634"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RPPLENDY is present in a dataset, because this variable\
+  \ is not permitted in human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("RPPLENDY")
+Outcome:
+  Message: "RPPLENDY is present but is not permitted in human clinical trials."
+  Output_Variables:
+  - "RPPLENDY"
+Source_Proposed:
+  Sheet_Issue: "#69"
+  Class: "ALL"
+  Domain: ""
+  Variable: "RPPLENDY"
+  Condition: ""
+  Rule: "RPPLENDY not present in dataset"
+Source:
+  Class: "ALL"
+  Variable: "RPLENDY"
+  Rule: "RPLENDY not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0634"
+        Version: "1"
+      Version: "2.0"

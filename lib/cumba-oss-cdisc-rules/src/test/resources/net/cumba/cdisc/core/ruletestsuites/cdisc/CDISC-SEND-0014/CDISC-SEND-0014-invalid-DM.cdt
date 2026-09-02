@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0014 expect=violation domain=DM
+#note "AGEU is Expected (library core=Exp), declared in the define with NO CommentOID; STUDYID/USUBJID both carry comments. Under the CURRENT rule this fires on AGEU (declared + no comment) -- green both before and after the proposed conditioned rule."
+#library standard=sendig version=3-0
+#library variable-metadata DM AGEU core=Exp
+#define-xml CDISC-SEND-0014-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=AGEU
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGEU    type=Char
+---
+S1 | S1-001 |
+S1 | S1-002 |

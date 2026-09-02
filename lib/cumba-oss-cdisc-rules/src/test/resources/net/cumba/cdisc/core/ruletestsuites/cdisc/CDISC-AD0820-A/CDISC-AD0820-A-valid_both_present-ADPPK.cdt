@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0820-A expect=noViolation domain=ADPPK
+#note "Both SITEID and SITEIDN are DECLARED; row 2 leaves SITEIDN blank on purpose -- a present-but-empty companion is the VALUE rule CDISC-AD0820's finding, not this presence sister's. Discriminates presence from population."
+#expectViolationCount 0
+# Declared-tier scope: structure=/subclass= state the ADaM data structure and the popPK subclass this
+# minimal table stands for; #define is their mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADPPK structure=BDS subclass=POPPK
+col STUDYID type=Char
+col USUBJID type=Char
+col SITEID type=Char
+col SITEIDN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 701 | 1
+CDISCPILOT01 | 01-701-1023 | 702 |
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2260 expect=violation domain=TP
+#note "Row 2 gives RPRFDY the value 2, which is neither 0 nor 1 -> fires. Row 1 pins that 0 is accepted."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 RPRFDY=2
+dataset TP label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col RPATH    type=Char label="Description of Planned Repro Path"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | PATH1 | Repro Path 1 | 1 | GEST | GESTATION | 0
+S1 | TP | PATH1 | Repro Path 1 | 2 | LACT | LACTATION | 2

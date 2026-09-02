@@ -1,0 +1,62 @@
+Core:
+  Id: "PMDA-AD0323"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Phase (N) (APHASEN) variable\
+  \ does not hold a single consistent value for each unique value of the Phase (APHASE)\
+  \ variable, evaluated over the records where the primary variable APHASE is populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "APHASEN"
+Check:
+  expression: >-
+    var_exists("APHASE") and not empty(APHASE) and is_inconsistent_across_dataset(APHASEN,
+    keys=[APHASE])
+Outcome:
+  Message: "Inconsistent value for APHASEN."
+  Output_Variables:
+  - "APHASE"
+  - "APHASEN"
+Source:
+  Message: "Inconsistent value for APHASEN"
+  Description: "Within a Study, all Phase (N) (APHASEN) variable values must be the\
+    \ same for each unique value of Phase (APHASE) variable when the primary variable\
+    \ APHASE is populated."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0323"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0323"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0323"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0586 expect=noViolation domain=ADLBC
+#note "Pins 'when all 3 variables are populated': compileArithmeticNotEqual skips any row where ANY of the three operands is missing, so neither row is evaluated. Both rows carry a PBCHG that would fire if the missing operand were coerced to zero."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE    type=Num
+col AVAL    type=Num
+col PBCHG   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC |     | 100 | 50
+CDISCPILOT01 | 01-701-1023 | GLUC | 120 |     | 50

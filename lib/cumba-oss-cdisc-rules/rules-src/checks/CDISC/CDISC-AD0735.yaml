@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-AD0735"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, considering only\
+  \ records on which BASE or BASEC is populated, BASETYPE is populated on at least\
+  \ one record and not populated on at least one other record"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Grouping:
+  Variables:
+  - "PARAMCD"
+Operations:
+- id: "$basetype_mixed"
+  expression: "has_mixed_emptiness_within_group(BASETYPE, group=[PARAMCD], qualifying_any_populated=[BASE,\
+    \ BASEC])"
+Check:
+  expression: >-
+    $basetype_mixed == true
+Outcome:
+  Message: "Within this PARAMCD, BASETYPE is populated on some records and not populated\
+    \ on others, among records where BASE or BASEC is populated"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "BASEC"
+  - "BASETYPE"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASETYPE"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD where either\
+    \ BASE or BASEC are populated, BASETYPE is populated for at least one record and\
+    \ is not populated for at least one record"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, BASETYPE is populated for\
+    \ at least one record and is not populated for at least one record"
+  Condition_Failure: "On rows where BASE or BASEC are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR735"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0206 expect=violation domain=ADSL
+#note "JOIN: Match_Datasets DM on Keys=[USUBJID], Join_Type inner (default -- correct: the rule fires on a POPULATED merged value; the unmatched-subject defect belongs to AD0053); DM one row per subject -> 1:1. ADSL.SEX populated and != DM.SEX -> fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 SEX=M
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+CDISCPILOT01 | 01-701-1015 | M
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | F

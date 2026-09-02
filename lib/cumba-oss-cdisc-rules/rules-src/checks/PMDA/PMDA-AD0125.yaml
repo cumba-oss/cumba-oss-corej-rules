@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-AD0125"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, a Parameter Category (PARCATy)\
+  \ takes more than one value for the same Parameter Category number (PARCATyN), considering\
+  \ only records on which PARCATy is populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARCATy"
+Check:
+  expression: >-
+    var_exists("PARCATyN") and not empty(PARCATy) and is_inconsistent_across_dataset(PARCATy,
+    keys=[PARCATyN])
+Outcome:
+  Message: "Inconsistent value for PARCATy"
+  Output_Variables:
+  - "PARCATy"
+  - "PARCATyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for PARCATy"
+  Description: "Within a study, all PARCATy values must be the same for each unique\
+    \ value of PARCATyN when the primary variable PARCATy is populated."
+  Domains: "BDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0125"
+        Version: "1"
+      Version: "6.0"

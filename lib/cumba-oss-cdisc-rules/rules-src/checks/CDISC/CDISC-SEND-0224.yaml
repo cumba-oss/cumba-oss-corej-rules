@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0224"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated Description of Planned Arm (ARM) or\
+  \ Planned Arm Code (ARMCD) in DM does not coincide with any planned Arm value defined\
+  \ in the Trial Arms (TA) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Operations:
+- id: "$ta_arm_pairs"
+  expression: "distinct([ARMCD, ARM], domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(ARM) and not empty(ARMCD) and tuple(ARMCD, ARM) not in $ta_arm_pairs
+Outcome:
+  Message: "DM ARM or ARMCD does not coincide with a planned Arm value in the TA dataset."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+  - "$ta_arm_pairs"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARM, ARMCD"
+  Plain_Text_Explanation: "Each ARM/ARMCD pair in DM, if present, must match those\
+    \ in TA."
+  Condition: "ARM ^= null AND ARMCD ^= null"
+  Rule: "DM.ARM = TA.ARM AND DM.ARMCD = TA.ARMCD for a given TA record"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND224"
+        Version: "1"
+      Version: "5.0"

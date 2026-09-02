@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2229 expect=violation domain=MI
+#note "Row 2: MIRESCAT=BENIGN but MISTRESC=Carcinoma, whose dummy-neoplasm malignancy attribute is MALIGNANT -> misaligned pair -> fires. Row 1 is correctly aligned; row 3 carries the same term under a non-BENIGN/MALIGNANT category (condition not met)."
+#library standard=sendig version=3-1-1
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 MISEQ=2 MISTRESC=Carcinoma MIRESCAT=BENIGN
+dataset MI class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MISEQ    type=Num
+col MITESTCD type=Char
+col MISTRESC type=Char
+col MIRESCAT type=Char
+---
+S01 | MI | 001 | 1 | GHISTXQL | Sarcoma   | MALIGNANT
+S01 | MI | 001 | 2 | GHISTXQL | Carcinoma | BENIGN
+S01 | MI | 002 | 1 | GHISTXQL | Carcinoma | NON-NEOPLASTIC

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0506 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in ADY must contain "Relative Day" in the label
+#note "PADY label "Param Day" lacks "Relative Day" -> violation"
+#expectViolationCount 1
+#expectViolationAt variable_label="Param Day" variable_name=PADY
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PADY type=Char label="Param Day"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

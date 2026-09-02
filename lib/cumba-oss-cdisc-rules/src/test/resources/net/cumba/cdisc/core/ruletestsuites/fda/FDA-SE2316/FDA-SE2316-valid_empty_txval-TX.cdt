@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2316 expect=noViolation domain=TX
+#note "Boundary: the TCNTRL record exists but its TXVAL is empty. The rule counts parameter RECORDS, not populated values -> no violation."
+#library standard=sendig version=3-1-1
+dataset TX class="TRIAL DESIGN" label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S01 | TX | SET01 | Control   | 1 | TCNTRL | Control Type | 
+S01 | TX | SET02 | High Dose | 2 | GRPLBL | Group Label  | High Dose

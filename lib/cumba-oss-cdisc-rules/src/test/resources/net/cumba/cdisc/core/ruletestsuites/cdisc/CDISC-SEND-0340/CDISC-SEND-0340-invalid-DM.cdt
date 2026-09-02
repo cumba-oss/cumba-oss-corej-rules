@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0340 expect=violation domain=DM
+#note "Mirror of CDISC-SEND-0014-invalid-DM (own sidecar): Expected AGEU present but all blank, declared without a comment; STUDYID/USUBJID declared with comments; library AGEU core=Exp. 1 violation under both current and proposed rule."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM AGEU core=Exp
+#define-xml CDISC-SEND-0340-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=AGEU
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+col AGEU    type=Char
+---
+S1 | S1-001 |
+S1 | S1-002 |

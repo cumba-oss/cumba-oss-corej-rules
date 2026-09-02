@@ -1,0 +1,24 @@
+Rule_Id: "PMDA-DD0077"
+Sheet_Rule_Identifier: "DD0077"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "If Order number is provided for any Codelist item (EnumeratedItem or CodeListItem) within a Codelist, it must be provided for all other items as well."
+Message: "Missing Order number"
+# One sheet row, two item-element legs (EnumeratedItem / CodeListItem) - split
+# into PMDA-DD0077 / -B per the 0165-B convention. The guard matches the row's
+# "provided for ANY Codelist item (EnumeratedItem or CodeListItem) within a
+# Codelist" wording verbatim by looking at both sibling sets (a CodeList only
+# ever carries one item type, so the cross-type clause is a no-op in valid
+# documents). EnumeratedItem leg; CDISC twins 0185/0196.
+Check:
+  kind: "exists"
+  target: "@OrderNumber"
+  when:
+    any:
+    - path: "../EnumeratedItem/@OrderNumber"
+      exists: true
+    - path: "../CodeListItem/@OrderNumber"
+      exists: true

@@ -1,0 +1,42 @@
+name: CDISC-AD0409
+kind: rule
+description: |
+  Wave B2 port — T1b PlainIntermediate.
+  CDISC-AD0409: There is more than one value of ABLFN for a given value of ABLFL.
+  Bare-leaf Check (`has_multiple_values_for`) scoped to BASIC DATA STRUCTURE.
+  Two rows share the same ABLFL value but distinct ABLFN; both fire. A third row is unique and does not fire.
+  Bare-leaf Check raises `KeyError: 'name'` on Python's business_rules library (Finding #26); Python lane baseline expected.
+python_source: rules-adamig-1-3.json (CDISC-AD0409)
+rule:
+  coreId: CDISC-AD0409
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ABLFN: 'X', ABLFL: 'A'}   # bad
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, ABLFN: 'Y', ABLFL: 'A'}   # bad (distinct ABLFN for same ABLFL)
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: 'HGB', AVISITN: 1, ABLFN: 'Z', ABLFL: 'B'}   # ok
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0409
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ABLFN: 'X'
+      ABLFL: 'A'
+  - rule_id: CDISC-AD0409
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      ABLFN: 'Y'
+      ABLFL: 'A'
+expected_errors: []

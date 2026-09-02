@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1008 expect=skipped domain=CO
+#note "Four-variable Requirements.Variables.All [CODTC, IDVAR, IDVARVAL, RDOMAIN] gate: IDVARVAL is not declared at all. RDOMAIN, IDVAR and CODTC are all populated on the one row, so three of the four Check conjuncts hold and only the missing IDVARVAL stops it -- absent must not be treated as empty."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col IDVAR   type=Char label="Identifying Variable"
+col COVAL   type=Char label="Comment"
+col CODTC   type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | AE | 01-701-1015 | 1 | AESEQ | Related to AE 3 | 2020-01-15

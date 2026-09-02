@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0041A expect=violation domain=ADLBC
+#note "ADT ends with DT and var_format(DATA) is empty -> ONE finding for the VARIABLE. Variable-metadata rule: NO row= pin. Pin variable_name ONLY: the rule's other output variable variable_format is BLANK on the fired variable, and a blank canonicalises to null and matches no pin - that emptiness is the very thing the rule reports."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ADT
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADT     type=Num
+---
+S1 | 001 | ALB | 22000
+---

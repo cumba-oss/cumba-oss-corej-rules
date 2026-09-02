@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0037"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a USUBJID value appears on more than one Demographics\
+  \ (DM) record within the study, i.e. the same USUBJID does not uniquely identify\
+  \ a single subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, STUDYID])
+Outcome:
+  Message: "USUBJID is not unique to one subject (it is duplicated across DM records)."
+  Output_Variables:
+  - "STUDYID"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "USUBJID"
+  Plain_Text_Explanation: "Each subject must have an unique USUBJID"
+  Condition: "USUBJID exists"
+  Rule: "USUBJID is unique to one subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND37"
+        Version: "1"
+      Version: "5.0"

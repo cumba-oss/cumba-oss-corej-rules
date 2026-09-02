@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0077 expect=noViolation domain=MH
+#note "MHCAT blank on every row. has_same_values counts the blank as one distinct value and would flag all rows, but the per-row not empty(MHCAT) conjunct is false on every row -- isolates the not-empty conjunct."
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHCAT type=Char label="Category for Medical History" format=$MHCAT.
+---
+CDISCPILOT01 | MH | 01-701-1015 | 1 |
+CDISCPILOT01 | MH | 01-701-1015 | 2 |
+CDISCPILOT01 | MH | 01-701-1023 | 1 |
+---

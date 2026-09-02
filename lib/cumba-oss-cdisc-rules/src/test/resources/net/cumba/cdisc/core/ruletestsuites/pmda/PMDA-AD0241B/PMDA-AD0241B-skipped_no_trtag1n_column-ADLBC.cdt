@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0241B expect=skipped domain=ADLBC
+#note "TRTAG1N is not declared. The expansion still happens (TRTAGy matches TRTAG1, tuple y=1; TRTAGyN has no instance and is synthesised as the absent TRTAG1N), and Requirements.Variables.All ['TRTAGyN'] rewrites to ['TRTAG1N'] for this tuple -- which is absent, so the rule is reported not executed with the Requirements.Variables reason. Not a wildcard NoMatch skip: one column did match."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTAG1  type=Char
+---
+S1 | 001 | GLUC | 5.0 | POOLA
+S1 | 002 | GLUC | 5.1 | POOLA

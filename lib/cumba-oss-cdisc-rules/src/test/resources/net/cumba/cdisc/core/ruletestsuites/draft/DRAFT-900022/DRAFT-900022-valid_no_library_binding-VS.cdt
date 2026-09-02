@@ -1,0 +1,18 @@
+#!RuleTest
+#test DRAFT-900022 expect=noViolation domain=VS
+#note "Library declares VSPOS with NO ccode (variable-metadata line without a ccode key, no codelist); define binds ccode=C99999. The not empty(var_ccode(\"LIBRARY\")) guard excludes variables without a library codelist expectation -> silent. Encodes the guard as intent (per the rule's ExecutabilityHint), not incidental behavior. VSLAT carries a matching library/define ccode pair so it does not confound the isolation."
+#library standard=sdtmig version=3-4
+#library variable-metadata VS VSPOS codelist=C71148
+#library variable-metadata VS VSLAT codelist=C99074 ccode=C99074
+#define domain-variables VS VSTESTCD:Topic VSPOS:Qualifier VSLAT:Qualifier
+#define variable-metadata VS VSPOS ccode=C99999
+#define variable-metadata VS VSLAT ccode=C99074
+#define variable-metadata VS VSTESTCD ccode=C66741
+dataset VS class=FINDINGS
+col USUBJID  type=Char
+col VSTESTCD type=Char
+col VSPOS    type=Char
+col VSLAT    type=Char
+---
+001 | SYSBP | SUPINE | LEFT
+---

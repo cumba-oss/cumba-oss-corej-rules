@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0091"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Numeric Result/Finding in Standard Units (--STRESN)\
+  \ is populated but the standardized character result (--STRESC) contains a comparator\
+  \ character (< or >), indicating numeric data collected with characters attached;\
+  \ --STRESN must be missing for such values."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESN"
+    - "--STRESC"
+Check:
+  expression: >-
+    not empty(--STRESN) and --STRESC =~ /.*[<>]/
+Outcome:
+  Message: "--STRESN is populated when --STRESC contains a comparator character (<\
+    \ or >); --STRESN must be missing when the value was collected with characters\
+    \ attached."
+  Output_Variables:
+  - "--STRESC"
+  - "--STRESN"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESN"
+  Plain_Text_Explanation: "If numeric data are collected with characters attached\
+    \ (e.g., >, <) no data value should be populated in --STRESN."
+  Condition: "Numeric data collected with characters attached"
+  Rule: "--STRESN = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND91"
+        Version: "1"
+      Version: "5.0"

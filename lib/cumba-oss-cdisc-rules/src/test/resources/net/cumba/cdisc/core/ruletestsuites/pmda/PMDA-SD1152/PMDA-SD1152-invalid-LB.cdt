@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1152 expect=violation domain=LB
+#note "Define declares ItemRefs carrying KeySequence: STUDYID=1, USUBJID=2, LBTESTCD=3 (LBORRES no KeySequence). Key tuple (STUDYID,USUBJID,LBTESTCD): rows 1-2 duplicate -> both flagged; row 3 unique."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1152-define.xml
+#expectViolationCount 2
+#expectViolationAt row=1 STUDYID=S1
+#expectViolationAt row=2 STUDYID=S1
+dataset LB
+col STUDYID  type=Char
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | 001 | ALB  | 3.5
+S1 | 001 | ALB  | 3.6
+S1 | 001 | GLUC | 5.0

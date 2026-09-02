@@ -1,0 +1,68 @@
+Core:
+  Id: "CDISC-SEND-0328"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record with PCELTM equal to PT0H exists\
+  \ within a single time-concentration profile."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCELTM"
+Check:
+  expression: >-
+    var_exists("PCTPTREF") and var_exists("PCSPEC") and PCELTM == "PT0H" and not
+    is_unique_set([PCTESTCD, USUBJID, POOLID, PCTPTREF, PCSPEC, PCELTM])
+Outcome:
+  Message: "More than one record with PCELTM equal to PT0H exists within a single\
+    \ time-concentration profile."
+  Output_Variables:
+  - "POOLID"
+  - "PCTESTCD"
+  - "PCSPEC"
+  - "PCELTM"
+  - "PCTPTREF"
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCELTM"
+  Plain_Text_Explanation: "Specimen concentrations (e.g., plasma) used to calculate\
+    \ a time concentration profile should only have one record with PCELTM = \"PT0H\"\
+    \ for the same profile. The immediate postdose concentrations should be separated\
+    \ from predose concentrations by populating these records with a unique PCELTM\
+    \ value."
+  Condition: "Specimen concentration (e.g., plasma) was used to calculate a time concentration\
+    \ profile"
+  Rule: "Only one PCELTM = \"PT0H\" exists within the specimen concentrations used\
+    \ to calculate a single time concentration profile"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND328"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND328"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND328"
+        Version: "1"
+      Version: "5.0"

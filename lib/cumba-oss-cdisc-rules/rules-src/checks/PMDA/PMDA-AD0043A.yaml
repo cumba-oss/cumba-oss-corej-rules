@@ -1,0 +1,60 @@
+Core:
+  Id: "PMDA-AD0043A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a datetime variable whose name ends in 'DTM' has\
+  \ no display format assigned; a *DTM variable must carry a non-missing SAS datetime\
+  \ format."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DTM") and empty(var_format("DATA"))
+Outcome:
+  Message: "A *DTM datetime variable has a missing SAS datetime format."
+  Output_Variables:
+  - "variable_name"
+  - "variable_format"
+Source:
+  Message: "*DTM variable has missing SAS Datetime Format"
+  Description: "*DTM variables must have non-missing SAS Datetime Format."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043A"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0043A"
+        Version: "1"
+      Version: "6.0"

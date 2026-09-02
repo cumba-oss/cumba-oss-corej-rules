@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1236 expect=violation domain=DO
+#note "Drop-and-regroup branch: DO (Device Properties) carries no USUBJID; the engine drops it from the key and checks DOSEQ uniqueness within (DOMAIN, SPDEVID) -> the duplicated seq 1 for device D1 fires on rows 1 and 2. ADJUDICATED landed behaviour - if this flips, escalate."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 SPDEVID=D1
+#expectViolationAt row=2 SPDEVID=D1
+dataset DO
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col DOSEQ   type=Num  label="Sequence Number"
+col DOPARMCD type=Char label="Device Property Short Name"
+---
+S1 | DO | D1 | 1 | MODEL
+S1 | DO | D1 | 1 | SERIAL
+S1 | DO | D2 | 1 | MODEL

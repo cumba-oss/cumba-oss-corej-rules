@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD0063 expect=violation domain=APMH1
+#note "Fix #373 — APMH1 is the AP-COMPOUND SPLIT, and it exercises BOTH fallback tiers. Tier 2 keeps the AP prefix (DOMAIN cell says MH -> the Library key is APMH), which is what carries the ASSOCIATED PERSONS identifiers: RSUBJID is declared under APMH and resolves only if the prefix survives. Tier 3 then drops the prefix for the parent-domain variables (MHTERM, declared under MH), which a product-less provider can only answer bare. Both labels are wrong in the data, so the rule fires twice."
+#library standard=sdtmig version=3-2
+#library variable-metadata APMH RSUBJID name=RSUBJID label="Related Subject or Pool Identifier"
+#library variable-metadata MH   MHTERM  name=MHTERM  label="Reported Term for the Medical History"
+#library variable-metadata MH   MHSEQ   name=MHSEQ   label="Sequence Number"
+#expectViolationCount 2
+#expectViolationAt variable_name=RSUBJID library_variable_label="Related Subject or Pool Identifier"
+#expectViolationAt variable_name=MHTERM library_variable_label="Reported Term for the Medical History"
+dataset APMH1 class=EVENTS label="Associated Persons Medical History - Part 1"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RSUBJID type=Char label="Related Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Medical History Reported Term"
+---
+S1 | MH | 001 | R01 | 1 | ASTHMA

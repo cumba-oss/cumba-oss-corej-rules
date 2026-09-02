@@ -1,0 +1,33 @@
+#!RuleTest
+#test FDA-SE2244 expect=violation domain=MI
+#note "SUPP --RESMOD branch: MI row 1 has MISTRESC = MIORRES (not NORMAL/UNREMARKABLE), all in-domain modifier qualifiers empty, but a SUPPMI QNAM=MIRESMOD record points at MISEQ=1 -> fires. Row 2 (same shape, no matching SUPPMI record) stays clean -> proves the record-level SUPP join. MISEQ is declared Char so the SUPP IDVARVAL string joins the parent key verbatim."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MISTRESC="NECROSIS FOCAL"
+dataset MI label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Char label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Examination Short Name"
+col MIORRES  type=Char label="Result or Finding in Original Units"
+col MISTRESC type=Char label="Result or Finding in Standard Format"
+col MISEV    type=Char label="Severity"
+col MICHRON  type=Char label="Chronicity of Finding"
+col MIDISTR  type=Char label="Distribution Pattern of Finding"
+---
+S1 | MI | 001 | 1 | MIEXAM | NECROSIS FOCAL | NECROSIS FOCAL |  |  |
+S1 | MI | 001 | 2 | MIEXAM | FIBROSIS       | FIBROSIS       |  |  |
+---
+
+dataset SUPPMI label="Supplemental Qualifiers for MI"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | MI | 001 | MISEQ | 1 | MIRESMOD | Result Modifiers | focal

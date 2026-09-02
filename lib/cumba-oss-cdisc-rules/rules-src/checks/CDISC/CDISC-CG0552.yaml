@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-CG0552"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --RESLOC is present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Check:
+  expression: >-
+    var_exists("--RESLOC")
+Outcome:
+  Message: "--RESLOC must not be present in the dataset because it is not used in\
+    \ human clinical trials."
+  Output_Variables:
+  - "--RESLOC"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--RESLOC"
+  Rule: "--RESLOC not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0552"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0552"
+        Version: "1"
+      Version: "2.0"

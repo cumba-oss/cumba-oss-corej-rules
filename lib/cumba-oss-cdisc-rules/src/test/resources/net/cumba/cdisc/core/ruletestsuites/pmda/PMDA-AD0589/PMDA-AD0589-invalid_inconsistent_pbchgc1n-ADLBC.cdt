@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0589 expect=violation domain=ADLBC
+#note "INDEX 1 ONLY. Here the TARGET is numeric PBCHGC1N and the key tuple is (PARAMCD, PBCHGCA1)=(GLUC, INCREASE); target holds {1, 1, 2} -> minority row 3 fires. These rows do NOT fire under PMDA-AD0588."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC PBCHGCA1=INCREASE PBCHGC1N=2
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col PBCHGCA1 type=Char
+col PBCHGC1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | INCREASE | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | INCREASE | 1
+CDISCPILOT01 | 01-701-1034 | GLUC | INCREASE | 2

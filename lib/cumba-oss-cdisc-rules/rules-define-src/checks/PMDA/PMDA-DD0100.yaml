@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0100"
+Sheet_Rule_Identifier: "DD0100"
+Rule_Set: "PMDA"
+Element: "AnalysisResult"
+Attribute: "AnalysisPurpose"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "Values for the AnalysisPurpose attribute are controlled by the Analysis Purpose extensible codelist in ADaM CT or Define CT."
+# CT-gated. Companion of PMDA-DD0099 for the AnalysisPurpose attribute.
+# C117745 = the "Analysis Purpose" ARM/Define-XML CT codelist (extensible).
+# CAUTION: confirm C117745 against the shipped CT package at Phase-7 binding
+# time (see PMDA-DD0099); a wrong c-code silently no-ops, never false-positives.
+Message: "Extended value for AnalysisPurpose [${value}]"
+Check:
+  kind: "term_in_ct_codelist"
+  attribute: "AnalysisPurpose"
+  cCode: "C117745"

@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2262 expect=noViolation domain=DM
+#note "Both populated DM.RPATHCD values (P1, P2) are declared in TP; the blank RPATHCD row is not flagged -> no violation."
+#library standard=sendig version=dart-1-1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+col SEX     type=Char label="Sex"
+col SETCD   type=Char label="Set Code"
+col RPATHCD type=Char label="Repro Path Code"
+---
+S1 | DM | 001 | 001 | 2020-01-01 | F | SET1 | P1
+S1 | DM | 002 | 002 | 2020-01-01 | M | SET1 | P2
+S1 | DM | 003 | 003 | 2020-01-01 | F | SET1 |
+---
+
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Repro Path Code"
+col RPATH    type=Char label="Repro Path"
+col TPSTGORD type=Num  label="Repro Stage Order Number"
+col RSTGCD   type=Char label="Repro Stage Code"
+---
+S1 | TP | P1 | F0 Female | 1 | ST1
+S1 | TP | P2 | F0 Male   | 1 | ST1
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0134 expect=violation domain=ADLBC
+# Rule:Description: R2AyHI is not equal to AVAL divided by AyHI
+#note "R2A1HI=9 but AVAL/A1HI = 10/2 = 5 -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col A1HI type=Num
+col R2A1HI type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 10 | 2 | 9
+---

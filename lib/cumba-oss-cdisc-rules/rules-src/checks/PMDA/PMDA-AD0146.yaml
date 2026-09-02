@@ -1,0 +1,39 @@
+Core:
+  Id: "PMDA-AD0146"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the character Parameter (PARAM) does not have a\
+  \ single consistent value for each unique value of the numeric Parameter (PARAMN),\
+  \ evaluated on rows where the primary variable PARAM is populated; within a study\
+  \ each PARAMN value must map to one PARAM value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAM) and var_exists("PARAMN") and is_inconsistent_across_dataset(PARAM,
+    keys=[PARAMN])
+Outcome:
+  Message: "Inconsistent value for PARAM"
+  Output_Variables:
+  - "PARAM"
+  - "PARAMN"
+Source:
+  Message: "Inconsistent value for PARAM"
+  Description: "Within a study, all PARAM values must be the same for each unique\
+    \ value of PARAMN when the primary variable PARAM is populated."
+  Domains: "BDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0146"
+        Version: "1"
+      Version: "6.0"

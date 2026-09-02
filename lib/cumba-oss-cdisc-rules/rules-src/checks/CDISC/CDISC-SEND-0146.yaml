@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0146"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Completion Status (--STAT) is empty but Reason Not\
+  \ Done (--REASND) is populated; --REASND must be empty when --STAT is not populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--REASND"
+Check:
+  expression: >-
+    empty(--STAT) and not empty(--REASND)
+Outcome:
+  Message: "--REASND is populated when --STAT is empty; --REASND must be empty when\
+    \ --STAT is not populated."
+  Output_Variables:
+  - "--STAT"
+  - "--REASND"
+Source:
+  Class: "FND"
+  Domain: "NOT (SC)"
+  Variable: "--REASND"
+  Plain_Text_Explanation: "If --STAT is not populated then --REASND is not populated"
+  Condition: "--STAT = null"
+  Rule: "--REASND = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND146"
+        Version: "1"
+      Version: "5.0"

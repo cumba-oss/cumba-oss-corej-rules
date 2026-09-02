@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-SD1356 expect=noViolation domain=CE
+#note "FRESH, DISCRIMINATING - TM present with ZERO rows. ds_exists(\"TM\") is literally 'resolver.resolve(\"TM\") != null' - a declared 0-row table still resolves -> TRUE -> silent. If this FIRES, escalate (would refute the resolver-based read)."
+#library standard=sdtmig version=3-4
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CESEQ   type=Num  label="Sequence Number"
+col CETERM  type=Char label="Reported Term for the Clinical Event"
+col RELMIDS type=Char label="Temporal Relation to Milestone Instance"
+---
+S1 | CE | 001 | 1 | HYPOGLYCEMIC EVENT | IMMEDIATELY BEFORE
+---
+
+dataset TM class="TRIAL DESIGN" label="Trial Disease Milestones"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col MIDSTYPE type=Char label="Disease Milestone Type"
+col TMDEF    type=Char label="Disease Milestone Definition"
+---
+---

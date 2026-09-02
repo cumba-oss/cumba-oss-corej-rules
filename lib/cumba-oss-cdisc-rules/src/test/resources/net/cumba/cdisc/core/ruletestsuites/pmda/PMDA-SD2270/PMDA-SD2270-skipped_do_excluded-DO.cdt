@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2270 expect=skipped domain=DO
+#note "DO declared class=FINDINGS is in Classes.Include, so ONLY the Domains.Exclude [DO] rejects. Pins this rule's unique sheet-given exclusion ('FINDINGS (-DO)', retained per the SD1202 ruling) - the deliberate counterpart of PMDA-SD1250-invalid_do_in_scope-DO, where the same-shaped dataset RUNS because SD1250's DO token was ruled away."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS label="Device Properties"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col SPDEVID  type=Char
+col DOSEQ    type=Num
+col DOTESTCD type=Char
+col DODY     type=Num
+---
+S1 | DO | DEV01 | 1 | DEVTYPE | 3
+---

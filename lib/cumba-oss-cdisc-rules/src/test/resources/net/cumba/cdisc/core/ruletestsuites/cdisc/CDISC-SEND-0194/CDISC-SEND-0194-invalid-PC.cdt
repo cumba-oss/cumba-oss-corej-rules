@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=violation domain=PC
+#note "Row 1 is below the limit of quantitation (PCSTRESC=BLQ, and PCORRES 0.05 < PCLLOQ 0.1 -- both witnesses agree) with a populated PCSTRESN -> FIRES. Row 2 is also BLQ but PCSTRESN is the SAS numeric missing -> silent. Row 3 is an ordinary numeric result -> silent. Every row gives the same verdict under the pre- and post-M3-D16 readings, which is why closing the conjunct cost no re-authoring."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSEQ=1 PCSTRESC=BLQ
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCLLOQ   type=Num  label="Lower Limit of Quantitation"
+col PCSTRESC type=Char label="Character Result/Finding in Std Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Std Units"
+---
+S1 | PC | S1-001 | 1 | DRUGX | 0.05 | 0.1 | BLQ  | 0.05
+S1 | PC | S1-002 | 2 | DRUGX | 0.04 | 0.1 | BLQ  | .
+S1 | PC | S1-003 | 3 | DRUGX | 12.4 | 0.1 | 12.4 | 12.4
+---

@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-CG0550"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STREFC is populated but --STREFN is missing."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STREFN"
+    - "--STREFC"
+Check:
+  expression: >-
+    not empty(--STREFC) and empty(--STREFN)
+Outcome:
+  Message: "--STREFN is missing when --STREFC is populated."
+  Output_Variables:
+  - "--STREFC"
+  - "--STREFN"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STREFN"
+  Condition: "--STREFC ^= null"
+  Rule: "--STREFN ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0550"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0550"
+        Version: "1"
+      Version: "2.0"

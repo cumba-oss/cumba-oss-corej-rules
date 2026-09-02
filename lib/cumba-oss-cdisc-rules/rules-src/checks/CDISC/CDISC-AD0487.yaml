@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0487"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when CRITyFN is populated and CRITyFL is empty on the\
+  \ same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(CRITyFN) and empty(CRITyFL)
+Outcome:
+  Message: "CRITyFN is populated but CRITyFL is empty."
+  Output_Variables:
+  - "CRITyFL"
+  - "CRITyFN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "CRITyFL where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, CRITyFN is populated\
+    \ and CRITyFL is not populated"
+  Rule_Failure_Criteria: "CRITyFL is not populated"
+  Condition_Failure: "CRITyFN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR487"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR487"
+        Version: "2"
+      Version: "5.0"

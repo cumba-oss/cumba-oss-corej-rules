@@ -1,0 +1,64 @@
+Core:
+  Id: "FDA-SE2280"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pharmacokinetic Concentrations (PC) specimen collected\
+  \ at or before its reference time point (PCDTC less than or equal to PCRFTDTC, both\
+  \ bearing a time component) has Planned Elapsed Time from Time Point Reference (PCELTM)\
+  \ not equal to 'PT0H'."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The 'pre-dose sample used to build a time-concentration profile' population\
+    \ is approximated by 'specimen collected at or before the populated reference\
+    \ point' (PCDTC <= PCRFTDTC). This uses the ACTUAL collection/reference times\
+    \ (PCDTC/PCRFTDTC) as a proxy for the PLANNED pre-dose designation; a sample planned\
+    \ post-dose but actually drawn at/just before the recorded reference time could\
+    \ false-positive, and profile membership is approximated by PCRFTDTC being populated.\
+    \ Records whose PCDTC/PCRFTDTC lack a time component are excluded (the comparison\
+    \ is not meaningful) and should be caught by a separate timing-completeness rule.\
+    \ Known limitation: when PCDTC and PCRFTDTC differ in ISO-8601 precision (e.g.\
+    \ seconds vs minutes), the engine truncates both operands to the coarser precision\
+    \ before comparing, so a specimen drawn shortly after the reference within the\
+    \ same coarser time unit can compare equal and fire (a cross-precision false-positive\
+    \ intrinsic to the actual-time comparison)."
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCDTC"
+    - "PCRFTDTC"
+    - "PCELTM"
+Check:
+  expression: >-
+    not empty(PCDTC) and not empty(PCRFTDTC) and PCDTC =~ /.*T[0-9]/ and PCRFTDTC =~ /.*T[0-9]/ and
+    date(PCDTC) <= PCRFTDTC and PCELTM != "PT0H"
+Outcome:
+  Message: "The PC specimen was collected at or before its reference point (PCDTC\
+    \ at or before PCRFTDTC) but PCELTM is not 'PT0H'; a pre-dose/at-reference profile\
+    \ sample must be anchored at PT0H."
+  Output_Variables:
+  - "PCDTC"
+  - "PCELTM"
+  - "PCRFTDTC"
+Source:
+  FDA_Validator_Rule_Message: "PCELTM is not 'PT0H' for pre-dose sampling"
+  FDA_Validator_Rule_Description: "Specimen concentrations (e.g., plasma) used to\
+    \ calculate a time concentration profile with a pre-dose sample should have Planned\
+    \ Elapsed Time from Time Point Ref (PCELTM) populated with 'PT0H'. A negative\
+    \ elapsed time would lead to an incorrect area under the curve."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2280"
+        Version: "1"
+      Version: "1.6"

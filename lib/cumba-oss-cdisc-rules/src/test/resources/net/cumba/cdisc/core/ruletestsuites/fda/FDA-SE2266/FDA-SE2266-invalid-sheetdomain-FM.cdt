@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2266 expect=violation domain=FM
+#note "Regression pin for the W6 Scope fix: FM and PY are in Scope.Domains (DART lane), so a negative FMSTRESN on a non-excluded record fires."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 FMSEQ=1
+dataset FM class=FINDINGS label="Fetal Measurements"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FMSEQ    type=Num  label="Sequence Number"
+col FMSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+col FMEXCLFL type=Char label="Exclude from Statistics"
+---
+S1 | FM | 001 | 1 | -2.5 |

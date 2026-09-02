@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1423 expect=noViolation domain=AC
+#note "Guard branch: no ACPARMCD='CAGTCAT' record exists -- the value 'CHEMICAL' only appears as the ACVAL of a different parameter (a deliberately mis-keyed record), so the CHAMCIND parameter is not expected -> no violation. Pins that the ACPARMCD half of the CAGTCAT filter is load-bearing."
+#library standard=sendig version=ar-1-0
+dataset AC label="Challenge Agent Characterization"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ACSEQ    type=Num  label="Sequence Number"
+col ACPARMCD type=Char label="Challenge Agent Parameter Short Name"
+col ACPARM   type=Char label="Challenge Agent Parameter"
+col ACVAL    type=Char label="Parameter Value"
+---
+S1 | AC | 1 | CAGTSUPN | Challenge Agent Supplier Name | ACME LABS
+S1 | AC | 2 | MCSCTIND | Multiple Challenge Agent Same Cat Ind | CHEMICAL

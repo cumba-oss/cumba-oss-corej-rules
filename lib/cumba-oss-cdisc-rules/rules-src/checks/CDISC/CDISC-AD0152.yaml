@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-AD0152"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when BASETYPE is present, BASE is populated, and BASE\
+  \ does not equal AVAL from the record where ABLFL equals Y, for the same subject,\
+  \ PARAMCD, and BASETYPE."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Operations:
+- id: "$baseline_aval"
+  expression: "max(AVAL, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BASE) and BASE != $baseline_aval
+Outcome:
+  Message: "BASE does not match the AVAL value from the record where ABLFL equals\
+    \ Y for this subject, PARAMCD, and BASETYPE."
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "BASETYPE"
+  - "$baseline_aval"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "BASE"
+  Natural_Language_Rule_Failure_Criteria: "BASETYPE is present, BASE is populated,\
+    \ and BASE is not equal to AVAL where ABLFL is equal to Y for a given value of\
+    \ PARAMCD and BASETYPE for a subject"
+  Rule_Failure_Criteria: "BASE is not equal to AVAL where ABLFL is equal to Y for\
+    \ a given value of PARAMCD and BASETYPE for a subject"
+  Condition_Failure: "BASETYPE is present and BASE is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR152"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR152"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR152"
+        Version: "1"
+      Version: "5.0"

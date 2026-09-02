@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD2272 expect=violation domain=AE
+#note "AEENDY is present but AEENDTC is not -> an end study day without the end date it is derived from -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEENDY   type=Num  label="Study Day of End of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 9
+---

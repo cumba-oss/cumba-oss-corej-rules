@@ -1,0 +1,115 @@
+Core:
+  Id: "PMDA-SD1095"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a split dataset name (excluding supplemental qualifier\
+  \ and associated-persons datasets) has a length other than 3 or 4 characters, because\
+  \ a split dataset must not reuse the name of the original domain."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SUPP--"
+    - "SQ--"
+    - "AP--"
+    - "APRELSUB"
+    include_split_datasets: true
+Check:
+  expression: >-
+    len(dataset_name) < 3 or len(dataset_name) > 4
+Outcome:
+  Message: "Invalid dataset name for split domain: the split dataset name is not 3\
+    \ or 4 characters in length."
+  Output_Variables:
+  - "dataset_name"
+Source:
+  Message: "Invalid dataset name for split domain"
+  Description: "Split datasets must not have the name of original domain. E.g., lbhm.xpt\
+    \ is a valid name when lb.xpt is not a valid dataset name for split domain."
+  Domains: "CO, INTERVENTIONS, FINDINGS, EVENTS, FINDINGS ABOUT"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1095"
+        Version: "1"
+      Version: "1.6"

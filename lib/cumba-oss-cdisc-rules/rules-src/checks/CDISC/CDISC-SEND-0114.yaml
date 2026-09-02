@@ -1,0 +1,83 @@
+Core:
+  Id: "CDISC-SEND-0114"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one CO record exists for the same combination\
+  \ of subject or pool (USUBJID/POOLID), parent-record linkage (RDOMAIN/IDVAR/IDVARVAL),\
+  \ comment text (COVAL/COVAL1/COVAL2), and date (CODTC); the CO dataset expects one\
+  \ record per comment."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Check:
+  expression: >-
+    not is_unique_set([USUBJID, POOLID, RDOMAIN, IDVAR, IDVARVAL, COVAL, COVAL1, COVAL2, CODTC])
+Outcome:
+  Message: "More than one CO record exists for the same subject or pool, parent-record\
+    \ linkage, comment text (COVAL/COVAL1/COVAL2), and date (CODTC)."
+  Output_Variables:
+  - "RDOMAIN"
+  - "POOLID"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "COVAL"
+  - "CODTC"
+Source:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "ALL"
+  Plain_Text_Explanation: "Only one record should exist per comment."
+  Rule: "One record per comment"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND114"
+        Version: "1"
+      Version: "5.0"

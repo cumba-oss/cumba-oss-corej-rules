@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1335 expect=noViolation domain=DM
+#note "Boundary for the right-hand operand: the Check guards only RFICDTC with not_empty, not RFXSTDTC. A never-treated subject has no first-treatment date, so there is nothing for the consent date to be 'after' and the rule must stay silent."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFICDTC  type=Char label="Date/Time of Informed Consent"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 |  | 2020-01-02
+CDISCPILOT01 | DM | 01-701-1023 | 1023 |  |

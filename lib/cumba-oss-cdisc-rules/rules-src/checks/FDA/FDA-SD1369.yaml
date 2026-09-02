@@ -1,0 +1,66 @@
+Core:
+  Id: "FDA-SD1369"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STREFC is empty while --ORREF is populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--STREFC"
+    - "--ORREF"
+Check:
+  expression: >-
+    not empty(--ORREF) and empty(--STREFC)
+Outcome:
+  Message: "--STREFC is empty when --ORREF is populated."
+  Output_Variables:
+  - "--ORREF"
+  - "--STREFC"
+Source:
+  FDA_Validator_Rule_Message: "--STREFC is null when --ORREF is populated"
+  FDA_Validator_Rule_Description: "Reference Result in Standard Format (--STREFC)\
+    \ should be populated when Reference Result in Original Units (--ORREF) is populated."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1369"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1369"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0549"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0549"
+        Version: "1"
+      Version: "2.0"

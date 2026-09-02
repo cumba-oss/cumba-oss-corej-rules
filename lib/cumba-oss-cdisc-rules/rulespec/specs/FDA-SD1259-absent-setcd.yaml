@@ -1,0 +1,39 @@
+name: FDA-SD1259-absent-setcd
+kind: rule
+description: |
+  EC-38 / Fix #128 pin — the check-side absent-column contract, on the shape that
+  named the EC. FDA-SD1259 is `SETCD longer_than 8` scoped to DM. SETCD is a
+  SEND/TS variable and is ABSENT from an SDTMIG DM dataset, so the Check leaf
+  reads a column the frame does not carry.
+
+  coreJ folds that operand to no-value and the leaf evaluates false, so the rule
+  EXECUTES and reports nothing (`ExprCompiler` compiles the leaf to an empty
+  BitSet when arg0 resolves to a null vector, :1444-1457). Before Fix #128 the
+  fork let the `self.value[target]` KeyError escape, which
+  `rules_engine.handle_validation_exceptions` maps to SKIPPED /
+  COLUMN_NOT_FOUND_IN_DATA (rules_engine.py:461) — the whole rule died where
+  coreJ reported zero findings.
+
+  Both lanes must now report EXECUTED with zero violations. The `expected_status`
+  pin is the point of this spec: on the violation channel alone it would have
+  passed both before and after the fix, since "skipped" and "executed to zero
+  findings" both produce an empty violation list. That blindness is exactly what
+  PLAN-parity-expected-status removed.
+python_source: rules-sdtmig-3-4.json (FDA-SD1259)
+rule:
+  coreId: FDA-SD1259
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMCD: TRT01}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMCD: TRT02}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_status: EXECUTED
+expected_violations: []
+expected_errors: []

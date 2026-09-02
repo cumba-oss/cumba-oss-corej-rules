@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0049 expect=violation domain=CM
+#note "Row 1: CMSTRTPT=BEFORE with CMSTTPT empty -> fires. Row 2: both populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMSTRTPT=BEFORE
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTRTPT type=Char
+col CMSTTPT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | BEFORE  |
+S1 | CM | 001 | 2 | IBUPROFEN | ONGOING | 2020-01-05

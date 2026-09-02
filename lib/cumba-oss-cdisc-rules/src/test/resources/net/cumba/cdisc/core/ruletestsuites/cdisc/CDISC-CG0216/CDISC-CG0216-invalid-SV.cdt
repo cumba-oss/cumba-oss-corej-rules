@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0216 expect=violation domain=SV
+#note "Row 2 is an unplanned visit (SVUPDES populated) yet carries a planned study day VISITDY=8 -> 'Planned Study Day of Visit (VISITDY) should equal null for unplanned visits.'"
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=2 VISITDY=8 SVUPDES="Subject felt unwell"
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1   | SCREENING   | 1 |
+CDISCPILOT01 | SV | 01-701-1015 | 1.1 | UNSCHEDULED | 8 | Subject felt unwell

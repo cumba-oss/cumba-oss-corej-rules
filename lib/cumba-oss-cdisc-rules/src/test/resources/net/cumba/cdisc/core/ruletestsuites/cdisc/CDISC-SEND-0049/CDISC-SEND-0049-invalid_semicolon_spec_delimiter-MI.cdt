@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=violation domain=MI
+#note "O-8 (Fix #339): --SPEC is deliberately EXCLUDED from the semicolon allow-list because its lawful combination delimiter is the slash (SEND56/SEND56.1, checked by CDISC-SEND-0056, which splits on '/' and never sees a ';'). MISPEC = LIVER;KIDNEY joins two lawful SPEC terms with the wrong delimiter and reports here - the hole Fix #329 opened (silent in 0049, invisible to 0056) is closed. Row 2 is the licensed discriminator: MISTRESC = ATROPHY;NECROSIS (one of the three --STRESC variables the owner licensed pending sheet issue #154) stays silent, and MIDIR = DORSAL;VENTRAL (IG-named) stays silent. Sheet issue #153."
+#library standard=sendig version=3-1-1
+#library variable-metadata MI MISPEC codelist=SPEC codelist_extensible=true codelist_coded_values="[\"LIVER\",\"KIDNEY\",\"SPLEEN\"]"
+#library variable-metadata MI MISTRESC codelist=NONNEO codelist_extensible=true codelist_coded_values="[\"ATROPHY\",\"NECROSIS\",\"NORMAL\"]"
+#library variable-metadata MI MIDIR codelist=DIR codelist_extensible=true codelist_coded_values="[\"DORSAL\",\"VENTRAL\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=MISPEC variable_value=LIVER;KIDNEY
+dataset MI class=FINDINGS label="Microscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MISEQ    type=Num  label="Sequence Number"
+col MITESTCD type=Char label="Microscopic Examination Short Name"
+col MISPEC   type=Char label="Specimen Material Type"
+col MIDIR    type=Char label="Directionality"
+col MISTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | MI | 001 | 1 | MIEXAM | LIVER;KIDNEY | DORSAL          | NORMAL
+S1 | MI | 001 | 2 | MIEXAM | SPLEEN       | DORSAL;VENTRAL  | ATROPHY;NECROSIS

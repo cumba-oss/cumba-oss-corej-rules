@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0502 expect=violation domain=DM
+#note "RELMIDS variable is present (as a column, values are both empty - presence, not population) and no TM dataset exists -> one dataset-broadcast finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RELMIDS type=Char label="Related Milestone Instance ID"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 |
+---

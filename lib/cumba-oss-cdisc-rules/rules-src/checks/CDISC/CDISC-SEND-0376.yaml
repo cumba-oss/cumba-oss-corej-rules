@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0376"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Trial Repro Stages (TT) record exists\
+  \ for the same Reproductive Stage Code (RSTGCD) within a study; the TT domain expects\
+  \ one record per planned Stage."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Check:
+  expression: >-
+    not is_unique_set([RSTGCD, STUDYID])
+Outcome:
+  Message: "More than one TT record exists for the same RSTGCD within the study."
+  Output_Variables:
+  - "STUDYID"
+  - "RSTGCD"
+Source:
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "ALL"
+  Plain_Text_Explanation: "tt.xpt, Trial Repro Stages is one record per planned Stage."
+  Rule: "One record per planned Stage, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND376"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND376"
+        Version: "1"
+      Version: "5.0"

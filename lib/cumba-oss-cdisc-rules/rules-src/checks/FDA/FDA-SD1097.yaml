@@ -1,0 +1,99 @@
+Core:
+  Id: "FDA-SD1097"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SUPPAE dataset does not contain a treatment-emergent\
+  \ flag (no record where QNAM is equal to 'AETRTEM'). The exact QNAM used for the\
+  \ treatment-emergent flag is sponsor-defined, so a SUPPAE that carries the flag\
+  \ under a different QNAM may be reported in error."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SUPPAE"
+Operations:
+- id: "$aetrtem_count"
+  expression: "record_count(QNAM, domain=\"SUPPAE\", filter=filter(QNAM=\"AETRTEM\"\
+    ))"
+Check:
+  expression: >-
+    $aetrtem_count < 1
+Outcome:
+  Message: "SUPPAE does not contain a treatment-emergent flag (no record with QNAM\
+    \ equal to 'AETRTEM')."
+  Output_Variables:
+  - "$aetrtem_count"
+Source:
+  FDA_Validator_Rule_Message: "No Treatment Emergent info for Adverse Event"
+  FDA_Validator_Rule_Description: "A treatment-emergent flag should be included in\
+    \ SUPPAE according to the FDA business rule that states, 'A treatment-emergent\
+    \ flag should be submitted.'"
+  Domains: "SUPPAE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1097"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB001"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1097"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB001"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1097"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB001"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1097"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB001"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1097"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB001"
+        Version: "1"
+      Version: "1.5"

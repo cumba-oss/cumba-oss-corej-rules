@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD2251 expect=violation domain=TS
+#note "Row 2: TSPARMCD=CURTRT with TSVALCD 'BADCODE123' which is not a UNII code of the dummy UNII dictionary -> fires. Row 1 carries a valid UNII code; row 3 is another parameter (out of the CURTRT condition); row 4 has an empty TSVALCD (completeness is another rule's concern -> no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSVALCD=BADCODE123
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | CURTRT | R16CO5Y76E
+S01 | TS | 2 | CURTRT | BADCODE123
+S01 | TS | 3 | AGEMAX | BADCODE123
+S01 | TS | 4 | CURTRT |

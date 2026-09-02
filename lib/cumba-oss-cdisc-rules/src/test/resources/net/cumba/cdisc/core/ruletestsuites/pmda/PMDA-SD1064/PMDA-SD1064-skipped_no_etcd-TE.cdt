@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1064 expect=skipped domain=TE
+#note "LOAD-BEARING skip. ETCD is absent from TE, so Requirements.Variables.All [ETCD] gates the rule to SKIPPED. Unlike the batch's other five skips, this gate is genuinely load-bearing: not is_unique_set(ETCD) carries NO keys= list, so without the gate the EC-53 target-drop would leave an EMPTY key tuple, every row would carry the identical empty key, and ALL THREE rows would fire -- the degenerate edge of PLAN-absent-unique-set-target-semantics section 6.4. The skip is what makes that unreachable here."
+#library standard=sdtmig version=3-4
+dataset TE class="TRIAL DESIGN"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TE | Screening
+S1 | TE | Treatment
+S1 | TE | Follow-up

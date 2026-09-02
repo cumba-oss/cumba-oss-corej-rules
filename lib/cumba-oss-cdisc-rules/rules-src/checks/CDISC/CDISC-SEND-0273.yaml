@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0273"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable's label is not unique within the dataset;\
+  \ each variable in a dataset should carry a descriptive label that is distinct from\
+  \ every other variable's label."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dup_labels"
+  expression: "duplicate_label_variables()"
+Check:
+  expression: >-
+    varname() in $dup_labels
+Outcome:
+  Message: "The variable label is not unique within the dataset."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Variable label should be unique for each variable in the\
+    \ dataset"
+  Rule: "Variable label is unique"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND273"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0102"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when APERIOD is populated with a value xx but the ADSL\
+  \ variable TRTxxP is not present."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(APERIOD) and not var_exists(ADSL.TRT${APERIOD:%02d}P)
+Outcome:
+  Message: "TRTxxP is not present in ADSL for this record's APERIOD value."
+  Output_Variables:
+  - "APERIOD"
+Source:
+  Message: "There is no TRTxxP variable in ADSL for every unique xx value of APERIOD"
+  Description: "The Analysis Period (APERIOD) values will be a number like 01. There\
+    \ must be a corresponding Planned Treatment for Period xx variable (like TRT01P)\
+    \ in ADSL dataset."
+  Domains: "BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0102"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0102"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0102"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0102"
+        Version: "1"
+      Version: "6.0"

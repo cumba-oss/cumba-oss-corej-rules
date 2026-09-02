@@ -1,0 +1,97 @@
+Core:
+  Id: "FDA-SE2310"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Standardized Result in Character Format (--STRESC)\
+  \ is populated while Status (--STAT) equals 'NOT DONE'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+Check:
+  expression: >-
+    not empty(--STRESC) and --STAT == "NOT DONE"
+Outcome:
+  Message: "--STRESC is populated when --STAT equals 'NOT DONE'."
+  Output_Variables:
+  - "--STRESC"
+  - "--STAT"
+Source:
+  FDA_Validator_Rule_Message: "Value for --STRESC is populated, when --STAT is 'NOT\
+    \ DONE'"
+  FDA_Validator_Rule_Description: "Status (--STAT) should be NULL, when Standardized\
+    \ Result in Character Format (--STRESC ) is provided."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2310"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB042"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2310"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB042"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2310"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB042"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2310"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB042"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2310"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB042"
+        Version: "1"
+      Version: "1.5"

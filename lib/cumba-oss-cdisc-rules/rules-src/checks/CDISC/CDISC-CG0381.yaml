@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0381"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a High Level Term (--HLT) value is not a valid High\
+  \ Level Term in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLT"
+Operations:
+- id: "$hlt_valid"
+  expression: "valid_external_dictionary_value(--HLT, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"HLT\", case_sensitive=false)"
+Check:
+  expression: >-
+    $hlt_valid == false
+Outcome:
+  Message: "High Level Term (--HLT) is not a valid MedDRA High Level Term."
+  Output_Variables:
+  - "--HLT"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--HLT"
+  Rule: "--HLT = MedDRA high level TERM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0381"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0381"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0381"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,108 @@
+Core:
+  Id: "FDA-SE0083"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TFDETECT (Time in Days to Detection of Tumor) is\
+  \ greater than the Study Day of the latest Disposition Event (the maximum DSSTDY\
+  \ in DS) for the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+    - "TFDETECT"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+- id: "$max_dsstdy"
+  expression: "max(DSSTDY, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ds_usubjid and not empty(TFDETECT) and TFDETECT > $max_dsstdy
+Outcome:
+  Message: "TFDETECT is greater than the Study Day of the latest Disposition Event\
+    \ (maximum DSSTDY in the DS dataset)."
+  Output_Variables:
+  - "TFDETECT"
+  - "$max_dsstdy"
+Source:
+  FDA_Validator_Rule_Message: "TFDETECT is after DSSTDY"
+  FDA_Validator_Rule_Description: "Time in Days to Detection of Tumor (TFDETECT) should\
+    \ be less than or equal to the Study Day of Disposition of the latest Disposition\
+    \ Event (DSSTDY)."
+  Domains: "TF"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0083"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB081"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0083"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB081"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0083"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB081"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0083"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB081"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE0083"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB081"
+        Version: "1"
+      Version: "1.5"

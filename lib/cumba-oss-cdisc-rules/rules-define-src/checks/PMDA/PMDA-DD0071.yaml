@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0071"
+Sheet_Rule_Identifier: "DD0071"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "CommentOID"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Referenced Comment must first be defined on Comments tab. Define-XML specification represents Comments as def:CommentDef elements within MetaDataVersion element."
+# Wildcard scope: def:CommentOID legally appears on MetaDataVersion, ItemGroupDef,
+# ItemDef, def:WhereClauseDef, CodeList, def:Standard and arm:AnalysisDatasets -
+# the PMDA row is the union of the per-element CDISC twins (30/83/127/148/177/256).
+# The value check fires only on elements that carry the attribute.
+Message: "Referenced Comment is missing [${value}]"
+Check:
+  kind: "references"
+  attribute: "CommentOID"
+  targetElement: "CommentDef"
+  targetKey: "OID"

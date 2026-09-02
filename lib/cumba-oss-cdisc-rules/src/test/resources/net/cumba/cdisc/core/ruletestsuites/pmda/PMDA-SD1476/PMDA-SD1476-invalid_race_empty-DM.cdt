@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1476 expect=violation domain=DM
+#note "Positive control at Record granularity: RACE is declared but blank on row 1, so the derived var_exists(\"RACE\") guard passes and the empty(RACE) leaf fires on that row alone. Rows 2 and 3 carry populated, space-free RACE values and stay silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SEX     type=Char
+col RACE    type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | F |
+CDISCPILOT01 | DM | 01-701-1023 | M | WHITE
+CDISCPILOT01 | DM | 01-701-1034 | F | ASIAN

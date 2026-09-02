@@ -1,0 +1,30 @@
+name: CDISC-AD0467
+kind: rule
+description: |
+  Wave A6 port — T1a PlainSimple.
+  CDISC-AD0467: On a given record, STRATARN is populated and STRATAR is not populated.
+  Record-data rule scoped to SUBJECT LEVEL ANALYSIS DATASET; non_empty + empty pair; literal column names per star-as-literal convention.
+python_source: rules-adamig-1-3.json (CDISC-AD0467)
+rule:
+  coreId: CDISC-AD0467
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', STRATARN: '', STRATAR: ''}      # ok
+      - {STUDYID: S1, USUBJID: '002', STRATARN: 'X', STRATAR: ''}      # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0467
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      STRATAR: null
+      STRATARN: 'X'
+expected_errors: []

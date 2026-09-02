@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-SEND-0388"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Order of Repro Stage (TPSTGORD) is populated\
+  \ with a value that is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Requirements:
+  Variables:
+    All:
+    - "TPSTGORD"
+Check:
+  expression: >-
+    not empty(TPSTGORD) and TPSTGORD !~ /^-?[0-9]+$/
+Outcome:
+  Message: "TPSTGORD is populated with a value that is not an integer."
+  Output_Variables:
+  - "TPSTGORD"
+Source:
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "TPSTGORD"
+  Plain_Text_Explanation: "TPSTGORD value should be an integer."
+  Rule: "TPSTGORD is an integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND388"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND388"
+        Version: "1"
+      Version: "5.0"

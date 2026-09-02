@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0336 expect=noViolation domain=CV
+#note "Exercises BOTH halves of the sheet's 'per observation time OR evaluation interval' cardinality: row 1 is an observation-time record (CVDTC populated, interval blank) and rows 2 and 3 are evaluation-interval records covering different intervals. Three distinct tuples -> the rule executes and stays silent. A fire here would mean CVSTINT or CVENINT had dropped out of the key."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset CV
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CVSEQ    type=Num
+col CVTESTCD type=Char
+col CVDTC    type=Char
+col CVSTINT  type=Char
+col CVENINT  type=Char
+---
+S1 | CV | ANIMAL1 | 1 | HR | 2023-03-20 |            |
+S1 | CV | ANIMAL1 | 2 | HR |            | 2023-03-20 | 2023-03-21
+S1 | CV | ANIMAL1 | 3 | HR |            | 2023-03-21 | 2023-03-22
+---

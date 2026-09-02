@@ -1,0 +1,73 @@
+Core:
+  Id: "PMDA-AD0247"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Censor (CNSR) variable is populated on a record\
+  \ but one or more of the companion analysis variables is missing on the same record:\
+  \ the Analysis Value (AVAL) is missing, or the Time-to-Event Origin Date for Subject\
+  \ (STARTDT) is missing, or both the Analysis Date (ADT) and Analysis Datetime (ADTM)\
+  \ are missing. When an event is censored, AVAL, STARTDT, and at least one of ADT\
+  \ or ADTM must all be populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(CNSR) and (empty(AVAL) or empty(STARTDT) or empty(ADT) and empty(ADTM))
+Outcome:
+  Message: "CNSR is populated, but AVAL, STARTDT, and at least one of ADT or ADTM\
+    \ are not all populated."
+  Output_Variables:
+  - "ADT"
+  - "ADTM"
+  - "AVAL"
+  - "STARTDT"
+  - "CNSR"
+Source:
+  Message: "CNSR is populated, but AVAL, STARTDT, and one of [ADT, ADTM] are not populated"
+  Description: "When an event is censored, 3 other variables must be populated. Censor\
+    \ (CNSR) variable qualifies the Analysis Value (AVAL) variable. ADT and ADTM variables\
+    \ are the Analysis Date and Time of event or censoring associated with AVAL. Origin\
+    \ Date for Subject (STARTDT) variable is the original date of risk for the time-to-event\
+    \ analysis. This is generally the time at which a subject is first at risk for\
+    \ the event of interest evaluation."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0247"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0247"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0247"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0247"
+        Version: "1"
+      Version: "6.0"

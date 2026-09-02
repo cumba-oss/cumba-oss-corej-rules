@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1042 expect=noViolation domain=CM
+#note "The non-occurred record (CMOCCUR='N') leaves both CMSTRF and CMENRF empty; the occurred records may carry them -> no violation."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR type=Char label="Occurrence"
+col CMSTRF  type=Char label="Start Relative to Reference Period"
+col CMENRF  type=Char label="End Relative to Reference Period"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | N |        |
+S1 | CM | 001 | 2 | IBUPROFEN | Y | BEFORE | DURING

@@ -1,0 +1,33 @@
+name: CDISC-SEND-0328-fire
+kind: rule
+description: |
+  CDISC-SEND-0328: only one PCELTM="PT0H" record is allowed within a single
+  time-concentration profile. Rows 1 and 2 are both PT0H for the same profile
+  (USUBJID/PCTESTCD/PCTPTREF/PCSPEC) so they fire; row 3 is PT1H for the same profile
+  and must NOT fire (PCELTM is part of the uniqueness key and the PCELTM=="PT0H" guard
+  excludes it). This distinguishes the re-modelled Check from the old precondition form.
+python_source: rules-sendig-3-1-1.json (CDISC-SEND-0328)
+rule:
+  coreId: CDISC-SEND-0328
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT0H}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 2, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT0H}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 3, PCTESTCD: DRUGX, PCTPTREF: DOSE1, PCSPEC: PLASMA, PCELTM: PT1H}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+expected_violations:
+  - rule_id: CDISC-SEND-0328
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '001', PCSEQ: 1}
+    status: SUCCESS
+    output_variables: {PCTESTCD: DRUGX, PCSPEC: PLASMA, PCELTM: PT0H, PCTPTREF: DOSE1}
+  - rule_id: CDISC-SEND-0328
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '001', PCSEQ: 2}
+    status: SUCCESS
+    output_variables: {PCTESTCD: DRUGX, PCSPEC: PLASMA, PCELTM: PT0H, PCTPTREF: DOSE1}
+expected_errors: []

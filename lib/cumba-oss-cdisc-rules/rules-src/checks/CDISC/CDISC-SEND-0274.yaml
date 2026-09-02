@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-SEND-0274"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the value of the Qualifier Variable Name (QNAM)\
+  \ equals a variable name defined in the SDTM model."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "QNAM"
+Operations:
+- id: "$model_variables"
+  expression: "get_parent_model_column_order()"
+Check:
+  expression: >-
+    QNAM in $model_variables
+Outcome:
+  Message: "QNAM equals a variable name defined in the SDTM model."
+  Output_Variables:
+  - "QNAM"
+  - "$model_variables"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "QNAM"
+  Plain_Text_Explanation: "QNAM name cannot be the same as a variable name in the\
+    \ parent domain"
+  Rule: "QNAM cannot be the same as a variable name in the parent domain"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND274"
+        Version: "1"
+      Version: "5.0"

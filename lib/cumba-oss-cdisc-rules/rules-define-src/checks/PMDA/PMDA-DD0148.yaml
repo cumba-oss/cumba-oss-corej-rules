@@ -1,0 +1,20 @@
+Rule_Id: "PMDA-DD0148"
+Sheet_Rule_Identifier: "DD0148"
+Rule_Set: "PMDA"
+Element: "Origin/Description/TranslatedText"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "Define-XML defines Predecessor as a value that is copied from a variable in another dataset. The Description child element identifies the dataset and variable that is copied. To enable other validation rules, the structure of this column needs to be in the form of DATASET.VARIABLE."
+# Scoped to the def:Origin Description text and guarded on Type='Predecessor'.
+# The sheet prescribes DATASET.VARIABLE without a formal pattern; both parts
+# are encoded as SAS names (the DD0048 character classes) joined by a single
+# dot - the minimal shape the downstream rules the sheet alludes to can parse.
+Message: "Invalid syntax for Predecessor"
+Check:
+  kind: "matches_regex"
+  attribute: "#text"
+  pattern: '[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*'
+  when:
+    path: "../../@Type"
+    equals: "Predecessor"

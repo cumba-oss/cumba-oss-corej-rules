@@ -1,0 +1,105 @@
+Core:
+  Id: "PMDA-SD2016"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a System Organ Class Code (--SOCCD) value is not\
+  \ a valid System Organ Class code in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--SOCCD"
+Operations:
+- id: "$soccd_valid"
+  expression: "valid_external_dictionary_code(--SOCCD, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"SOCCD\")"
+Check:
+  expression: >-
+    $soccd_valid == false
+Outcome:
+  Message: "System Organ Class Code (--SOCCD) is not a valid MedDRA System Organ Class\
+    \ code."
+  Output_Variables:
+  - "--SOCCD"
+Source:
+  Message: "Value for --SOCCD not found in MedDRA dictionary"
+  Description: "Value for System Organ Class Code (--SOCCD) variable must be populated\
+    \ using a System Organ Class Code of the MedDRA dictionary of a version specified\
+    \ in the define.xml."
+  Domains: "AE, CE, MH"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2016"
+        Version: "1"
+      Version: "1.6"

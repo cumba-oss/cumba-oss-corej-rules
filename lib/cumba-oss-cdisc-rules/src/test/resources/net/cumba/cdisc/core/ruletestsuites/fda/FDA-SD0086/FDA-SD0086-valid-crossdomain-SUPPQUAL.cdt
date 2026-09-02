@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0086 expect=noViolation domain=SUPPQUAL
+#note "Regression pin for the W3 group-key fix: RDOMAIN is part of both uniqueness keys, so a DM qualifier and an LB qualifier sharing only USUBJID+QNAM no longer collide in a combined SUPPQUAL."
+#library standard=sdtmig version=3-4
+dataset SUPPQUAL class=RELATIONSHIP label="Supplemental Qualifiers"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | DM | 001 |       |   | COMMENT | subject-level comment
+S1 | LB | 001 | LBSEQ | 1 | COMMENT | record-level comment

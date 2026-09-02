@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1236 expect=noViolation domain=DX
+#note "DXSEQ is unique within each (SPDEVID, USUBJID) pair; seq 1 recurs across devices D1/D2, which is allowed -> no violation."
+#library standard=sdtmig version=3-4
+dataset DX
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col SPDEVID type=Char label="Sponsor Device Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DXSEQ   type=Num  label="Sequence Number"
+col DXTRT   type=Char label="Name of Device Exposure"
+---
+S1 | DX | D1 | S1-001 | 1 | Stent
+S1 | DX | D1 | S1-001 | 2 | Stent
+S1 | DX | D2 | S1-001 | 1 | Pump

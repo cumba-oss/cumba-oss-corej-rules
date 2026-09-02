@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1474 expect=violation domain=LB
+#note "The first character must be [A-Z_], so a leading digit (1LBTEST) fires - the Source's explicit 'It cannot start with a number' clause. A punctuated / non-standard column NAME parses fine in a .cdt col line; precedent cdisc/CDISC-AD0015-invalid-ADSL.cdt uses col INVAL!D and pins variable_name=INVAL!D."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=1LBTEST
+dataset LB
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col LBSEQ   type=Num
+col 1LBTEST type=Char
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | X

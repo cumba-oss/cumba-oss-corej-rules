@@ -1,0 +1,40 @@
+Core:
+  Id: "PMDA-AD0652"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ONTRTwFL is present in the dataset but ONTRTFL is\
+  \ not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ONTRTwFL") and not var_exists("ONTRTFL")
+Outcome:
+  Message: "ONTRTwFL is present, but the overall on-treatment flag ONTRTFL is not\
+    \ present."
+  Output_Variables:
+  - "ONTRTwFL"
+wildcards:
+  w:
+    min: 1
+    max: 9
+Source:
+  Message: "ONTRTwFL is present but ONTRTFL is not present"
+  Description: "If ONTRTwFL is included, then ONTRTFL must be included and is defined\
+    \ as the overall on treatment flag."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0652"
+        Version: "1"
+      Version: "6.0"

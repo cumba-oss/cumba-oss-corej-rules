@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2250 expect=violation domain=SJ
+#note "Row 2 is an unplanned repro stage yet still fills the planned-stage description RSTAGE -> fires. Row 1 shows a populated RSTAGE is correct for a planned stage."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 RSTGCD=UNPLAN RSTAGE="Unplanned Stage"
+dataset SJ label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col SJUPDES type=Char label="Description of Unplanned Repro Stage"
+---
+S1 | 001 | 1 | GEST   | Gestation       |
+S1 | 001 | 2 | UNPLAN | Unplanned Stage | Unplanned recovery period

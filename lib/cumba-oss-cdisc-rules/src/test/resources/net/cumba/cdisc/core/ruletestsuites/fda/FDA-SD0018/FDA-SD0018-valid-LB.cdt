@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0018 expect=noViolation domain=LB
+#note "All LBTESTCD values are <=8 characters, start with a letter or underscore, and use only upper-case letters, digits and underscores."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC_2
+CDISCPILOT01 | LB | 01-701-1015 | 3 | _ABC
+CDISCPILOT01 | LB | 01-701-1015 | 4 | ABCDEFGH

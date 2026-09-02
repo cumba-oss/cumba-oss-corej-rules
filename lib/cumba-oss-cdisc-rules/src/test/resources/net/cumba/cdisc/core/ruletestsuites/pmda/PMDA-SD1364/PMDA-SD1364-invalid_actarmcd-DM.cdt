@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1364 expect=violation domain=DM
+#note "any-branch 1: a screen-failure subject has a populated ACTARMCD -> fires on row 1; row 2 is the conformant twin."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ACTARMCD=A
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A |  | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1023 |   |  | SCREEN FAILURE

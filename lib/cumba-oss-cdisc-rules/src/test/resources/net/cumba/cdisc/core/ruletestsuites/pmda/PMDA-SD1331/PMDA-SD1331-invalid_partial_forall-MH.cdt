@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1331 expect=violation domain=MH
+#note "*** RISKY CALL (IsoDateComparison forall-hull grounding) ***. Row 1: month-partial MHSTDTC=2020-07 vs complete MHDTC=2020-06-30 -> lower bound 2020-07-01 > 2020-06-30 -> fires. Row 2: year-partial MHSTDTC=2020 -> lower bound 2020-01-01 not > 2020-06-30 -> clean. Row 3: MHSTDTC empty -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 MHSTDTC=2020-07
+dataset MH class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MHSEQ    type=Num
+col MHTERM   type=Char
+col MHSTDTC  type=Char
+col MHDTC    type=Char
+---
+S1 | MH | 001 | 1 | ASTHMA  | 2020-07 | 2020-06-30
+S1 | MH | 001 | 2 | ECZEMA  | 2020    | 2020-06-30
+S1 | MH | 001 | 3 | GOUT    |         | 2020-06-30

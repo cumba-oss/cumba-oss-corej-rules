@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0095"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --LOC is not present but --LAT is present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not var_exists("--LOC") and var_exists("--LAT")
+Outcome:
+  Message: "--LAT is present when --LOC is not present."
+  Output_Variables:
+  - "--LAT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--LAT"
+  Condition: "--LOC not present in dataset"
+  Rule: "--LAT not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0095"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0095"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0095"
+        Version: "2"
+      Version: "2.0"

@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1469 expect=violation domain=EX
+#note "No Match_Datasets on this rule; ds_exists(\"EC\") reads the resolver's study inventory, and the second dataset block IS the EC-present state. Shipped Check is the lowered `var_exists(\"EXVAMTU\") and ds_exists(\"EC\")` -- a pure presence conjunction that folds to a dataset constant -> exactly ONE violation at row=1 (Dataset sensitivity; no value pin by design -- the $-value projection shape on the broadcast path is not pinned anywhere in the corpus for this operator)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col EXSEQ   type=Num
+col EXTRT   type=Char
+col EXVAMTU type=Char
+---
+S1 | EX | 001 | 1 | DRUGA | mL
+---
+
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ECSEQ   type=Num
+col ECDOSE  type=Num
+col ECDOSU  type=Char
+---
+S1 | EC | 001 | 1 | 10 | mg

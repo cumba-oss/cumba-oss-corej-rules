@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0288"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSVCDREF begins with 'CDISC' (e.g. 'CDISC CT') and\
+  \ TSVALCD is not a valid code in the CDISC Controlled Terminology version identified\
+  \ in TSVCDVER."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$VALID_TERM_CODES"
+  expression: "get_codelist_attributes(TSVCDREF, ct_attribute=\"Term CCODE\", version=\"\
+    TSVCDVER\")"
+Check:
+  expression: >-
+    prefix(TSVCDREF, 5) == "CDISC" and not empty($VALID_TERM_CODES) and TSVALCD not in
+    $VALID_TERM_CODES
+Outcome:
+  Message: "TSVALCD is not a valid code in the CDISC Controlled Terminology version\
+    \ identified in TSVCDVER."
+  Output_Variables:
+  - "TSVALCD"
+  - "TSVCDREF"
+  - "$VALID_TERM_CODES"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALCD"
+  Condition: "TSVCDREF = 'CDISC'"
+  Rule: "TSVALCD = valid code in the  version identified in TSVCDVER"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0288"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0288"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0288"
+        Version: "1"
+      Version: "2.0"

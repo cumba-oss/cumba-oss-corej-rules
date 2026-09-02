@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0024 expect=noViolation domain=LB
+#note "Every record with a populated LBENDTC also carries a populated LBDTC; the LBENDTC-empty rows are outside the sheet condition ('--DTC should not be NULL, when --ENDTC is not NULL')."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 2020-01-01T08:00 | 2020-01-01T09:00
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | 2020-02-01T08:00 |
+CDISCPILOT01 | LB | 01-701-1023 | 1 | GLUC |                  |

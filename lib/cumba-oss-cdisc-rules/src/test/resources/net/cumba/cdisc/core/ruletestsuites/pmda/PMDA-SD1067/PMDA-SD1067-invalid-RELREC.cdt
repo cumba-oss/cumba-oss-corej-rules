@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1067 expect=violation domain=RELREC
+#note "row 1 carries both RELTYPE and USUBJID -> fires; row 2 is a conformant dataset-level row. NOTE: the pin is RELTYPE=ONE, matching the twin -- a USUBJID=001 pin would ALSO pass today because an unknown key falls through to the primary table's column, which is exactly why finding SD1067-F1 is not scenario-observable."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 RELTYPE=ONE
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AESPID |  | ONE | RL1
+S1 | CM |  | CMSPID |  | MANY | RL1

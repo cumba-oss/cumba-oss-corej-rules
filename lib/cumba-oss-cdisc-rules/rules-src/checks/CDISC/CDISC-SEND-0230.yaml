@@ -1,0 +1,79 @@
+Core:
+  Id: "CDISC-SEND-0230"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one record in the Trial Sets (TX) dataset\
+  \ shares the same combination of Trial Set (SETCD) and Trial Set Parameter Short\
+  \ Name (TXPARMCD); the domain expects one record per Trial Set parameter per Trial\
+  \ Set."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TX"
+Check:
+  expression: >-
+    not is_unique_set([TXPARMCD, SETCD])
+Outcome:
+  Message: "More than one TX record exists for the same TXPARMCD within the same Trial\
+    \ Set (SETCD)."
+  Output_Variables:
+  - "SETCD"
+  - "TXPARMCD"
+Source:
+  Class: "TDM"
+  Domain: "TX"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per Trial Set parameter per Trial Set"
+  Rule: "One record per Trial Set parameter per Trial Set"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND230"
+        Version: "1"
+      Version: "5.0"

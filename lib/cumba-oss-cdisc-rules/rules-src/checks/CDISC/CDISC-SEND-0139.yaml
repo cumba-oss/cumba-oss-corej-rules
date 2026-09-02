@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0139"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pool Identifier (POOLID) value present in a SEND\
+  \ dataset is not defined in the Pool Definition (POOLDEF) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "POOLID"
+Operations:
+- id: "$pooldef_poolid"
+  expression: "distinct(POOLID, domain=\"POOLDEF\")"
+Check:
+  expression: >-
+    not empty(POOLID) and POOLID not in $pooldef_poolid
+Outcome:
+  Message: "POOLID is populated but the value is not defined in the POOLDEF dataset."
+  Output_Variables:
+  - "POOLID"
+  - "$pooldef_poolid"
+Source:
+  Class: "ALL"
+  Domain: "POOLDEF"
+  Variable: "POOLID"
+  Plain_Text_Explanation: "Each POOLID that exists in the SEND dataset must be defined\
+    \ in POOLDEF and must include a record for each subject in the POOLID"
+  Condition: "POOLID exists in any domain"
+  Rule: "POOLID exists in POOLDEF; and a record exists for each subject in POOLID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND139"
+        Version: "1"
+      Version: "5.0"

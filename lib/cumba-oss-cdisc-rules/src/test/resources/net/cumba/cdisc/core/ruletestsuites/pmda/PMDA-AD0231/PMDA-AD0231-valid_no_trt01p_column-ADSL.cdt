@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0231 expect=noViolation domain=ADSL
+#note "The OTHER direction of the mixed-group mechanic, and it does NOT skip: TRT01P, the operator's KEY, is absent. TR01PG1 seeds tuple (xx=01, y=1) and TRTxxP is synthesised by concreteFromTuple as the absent column TRT01P, so the rule executes: var_exists(\"TRT01P\") is false and not empty(TRT01P) is broadcast false, and the verdict is a silent no-violation even though the degraded key would collapse the table into one group and flag row 3."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01PG1 type=Char
+---
+S1 | 001 | POOLX
+S1 | 002 | POOLX
+S1 | 003 | POOLY

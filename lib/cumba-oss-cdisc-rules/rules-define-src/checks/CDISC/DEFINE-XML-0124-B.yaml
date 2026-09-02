@@ -1,0 +1,25 @@
+Rule_Id: "DEFINE-XML-0124-B"
+Sheet_Rule_Identifier: "124"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+# Companion of DEFINE-XML-0124 (one sheet row, two rules): 0124's references
+# kind catches dangling def:StandardOID values; this rule adds the sheet's
+# Type="IG" refinement via a when-deref guard — it fires when the reference
+# RESOLVES but the target def:Standard's Type is not "IG"
+# (review-batch-c WARN resolution; the not_exists check is the fire-always
+# vehicle under a guard that already encodes the violation).
+Plain_Text_Rule: "The def:StandardOID attribute must reference a def:Standard element of Type 'IG'."
+Message: "The def:StandardOID attribute references a def:Standard whose Type is not 'IG'."
+Check:
+  kind: "not_exists"
+  target: "@StandardOID"
+  when:
+    all:
+    - path: "@StandardOID->Standard@OID/@Type"
+      exists: true
+    - not:
+        path: "@StandardOID->Standard@OID/@Type"
+        equals: "IG"

@@ -1,0 +1,73 @@
+Core:
+  Id: "PMDA-AD0250"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Event or Censoring Description (EVNTDESC) variable\
+  \ and/or the Censor Date Description (CNSDTDSC) variable is present in a time-to-event\
+  \ dataset but the Censor (CNSR) variable is not present. EVNTDESC describes the\
+  \ event of interest or an event that warrants censoring, and CNSDTDSC describes\
+  \ the circumstance represented by the censoring date; whenever either is present,\
+  \ CNSR must also be present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    (var_exists("EVNTDESC") or var_exists("CNSDTDSC")) and not var_exists("CNSR")
+Outcome:
+  Message: "EVNTDESC and/or CNSDTDSC is present, but CNSR is not present."
+  Output_Variables:
+  - "EVNTDESC"
+  - "CNSDTDSC"
+Source:
+  Message: "EVNTDESC and/or CNSDTDSC is present, but CNSR is not present"
+  Description: "In Time to Event studies, Event or Censoring Description (EVNTDESC)\
+    \ variable is the description of the event of interest or an event that warrants\
+    \ censoring. Therefore, Censor (CNSR) variable should be present. Censor Date\
+    \ Description (CNSDTDSC) variable describes the circumstance represented by the\
+    \ censoring date if different from the event date that warrants censoring. If\
+    \ present, CNSR must be present. Note that adding CNSDTDSC provides additional\
+    \ information when there is a difference between the event date that warrants\
+    \ censoring and the actual date of censoring. If the event that warrants censoring\
+    \ is the same as the onset date of the event that represents the censoring date,\
+    \ then the CNSDTDSC column is not needed in the analysis dataset."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0250"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0250"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0250"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0250"
+        Version: "1"
+      Version: "6.0"

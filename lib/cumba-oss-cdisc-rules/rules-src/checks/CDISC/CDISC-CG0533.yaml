@@ -1,0 +1,43 @@
+Core:
+  Id: "CDISC-CG0533"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Repro Path Code (RPATHCD) variable is\
+  \ present in the Demographics (DM) dataset; RPATHCD is not used in human clinical\
+  \ trials."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Check:
+  expression: >-
+    var_exists("RPATHCD")
+Outcome:
+  Message: "RPATHCD is present in the DM dataset."
+  Output_Variables:
+  - "RPATHCD"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RPATHCD"
+  Rule: "RPATHCD not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0533"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0533"
+        Version: "1"
+      Version: "2.0"

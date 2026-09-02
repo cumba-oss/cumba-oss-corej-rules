@@ -1,0 +1,43 @@
+name: EC43-absent-equals-blank-control
+kind: check_operator
+description: |
+  EC-43 NEGATIVE CONTROL — the same `not_equal_to` leaf over a column that is PRESENT but blank on
+  every row.
+
+  This is the contract EC-43 implements, stated as a spec: an absent column and a present-but-all-
+  blank column must evaluate IDENTICALLY. Both lanes already agreed on this shape BEFORE the fix
+  (the fork via EC-38, coreJ because a present column reaches the primitive and `Primitives.equality`
+  folds a missing cell to ""), and they must still agree after it.
+
+  Paired with EC43-not-equal-absent: identical expectations, only the fixture differs. If these two
+  specs ever diverge from each other, the EC-43 contract has been broken.
+python_notes: |
+  Both lanes fire every row; identical to EC43-not-equal-absent but with TSVAL present and blank.
+python_source: EC-43 (PLAN-negative-leaf-absent-column.md Phase 2, negative control)
+check:
+  name: TSVAL
+  operator: not_equal_to
+  value: "PLANNED"
+  value_is_literal: true
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+    - {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1, TSVAL: ''}
+    - {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2, TSVAL: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+- rule_id: AUTO-EC43-absent-equals-blank-control
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
+  status: SUCCESS
+  output_variables: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: '1', TSVAL: }
+- rule_id: AUTO-EC43-absent-equals-blank-control
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
+  status: SUCCESS
+  output_variables: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: '2', TSVAL: }
+expected_errors: []

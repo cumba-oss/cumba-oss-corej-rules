@@ -1,0 +1,67 @@
+Core:
+  Id: "CDISC-CG0348"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --STAT is not populated and --DRVFL is not equal\
+  \ to 'Y', but --ORRES is not populated."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ORRES"
+Check:
+  expression: >-
+    empty(--STAT) and --DRVFL != "Y" and empty(--ORRES) or empty(--STAT) and not
+    var_exists("--DRVFL") and empty(--ORRES) or not var_exists("--STAT") and --DRVFL != "Y" and
+    empty(--ORRES) or not var_exists("--STAT") and not var_exists("--DRVFL") and empty(--ORRES)
+Outcome:
+  Message: "--STAT is not populated and --DRVFL is not equal to 'Y', but --ORRES is\
+    \ not populated."
+  Output_Variables:
+  - "!--ORRES"
+  - "!--STAT"
+  - "--DRVFL"
+Source_Proposed:
+  Sheet_Issue: "#66,#91"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--ORRES"
+  Condition: "--STAT = null and --DRVFL ^= 'Y'"
+  Rule: "--ORRES ^= null"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--ORRES"
+  Condition: "--STAT = null or --DRVFL ^= 'Y'"
+  Rule: "--ORRES ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0348"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0348"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0348"
+        Version: "1"
+      Version: "2.0"

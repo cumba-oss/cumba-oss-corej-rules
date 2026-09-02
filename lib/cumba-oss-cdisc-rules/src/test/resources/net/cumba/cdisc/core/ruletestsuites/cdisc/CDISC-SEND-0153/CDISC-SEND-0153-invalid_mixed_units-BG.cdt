@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0153 expect=violation domain=BG
+#note "All rows BGTEST=BODY WEIGHT GAIN; BGSTRESU = g, g, kg (strict 2-vs-1 majority, no tie). is_inconsistent_across_dataset flags only the minority row (row 3); Sensitivity=Dataset collapses to the FIRST FIRING row, which is that minority row."
+#expectViolationCount 1
+#expectViolationAt row=3 BGSTRESU=kg
+dataset BG label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGTEST   type=Char label="Body Weight Gain Test Name"
+col BGSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | BG | 001 | 1 | BODY WEIGHT GAIN | g
+CDISCPILOT01 | BG | 002 | 2 | BODY WEIGHT GAIN | g
+CDISCPILOT01 | BG | 003 | 3 | BODY WEIGHT GAIN | kg
+---

@@ -1,0 +1,37 @@
+Core:
+  Id: "PMDA-AD0661"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when ADOSEDUR (Actual Duration of Treatment Dose) is\
+  \ present in the dataset but NDOSEDUR (Nominal Duration of Treatment Dose) or DOSEDURU\
+  \ (Duration of Treatment Dose Units) is not present; when ADOSEDUR is included,\
+  \ both NDOSEDUR and DOSEDURU must also be included."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("ADOSEDUR") and (not var_exists("NDOSEDUR") or not var_exists("DOSEDURU"))
+Outcome:
+  Message: "ADOSEDUR is present and NDOSEDUR or DOSEDURU is not present in the dataset."
+  Output_Variables:
+  - "ADOSEDUR"
+Source:
+  Message: "ADOSEDUR is present and NDOSEDUR or DOSEDURU is not present"
+  Description: "When ADOSEDUR is present, NDOSEDUR and/or DOSEDURU must also be included\
+    \ in the dataset."
+  Domains: "ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0661"
+        Version: "1"
+      Version: "6.0"

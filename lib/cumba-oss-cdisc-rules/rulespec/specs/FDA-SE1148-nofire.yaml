@@ -1,0 +1,27 @@
+name: FDA-SE1148-nofire
+kind: rule
+description: |
+  No-fire companion for FDA-SE1148 (ts_parameter_value). Every EXSTDTC is on or after the TS
+  EXPSTDTC experimental start date, so the rule does not fire.
+python_source: rules-sendig FDA-SE1148
+rule:
+  coreId: FDA-SE1148
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXSTDTC: '2020-01-01'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXSTDTC: '2020-03-01'}
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: EXPSTDTC, TSVAL: '2020-01-01'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    interventions: [EX]
+    trial-design: [TS]
+expected_violations: []
+expected_errors: []

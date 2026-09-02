@@ -1,0 +1,44 @@
+name: CDISC-AD0368
+kind: rule
+description: |
+  Fix #23 — mixed-group wildcard expansion. ADSL VMC rule:
+    TRxxPGy exists AND TRTxxA exists AND TRxxAGy not_exists
+  with mixed capture-group structures (`[xx, y]` for TRxxPGy / TRxxAGy,
+  `[xx]` for TRTxxA). Pre-fix the WildcardExpander rejected the rule
+  outright because group lists differed; now the wider pattern seeds
+  candidate tuples and TRTxxA is matched-or-computed per tuple.
+
+  Spec uses literal wildcard column names (TRxxPGy, TRTxxA) — same
+  shortcut other ADaM wildcard specs use (e.g. CDISC-AD0078). Wildcard
+  expansion correctness is covered by `WildcardExpanderTest` unit tests;
+  this spec exercises the post-expansion Check semantics on both lanes.
+python_notes: |
+  Baselined on Python lane: this is a Variable Metadata Check. Python
+  swaps the dataset for a VariablesMetadataDatasetBuilder projection,
+  so `exists("TRxxPGy")` checks meta-field column names instead of the
+  source dataset's columns and yields 0 violations (Wave 2 Finding #9).
+  Java fires the dataset-level violation; expected_violations matches
+  Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0368)
+rule:
+  coreId: CDISC-AD0368
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', TRxxPGy: 'GroupA', TRTxxA: 'Active'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0368
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      TRxxPGy: 'GroupA'
+      TRTxxA: 'Active'
+expected_errors: []

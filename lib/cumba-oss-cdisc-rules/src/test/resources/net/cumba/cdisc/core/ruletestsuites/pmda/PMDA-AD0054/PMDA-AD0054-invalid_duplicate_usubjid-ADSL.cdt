@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0054 expect=violation domain=ADSL
+#note "ADSL must hold one record per subject; USUBJID 01-701-1015 appears twice, so 'not is_unique_set(USUBJID)' flags BOTH members of the duplicate tuple. Row 3 is unique and silent. Derived Sensitivity is Record, so count 2. Body and pin style from the shipped green cdisc/CDISC-AD0054-invalid-ADSL.cdt."
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1015
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 56
+CDISCPILOT01 | 01-701-1015 | 56
+CDISCPILOT01 | 01-701-1023 | 44

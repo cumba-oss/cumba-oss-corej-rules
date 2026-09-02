@@ -1,0 +1,73 @@
+Core:
+  Id: "PMDA-AD0151"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the Analysis Criterion y (CRITy)\
+  \ takes more than one value for the same Parameter Code (PARAMCD) on records where\
+  \ PARAMCD and CRITy are populated; every record for a given PARAMCD must carry the\
+  \ same CRITy. Example: PARAMCD equals SYSBP, CRIT1 equals 'SYSBP >160'."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "CRITy"
+Check:
+  expression: >-
+    var_exists("PARAMCD") and not empty(CRITy) and not empty(PARAMCD) and
+    is_inconsistent_across_dataset(CRITy, keys=[PARAMCD])
+Outcome:
+  Message: "Inconsistent value for CRITy within a unique PARAMCD"
+  Output_Variables:
+  - "PARAMCD"
+  - "CRITy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for CRITy within a unique PARAMCD"
+  Description: "Within a study, all CRITy values must be the same for each unique\
+    \ value of PARAMCD when PARAMCD and CRITy are populated. Example: PARAMCD = SYSBP\
+    \ (mm Hg), CRIT1 = SYSBP >160."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0151"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0151"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0151"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0151"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0125 expect=noViolation domain=ADLBC
+#note "Load-bearing var_exists pin: PARCAT1N, the operator's KEY, is absent. var_exists(\"PARCAT1N\") is false so the rule is executed and silent, even though the degraded key would collapse the table into one group and flag row 3 under the EC-44 whole-table regroup. Contrast the mirror PMDA-AD0126-skipped_no_parcat1n_column-ADLBC.cdt: same missing column, opposite verdict."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+---
+S1 | 001 | SYSBP | VITALS
+S1 | 002 | SYSBP | VITALS
+S1 | 003 | SYSBP | VITALSIGNS

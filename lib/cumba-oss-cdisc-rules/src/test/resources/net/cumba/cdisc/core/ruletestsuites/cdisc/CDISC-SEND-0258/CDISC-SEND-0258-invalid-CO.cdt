@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0258 expect=violation domain=CO
+#note "No class= -- the rule has no Scope.Classes, and a DOMAIN column carrying CO is what makes Scope.Domains.Include [CO] resolve. Row 1 has RDOMAIN, IDVAR, IDVARVAL and USUBJID all empty AND a present-but-empty POOLID, so every conjunct is true -> FIRES. Row 2 identifies a subject -> silent. Pin COSEQ, not the Output_Variables: RDOMAIN/IDVAR/IDVARVAL are EMPTY on the firing row, so a pin on them would assert an empty string. M3-D20 widened Output_Variables to the .1 sibling's list plus USUBJID (which the Check reads and the sheet Variable cell names); no pin depends on it."
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt row=1 COSEQ=1
+dataset CO
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COSEQ    type=Num  label="Sequence Number"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO |    |     |  |       |   | 1 | Orphan comment
+S1 | CO |    | 001 |  |       |   | 2 | Subject comment
+---

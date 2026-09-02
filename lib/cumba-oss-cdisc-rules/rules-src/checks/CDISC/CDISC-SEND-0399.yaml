@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-SEND-0399"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Parameter Value (TSVAL) is populated with a value\
+  \ that is not a term in the SEND Implementation Guide Version (SNDIGVER) controlled\
+  \ terminology codelist for a record where Parameter Short Name (TSPARMCD) equals\
+  \ 'SNDIGVER'."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$sndigver_terms"
+  expression: "codelist_terms(codelists=[SNDIGVER], level=\"term\", returntype=\"\
+    value\")"
+Check:
+  expression: >-
+    TSPARMCD == "SNDIGVER" and not empty(TSVAL) and TSVAL not in $sndigver_terms
+Outcome:
+  Message: "TSVAL is not a term from the SNDIGVER controlled terminology codelist\
+    \ for a record where TSPARMCD equals 'SNDIGVER'."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$sndigver_terms"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "The TSVAL for SNDIGVER should be the Controlled Terminology\
+    \ term for SENDIG-DART from the SNDIGVER codelist."
+  Rule: "A record exists in TS where TSPARMCD = \"SNDIGVER\" and TSVAL  = Controlled\
+    \ Terminology term for SENDIG-DART from the SNDIGVER codelist"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND399"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND399"
+        Version: "1"
+      Version: "5.0"

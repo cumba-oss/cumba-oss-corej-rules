@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-AD0419"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRxxPGyN is populated and TRxxPGy is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRxxPGyN"
+    - "TRxxPGy"
+Check:
+  expression: >-
+    not empty(TRxxPGyN) and empty(TRxxPGy)
+Outcome:
+  Message: "TRxxPGyN is populated but TRxxPGy is not populated."
+  Output_Variables:
+  - "TRxxPGy"
+  - "TRxxPGyN"
+wildcards:
+  xx:
+    min: 1
+    max: 99
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRxxPGy where xx is an integer [01-99, zero-padded] and y is\
+    \ an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TRxxPGyN is populated\
+    \ and TRxxPGy is not populated"
+  Rule_Failure_Criteria: "TRxxPGy is not populated"
+  Condition_Failure: "TRxxPGyN is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR419"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR419"
+        Version: "1"
+      Version: "5.0"

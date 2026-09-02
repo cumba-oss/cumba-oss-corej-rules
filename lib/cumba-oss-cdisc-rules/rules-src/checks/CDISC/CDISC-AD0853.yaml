@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0853"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, considering only rows on which both ROUTE and ROUTEN\
+  \ are populated, more than one value of ROUTE is present within the dataset for\
+  \ a given value of ROUTEN."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ROUTE) and not empty(ROUTEN) and has_multiple_values_for(ROUTE, ROUTEN)
+Outcome:
+  Message: "More than one value of ROUTE is present for this value of ROUTEN within\
+    \ the dataset."
+  Output_Variables:
+  - "ROUTE"
+  - "ROUTEN"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Subclass: "POPULATION PHARMACOKINETIC ANALYSIS"
+  Variable_or_Item: "ROUTE"
+  Natural_Language_Rule_Failure_Criteria: "Within a dataset, there is more than one\
+    \ value of ROUTE for a given value of ROUTEN, considering only those rows on which\
+    \ both variables are populated"
+  Rule_Failure_Criteria: "Within a dataset, there is more than one value of ROUTE\
+    \ for a given value of ROUTEN"
+  Condition_Failure: "On rows where both ROUTE and ROUTEN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR853"
+        Version: "1"
+      Version: "5.0"

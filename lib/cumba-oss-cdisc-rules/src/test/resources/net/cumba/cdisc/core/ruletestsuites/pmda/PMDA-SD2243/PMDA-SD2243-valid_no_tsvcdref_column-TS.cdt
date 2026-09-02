@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD2243 expect=skipped domain=TS
+#note "DELIBERATELY NO TSVCDREF COLUMN. The machine-emitted var_exists(\"TSVCDREF\") conjunct folds FALSE -> no violation, with the rule executing. This rule is the batch's sharpest ABSENT-vs-EMPTY contrast: the two produce OPPOSITE verdicts on the SAME rule and sit side by side in one directory - invalid_empty_tsvcdref (blank -> FIRES) against this one (column not there -> SILENT). Grounds finding SD2243-F2. PLAN-retire-corpus-transforms phase 4: the rule now declares the gate variable in Requirements.Variables.All, so the absent column takes the auditable SKIP this scenario pins (Fix #330 remedy: a presence rule reports the absence once)."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+---
+CDISCPILOT01 | TS | 1 | PCLAS | Cyclooxygenase Inhibitors | N0000175722

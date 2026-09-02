@@ -1,0 +1,78 @@
+Core:
+  Id: "FDA-SE2276"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Collection (--DTC) of a necropsy\
+  \ findings record does not equal the subject's latest Disposition start date (DSSTDTC)."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "MA"
+    - "MI"
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", missing_values=\"indeterminate\",\
+    \ group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ds_usubjid and not empty(--DTC) and date(--DTC) != $max_ds_dsstdtc
+Outcome:
+  Message: "--DTC does not equal the Start Date/Time of the subject's latest Disposition\
+    \ (DSSTDTC)."
+  Output_Variables:
+  - "--DTC"
+  - "$max_ds_dsstdtc"
+  - "$ds_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "--DTC does not equal DSSTDTC"
+  FDA_Validator_Rule_Description: "Date/Time of Collection (--DTC) variable value\
+    \ must be equal to Start Date/Time of latest Disposition (DSSTDTC) for post-mortem\
+    \ findings in the Macroscopic Findings (MA), Microscopic Findings (MI), and Tumor\
+    \ Findings (TF) domains."
+  Domains: "MA, MI, TF"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2276"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2276"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2276"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2276"
+        Version: "1"
+      Version: "1.6"

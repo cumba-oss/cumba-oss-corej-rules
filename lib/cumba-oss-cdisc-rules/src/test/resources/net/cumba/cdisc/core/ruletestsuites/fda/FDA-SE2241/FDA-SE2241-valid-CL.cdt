@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SE2241 expect=noViolation domain=CL
+#note "Latest disposition for subject 001 starts 2020-01-20. Row 1 is observed exactly on that date (boundary: equal is allowed), row 2 before it, row 3 has an empty CLDTC (guarded out by non_empty) -> no violation."
+#library standard=sendig version=3-1-1
+#library dataset-class CL FINDINGS
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLDTC    type=Char label="Date/Time of Observation"
+---
+S1 | CL | 001 | 1 | CLSIGN | 2020-01-20
+S1 | CL | 001 | 2 | CLSIGN | 2020-01-12
+S1 | CL | 001 | 3 | CLSIGN |
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY   | RECOVERY            | 2020-01-10
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  | 2020-01-20

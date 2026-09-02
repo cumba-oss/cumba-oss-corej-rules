@@ -1,0 +1,31 @@
+name: CDISC-AD0449
+kind: rule
+description: |
+  Wave A5 port — T1a PlainSimple.
+  CDISC-AD0449: On a given record, DTHCAUSN is populated and DTHCAUS is not populated.
+  Record-data rule scoped to SUBJECT LEVEL ANALYSIS DATASET (ADSL);
+  simple non_empty + empty pair.
+python_source: rules-adamig-1-3.json (CDISC-AD0449)
+rule:
+  coreId: CDISC-AD0449
+datasets:
+  ADSL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, USUBJID: '001', DTHCAUS: 'CARDIAC', DTHCAUSN: '1'}  # ok
+      - {STUDYID: S1, USUBJID: '002', DTHCAUS: '',        DTHCAUSN: '1'}  # bad — DTHCAUSN populated, DTHCAUS empty
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    subject level analysis dataset: [ADSL]
+expected_violations:
+  - rule_id: CDISC-AD0449
+    dataset: ADSL
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DTHCAUS: null
+      DTHCAUSN: '1'
+expected_errors: []

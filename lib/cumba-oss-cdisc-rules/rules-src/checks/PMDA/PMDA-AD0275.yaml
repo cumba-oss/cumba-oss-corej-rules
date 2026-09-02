@@ -1,0 +1,43 @@
+Core:
+  Id: "PMDA-AD0275"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when only one of Cumulative Study Drug Dose (DOSECUM)\
+  \ and Cumulative Study Drug Dose Unit (DOSECUMU) is populated. If either variable\
+  \ is populated, both must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "DOSECUM"
+    - "DOSECUMU"
+Check:
+  expression: >-
+    not empty(DOSECUM) and empty(DOSECUMU) or empty(DOSECUM) and not empty(DOSECUMU)
+Outcome:
+  Message: "Only one of DOSECUMU, DOSECUM is populated"
+  Output_Variables:
+  - "DOSECUM"
+  - "DOSECUMU"
+Source:
+  Message: "Only one of DOSECUMU, DOSECUM is populated"
+  Description: "If Cumulative Study Drug Dose Unit (DOSECUMU) or Cumulative Study\
+    \ Drug Dose (DOSECUM) variable is populated, then both variables must be populated\
+    \ together."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0275"
+        Version: "1"
+      Version: "6.0"

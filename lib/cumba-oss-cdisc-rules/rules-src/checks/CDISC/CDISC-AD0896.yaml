@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-AD0896"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when AWU is present and AWLO, AWHI, AWTARGET, and AWTDIFF\
+  \ are not present"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("AWU") and not var_exists("AWLO") and not var_exists("AWHI") and not
+    var_exists("AWTARGET") and not var_exists("AWTDIFF")
+Outcome:
+  Message: "AWU is present, but AWLO, AWHI, AWTARGET, and AWTDIFF are not present"
+  Output_Variables:
+  - "AWU"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "AWU"
+  Natural_Language_Rule_Failure_Criteria: "AWU is present and AWLO, AWHI, AWTARGET,\
+    \ and AWTDIFF are not present"
+  Rule_Failure_Criteria: "AWLO, AWHI, AWTARGET, and AWTDIFF are not present"
+  Condition_Failure: "AWU is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR896"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR896"
+        Version: "1"
+      Version: "5.0"

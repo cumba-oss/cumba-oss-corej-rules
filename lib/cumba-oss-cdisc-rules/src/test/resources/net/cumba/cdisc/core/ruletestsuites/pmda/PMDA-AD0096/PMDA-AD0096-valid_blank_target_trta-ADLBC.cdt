@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0096 expect=noViolation domain=ADLBC
+#note "Row 3's TRTA (the character TARGET) is blank: excluded from the distinct-value count and flag pass, leaving {DRUGA} -> silent. not empty(TRTA) is independently false on row 3. The batch's CHARACTER-target blank pin (the numeric one is PMDA-AD0384's)."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col TRTA    type=Char
+col TRTAN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | DRUGA | 1
+CDISCPILOT01 | 01-701-1034 | GLUC |       | 1

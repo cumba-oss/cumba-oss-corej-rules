@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-AD0384"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when, within a parameter, there is more than one value\
+  \ of BTOXGRLN for a given value of BTOXGRL, considering only rows on which both\
+  \ variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BTOXGRL) and not empty(BTOXGRLN) and has_multiple_values_for(BTOXGRLN, BTOXGRL,
+    within=PARAMCD)
+Outcome:
+  Message: "Within a parameter, there is more than one value of BTOXGRLN for a given\
+    \ value of BTOXGRL, considering only rows on which both variables are populated."
+  Output_Variables:
+  - "PARAMCD"
+  - "BTOXGRL"
+  - "BTOXGRLN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "BTOXGRLN"
+  Natural_Language_Rule_Failure_Criteria: "Within a parameter, there is more than\
+    \ one value of BTOXGRLN for a given value of BTOXGRL, considering only those rows\
+    \ on which both variables are populated"
+  Rule_Failure_Criteria: "Within a parameter, there is more than one value of BTOXGRLN\
+    \ for a given value of BTOXGRL"
+  Condition_Failure: "On rows where both BTOXGRLN and BTOXGRL are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR384"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR384"
+        Version: "2"
+      Version: "5.0"

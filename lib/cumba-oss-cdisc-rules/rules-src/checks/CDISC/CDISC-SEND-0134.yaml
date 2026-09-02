@@ -1,0 +1,86 @@
+Core:
+  Id: "CDISC-SEND-0134"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Lot Number (EXLOT) is populated on a record where\
+  \ the test article is not administered (EXDOSE is 0); EXLOT must be empty when the\
+  \ dose is 0."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "EXLOT"
+    - "EXDOSE"
+Check:
+  expression: >-
+    EXDOSE == 0 and not empty(EXLOT)
+Outcome:
+  Message: "EXLOT is populated when the test article is not administered (EXDOSE is\
+    \ 0)."
+  Output_Variables:
+  - "EXDOSE"
+  - "EXLOT"
+Source:
+  Class: "INT"
+  Domain: "EX"
+  Variable: "EXLOT"
+  Plain_Text_Explanation: "If no test article (as described in EXTRT) is administered\
+    \ (i.e., EXDOSE is 0), EXLOT is null."
+  Condition: "Test article, as described in EXTRT, is not administered (i.e., EXDOSE\
+    \ is 0)"
+  Rule: "EXLOT = null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND134"
+        Version: "1"
+      Version: "5.0"

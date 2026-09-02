@@ -1,0 +1,37 @@
+name: CDISC-AD0128
+kind: rule
+description: |
+  Wave C3 port — T2-Grouping (Sensitivity=Group). BDS class scope.
+  CDISC-AD0128: within a (USUBJID, PARAMCD) group, BASEC is populated
+  and there is no record with ABLFL=Y → fire. Output_Variables per rule:
+  ABLFL, BASEC, PARAMCD. Group's first row holds the emitted violation.
+python_source: rules-adamig-1-3.json (CDISC-AD0128)
+rule:
+  coreId: CDISC-AD0128
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 0, ABLFL: Y, BASEC: NORMAL}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASEC: NORMAL}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 0, ABLFL: '', BASEC: HIGH}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, ABLFL: '', BASEC: HIGH}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0128
+    dataset: ADLB
+    row_key: {AVISITN: 0, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ablfl_y_count: '0'
+      ABLFL:
+      BASEC: HIGH
+      PARAMCD: HGB
+expected_errors: []

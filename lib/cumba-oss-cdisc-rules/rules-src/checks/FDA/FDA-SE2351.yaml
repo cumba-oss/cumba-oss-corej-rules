@@ -1,0 +1,81 @@
+Core:
+  Id: "FDA-SE2351"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when SEENDTC is after the Start Date/Time of the latest\
+  \ Disposition Event (DSSTDTC) for the subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\")"
+- id: "$max_ds_dsstdtc"
+  expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
+Check:
+  expression: >-
+    USUBJID in $ds_usubjid and not empty(SEENDTC) and date(SEENDTC) > $max_ds_dsstdtc
+Outcome:
+  Message: "SEENDTC is after the latest Disposition Event start date (DSSTDTC) for\
+    \ the subject."
+  Output_Variables:
+  - "SEENDTC"
+  - "$max_ds_dsstdtc"
+  - "$ds_usubjid"
+Source:
+  FDA_Validator_Rule_Message: "SEENDTC is after the latest Disposition date"
+  FDA_Validator_Rule_Description: "End Date/Time of Element (SEENDTC) should be less\
+    \ than or equal to the Start Date/Time of the latest Disposition Event (DSSTDTC)."
+  Domains: "SE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2351"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2351"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.1"
+  - Name: "SENDIG"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2351"
+        Version: "1"
+      Version: "1.6"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2351"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2351"
+        Version: "1"
+      Version: "1.6"
+    Version: "1.1"

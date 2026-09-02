@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0348 expect=skipped domain=LB
+#note "THE --ORRES ALL-FACET GATE (Fix #331, M2-D24 bucket 2). LB declares no LBORRES column. Requirements.Variables.All gained the wildcard entry `--ORRES`; ScopeMatcher resolves it to LBORRES (EC-36), finds it absent and the rule is SKIPPED naming it. Drop the entry and the rule EXECUTES: under Fix #330 empty(--ORRES) is TRUE on every row of the absent column and every other conjunct is absence-tolerant here, so it would fire on every row -- the flood the gate exists for. If this EXECUTES, the gate was removed -- escalate. LBSTAT is declared and blank and there is no LBDRVFL, so the branch `empty(--STAT) and not var_exists(--DRVFL) and empty(--ORRES)` would be the flooding one."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | ALB |  | 4.1
+S1 | LB | 001 | 2 | ALT |  | 12
+---

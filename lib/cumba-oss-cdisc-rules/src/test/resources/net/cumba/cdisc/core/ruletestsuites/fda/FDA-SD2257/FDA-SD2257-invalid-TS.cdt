@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD2257 expect=violation domain=TS
+#note "Row 2: TSPARMCD=INDIC with TSVAL=MIGRAINE, which is not a term in the dummy SNOMED dictionary -> fires. Row 1 carries a valid term in its preferred case (Headache; the D-TA-3 sensitive default, Fix #266); row 3 has the same invalid term under AGEMAX (outside the INDIC condition); row 4 has a blank TSVAL (no fire)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSPARMCD=INDIC TSVAL=MIGRAINE
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | INDIC  | Headache
+S01 | TS | 2 | INDIC  | MIGRAINE
+S01 | TS | 3 | AGEMAX | MIGRAINE
+S01 | TS | 4 | INDIC  |

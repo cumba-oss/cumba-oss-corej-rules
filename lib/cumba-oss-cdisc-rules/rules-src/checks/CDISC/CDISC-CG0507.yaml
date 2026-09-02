@@ -1,0 +1,45 @@
+Core:
+  Id: "CDISC-CG0507"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --USCHFL, a variable defined for use in non-clinical\
+  \ (SEND) studies, is present in a dataset submitted as SDTM-based data for a human\
+  \ clinical trial."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_exists("--USCHFL")
+Outcome:
+  Message: "--USCHFL is present; this variable is defined for use in non-clinical\
+    \ (SEND) studies and must never be used in SDTM-based data for human clinical\
+    \ trials."
+  Output_Variables:
+  - "--USCHFL"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--USCHFL"
+  Rule: "--USCHFL not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0507"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0507"
+        Version: "1"
+      Version: "2.0"

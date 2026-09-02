@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0370 expect=violation domain=ADSL
+#note "Expansion: ^(.+)TMF$ -> TRTSTMF root 'TRTS'; ^(.+)TM$ -> TRTSTM root 'TRTS' AND TRTSDTM root 'TRTSD'; ^(.+)DTM$ -> TRTSDTM root 'TRTS'. Tuples {TRTS, TRTSD}. Expansion 'TRTS' fires once (all three columns declared); expansion 'TRTSD' needs TRTSDTMF, which is absent, so it broadcasts FALSE. Total = 1 at row 1. TRTSTMF (Char, Cond), TRTSTM (Num, Perm) and TRTSDTM (Num, Cond) are all real ADaMIG ADSL 'Treatment Timing' variables. The shipped Scope.Data_Structures carries the six sheet-named tokens (Fix #273, ruling M2-D6, applied to AD0369 and AD0370 as one change); under the previous [BDS, OCCDS] pair the harness reported the structure out of scope. CDISC-AD0370 is deliberately untouched."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 TRTSTMF=T
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTSTMF type=Char
+col TRTSTM  type=Num
+col TRTSDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | T | |

@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0418"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Order of Element within Arm (TAETORD) value does\
+  \ not match any Order of Element within Arm (TAETORD) value defined in the Trial\
+  \ Arms (TA) dataset."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "TAETORD"
+Operations:
+- id: "$ta_taetord"
+  expression: "distinct(TAETORD, domain=\"TA\")"
+Check:
+  expression: >-
+    not empty(TAETORD) and TAETORD not in $ta_taetord
+Outcome:
+  Message: "TAETORD does not match any TAETORD value defined in the Trial Arms (TA)\
+    \ dataset."
+  Output_Variables:
+  - "TAETORD"
+  - "$ta_taetord"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "TAETORD"
+  Rule: "TAETORD order of elements match order in TA within ARM of the Subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0418"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0418"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0418"
+        Version: "1"
+      Version: "2.0"

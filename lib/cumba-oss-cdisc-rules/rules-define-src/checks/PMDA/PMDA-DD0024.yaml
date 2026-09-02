@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0024"
+Sheet_Rule_Identifier: "DD0024"
+Rule_Set: "PMDA"
+Element: "EnumeratedItem"
+Attribute: "CodedValue"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Requires: "ct"
+Plain_Text_Rule: "If the allowed values for a variable are restricted by a non-extensible CDISC controlled terminology, the Codelist referenced in Define.xml must not contain Terms that are not part of CDISC controlled terminology. Define-XML specification represents Term as CodedValue attribute on either EnumeratedItem or CodeListItem elements within CodeList element."
+# CT-gated (P5), EnumeratedItem leg (-B: CodeListItem): the CodedValue must be
+# a submission value of the CT codelist resolved via the parent CodeList's
+# nci:ExtCodeID alias; per the sheet, only NON-EXTENSIBLE codelists are in
+# scope (extensible codelists may legally carry extra terms). The sheet
+# message's <codelist>/<variable> placeholders are not renderable here; the
+# offending term is interpolated instead. Twins: CDISC 179/192.
+Message: "Invalid Term ${value} in codelist"
+Check:
+  kind: "term_in_ct_codelist"
+  nonExtensibleOnly: true

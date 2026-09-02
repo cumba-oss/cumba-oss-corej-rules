@@ -1,0 +1,84 @@
+Core:
+  Id: "CDISC-SEND-0048"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the order of the variables present in the dataset\
+  \ does not follow the order of those variables as presented in the SENDIG."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$column_order_from_library"
+  expression: "get_column_order_from_library()"
+- id: "$column_order_from_dataset"
+  expression: "get_column_order_from_dataset()"
+Check:
+  expression: >-
+    not empty($column_order_from_library) and not is_ordered_subset_of($column_order_from_dataset,
+    $column_order_from_library)
+Outcome:
+  Message: "The order of the variables in the dataset does not follow the order presented\
+    \ in the SENDIG."
+  Output_Variables:
+  - "$column_order_from_dataset"
+  - "$column_order_from_library"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Variable order should match the appropriate SENDIG"
+  Condition: "Variable is present"
+  Rule: "Variable is in the order presented in SENDIG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND48"
+        Version: "1"
+      Version: "5.0"

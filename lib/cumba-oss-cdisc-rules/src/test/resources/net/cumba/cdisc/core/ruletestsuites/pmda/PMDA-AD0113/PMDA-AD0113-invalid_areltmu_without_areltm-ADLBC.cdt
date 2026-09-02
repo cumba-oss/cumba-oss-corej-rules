@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0113 expect=violation domain=ADLBC
+#note "A unit without the value it qualifies -> one dataset-level violation at reported row 1, count 1 despite two rows. ARELTMU is the single Output_Variable and is present, so it is pinned."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 ARELTMU=HOURS
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.4 | HOURS
+CDISCPILOT01 | 01-701-1023 | GLUC | 6.1 | HOURS

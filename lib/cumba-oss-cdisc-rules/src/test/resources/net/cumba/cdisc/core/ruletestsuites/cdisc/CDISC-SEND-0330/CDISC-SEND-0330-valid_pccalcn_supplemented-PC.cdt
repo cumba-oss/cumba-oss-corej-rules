@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-SEND-0330 expect=noViolation domain=PC
+#note "THE FALSE-POSITIVE PIN (Fix #288 / M3-D5). This is a perfectly conformant submission: the BLQ result at PCSEQ=1 carries the SUPPPC record the SENDIG asks for, QNAM=PCCALCN, joined on (001, PCSEQ=1). With key_value=PCCALCN the operation resolves, $calcn_present is true, `$calcn_present == false` is false and the rule is SILENT. Before M3-D5 the operation's key_value was the literal CALCN: NO SUPPPC row will ever carry QNAM='CALCN', so $calcn_present was false on every parent row and EVERY out-of-quantification PC record -- supplemented or not -- was reported in the three packages the rule ships in. The sheet's own row 1713-1715 says PCCALCN in its Plain Text AND its Cited Guidance and CALCN only in the Rule cell, and the cross-family FDA-SE2234, written from the identical guidance, uses PCCALCN with four green fixtures in tree. A sheet issue is owed against the Rule cell either way."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ |
+S1 | PC | 001 | 2 | DRUGX | 5.2 | 5.2
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | PC | 001 | PCSEQ | 1 | PCCALCN | Numeric Interpretation for Calculations | 0.05
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0472 expect=violation domain=ADSL
+#note "The w marker is a single digit, so STRATwR / STRATwRN compile to ^STRAT(\\d)R$ / ^STRAT(\\d)RN$, and the rule's _wildcards {w: 1..9} filter accepts the captured 1. STRAT1R / STRAT1RN give exactly one tuple. Target is the LABEL STRAT1R, key is the code STRAT1RN. Group STRAT1RN=1 holds STRAT1R {REGIONA x2, RA x1} -> row 3 is the lone minority. STRATAR/STRATARN (not digit-suffixed) belong to AD0468/AD0469, kept out."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 STRAT1R=RA STRAT1RN=1
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col STRAT1R  type=Char
+col STRAT1RN type=Num
+---
+S1 | 001 | REGIONA | 1
+S1 | 002 | REGIONA | 1
+S1 | 003 | RA      | 1
+S1 | 004 | REGIONB | 2

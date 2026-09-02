@@ -1,0 +1,39 @@
+name: CDISC-AD0879
+kind: rule
+description: |
+  Wave D9 port - T3-VMC Variable Metadata Check with `exists`/`not_exists`
+  leaves on ADaM column names. Baselined on Python lane under Finding #9
+  (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection before evaluating the Check,
+  so `exists(COLNAME)` checks meta-field column names instead of the
+  actual dataset columns and yields 0 violations. Java evaluates the
+  leaves against the original column metadata and fires correctly.
+  expected_violations matches Java; Python XFAILs on the asymmetric-lane
+  baseline.
+python_source: rules-adamig-1-3.json (CDISC-AD0879)
+rule:
+  coreId: CDISC-AD0879
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      COUNTRYN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, COUNTRYN: 1}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0879
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      COUNTRYN: '1'
+expected_errors: []

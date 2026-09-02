@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0281 expect=noViolation domain=ADAE
+#note "Row 2 AESEV=MILD populated (guard true) but AESEVN (the DEPENDENT) blank: excluded from the functional dependency by the operator itself, not the guard. Key MILD sees only {1} -> silent. Isolates the operator's own blank-dependent exception (AD0281-F2: the guard is redundant here)."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE | MILD | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA | MILD | .
+CDISCPILOT01 | 01-701-1034 | 2 | RASH | SEVERE | 3

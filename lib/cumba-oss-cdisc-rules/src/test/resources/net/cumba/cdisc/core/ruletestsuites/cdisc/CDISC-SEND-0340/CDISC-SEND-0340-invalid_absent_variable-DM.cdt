@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0340 expect=violation domain=DM
+#note "PROPOSED-RULE scenario (ruling 8). Mirror of CDISC-SEND-0014-invalid_absent_variable-DM: define declares Expected RFENDTC (no comment) that is absent from the dataset; STUDYID/USUBJID declared with comments and populated. Proposed rule -> 1 violation on RFENDTC. CURRENT rule iterates dataset columns only -> predicted-red: engine reports noViolation instead of this 1 violation on define_variable_name=RFENDTC."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM RFENDTC core=Exp
+#define-xml CDISC-SEND-0340-absent-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=RFENDTC
+dataset DM
+col STUDYID type=Char
+col USUBJID type=Char
+---
+S1 | S1-001

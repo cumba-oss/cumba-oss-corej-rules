@@ -1,0 +1,120 @@
+Core:
+  Id: "PMDA-SD2253"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Parameter Value (TSVAL) for a 'COMPTRT' trial-summary\
+  \ parameter is not a valid preferred term in the FDA Substance Registration System\
+  \ (SRS)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$comptrt_srs_term"
+  expression: "valid_external_dictionary_value(TSVAL, external_dictionary_type=\"\
+    unii\", dictionary_term_type=\"SRS\")"
+Check:
+  expression: >-
+    TSPARMCD == "COMPTRT" and $comptrt_srs_term == false
+Outcome:
+  Message: "TSVAL is not a valid FDA-SRS preferred term for the 'COMPTRT' parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Message: "Invalid TSVAL value for COMPTRT"
+  Description: "TSVAL for COMPTRT record must be a valid preferred term from FDA Substance\
+    \ Registration System (SRS)."
+  Domains: "TS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD2253"
+        Version: "1"
+      Version: "1.6"

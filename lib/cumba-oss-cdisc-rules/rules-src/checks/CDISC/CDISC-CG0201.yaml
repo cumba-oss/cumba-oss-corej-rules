@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0201"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when IDVARVAL and USUBJID are empty but IDVAR is populated\
+  \ with a --SEQ value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RELREC"
+Check:
+  expression: >-
+    empty(IDVARVAL) and empty(USUBJID) and ends_with(IDVAR, "SEQ")
+Outcome:
+  Message: "IDVAR is populated with a --SEQ value when IDVARVAL and USUBJID are empty."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+Source:
+  Class: "SPC"
+  Domain: "RELREC"
+  Variable: "IDVAR"
+  Condition: "IDVARVAL = null and USUBJID = null"
+  Rule: "IDVAR ^= --SEQ"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0201"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0201"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0201"
+        Version: "1"
+      Version: "2.0"

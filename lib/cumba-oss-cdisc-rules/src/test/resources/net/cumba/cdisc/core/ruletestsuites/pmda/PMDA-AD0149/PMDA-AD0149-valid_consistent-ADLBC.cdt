@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0149 expect=noViolation domain=ADLBC
+#note "A clean one-to-one map inside GLUC, plus a row that reuses AVAL=1 under a different PARAMCD with a different AVALC - which pins PARAMCD as part of the key."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col AVALC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1023 | GLUC | 1 | LOW
+CDISCPILOT01 | 01-701-1015 | GLUC | 2 | HIGH
+CDISCPILOT01 | 01-701-1023 | ALB  | 1 | NORMAL

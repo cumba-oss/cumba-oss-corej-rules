@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD0069 expect=noViolation domain=DM
+#note "Row 1 (ARMCD=A) has a DS record; row 2 SCRNFAIL, row 3 NOTASSGN and row 4 (empty ARMCD) are the sheet's exceptions and need no DS record."
+#library standard=sdtmig version=3-2
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | A        | Arm A
+S1 | DM | 002 | SCRNFAIL | Screen Failure
+S1 | DM | 003 | NOTASSGN | Not Assigned
+S1 | DM | 004 |          |
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | COMPLETED | COMPLETED

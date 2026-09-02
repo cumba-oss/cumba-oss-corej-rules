@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1331 expect=violation domain=CM
+#note "Row 1: complete-vs-complete, start 2020-03-15 after collection 2020-02-01 -> fires. Row 2: equal dates -> clean (boundary). Row 3: start before collection -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMSTDTC=2020-03-15
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTDTC  type=Char
+col CMDTC    type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN     | 2020-03-15 | 2020-02-01
+S1 | CM | 001 | 2 | IBUPROFEN   | 2020-02-01 | 2020-02-01
+S1 | CM | 001 | 3 | PARACETAMOL | 2020-01-10 | 2020-01-20

@@ -1,0 +1,21 @@
+Rule_Id: "DEFINE-XML-0105"
+Sheet_Rule_Identifier: "105"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "Domain"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Attribute Domain must be provided for the ItemGroupDef element that references the SDTM or SEND implementation guides."
+# Sheet: "@Domain must be provided when ItemGroupDef/@def:StandardOID references
+# def:Standard with def:Standard/@Name beginning with 'SDTM' or 'SEND'." — the guard
+# dereferences def:StandardOID to the def:Standard and full-matches its Name against
+# a begins-with regex. Datasets without def:StandardOID (or bound to another
+# standard) are out of reach. Presence findings carry no ${value}, so the sheet's
+# "ItemGroupDef[@Name]" placeholder cannot be interpolated.
+Message: "Attribute Domain is missing for an ItemGroupDef that references an SDTM or SEND implementation guide."
+Check:
+  kind: "exists"
+  target: "@Domain"
+  when:
+    path: "@StandardOID->Standard@OID/@Name"
+    matchesRegex: "(SDTM|SEND).*"

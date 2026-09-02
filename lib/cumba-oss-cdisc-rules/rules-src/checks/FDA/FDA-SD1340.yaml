@@ -1,0 +1,100 @@
+Core:
+  Id: "FDA-SD1340"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Exposure (EX) record, other than a run-in record\
+  \ (EPOCH equals 'RUN-IN'), is present for a subject who is not treated (DM.ACTARMCD\
+  \ equals 'NOTTRT' or is empty)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "EX"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    (not var_exists("EPOCH") or EPOCH != "RUN-IN") and var_exists(DM.ACTARMCD) and (DM.ACTARMCD ==
+    "NOTTRT" or empty(DM.ACTARMCD))
+Outcome:
+  Message: "An Exposure (EX) record is present for a subject who is not treated (ACTARMCD\
+    \ equals 'NOTTRT' or is empty)."
+  Output_Variables:
+  - "EPOCH"
+  - "DM.ACTARMCD"
+Source:
+  FDA_Validator_Rule_Message: "EX record is present, when subject is not treated"
+  FDA_Validator_Rule_Description: "Subjects that are not treated (ACTARMCD='NOTTRT'\
+    \ or null) should not have any Exposure records. Run-in records (EPOCH='RUN-IN')\
+    \ are excluded from firing for this validation rule."
+  Domains: "EX"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1340"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1340"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1340"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1340"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1340"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0396 expect=violation domain=ADLBC
+#note "Group (GRADE1, GLUC) holds two distinct target values each occurring once -> no strict majority, EVERY non-blank row flagged. TIE branch: count 2, both rows."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 PARAMCD=GLUC ATOXGRL=GRADE1 ATOXGRLN=1
+#expectViolationAt row=2 USUBJID=01-701-1023 PARAMCD=GLUC ATOXGRL=GRADE1 ATOXGRLN=2
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col ATOXGRL  type=Char
+col ATOXGRLN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | GRADE1 | 1
+CDISCPILOT01 | 01-701-1023 | GLUC | GRADE1 | 2

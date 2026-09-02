@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0367"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Subject or Pool Identifier (RSUBJID) is\
+  \ populated, does not match any USUBJID in the Demographics (DM) domain, and does\
+  \ not match any POOLID in the Pool Definition (POOLDEF) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AP--"
+    - "APRELSUB"
+Requirements:
+  Variables:
+    All:
+    - "RSUBJID"
+Operations:
+- id: "$dm_usubjid"
+  expression: "distinct(USUBJID, domain=\"DM\")"
+- id: "$pooldef_poolid"
+  expression: "distinct(POOLID, domain=\"POOLDEF\")"
+Check:
+  expression: >-
+    not empty(RSUBJID) and RSUBJID not in $dm_usubjid and RSUBJID not in $pooldef_poolid
+Outcome:
+  Message: "RSUBJID is populated but does not match any DM.USUBJID or POOLDEF.POOLID;\
+    \ RSUBJID must reference a related subject's USUBJID or a related pool's POOLID."
+  Output_Variables:
+  - "RSUBJID"
+  - "$dm_usubjid"
+  - "$pooldef_poolid"
+Source:
+  Class: "AP"
+  Domain: "ALL"
+  Variable: "RSUBJID"
+  Condition: "RSUBJID ^=null and RSUBJID ^= POOLID"
+  Rule: "RSUBJID = DM.USUBJID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0367"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0367"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0367"
+        Version: "1"
+      Version: "2.0"

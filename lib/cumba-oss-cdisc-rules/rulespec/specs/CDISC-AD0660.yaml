@@ -1,0 +1,33 @@
+name: CDISC-AD0660
+kind: rule
+description: |
+  Wave A8 port — T1a PlainSimple.
+  CDISC-AD0660: METABFL has a value other than Y (or null) (ADNCA v1.0).
+  Record-data rule scoped to BASIC DATA STRUCTURE; exists + non_empty + is_not_contained_by.
+python_source: rules-adamig-1-3.json (CDISC-AD0660)
+rule:
+  coreId: CDISC-AD0660
+datasets:
+  ADNCA:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+      NFRLT: DOUBLE
+      AFRLT: DOUBLE
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, METABFL: Y, NFRLT: 0.0, AFRLT: 0.0}         # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, METABFL: MAYBE, NFRLT: 0.0, AFRLT: 0.0}     # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADNCA]
+expected_violations:
+  - rule_id: CDISC-AD0660
+    dataset: ADNCA
+    row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      METABFL: MAYBE
+expected_errors: []

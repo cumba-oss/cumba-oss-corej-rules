@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0377"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Lowest Level Term (--LLT) value is not a valid\
+  \ Lowest Level Term in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--LLT"
+Operations:
+- id: "$llt_valid"
+  expression: "valid_external_dictionary_value(--LLT, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"LLT\", case_sensitive=false)"
+Check:
+  expression: >-
+    $llt_valid == false
+Outcome:
+  Message: "Lowest Level Term (--LLT) is not a valid MedDRA Lowest Level Term."
+  Output_Variables:
+  - "--LLT"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--LLT"
+  Rule: "--LLT = MedDRA lowest level TERM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0377"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0377"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0377"
+        Version: "1"
+      Version: "2.0"

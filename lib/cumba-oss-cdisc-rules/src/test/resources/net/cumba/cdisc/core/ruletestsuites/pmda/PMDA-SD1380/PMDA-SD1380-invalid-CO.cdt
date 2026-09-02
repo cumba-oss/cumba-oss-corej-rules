@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1380 expect=violation domain=CO
+#note "Special-Purpose branch (CO is one of the sheet-listed domains): row 1 has an empty USUBJID and none of APID/SPDEVID/POOLID present -> fires; row 2 carries USUBJID."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 COVAL="General comment"
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO |     | 1 | General comment
+S1 | CO | 001 | 2 | Subject comment

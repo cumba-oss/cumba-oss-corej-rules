@@ -1,0 +1,35 @@
+name: FDA-SE1148-fire
+kind: rule
+description: |
+  Representative fixture for the ts_parameter_value capability. FDA-SE1148 fires when EXSTDTC is
+  populated and earlier than the Experimental Start Date (TS TSPARMCD=EXPSTDTC / TSVAL). EX row 1
+  starts 2019-12-31, before the TS EXPSTDTC 2020-01-01 -> fires; row 2 starts on/after -> no fire.
+python_source: rules-sendig FDA-SE1148
+rule:
+  coreId: FDA-SE1148
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXSTDTC: '2019-12-31'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXSTDTC: '2020-03-01'}
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: EXPSTDTC, TSVAL: '2020-01-01'}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    interventions: [EX]
+    trial-design: [TS]
+expected_violations:
+  - rule_id: FDA-SE1148
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $exp_start: '2020-01-01'
+      EXSTDTC: '2019-12-31'
+expected_errors: []

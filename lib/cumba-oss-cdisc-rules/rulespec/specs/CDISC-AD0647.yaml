@@ -1,0 +1,39 @@
+name: CDISC-AD0647
+kind: rule
+description: |
+  EC-6 — Python VMC melt narrow merge-back on row_number (TRTEMFL family).
+  AD0647: a TREMxxFL variable is 'Y' but the overall treatment-emergent flag TRTEMFL
+  is not 'Y' on the same record (variable_name matches ^TREM\d{2}FL$). Before the fix
+  the Python lane SKIPPED (concrete TRTEMFL dropped by melt → KeyError); the Java lane
+  already resolves the raw column. Both lanes now fire exactly once (USUBJID 001:
+  TREM01FL=Y, TRTEMFL=N). TRTEMFL is present in the fixture.
+python_source: rules-adamig-1-3.json (CDISC-AD0647)
+rule:
+  coreId: CDISC-AD0647
+datasets:
+  ADAE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', AESEQ: 1, TREM01FL: 'Y', TRTEMFL: 'N'}   # bad: TREM01FL=Y, TRTEMFL!=Y
+      - {STUDYID: S1, USUBJID: '002', AESEQ: 1, TREM01FL: 'Y', TRTEMFL: 'Y'}   # ok: both Y
+      - {STUDYID: S1, USUBJID: '003', AESEQ: 1, TREM01FL: 'N', TRTEMFL: 'N'}   # ok: TREM01FL!=Y
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    occurrence data structure: [ADAE]
+# EC-6 discharge: this rule must RUN, not just fire — see PLAN-parity-expected-status P3
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: CDISC-AD0647
+    dataset: ADAE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      variable_name: TREM01FL
+      variable_value: 'Y'
+      TRTEMFL: 'N'
+expected_errors: []

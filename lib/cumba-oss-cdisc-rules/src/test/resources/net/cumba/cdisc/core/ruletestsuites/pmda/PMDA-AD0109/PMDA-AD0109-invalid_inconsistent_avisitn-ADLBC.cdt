@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0109 expect=violation domain=ADLBC
+#note "Key is the TUPLE (PARAMCD, AVISIT); within (GLUC, WEEK2) the target AVISITN holds {2,2,3} -> minority row 3 fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1034 PARAMCD=GLUC AVISIT=WEEK2 AVISITN=3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | WEEK2 | 2
+CDISCPILOT01 | 01-701-1023 | GLUC | WEEK2 | 2
+CDISCPILOT01 | 01-701-1034 | GLUC | WEEK2 | 3
+---

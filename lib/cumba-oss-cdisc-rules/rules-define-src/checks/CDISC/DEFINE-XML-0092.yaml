@@ -1,0 +1,15 @@
+Rule_Id: "DEFINE-XML-0092"
+Sheet_Rule_Identifier: "92"
+Rule_Set: "CDISC"
+Element: "RangeCheck"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "Child element CheckValue must be provided for the RangeCheck element."
+# Spec §5.3.10.2: CheckValue is Required, cardinality one or more — unconditional
+# for every Comparator. The sheet's "$ParentWhereClause[OID]" placeholder is
+# carried by the finding's xpath.
+Message: "Child element CheckValue is missing for element def:WhereClauseDef/RangeCheck."
+Check:
+  kind: "exists"
+  target: "CheckValue"

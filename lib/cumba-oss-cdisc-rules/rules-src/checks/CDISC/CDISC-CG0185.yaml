@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0185"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when LBTOXGR is populated but does not contain only a\
+  \ numeric (integer) value."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "LB"
+Requirements:
+  Variables:
+    All:
+    - "LBTOXGR"
+Check:
+  expression: >-
+    not empty(LBTOXGR) and LBTOXGR !~ /^[0-9]+$/
+Outcome:
+  Message: "LBTOXGR is not a numeric value when a numeric scale is used."
+  Output_Variables:
+  - "LBTOXGR"
+Source:
+  Class: "FND"
+  Domain: "LB"
+  Variable: "LBTOXGR"
+  Condition: "Numeric scale used"
+  Rule: "LBTOXGR is a numeric value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0185"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0185"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0185"
+        Version: "1"
+      Version: "2.0"

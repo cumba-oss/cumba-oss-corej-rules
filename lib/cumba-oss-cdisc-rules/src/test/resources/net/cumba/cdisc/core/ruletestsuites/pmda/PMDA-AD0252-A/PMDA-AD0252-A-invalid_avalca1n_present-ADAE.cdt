@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0252-A expect=violation domain=ADAE
+#note "Positive control on the first disjunct. AVALCA1N seeds one expansion (y=1) and `var_exists(\"AVALCA1N\")` is true, so the rule fires. Derived Sensitivity is Dataset, so the result is exactly ONE violation regardless of the two data rows: an exists-only tree is folded to a dataset-level constant by BroadcastFold before the row loop, emitting one violation carrying internal row 0, which is reported as row=1. AVALCA1N is a PRESENT column, so the expanded Output_Variable also resolves by value from data row 1."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 AVALCA1N=1
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col AVALCA1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1
+CDISCPILOT01 | 01-701-1023 | NAUSEA | 2

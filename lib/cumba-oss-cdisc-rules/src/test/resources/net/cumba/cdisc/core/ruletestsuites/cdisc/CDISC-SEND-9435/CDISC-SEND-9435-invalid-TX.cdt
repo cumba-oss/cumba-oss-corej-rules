@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-9435 expect=violation domain=TX
+# Rule:Description: CDISC-SEND-9435 — the Required key TXPARMCD is not populated.
+#note "TXPARMCD blank -> violation; the twin scenario differs only in the value of TXPARMCD."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset TX
+col STUDYID type=Char
+col DOMAIN type=Char
+col SETCD type=Char
+col TXSEQ type=Char
+col TXPARMCD type=Char
+col TXPARM type=Char
+col TXVAL type=Char
+---
+S1      | TX     | GRP1  | 1     |          | Treatment Dose | 10
+---

@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SD1332"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Outcome of Adverse Event (AEOUT) is equal to\
+  \ 'NOT RECOVERED/NOT RESOLVED' but an End Date/Time of Adverse Event (AEENDTC) is\
+  \ provided."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AEOUT"
+Check:
+  expression: >-
+    AEOUT == "NOT RECOVERED/NOT RESOLVED" and not empty(AEENDTC)
+Outcome:
+  Message: "AEENDTC is populated, when AEOUT is equal to NOT RECOVERED/NOT RESOLVED."
+  Output_Variables:
+  - "AEOUT"
+  - "AEENDTC"
+Source:
+  FDA_Validator_Rule_Message: "AEOUT = NOT RECOVERED/NOT RESOLVED, but an end date\
+    \ is provided"
+  FDA_Validator_Rule_Description: "The Outcome of Adverse Event (AEOUT) variable is\
+    \ populated with the value NOT RECOVERED/NOT RESOLVED, however the End Date/Time\
+    \ of Adverse Event (AEENDTC) variable is populated with an end date for the adverse\
+    \ event. If the adverse event has an outcome of NOT RECOVERED/NOT RESOLVED, it\
+    \ is expected that no end date is available."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1332"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

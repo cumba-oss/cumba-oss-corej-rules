@@ -1,0 +1,23 @@
+Core:
+  Id: "DRAFT-900035"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when SRCVAR is present in a Basic Data Structure dataset\
+  \ but SRCDOM is not; both are needed for datapoint traceability."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("SRCVAR") and not var_exists("SRCDOM")
+Outcome:
+  Message: "SRCVAR is present but SRCDOM is not. Both are needed for datapoint traceability."
+  Output_Variables:
+  - "SRCVAR"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

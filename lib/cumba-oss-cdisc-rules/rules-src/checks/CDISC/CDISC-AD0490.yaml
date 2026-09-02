@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-AD0490"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when LVOTFL is populated and LVOTFN is missing on the\
+  \ same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(LVOTFL) and empty(LVOTFN)
+Outcome:
+  Message: "LVOTFL is populated but LVOTFN is missing."
+  Output_Variables:
+  - "LVOTFL"
+  - "LVOTFN"
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE; OCCURRENCE DATA\
+    \ STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "LVOTFN"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, LVOTFL is populated\
+    \ and LVOTFN is not populated"
+  Rule_Failure_Criteria: "LVOTFN is not populated"
+  Condition_Failure: "LVOTFL is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR490"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR490"
+        Version: "2"
+      Version: "5.0"

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0886 expect=noViolation domain=ADPPK
+#note "Positive control for the subclass gate: same popPK signature as the invalid twin, but AFRLT is present. expect=noViolation asserts the rule EXECUTED and did not fire -- it fails if the subclass gate skips the rule."
+# Rule:Description: Raise an error when AFRLT is not present in an ADPPKIG v1.0 dataset.
+dataset ADPPK
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col EVID    type=Num
+col MDV     type=Num
+col DV      type=Num
+col AMT     type=Num
+col CMT     type=Num
+col AFRLT   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 | 0 | 0 | 12.5 | 0 | 1 | 1
+---

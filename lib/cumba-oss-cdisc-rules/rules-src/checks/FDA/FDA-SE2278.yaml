@@ -1,0 +1,42 @@
+Core:
+  Id: "FDA-SE2278"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Lower Limit of Quantitation (PCLLOQ) is missing\
+  \ or not present while Standardized Result in Character Format (PCSTRESC) indicates\
+  \ a below-limit-of-quantitation result ('BLQ' or 'BQL')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCSTRESC"
+Check:
+  expression: >-
+    PCSTRESC in ["BLQ", "BQL"] and empty(PCLLOQ)
+Outcome:
+  Message: "PCLLOQ is missing or not present when PCSTRESC is 'BLQ' or 'BQL'."
+  Output_Variables:
+  - "PCSTRESC"
+  - "PCLLOQ"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for PCLLOQ when PCSTRESC is 'BLQ' or\
+    \ 'BQL'"
+  FDA_Validator_Rule_Description: "When a measurement is identified as being below\
+    \ a limit of quantification threshold in Standardized Result in Character Format\
+    \ (PCSTRESC), Lower Limit of Quantitation (PCLLOQ) should be populated."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2278"
+        Version: "1"
+      Version: "1.6"

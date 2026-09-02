@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0032 expect=skipped domain=DS
+#note "DSTPTNUM is present and populated, DSTPT is empty -> the row would fire if not scoped out; DS is a member of the included EVENTS class, so ONLY the Domains.Exclude [DX, DS] entry rejects. Discriminator: the FDA twin has no exclusions and would execute here."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col DSSEQ    type=Num
+col DSTERM   type=Char
+col DSTPTNUM type=Num
+col DSTPT    type=Char
+---
+S1 | DS | 001 | 1 | DISPOSITION EVENT | 1 |

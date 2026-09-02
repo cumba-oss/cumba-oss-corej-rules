@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-SEND-0365"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for a record whose Pregnancy Findings Test Code\
+  \ (PYTESTCD) is \"PREGSTAT\", the Character Result/Finding in Std Format (PYSTRESC)\
+  \ is populated with a value that is not a term in the (PYFINDRS) controlled terminology\
+  \ codelist."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PY"
+Requirements:
+  Variables:
+    All:
+    - "PYTESTCD"
+Operations:
+- id: "$pyfindrs_terms"
+  expression: "codelist_terms(codelists=[PYFINDRS], level=\"term\", returntype=\"\
+    value\")"
+Check:
+  expression: >-
+    PYTESTCD == "PREGSTAT" and not empty(PYSTRESC) and PYSTRESC not in $pyfindrs_terms
+Outcome:
+  Message: "PYSTRESC is populated with a value that is not a term in the (PYFINDRS)\
+    \ controlled terminology codelist when PYTESTCD is \"PREGSTAT\"."
+  Output_Variables:
+  - "PYTESTCD"
+  - "PYSTRESC"
+  - "$pyfindrs_terms"
+Source:
+  Class: "FND"
+  Domain: "PY"
+  Variable: "PYSTRESC"
+  Plain_Text_Explanation: "When the PYTESTCD is \"PREGSTAT\", PYSTRESC should be populated\
+    \ with a value in the PYFINDRS controlled terminology list."
+  Condition: "PYTESTCD = \"PREGSTAT\""
+  Rule: "PYSTRESC populated using PYFINDRS controlled list"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND365"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND365"
+        Version: "1"
+      Version: "5.0"

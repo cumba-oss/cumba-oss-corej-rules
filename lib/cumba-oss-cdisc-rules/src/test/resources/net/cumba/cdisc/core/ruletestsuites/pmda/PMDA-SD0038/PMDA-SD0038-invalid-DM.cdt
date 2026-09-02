@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0038 expect=violation domain=DM
+#note "Second domain shape: the DY$ name pattern must pick up DMDY in DM, and DM is the SPECIAL PURPOSE member of the Classes.Include list. DMDY=0 on row 1 fires; row 2 (DMDY=1) is silent. ADAPTED-FROM fda/FDA-SD0038/FDA-SD0038-invalid-DM.cdt (verbatim; pin strengthened with the projected output variables)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=DMDY variable_value=0
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DMDY    type=Num  label="Study Day of Collection"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 0
+CDISCPILOT01 | DM | 01-701-1023 | 1

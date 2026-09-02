@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0010 expect=noViolation domain=AE
+#note "USUBJID Role=Identifier matches; AESEV Role=Timing matches; AECUSTOM is a sponsor item with NO library variable-metadata entry -> var_role(LIBRARY) empty -> the leading not-empty guard keeps it silent. Doubles as the behavioural boundary against CORE-001081, which lacks this guard."
+#library standard=sdtmig version=3-4
+#library variable-metadata AE AESEV name=AESEV role=Timing
+#library variable-metadata AE USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-valid-define.xml
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AESEV   type=Char
+---
+S1 | AE | 001 | 1 | MILD

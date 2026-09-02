@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-AD0253 expect=violation domain=ADAE
+#note "Fix #247 granularity arm: THREE AE keys are missing from ADAE and the result is still exactly ONE dataset-level finding, listing all three inside $untraceable_ae_keys. This is the one-finding constraint asserted on a many-missing fixture rather than argued."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 "$untraceable_ae_keys"="[[CDISCPILOT01, 01-701-1015, 2], [CDISCPILOT01, 01-701-1028, 1], [CDISCPILOT01, 01-701-1034, 1]]"
+dataset ADAE label="Adverse Events Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESEQ   type=Num  label="Sequence Number"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESEQ   type=Num  label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | HEADACHE  | 1
+CDISCPILOT01 | AE | 01-701-1015 | NAUSEA    | 2
+CDISCPILOT01 | AE | 01-701-1028 | RASH      | 1
+CDISCPILOT01 | AE | 01-701-1034 | DIZZINESS | 1
+---

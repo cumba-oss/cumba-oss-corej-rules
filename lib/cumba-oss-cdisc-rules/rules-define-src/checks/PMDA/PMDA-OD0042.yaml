@@ -1,0 +1,17 @@
+Rule_Id: "PMDA-OD0042"
+Sheet_Rule_Identifier: "OD0042"
+Rule_Set: "PMDA"
+Element: "*"
+Attribute: "OrderNumber"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Warning"
+Plain_Text_Rule: "The Order number attribute must be unique."
+# The sheet names no carrier, and OrderNumber legally appears on ItemRef,
+# CodeListItem and EnumeratedItem. The wildcard scope plus per-parent sibling
+# grouping enforces uniqueness inside each container (ItemGroupDef,
+# def:ValueListDef, CodeList) without cross-container false positives; elements
+# without the attribute are skipped.
+Message: "Duplicate Order number [${value}]"
+Check:
+  kind: "unique_among_siblings"
+  attribute: "OrderNumber"

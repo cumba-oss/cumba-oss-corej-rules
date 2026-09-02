@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD0744 expect=noViolation domain=ADLBC
+# Rule:Description: BASETYPE is populated, BTOXGR is populated, and BTOXGR is not equal to ATOXGR where ABLFL is equal to Y for a given value of PARAMCD and BASETYPE for a subject
+#note "BTOXGR=2 vs max(ATOXGR where ABLFL=Y)=2 -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASETYPE type=Char
+col ABLFL type=Char
+col ATOXGR type=Char
+col BTOXGR type=Char
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | LAST | Y | 2 | 2
+---

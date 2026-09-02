@@ -1,0 +1,26 @@
+name: FDA-SE2234-nofire
+kind: rule
+description: |
+  No-fire companion for FDA-SE2234 (supp_qnam). Every BLQ/BQL PC record has a matching SUPPPC
+  PCCALCN supplemental-qualifier record, so the rule does not fire.
+python_source: rules-sendig FDA-SE2234
+rule:
+  coreId: FDA-SE2234
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCSTRESC: BLQ}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 2, PCSTRESC: '5.2'}
+  SUPPPC:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: PC, USUBJID: '001', IDVAR: PCSEQ, IDVARVAL: '1', QNAM: PCCALCN, QVAL: Y}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    findings: [PC]
+expected_violations: []
+expected_errors: []

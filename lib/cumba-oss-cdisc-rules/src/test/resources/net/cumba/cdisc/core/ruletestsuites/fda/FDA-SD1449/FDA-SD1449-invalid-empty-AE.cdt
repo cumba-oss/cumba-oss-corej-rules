@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SD1449 expect=violation domain=AE
+#note "row 1: AEDECOD (Char) empty -> fires; row 2: AESOCCD (Num) missing -> fires; row 3 fully coded -> ok"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AELLT    type=Char label="Lowest Level Term"
+col AELLTCD  type=Num  label="Lowest Level Term Code"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEPTCD   type=Num  label="Preferred Term Code"
+col AEHLT    type=Char label="High Level Term"
+col AEHLTCD  type=Num  label="High Level Term Code"
+col AEHLGT   type=Char label="High Level Group Term"
+col AEHLGTCD type=Num  label="High Level Group Term Code"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+col AESOC    type=Char label="Primary System Organ Class"
+col AESOCCD  type=Num  label="Primary System Organ Class Code"
+---
+S1 | AE | 001 | 1 | NAUSEA   | Nausea   | 10028813 |          | 10028813 | Nausea and vomiting symptoms | 10028817 | Gastrointestinal signs and symptoms | 10017977 | Gastrointestinal disorders | 10017947 | Gastrointestinal disorders | 10017947
+S1 | AE | 001 | 2 | RASH     | Rash     | 10037844 | Rash     | 10037844 | Rashes NEC    | 10037868 | Epidermal conditions | 10014982 | Skin disorders | 10040785 | Skin disorders | .
+S1 | AE | 001 | 3 | HEADACHE | Headache | 10019211 | Headache | 10019211 | Headaches NEC | 10019231 | Headaches | 10019233 | Nervous system disorders | 10029205 | Nervous system disorders | 10029205

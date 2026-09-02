@@ -1,0 +1,128 @@
+Core:
+  Id: "FDA-SD1125"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --TPT and --ELTM are populated but --ELTM does not\
+  \ have the same value across records that share the same value of Planned Time Point\
+  \ Name (--TPT), Time Point Reference (--TPTREF), and/or Visit Number (VISITNUM)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+    - "--TPT"
+Check:
+  expression: >-
+    is_inconsistent_across_dataset(--ELTM, keys=[VISITNUM, --TPTREF, --TPT])
+Outcome:
+  Message: "Inconsistent value for --ELTM: it is not the same value across records\
+    \ with the same --TPT, --TPTREF, and/or VISITNUM."
+  Output_Variables:
+  - "VISITNUM"
+  - "--TPT"
+  - "--ELTM"
+  - "--TPTREF"
+Source:
+  FDA_Validator_Rule_Message: "Inconsistent value for  --ELTM within --TPT, --TPTREF\
+    \ and/or VISITNUM"
+  FDA_Validator_Rule_Description: "All values of Planned Elapsed Time (--ELTM) variable\
+    \ should be the same for a given value of Planned Time Point Name (--TPT) variable,\
+    \ Time Point Reference (--TPTREF) and/or Visit Number (VISITNUM)"
+  Domains: "CO, INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1125"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0241"
+        Version: "1"
+      Version: "2.0"

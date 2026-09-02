@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1004 expect=noViolation domain=DM
+#note "ADAPTED-FROM fda/FDA-SD1004/FDA-SD1004-valid-DM.cdt (verbatim). ARMCD at the 20-character boundary (row 2) is conformant; short and empty (screen-failure) values never fire."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | PBO | Placebo
+S1 | DM | 002 | PLACEBO-RUN-IN-ARM-A | Placebo run-in arm A
+S1 | DM | 003 |  | Screen Failure

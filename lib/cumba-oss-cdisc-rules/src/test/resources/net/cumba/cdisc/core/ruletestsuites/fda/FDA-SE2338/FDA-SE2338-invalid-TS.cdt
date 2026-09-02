@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SE2338 expect=violation domain=TS
+#note "Synthetic SNDIGVER codelist terms taken verbatim from SEND CT C89982. Row 1: bare version number '3.1' instead of the CT submission value -> fires. Row 2: a version that is not in the codelist -> fires. Row 3: the same bare '3.1' string under a different TSPARMCD -> outside the guard, clean. Row 4: valid CT term -> clean."
+#library standard=sendig version=3-1-1
+#library codelist-terms SNDIGVER "SEND IMPLEMENTATION GUIDE VERSION 3.0" "SEND IMPLEMENTATION GUIDE VERSION 3.1" "SEND ANIMAL RULE IMPLEMENTATION GUIDE VERSION 1.0"
+#expectViolationCount 2
+#expectViolationAt row=1 TSVAL=3.1
+#expectViolationAt row=2 TSVAL="SEND IMPLEMENTATION GUIDE VERSION 3.2"
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SNDIGVER | SEND Implementation Guide Version | 3.1
+S1 | TS | 2 | SNDIGVER | SEND Implementation Guide Version | SEND IMPLEMENTATION GUIDE VERSION 3.2
+S1 | TS | 1 | SSPONSOR | Study Sponsor                     | 3.1
+S1 | TS | 3 | SNDIGVER | SEND Implementation Guide Version | SEND IMPLEMENTATION GUIDE VERSION 3.0

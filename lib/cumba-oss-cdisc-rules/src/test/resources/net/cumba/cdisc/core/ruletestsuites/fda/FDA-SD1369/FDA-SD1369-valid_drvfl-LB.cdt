@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1369 expect=noViolation domain=LB
+#note "CL-A A.11 (wave TA-4): the --DRVFL = 'Y' branch was imported from CDISC-CG0549 and is NOT in FDA's sheet - FDA's condition is --ORREF populated, nothing about derived records. Row 1 is a derived record with LBORREF empty and LBSTREFC empty: the old shape fired via the imported branch; the sheet-faithful shape stays silent. Row 2's populated LBORREF with empty LBSTREFC still fires in the invalid scenario."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORREF  type=Char label="Reference Result in Original Units"
+col LBSTREFC type=Char label="Reference Result in Standard Format"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | GLUC |     |     | Y
+S1 | LB | 001 | 2 | ALB  |     | 7.0 | Y

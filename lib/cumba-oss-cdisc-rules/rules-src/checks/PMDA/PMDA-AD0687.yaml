@@ -1,0 +1,43 @@
+Core:
+  Id: "PMDA-AD0687"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Date Device Implanted (DEVIPDT) and Date Device\
+  \ Explanted (DEVXPDT) are both populated and the value of DEVIPDT is greater than\
+  \ the value of DEVXPDT on the same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DEVIPDT"
+    - "DEVXPDT"
+Check:
+  expression: >-
+    not empty(DEVIPDT) and not empty(DEVXPDT) and DEVIPDT > DEVXPDT
+Outcome:
+  Message: "The value of DEVIPDT (Date Device Implanted) is greater than the value\
+    \ of DEVXPDT (Date Device Explanted)."
+  Output_Variables:
+  - "DEVIPDT"
+  - "DEVXPDT"
+Source:
+  Message: "Value of DEVIPDT is greater than value of DEVXPDT"
+  Description: "The value of DEVIPDT (Date Device Implanted) variable must be less\
+    \ or equal to DEVXPDT (Date Device Explanted)"
+  Domains: "ADDL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0687"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-AD0223"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when CHG is populated and does not equal AVAL minus BASE"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "CHG"
+Check:
+  expression: >-
+    not empty(CHG) and CHG != (AVAL - BASE)
+Outcome:
+  Message: "CHG is populated, but does not equal AVAL minus BASE"
+  Output_Variables:
+  - "PARAMCD"
+  - "AVAL"
+  - "BASE"
+  - "CHG"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "CHG"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD for a subject,\
+    \ CHG is populated and is not equal to AVAL - BASE"
+  Rule_Failure_Criteria: "CHG is not equal to AVAL - BASE"
+  Condition_Failure: "CHG is populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR223"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR223"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR223"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR223"
+        Version: "1"
+      Version: "5.0"

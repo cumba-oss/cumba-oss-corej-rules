@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0278 expect=violation domain=LB
+#note "LB is submitted with its full column set but ZERO records ($records_in_dataset = 0) -> one dataset-level violation. This is the whole intent of SEND278: empty dataset files must not be included in a SEND submission. The CDISC-SEND family's only no-records rule, previously untested; it decides on the record count alone (BroadcastFold, totalViolationCount = -1) and is the ONE rule that reports an empty dataset under the zero-row policy (PLAN-zero-row-routing-rekey.md, zero-row-policy.md)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---

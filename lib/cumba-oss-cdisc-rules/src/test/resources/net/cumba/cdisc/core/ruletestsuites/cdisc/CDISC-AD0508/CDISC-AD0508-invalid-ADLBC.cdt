@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-AD0508 expect=violation domain=ADLBC
+# Rule:Description: A variable ending in TMF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Time"
+#note "ATMF has no Imputation-Flag suffix; BTMF has the suffix but no "Time"; CTMF carries the phrase but not at the END; DTMF and FTMF differ from a passing label only in CASE -> five violations"
+#expectViolationCount 5
+#expectViolationAt variable_label="Time Flag" variable_name=ATMF
+#expectViolationAt variable_label="Analysis Imputation Flag" variable_name=BTMF
+#expectViolationAt variable_label="Time Imputation Flag Extra" variable_name=CTMF
+#expectViolationAt variable_label="Analysis Time imputation Flag" variable_name=DTMF
+#expectViolationAt variable_label="Analysis time Imputation Flag" variable_name=FTMF
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ATMF type=Char label="Time Flag"
+col BTMF type=Char label="Analysis Imputation Flag"
+col CTMF type=Char label="Time Imputation Flag Extra"
+col DTMF type=Char label="Analysis Time imputation Flag"
+col FTMF type=Char label="Analysis time Imputation Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x | x
+---

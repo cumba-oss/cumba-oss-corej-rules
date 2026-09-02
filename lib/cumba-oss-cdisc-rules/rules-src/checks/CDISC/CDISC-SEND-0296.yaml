@@ -1,0 +1,76 @@
+Core:
+  Id: "CDISC-SEND-0296"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a non-empty value is not a term in the non-extensible\
+  \ CDISC controlled terminology codelist the CDISC Library defines for the variable.\
+  \ A variable must be populated with terms from its CDISC controlled-terminology\
+  \ codelist; new terms cannot be added to a non-extensible codelist."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_codelist_extensible("LIBRARY") == false and not empty(var_codelist_coded_values("LIBRARY"))
+    and not empty(value()) and value() not in var_codelist_coded_values("LIBRARY")
+Outcome:
+  Message: "The value is not a term in the non-extensible CDISC controlled terminology\
+    \ codelist the CDISC Library defines for this variable."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "The CDISC published Controlled Terminology indicates whether\
+    \ a particular codelist is extensible or not. New terms cannot be added into non-extensible\
+    \ codelists."
+  Condition: "CDISC published Controlled Terminology indicates that a codelist is\
+    \ non-extensible"
+  Rule: "Only terms from the CDISC published Controlled Terminology codelist are used"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND296"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND296"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND296"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND296"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND296"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1114 expect=violation domain=AE
+#note "AEBODSYS 'Cardiac things' is not a System Organ Class of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid SOC (membership stays case-folded via the rule's authored case_sensitive: false, D-TA-3 / Fix #266)."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AEBODSYS="Cardiac things"
+dataset AE
+col USUBJID  type=Char
+col AEBODSYS type=Char
+---
+001 | Nervous system disorders
+001 | Cardiac things

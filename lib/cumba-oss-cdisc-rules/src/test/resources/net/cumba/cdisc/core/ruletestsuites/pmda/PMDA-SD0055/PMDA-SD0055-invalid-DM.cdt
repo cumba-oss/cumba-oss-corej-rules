@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0055 expect=violation domain=DM
+#note "AGE is submitted as a character variable although the SDTM Library defines it as numeric -> fires on AGE. AGEU/SEX match, and STUDYID/USUBJID carry no Library type so the non_empty guard excludes them."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM AGE  name=AGE  simpleDatatype=Num  label="Age"
+#library variable-metadata DM AGEU name=AGEU simpleDatatype=Char label="Age Units"
+#library variable-metadata DM SEX  name=SEX  simpleDatatype=Char label="Sex"
+#expectViolationCount 1
+#expectViolationAt variable_name=AGE
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Char label="Age"
+col AGEU    type=Char label="Age Units"
+col SEX     type=Char label="Sex"
+---
+S1 | 001 | 56 | YEARS | M

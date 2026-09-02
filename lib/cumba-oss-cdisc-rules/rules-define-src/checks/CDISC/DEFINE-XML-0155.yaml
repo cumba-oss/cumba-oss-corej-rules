@@ -1,0 +1,32 @@
+Rule_Id: "DEFINE-XML-0155"
+Sheet_Rule_Identifier: "155"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef/ItemRef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "All variable definitions must have a  def:Origin child element when there is no def:ValueListRef child element. When there is a def:ValueListRef either the variable definition must have a def:Origin or it must be provided for each ItemDef referenced in the def:ValueLIstDef."
+# "Variable definitions" are the ItemDefs referenced from an ItemGroupDef — a
+# reverse join, so the rule is scoped to ItemGroupDef/ItemRef with the 0124-B
+# fire-always vehicle. Covered branch: the referenced ItemDef has neither a
+# def:Origin nor a def:ValueListRef. Deviations (documented): (1) the second
+# branch — def:ValueListRef present but some value-level ItemDef in the value
+# list lacks a def:Origin — needs a universal quantifier over a dereferenced
+# node set — now shipped separately as DEFINE-XML-0155-B via the 0142-style
+# reverse join (review-batch-d deferral verdict). (2) def:Origin presence is
+# proxied by its required Type attribute (a dereferenced element-terminal path
+# reads text, not presence), so an Origin missing its Type fires here alongside
+# sheet id 158. (3) deref is FIRST-REFERRER-ONLY: an ItemDef referenced by
+# several parents is attributed to the first ItemRef in document order.
+Message: "There must be a def:Origin defined at the variable or value level for the ItemDef referenced from ItemGroupDef/ItemRef."
+Check:
+  kind: "not_exists"
+  target: "@ItemOID"
+  when:
+    all:
+    - path: "@ItemOID->ItemDef@OID/@OID"
+      exists: true
+    - path: "@ItemOID->ItemDef@OID/Origin/@Type"
+      exists: false
+    - path: "@ItemOID->ItemDef@OID/ValueListRef/@ValueListOID"
+      exists: false

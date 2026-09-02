@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0215 expect=violation domain=ADSL
+#note "Pins finding AD0215-F2 and the per-column granularity at 2: RACEGR10 and RACEGR10N both capture a two-digit index and neither can be parsed by ^RACEGR[1-9]N?$ (the class consumes '1' and leaves '0N'), so BOTH fire; RACEGR9 is conformant."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt variable_name=RACEGR10
+#expectViolationAt variable_name=RACEGR10N
+dataset ADSL
+col STUDYID   type=Char
+col USUBJID   type=Char
+col RACEGR10  type=Char
+col RACEGR10N type=Num
+col RACEGR9   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | WHITE | 1 | ASIAN

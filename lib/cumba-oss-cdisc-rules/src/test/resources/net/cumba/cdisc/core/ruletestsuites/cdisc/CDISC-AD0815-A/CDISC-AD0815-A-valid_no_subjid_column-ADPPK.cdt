@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0815-A expect=noViolation domain=ADPPK
+#note "Neither SUBJID nor SUBJIDN is declared. The sister is conditional on SUBJID being present (var_exists(\"SUBJID\")), so there is nothing to pair and it stays silent; a missing SUBJID is a Required-variable presence rule's finding."
+#expectViolationCount 0
+# Declared-tier scope: structure=/subclass= state the ADaM data structure and the popPK subclass this
+# minimal table stands for; #define is their mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADPPK structure=BDS subclass=POPPK
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+---

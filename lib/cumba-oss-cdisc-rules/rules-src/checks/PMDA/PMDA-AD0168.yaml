@@ -1,0 +1,74 @@
+Core:
+  Id: "PMDA-AD0168"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Baseline Reference Range Indicator (BNRIND)\
+  \ value does not equal the Analysis Reference Range Indicator (ANRIND) value taken\
+  \ from the baseline record (ABLFL equals Y) for the same USUBJID, PARAMCD and BASETYPE;\
+  \ the baseline normal range indicator must equal the analysis normal range indicator\
+  \ of the baseline record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "BNRIND"
+Operations:
+- id: "$baseline_anrind"
+  expression: "max(ANRIND, group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL=\"\
+    Y\"))"
+Check:
+  expression: >-
+    var_exists("BASETYPE") and not empty(BNRIND) and BNRIND != $baseline_anrind
+Outcome:
+  Message: "BNRIND does not equal the baseline-record ANRIND."
+  Output_Variables:
+  - "ANRIND"
+  - "BNRIND"
+  - "ABLFL"
+Source:
+  Message: "ABLFL = Y, but BNRIND != ANRIND"
+  Description: "If the record is flagged as the baseline (ABLFL = Y), then the baseline\
+    \ normal range indicator (BNRIND) value must equal the analysis normal range indicator\
+    \ (ANRIND) value."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0168"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0168"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0168"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0168"
+        Version: "1"
+      Version: "6.0"

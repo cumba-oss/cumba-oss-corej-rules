@@ -1,0 +1,41 @@
+Core:
+  Id: "FDA-SE2251"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Unplanned Repro Stage (SJUPDES) is\
+  \ empty or not present while Repro Stage Code (RSTGCD) equals 'UNPLAN'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SJ"
+Requirements:
+  Variables:
+    All:
+    - "SJUPDES"
+    - "RSTGCD"
+Check:
+  expression: >-
+    RSTGCD == "UNPLAN" and empty(SJUPDES)
+Outcome:
+  Message: "SJUPDES is empty or not present when RSTGCD equals 'UNPLAN'."
+  Output_Variables:
+  - "RSTGCD"
+  - "SJUPDES"
+Source:
+  FDA_Validator_Rule_Message: "Missing value for SJUPDES, when RSTGCD='UNPLAN'"
+  FDA_Validator_Rule_Description: "Description of Repro Stage (SJUPDES) should be\
+    \ populated, when a subject's experience for a particular period of time is represented\
+    \ as an unplanned Repro Stage, where Repro Stage Code (RSTGCD) is equal to 'UNPLAN'."
+  Domains: "SJ"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2251"
+        Version: "1"
+      Version: "1.6"

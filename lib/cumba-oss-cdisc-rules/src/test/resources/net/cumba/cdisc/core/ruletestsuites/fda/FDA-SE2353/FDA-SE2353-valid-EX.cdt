@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2353 expect=noViolation domain=EX
+#note "Every administered dose (EXDOSE greater than zero) names its lot; the zero-dose vehicle record on row 3 may leave EXLOT empty, and so may the record with a missing dose on row 4."
+#library standard=sendig version=3-1-1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+col EXDOSE  type=Num  label="Dose per Administration"
+col EXLOT   type=Char label="Lot Number"
+---
+S1 | EX | 001 | 1 | TEST ARTICLE | 10 | LOT-001
+S1 | EX | 001 | 2 | TEST ARTICLE | 20 | LOT-002
+S1 | EX | 001 | 3 | VEHICLE      | 0  |
+S1 | EX | 001 | 4 | VEHICLE      | .  |

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2016 expect=violation domain=AE
+#note "AESOCCD 7654321 is not a System Organ Class code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid SOC code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AESOCCD=7654321
+dataset AE
+col USUBJID type=Char
+col AESOC   type=Char
+col AESOCCD type=Num
+---
+001 | Gastrointestinal disorders | 10017947
+001 | Gastrointestinal disorders | 7654321

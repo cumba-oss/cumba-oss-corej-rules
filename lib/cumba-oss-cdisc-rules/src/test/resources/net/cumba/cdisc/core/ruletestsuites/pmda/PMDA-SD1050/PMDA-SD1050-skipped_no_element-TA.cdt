@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1050 expect=skipped domain=TA
+#note "ELEMENT is absent from TA, so Requirements.Variables.All [ETCD, ELEMENT] gates the rule to SKIPPED. This asserts the SKIP itself, not a would-otherwise-fire: without the gate, GroupSemantics.relationshipNotUniqueViolations would find its value-column list empty and return an empty BitSet, i.e. silence either way -- but expect=skipped is the honest contract and noViolation would pass vacuously. Both rows share the same ETCD (SCRN) so there is visibly something to check."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A1 | Drug A  | 1 | SCRN
+S1 | TA | A2 | Placebo | 1 | SCRN

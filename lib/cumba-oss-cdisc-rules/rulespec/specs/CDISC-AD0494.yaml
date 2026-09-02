@@ -1,0 +1,34 @@
+name: CDISC-AD0494
+kind: rule
+description: |
+  Wave A7 port — T1a PlainSimple.
+  CDISC-AD0494: ABLFL is equal to "N".
+  Record-data rule scoped to BDS; equal_to literal check. Baselined on Python lane:
+  Check is a bare leaf (no all/any/not wrapper) — Python's business_rules library
+  raises KeyError: 'name' on this shape (Finding #26 / §0b point 4). Expected
+  matches Java's output.
+python_source: rules-adamig-1-3.json (CDISC-AD0494)
+rule:
+  coreId: CDISC-AD0494
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, ABLFL: 'Y'}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 2, ABLFL: 'N'}   # bad
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0494
+    dataset: ADLB
+    row_key: {AVISITN: 2, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ABLFL: 'N'
+expected_errors: []

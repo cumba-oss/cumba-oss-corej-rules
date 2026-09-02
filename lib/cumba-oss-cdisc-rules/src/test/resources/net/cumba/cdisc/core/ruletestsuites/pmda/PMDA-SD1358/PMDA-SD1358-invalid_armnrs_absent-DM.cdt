@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1358 expect=violation domain=DM
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (1 here). CORRECTION: ARMNRS is Expected in SDTMIG 3.4 DM, not Permissible as this note once claimed (refuted by the M2-D24 dossier). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: ARMNRS is Permissible and ABSENT altogether - the strongest possible form of 'ARMNRS is not populated' - yet the machine-emitted var_exists(ARMNRS) conjunct makes the leaf false and the rule stays SILENT; with no Requirements.Variables gate the silence is not auditable. Pins CURRENT behaviour (finding SD1358-F1 / SD1359-F1; EC-43 / Fix #126). DECISION-LANE-SENSITIVE: flips to expect=skipped if the lane adds Requirements.Variables.All ['ARMNRS']. FRESH - no twin equivalent (fda/FDA-SD1358 has no absent-column fixture)."
+#expectViolationCount 1
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 |   |

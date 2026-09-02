@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD2013 expect=violation domain=MH
+#note "MHHLGTCD 1111111 is not a High Level Group Term code of the (dummy) MedDRA dictionary -> fires on row 2; row 1 is a valid HLGT code."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 MHHLGTCD=1111111
+dataset MH
+col USUBJID  type=Char
+col MHHLGT   type=Char
+col MHHLGTCD type=Num
+---
+001 | Headaches | 10019233
+001 | Headaches | 1111111

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0125B expect=violation domain=ADLBC
+#note "Category number 1 carries both VITALS and VITALSIGNS; VITALS is the strict majority so row 3 alone fires."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 PARCAT1=VITALSIGNS PARCAT1N=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARCAT1 type=Char
+col PARCAT1N type=Num
+---
+S1 | 001 | SYSBP | VITALS | 1
+S1 | 002 | SYSBP | VITALS | 1
+S1 | 003 | SYSBP | VITALSIGNS | 1
+S1 | 001 | ALB | CHEMISTRY | 2
+S1 | 002 | ALB | CHEMISTRY | 2

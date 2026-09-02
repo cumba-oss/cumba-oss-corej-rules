@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0089"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --OCCUR is populated but --PRESP is not equal to\
+  \ 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "AE"
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--OCCUR"
+Check:
+  expression: >-
+    not empty(--OCCUR) and (not var_exists("--PRESP") or --PRESP != "Y")
+Outcome:
+  Message: "--PRESP must be equal to 'Y' when --OCCUR is populated."
+  Output_Variables:
+  - "--PRESP"
+  - "--OCCUR"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(AE, DS, DV, EX)"
+  Variable: "--PRESP"
+  Condition: "--OCCUR ^= null"
+  Rule: "--PRESP = 'Y'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0089"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0089"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0089"
+        Version: "1"
+      Version: "2.0"

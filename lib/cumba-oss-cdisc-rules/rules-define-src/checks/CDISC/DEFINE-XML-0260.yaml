@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0260"
+Sheet_Rule_Identifier: "260"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "Repeating"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "The value of the Repeating attribute must be 'No', when IsReferenceData='Yes'."
+Message: "The value of Repeating [${value}] must be 'No' when IsReferenceData='Yes'."
+Check:
+  kind: "one_of"
+  attribute: "Repeating"
+  values: ["No"]
+  when:
+    path: "@IsReferenceData"
+    equals: "Yes"

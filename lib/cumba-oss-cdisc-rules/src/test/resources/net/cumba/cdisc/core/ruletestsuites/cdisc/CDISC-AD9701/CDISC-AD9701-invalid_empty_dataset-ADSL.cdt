@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-AD9701 expect=violation domain=ADSL
+#note "ADSL is submitted with its column set but ZERO records ($records_in_dataset = 0) -> one dataset-level violation. CDISC-AD9701 is the minted (no sheet parent; sheet issue drafted under PLAN-zero-row-routing-rekey.md phase 3, the coordinator files) no-records rule for cdisc-adamig-1-0..1-3, the ADaM counterpart of CG0408 / SEND278: under the zero-row policy (PLAN-zero-row-routing-rekey.md, owner ruling 6c-3: an empty ADaM dataset IS an error case) an empty dataset is reported ONCE, by this rule, decided on the record count alone (BroadcastFold, never the row path)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+dataset ADSL label="Subject-Level Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col TRT01P  type=Char label="Planned Treatment for Period 01"
+---

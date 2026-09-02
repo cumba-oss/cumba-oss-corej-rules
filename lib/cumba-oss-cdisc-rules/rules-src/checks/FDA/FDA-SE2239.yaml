@@ -1,0 +1,76 @@
+Core:
+  Id: "FDA-SE2239"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Result Category (--RESCAT) is populated and is identical\
+  \ to the value of Test Name (--TEST), Category (--CAT), or Subcategory (--SCAT)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CL"
+Requirements:
+  Variables:
+    All:
+    - "--RESCAT"
+Check:
+  expression: >-
+    not empty(--RESCAT) and (var_exists("--TEST") and --RESCAT == --TEST or var_exists("--CAT") and
+    --RESCAT == --CAT or var_exists("--SCAT") and --RESCAT == --SCAT)
+Outcome:
+  Message: "--RESCAT is identical to --TEST, --CAT, or --SCAT; Result Category should\
+    \ not duplicate those values."
+  Output_Variables:
+  - "--TEST"
+  - "--CAT"
+  - "--SCAT"
+  - "--RESCAT"
+Source:
+  FDA_Validator_Rule_Message: "--RESCAT value is redundant with other variable values"
+  FDA_Validator_Rule_Description: "Value of Result Category (--RESCAT) should not\
+    \ be identical to that in Test Name (--TEST); Category (--CAT); and/or Subcategory\
+    \ (--SCAT)."
+  Domains: "CL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2239"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2239"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2239"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2239"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2239"
+        Version: "1"
+      Version: "1.6"

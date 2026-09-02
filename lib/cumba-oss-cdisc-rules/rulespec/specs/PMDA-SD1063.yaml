@@ -1,0 +1,57 @@
+name: PMDA-SD1063
+kind: rule
+description: |
+  PLAN-parity-define-dataset-channel P5b — the FIRST executable coverage of ANY kind for
+  `PMDA-SD1063`. Unlike its FDA twin the PMDA rule has **no `.cdt` scenarios and no other
+  executable coverage anywhere in the tree**, so this spec is not an extra cross-engine pin on
+  top of an existing one — it is the only thing that runs the rule at all.
+
+  `PMDA-SD1063` and `FDA-SD1063` are byte-identical in every executable field (Scope, Operations,
+  Check, Outcome, Sensitivity `Dataset`, Rule_Type `Dataset Metadata Check`); only the Core.Id,
+  the Description's provenance and the Authorities differ. The fixture is therefore deliberately
+  identical to `FDA-SD1063`'s so a divergence between the two specs can only mean the corpus
+  entries have drifted apart — which is a fact worth catching.
+
+  Fixture: the study ships AE and VS; the Define declares VS only, so the submitted AE is not
+  described in the Define and the rule fires once. AE is the PRIMARY because both lanes only ever
+  report the primary dataset's bucket (Java evaluates the primary table; the Python adapter
+  filters to the primary domain), so an offending non-primary dataset would give Java 0 and a
+  silently broken fixture.
+
+  Both lanes report the same single violation, byte-identical — no `parity-diff-baseline.json`
+  entry.
+
+  For the full rationale behind every choice here — why the Define reaches this rule only through
+  the `define_dataset_names` OPERATION and not through any dataset builder (so Fix #132 / EC-41
+  cannot move it), why only the sink-backed `define_dataset_label` is declared, why
+  `define_dataset_name` / `define_dataset_location` are left to D4's derivation, and what this
+  shape does NOT pin (the §3.5 empty-name-list trap, guarded by `FDA-SD1063-declared` and
+  `FDA-SD0061`) — see the sibling `FDA-SD1063.yaml`. It is not repeated here so the two cannot
+  drift out of step.
+python_source: rules-pmda-sdtmig-3-4.json (PMDA-SD1063)
+rule:
+  coreId: PMDA-SD1063
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: VS, USUBJID: '001', VSSEQ: 1, VSTESTCD: SYSBP}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+define_xml:
+  VS:
+    define_dataset_label: VS
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: PMDA-SD1063
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      dataset_name: AE
+expected_errors: []

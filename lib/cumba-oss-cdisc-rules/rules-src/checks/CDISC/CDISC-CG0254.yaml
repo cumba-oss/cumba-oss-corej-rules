@@ -1,0 +1,51 @@
+Core:
+  Id: "CDISC-CG0254"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TIVERS is not present and IETESTCD is not unique\
+  \ within the TI dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TI"
+Check:
+  expression: >-
+    not var_exists("TIVERS") and not is_unique_set([IETESTCD, DOMAIN])
+Outcome:
+  Message: "IETESTCD is not unique within the dataset."
+  Output_Variables:
+  - "IETESTCD"
+Source:
+  Class: "TDM"
+  Domain: "TI"
+  Variable: "TIVERS"
+  Condition: "Greater than one version of the IE criteria"
+  Rule: "TIVERS present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0254"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0254"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0254"
+        Version: "1"
+      Version: "2.0"

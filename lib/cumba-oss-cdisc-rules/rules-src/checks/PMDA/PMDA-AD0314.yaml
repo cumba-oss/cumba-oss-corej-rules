@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0314"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an Original/Prior MedDRA Coding variable (DECDORGy,\
+  \ BDSYORGy, HLGTORGy, HLTORGy, LLTORGy, LLTNORGy) carries a single-digit 'y' index\
+  \ that is not in the range [1-9]. The 'y' suffix denotes a previous MedDRA version,\
+  \ so it must be 1-9; the only illegal single-digit value is 0."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    varname() =~ /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)\\d$/ and varname() !~
+    /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)[1-9]$/
+Outcome:
+  Message: "An Original/Prior MedDRA Coding variable (*ORGy: DECDORGy, BDSYORGy, HLGTORGy,\
+    \ HLTORGy, LLTORGy, LLTNORGy) has a single-digit 'y' index outside [1-9]."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: y is not in [1-9] for original or prior MedDRA\
+    \ coding variables of form *ORGy"
+  Description: "Original or Prior MedDRA Coding (DECDORGy, BDSYORGy, HLGTORGy, HLTORGy,\
+    \ LLTORGy, LLTNORGy) variables should have the suffix 'y' which represents an\
+    \ integer [1-9] corresponding to a previous version."
+  Domains: "ADAE"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0314"
+        Version: "1"
+      Version: "6.0"

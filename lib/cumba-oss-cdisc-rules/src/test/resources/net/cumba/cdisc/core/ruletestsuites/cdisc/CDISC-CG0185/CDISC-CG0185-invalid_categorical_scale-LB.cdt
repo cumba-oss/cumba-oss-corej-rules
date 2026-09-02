@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0185 expect=violation domain=LB
+#note "FRESH. Rows 1 and 2 record a legitimately CATEGORICAL toxicity scale, which the sheet Condition ('Numeric scale used') excludes from the rule - and the Check cannot read that condition, so it reports them anyway. This fixture encodes CURRENT AND CORRECT-AS-SHIPPED behaviour and is GREEN, not a D9 red. It exists as the in-tree evidence for finding CG0185-F1: it is exactly the over-reporting that CDISC-CG0185's Executability label names and that FDA-SD1298 / PMDA-SD1298's plainer label does not."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBTOXGR=MILD
+#expectViolationAt row=2 LBTOXGR=MODERATE
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOXGR  type=Char label="Standard Toxicity Grade"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB   | MILD
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC  | MODERATE
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | 3

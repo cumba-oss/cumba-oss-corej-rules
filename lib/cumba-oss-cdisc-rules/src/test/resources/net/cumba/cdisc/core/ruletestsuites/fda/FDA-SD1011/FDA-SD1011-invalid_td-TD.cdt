@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1011 expect=violation domain=TD
+#note "The rule's variable list also names the four TD trial-design interval variables by their full name. TDTGTPAI='2 weeks' on row 1 is not an ISO 8601 duration; TDSTOFF/TDMINPAI/TDMAXPAI are valid."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TDORDER  type=Num  label="Order of Assessment Schedule"
+col TDANCVAR type=Char label="Anchor Variable Name"
+col TDSTOFF  type=Char label="Offset from the Anchor"
+col TDTGTPAI type=Char label="Planned Assessment Interval"
+col TDMINPAI type=Char label="Planned Assessment Interval Minimum"
+col TDMAXPAI type=Char label="Planned Assessment Interval Maximum"
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | P0D | 2 weeks | P12D | P16D

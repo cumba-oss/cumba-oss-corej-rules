@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0273 expect=violation domain=ADAE
+#note "AOCC00FL matches ^AOCC\d\dFL$ and fails ^AOCC(0[1-9]|[1-9]\d)FL$ -> fires; AOCC01FL satisfies both -> silent."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=AOCC00FL
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col AOCC00FL type=Char
+col AOCC01FL type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | Y | Y

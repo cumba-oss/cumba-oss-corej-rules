@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0366A expect=noViolation domain=ADSL
+#note "Negative control on the same header and columns. Isolates BOTH conjuncts: rows 1 and 2 are randomised subjects with a populated RANDDT, and row 3 has a blank RANDDT that is fine because RANDFL is not Y. The rule executes - both RANDDT and RANDFL are declared, so Requirements.Variables.All is satisfied."
+#library standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col RANDFL  type=Char
+col RANDDT  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Y | 21915
+CDISCPILOT01 | 01-701-1023 | Y | 22281
+CDISCPILOT01 | 01-701-1034 | N |

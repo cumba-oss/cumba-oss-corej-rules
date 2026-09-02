@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0013 expect=violation domain=VS
+#note "VSCUSTOM is a sponsor-defined variable that is not in the SDTM model list of allowed variables for the class -> one finding for the offending variable. (Authorable since the harness serves #library model-column-order through getStandardModelVariables.)"
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSGRPID VSTESTCD VSTEST VSCAT VSPOS VSORRES VSORRESU
+#expectViolationCount 1
+#expectViolationAt row=8 variable_name=VSCUSTOM
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSCUSTOM type=Char label="Sponsor Defined Variable"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120 | X
+---

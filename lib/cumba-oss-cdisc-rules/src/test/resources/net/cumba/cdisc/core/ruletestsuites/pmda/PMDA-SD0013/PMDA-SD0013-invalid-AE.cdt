@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0013 expect=violation domain=AE
+#note "Row 2's AESTDTC is after AEENDTC -> fires. Row 1 is ordered correctly."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | 2026-01-01 | 2026-01-10
+S1 | AE | 001 | 2 | 2026-01-10 | 2026-01-01

@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1369 expect=violation domain=LB
+#note "Row 1: LBORREF populated but LBSTREFC empty -> fires via the --ORREF branch. Row 2: both populated -> no fire. Row 3: both empty, not derived -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORREF  type=Char label="Reference Result in Original Units"
+col LBSTREFC type=Char label="Reference Result in Standard Format"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | GLUC | 4.5 |     |
+S1 | LB | 001 | 2 | ALB  | 3.8 | 3.8 |
+S1 | LB | 001 | 3 | HGB  |     |     |

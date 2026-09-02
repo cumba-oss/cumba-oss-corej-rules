@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1012 expect=violation domain=TA
+#note "TA is also in scope: row 2 uses ETCD=RECOV unknown to TE -> the ETCD/ELEMENT combination matches no TE entry. Row 1 matches and must not fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=RECOV
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | A1 | Placebo | 1 | SCRN  | Screening
+CDISCPILOT01 | TA | A1 | Placebo | 2 | RECOV | Recovery
+---
+
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening
+CDISCPILOT01 | TE | TRT  | Treatment

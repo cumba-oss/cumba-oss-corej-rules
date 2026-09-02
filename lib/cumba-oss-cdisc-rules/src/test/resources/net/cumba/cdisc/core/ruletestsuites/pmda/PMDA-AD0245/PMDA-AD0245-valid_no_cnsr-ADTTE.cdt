@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0245 expect=noViolation domain=ADTTE
+#note "Isolates the leading `var_exists(\"CNSR\")` conjunct: neither CNSR nor STARTDT is declared, so the rule's trigger variable is absent and the rule executes silently - a BDS dataset with no censoring variable owes no analysis start date."
+#library standard=adamig version=1-3
+dataset ADTTE structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ADT     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | TTDEATH | 120 | 22035
+CDISCPILOT01 | 01-701-1023 | TTDEATH | 300 | 22215

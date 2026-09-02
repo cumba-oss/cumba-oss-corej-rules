@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2238 expect=skipped domain=CM
+#note "No CMSTTPT column -> Requirements.Variables.All [--STTPT] rejects (auditable skip). The [DE, DT, DX, EC, HO, PR] Domains.Exclude block is sheet-exact but not separately pinned - CM/AE cover the live classes and the block's members are largely non-base-IG tokens (DE/DT/DX) plus EC/HO/PR; the batch pins one exclude-block per distinct set and this rule's set has no twin-discriminating force beyond SD1293/SD0041's already-pinned mechanism."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTDTC  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN | 2020-01-15
+---

@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0002 expect=violation domain=LB
+#note "Companion to FDA-SD0018-valid_empty_testcd-LB: an empty LBTESTCD (Char, Req in SDTMIG 3.4) is a populated-ness defect owned by THIS rule, not a value-format defect of FDA-SD0018 - same data shape, the finding lands here."
+#library standard=sdtmig version=3-4
+#library required-variables LB STUDYID DOMAIN USUBJID LBSEQ LBTESTCD
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=LBTESTCD
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB
+CDISCPILOT01 | LB | 01-701-1015 | 2 |
+---

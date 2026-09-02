@@ -1,0 +1,43 @@
+name: EMPTYSTR-within-multiple-values-for
+kind: check_operator
+description: |
+  Empty-string `within` key for has_multiple_values_for.
+
+  ⭐⭐ RE-BASELINED by W32-E3 (owner ruling, 2026-08-12). This spec used to assert
+  the opposite, and its own words were: 'A "" within value is a REAL value, not a
+  genuine missing: Java's DataValueString "" is not a MissingValue, so
+  IndexHelper.isBlockKeyMissing is false and the "" group is KEPT (not dropped).
+  Within that "" group the key VSTESTCD=K1 maps to two distinct dependents
+  {D1, D2}, so both ""-within rows fire.' That was an accurate description of the
+  shipped engine and is now false BY RULING: "" is blank wherever a MissingValue
+  is, so the ""-within group is DROPPED and neither row fires.
+  ⇒ expected_violations is now EMPTY.
+
+  ⚑ The fixture is deliberately UNCHANGED — it still contrasts a ""-within group
+  against a populated 'V1' group, so it still discriminates; the ""-group half
+  simply moved from 'fires' to 'dropped'.
+
+  ⚠ coreJ now DIVERGES from the fork here (java-only-accepted, per the Java-first
+  direction of 2026-08-03). No baseline entry is added: the fork is being retired
+  and W37-B2 freezes the existing python-lane entries as historical.
+python_source: PLAN-python-has-multiple-values-for.md (§8.3, Q1 edge)
+check:
+  name: VSTEST
+  operator: has_multiple_values_for
+  value: VSTESTCD
+  within: VISIT
+datasets:
+  VS:
+    row_key: [STUDYID, USUBJID, VSSEQ]
+    rows:
+      # "" within group: W32-E3 -> the group is now DROPPED, neither row fires
+      # (was: VSTESTCD='K1' -> {D1,D2} -> both fire)
+    - {STUDYID: S1, USUBJID: '001', VSSEQ: 1, VISIT: '', VSTESTCD: K1, VSTEST: D1}
+    - {STUDYID: S1, USUBJID: '001', VSSEQ: 2, VISIT: '', VSTESTCD: K1, VSTEST: D2}
+      # 'V1' within group: VSTESTCD='K2' -> {D5} -> single -> no fire
+    - {STUDYID: S1, USUBJID: '001', VSSEQ: 3, VISIT: V1, VSTESTCD: K2, VSTEST: D5}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations: []
+expected_errors: []

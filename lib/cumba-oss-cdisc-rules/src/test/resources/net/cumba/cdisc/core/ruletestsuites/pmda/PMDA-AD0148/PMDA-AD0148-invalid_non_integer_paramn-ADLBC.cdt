@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0148 expect=violation domain=ADLBC
+#note "PARAMCD makes ADLBC BASIC DATA STRUCTURE. Row 1's PARAMN is fractional so is_integer is false and the rule fires; row 2 is a whole number."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 PARAMN=1.5
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAMN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 1.5
+CDISCPILOT01 | 01-701-1015 | DIABP | 2

@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD0046 expect=violation domain=SQAE
+#note "Pins the SECOND Domains.Include token. 'SQAE' is 4 characters beginning 'SQ', which is exactly what SQ-- means (ScopeMatcher, prefix + 2). Include matching is against the RAW dataset name so the split-base path is not involved. The AESOSP group is a 1-vs-1 tie, so both rows fire. Second SQ-- fixture corpus-wide (after pmda/PMDA-SD1365/PMDA-SD1365-invalid_sq_dataset-SQDM.cdt). No DOMAIN column and no class= key."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 QNAM=AESOSP QLABEL="Other Medically Important SAE"
+#expectViolationAt row=2 QNAM=AESOSP QLABEL="Other Serious Event"
+dataset SQAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP  | Other Medically Important SAE | Y
+S1 | AE | 002 | AESEQ | 1 | AESOSP  | Other Serious Event           | Y
+S1 | AE | 001 | AESEQ | 2 | AETRTEM | Treatment Emergent Flag       | Y

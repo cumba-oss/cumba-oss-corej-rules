@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1470 expect=violation domain=LB
+#note "Row 1's result matches the numeric pattern and is silent; row 2's does not, and LBORNRLO is populated, so it fires. Record-sensitivity rule over the raw data table: pin by row= plus the two projected output variables."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 LBORRES=POSITIVE LBORNRLO=3.9
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+col LBORNRLO type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 12.5     | 3.9
+S1 | LB | 002 | 2 | GLUC | POSITIVE | 3.9
+---

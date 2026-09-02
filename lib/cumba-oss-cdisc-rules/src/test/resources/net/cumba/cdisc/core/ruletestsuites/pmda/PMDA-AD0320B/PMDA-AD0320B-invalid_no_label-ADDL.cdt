@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0320B expect=violation domain=ADDL
+#note "No label= attribute at all. ds_label("DATA") is a CALL, not a direct column, so no absent-column guard is derived -> fires."
+#expectViolationCount 1
+#library standard=adamig version=1-3
+dataset ADDL
+col STUDYID type=Char
+col USUBJID type=Char
+col SPDEVID type=Char
+---
+CDISCPILOT01 | 01-701-1015 | DEV01
+---

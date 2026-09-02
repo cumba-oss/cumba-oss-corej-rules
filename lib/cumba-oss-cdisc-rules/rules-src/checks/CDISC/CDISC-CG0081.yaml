@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-CG0081"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --PRESP is equal to 'Y' and --OCCUR is empty but\
+  \ --STAT is not equal to 'NOT DONE'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--STAT"
+    - "--PRESP"
+    - "--OCCUR"
+Check:
+  expression: >-
+    --PRESP == "Y" and empty(--OCCUR) and --STAT != "NOT DONE"
+Outcome:
+  Message: "--STAT does not equal 'NOT DONE' when --PRESP equals 'Y' and --OCCUR is\
+    \ empty."
+  Output_Variables:
+  - "--PRESP"
+  - "!--OCCUR"
+  - "--STAT"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(DS, DV, EX)"
+  Variable: "--STAT"
+  Condition: "--PRESP = 'Y' and --OCCUR = null"
+  Rule: "--STAT = 'NOT DONE'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0081"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0081"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0081"
+        Version: "1"
+      Version: "2.0"

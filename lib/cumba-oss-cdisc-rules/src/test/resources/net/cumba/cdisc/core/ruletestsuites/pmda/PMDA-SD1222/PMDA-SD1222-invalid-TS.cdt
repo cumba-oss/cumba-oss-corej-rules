@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1222 expect=violation domain=TS
+#note "ADAPTED-FROM fda/FDA-SD1222/FDA-SD1222-invalid-TS.cdt (verbatim). TS carries two PLANSUB records ($plansub_count = 2 > 1) -> exactly one dataset-level violation. The single TITLE record is ignored by the TSPARMCD=PLANSUB filter."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | PLANSUB | Planned Number of Subjects | 300
+S1 | TS | 2 | PLANSUB | Planned Number of Subjects | 250
+S1 | TS | 1 | TITLE | Trial Title | A Randomized Study

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD2005 expect=violation domain=DM
+#note "Row 2 flags the subject as died but supplies no date of death -> fires. Adapted verbatim from FDA-SD2005 (byte-identical Check/Scope)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 DTHFL=Y
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col DTHDTC  type=Char label="Date/Time of Death"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2020-05-01 | Y
+CDISCPILOT01 | DM | 01-701-1023 | 1023 |            | Y

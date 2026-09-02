@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-SEND-0407"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Genetic Toxicology In Vivo (GV) record\
+  \ exists for the same combination of Test Short Name (GVTESTCD), Specimen Material\
+  \ Type (GVSPEC), observation time (GVDTC), and Unique Subject Identifier (USUBJID);\
+  \ the domain should hold one record per test per specimen material type per observation\
+  \ time per subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "GV"
+Check:
+  expression: >-
+    not is_unique_set([GVTESTCD, USUBJID, GVSPEC, GVDTC])
+Outcome:
+  Message: "More than one GV record exists for the same test (GVTESTCD), specimen\
+    \ material type (GVSPEC), observation time (GVDTC), and subject (USUBJID)."
+  Output_Variables:
+  - "GVTESTCD"
+  - "GVSPEC"
+  - "GVDTC"
+Source:
+  Class: "FND"
+  Domain: "GV"
+  Variable: "ALL"
+  Plain_Text_Explanation: "gv.xpt, Genetic Toxicology In Vivo Test Results - Findings.\
+    \ One record per test per specimen material type per observation time per subject,\
+    \ Tabulation."
+  Rule: "gv.xpt, Genetic Toxicology In Vivo Test Results - Findings. One record per\
+    \ test per specimen material type per observation time per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND407"
+        Version: "1"
+      Version: "5.0"

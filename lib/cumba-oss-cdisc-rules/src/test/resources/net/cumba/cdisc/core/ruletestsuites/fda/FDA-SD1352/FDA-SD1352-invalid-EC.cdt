@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1352 expect=violation domain=EC
+#note "Rows 1 and 2 are identical on USUBJID + the full Interventions key (--TRT, --DECOD, --MOOD, --CAT, --SCAT, --ROUTE, --LOC, --TRTV, --STDTC, --TPT, --TPTNUM); only ECSEQ differs, which is not part of the key -> both fire. Row 3 differs in ECTPTNUM -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 ECSEQ=1
+#expectViolationAt row=2 ECSEQ=2
+dataset EC class=INTERVENTIONS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ECSEQ    type=Num  label="Sequence Number"
+col ECTRT    type=Char label="Name of Treatment"
+col ECDECOD  type=Char label="Standardized Treatment Name"
+col ECMOOD   type=Char label="Mood"
+col ECCAT    type=Char label="Category of Treatment"
+col ECSCAT   type=Char label="Subcategory of Treatment"
+col ECROUTE  type=Char label="Route of Administration"
+col ECLOC    type=Char label="Location of Dose Administration"
+col ECTRTV   type=Char label="Treatment Vehicle"
+col ECSTDTC  type=Char label="Start Date/Time of Treatment"
+col ECTPT    type=Char label="Planned Time Point Name"
+col ECTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | EC | S1-001 | 1 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-01-01 | DOSE 1 | 1
+S1 | EC | S1-001 | 2 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-01-01 | DOSE 1 | 1
+S1 | EC | S1-001 | 3 | DRUG A | Drug A | PERFORMED | | | ORAL | | | 2020-01-01 | DOSE 2 | 2

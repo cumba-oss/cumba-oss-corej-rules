@@ -1,0 +1,59 @@
+Core:
+  Id: "CDISC-SEND-0351"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Repro Phase timing variable (RPPLDY, RPPLSTDY,\
+  \ RPPLENDY, --RPDY, --RPSTDY, or --RPENDY) is populated but Repro Phase (RPHASE)\
+  \ is empty; RPHASE is required whenever any Repro Phase day variable is used."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    (var_exists("RPPLDY") and not empty(RPPLDY) or var_exists("RPPLSTDY") and not empty(RPPLSTDY) or
+    var_exists("RPPLENDY") and not empty(RPPLENDY) or var_exists("--RPDY") and not empty(--RPDY) or
+    var_exists("--RPSTDY") and not empty(--RPSTDY) or var_exists("--RPENDY") and not
+    empty(--RPENDY)) and empty(RPHASE)
+Outcome:
+  Message: "RPHASE is empty while at least one Repro Phase timing variable (RPPLDY,\
+    \ RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY, --RPENDY) is populated."
+  Output_Variables:
+  - "RPHASE"
+  - "RPPLDY"
+  - "RPPLSTDY"
+  - "RPPLENDY"
+  - "--RPDY"
+  - "--RPSTDY"
+  - "--RPENDY"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "RPHASE"
+  Plain_Text_Explanation: "RPHASE is required when any Repro Phase timing variable\
+    \ is populated."
+  Condition: "RPPLDY ^= null  OR RPPLSTDY ^= null OR RPPLENDY ^= null OR --RPDY ^=\
+    \ null OR --RPSTDY ^= null OR --RPENDY ^= null"
+  Rule: "RPHASE ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND351"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND351"
+        Version: "1"
+      Version: "5.0"

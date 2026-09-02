@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1250 expect=violation domain=PC
+#note "PCTPT is present but PCTPTNUM is not -> the Planned Time Point Number variable must be included -> one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTPT    type=Char label="Planned Time Point Name"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUGA | 1H POST-DOSE
+---

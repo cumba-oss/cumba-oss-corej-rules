@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SD1086 expect=violation domain=LB
+#note "NEW with the M2-P2 ruling (option (a), Fix #303) - the per-family pin of the truncated-time class. FDA-SD1086 is one of four byte-identical carriers of the CG0006 Check, and every one of the family's authority rows says 'date portion'; the four moved together so the group does not acquire a divergence it did not have. LBDTC '2020-01-15T09' is 13 characters - a complete date with a truncated time - which is_complete_date rejected (it gates on length 10/16/19) and is_complete_date_part accepts. The dy operation already computed 15 from the first ten characters, so the Check was discarding a correct answer; LBDY=14 now fires. Row 2 is the same shape with the correct day and stays silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2020-01-15T09 | 14
+S1 | LB | 001 | 2 | ALB | 2020-01-10T09 | 10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

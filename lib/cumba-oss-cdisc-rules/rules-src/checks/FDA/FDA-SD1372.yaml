@@ -1,0 +1,66 @@
+Core:
+  Id: "FDA-SD1372"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --LOBXFL equals 'Y' but --STRESC is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--LOBXFL"
+Check:
+  expression: >-
+    --LOBXFL == "Y" and empty(--STRESC)
+Outcome:
+  Message: "--LOBXFL equals 'Y', but --STRESC is empty."
+  Output_Variables:
+  - "!--STRESC"
+  - "--LOBXFL"
+Source:
+  FDA_Validator_Rule_Message: "--STRESC is null when --LOBXFL = 'Y'"
+  FDA_Validator_Rule_Description: "Character Result/Finding in Std Format (--STRESC)\
+    \ should be populated when Last Observation Before Exposure Flag (--LOBXFL) is\
+    \ set to 'Y'."
+  Domains: "FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1372"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1372"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0569"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0569"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1012 expect=violation domain=SE
+#note "Row 2 pairs ETCD=TRT with the wrong ELEMENT text (TE has TRT/Treatment) -> the ETCD/ELEMENT combination matches no TE entry, TE.ETCD null-filled -> fires. Row 1 matches and must not fire. JOIN: authored LEFT on Keys [ETCD, ELEMENT] -> TE; TE tuples unique so multiplicity 1:1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 ETCD=TRT
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | SCRN | Screening       | 2013-12-26
+CDISCPILOT01 | SE | 01-701-1015 | 2 | TRT  | Wrong Treatment | 2014-01-02
+---
+
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening
+CDISCPILOT01 | TE | TRT  | Treatment
+---

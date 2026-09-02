@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SE2234 expect=noViolation domain=PC
+#note "Row 1: PCSTRESC=BLQ and SUPPPC carries a QNAM=PCCALCN row joined via IDVAR=PCSEQ/IDVARVAL=1 for subject 001 -> covered, clean. Row 2: numeric result (not BLQ/BQL) with no supplemental record -> out of scope, clean. Row 3: BQL for subject 002 covered by its own PCCALCN row -> clean."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ
+S1 | PC | 001 | 2 | DRUGX | 5.2
+S1 | PC | 002 | 1 | DRUGX | BQL
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | PC | 001 | PCSEQ | 1 | PCCALCN | Numeric Interpretation | 0.05
+S1 | PC | 002 | PCSEQ | 1 | PCCALCN | Numeric Interpretation | 0.10

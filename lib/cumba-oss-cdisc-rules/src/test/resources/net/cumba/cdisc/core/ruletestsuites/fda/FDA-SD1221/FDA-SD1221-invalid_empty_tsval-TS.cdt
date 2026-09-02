@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1221 expect=violation domain=TS
+#note "Boundary: an empty TSVAL on the PLANSUB record is not a number either, so the rule fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=PLANSUB
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects |
+CDISCPILOT01 | TS | 1 | TITLE   | Trial Title                | A Phase 3 Study

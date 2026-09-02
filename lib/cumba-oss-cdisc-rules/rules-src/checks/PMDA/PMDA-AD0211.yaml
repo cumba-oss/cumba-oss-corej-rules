@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD0211"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Baseline Flag Numeric (ABLFN) variable\
+  \ has a populated value other than 1. For this parameter-level / record-level numeric\
+  \ population flag, 1 indicates the record is included; a missing value is allowed,\
+  \ so only populated values that are not 1 are flagged."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ABLFN) and ABLFN not in [1]
+Outcome:
+  Message: "ABLFN value is not 1 or missing."
+  Output_Variables:
+  - "ABLFN"
+Source:
+  Message: "ABLFN value is not 1 or null"
+  Description: "ABLFN (Analysis Baseline Flag Numeric) must be 1 or null. For Parameter-Level\
+    \ and Record-Level Numeric Population Flag variables: 1 = yes (included). Null\
+    \ values are allowed."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0211"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0211"
+        Version: "1"
+      Version: "6.0"

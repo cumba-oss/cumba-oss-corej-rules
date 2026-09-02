@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0235 expect=violation domain=ADSL
+#note "Pins cross-expansion aggregation: two index pairs (y=1 and y=2) seed two expanded rules, each with its own rewritten Output_Variables. Expansion y=1: key 1 holds {POOLA x2, POOLAA x1} -> row 3. Expansion y=2: key 7 holds {GRPA x3} silent; key 8 holds {GRPB x2, GRPBB x1} -> row 6. The harness aggregates, so the total is 2."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=3 USUBJID=003 TR01AG1=POOLAA TR01AG1N=1
+#expectViolationAt row=6 USUBJID=006 TR01AG2=GRPBB TR01AG2N=8
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TR01AG1  type=Char
+col TR01AG1N type=Num
+col TR01AG2  type=Char
+col TR01AG2N type=Num
+---
+S1 | 001 | POOLA  | 1 | GRPA  | 7
+S1 | 002 | POOLA  | 1 | GRPA  | 7
+S1 | 003 | POOLAA | 1 | GRPA  | 7
+S1 | 004 | POOLB  | 2 | GRPB  | 8
+S1 | 005 | POOLB  | 2 | GRPB  | 8
+S1 | 006 | POOLB  | 2 | GRPBB | 8

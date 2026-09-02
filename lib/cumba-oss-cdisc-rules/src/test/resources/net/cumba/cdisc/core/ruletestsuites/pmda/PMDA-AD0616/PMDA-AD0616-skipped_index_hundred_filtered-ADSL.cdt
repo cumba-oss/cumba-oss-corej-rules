@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0616 expect=skipped domain=ADSL
+#note "O-3 (Fix #336): the _wildcards UPPER-bound pin, moved from index 10 to index 100. `y` is (\\d+) so TRCMPG100/TRCMPG100N match and capture y=100, but `_wildcards: y: {min: 1, max: 99}` rejects it, leaving no instances -> NoMatch -> SKIPPED. Data is deliberately inconsistent (HIGH and LOW both coded 1) to prove structure alone is not the cause. If this reports a violation the filter is not being applied - escalate, do not rewrite."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID    type=Char
+col USUBJID    type=Char
+col TRCMPG100  type=Char
+col TRCMPG100N type=Num
+---
+S1 | 001 | HIGH | 1
+S1 | 002 | LOW  | 1
+---

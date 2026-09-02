@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0151 expect=noViolation domain=ADLBC
+# Rule:Description: Within a given value of PARAMCD, there is more than one value of CRITy
+#note "each PARAMCD maps to a single CRIT1 value -> noViolation"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col CRIT1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | AGE>60
+CDISCPILOT01 | 01-701-1023 | ALB | AGE>60
+---

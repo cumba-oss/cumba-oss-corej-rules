@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0038 expect=noViolation domain=LB
+#note "FRESH, DISCRIMINATING. Zero data rows. Predicted SILENT for the reason given in the batch's STAGE-G CRITICAL 5(iv): this rule is RECORD-sensitivity value-based, so RuleRunner never substitutes a synthetic 1-row table on a 0-row dataset. If this fires, escalate to stage R; do not rewrite."
+#expectViolationCount 0
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY     type=Num  label="Study Day of Specimen Collection"
+---

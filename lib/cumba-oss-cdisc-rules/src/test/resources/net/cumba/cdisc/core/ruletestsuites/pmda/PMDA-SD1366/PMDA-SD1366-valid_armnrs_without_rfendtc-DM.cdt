@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1366 expect=noViolation domain=DM
+#note "Row 1: unassigned subject (SCREEN FAILURE), RFENDTC correctly empty. Row 2: on-study subject, RFENDTC populated but ARMNRS empty, so the first conjunct is FALSE. The two rows exercise the two independent ways the conjunction can be false."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col RFSTDTC type=Char
+col RFENDTC type=Char
+col ARMNRS  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | | | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1028 | 2020-01-05 | 2020-06-30 |

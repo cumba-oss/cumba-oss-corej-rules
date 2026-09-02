@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0187"
+Sheet_Rule_Identifier: "187"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: "ExtendedValue"
+Applicable_Versions: ["2.1"]
+Source_Type: "Specification"
+Requires: "ct"
+Plain_Text_Rule: "Attribute @def:ExtendedValue must not be present when a CodeList is non-extensible."
+# CT-gated (P5): fires on a def:ExtendedValue attribute when CT says the
+# codelist (resolved via the parent CodeList's nci:ExtCodeID alias) is
+# non-extensible.
+Message: "EnumeratedItem[@CodedValue] [${value}] has a def:ExtendedValue attribute but the CodeList[@Name]/Alias[@Name] is non-extensible."
+Check:
+  kind: "extended_value_marking"
+  mode: "forbidden"

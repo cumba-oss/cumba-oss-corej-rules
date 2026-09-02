@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0345 expect=noViolation domain=ADLBC
+#note "Row 3 carries ANRHIC=HIGH, so each (PARAMCD, ANRHI) group maps to one label."
+#library standard=adamig version=1-3
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ANRHI   type=Num
+col ANRHIC  type=Char
+---
+S1 | 001 | ALB | 50 | HIGH
+S1 | 002 | ALB | 50 | HIGH
+S1 | 003 | ALB | 50 | HIGH
+S1 | 004 | ALB | 60 | VERYHIGH
+S1 | 005 | ALB | 60 | VERYHIGH

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1450 expect=violation domain=PP
+#note "PPSTINT declared, PPENINT absent. No wildcards: the Check names both columns concretely, so the rule executes unexpanded and the exists-only tree is decided by BroadcastFold -> exactly ONE violation at reported row 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PPSTINT=PT0H
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPSTINT  type=Char
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | AUCALL | PT0H

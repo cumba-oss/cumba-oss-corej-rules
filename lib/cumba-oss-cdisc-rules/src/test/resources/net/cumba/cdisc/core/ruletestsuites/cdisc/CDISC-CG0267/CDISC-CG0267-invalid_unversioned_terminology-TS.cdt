@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0267 expect=violation domain=TS
+#note "Declared OVER-REPORT boundary: the sheet's Condition 'Reference Terminology is versioned' is a fact not present in the data, so the Check approximates it with 'TSVCDREF populated'. UNII (the FDA Unique Ingredient Identifier, the standard code system for TSPARMCD=TRT) is NOT a versioned terminology, yet the rule fires on it because Executability declares 'Partially Executable - Possible Overreporting'. Grounds finding CG0267-F1/SD1260-F1; no rule change proposed."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=TRT
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | TRT | Investigational Therapy or Treatment | XANOMELINE | U6RSY2UBI4 | UNII |
+CDISCPILOT01 | TS | 2 | INDIC | Trial Indication | ASTHMA | 10003553 | MEDDRA | 21.0

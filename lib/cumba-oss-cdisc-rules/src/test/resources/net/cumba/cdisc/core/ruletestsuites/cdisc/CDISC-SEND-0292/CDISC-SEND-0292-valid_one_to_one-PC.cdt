@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-SEND-0292 expect=noViolation domain=PC
+#note "A clean one-to-one mapping in both directions inside one (DRUGX, DOSE 1) partition. NOT vacuous: changing row 2's PCTPTNUM to 2 makes this same file fire, which is the invalid sibling."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTEST   type=Char label="Pharmacokinetic Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCTPT    type=Char label="Planned Time Point Name"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 | 1 | DRUGX | Drug X | 412 | 1 HOUR | 1 | DOSE 1
+S1 | PC | 002 | 1 | DRUGX | Drug X | 388 | 1 HOUR | 1 | DOSE 1
+S1 | PC | 003 | 1 | DRUGX | Drug X | 350 | 2 HOUR | 2 | DOSE 1
+---

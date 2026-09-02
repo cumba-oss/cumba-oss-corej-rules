@@ -1,0 +1,118 @@
+Core:
+  Id: "PMDA-SD9999"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the class declared in the Define-XML for a custom\
+  \ dataset is not based on one of the SDTM general observation classes (EVENTS, FINDINGS,\
+  \ INTERVENTIONS)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "SUPP--"
+    - "SQ--"
+    - "AP--"
+    - "APRELSUB"
+Operations:
+- id: "$domain_is_custom"
+  expression: "domain_is_custom()"
+Check:
+  expression: >-
+    $domain_is_custom == true and not empty(ds_class("DEFINE")) and upper(ds_class("DEFINE")) not in
+    ["EVENTS", "FINDINGS", "INTERVENTIONS"]
+Outcome:
+  Message: "The class of a custom dataset is not one of the SDTM general observation\
+    \ classes (EVENTS, FINDINGS, INTERVENTIONS)."
+  Output_Variables:
+  - "define_dataset_class"
+Source:
+  Message: "Dataset class not recognized"
+  Description: "The structure for custom dataset should be based on one of the general\
+    \ observation classes (EVENTS, FINDINGS, INTERVENTIONS) defined by the SDTM model."
+  Domains: "UNRECOGNIZED"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD9999"
+        Version: "1"
+      Version: "1.6"

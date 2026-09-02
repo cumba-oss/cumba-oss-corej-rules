@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-AD0492"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when SHIFTy is present and none of the following variable\
+  \ pairs are present: (BASECATy, AVALCATy), (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR,\
+  \ ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH, ATOXGRH), (BASE, AVAL), (BASEC, AVALC)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("SHIFTy") and not var_exists("BASECATy") and not var_exists("AVALCATy") and not
+    var_exists("BNRIND") and not var_exists("ANRIND") and not var_exists("ByIND") and not
+    var_exists("AyIND") and not var_exists("BTOXGR") and not var_exists("ATOXGR") and not
+    var_exists("BTOXGRL") and not var_exists("ATOXGRL") and not var_exists("BTOXGRH") and not
+    var_exists("ATOXGRH") and not var_exists("BASE") and not var_exists("AVAL") and not
+    var_exists("BASEC") and not var_exists("AVALC")
+Outcome:
+  Message: "SHIFTy is present, but none of the variable pairs (BASECATy, AVALCATy),\
+    \ (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR, ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH,\
+    \ ATOXGRH), (BASE, AVAL), (BASEC, AVALC) are present."
+  Output_Variables:
+  - "SHIFTy"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "SHIFTy where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "SHIFTy is present and all of the following\
+    \ variable pairs (BASECATy, AVALCATy), (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR,\
+    \ ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH, ATOXGRH), (BASE, AVAL) and (BASEC, AVALC)\
+    \ are not present"
+  Rule_Failure_Criteria: "All of the following variable pairs (BASECATy, AVALCATy),\
+    \ (BNRIND, ANRIND), (ByIND, AyIND), (BTOXGR, ATOXGR), (BTOXGRL, ATOXGRL), (BTOXGRH,\
+    \ ATOXGRH), (BASE, AVAL) and (BASEC, AVALC) are not present"
+  Condition_Failure: "SHIFTy is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR492"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR492"
+        Version: "2"
+      Version: "5.0"

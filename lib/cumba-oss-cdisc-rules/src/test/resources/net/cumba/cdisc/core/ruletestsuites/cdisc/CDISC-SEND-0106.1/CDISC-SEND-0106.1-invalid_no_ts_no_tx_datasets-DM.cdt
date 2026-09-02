@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0106.1 expect=violation domain=DM
+#note "THE ABSENT-FOREIGN-DATASET ARM, legitimate here only because CDISC-SEND-0106.1 is a member of AbsentDatasetSkip.INTENT_OPT_OUT_RULE_IDS. There is NO TS and NO TX dataset in the file: resolveTargetTable cannot resolve either, both operations yield null, both empty() conjuncts are true, and row 1's blank STRAIN fires. AbsentDatasetSkip.decide returns Decision.NONE for this rule id unconditionally, so production behaves as the harness does -- the finding a reviewer needs is 'the strain of the study animals is unknown', not 'TS is missing'. ESCALATE if this reports SKIPPED; NO OTHER RULE IN THIS LANE MAY COPY THIS FIXTURE."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SPECIES type=Char label="Species"
+col STRAIN  type=Char label="Strain/Substrain"
+---
+S1 | DM | 001 | RAT |
+S1 | DM | 002 | RAT | WISTAR
+---

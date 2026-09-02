@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0056"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Pre-Specified (--PRESP) is not present in the dataset\
+  \ but Completion Status (--STAT) is present in the dataset."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+  Domains:
+    Exclude:
+    - "DS"
+    - "DV"
+    - "EX"
+Check:
+  expression: >-
+    not var_exists("--PRESP") and var_exists("--STAT")
+Outcome:
+  Message: "--STAT is present when --PRESP is not present."
+  Output_Variables:
+  - "--STAT"
+Source:
+  Class: "EVT, INT"
+  Domain: "NOT(DS, DV, EX)"
+  Variable: "--STAT"
+  Condition: "--PRESP not present in dataset"
+  Rule: "--STAT not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0056"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0056"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0056"
+        Version: "1"
+      Version: "2.0"

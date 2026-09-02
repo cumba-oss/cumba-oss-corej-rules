@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0043 expect=violation domain=ADLBC
+#note "ADTM ends with DTM, non-empty format matching none of the 16 SAS datetime formats -> one finding. No row= pin."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=ADTM variable_format=8.
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM    type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1
+---

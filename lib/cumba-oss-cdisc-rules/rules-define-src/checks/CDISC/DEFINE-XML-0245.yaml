@@ -1,0 +1,16 @@
+Rule_Id: "DEFINE-XML-0245"
+Sheet_Rule_Identifier: "245"
+Rule_Set: "CDISC"
+Element: "EnumeratedItem"
+Attribute: null
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "No more than one Description child element may be provided for an EnumeratedItem element."
+# The sheet's XPaths column reads .../CodeListItem/EnumeratedItem/Description —
+# a sheet slip; EnumeratedItem is a direct CodeList child (spec SS5.3.13.1), so
+# the scope is the EnumeratedItem element itself.
+Message: "EnumeratedItem has more than one Description child element. Only 1 is permitted."
+Check:
+  kind: "cardinality_at_most"
+  target: "Description"
+  max: 1

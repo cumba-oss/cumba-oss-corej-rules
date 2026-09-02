@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0270 expect=violation domain=TS
+#note "Row 2 carries '80Y' for AGEMAX -- no leading 'P', so it is not an ISO 8601 time period. No class= (the twins declare none and Scope carries no Classes axis). ADAPTED-FROM fda/FDA-SD1215/FDA-SD1215-invalid-TS.cdt via the PMDA sibling (Check byte-identical across all four TG-0090 members)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=AGEMAX TSVAL=80Y
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P18Y
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | 80Y

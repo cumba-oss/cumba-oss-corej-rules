@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0370"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Fetal Measurements (FM) record exists\
+  \ for the same combination of Test Short Name (FMTESTCD), Unique Subject Identifier\
+  \ (USUBJID), fetus (FETUSID), standardized finding (FMSTRESC), location (FMLOC),\
+  \ laterality (FMLAT), and anatomical region (FMANTREG); the FM domain expects one\
+  \ record per finding per fetus per subject per test."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "FM"
+Check:
+  expression: >-
+    not is_unique_set([FMTESTCD, USUBJID, FETUSID, FMSTRESC, FMLOC, FMLAT, FMANTREG])
+Outcome:
+  Message: "More than one FM record exists for the same finding (FMTESTCD/FMSTRESC),\
+    \ subject (USUBJID), and fetus (FETUSID)."
+  Output_Variables:
+  - "FETUSID"
+  - "FMTESTCD"
+  - "FMSTRESC"
+  - "FMANTREG"
+  - "FMLOC"
+  - "FMLAT"
+Source:
+  Class: "FND"
+  Domain: "FM"
+  Variable: "ALL"
+  Plain_Text_Explanation: "One record per finding per fetus per subject per test."
+  Rule: "One record per finding per fetus per subject per test, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND370"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND370"
+        Version: "1"
+      Version: "5.0"

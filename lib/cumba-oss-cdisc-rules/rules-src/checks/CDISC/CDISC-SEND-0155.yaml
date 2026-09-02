@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0155"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Exclusion Flag (BGEXCLFL) is populated but the\
+  \ Reason for Exclusion (BGREASEX) is not \"EXCLUDED BODY WEIGHT\"."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "BG"
+Requirements:
+  Variables:
+    All:
+    - "BGEXCLFL"
+    - "BGREASEX"
+Check:
+  expression: >-
+    not empty(BGEXCLFL) and BGREASEX != "EXCLUDED BODY WEIGHT"
+Outcome:
+  Message: "BGREASEX is not \"EXCLUDED BODY WEIGHT\" for a record where the exclusion\
+    \ flag (BGEXCLFL) is populated."
+  Output_Variables:
+  - "BGEXCLFL"
+  - "BGREASEX"
+Source:
+  Class: "FND"
+  Domain: "BG"
+  Variable: "BGEXCLFL, BGREASEX"
+  Plain_Text_Explanation: "If one of the two body weights (BW) needed for the calculation\
+    \ has an exclusion flag, then the corresponding BG values should have the exclusion\
+    \ flag set. The BGREASEX should be \"EXCLUDED BODY WEIGHT\"."
+  Condition: "BWEXCLFL ^= null for one of the two body weights needed for the calculation"
+  Rule: "BGEXCLFL ^= null AND BGREASEX = \"EXCLUDED BODY WEIGHT\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND155"
+        Version: "1"
+      Version: "5.0"

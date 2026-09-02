@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0269 expect=violation domain=ADAE
+#note "All five enumerated names present and populated with a non-Y value, so one data row yields FIVE findings - one per cell. Add no further column: any extra name matching the alternation is another finding."
+#library standard=adamig version=1-3
+#expectViolationCount 5
+#expectViolationAt row=1 variable_name=TRTEMFL USUBJID=01-701-1015
+#expectViolationAt row=1 variable_name=PREFL USUBJID=01-701-1015
+#expectViolationAt row=1 variable_name=ONTRTFL USUBJID=01-701-1015
+#expectViolationAt row=1 variable_name=FUPFL USUBJID=01-701-1015
+#expectViolationAt row=1 variable_name=LVOTFL USUBJID=01-701-1015
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AETERM  type=Char
+col TRTEMFL type=Char
+col PREFL   type=Char
+col ONTRTFL type=Char
+col FUPFL   type=Char
+col LVOTFL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | N | N | N | N | N

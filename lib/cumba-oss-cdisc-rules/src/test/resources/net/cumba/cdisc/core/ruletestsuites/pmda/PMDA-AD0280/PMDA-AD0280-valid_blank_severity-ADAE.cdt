@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0280 expect=noViolation domain=ADAE
+#note "Row 1: AESEV BLANK. Row 1 would make key 1 multi-valued, but its dependent is blank, so it is excluded by the rule's own not empty(AESEV) conjunct AND by D.13, leaving key 1 with {MODERATE} -> silent. M2-D17 / Fix #313: the PMDA sheet marks AD0280 for ADaMIG 1.0 only (1.1-1.3 belong to AD0280B), so the rule left rules-pmda-adamig-1-1.json; this fixture moved from version=1-1 to version=1-0 (same rule, same data, same expectation)."
+#library standard=adamig version=1-0
+#expectViolationCount 0
+dataset ADAE structure=OCCDS subclass=AE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AESEV   type=Char
+col AESEVN  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE |          | 1
+CDISCPILOT01 | 01-701-1023 | 1 | NAUSEA   | MODERATE | 1
+CDISCPILOT01 | 01-701-1034 | 2 | RASH     | SEVERE   | 3

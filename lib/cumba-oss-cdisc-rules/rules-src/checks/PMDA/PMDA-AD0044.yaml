@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-AD0044"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a record carries both a time variable (*TM) and\
+  \ its corresponding datetime variable (*DTM) and the time portion of the datetime\
+  \ value differs from the time value itself."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(*TM) and not empty(*DTM) and time_part(*DTM) != *TM
+Outcome:
+  Message: "The time portion of a *DTM datetime variable differs from its corresponding\
+    \ *TM time variable."
+  Output_Variables:
+  - "*TM"
+  - "*DTM"
+Source:
+  Message: "*TM and its corresponding *DTM variable have different time values"
+  Description: "When both time and datetime variables are collected on the same record\
+    \ for the same observation, the Time portion of the datetime variable should be\
+    \ equal to the Time variable itself."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0044"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0044"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0044"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0044"
+        Version: "1"
+      Version: "6.0"

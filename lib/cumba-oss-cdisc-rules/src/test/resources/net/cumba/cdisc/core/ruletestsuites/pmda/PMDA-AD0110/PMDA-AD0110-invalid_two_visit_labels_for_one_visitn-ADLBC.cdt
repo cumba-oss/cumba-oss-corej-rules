@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-AD0110 expect=violation domain=ADLBC
+#note "AVISITN=1 carries both WEEK2 and WEEK02; WEEK2 is the strict majority so row 3 alone fires."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 AVISIT=WEEK02 AVISITN=1 PARAMCD=SYSBP
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM type=Char
+col AVISITN type=Num
+col AVISIT type=Char
+---
+S1 | 001 | SYSBP | SystolicBP | 1 | WEEK2
+S1 | 002 | SYSBP | SystolicBP | 1 | WEEK2
+S1 | 003 | SYSBP | SystolicBP | 1 | WEEK02
+S1 | 001 | SYSBP | SystolicBP | 2 | WEEK4
+S1 | 002 | SYSBP | SystolicBP | 2 | WEEK4

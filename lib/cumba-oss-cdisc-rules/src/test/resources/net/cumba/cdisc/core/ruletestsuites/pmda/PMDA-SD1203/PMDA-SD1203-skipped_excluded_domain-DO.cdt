@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1203 expect=skipped domain=DO
+#note "dataset DO class=FINDINGS (declared via the class= key; the sheet itself files DO under FINDINGS) carrying DODTC plus the DM block - the declared class is in the Include set and DODTC satisfies the Variables gate, so ONLY the Domains.Exclude [DO] rejects."
+#library standard=sdtmig version=3-4
+dataset DO class=FINDINGS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DODTC   type=Char
+---
+S1 | DO | 001 | 2020-07-05
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30

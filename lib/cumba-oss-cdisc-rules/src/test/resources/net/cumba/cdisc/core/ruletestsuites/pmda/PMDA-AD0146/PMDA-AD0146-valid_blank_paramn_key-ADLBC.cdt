@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0146 expect=noViolation domain=ADLBC
+#note "Pins DROP_MISSING_KEYS (blank KEY): row 3's PARAMN cell is empty, so its group key is blank and the row is removed from grouping entirely under the shipped default and can never be flagged; the surviving PARAMN=1 group holds one distinct PARAM."
+#library standard=adamig version=1-0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+S1 | 001 | ALB | Albumin   | 1
+S1 | 002 | ALB | Albumin   | 1
+S1 | 003 | ALB | Bilirubin |

@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0066"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Category for Disposition Event (DSCAT) equals 'PROTOCOL\
+  \ MILESTONE' but Reported Term for the Disposition Event (DSTERM) is not equal to\
+  \ Standardized Disposition Term (DSDECOD)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+    - "DSTERM"
+    - "DSDECOD"
+Check:
+  expression: >-
+    DSCAT == "PROTOCOL MILESTONE" and DSTERM != DSDECOD
+Outcome:
+  Message: "DSCAT is equal to 'PROTOCOL MILESTONE' but DSTERM is not equal to DSDECOD."
+  Output_Variables:
+  - "DSTERM"
+  - "DSDECOD"
+  - "DSCAT"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSDECOD"
+  Condition: "DSCAT = 'PROTOCOL MILESTONE'"
+  Rule: "DSTERM = DSDECOD"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0066"
+        Version: "1"
+      Version: "2.0"

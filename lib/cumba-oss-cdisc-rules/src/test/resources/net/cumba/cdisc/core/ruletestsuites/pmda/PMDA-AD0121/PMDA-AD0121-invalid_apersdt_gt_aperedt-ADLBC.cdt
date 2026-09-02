@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0121 expect=violation domain=ADLBC
+#note "The BDS arm of the same rule - the sheet's second example ('BDS - APERSDT'). Expansion root 'APER' from both patterns; ONE tuple, ONE violation on row 1. APERSDT/APEREDT are real ADaMIG BDS 'Period, Subperiod, and Phase Start and End Timing' variables. Exercising two of the six declared structures is what keeps the multi-token Scope honest."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 APERSDT=22006 APEREDT=21950
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col APERSDT type=Num
+col APEREDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 3.5 | 22006 | 21950

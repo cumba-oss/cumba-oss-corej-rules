@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0429"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Subcategory (--SCAT) is populated but Category (--CAT)\
+  \ is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+Check:
+  expression: >-
+    not empty(--SCAT) and empty(--CAT)
+Outcome:
+  Message: "--CAT is not populated when --SCAT is populated."
+  Output_Variables:
+  - "--CAT"
+  - "--SCAT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--CAT"
+  Condition: "--SCAT ^= null"
+  Rule: "--CAT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0429"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0429"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0429"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,42 @@
+Core:
+  Id: "PMDA-AD0267"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when only one of Analysis Duration Units (ADURU) and\
+  \ Analysis Duration (N) (ADURN) is populated. If either variable is populated, both\
+  \ must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "ADURU"
+    - "ADURN"
+Check:
+  expression: >-
+    not empty(ADURU) and empty(ADURN) or empty(ADURU) and not empty(ADURN)
+Outcome:
+  Message: "Only one of these variables is populated: ADURU, ADURN"
+  Output_Variables:
+  - "ADURN"
+  - "ADURU"
+Source:
+  Message: "Only one of these variables is populated: ADURU, ADURN"
+  Description: "If any of Analysis Duration Units (ADURU) or Analysis Duration (N)\
+    \ (ADURN) variables is populated, then both must be populated together."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0267"
+        Version: "1"
+      Version: "6.0"

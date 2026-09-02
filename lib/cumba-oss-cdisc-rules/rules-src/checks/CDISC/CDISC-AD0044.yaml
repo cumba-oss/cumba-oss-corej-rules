@@ -1,0 +1,64 @@
+Core:
+  Id: "CDISC-AD0044"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable with a suffix of TM and a variable with\
+  \ a suffix of DTM with the same root name are both populated and the time portion\
+  \ of the DTM value does not equal the TM value"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*TM) and not empty(*DTM) and time_part(*DTM) != *TM
+Outcome:
+  Message: "The time portion of the value of the DTM-suffixed variable does not equal\
+    \ the value of the TM-suffixed variable with the same root name"
+  Output_Variables:
+  - "*TM"
+  - "*DTM"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "*TM; *DTM"
+  Natural_Language_Rule_Failure_Criteria: "A variable with a suffix of TM and a variable\
+    \ with a suffix of DTM with the same root name have different time values"
+  Rule_Failure_Criteria: "Time values are different"
+  Condition_Failure: "Variable with a suffix of TM and a variable with a suffix of\
+    \ DTM with the same root name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR44"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR44"
+        Version: "1"
+      Version: "5.0"

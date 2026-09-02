@@ -1,0 +1,39 @@
+Core:
+  Id: "PMDA-AD0660"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when METABFL (Metabolite Flag) is populated with a value\
+  \ other than Y; the only permitted populated value is Y, with an empty value being\
+  \ acceptable."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "METABFL"
+Check:
+  expression: >-
+    not empty(METABFL) and METABFL != "Y"
+Outcome:
+  Message: "METABFL is populated with a value other than Y."
+  Output_Variables:
+  - "METABFL"
+Source:
+  Message: "METABFL value is not Y or null"
+  Description: "METABFL (Metabolite Flag) must be Y or null."
+  Domains: "ADNCA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0660"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,58 @@
+Core:
+  Id: "CDISC-CG0140"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when multiple races are captured in SUPPDM (QNAM values\
+  \ beginning with 'RACE') but RACE in the DM dataset does not equal 'MULTIPLE'."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SUPPDM"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    DM.RACE != "MULTIPLE" and starts_with(QNAM, "RACE") and suffix(QNAM, 1) =~ /^[A-Z0-9]$/ and
+    suffix(QNAM, 3) !~ /^(OTH)$/
+Outcome:
+  Message: "Multiple races are captured in SUPPDM but RACE in the DM dataset does\
+    \ not equal 'MULTIPLE'."
+  Output_Variables:
+  - "DM.RACE"
+  - "QNAM"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RACE"
+  Condition: "Multiple records in SUPPDM where RACE captured"
+  Rule: "RACE = 'MULTIPLE'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0140"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0140"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0140"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1213 expect=violation domain=DM
+#note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (2 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: FRESH - same derived-guard pin as PMDA-SD0087's, on this rule's own columns. RFSTDTC is not declared. Shipped var_exists(\"RFSTDTC\") and empty(RFSTDTC) folds FALSE -> executes, silent."
+#expectViolationCount 2
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+S1 | DM | 001 | A
+S1 | DM | 002 | B

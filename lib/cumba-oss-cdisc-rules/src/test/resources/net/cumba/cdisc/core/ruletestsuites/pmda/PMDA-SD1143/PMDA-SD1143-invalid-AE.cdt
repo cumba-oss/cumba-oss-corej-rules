@@ -1,0 +1,30 @@
+#!RuleTest
+#test PMDA-SD1143 expect=violation domain=AE
+#note "CL-E.2 (wave TA-4): restructured to the sheet-Message direction - 'No Details info for AESMIE Adverse Event in SUPPAE domain'. Row 1 is flagged Other-Medically-Important (AESMIE='Y') but no SUPPAE AESOSP record describes it -> fires. Row 2 is flagged and described (SUPPAE row keyed USUBJID+AESEQ) -> no fire. Row 3 is unflagged; its stray AESOSP description is the OLD converse direction, dropped as ruled -> no fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 AESMIE=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESMIE  type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | CHEST PAIN | Y
+S1 | AE | 001 | 2 | SYNCOPE    | Y
+S1 | AE | 002 | 1 | HEADACHE   |
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 2 | AESOSP | Recurrent syncope requiring intervention
+S1 | AE | 002 | AESEQ | 1 | AESOSP | Stray description on an unflagged event

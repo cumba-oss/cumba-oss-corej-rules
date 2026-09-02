@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1445 expect=violation domain=VS
+#note "Tuple = (VSLOBXFL, USUBJID, VSTESTCD, VSTSTDTL) after the undeclared key columns (--CAT/--SCAT/--METHOD/--SPEC/--LOC/--LAT) drop out. Rows 1/2 share the full tuple and VSLOBXFL='Y' -> both fire. Row 3: blank target is a distinct tuple and fails the equality conjunct. Row 4: different VSTESTCD -> unique tuple."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 VSSEQ=1
+#expectViolationAt row=2 VSSEQ=2
+dataset VS class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VSTSTDTL type=Char
+col VSLOBXFL type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | REST | Y
+S1 | VS | 001 | 2 | SYSBP | REST | Y
+S1 | VS | 001 | 3 | SYSBP | REST |
+S1 | VS | 001 | 4 | TEMP  | REST | Y

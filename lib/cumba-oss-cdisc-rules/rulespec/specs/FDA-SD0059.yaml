@@ -1,0 +1,45 @@
+name: FDA-SD0059
+kind: rule
+description: |
+  EC-2 — Variable Metadata Check against Define XML. Fires when a variable's loaded
+  data type (Char/Num) does not match the Define-XML declared type. The Define-XML
+  vocabulary (integer/text/…) is normalized to the author vocabulary (Num/Char) in
+  the VariablesMetadataWithDefineDatasetBuilder, so the comparison
+  ``variable_data_type != define_variable_data_type`` compares Num/Char on BOTH
+  operands. Without this the Python lane (and the Java legacy lane, fixed in P2c)
+  over-fired ``"Num" != "integer"`` on every numeric variable; the Java native lane
+  already normalized. Both lanes now agree: AGE (Num vs integer→Num) and SEX
+  (Char vs text→Char) do NOT fire; HEIGHT is declared integer in the Define but is a
+  Char column in the data → the sole firing variable.
+  Uses the define mock channel (engine_adapter._patched_define_xml), precedent
+  CORE-000929.
+python_source: rules-fda-sdtmig-3-4.json (FDA-SD0059)
+rule:
+  coreId: FDA-SD0059
+datasets:
+  LB:
+    row_key: [variable_name]
+    rows:
+    - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSTRESN: 5, LBORRES: high, LBDY: pos}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+define_xml:
+  LB:
+  - {define_variable_name: LBSTRESN, define_variable_data_type: float}
+  - {define_variable_name: LBORRES, define_variable_data_type: text}
+  - {define_variable_name: LBDY, define_variable_data_type: integer}
+expected_violations:
+- rule_id: FDA-SD0059
+  dataset: LB
+  row_key: {variable_name: null}
+  status: SUCCESS
+  output_variables:
+    define_variable_data_type: Num
+    define_variable_name: LBDY
+    variable_data_type: Char
+    variable_name: LBDY
+expected_errors: []

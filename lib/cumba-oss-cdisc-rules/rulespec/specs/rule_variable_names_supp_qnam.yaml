@@ -1,0 +1,58 @@
+name: rule_variable_names_supp_qnam
+kind: rule
+description: |
+  EC-13 parity — Java `variable_names` mirror of Python's existing variable_names op.
+  A SUPP-- QNAM must not equal a variable name defined in another domain. The Operation
+  `variable_names` builds $variable_names (the union of variable names across the datasets
+  the IG standard defines, mocked via library_mocks.classes + domain_variables); the Check
+  fires when QNAM is_contained_by that union. QNAM=AESEQ collides with AE.AESEQ (fires);
+  QNAM=MYNOVEL does not (passes). Both engines read the same mock: Python's variable_names
+  reads the mock-built variables_metadata; Java's MockLibraryProvider unions the same
+  domain_variables. $variable_names is left out of Output_Variables because Python returns
+  an unordered set (its serialised order is not canonical) — the membership check itself is
+  order-independent.
+rule:
+  id: variable-names-supp-qnam
+  Core: {Id: EC13-VARIABLE-NAMES}
+  Description: QNAM must not equal a variable name defined in another domain or the SDTM.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [SUPP--]}
+  Requirements:
+    Variables: {All: [QNAM]}
+  Operations:
+    - id: $variable_names
+      operator: variable_names
+  Check:
+    all:
+      - {name: QNAM, operator: is_contained_by, value: $variable_names}
+  Outcome:
+    Message: QNAM equals a variable name defined in another domain or the SDTM.
+    Output_Variables: [QNAM]
+datasets:
+  SUPPAE:
+    row_key: [RDOMAIN, USUBJID, QNAM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESEQ, QLABEL: collides, QVAL: bad}
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: MYNOVEL, QLABEL: novel, QVAL: ok}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+    events: [AE]
+  domain_variables:
+    AE:
+      - {name: STUDYID}
+      - {name: USUBJID}
+      - {name: AESEQ}
+      - {name: AETERM}
+expected_violations:
+  - rule_id: EC13-VARIABLE-NAMES
+    dataset: SUPPAE
+    row_key: {RDOMAIN: AE, USUBJID: '001', QNAM: AESEQ}
+    status: SUCCESS
+    output_variables: {QNAM: AESEQ}
+expected_errors: []

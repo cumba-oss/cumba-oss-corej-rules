@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0616 expect=noViolation domain=ADSL
+# Rule:Description: There is more than one value of TRCMPGy for a given value of TRCMPGyN, where y is an integer [1-99, not zero-padded], considering only those rows on which both variables are populated
+#note "each TRCMPG1N value maps to a single TRCMPG1 value -> noViolation"
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRCMPG1 type=Char
+col TRCMPG1N type=Char
+---
+CDISCPILOT01 | 01-701-1015 | A1 | K1
+CDISCPILOT01 | 01-701-1023 | A2 | K2
+CDISCPILOT01 | 01-701-1028 | A1 | K1
+---

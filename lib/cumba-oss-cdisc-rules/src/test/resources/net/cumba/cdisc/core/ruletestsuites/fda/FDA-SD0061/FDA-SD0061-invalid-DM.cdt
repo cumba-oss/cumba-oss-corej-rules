@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0061 expect=violation domain=DM
+#note "The Define-XML sidecar declares ItemGroupDefs DM and AE, but the study submits only a DM dataset -> AE is referenced in the define but missing from the study -> fires."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD0061-define.xml
+#expectViolationCount 1
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001

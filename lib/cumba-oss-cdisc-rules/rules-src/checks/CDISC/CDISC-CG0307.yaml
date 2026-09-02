@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0307"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TSPARM and TSPARMCD do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARM"
+    - "TSPARMCD"
+Check:
+  expression: >-
+    not is_unique_relationship(TSPARM, TSPARMCD)
+Outcome:
+  Message: "TSPARM and TSPARMCD do not have a one-to-one relationship."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSPARM"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Rule: "TSPARM and TSPARMCD have a one-to-one relationship"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0307"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0307"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0307"
+        Version: "1"
+      Version: "2.0"

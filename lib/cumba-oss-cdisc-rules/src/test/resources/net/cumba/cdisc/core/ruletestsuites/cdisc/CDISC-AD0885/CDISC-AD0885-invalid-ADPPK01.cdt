@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0885 expect=violation domain=ADPPK01
+#note "Name-independence pin for D21. The rule no longer carries a Domains facet at all, so the split dataset name is irrelevant to selection: PARAMCD/AVAL detect BASIC DATA STRUCTURE and the NONMEM columns (EVID control + DV/MDV/AMT >= 3) detect POPULATION PHARMACOKINETIC ANALYSIS. Only AdamDataStructureDetector's AD*/AX* name gate still reads the name, and ADPPK01 satisfies it. USUBJIDN is absent, so the check fires."
+# Rule:Description: Raise an error when USUBJIDN is not present in an ADPPKIG v1.0 dataset.
+#expectViolationCount 1
+dataset ADPPK01
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL    type=Num  label="Analysis Value"
+col EVID    type=Num  label="Event Identifier"
+col MDV     type=Num  label="Missing Dependent Variable"
+col DV      type=Num  label="Dependent Variable"
+col AMT     type=Num  label="Dose Amount"
+---
+CDISCPILOT01 | 01-701-1015 | CONC | 12.5 | 0 | 0 | 12.5 | 0
+---

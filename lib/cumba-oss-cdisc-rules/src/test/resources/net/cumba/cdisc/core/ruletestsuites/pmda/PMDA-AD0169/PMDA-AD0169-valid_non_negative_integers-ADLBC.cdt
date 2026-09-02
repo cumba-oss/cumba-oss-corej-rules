@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0169 expect=noViolation domain=ADLBC
+#note "Zero and positive whole numbers -> executes, silent. Row 1 also pins that 0 is ACCEPTED (CNSR < 0 is strict), which the sheet's 'use 0 as an event indicator' makes the most important negative case."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col CNSR    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | OS | 100 | 0
+CDISCPILOT01 | 01-701-1023 | OS | 120 | 1
+CDISCPILOT01 | 01-701-1034 | OS | 130 | 2

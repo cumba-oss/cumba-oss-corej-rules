@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0329"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study and a parameter, the character Baseline\
+  \ Category y (BASECATy) variable does not hold a single consistent value for each\
+  \ unique value of its numeric equivalent Baseline Category y (N) (BASECAyN), evaluated\
+  \ on rows where the primary variable BASECATy is populated. BASECATy is a derived\
+  \ category variable (name ends in BASECAT followed by y, y = 1-9) and BASECAyN is\
+  \ its numeric code (BASECA followed by y then N). The mapping is evaluated within\
+  \ each Parameter Code (PARAMCD)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(BASECATy) and is_inconsistent_across_dataset(BASECATy,
+    keys=[PARAMCD, BASECAyN])
+Outcome:
+  Message: "Inconsistent value for BASECATy"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASECATy"
+  - "BASECAyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for BASECAT*"
+  Description: "Within a Study and a Parameter, all Baseline Category y (BASECATy)\
+    \ variable values must be the same for each unique value of Baseline Category\
+    \ y (N) (BASECAyN) variable when the primary variable BASECATy is populated."
+  Domains: "BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0329"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0329"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0329"
+        Version: "1"
+      Version: "6.0"

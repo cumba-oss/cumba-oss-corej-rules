@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0219"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a dataset based on the Interventions, Events or\
+  \ Findings general observation classes does not contain at least one Timing variable."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+  Domains:
+    Exclude:
+    - "IE"
+    - "SC"
+Operations:
+- id: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- id: "$timing_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
+    )"
+Check:
+  expression: >-
+    not shares_elements_with($dataset_variables, $timing_variables)
+Outcome:
+  Message: "No timing variables are present in the dataset."
+  Output_Variables:
+  - "$dataset_variables"
+  - "$timing_variables"
+Source:
+  Class: "INT, FND, EVT"
+  Domain: "NOT(IE, SC)"
+  Variable: "GEN"
+  Rule: "At least one timing variable present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0219"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0219"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0219"
+        Version: "1"
+      Version: "2.0"

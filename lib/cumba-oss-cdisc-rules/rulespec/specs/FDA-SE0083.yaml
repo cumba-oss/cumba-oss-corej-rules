@@ -1,0 +1,50 @@
+name: FDA-SE0083
+kind: rule
+description: |
+  EC-35 / Fix #126 control (present-column): TFDETECT greater than the subject's
+  latest Disposition Event day (grouped max of DS.DSSTDY per USUBJID). Subject
+  001's max DSSTDY is 10.5: TF row 1 (TFDETECT=15) fires, TF row 2 (TFDETECT=5)
+  does not. This also pins the D5 grouped-aggregate correction at parity level —
+  the fork's grouped max must aggregate the TARGET column (DSSTDY), not the whole
+  frame, for $max_dsstdy to carry the value this fixture fires on.
+  NOTE (updated 2026-07-30, EC-39 / Fix #129): DSSTDY was made non-integral to
+  dodge a rendering gap — coreJ's evalMaxGrouped accumulated in a double and
+  rendered an integral max as "10.0" where the fork's int64 max rendered "10".
+  That gap is now FIXED: the aggregate keys its result type on the declared
+  column type, so a LONG column yields a Long ("10") and a DOUBLE column keeps
+  the decimal ("10.5") — matching pandas' dtype propagation on both sides.
+  The 10.5 fixture is kept as the DOUBLE half of that contract.
+  The fix is pinned by OperationExecutorTest, not here: since the Java parity
+  lane switched to the native rules/ corpus, `max` is inlined and `$max_dsstdy`
+  never reaches Java's Output_Variables at all, so no spec can observe the
+  rendering. See PLAN-parity-open-engine-changes P2.
+python_source: rules-sendig FDA-SE0083
+rule:
+  coreId: FDA-SE0083
+datasets:
+  TF:
+    row_key: [STUDYID, USUBJID, TFSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '001', TFSEQ: 1, TFDETECT: 15}
+      - {STUDYID: S1, DOMAIN: TF, USUBJID: '001', TFSEQ: 2, TFDETECT: 5}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSSTDY: 3.5, DSDECOD: RECOVERED}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSSTDY: 10.5, DSDECOD: TERMINAL SACRIFICE}
+config:
+  standard: sendig
+  standard_version: 3.1.1
+library_mocks:
+  classes:
+    findings: [TF]
+    events: [DS]
+expected_violations:
+  - rule_id: FDA-SE0083
+    dataset: TF
+    row_key: {STUDYID: S1, TFSEQ: 1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $max_dsstdy: '10.5'
+      TFDETECT: '15'
+expected_errors: []

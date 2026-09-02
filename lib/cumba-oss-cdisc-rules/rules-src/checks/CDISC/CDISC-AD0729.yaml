@@ -1,0 +1,42 @@
+Core:
+  Id: "CDISC-AD0729"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a given value of PARAMCD, there is more\
+  \ than one value of ATPTN for a given value of ATPT, considering only records where\
+  \ both variables are populated"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ATPT) and not empty(ATPTN) and has_multiple_values_for(ATPTN, ATPT, within=PARAMCD)
+Outcome:
+  Message: "Within this value of PARAMCD, more than one value of ATPTN is present\
+    \ for the same populated value of ATPT"
+  Output_Variables:
+  - "ATPT"
+  - "ATPTN"
+  - "PARAMCD"
+Source:
+  Class: "BASIC DATA STRUCTURE"
+  Variable_or_Item: "ATPTN"
+  Natural_Language_Rule_Failure_Criteria: "Within a given value of PARAMCD, there\
+    \ is more than one value of ATPTN for a given value of ATPT, considering only\
+    \ those rows on which both variables are populated"
+  Rule_Failure_Criteria: "Within a given value of PARAMCD, there is more than one\
+    \ value of ATPTN for a given value of ATPT"
+  Condition_Failure: "On rows where ATPT and ATPTN are both populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR729"
+        Version: "1"
+      Version: "5.0"

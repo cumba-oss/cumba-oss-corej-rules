@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0342 expect=noViolation domain=ADLBC
+#note "ANRLOC (the guard AND key column) is not declared -- data that WOULD fire if ANRLOC existed and were constant. empty(ANRLOC) over an absent column folds to a broadcast TRUE, not makes it a broadcast FALSE and the AND short-circuits, so the rule EXECUTES and reports nothing -- even though the operator, left alone, would have dropped the absent key, regrouped on [PARAMCD] and flagged row 3. Pins 'the key-side guard suppresses the drop-and-regroup'. Verdict is noViolation WITH execution, not skipped."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ANRLO   type=Num
+---
+S1 | 001 | GLUC | 5.0 | 3
+S1 | 002 | GLUC | 5.1 | 3
+S1 | 003 | GLUC | 5.2 | 4

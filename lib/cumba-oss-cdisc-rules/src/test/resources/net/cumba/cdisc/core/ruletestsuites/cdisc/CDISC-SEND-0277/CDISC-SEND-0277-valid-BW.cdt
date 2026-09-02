@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0277 expect=noViolation domain=BW
+#note "Same fixture with a lowercase basename: dataset_location resolves to 'bw.xpt', no uppercase letter, so the rule executes and stays silent. Note the accessor is URI-based, not name-based - the dataset is still named BW, and that is deliberately not what the rule reads."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset BW class=FINDINGS label="Body Weight" uri=file:///study/send/bw.xpt
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Findings as Collected"
+---
+S1 | BW | 001 | 1 | BW | 250
+S1 | BW | 002 | 1 | BW | 260

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0353 expect=skipped domain=ADLBC
+#note "No A<digits>IND and no B<digits>IND column is declared, so nothing matches either wildcard pattern: WildcardExpander returns NoMatch and the rule DOES NOT EXECUTE. ADaM wildcard expansion is column-driven - the `_wildcards` block filters observed captures, it never generates indices - so this must be expect=skipped. Writing expect=noViolation here would fail, because that verdict asserts the rule ran."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ABLFL   type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | Y | 12.5
+CDISCPILOT01 | 01-701-1023 | ALT | Y | 14.0

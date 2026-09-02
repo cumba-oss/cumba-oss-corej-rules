@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1105 expect=noViolation domain=DS
+#note "EPOCH is not declared. EPOCH is Permissible in SDTMIG DS, so its absence is legitimate. The rule EXECUTES and is silent: empty(EPOCH) broadcasts TRUE over the absent column, so not empty(EPOCH) broadcasts FALSE and the AND dies. This is precisely where the cross-family twin FDA-SD1105 behaves differently - it carries Requirements.Variables.All: [EPOCH] and would report an auditable SKIP naming the absent variable, where PMDA-SD1105 reports a silent no-violation. Same verdict, different report; pins the PMDA side (finding SD1105-F1, WARNING, reporting-only)."
+#library standard=sdtmig version=3-2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSTERM  type=Char
+col DSDECOD type=Char
+col DSCAT   type=Char
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE

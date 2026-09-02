@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0010 expect=noViolation domain=ADSL
+#library standard=adamig version=1-1
+#note "The authored EC-43 Q2 exception. Three *FL columns are Y and the dataset carries no *FN column at all - the shape 11 of the 12 CDISC ADaM pilot datasets have, and a conformant one, because *FN is an optional ADaM companion variable. Without the guard this reported 6 times on 2 rows (3 per row, one per *FL root); WildcardExpander materialises the missing partner's concrete name, so the leaf is in EC-43's absent-column class and not EC-54's unresolved-NAME class. The suppressing conjunct is the *FN exists leaf in the Check - the same shape the CDISC twins CDISC-AD0010/AD0011 ship. NOTE it is effective in JAVA ONLY: the Python fork has no *-placeholder resolution for check targets, so these rules are inert there before and after the guard (documented ADaM wildcard-family limitation). exists rather than non_empty is deliberate - a PRESENT but blank *FN next to *FL=Y must still report, because the sheet requires *FN to be 1. expect=noViolation additionally asserts the rule EXECUTED, so this cannot pass by being out of scope, and the -invalid- twin is the positive control against passing vacuously."
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+col ITTFL   type=Char
+col EFFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Y | Y | Y
+CDISCPILOT01 | 01-701-1023 | Y | Y | Y
+---

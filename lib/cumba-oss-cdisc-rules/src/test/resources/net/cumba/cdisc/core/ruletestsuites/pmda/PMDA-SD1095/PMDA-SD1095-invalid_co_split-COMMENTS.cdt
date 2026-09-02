@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1095 expect=violation domain=COMMENTS
+#note "D-TA-6b scope fix: PMDA's own sheet lists CO, but the old Classes-based Scope (EVENTS/FINDINGS/FINDINGS ABOUT/INTERVENTIONS) never reached class Special Purpose, so a split Comments dataset was never checked. Under the classmates' exclusion-based Scope this 8-character split of CO fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset COMMENTS class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | 001 | 1 | GENERAL COMMENT

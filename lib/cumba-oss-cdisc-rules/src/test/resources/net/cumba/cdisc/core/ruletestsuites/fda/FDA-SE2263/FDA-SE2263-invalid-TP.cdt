@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE2263 expect=violation domain=TP
+#note "TPSTGORD 1 appears twice within RPATHCD P1 -> both duplicate records fire; path P2's order 1 does not."
+#library standard=sendig-dart version=1-1
+#expectViolationCount 2
+#expectViolationAt row=1 RPATHCD=P1 TPSTGORD=1
+#expectViolationAt row=2 RPATHCD=P1 TPSTGORD=1
+dataset TP class="TRIAL DESIGN"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Planned Repro Stage Code"
+---
+S1 | TP | P1 | 1 | MAT
+S1 | TP | P1 | 1 | GES
+S1 | TP | P2 | 1 | MAT

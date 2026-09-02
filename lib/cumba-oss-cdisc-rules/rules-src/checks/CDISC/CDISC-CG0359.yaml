@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0359"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable label is not in title case, i.e. the\
+  \ first letter of every word is not capitalized except for articles, prepositions,\
+  \ and conjunctions (per SDTMIG Section 2.6, item 3h), which may remain lowercase."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_label("DATA") !~
+    /^\\s*[A-Z]\\S*(\\s+(a|an|the|and|or|nor|but|for|so|yet|about|above|across|after|against|along|amid|among|around|as|at|before|behind|below|beneath|beside|between|beyond|by|concerning|despite|down|during|except|following|from|inside|into|in|like|near|onto|on|outside|out|over|of|off|past|per|regarding|since|than|throughout|through|till|toward|towards|to|underneath|under|until|unto|upon|up|versus|via|within|without|with|if|while|whereas|because|unless|although|though|when|where|whether|once|and\/or|vs\\.|w\/|\\([^)]*\\)|[a-z]+[A-Z]\\S*|[A-Z]\\S*))*\\s*$/
+Outcome:
+  Message: "Variable label is not in title case."
+  Output_Variables:
+  - "variable_name"
+  - "variable_label"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable labels are in title case"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0359"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0359"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0359"
+        Version: "1"
+      Version: "2.0"

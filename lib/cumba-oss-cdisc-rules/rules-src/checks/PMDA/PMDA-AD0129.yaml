@@ -1,0 +1,68 @@
+Core:
+  Id: "PMDA-AD0129"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, within a study, the numeric Baseline Value (BASE)\
+  \ takes more than one value for the same combination of Parameter Code (PARAMCD)\
+  \ and Character Baseline Value (BASEC). Only records on which PARAMCD, BASE and\
+  \ BASEC are populated are considered; there must be a one-to-one map between BASE\
+  \ and BASEC within a given parameter when both are populated."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(BASE) and not empty(BASEC) and not empty(PARAMCD) and has_multiple_values_for(BASE,
+    BASEC, within=PARAMCD)
+Outcome:
+  Message: "Inconsistent value for BASE"
+  Output_Variables:
+  - "PARAMCD"
+  - "BASE"
+  - "BASEC"
+Source:
+  Message: "Inconsistent value for BASE"
+  Description: "Within a study, all BASE values must be the same for each unique value\
+    \ group of [PARAMCD, BASEC] when PARAMCD, BASE and BASEC are populated (ADaM IG:\
+    \ There must be a one-to-one map between BASE and BASEC within a given PARAM if\
+    \ BOTH are populated)."
+  Domains: "BDS, ADNCA"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0129"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0129"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0129"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0129"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1022 expect=violation domain=SUPPAE
+#note "FRESH. Four rows pin both ends of the length range and the character set. Row 1 (AETRTEMF) is EXACTLY 8 characters, SILENT (isValidIdentifier: n < 1 || n > 8 rejects, so 8 is admitted). Row 2 (AETRTEMFL) is 9 characters, FIRES. Row 3 (A) is 1 character, SILENT (the lower bound). Row 4 (AE-SER) has a hyphen, outside [A-Z0-9_], FIRES. The twins carry only a 10-character name and a 7-character one, so neither end of the boundary is covered anywhere in the twin group."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 QNAM=AETRTEMFL
+#expectViolationAt row=4 QNAM=AE-SER
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEMF  | Flag One   | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | AETRTEMFL | Flag Two   | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 3 | A         | Flag Three | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 4 | AE-SER    | Flag Four  | Y

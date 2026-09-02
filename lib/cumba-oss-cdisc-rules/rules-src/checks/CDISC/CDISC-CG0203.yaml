@@ -1,0 +1,56 @@
+Core:
+  Id: "CDISC-CG0203"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when RDOMAIN is not equal to 'DM' but IDVAR is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Check:
+  expression: >-
+    RDOMAIN != "DM" and empty(IDVAR)
+Outcome:
+  Message: "RDOMAIN is not equal to 'DM' but IDVAR is not populated."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+Source:
+  Class: "SPC"
+  Domain: "SUPP--"
+  Variable: "IDVAR"
+  Condition: "RDOMAIN ^= 'DM'"
+  Rule: "IDVAR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0203"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0203"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0203"
+        Version: "1"
+      Version: "2.0"

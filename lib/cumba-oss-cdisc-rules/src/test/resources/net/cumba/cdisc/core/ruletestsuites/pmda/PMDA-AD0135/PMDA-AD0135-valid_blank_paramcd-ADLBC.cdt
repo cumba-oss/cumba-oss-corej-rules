@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0135 expect=noViolation domain=ADLBC
+#note "Data is inconsistent, but not empty(PARAMCD) is false on both rows and the blank within key additionally drops the group under DROP_MISSING_KEYS -> silent by two independent routes."
+#library standard=adamig version=1-0
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col SHIFT1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 |  | NORMALTOHIGH | 1
+CDISCPILOT01 | 01-701-1023 |  | LOWTONORMAL  | 1
+---

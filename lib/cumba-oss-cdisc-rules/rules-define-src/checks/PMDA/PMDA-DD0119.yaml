@@ -1,0 +1,16 @@
+Rule_Id: "PMDA-DD0119"
+Sheet_Rule_Identifier: "DD0119"
+Rule_Set: "PMDA"
+Element: "Standard"
+Attribute: "PublishingSet"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The PublishingSet attribute is required when Type is 'CT'."
+Message: "Missing PublishingSet value"
+# Exact duplicate of CDISC twin 0035 (same guard, target, versions).
+Check:
+  kind: "exists"
+  target: "@PublishingSet"
+  when:
+    path: "@Type"
+    equals: "CT"

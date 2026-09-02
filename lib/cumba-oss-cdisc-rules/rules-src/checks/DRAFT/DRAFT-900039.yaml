@@ -1,0 +1,29 @@
+Core:
+  Id: "DRAFT-900039"
+  Status: "Draft"
+  Version: "1"
+Description: "Raise an error when DCSREAS is populated while EOSSTT is 'COMPLETED';\
+  \ the discontinuation reason should be null for subjects who completed the study."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "EOSSTT"
+Check:
+  expression: >-
+    EOSSTT == "COMPLETED" and not empty(DCSREAS)
+Outcome:
+  Message: "DCSREAS is populated when EOSSTT is 'COMPLETED'. Discontinuation reason\
+    \ should be null for subjects who completed the study."
+  Output_Variables:
+  - "EOSSTT"
+  - "!DCSREAS"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"

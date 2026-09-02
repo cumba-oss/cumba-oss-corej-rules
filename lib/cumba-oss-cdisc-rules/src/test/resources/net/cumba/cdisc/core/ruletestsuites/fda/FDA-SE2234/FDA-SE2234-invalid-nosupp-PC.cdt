@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE2234 expect=violation domain=PC
+#note "Regression pin for the W5 absent-dataset fix: the $study_datasets shares_no_elements_with [SUPPPC] branch fires the BLQ record although the study ships no SUPPPC dataset at all."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ
+S1 | PC | 001 | 2 | DRUGX | 4.1

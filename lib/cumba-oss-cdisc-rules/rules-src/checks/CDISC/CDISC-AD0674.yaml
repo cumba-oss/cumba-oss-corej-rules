@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-AD0674"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when there is more than one value of DEVGRyN for a given\
+  \ value of DEVGRy, considering only rows where both variables are populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "DEVICE LEVEL ANALYSIS DATASET"
+Check:
+  expression: >-
+    not empty(DEVGRyN) and not empty(DEVGRy) and has_multiple_values_for(DEVGRyN, DEVGRy)
+Outcome:
+  Message: "More than one value of DEVGRyN was found for a given value of DEVGRy,\
+    \ among the rows where both variables are populated."
+  Output_Variables:
+  - "DEVGRy"
+  - "DEVGRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "DEVICE LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "DEVGRyN where y is an integer [1-99, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "There is more than one value of DEVGRyN\
+    \ for a given value of DEVGRy, considering only those rows on which both variables\
+    \ are populated"
+  Rule_Failure_Criteria: "There is more than one value of DEVGRyN for a given value\
+    \ of DEVGRy"
+  Condition_Failure: "On rows where both DEVGRyN and DEVGRy are both populated."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR674"
+        Version: "1"
+      Version: "5.0"

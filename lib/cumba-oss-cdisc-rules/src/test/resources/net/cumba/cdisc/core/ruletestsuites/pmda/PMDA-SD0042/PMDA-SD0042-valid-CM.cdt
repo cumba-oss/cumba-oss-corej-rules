@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0042 expect=noViolation domain=CM
+#note "Row 1: the conformant pre-specified-not-done shape. Row 2: occurrence recorded. Row 3: PRESP empty ('' == 'Y' false) -> clean."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMPRESP  type=Char
+col CMOCCUR  type=Char
+col CMSTAT   type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | Y |   | NOT DONE
+S1 | CM | 001 | 2 | IBUPROFEN | Y | Y |
+S1 | CM | 001 | 3 | NAPROXEN  |   |   |
+---

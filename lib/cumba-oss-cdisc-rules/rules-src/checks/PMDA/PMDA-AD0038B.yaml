@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0038B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, within a study, the character grouping variable\
+  \ *GRy does not have a single consistent value for each unique value of the numeric\
+  \ grouping variable *GRyN. *GRy is a derived character grouping variable (name ends\
+  \ in GRy, y = 1-99) and *GRyN is its numeric equivalent (name ends in GRyN). Only\
+  \ rows on which both variables are populated are considered."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(*GRyN) and not empty(*GRy) and has_multiple_values_for(*GRy, *GRyN)
+Outcome:
+  Message: "The character grouping variable *GRy has inconsistent values for a given\
+    \ value of the numeric grouping variable *GRyN."
+  Output_Variables:
+  - "*GRy"
+  - "*GRyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Message: "Inconsistent value for *GRy"
+  Description: "Within a study, all *GRy values must be the same for each unique value\
+    \ of *GRyN when the primary variable *GRy is populated. ADaM IG v1.1 p.15 general\
+    \ variable naming conventions #10: If any combining of the SDTM character categories\
+    \ is done, the name of the derived ADaM character grouping variable should end\
+    \ in GRy and the name of its numeric equivalent should end in GRyN where y is\
+    \ an integer from 1-9 representing a grouping scheme. CDISC created 3 new explicit\
+    \ rules for ADAE which were already covered by this general rule. Considering\
+    \ only those rows on which both variables are populated."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0038B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0038B"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0038B"
+        Version: "1"
+      Version: "6.0"

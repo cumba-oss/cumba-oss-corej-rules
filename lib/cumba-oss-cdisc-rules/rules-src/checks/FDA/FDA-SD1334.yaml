@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SD1334"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Informed Consent (RFICDTC) is after\
+  \ the Subject Reference Start Date/Time (RFSTDTC)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFSTDTC"
+Check:
+  expression: >-
+    not empty(RFICDTC) and date(RFICDTC) > RFSTDTC
+Outcome:
+  Message: "RFICDTC is after RFSTDTC"
+  Output_Variables:
+  - "RFSTDTC"
+  - "RFICDTC"
+Source:
+  FDA_Validator_Rule_Message: "RFICDTC is after RFSTDTC"
+  FDA_Validator_Rule_Description: "Date/Time of Informed Consent (RFICDTC) should\
+    \ not be after Subject Reference Start Date/Time (RFSTDTC)."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1334"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1334"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1334"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1334"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB034"
+        Version: "1"
+      Version: "1.5"

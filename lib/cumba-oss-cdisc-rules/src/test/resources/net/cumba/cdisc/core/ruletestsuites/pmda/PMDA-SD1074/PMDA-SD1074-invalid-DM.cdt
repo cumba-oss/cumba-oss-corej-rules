@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1074 expect=violation domain=DM
+#note "DM carries SPECIES and STRAIN, two variables that exist only in SEND, so an SDTM submission must not include them. Each variable is independently non-conformant -> one finding per offending variable."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt variable_name=SPECIES
+#expectViolationAt variable_name=STRAIN
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+col STRAIN  type=Char label="Strain/Substrain"
+---
+S1 | DM | 001 | M | RAT | WISTAR

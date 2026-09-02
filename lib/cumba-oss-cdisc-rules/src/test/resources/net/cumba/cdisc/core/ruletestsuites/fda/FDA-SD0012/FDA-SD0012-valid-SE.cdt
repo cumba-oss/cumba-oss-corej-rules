@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0012 expect=noViolation domain=SE
+#note "Every element starts on or before its end day; the boundary row 2 has SESTDY equal to SEENDY, which the rule allows. Row 3 leaves SEENDY missing."
+#library standard=sdtmig version=3-4
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDY  type=Num  label="Study Day of Start of Element"
+col SEENDY  type=Num  label="Study Day of End of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 1  | 5
+S1 | SE | 001 | 2 | TRT  | 6  | 6
+S1 | SE | 001 | 3 | FUP  | 29 |

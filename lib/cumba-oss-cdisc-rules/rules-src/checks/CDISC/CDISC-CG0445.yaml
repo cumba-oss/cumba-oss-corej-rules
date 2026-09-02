@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG0445"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Parameter Value (TSVAL) for a 'COMPTRT' trial-summary\
+  \ parameter is not a valid preferred term in the FDA Substance Registration System\
+  \ (SRS)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$term_valid"
+  expression: "valid_external_dictionary_value(TSVAL, external_dictionary_type=\"\
+    unii\", dictionary_term_type=\"SRS\")"
+Check:
+  expression: >-
+    TSPARMCD == "COMPTRT" and $term_valid == false
+Outcome:
+  Message: "TSVAL is not a valid FDA-SRS preferred term for the 'COMPTRT' parameter."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL"
+  Condition: "TSPARMCD = 'COMPTRT'"
+  Rule: "TSVAL is a valid preferred term from FDA Substance Registration System (SRS)"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0445"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0445"
+        Version: "1"
+      Version: "2.0"

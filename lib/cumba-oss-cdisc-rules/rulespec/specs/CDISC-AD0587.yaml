@@ -1,0 +1,44 @@
+name: CDISC-AD0587
+kind: rule
+description: |
+  Wave B3 port — T1b PlainIntermediate.
+  CDISC-AD0587: more than one PBCHGCAy for a given PBCHG within PARAMCD
+  Record-data rule scoped to BASIC DATA STRUCTURE + MEDICAL DEVICE BASIC DATA STRUCTURE.
+  Uses has_multiple_values_for (within PARAMCD) — Python's DataframeType lacks this operator
+  (Python engine gap), so this spec baselines on the Python lane; expected matches Java.
+python_source: rules-adamig-1-3.json (CDISC-AD0587)
+rule:
+  coreId: CDISC-AD0587
+datasets:
+  ADLB:
+    row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
+    column_types:
+      AVISITN: LONG
+    rows:
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, PBCHGCAy: 'A', PBCHG: '1'}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 2, PBCHGCAy: 'B', PBCHG: '1'}
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, PBCHGCAy: 'C', PBCHG: '2'}
+config:
+  standard: adamig
+  standard_version: '1.3'
+library_mocks:
+  classes:
+    basic data structure: [ADLB]
+expected_violations:
+  - rule_id: CDISC-AD0587
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1}
+    status: SUCCESS
+    output_variables:
+      PBCHGCAy: 'A'
+      PBCHG: '1'
+      PARAMCD: 'HGB'
+  - rule_id: CDISC-AD0587
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 2}
+    status: SUCCESS
+    output_variables:
+      PBCHGCAy: 'B'
+      PBCHG: '1'
+      PARAMCD: 'HGB'
+expected_errors: []

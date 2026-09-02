@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-CG0383"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a High Level Group Term (--HLGT) value is not a\
+  \ valid High Level Group Term in the MedDRA dictionary."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+    - "CE"
+    - "MH"
+Requirements:
+  Variables:
+    All:
+    - "--HLGT"
+Operations:
+- id: "$hlgt_valid"
+  expression: "valid_external_dictionary_value(--HLGT, external_dictionary_type=\"\
+    meddra\", dictionary_term_type=\"HLGT\", case_sensitive=false)"
+Check:
+  expression: >-
+    $hlgt_valid == false
+Outcome:
+  Message: "High Level Group Term (--HLGT) is not a valid MedDRA High Level Group\
+    \ Term."
+  Output_Variables:
+  - "--HLGT"
+Source:
+  Class: "EVT"
+  Domain: "AE, MH, CE"
+  Variable: "--HLGT"
+  Rule: "--HLGT = MedDRA high level group TERM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0383"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0383"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0383"
+        Version: "1"
+      Version: "2.0"

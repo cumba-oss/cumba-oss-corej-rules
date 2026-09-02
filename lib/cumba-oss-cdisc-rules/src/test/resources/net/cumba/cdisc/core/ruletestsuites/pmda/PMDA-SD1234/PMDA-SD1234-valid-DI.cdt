@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1234 expect=noViolation domain=DI
+#note "Every device (DEV1, DEV2) carries a DIPARMCD DEVTYPE record, so \$devtype_count is 1 for each group -> no violation."
+#library standard=sdtmig version=3-4
+dataset DI label="Device Identifiers"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SPDEVID  type=Char label="Sponsor Device Identifier"
+col DISEQ    type=Num  label="Sequence Number"
+col DIPARMCD type=Char label="Device Parameter Short Name"
+col DIPARM   type=Char label="Device Parameter"
+col DIVAL    type=Char label="Parameter Value"
+---
+S1 | DI | DEV1 | 1 | DEVTYPE | Device Type  | INFUSION PUMP
+S1 | DI | DEV1 | 2 | MODEL   | Model Number | M-100
+S1 | DI | DEV2 | 1 | DEVTYPE | Device Type  | CATHETER
+S1 | DI | DEV2 | 2 | MODEL   | Model Number | M-200

@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-SEND-0292 expect=violation domain=PC
+#note "Inside the single (DRUGX, DOSE 1) partition the key '1 HOUR' has two distinct dependents -> rows 1 and 2 fire; row 3's key has one. The M3-D21 widening added --CAT and --SCAT to the partition; neither column is declared here, and the grouped operator drops absent key columns and regroups, so the verdict is unchanged."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 PCTPT="1 HOUR" PCTPTNUM=1
+#expectViolationAt row=2 PCTPT="1 HOUR" PCTPTNUM=2
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCTEST   type=Char label="Pharmacokinetic Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+col PCTPT    type=Char label="Planned Time Point Name"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 | 1 | DRUGX | Drug X | 412 | 1 HOUR | 1 | DOSE 1
+S1 | PC | 002 | 1 | DRUGX | Drug X | 388 | 1 HOUR | 2 | DOSE 1
+S1 | PC | 003 | 1 | DRUGX | Drug X | 350 | 2 HOUR | 3 | DOSE 1
+---

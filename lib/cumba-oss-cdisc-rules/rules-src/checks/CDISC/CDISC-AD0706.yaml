@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-AD0706"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a BDS or OCCDS record has a populated APERIOD value\
+  \ but the ADSL dataset contains no PxxSw variable for that xx=APERIOD value (for\
+  \ any w)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    not empty(APERIOD) and not empty(ASPER) and not var_exists(ADSL.P${APERIOD:%02d}S${*})
+Outcome:
+  Message: "For every unique xx value of APERIOD in BDS or OCCDS datasets, there is\
+    \ not a variable PxxSw"
+  Output_Variables:
+  - "APERIOD"
+  - "ASPER"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "ASPER"
+  Natural_Language_Rule_Failure_Criteria: "For every unique xx value of APERIOD in\
+    \ BDS or OCCDS datasets, there is not a variable PxxSw"
+  Rule_Failure_Criteria: "For every unique xx value of APERIOD in BDS or OCCDS datasets,\
+    \ there is not a variable PxxSw"
+  Condition_Failure: "APERIOD and ASPER are populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR706"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR706"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1144 expect=violation domain=MH
+#note "Row 1: MHSTDTC equal to RFSTDTC -> fires (>= admits equality; the sheet Rule is MHSTDTC < DM.RFSTDTC so equal is non-conformant). Row 2: MHSTDTC after RFSTDTC -> fires. Row 3: MHSTDTC before RFSTDTC -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 MHSEQ=1
+#expectViolationAt row=2 MHSEQ=2
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHSTDTC type=Char label="Start Date/Time of Medical History Event"
+---
+S1 | MH | 001 | 1 | ASTHMA       | 2020-01-01
+S1 | MH | 001 | 2 | DIABETES     | 2020-02-01
+S1 | MH | 001 | 3 | HYPERTENSION | 2019-06-15
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-01
+---

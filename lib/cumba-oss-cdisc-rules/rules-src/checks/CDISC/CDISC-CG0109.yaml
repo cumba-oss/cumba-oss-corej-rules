@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-CG0109"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a subject has no records in the EX dataset but Actual\
+  \ Arm Code (ACTARMCD) is not 'SCRNFAIL', 'NOTASSGN', or 'NOTTRT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Operations:
+- id: "$usubjids_in_ex"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+Check:
+  expression: >-
+    upper(ACTARMCD) not in ["SCRNFAIL", "NOTASSGN", "NOTTRT"] and USUBJID not in $usubjids_in_ex
+Outcome:
+  Message: "Subject has no records in the EX dataset but ACTARMCD is not 'SCRNFAIL',\
+    \ 'NOTASSGN', or 'NOTTRT'."
+  Output_Variables:
+  - "ACTARMCD"
+  - "$usubjids_in_ex"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARMCD"
+  Condition: "No records in EX for Subject"
+  Rule: "DM.ACTARMCD in ('SCRNFAIL', 'NOTASSGN', 'NOTTRT')"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0109"
+        Version: "1"
+      Version: "2.0"

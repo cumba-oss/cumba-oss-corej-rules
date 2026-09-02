@@ -1,0 +1,34 @@
+#!RuleTest
+#test FDA-SE2270 expect=violation domain=MA
+#note "Subject 001's latest disposition is study day 20. Row 1: MADY=15 does not equal DSSTDY=20 -> offending. Row 2: MADY=20 equals it -> clean. Row 3: MADY=5 matches only the earlier (superseded) disposition day -> offending. O-4 (Fix #337, owner 2026-08-22 'the issue is by subject'): the rule carries Grouping: {Variables: [USUBJID]}, so the two offending rows of ONE subject fold into ONE finding, anchored at the subject's first flagged row (row 1). Re-pinned 2 -> 1; a per-record reading would report 2 here."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 MADY=15
+dataset MA label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASPEC   type=Char label="Specimen Material Type"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+col MADTC    type=Char label="Date/Time of Collection"
+col MADY     type=Num  label="Study Day of Collection"
+---
+S1 | MA | 001 | 1 | GROSPATH | LIVER  | ENLARGED | 2020-01-15 | 15
+S1 | MA | 001 | 2 | GROSPATH | KIDNEY | NORMAL   | 2020-01-20 | 20
+S1 | MA | 001 | 3 | GROSPATH | SPLEEN | NORMAL   | 2020-01-05 | 5
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY  | RECOVERY           | 2020-01-05 | 5
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20 | 20

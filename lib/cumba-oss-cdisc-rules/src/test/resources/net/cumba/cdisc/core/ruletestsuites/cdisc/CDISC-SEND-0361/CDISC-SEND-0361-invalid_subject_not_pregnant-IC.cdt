@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-SEND-0361 expect=violation domain=IC
+#note "FRESH, per M3-SEND-T1-K3-04 stage-r. Row 1 (001) is in \$pregnant_subjects -> silent. Rows 2 and 3 are BOTH subject 002, which has no PYRESCAT='PREGNANT' record -> DISCRIMINATING: per subject 1, per record 2. Ruled per subject (SD1316-F3), anchored at the group's first flagged row = IC row 2. No class= on IC: the rule has no Scope.Classes block and the offline domain-class map has no 'send'.IC entry. PY must be DECLARED - an entirely absent PY is the Fix #222 AbsentDatasetSkip carve-out."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002 ICSEQ=1
+dataset IC label="Implantation Classification"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FETUSID  type=Char label="Unique Fetus Identifier"
+col ICSEQ    type=Num  label="Sequence Number"
+col ICTESTCD type=Char label="Test Short Name"
+col ICTEST   type=Char label="Implantation Exam Name"
+col ICIMPLBL type=Char label="Implantation Site Label"
+col ICORRES  type=Char label="Result or Findings as Collected"
+---
+S1 | IC | 001 | F01 | 1 | IMPLNUM | Implantation Count | A1 | 3
+S1 | IC | 002 | F01 | 1 | IMPLNUM | Implantation Count | A1 | 2
+S1 | IC | 002 | F02 | 2 | IMPLNUM | Implantation Count | A2 | 1
+---
+
+dataset PY label="Nonclinical Pregnancy Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PYSEQ    type=Num  label="Sequence Number"
+col PYTESTCD type=Char label="Test Short Name"
+col PYTEST   type=Char label="Pregnancy Result Test Name"
+col PYRESCAT type=Char label="Result Category"
+---
+S1 | PY | 001 | 1 | PREGIND | Pregnancy Indicator | PREGNANT
+S1 | PY | 003 | 1 | PREGIND | Pregnancy Indicator | NOT PREGNANT
+---

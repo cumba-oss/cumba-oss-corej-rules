@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0060 expect=violation domain=DM
+#note "AGEU is present in the submitted DM dataset but has no declaration in the Define-XML -> the variable is not described in the data definition document."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=AGEU
+#define variable-metadata DM STUDYID name=STUDYID label="Study Identifier"
+#define variable-metadata DM USUBJID name=USUBJID label="Unique Subject Identifier"
+#define variable-metadata DM AGE name=AGE label="Age"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | 01-701-1015 | 56 | YEARS

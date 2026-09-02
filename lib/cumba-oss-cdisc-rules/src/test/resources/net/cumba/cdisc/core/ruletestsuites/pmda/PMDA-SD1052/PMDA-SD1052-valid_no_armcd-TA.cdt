@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1052 expect=noViolation domain=TA
+#note "FRESH, DISCRIMINATING. DELIBERATELY NO ARMCD COLUMN. Predicted SILENT because the AUTHORED var_exists(\"ARMCD\") conjunct is false - and it is load-bearing: without it, uniqueSetViolations would DROP the absent key and regroup on TAETORD alone (EC-53 / Fix #143), making the two rows duplicates and firing on both. The rule is NOT skipped: Requirements.Variables.All names TAETORD, which is present. A fire means the authored guard stopped working; escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col ARM     type=Char
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char
+---
+S1 | TA | Arm A | 1 | SCRN
+S1 | TA | Arm A | 1 | TRT

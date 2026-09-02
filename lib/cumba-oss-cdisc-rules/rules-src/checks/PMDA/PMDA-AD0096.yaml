@@ -1,0 +1,38 @@
+Core:
+  Id: "PMDA-AD0096"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the character Actual Treatment (TRTA) does not have\
+  \ a single consistent value for each unique value of the numeric Actual Treatment\
+  \ (TRTAN), evaluated on rows where the primary variable TRTA is populated; within\
+  \ a study each TRTAN value must map to one TRTA value."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(TRTA) and var_exists("TRTAN") and is_inconsistent_across_dataset(TRTA, keys=[TRTAN])
+Outcome:
+  Message: "TRTA has inconsistent values for the same TRTAN."
+  Output_Variables:
+  - "TRTA"
+  - "TRTAN"
+Source:
+  Message: "Inconsistent value for TRTA"
+  Description: "Within a study, all TRTA values must be the same for each unique value\
+    \ of TRTAN when the primary variable TRTA is populated."
+  Domains: "BDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0096"
+        Version: "1"
+      Version: "6.0"

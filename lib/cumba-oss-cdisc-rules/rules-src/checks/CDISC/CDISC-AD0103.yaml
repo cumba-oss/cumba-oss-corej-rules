@@ -1,0 +1,71 @@
+Core:
+  Id: "CDISC-AD0103"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when APERIOD is greater than 1 but the corresponding\
+  \ TRxxSDT variable (xx = zero-padded APERIOD value) is not present in ADSL."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "APERIOD"
+Match_Datasets:
+- Name: "ADSL"
+  Keys:
+  - "USUBJID"
+Check:
+  expression: >-
+    APERIOD > 1 and not var_exists(ADSL.TR${APERIOD:%02d}SDT)
+Outcome:
+  Message: "The value of APERIOD (greater than 1) has no corresponding TRxxSDT variable\
+    \ present in ADSL."
+  Output_Variables:
+  - "APERIOD"
+Source:
+  Class: "ALL"
+  Variable_or_Item: "APERIOD"
+  Natural_Language_Rule_Failure_Criteria: "For every unique xx value of APERIOD, there\
+    \ is not an ADSL variable TRxxSDT"
+  Rule_Failure_Criteria: "The value of APERIOD does not have a corresponding xx component\
+    \ of a TRxxSDT variable in ADSL"
+  Condition_Failure: "APERIOD is greater than 1"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR103"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR103"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR103"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR103"
+        Version: "1"
+      Version: "5.0"

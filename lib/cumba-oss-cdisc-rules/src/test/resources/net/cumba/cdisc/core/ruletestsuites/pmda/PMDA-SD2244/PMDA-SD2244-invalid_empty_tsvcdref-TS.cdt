@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD2244 expect=violation domain=TS
+#note "Boundary: TSVCDREF is present as a column but the value is EMPTY on the FCNTRY record. 'must be GENC or ISO 3166-1 alpha-3' is violated by an empty value just as by a wrong one - a populated literal compared with != against an empty target is TRUE. TSVCDREF is deliberately NOT pinned by value; the row and the gate variable are."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 TSPARMCD=FCNTRY
+dataset TS label="Trial Summary"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSPARM   type=Char
+col TSVAL    type=Char
+col TSVALCD  type=Char
+col TSVCDREF type=Char
+---
+S1 | TS | 1 | FCNTRY | Planned Country of Investigational Sites | USA | USA |

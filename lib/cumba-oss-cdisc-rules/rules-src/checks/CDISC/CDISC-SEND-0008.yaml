@@ -1,0 +1,78 @@
+Core:
+  Id: "CDISC-SEND-0008"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable declared in the Define-XML document has\
+  \ no Origin (Type) declared."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not empty(var_name("DEFINE")) and empty(var_origin_type("DEFINE"))
+Outcome:
+  Message: "A variable declared in the Define-XML document has no Origin (Type)."
+  Output_Variables:
+  - "define_variable_name"
+  - "define_variable_origin_type"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "Variable-level metadata in Define-XML document should include\
+    \ the Origin of each variable such as whether it was collected or derived."
+  Rule: "Variable-level metadata in Define-XML document matches the Origin in the\
+    \ SENDIG"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND8"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0090 expect=noViolation domain=ADLBC
+#note "Subject-level arm of the sheet's list. Column TRT01P (DRUGA) matches TRT\\d\\d[PA] -> count 1 -> silent."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRT01P  type=Char
+---
+S1 | 01-701-1015 | ALB | 30 | DRUGA
+S1 | 01-701-1023 | ALB | 31 | DRUGA

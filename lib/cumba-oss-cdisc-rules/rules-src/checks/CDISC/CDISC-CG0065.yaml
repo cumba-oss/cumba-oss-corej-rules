@@ -1,0 +1,57 @@
+Core:
+  Id: "CDISC-CG0065"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reported Term for the Disposition Event (DSTERM)\
+  \ is 'COMPLETED' but Standardized Disposition Term (DSDECOD) is not 'COMPLETED'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSTERM"
+    - "DSDECOD"
+Check:
+  expression: >-
+    DSTERM == "COMPLETED" and DSDECOD != "COMPLETED"
+Outcome:
+  Message: "DSDECOD is not equal to 'COMPLETED' when DSTERM equals 'COMPLETED'."
+  Output_Variables:
+  - "DSTERM"
+  - "DSDECOD"
+Source:
+  Class: "EVT"
+  Domain: "DS"
+  Variable: "DSDECOD"
+  Condition: "DSTERM = 'COMPLETED'"
+  Rule: "DSDECOD = 'COMPLETED'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0065"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0065"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0065"
+        Version: "1"
+      Version: "2.0"

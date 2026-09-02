@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2229 expect=violation domain=TF
+#note "Domain-scope variant: TF is in the rule's sheet scope (MI, TF). Row 1: TFRESCAT=MALIGNANT but TFSTRESC=Papilloma, whose dummy-neoplasm malignancy attribute is BENIGN -> misaligned pair -> fires. Row 2 is correctly aligned."
+#library standard=sendig version=3-1-1
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1 TFSEQ=1 TFSTRESC=Papilloma TFRESCAT=MALIGNANT
+dataset TF class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col TFSEQ    type=Num
+col TFTESTCD type=Char
+col TFSTRESC type=Char
+col TFRESCAT type=Char
+---
+S01 | TF | 001 | 1 | TUMEXAM | Papilloma | MALIGNANT
+S01 | TF | 001 | 2 | TUMEXAM | Sarcoma   | MALIGNANT

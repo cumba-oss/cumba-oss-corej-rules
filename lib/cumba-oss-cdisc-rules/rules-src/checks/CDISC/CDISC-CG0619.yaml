@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-CG0619"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SPCUFL is populated with a value other than 'N'."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--SPCUFL"
+Check:
+  expression: >-
+    not empty(--SPCUFL) and --SPCUFL != "N"
+Outcome:
+  Message: "--SPCUFL is populated with a value other than 'N'."
+  Output_Variables:
+  - "--SPCUFL"
+Source:
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--SPCUFL"
+  Rule: "--SPCUFL = 'N' or null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0619"
+        Version: "1"
+      Version: "2.0"

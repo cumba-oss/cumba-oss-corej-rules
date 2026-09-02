@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD2285 expect=violation domain=MB
+#note "Domain-scope variant: MB is in the rule's sheet scope (LB, MB, MS). Row 1: MBLOINC=0000-0 is not a LOINC code in the dummy dictionary -> fires."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1 MBSEQ=1 MBLOINC=0000-0
+dataset MB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MBSEQ    type=Num
+col MBTESTCD type=Char
+col MBLOINC  type=Char
+---
+S01 | MB | 001 | 1 | BACT | 0000-0
+S01 | MB | 001 | 2 | BACT | 1558-6

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0146 expect=violation domain=ADLBC
+#note "No wildcard marker in PARAM/PARAMN, so the rule runs once unexpanded. Key PARAMN=1 holds PARAM {Albumin x2, Bilirubin x1} -> row 3 is the minority. Group 2 is consistent."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003 PARAM=Bilirubin PARAMN=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col PARAMN  type=Num
+---
+S1 | 001 | ALB   | Albumin    | 1
+S1 | 002 | ALB   | Albumin    | 1
+S1 | 003 | ALB   | Bilirubin  | 1
+S1 | 004 | CREAT | Creatinine | 2
+S1 | 005 | CREAT | Creatinine | 2

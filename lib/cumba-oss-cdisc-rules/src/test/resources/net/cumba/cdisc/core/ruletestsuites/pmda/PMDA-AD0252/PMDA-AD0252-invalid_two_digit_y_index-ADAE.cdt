@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0252 expect=violation domain=ADAE
+#note "Pins the M2-D3 ruled y-marker WIDENING (Fix #270): y = ([1-9]|[1-9][0-9]), indices 1-99 unpadded - deliberately wider than the deleted _wildcards {y: min 1, max 9} declaration, whose cap disappeared with the block. PARCAT10 (two-digit index) matches ^PARCAT([1-9]|[1-9][0-9])$ and fires; the negative controls in the same dataset prove the two forms the ruling deliberately EXCLUDES stay silent: PARCAT01 (zero-padded - ADaM's index grammar is non-zero-padded, the shipped RACEGRy idiom) and PARCAT0 (index 0) match no disjunct. Exactly ONE violation, pinned by variable_name."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt variable_name=PARCAT10
+dataset ADAE structure=OCCDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col PARCAT10 type=Char
+col PARCAT01 type=Char
+col PARCAT0  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | SEVERITY | SEVERITY | SEVERITY
+CDISCPILOT01 | 01-701-1023 | NAUSEA | SEVERITY | SEVERITY | SEVERITY

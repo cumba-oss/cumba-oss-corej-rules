@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0130 expect=violation domain=ADLBC
+#note "NEW under the M2-P1 ruling (option (a), Fix #302) - the mirror the AD0130 side was missing, so the within=PARAMCD change does not land unpinned on this rule. Dependent BASEC, key BASE. Two subjects, one parameter, one BASE value carrying two distinct BASEC values: silent while the partition carried USUBJID, and under within=PARAMCD both rows share the SYSBP partition, key 120 carries {NORMAL, WITHINRANGE}, and both fire. Row 3 (BASE 140 -> HIGH) is the one-to-one control that must stay silent. Mirror of PMDA-AD0129-invalid_cross_subject_disagreement-ADLBC."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=SYSBP BASE=120 BASEC=NORMAL
+#expectViolationAt row=2 PARAMCD=SYSBP BASE=120 BASEC=WITHINRANGE
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col BASE    type=Num
+col BASEC   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | SYSBP | 120 | NORMAL
+CDISCPILOT01 | 01-701-1023 | SYSBP | 120 | WITHINRANGE
+CDISCPILOT01 | 01-701-1034 | SYSBP | 140 | HIGH

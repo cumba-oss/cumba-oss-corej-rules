@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0043A expect=violation domain=ADLBC
+#note "ADTM declares a format and is silent; the other two do not -> TWO findings."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt variable_name=ASTDTM
+#expectViolationAt variable_name=AENDTM
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col ADTM    type=Num format=DATETIME20.
+col ASTDTM  type=Num
+col AENDTM  type=Num
+---
+S1 | 001 | ALB | 1900000 | 1900000 | 1900500
+---

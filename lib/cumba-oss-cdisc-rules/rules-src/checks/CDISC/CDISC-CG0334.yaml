@@ -1,0 +1,60 @@
+Core:
+  Id: "CDISC-CG0334"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, in a split Supplemental Qualifier (SUPP--) dataset,\
+  \ the value of RDOMAIN does not equal characters 5 and 6 of the dataset name."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Operations:
+- id: "$dataset_name"
+  expression: "extract_metadata(\"dataset_name\")"
+Check:
+  expression: >-
+    RDOMAIN != substring($dataset_name, 5, 2)
+Outcome:
+  Message: "RDOMAIN does not equal characters 5 and 6 of the Supplemental Qualifier\
+    \ dataset name."
+  Output_Variables:
+  - "$dataset_name"
+  - "RDOMAIN"
+Source:
+  Class: "ALL"
+  Domain: "SUPP----"
+  Variable: "RDOMAIN"
+  Condition: "Dataset name begins with 'SUPP'"
+  Rule: "Value of RDOMAIN equals characters 5 and 6 of the dataset name"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0334"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0334"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0334"
+        Version: "2"
+      Version: "2.0"

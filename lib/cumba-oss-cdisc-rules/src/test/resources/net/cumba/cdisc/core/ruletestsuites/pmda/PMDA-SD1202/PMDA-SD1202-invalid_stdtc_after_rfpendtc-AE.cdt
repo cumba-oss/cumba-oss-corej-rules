@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1202 expect=violation domain=AE
+#note "Row 1: AESTDTC 2020-07-01 after RFPENDTC 2020-06-30 -> fires. Row 2: AESTDTC equal to RFPENDTC -> boundary, strict > does not fire. DM is unique per USUBJID (1:1 expansion; Match_Datasets Keys=[USUBJID] Name=DM, inner default)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESTDTC type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-07-01
+S1 | AE | 001 | 2 | NAUSEA   | 2020-06-30
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFPENDTC type=Char
+---
+S1 | DM | 001 | 2020-06-30

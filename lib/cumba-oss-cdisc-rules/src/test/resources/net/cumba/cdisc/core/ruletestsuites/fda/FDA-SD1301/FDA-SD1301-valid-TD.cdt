@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1301 expect=noViolation domain=TD
+#note "TDSTOFF is '0' (the explicit no-offset value), a positive ISO 8601 duration ('P80Y', 'PT12H', 'P1Y6M'), or empty — the three forms the guidance allows."
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TDORDER  type=Num  label="Order of Assessment Schedule"
+col TDANCVAR type=Char label="Anchor Variable Name"
+col TDSTOFF  type=Char label="Offset from the Anchor"
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | 0
+CDISCPILOT01 | TD | 2 | RSSTDTC | P80Y
+CDISCPILOT01 | TD | 3 | RSSTDTC | PT12H
+CDISCPILOT01 | TD | 4 | RSSTDTC | P1Y6M
+CDISCPILOT01 | TD | 5 | RSSTDTC |

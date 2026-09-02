@@ -1,0 +1,18 @@
+Rule_Id: "DEFINE-XML-0132"
+Sheet_Rule_Identifier: "132"
+Rule_Set: "CDISC"
+Element: "def:Class"
+Attribute: "Name"
+Applicable_Versions: ["2.1"]
+Source_Type: "Schema"
+Requires: "ct"
+Plain_Text_Rule: "The value of the Name attribute in the ItemGroupDef/def:Class element must be one of the values from the CDISC/NCI GNRLOBSC General Observation Class codelist included in the Define-XML Controlled Terminology."
+# CT-gated (P5): def:Class has no CodeList to resolve an nci:ExtCodeID alias
+# from, so the GNRLOBSC codelist is named by its fixed C-Code from the sheet's
+# Rule column (explicit cCode). GNRLOBSC is non-extensible, so plain
+# membership is the whole check. Twin: PMDA-DD0055-C.
+Message: "The value of the dataset's class name [ItemGroupDef/def:Class/@Name] is not in the CDISC/NCI GNRLOBSC General Observation Class codelist with C-Code C103329."
+Check:
+  kind: "term_in_ct_codelist"
+  attribute: "Name"
+  cCode: "C103329"

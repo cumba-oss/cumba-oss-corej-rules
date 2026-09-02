@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-CG0042"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Serious Event (AESER) is not equal to 'N' but none\
+  \ of the seriousness criteria variables (AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP,\
+  \ AESLIFE, AESOD, AESMIE, AESINTV) is equal to 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Requirements:
+  Variables:
+    All:
+    - "AESER"
+Check:
+  expression: >-
+    AESER != "N" and (not var_exists("AESCAN") or AESCAN != "Y") and (not var_exists("AESCONG") or
+    AESCONG != "Y") and (not var_exists("AESDISAB") or AESDISAB != "Y") and (not
+    var_exists("AESDTH") or AESDTH != "Y") and (not var_exists("AESHOSP") or AESHOSP != "Y") and
+    (not var_exists("AESLIFE") or AESLIFE != "Y") and (not var_exists("AESOD") or AESOD != "Y") and
+    (not var_exists("AESMIE") or AESMIE != "Y") and (not var_exists("AESINTV") or AESINTV != "Y")
+Outcome:
+  Message: "AESER indicates a serious event but none of the seriousness criteria variables\
+    \ (AESCAN, AESCONG, AESDISAB, AESDTH, AESHOSP, AESLIFE, AESOD, AESMIE, AESINTV)\
+    \ is set to 'Y'."
+  Output_Variables:
+  - "AETERM"
+  - "AESER"
+  - "AESCAN"
+  - "AESCONG"
+  - "AESDISAB"
+  - "AESDTH"
+  - "AESHOSP"
+  - "AESLIFE"
+  - "AESOD"
+  - "AESMIE"
+  - "AESINTV"
+Source:
+  Class: "EVT"
+  Domain: "AE"
+  Variable: "AESER"
+  Condition: "AESCAN ^= 'Y' and AESCONG ^= 'Y' and AESDISAB ^= 'Y' and AESDTH ^= 'Y'\
+    \ and AESHOSP ^= 'Y' and AESLIFE ^= 'Y' and AESOD ^= 'Y' and AESMIE ^= 'Y'"
+  Rule: "AESER = 'N'"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0042"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0042"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0042"
+        Version: "1"
+      Version: "2.0"

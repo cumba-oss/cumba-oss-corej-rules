@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0278 expect=noViolation domain=LB
+#note "LB carries two records ($records_in_dataset = 2, not equal to 0) -> no violation. Negative control for the -invalid_empty_dataset- twin."
+#library standard=sendig version=3-1-1
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALT
+---

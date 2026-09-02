@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1144 expect=violation domain=MH
+#note "FRESH, DISCRIMINATING (IsoDateComparison hull FOR-ALL for >=) against RFSTDTC 2020-01-15. Row 1: MHSTDTC=2020-02 -> month hull entirely on/after (lower 2020-02-01 >= 2020-01-15) -> FIRES. Row 2: MHSTDTC=2020-01 -> hull straddles RFSTDTC (lower 2020-01-01 < 2020-01-15) -> clean. Row 3: MHSTDTC=2019 -> entirely before -> clean. Row 4: MHSTDTC=----01-15 year-masked -> null bounds saturate FALSE -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 MHSEQ=1
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHSTDTC type=Char label="Start Date/Time of Medical History Event"
+---
+S1 | MH | 001 | 1 | ASTHMA       | 2020-02
+S1 | MH | 001 | 2 | DIABETES     | 2020-01
+S1 | MH | 001 | 3 | HYPERTENSION | 2019
+S1 | MH | 001 | 4 | GOUT         | ----01-15
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+S1 | DM | 001 | 2020-01-15
+---

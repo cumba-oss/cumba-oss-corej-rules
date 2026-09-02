@@ -1,0 +1,48 @@
+Core:
+  Id: "CDISC-AD0412"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when ANLzzFL is populated and ANLzzFN is not populated."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ANLzzFL) and empty(ANLzzFN)
+Outcome:
+  Message: "ANLzzFL is populated but ANLzzFN is not populated."
+  Output_Variables:
+  - "ANLzzFL"
+  - "ANLzzFN"
+wildcards:
+  zz:
+    min: 1
+    max: 99
+Source:
+  Class: "BASIC DATA STRUCTURE; MEDICAL DEVICE BASIC DATA STRUCTURE"
+  Variable_or_Item: "ANLzzFN where zz is an integer [01-99, zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, ANLzzFL is populated\
+    \ and ANLzzFN is not populated"
+  Rule_Failure_Criteria: "ANLzzFN is not populated"
+  Condition_Failure: "ANLzzFL is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR412"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR412"
+        Version: "2"
+      Version: "5.0"

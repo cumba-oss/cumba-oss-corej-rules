@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0462 expect=violation domain=EC
+#note "D-TA-1a (twin of FDA-SD1279): the ECDOSTXT column is ABSENT from the dataset. Row 1 has ECDOSE empty, ECOCCUR=Y (!=N) and ECSTAT empty, and the dose description exists nowhere -> fires: the Check now carries a bare empty(ECDOSTXT) leaf, and an absent column is an all-missing column (EC-43), so the leaf is TRUE. The r2 W5(2) fix originally spelled this out as a '(not present or empty)' branch; Plan B phase 4d' deleted the redundant not var_exists half and the verdict is unchanged. Row 2 has ECDOSE populated -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 ECSEQ=1 USUBJID=01-701-1015
+dataset EC label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ type=Num label="Sequence Number"
+col ECOCCUR type=Char label="Occurrence"
+col ECSTAT type=Char label="Completion Status"
+col ECDOSE type=Num label="Dose per Administration"
+---
+CDISCPILOT01 | EC | 01-701-1015 | 1 | Y |  |
+CDISCPILOT01 | EC | 01-701-1023 | 2 | Y |  | 100

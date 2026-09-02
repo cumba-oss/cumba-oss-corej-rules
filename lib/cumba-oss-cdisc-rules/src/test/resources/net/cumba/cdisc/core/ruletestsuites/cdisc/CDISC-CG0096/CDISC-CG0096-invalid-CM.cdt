@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0096 expect=violation domain=CM
+# Rule:Description: Raise an error when the reported term (CMTRT) has a decode value in the coding dictionary but the Standardized Medication Name (CMDECOD) is not populated.
+#note "First fixture for CDISC-CG0096 (PLAN-dictionary-seeder Phase 7b, closing the plan's section 2.6 latency): until the C1-era dummy whodrug.json gained a pairs.whodrug registry keyed by REPORTED drug name, dictionary_has_decode could only answer false and this rule could never fire. Row 1's CMTRT 'ASPIRIN TABLETS' is a pairs.whodrug key (decode 'Aspirin') with CMDECOD empty -> FIRES. Row 2 has a decode ('PANADOL EXTRA' -> 'Paracetamol') and a populated CMDECOD -> quiet. Row 3's 'HERBAL REMEDY XYZ' has NO decode entry, so its empty CMDECOD is allowed -> quiet; that row is what makes the scenario discriminate a real pairs lookup from an operation stub answering true everywhere. The flag-less rule probes the pairs key case-sensitively (D-TA-3 default), matching the registry's as-authored reported names."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=1 CMSEQ=1
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | ASPIRIN TABLETS |
+S01 | CM | 001 | 2 | PANADOL EXTRA | Paracetamol
+S01 | CM | 001 | 3 | HERBAL REMEDY XYZ |
+---

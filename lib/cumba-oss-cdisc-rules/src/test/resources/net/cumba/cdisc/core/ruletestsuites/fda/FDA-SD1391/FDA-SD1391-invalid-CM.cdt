@@ -1,0 +1,36 @@
+#!RuleTest
+#test FDA-SD1391 expect=violation domain=CM
+#note "CMCHSTDY populated on every row: row1 CMSTDTC empty; row2 CMSTDTC incomplete; row3 DM.RFCSTDTC empty (002 has RFXSTDTC complete, so a wrong reference column would not fire here); row4 DM.RFCSTDTC incomplete; row5 subject 004 is absent from DM, so the inner join drops the row and it no longer fires -- D-TA-2 (inner is the doctrine: a subject absent from DM is FDA-SD0064's finding, not this rule's); it fired here until the Join_Type was removed."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 4
+#expectViolationAt row=1 USUBJID=001
+#expectViolationAt row=2 USUBJID=001
+#expectViolationAt row=3 USUBJID=002
+#expectViolationAt row=4 USUBJID=003
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Treatment"
+col CMSTDTC type=Char label="Start Date/Time of Observation"
+col CMCHSTDY  type=Num  label="Start Day of Obs Rel to Challenge Agent"
+---
+S1 | CM | 001 | 1 | DRUG A |  | 5
+S1 | CM | 001 | 2 | DRUG A | 2023-06 | 5
+S1 | CM | 002 | 1 | DRUG A | 2023-06-25 | 5
+S1 | CM | 003 | 1 | DRUG A | 2023-06-25 | 5
+S1 | CM | 004 | 1 | DRUG A | 2023-06-25 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFXSTDTC type=Char label="Date/Time of First Study Treatment"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 001 | 2023-06-01 |            | 2023-06-20
+S1 | DM | 002 | 2023-06-01 | 2023-06-10 |           
+S1 | DM | 003 | 2023-06-01 | 2023-06-10 | 2023-06   

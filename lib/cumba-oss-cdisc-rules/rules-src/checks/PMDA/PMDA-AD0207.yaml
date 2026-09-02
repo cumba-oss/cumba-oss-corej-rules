@@ -1,0 +1,65 @@
+Core:
+  Id: "PMDA-AD0207"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, for the same subject (USUBJID), the Race (RACE)\
+  \ value in ADSL is populated and differs from the Race (RACE) value in DM. There\
+  \ must be traceability between ADaM and SDTM."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+Check:
+  expression: >-
+    var_exists(DM.RACE) and not empty(RACE) and RACE != DM.RACE
+Outcome:
+  Message: "ADSL.RACE does not match DM.RACE for the same subject (USUBJID)."
+  Output_Variables:
+  - "RACE"
+  - "DM.RACE"
+Source:
+  Message: "For the same USUBJID, the ADSL.RACE != DM.RACE"
+  Description: "The same subject in ADSL and DM must have the same value for Race\
+    \ (RACE). There must be traceability between ADaM and SDTM."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0207"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0207"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0207"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0207"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0142 expect=violation domain=ADLBC
+#note "Within PARAM=Albumin, PARAMCD holds {ALB x1, ALBU x1} -- a TIE, no strict majority -- so EVERY non-blank row of the group is flagged. This is the batch's single pin on the tie branch of flagInconsistentGroupMinority."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMCD=ALB PARAM=Albumin
+#expectViolationAt row=2 PARAMCD=ALBU PARAM=Albumin
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+S1 | 001 | ALB  | Albumin   | 40
+S1 | 002 | ALBU | Albumin   | 41
+S1 | 003 | BILI | Bilirubin | 8

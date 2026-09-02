@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0109B expect=noViolation domain=ADLBC
+#note "Three distinct (PARAMCD, AVISIT) groups, each single-valued. Row 4 gives AVISIT=WEEK2 a DIFFERENT AVISITN under a different PARAMCD, which pins that PARAMCD is part of the key and not just AVISIT."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | GLUC | WEEK2 | 2
+CDISCPILOT01 | 01-701-1023 | GLUC | WEEK2 | 2
+CDISCPILOT01 | 01-701-1015 | GLUC | WEEK4 | 4
+CDISCPILOT01 | 01-701-1023 | ALB  | WEEK2 | 9

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0312 expect=noViolation domain=ADAE
+#note "SMQ1SC carries only one digit and SMQ01SCN does not end at SC, so neither matches the anchored ^SMQ\\d{2}SC$ - even though SMQ1SC holds a value the rule would otherwise report and SMQ01SCN holds a value PMDA-AD0313 would report. Pins the anchoring and the AD0312/AD0313 partition. Dataset is in scope, so this asserts EXECUTION, not silence-by-scope."
+#library standard=adamig version=1-1
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AETERM   type=Char
+col SMQ1SC   type=Char
+col SMQ01SCN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | WIDE | 3

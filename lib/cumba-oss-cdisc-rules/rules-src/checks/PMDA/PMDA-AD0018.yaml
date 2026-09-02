@@ -1,0 +1,74 @@
+Core:
+  Id: "PMDA-AD0018"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the label of a variable that is defined in the\
+  \ ADaM metadata does not match the variable label described in ADaM. The check runs\
+  \ only for variables that carry a label in the ADaM standard metadata; newly created\
+  \ variables without ADaM-defined labels are not flagged."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+    - "BASIC DATA STRUCTURE"
+    - "OCCURRENCE DATA STRUCTURE"
+    - "DEVICE LEVEL ANALYSIS DATASET"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    varname() == var_name("LIBRARY") and varname() !~ /[a-z]/ and not empty(var_label("LIBRARY"))
+    and not contains(var_label("LIBRARY"), "*") and not contains(var_label("LIBRARY"), "...") and
+    not contains(var_label("LIBRARY"), "{") and var_label("DATA") != var_label("LIBRARY")
+Outcome:
+  Message: "The variable label in the dataset does not match the variable label described\
+    \ in ADaM."
+  Output_Variables:
+  - "variable_name"
+  - "library_variable_label"
+  - "variable_label"
+Source:
+  Message: "Variable label mismatch between dataset and ADaM standard"
+  Description: "The variable label in the dataset should match the variable label\
+    \ described in ADaM. When creating a new variable, labels can be adjusted as appropriate.\
+    \ Currently, this rule runs if a variable has a label that is defined in the ADaM\
+    \ metadata."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS, OCCDS, ADAE, MDOCCDS, ADAMOTHER"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0018"
+        Version: "1"
+      Version: "6.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0041 expect=skipped domain=AE
+#note "AE's class is in Classes.Include, so ONLY the Domains.Exclude [EX, AE, DS, DV] rejects (AEOCCUR is an Events-class MODEL Record Qualifier, declarable in data). Pinned ONCE on behalf of PMDA-SD0042 (identical set). Twin discriminator: FDA-SD0041 has no exclusions and would run on AE."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEOCCUR  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Y
+---

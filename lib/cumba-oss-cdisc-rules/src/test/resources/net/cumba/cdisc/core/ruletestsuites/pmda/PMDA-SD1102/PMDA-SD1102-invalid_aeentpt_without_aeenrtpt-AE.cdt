@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1102 expect=violation domain=AE
+#note "Shipped Check var_exists(\"--ENTPT\") and not var_exists(\"--ENRTPT\") resolves per the EC-36 prefix rule to AEENTPT/AEENRTPT; both leaves are dataset constants -> BroadcastFold -> exactly ONE violation reported at row=1 regardless of row count."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AEENTPT=SCREENING
+dataset AE class=EVENTS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AEENTPT  type=Char
+---
+S1 | AE | 001 | 1 | SCREENING

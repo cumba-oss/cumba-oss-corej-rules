@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0144 expect=noViolation domain=BW
+#note "A result on row 1 and an explaining status on row 2: the rule executes and reports nothing."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset BW label="Body Weight" class=FINDINGS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWSTAT   type=Char label="Completion Status"
+---
+S1 | BW | 001 | 1 | BW | 250 |
+S1 | BW | 001 | 2 | BW |     | NOT DONE
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0756 expect=violation domain=ADSL
+# Rule:Description: Within a given value of TRTxxP, there is more than one value of TRxxPGy, where xx is an integer [01-99, zero-padded] and y is an integer [1-99, not zero-padded]
+#note "within TRT01P=Placebo, TR01PG1 takes two distinct values -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+col TR01PG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | GROUP A
+CDISCPILOT01 | 01-701-1023 | Placebo | GROUP B
+---

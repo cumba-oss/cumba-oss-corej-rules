@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0034 expect=violation domain=ADLBC
+#note "SAFPFL is the only column ending in PFL; row 2's N is populated and not in [\"Y\"] -> one cell fires."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=SAFPFL USUBJID=01-701-1023
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SAFPFL  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | Y
+CDISCPILOT01 | 01-701-1023 | ALB | N

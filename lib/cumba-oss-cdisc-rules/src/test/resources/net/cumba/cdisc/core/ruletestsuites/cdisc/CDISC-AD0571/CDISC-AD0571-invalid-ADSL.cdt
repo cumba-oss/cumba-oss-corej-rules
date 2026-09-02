@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0571 expect=violation domain=ADSL
+# Rule:Description: PxxSwSDT is present and TRTxxP is not present for the same "xx" value
+#note "P01S1SDT present (xx=01) but TRT01P (same xx) absent -> violation"
+#expectViolationCount 1
+#expectViolationAt P01S1SDT=x
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col P01S1SDT type=Char
+---
+CDISCPILOT01 | 01-701-1015 | x
+---

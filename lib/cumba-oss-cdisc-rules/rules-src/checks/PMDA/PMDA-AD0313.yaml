@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0313"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a populated SMQzzSCN (Standardized MedDRA Query\
+  \ scope, numeric) value is neither 1 nor 2."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    varname() =~ /^SMQ(0[1-9]|[1-9][0-9])SCN$/ and not empty(value()) and value() not in [1, 2]
+Outcome:
+  Message: "SMQzzSCN value must be 1, 2 or missing."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Message: "SMQzzSCN value != 1, 2 or null"
+  Description: "Standardized MedDRA Query Scope Numeric (SMQzzSCN) variable value\
+    \ must be 1 (BROAD), 2 (NARROW), or NULL. The search strategy for SMQs can be\
+    \ narrow or broad. The preferred terms that are narrow in scope have high specificity\
+    \ for identifying events of interest while the broad terms have high sensitivity.\
+    \ By definition, all narrow terms are also considered within the broad score.\
+    \ Therefore, to summarize all broad terms, terms with either narrow OR broad would\
+    \ be considered. Will be null for terms that do not meet the criteria. Conditional\
+    \ on whether SMQ analysis is done."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0313"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0313"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0313"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0313"
+        Version: "1"
+      Version: "6.0"

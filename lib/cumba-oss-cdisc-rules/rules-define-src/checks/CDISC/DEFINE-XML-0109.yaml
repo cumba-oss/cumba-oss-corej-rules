@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0109"
+Sheet_Rule_Identifier: "109"
+Rule_Set: "CDISC"
+Element: "ItemGroupDef"
+Attribute: "SASDatasetName"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Specification"
+Plain_Text_Rule: "Non-conforming SAS dataset name."
+Message: "The SAS dataset name [${value}] does not conform to submission requirements."
+# SAS Transport (XPT v5) member-naming rules per the spec's SASDatasetName business
+# rules (Define-XML 2.1 §5.3.11): at most 8 characters, starting with a letter or
+# underscore, letters/digits/underscores only. Upper case is required because the
+# spec states the root name "is file name in upper case" for submissions.
+Check:
+  kind: "matches_regex"
+  attribute: "SASDatasetName"
+  pattern: "[A-Z_][A-Z0-9_]{0,7}"

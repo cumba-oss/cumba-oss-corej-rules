@@ -1,0 +1,25 @@
+Rule_Id: "PMDA-DD0125"
+Sheet_Rule_Identifier: "DD0125"
+Rule_Set: "PMDA"
+Element: "CodeList"
+Attribute: "StandardOID"
+Applicable_Versions: ["2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The referenced CT standard must be defined in a def:Standard element with Type='CT'."
+# The references kind cannot constrain attributes of the resolved target, so this
+# uses the when-deref shape (DEFINE-XML-0152-B precedent): the not_exists check on
+# the present attribute is the fire-always vehicle under a guard that already
+# encodes the violation. The guard passes when the deref'd def:Standard's Type is
+# not "CT" - which covers BOTH a dangling def:StandardOID (deref resolves to
+# nothing) AND one resolving to a def:Standard of another Type, exactly the
+# sheet's "must be defined in a def:Standard element with Type='CT'". No ${value}
+# in the message: the guarded not_exists path reports without a value; the
+# offending CodeList is identified by the finding's xpath.
+Message: "Referenced CT Standard is missing"
+Check:
+  kind: "not_exists"
+  target: "@StandardOID"
+  when:
+    not:
+      path: "@StandardOID->Standard@OID/@Type"
+      equals: "CT"

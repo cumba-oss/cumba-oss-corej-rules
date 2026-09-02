@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-SEND-0372"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when more than one Fetal Pathology Findings (FX) record\
+  \ exists for the same combination of Test Short Name (FXTESTCD), Unique Subject\
+  \ Identifier (USUBJID), fetus (FETUSID), test location (FXLOC), finding location\
+  \ (FXRESLOC), standardized finding (FXSTRESC), laterality (FXLAT), and anatomical\
+  \ region (FXANTREG); the FX domain expects one record per test per location per\
+  \ finding per fetus per subject."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "FX"
+Check:
+  expression: >-
+    not is_unique_set([FXTESTCD, USUBJID, FETUSID, FXLOC, FXRESLOC, FXSTRESC, FXLAT, FXANTREG])
+Outcome:
+  Message: "More than one FX record exists for the same test (FXTESTCD), location\
+    \ (FXLOC), finding (FXSTRESC), subject (USUBJID), and fetus (FETUSID)."
+  Output_Variables:
+  - "FETUSID"
+  - "FXTESTCD"
+  - "FXSTRESC"
+  - "FXRESLOC"
+  - "FXANTREG"
+  - "FXLOC"
+  - "FXLAT"
+Source:
+  Class: "FND"
+  Domain: "FX"
+  Variable: "All"
+  Plain_Text_Explanation: "One record per test per location per finding per fetus\
+    \ per subject."
+  Rule: "One record per test per location per finding per fetus per subject, Tabulation."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND372"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND372"
+        Version: "1"
+      Version: "5.0"

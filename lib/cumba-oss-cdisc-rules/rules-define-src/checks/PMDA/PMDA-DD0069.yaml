@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0069"
+Sheet_Rule_Identifier: "DD0069"
+Rule_Set: "PMDA"
+Element: "ItemDef"
+Attribute: "SignificantDigits"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "The Significant Digits attribute must be empty when DataType is not float."
+Message: "Invalid use of Significant Digits"
+# The negative leg of OD0071 (same shape as PMDA-DD0068 for Length / CDISC
+# 0143). No CDISC-sheet twin in the corpus (CDISC 0145/0146 are the positive
+# and value-format legs).
+Check:
+  kind: "not_exists"
+  target: "@SignificantDigits"
+  when:
+    not:
+      path: "@DataType"
+      equals: "float"

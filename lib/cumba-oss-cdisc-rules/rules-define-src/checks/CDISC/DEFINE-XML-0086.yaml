@@ -1,0 +1,17 @@
+Rule_Id: "DEFINE-XML-0086"
+Sheet_Rule_Identifier: "86"
+Rule_Set: "CDISC"
+Element: "RangeCheck"
+Attribute: "Comparator"
+Applicable_Versions: ["2.0", "2.1"]
+Source_Type: "Schema"
+Plain_Text_Rule: "The value of the Comparator attribute must be one of \"LT\",\"LE\",\"GT\",\"GE\",\"EQ\", \"NE\",\"IN\",\"NOTIN\"."
+# Enumeration verified against spec §5.3.10.1 (RangeCheck attribute table). Value
+# check fires only on a present Comparator (presence is sheet id 87). The sheet's
+# "for VLM record ItemGroupDef[@Name].ItemDef[@Name]" tail cannot be interpolated
+# (only ${value} is available); the finding's xpath locates the RangeCheck.
+Message: "The value of Comparator [${value}] is not one of \"LT\",\"LE\",\"GT\",\"GE\",\"EQ\", \"NE\",\"IN\",\"NOTIN\"."
+Check:
+  kind: "one_of"
+  attribute: "Comparator"
+  values: ["LT", "LE", "GT", "GE", "EQ", "NE", "IN", "NOTIN"]

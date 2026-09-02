@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0159 expect=noViolation domain=ADLBC
+#note "ADY IS ABSENT but ARELTM is present and populated. The second disjunct is a conjunction of the two per-variable factors: empty(ADY) is TRUE (absent = all-missing, EC-43) but empty(ARELTM) is FALSE (present and populated), so the conjunction is false and nothing fires. Pins that ADY and ARELTM are alternatives, which is the whole 'one of [ADY, ARELTM]' half of the Message."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADLBC
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col ARELTM   type=Num
+col AWTARGET type=Num
+col AWTDIFF  type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | 120 | 7 | 2
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | 130 | 7 | 2

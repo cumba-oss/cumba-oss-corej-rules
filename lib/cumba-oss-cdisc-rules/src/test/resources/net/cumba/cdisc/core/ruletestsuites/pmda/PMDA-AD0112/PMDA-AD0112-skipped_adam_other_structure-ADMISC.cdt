@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-AD0112 expect=skipped domain=ADMISC
+#note "The single row carries ARELTM=4 with a blank ARELTMU - data that WOULD fire on a BDS dataset. The sheet's Domains column for AD0112 reads 'BDS, ADNCA, MDBDS, ADAMOTHER' but the authored Scope.Data_Structures is BDS + MEDICAL DEVICE BDS, so structure=OTHER (ADAM OTHER, the declared tier winning over the columns per Fix #154) puts the dataset out of scope. THIS FIXTURE ENCODES THE RULE EXACTLY AS IT STANDS - the ADAMOTHER gap is a corpus-wide decision-lane item (finding AD0112-F1), NOT a change proposal. If the convention is ever changed this is the fixture that flips and must be re-authored to expect=violation."
+#library standard=adamig version=1-3
+dataset ADMISC structure=OTHER
+col STUDYID type=Char
+col USUBJID type=Char
+col ARELTM  type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 4 |

@@ -1,0 +1,85 @@
+Core:
+  Id: "PMDA-SD1290"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when, for records in the Disposition (DS) dataset where\
+  \ Category for Disposition Event (DSCAT) equals 'DISPOSITION EVENT', there is more\
+  \ than one disposition event record per subject for the same Epoch (EPOCH)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DS"
+Requirements:
+  Variables:
+    All:
+    - "DSCAT"
+Check:
+  expression: >-
+    DSCAT == "DISPOSITION EVENT" and not is_unique_set([DSCAT, USUBJID, EPOCH])
+Outcome:
+  Message: "Multiple disposition events are reported for the same EPOCH."
+  Output_Variables:
+  - "DSCAT"
+  - "EPOCH"
+Source:
+  Message: "Multiple disposition events for the same EPOCH"
+  Description: "If multiple disposition events are reported for an EPOCH, the sponsor\
+    \ should identify a primary reason and use that to populate DSTERM and DSDECOD.\
+    \ Additional reasons should be submitted in SUPPDS."
+  Domains: "DS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1290"
+        Version: "1"
+      Version: "1.6"

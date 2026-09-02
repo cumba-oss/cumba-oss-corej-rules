@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD1353 expect=violation domain=LB
+#note "Row 2 keeps the original units (mmol/L both sides) yet the standardized result 5.6 differs from the original result 5.5 -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 LBSTRESC=5.6
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5 | mmol/L | 5.5 | mmol/L
+CDISCPILOT01 | LB | 01-701-1023 | 1 | GLUC | 5.5 | mmol/L | 5.6 | mmol/L

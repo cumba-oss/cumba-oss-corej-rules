@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0004-A expect=violation domain=APMH
+#note "DOMAIN carries a well-formed but WRONG four-character AP code. prefix('APMH',4)='APMH' != DOMAIN='APDM' -> fires. Also exercises the split re-test from the other side: the row-0 DOMAIN value 'APDM' differs from the name 'APMH', so the dataset is treated as a split and the Include is satisfied by the NAME leg."
+#expectViolationCount 1
+#expectViolationAt DOMAIN=APDM
+#library standard=sdtmig version=3-4
+dataset APMH
+col STUDYID type=Char
+col DOMAIN  type=Char
+col APID    type=Char
+col MHSEQ   type=Num
+col MHTERM  type=Char
+---
+CDISCPILOT01 | APDM | AP-001 | 1 | HEADACHE

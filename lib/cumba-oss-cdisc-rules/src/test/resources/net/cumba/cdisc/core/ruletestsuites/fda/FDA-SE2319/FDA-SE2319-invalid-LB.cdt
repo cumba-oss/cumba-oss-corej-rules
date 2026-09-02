@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SE2319 expect=violation domain=LB
+#note "Subject 002 has LB records but none with LBBLFL equal to 'Y' -> one Group-level finding for that subject. Subject 001 has a baseline record and is not flagged."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt USUBJID=002
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBBLFL   type=Char label="Baseline Flag"
+---
+S1 | LB | 001 | 1 | ALB | Albumin | 4.1 | Y
+S1 | LB | 001 | 2 | ALB | Albumin | 4.3 |
+S1 | LB | 002 | 1 | ALB | Albumin | 3.8 |
+S1 | LB | 002 | 2 | ALB | Albumin | 3.9 |
+---

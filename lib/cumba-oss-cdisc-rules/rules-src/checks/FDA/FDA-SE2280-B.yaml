@@ -1,0 +1,62 @@
+Core:
+  Id: "FDA-SE2280-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Elapsed Time from Time Point Reference (PCELTM)\
+  \ is populated with a negative ISO 8601 duration on a Pharmacokinetic Concentrations\
+  \ (PC) record."
+Executability: "Fully Executable"
+ExecutabilityHint:
+  Category: "known limitation"
+  Detail: "Negative detection uses matches_regex '^-', which correctly flags negative\
+    \ ISO-8601 durations (a leading '-') but ALSO fires on negative-zero encodings\
+    \ ('-PT0H', '-P0D') that denote zero elapsed time. That over-fire is ACCEPTED,\
+    \ not pending: it is benign, because the AUC-corruption rationale does not apply\
+    \ to a zero-magnitude duration, and the alternative — matching all-zero ISO durations\
+    \ across their many spellings ('-PT0H', '-P0D', '-PT0.0S', '-P0Y0M0D') — is a\
+    \ fragile leaf-form regex whose failure mode is silently under-reporting real\
+    \ negatives, the worse direction. Mid-component signs like 'PT-1H' are malformed\
+    \ ISO-8601 and correctly not matched."
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCELTM"
+Check:
+  expression: >-
+    not empty(PCELTM) and PCELTM =~ /^-/
+Outcome:
+  Message: "PCELTM is a negative elapsed time (planned pre-reference); a pre-dose\
+    \ PK profile sample must be anchored at 'PT0H' — a negative elapsed time corrupts\
+    \ the AUC."
+  Output_Variables:
+  - "PCELTM"
+Source_Proposed:
+  FDA_Validator_Rule_Message: "PCELTM is a negative elapsed time (planned pre-reference);\
+    \ a pre-dose PK profile sample must be anchored at 'PT0H' — a negative elapsed\
+    \ time corrupts the AUC."
+  FDA_Validator_Rule_Description: "Planned Elapsed Time from Time Point Reference\
+    \ (PCELTM) is populated with a negative ISO 8601 duration on a Pharmacokinetic\
+    \ Concentrations (PC) record."
+  Domains: "PC"
+Source:
+  FDA_Validator_Rule_Message: "PCELTM is not 'PT0H' for pre-dose sampling"
+  FDA_Validator_Rule_Description: "Specimen concentrations (e.g., plasma) used to\
+    \ calculate a time concentration profile with a pre-dose sample should have Planned\
+    \ Elapsed Time from Time Point Ref (PCELTM) populated with 'PT0H'. A negative\
+    \ elapsed time would lead to an incorrect area under the curve."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2280"
+        Version: "1"
+      Version: "1.6"

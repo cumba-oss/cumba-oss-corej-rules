@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0252 expect=skipped domain=ADLBC
+#note "THE PARENT/-D PARTITION BOUNDARY, pinned. Exactly the wildcard family the violation fixture uses, so NoMatch cannot be the cause of the skip -- PARCAT1, PARAMCD and AVAL are all LEGITIMATE in a basic-data-structure dataset. The declared BDS beats the columns (Fix #154; carrier = the mandatory #library line), so the dataset is outside Data_Structures: [OCCURRENCE DATA STRUCTURE, MEDICAL DEVICE OCCURRENCE DATA STRUCTURE] and the parent never runs. Sibling PMDA-AD0252-D owns the BDS partition and asks the converse question there."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID  type=Char
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col AVAL     type=Num
+col PARCAT1  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | SEVERITY

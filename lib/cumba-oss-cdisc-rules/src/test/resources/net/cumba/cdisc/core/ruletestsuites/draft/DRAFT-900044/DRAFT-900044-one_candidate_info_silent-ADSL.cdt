@@ -1,0 +1,11 @@
+#!RuleTest
+#test DRAFT-900044 expect=noViolation domain=ADSL
+#note "⛔ THE DISCRIMINATING NEGATIVE FOR count(). Exactly ONE candidate, and the dataset label matches it, so BOTH levels must stay silent -- Phase 6's table row 2. Under the original len(candidates) > 1 this fired INFO, because len sees the rendered list '[Subject Reference Start Date/Time]' and 34 > 1. Restore len() here and this scenario goes red; that is the whole point of it. Run at Info so the INFO level is actually evaluated."
+#runLevel Info
+#library-include DRAFT-900044-library.yaml
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | 2026-01-01
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0033 expect=violation domain=LB
+#note "Row 1: LBTPT populated with LBTPTNUM missing -> fires. Row 2: both populated -> clean. Row 3: driver (LBTPT) empty -> clean. (The column-absent case is pinned family-wide by SD0032/SD0034/SD0050, which since Plan B phase 4d' carry it on the same bare empty() leaf rather than a separate or-arm.)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBTPT    type=Char
+col LBTPTNUM type=Num
+---
+S1 | LB | 001 | 1 | GLUC | PRE-DOSE  |
+S1 | LB | 001 | 2 | GLUC | 2 HR POST | 2
+S1 | LB | 001 | 3 | GLUC |           | .

@@ -1,0 +1,63 @@
+Core:
+  Id: "PMDA-AD0048"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject-Level Analysis Dataset (ADSL) contains\
+  \ no variable whose name ends in 'FL'; ADSL must carry at least one subject-population\
+  \ flag variable."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Operations:
+- id: "$fl_variable_count"
+  expression: "variable_count(name_pattern=\"^.+FL$\")"
+Check:
+  expression: >-
+    $fl_variable_count == 0
+Outcome:
+  Message: "ADSL does not contain any subject-population flag (*FL) variable."
+  Output_Variables:
+  - "$fl_variable_count"
+Source:
+  Message: "*FL subject-population flag variable is not present"
+  Description: "ADSL must have at least one variable that ends in FL because you need\
+    \ at least one population flag."
+  Domains: "ADSL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0048"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0048"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0048"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0048"
+        Version: "1"
+      Version: "6.0"

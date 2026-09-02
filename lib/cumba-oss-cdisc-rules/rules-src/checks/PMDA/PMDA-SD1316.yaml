@@ -1,0 +1,92 @@
+Core:
+  Id: "PMDA-SD1316"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a subject has a Death record (SSSTRESC equals 'DEAD')\
+  \ in the Survival Status (SS) dataset but no Disposition (DS) record for that subject\
+  \ has Standardized Disposition Term (DSDECOD) equal to 'DEATH'."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SS"
+Requirements:
+  Variables:
+    All:
+    - "SSSTRESC"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ds_death_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\", filter=filter(DSDECOD=\"DEATH\"))"
+Check:
+  expression: >-
+    SSSTRESC == "DEAD" and USUBJID not in $ds_death_usubjid
+Outcome:
+  Message: "SSSTRESC equals 'DEAD' but no Disposition record has DSDECOD equal to\
+    \ 'DEATH'."
+  Output_Variables:
+  - "SSSTRESC"
+  - "$ds_death_usubjid"
+Source:
+  Message: "Missing 'DEATH' record for subject in DS domain"
+  Description: "All subjects who have Death records (SSSTRESC = 'DEAD') in Survival\
+    \ Status (SS) domain should also have death records (DSDECOD='DEATH') in Disposition\
+    \ (DS) domain."
+  Domains: "SS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1316"
+        Version: "1"
+      Version: "1.6"

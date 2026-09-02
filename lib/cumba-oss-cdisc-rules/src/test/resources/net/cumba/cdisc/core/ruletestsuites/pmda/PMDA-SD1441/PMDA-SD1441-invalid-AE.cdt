@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1441 expect=violation domain=AE
+#note "The collected term 'HEADACHE' is mapped to two different MedDRA high level terms, so --HLT is not consistent for the same --TERM. Both records of the conflicting pair are reported."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AETERM=HEADACHE AEHLT="Headaches NEC"
+#expectViolationAt row=2 AETERM=HEADACHE AEHLT="Neurological signs and symptoms NEC"
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AEHLT    type=Char label="High Level Term"
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache | Headaches NEC
+S1 | AE | 002 | 1 | HEADACHE | Headache | Neurological signs and symptoms NEC
+S1 | AE | 003 | 1 | NAUSEA   | Nausea   | Nausea and vomiting symptoms

@@ -1,0 +1,44 @@
+Core:
+  Id: "PMDA-AD0136"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the numeric Shift (SHIFTyN) does not have a single\
+  \ consistent value for each unique value of the character Shift (SHIFTy), evaluated\
+  \ on rows where both Parameter Code (PARAMCD) and the primary variable SHIFTy are\
+  \ populated; within a study each SHIFTy value must map to one SHIFTyN value."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(PARAMCD) and not empty(SHIFTy) and has_multiple_values_for(SHIFTyN, SHIFTy,
+    within=PARAMCD)
+Outcome:
+  Message: "Inconsistent value for SHIFTyN"
+  Output_Variables:
+  - "PARAMCD"
+  - "SHIFTy"
+  - "SHIFTyN"
+wildcards:
+  "y":
+    min: 1
+    max: 9
+Source:
+  Message: "Inconsistent value for SHIFTyN"
+  Description: "Within a study, All SHIFTyN values must be the same for each unique\
+    \ value of SHIFTy when PARAMCD and primary variable SHIFTy are populated."
+  Domains: "BDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0136"
+        Version: "1"
+      Version: "6.0"

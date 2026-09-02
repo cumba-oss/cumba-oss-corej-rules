@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0211 expect=noViolation domain=ADLBC
+#note "ABLFN is not declared at all. The rule still EXECUTES and stays silent because `not empty(ABLFN)` is false over an absent column - the leading negation flips the bare-empty broadcast to false before it can produce a dataset-level violation. Worth knowing: unlike its character sibling PMDA-AD0176, this rule receives NO derived var_exists conjunct from the loader (the numeric-list `not in [1]` shape sits outside the guard-matrix arms), so the shipped form is the authored text verbatim. The behaviour is identical because the leading `not empty` already closes it, and this fixture is the pin that says so."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0

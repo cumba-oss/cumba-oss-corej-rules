@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-CG0542"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the ECG Beat Number (--BEATNO) variable is present\
+  \ in a general-observation-class dataset other than the ECG Test Results (EG) domain.\
+  \ Per SDTM Model v2.0, --BEATNO is an Identifier allowed for all general observation\
+  \ classes but restricted to the EG domain ('EG Domain only')."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "EG"
+Check:
+  expression: >-
+    var_exists("--BEATNO")
+Outcome:
+  Message: "--BEATNO is present in a dataset other than the EG domain."
+  Output_Variables:
+  - "--BEATNO"
+Source:
+  Class: "FND"
+  Domain: "NOT(EG)"
+  Variable: "--BEATNO"
+  Rule: "--BEATNO not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"

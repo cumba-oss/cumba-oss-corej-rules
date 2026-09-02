@@ -1,0 +1,45 @@
+Core:
+  Id: "PMDA-AD0170"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Time-to-Event Origin Date for Subject (STARTDT)\
+  \ variable is present in a Basic Data Structure dataset but its companion Censor\
+  \ (CNSR) variable is not present. A time-to-event analysis dataset that carries\
+  \ STARTDT must also carry CNSR."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("STARTDT") and not var_exists("CNSR")
+Outcome:
+  Message: "STARTDT is present, but CNSR is not present."
+  Output_Variables:
+  - "STARTDT"
+Source:
+  Message: "STARTDT is present, but CNSR is not present"
+  Description: "If Time-to-Event Origin Date for Subject (STARTDT) variable is present,\
+    \ then Censor (CNSR) variable must be present."
+  Domains: "BDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0170"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0170"
+        Version: "1"
+      Version: "6.0"

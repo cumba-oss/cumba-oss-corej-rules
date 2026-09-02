@@ -1,0 +1,38 @@
+Core:
+  Id: "FDA-SD1406"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Challenge Agent Characterization (AC) dataset\
+  \ does not contain a record where ACPARMCD equals 'CAGTCAT' (Challenge Agent Category)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AC"
+Operations:
+- id: "$parm_count"
+  expression: "record_count(filter=filter(ACPARMCD=\"CAGTCAT\"))"
+Check:
+  expression: >-
+    $parm_count < 1
+Outcome:
+  Message: "A 'Challenge Agent Category' (CAGTCAT) record is not present in the AC\
+    \ domain."
+  Output_Variables:
+  - "$parm_count"
+Source:
+  FDA_Validator_Rule_Message: "Missing CAGTCAT Challenge Agent Parameter"
+  FDA_Validator_Rule_Description: "'Challenge Agent Category' (CAGTCAT) record must\
+    \ be populated in Challenge Agent Characterization (AC) domain."
+  Domains: "AC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1406"
+        Version: "1"
+      Version: "1.6"

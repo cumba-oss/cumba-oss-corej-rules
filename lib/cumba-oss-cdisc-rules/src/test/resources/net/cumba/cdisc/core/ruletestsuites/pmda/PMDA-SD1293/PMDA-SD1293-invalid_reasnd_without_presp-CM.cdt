@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1293 expect=violation domain=CM
+#note "not var_exists(\"--PRESP\") and var_exists(\"--REASND\") -> broadcast fires ONCE at row=1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CMREASND="SUBJECT REFUSED"
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMREASND type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN | SUBJECT REFUSED
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0570 expect=violation domain=ADSL
+#note "Isolates a different disjunct of the eleven-way OR: P01S1SDT seeds the same tuple {xx=01, w=1}; P01S1 itself is absent. Column is declared Char (not Date) - the rule tests presence only, and Char keeps the pinned value literal."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 P01S1SDT=2020-01-15
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col P01S1SDT type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 2020-01-15

@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SE2256 expect=violation domain=TT
+#note "The RSTAGE component of the RSTAGE/TTSTRL/TTENRL/TTDUR combination varies within repro stage code GD0-6, so the combination is not the same for each RSTGCD. Both records of the offending code are reported."
+#library standard=sendig version=dart-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 RSTGCD=GD0-6 RSTAGE="Gestation Day 0 to 6"
+#expectViolationAt row=2 RSTGCD=GD0-6 RSTAGE="GD 0-6"
+dataset TT class="TRIAL DESIGN" label="Trial Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Rule for Start of Repro Stage"
+col TTENRL  type=Char label="Rule for End of Repro Stage"
+col TTDUR   type=Char label="Planned Duration of Repro Stage"
+---
+S1 | TT | GD0-6  | Gestation Day 0 to 6  | Day of mating      | Day 6 of gestation  | P7D
+S1 | TT | GD0-6  | GD 0-6                | Day of mating      | Day 6 of gestation  | P7D
+S1 | TT | GD7-13 | Gestation Day 7 to 13 | Day 7 of gestation | Day 13 of gestation | P7D

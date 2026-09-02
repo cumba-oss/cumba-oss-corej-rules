@@ -1,0 +1,19 @@
+Rule_Id: "PMDA-DD0085"
+Sheet_Rule_Identifier: "DD0085"
+Rule_Set: "PMDA"
+Element: "Document"
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Requires: "folder"
+Plain_Text_Rule: "Stylesheet (\".xsl\") file referenced in Define.xml must exist."
+# The stylesheet reference is an <?xml-stylesheet?> processing instruction in
+# the prolog - content the element tree cannot see - so the engine extracts the
+# PI hrefs off the DOM into the DocumentContext and this rule checks them via
+# the dedicated stylesheet_file_exists kind, scoped to the synthetic Document
+# node. Folder-gated like DD0084: SKIPs without a submission folder; hrefs
+# escaping the folder (absolute or ../) count as missing; a document without
+# any stylesheet PI is clean (the sheet requires the referenced file to exist,
+# not that a stylesheet be referenced).
+Message: "Missing Define XSL [${value}]"
+Check:
+  kind: "stylesheet_file_exists"

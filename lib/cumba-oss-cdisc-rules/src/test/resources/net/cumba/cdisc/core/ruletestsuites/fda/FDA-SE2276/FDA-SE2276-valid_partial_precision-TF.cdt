@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SE2276 expect=noViolation domain=TF
+#note "Third in-scope domain (--DTC resolves to TFDTC) and a precision boundary: the disposition is timed (2020-01-20T09:30) while the tumour finding carries a day-precision collection date (2020-01-20). Both sides denote the same day, so the intended 'must be equal to the latest DSSTDTC' check must not fire on the differing precision alone."
+#library standard=sendig version=3-1-1
+dataset TF label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFSPEC   type=Char label="Specimen Material Type"
+col TFORRES  type=Char label="Result or Finding in Original Units"
+col TFDTC    type=Char label="Date/Time of Collection"
+---
+S1 | TF | 001 | 1 | TUMORDET | LIVER | ADENOMA | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-01-20T09:30

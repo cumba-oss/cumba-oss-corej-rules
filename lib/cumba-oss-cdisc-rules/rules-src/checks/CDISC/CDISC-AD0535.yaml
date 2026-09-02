@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-AD0535"
+  Status: "Published"
+  Version: "2"
+Description: "Raise an error when AETOXGRN is present but AETOXGR is not present."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    var_exists("AETOXGRN") and not var_exists("AETOXGR")
+Outcome:
+  Message: "AETOXGRN is present but AETOXGR is not present."
+  Output_Variables:
+  - "AETOXGRN"
+Source:
+  Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+  Variable_or_Item: "AETOXGRN"
+  Natural_Language_Rule_Failure_Criteria: "AETOXGRN is present and AETOXGR is not\
+    \ present"
+  Rule_Failure_Criteria: "AETOXGR is not present"
+  Condition_Failure: "AETOXGRN is present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR535"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR535"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR535"
+        Version: "2"
+      Version: "5.0"

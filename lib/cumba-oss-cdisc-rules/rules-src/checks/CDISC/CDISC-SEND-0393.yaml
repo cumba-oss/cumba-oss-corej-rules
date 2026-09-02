@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-SEND-0393"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the SDTM variables introduced for SEND use are not\
+  \ presented in the variable order defined by the SDTM model."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$dataset_order"
+  expression: "get_column_order_from_dataset()"
+- id: "$model_order"
+  expression: "get_model_column_order()"
+Check:
+  expression: >-
+    not empty($model_order) and not is_ordered_subset_of($dataset_order, $model_order)
+Outcome:
+  Message: "SDTM variables introduced for SEND use are not presented in the SDTM model\
+    \ variable order."
+  Output_Variables:
+  - "$dataset_order"
+  - "$model_order"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "SDTM variables introduced for SEND use in the SENDIG-DART\
+    \ v1.1 must be implemented in the order shown in SDTM v1.6."
+  Rule: "SDTM variables introduced for SEND use in the SENDIG-DART v1.1 are presented\
+    \ in the variable order in SDTM v1.6"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND393"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND393"
+        Version: "1"
+      Version: "5.0"

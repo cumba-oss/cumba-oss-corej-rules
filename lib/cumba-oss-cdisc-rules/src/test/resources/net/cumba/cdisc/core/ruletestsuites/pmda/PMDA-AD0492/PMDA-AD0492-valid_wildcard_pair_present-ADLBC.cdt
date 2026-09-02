@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0492 expect=noViolation domain=ADLBC
+#note "Pins the (ByIND, AyIND) partner pair, the only partner pair that is itself wildcard-shaped: B1IND and A1IND resolve under the SAME tuple y=1 that SHIFT1 seeds, so 'not var_exists(B1IND)' is false and the rule is silent. This fixture would also catch a mis-parse of B(\\d+)IND against ANRIND / BNRIND, which must NOT be added here."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col SHIFT1  type=Char
+col B1IND   type=Char
+col A1IND   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | NORMAL to HIGH | NORMAL | HIGH

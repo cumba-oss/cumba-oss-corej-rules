@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0356 expect=violation domain=ADSL
+#note "Wildcard y=1 (REGION1/REGION1N, single index). Key REGION1=ASIA groups rows 1-3 with targets {1,1,2}: 1 is the strict majority, so only the minority row 3 fires. EUROPE is a singleton."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 REGION1=ASIA REGION1N=2
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col REGION1  type=Char
+col REGION1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ASIA   | 1
+CDISCPILOT01 | 01-701-1023 | ASIA   | 1
+CDISCPILOT01 | 01-701-1034 | ASIA   | 2
+CDISCPILOT01 | 01-701-1047 | EUROPE | 3

@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1062 expect=violation domain=AE
+#note "Row 2 occurred with an overdose (AESOD='Y') but is not flagged serious (AESER='N') -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 AESER=N AESOD=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESOD   type=Char label="Occurred with Overdose"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | Y | Y
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA   | N | Y
+CDISCPILOT01 | AE | 01-701-1023 | 1 | RASH     | N | N

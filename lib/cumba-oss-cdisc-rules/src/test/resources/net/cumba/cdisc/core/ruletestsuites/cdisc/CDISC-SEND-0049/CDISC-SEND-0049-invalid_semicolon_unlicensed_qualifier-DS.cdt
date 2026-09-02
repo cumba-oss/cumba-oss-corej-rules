@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0049 expect=violation domain=DS
+#note "O-8 (Fix #339): the 'other single-valued qualifier' class of the 165 unlicensed pairs. DSDECOD = FOUND DEAD;TERMINAL SACRIFICE joins two lawful DSDECOD terms (a non-extensible codelist, so the extensible-gate fix the Fix #329 review proposed would also have caught it - this pin does not depend on that) and reports; row 2's single term is silent. Sheet issue #152."
+#library standard=sendig version=3-1-1
+#library variable-metadata DS DSDECOD codelist=DSDECOD codelist_extensible=false codelist_coded_values="[\"FOUND DEAD\",\"TERMINAL SACRIFICE\",\"MORIBUND SACRIFICE\"]"
+#expectViolationCount 1
+#expectViolationAt variable_name=DSDECOD variable_value="FOUND DEAD;TERMINAL SACRIFICE"
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | DEAD      | FOUND DEAD;TERMINAL SACRIFICE
+S1 | DS | 002 | 2 | SACRIFICE | TERMINAL SACRIFICE

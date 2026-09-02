@@ -1,0 +1,33 @@
+Core:
+  Id: "CDISC-CG0628"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --EXCLFL is present in a Findings dataset, since\
+  \ --EXCLFL is not permitted in human clinical trials."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Check:
+  expression: >-
+    var_exists("--EXCLFL")
+Outcome:
+  Message: "Variable --EXCLFL is present but is not permitted in human clinical trials."
+  Output_Variables:
+  - "--EXCLFL"
+Source:
+  Class: "FND"
+  Variable: "--EXCLFL"
+  Rule: "--EXCLFL not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0628"
+        Version: "1"
+      Version: "2.0"

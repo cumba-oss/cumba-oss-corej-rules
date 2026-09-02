@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0241B expect=noViolation domain=ADLBC
+#note "Row 3's TRTAG1 (the grouping key) is blank; under the shipped DROP_MISSING_KEYS default its group is dropped and it can never fire, and independently its own not empty(TRTAG1) conjunct is false. The POOLA group is left with one distinct TRTAG1N value. Pins the blank-KEY contract (the blank-TARGET exception is pinned separately on PMDA-AD0403)."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTAG1  type=Char
+col TRTAG1N type=Num
+---
+S1 | 001 | GLUC | 5.0 | POOLA | 1
+S1 | 002 | GLUC | 5.1 | POOLA | 1
+S1 | 003 | GLUC | 5.2 |       | 2

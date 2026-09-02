@@ -1,0 +1,40 @@
+Core:
+  Id: "PMDA-SD1465"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Domain Abbreviation (RDOMAIN) is not populated\
+  \ and Identifying Variable Value (IDVARVAL) is populated in the Comments (CO) dataset."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Check:
+  expression: >-
+    not empty(IDVARVAL) and empty(RDOMAIN)
+Outcome:
+  Message: "RDOMAIN is empty when IDVARVAL is populated."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVARVAL"
+Source:
+  Message: "Missing RDOMAIN value when IDVARVAL is populated"
+  Description: "Value of Related Domain Abbreviation (RDOMAIN) variable should be\
+    \ populated when value of Identifying Variable Value (IDVARVAL) variable is populated."
+  Domains: "CO"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1465"
+        Version: "1"
+      Version: "6.0"

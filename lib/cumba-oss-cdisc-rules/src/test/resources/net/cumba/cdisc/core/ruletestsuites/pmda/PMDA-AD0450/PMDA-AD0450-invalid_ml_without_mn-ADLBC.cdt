@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0450 expect=violation domain=ADLBC
+#note "MCRIT1ML populated but numeric partner MCRIT1MN missing on row 1 -> fires. Row 2 both populated -> silent. ONE expansion (y=1). MCRIT1MN is Num/Perm in ADaMIG 1.3 (twin's fixture declares it Char - deliberately changed). structure=BDS inert (ruling-neutrality)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 MCRIT1ML=PARTIAL
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID    type=Char
+col USUBJID    type=Char
+col PARAMCD    type=Char
+col MCRIT1ML   type=Char
+col MCRIT1MN   type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | PARTIAL  |
+CDISCPILOT01 | 01-701-1023 | ALT | COMPLETE | 1
+---

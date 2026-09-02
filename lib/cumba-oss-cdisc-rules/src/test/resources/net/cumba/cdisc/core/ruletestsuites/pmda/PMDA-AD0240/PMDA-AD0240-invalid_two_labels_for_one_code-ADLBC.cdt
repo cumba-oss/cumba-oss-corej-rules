@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0240 expect=violation domain=ADLBC
+#note "Patterns ^TRTAG(\\d+)$ and ^TRTAG(\\d+)N$, one deduped tuple y=1, one expansion. KEY = TRTAG1N, DEPENDENT = TRTAG1: key 1 carries {POOLA, POOLB} -> rows 1 and 2 fire. Exactly 2 violations."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 TRTAG1=POOLA TRTAG1N=1
+#expectViolationAt row=2 USUBJID=01-701-1023 TRTAG1=POOLB TRTAG1N=1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col TRTAG1  type=Char
+col TRTAG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 30 | POOLA | 1
+CDISCPILOT01 | 01-701-1023 | ALB | 31 | POOLB | 1
+CDISCPILOT01 | 01-701-1034 | ALB | 32 | POOLC | 3

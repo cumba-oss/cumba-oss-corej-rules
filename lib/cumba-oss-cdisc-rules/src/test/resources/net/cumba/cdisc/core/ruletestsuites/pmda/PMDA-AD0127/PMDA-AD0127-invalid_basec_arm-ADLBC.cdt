@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0127 expect=violation domain=ADLBC
+#note "BASE missing, BASEC populated, no ABLFL=Y in group -> fires via the `or not empty(BASEC)` arm (the PMDA-vs-CDISC discriminator: CDISC-AD0127 reads BASE only)."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt row=1 BASEC=POSITIVE
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col BASE    type=Num
+col BASEC   type=Char
+col ABLFL   type=Char
+---
+S1 | 001 | GLUC | 5.2 | | POSITIVE | N

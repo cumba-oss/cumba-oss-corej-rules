@@ -1,0 +1,54 @@
+Core:
+  Id: "CDISC-AD0464"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when TRCMPGy is populated and TRCMPGyN is missing on\
+  \ the same record."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRCMPGy"
+    - "TRCMPGyN"
+Check:
+  expression: >-
+    not empty(TRCMPGy) and empty(TRCMPGyN)
+Outcome:
+  Message: "TRCMPGy is populated but TRCMPGyN is missing."
+  Output_Variables:
+  - "TRCMPGy"
+  - "TRCMPGyN"
+wildcards:
+  "y":
+    min: 1
+    max: 99
+Source:
+  Class: "SUBJECT LEVEL ANALYSIS DATASET"
+  Variable_or_Item: "TRCMPGyN where y is an integer [1-9, not zero-padded]"
+  Natural_Language_Rule_Failure_Criteria: "On a given record, TRCMPGy is populated\
+    \ and TRCMPGyN is not populated"
+  Rule_Failure_Criteria: "TRCMPGyN is not populated"
+  Condition_Failure: "TRCMPGy is populated"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR464"
+        Version: "1"
+      Version: "5.0"
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "ADaM Conformance Rules"
+      Rule_Identifier:
+        Id: "CR464"
+        Version: "1"
+      Version: "5.0"

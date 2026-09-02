@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG0664"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the order of variables does not reflect the order\
+  \ of the variables in the SDTM Model for the observation class."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$model_column_order"
+  expression: "get_model_column_order()"
+- id: "$column_order_from_dataset"
+  expression: "get_column_order_from_dataset()"
+Check:
+  expression: >-
+    not empty($model_column_order) and not is_ordered_subset_of($column_order_from_dataset,
+    $model_column_order)
+Outcome:
+  Message: "Variables are not in the correct order as shown in the SDTM Model for\
+    \ the observation class."
+  Output_Variables:
+  - "$column_order_from_dataset"
+  - "$model_column_order"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variables are ordered with Identifiers first, followed by the Topic, Qualifier,\
+    \ and Timing variables. Within each role, variables are ordered as shown in SDTM\
+    \ tables in sections 3.1.1, 3.1.2, 3.1.3, 3.1.3.1, 3.1.4, and 3.1.5"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0664"
+        Version: "1"
+      Version: "2.0"

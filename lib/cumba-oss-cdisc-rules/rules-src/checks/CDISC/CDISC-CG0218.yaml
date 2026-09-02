@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-CG0218"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Epoch (EPOCH) in the Subject Visits (SV) domain\
+  \ does not match the EPOCH value of the corresponding Subject Elements (SE) element\
+  \ whose date range (SESTDTC to SEENDTC) contains the visit start date (SVSTDTC)."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
+    - "SVSTDTC"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "SE"
+Check:
+  ERROR:
+    expression: >-
+      date(SE.SESTDTC) <= SVSTDTC and date(SVSTDTC) <= SE.SEENDTC and EPOCH != SE.EPOCH
+  INFO:
+    expression: >-
+      date(earliest_possible(SE.SESTDTC)) <= latest_possible(SVSTDTC) and
+      date(earliest_possible(SVSTDTC)) <= latest_possible(SE.SEENDTC) and EPOCH != SE.EPOCH
+    Message: "EPOCH in SV does not match EPOCH of an SE element whose date range may contain\
+      \ the visit start date (partial date/time precision leaves the containment undetermined)."
+Outcome:
+  Message: "EPOCH in SV does not match EPOCH of the corresponding element in the SE\
+    \ dataset."
+  Output_Variables:
+  - "EPOCH"
+  - "SVSTDTC"
+  - "SE.SESTDTC"
+  - "SE.SEENDTC"
+  - "SE.EPOCH"
+Source:
+  Class: "SPC"
+  Domain: "SV"
+  Variable: "EPOCH"
+  Condition: "EPOCH present in dataset and SESTDTC <= SVSTDTC and SVSTDTC <= SEENDTC"
+  Rule: "EPOCH = SE.EPOCH"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0218"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0218"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0218"
+        Version: "1"
+      Version: "2.0"

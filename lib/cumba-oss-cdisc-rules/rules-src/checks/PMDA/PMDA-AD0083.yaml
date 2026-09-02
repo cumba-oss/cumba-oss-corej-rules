@@ -1,0 +1,46 @@
+Core:
+  Id: "PMDA-AD0083"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when both TRTSDT (Date of First Exposure to Treatment)\
+  \ and TR01SDT (Date of First Exposure in Period 01) are populated and TRTSDT does\
+  \ not equal TR01SDT for the subject."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "TRTSDT"
+    - "TR01SDT"
+Check:
+  expression: >-
+    not empty(TRTSDT) and not empty(TR01SDT) and TRTSDT != TR01SDT
+Outcome:
+  Message: "TRTSDT (Date of First Exposure to Treatment) is not equal to TR01SDT (Date\
+    \ of First Exposure in Period 01)."
+  Output_Variables:
+  - "TRTSDT"
+  - "TR01SDT"
+Source:
+  Message: "TRTSDT != TR01SDT"
+  Description: "Date of First Exposure to Treatment (TRTSDT) must equal the First\
+    \ Treatment in Period 01 (TRT01SDT). If TR01SDT (First Treatment in Period 01)\
+    \ exists it must equal TRTSDT (First Treatment Date) of the entire trial for a\
+    \ given patient)."
+  Domains: "ADSL"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0083"
+        Version: "1"
+      Version: "6.0"

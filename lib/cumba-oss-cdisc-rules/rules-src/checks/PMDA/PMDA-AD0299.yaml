@@ -1,0 +1,66 @@
+Core:
+  Id: "PMDA-AD0299"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a member of the Standardized MedDRA Query variable\
+  \ family (SMQzzNAM, SMQzzCD, SMQzzSC, SMQzzSCN) carries a two-digit zz index that\
+  \ is not in the range 01 to 99 (i.e. SMQ00NAM/SMQ00CD/SMQ00SC/SMQ00SCN)."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+  Subclasses:
+    Include:
+    - "ADVERSE EVENT"
+Check:
+  expression: >-
+    varname() =~ /^SMQ\\d\\d(NAM|CD|SC|SCN)$/ and varname() !~
+    /^SMQ(0[1-9]|[1-9]\\d)(NAM|CD|SC|SCN)$/
+Outcome:
+  Message: "Illegal variable name: zz is not in [01-99] for SMQzz(NAM/CD/SC/SCN)."
+  Output_Variables:
+  - "variable_name"
+Source:
+  Message: "Illegal variable name: zz is not in [01-99] for SMQzz(NAM, CD, SC, SCN)"
+  Description: "For Standardized MedDRA Query Variables of Name, Code and Scope(N),\
+    \ zz must be the ordered SMQ of interest (01 to 99). This ordering can be based\
+    \ on importance or some other sponsor-defined criteria. It is recommended that\
+    \ the ordering be consistent across studies within a development program."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0299"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0299"
+        Version: "1"
+      Version: "6.0"

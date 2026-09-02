@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0621 expect=violation domain=ADAE01
+#note "Split-named ADaM dataset. ADAE01 carries no DOMAIN column (ADaM has none), so nothing but the columns can classify it: AETERM makes it an OCCURRENCE DATA STRUCTURE and, being an AE topic variable, an ADVERSE EVENT subclass. The rule's Data_Structures/Subclasses scope therefore reaches the split; the retired Domains.Include ['ADAE'] name scope did not. This is the migration's motivating case."
+# Rule:Description: Raise an error when TRTEMFL is not present in an ADVERSE EVENT sub-class OCCDS dataset (e.g., ADAE).
+#expectViolationCount 1
+dataset ADAE01
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE
+---

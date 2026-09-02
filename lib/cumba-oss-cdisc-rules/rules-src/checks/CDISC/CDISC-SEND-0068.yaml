@@ -1,0 +1,82 @@
+Core:
+  Id: "CDISC-SEND-0068"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a date/time variable (a variable whose name ends\
+  \ in DTC) contains a time component (a colon) but does not contain the \"T\" designator\
+  \ that must separate the date from the time in the notation YYYY-MM-DDThh:mm:ss."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    ends_with(varname(), "DTC") and value() =~ /.*:/ and value() !~ /.*T/
+Outcome:
+  Message: "A date/time (DTC) variable value contains a time (a colon) but no \"T\"\
+    \ date/time separator."
+  Output_Variables:
+  - "variable_name"
+  - "variable_value"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "When a date is presented with a time in the same variable\
+    \ as a date/time the date is written in front of the time and the time is prededed\
+    \ with \"T\" using the notation YYYY-MM-DDThh:mm:ss"
+  Condition: "A date is presented with a time in the same variable as a date/time"
+  Rule: "Date in format  YYYY-MM-DD is written before time in format 00:00:00 and\
+    \ time is preceded with \"T\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND68"
+        Version: "1"
+      Version: "5.0"
