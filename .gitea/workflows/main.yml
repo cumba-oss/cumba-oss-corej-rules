@@ -81,6 +81,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # full history: the <revision> staleness guard below compares against tags
+          fetch-depth: 0
 
       # The pickle cache must exist BEFORE the test passes. Keyed on the pinned
       # upstream ref with NO restore-keys - a ref bump must refetch cold, never
@@ -149,6 +152,32 @@ jobs:
                 echo "::error::pom.xml <revision> is '$VERSION' - expected a -SNAPSHOT dev version." >&2
                 exit 1
             fi
+              # ⛔ Has <revision> been bumped since the last release?
+              #
+              # Nothing bumps it automatically. maven-release-plugin would not help: it
+              # rewrites <version> ELEMENTS and leaves <revision> untouched, which for a
+              # ${revision} project replaces the placeholder with a literal and strands the
+              # property (verified by dry run, 2026-09-03). So the reminder lives here.
+              #
+              # ⚠ A shallow checkout hides every tag, which would make this guard pass
+              #   vacuously -- exactly the failure it exists to catch. Say so out loud
+              #   rather than skip quietly.
+              if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+                  echo "::warning::shallow checkout - cannot check <revision> against the last tag."
+              else
+                  LAST_TAG="$(git tag -l 'v*' | sed 's/^v//' | sort -V | tail -1)"
+                  DEV="${VERSION%-SNAPSHOT}"
+                  if [ -n "$LAST_TAG" ]; then
+                      HIGHEST="$(printf '%s\n%s\n' "$DEV" "$LAST_TAG" | sort -V | tail -1)"
+                      if [ "$DEV" = "$LAST_TAG" ] || [ "$HIGHEST" != "$DEV" ]; then
+                          echo "::error::pom.xml <revision> is $VERSION, but v$LAST_TAG is already released."
+                          echo "::error::The dev line was never moved on, so main would publish a snapshot of a released version."
+                          echo "::error::Fix: mvn versions:set-property -Dproperty=revision -DnewVersion=<next>-SNAPSHOT"
+                          exit 1
+                      fi
+                      echo "dev line $VERSION is ahead of the last release v$LAST_TAG"
+                  fi
+              fi
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building version: $VERSION"
