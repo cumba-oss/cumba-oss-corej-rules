@@ -429,9 +429,9 @@ jobs:
       # Hand the CORPUS ARCHIVES to the release job. Short-lived hand-off → low
       # retention.
       #
-      # ⛔ ARCHIVES, not jars. lib/cumba-oss-corej-rules has no src/main, so its jar is
+      # ⛔ ARCHIVES, not jars. this repo has no src/main, so its jar is
       #    EMPTY — attaching it would attach nothing. The two zips built by
-      #    dist/cumba-oss-corej-rules-dist are the entire deliverable. The internal Nexus
+      #    the assembly are the entire deliverable. The internal Nexus
       #    deploy above is the jar path; a release asset is a different audience.
       # ⛔ The artifact NAME must stay `release-archives`: the release job below downloads
       #    exactly that name, and a mismatch fails at download — before the signing steps,
@@ -447,7 +447,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           name: release-archives
-          path: dist/*-dist/target/*-${{ steps.ver.outputs.version }}.zip
+          # ⚠ target/, not dist/*-dist/target/. Single module now: the assembly writes into
+          #   this module's own target/, and upload-artifact only WARNS on a no-match.
+          path: target/*-${{ steps.ver.outputs.version }}.zip
           if-no-files-found: error
           retention-days: 2
 

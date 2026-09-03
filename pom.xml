@@ -12,8 +12,8 @@
         ============================================================
     -->
     <groupId>net.cumba</groupId>
-    <artifactId>cumba-oss-corej-rules-parent</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>cumba-oss-corej-rules</artifactId>
+    <packaging>jar</packaging>
     <version>${revision}</version>
 
     <properties>
@@ -324,8 +324,47 @@
             (`coverage/`), so one path - this used to be set per profile,
             pointing at coverage/dev or coverage/main.
         -->
-        <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 
+        <!-- ===== From the former lib module pom. ===== -->
+        <!--
+            Where the build generates the two shipped corpora. ONE definition, read by three
+            places: the exec bindings that write them, the surefire properties that tell the
+            tests where to look (CorpusPaths), and dist/*-dist's assembly fileSets.
+            Under target/, so `mvn clean` wipes them and nothing generated is ever committed
+            (PLAN-rules-corpus-build-integration D1).
+        -->
+        <corej.corpus.dir>${project.build.directory}/rules</corej.corpus.dir>
+        <corej.define.corpus.dir>${project.build.directory}/rules-define</corej.define.corpus.dir>
+
+        <!--
+            DO NOT DEPLOY THIS MODULE'S JAR (PLAN-rules-corpus-build-integration §5).
+
+            The module is test-only: no src/main, so the jar is ~1 KB of nothing. The
+            deliverable is the corpus, and it ships through dist/corej-cdisc-rules-dist.
+            Nothing declares a Maven dependency on this artifact except coverage/main (the
+            reactor aggregator) and, for the reactor edge alone, the two dist modules — all
+            of them inside the reactor, none of them from a repository.
+
+            ⛔⛔ SUPPRESS PUBLICATION, NOT THE JAR ITSELF. Keep packaging=jar and let the
+            empty jar be built. Binding default-jar to <phase>none</phase>, or setting
+            maven-jar-plugin's skipIfEmpty, makes `mvn install` fail outright —
+            "The packaging plugin for project ... did not assign a file to the build
+            artifact" — and it fails LATE: a scoped `verify` still passes, so it would
+            surface at release time. Switching to packaging=pom is worse still: pom packaging
+            binds no compile and no test, so this module's ENTIRE test tree (11 500+ tests)
+            would silently stop running and the build would go green having executed nothing.
+        -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <mockito.agent>-javaagent:${org.mockito:mockito-core:jar}</mockito.agent>
+        <!--
+            Inherited from corej-cdisc-core-rulespec when it was folded into this module.
+            MUST stay on ONE physical line: Plexus' ArrayList converter splits on commas
+            without trimming, and pitest's Glob matches literally, so XML indentation before
+            patterns 2..N silently neutralises them (see the parent pom's note).
+        -->
+        <pitest.excludedTestClasses>net.cumba.corej.core.rulespec.RuleExecutionSpecTest,net.cumba.corej.core.rulespec.DefineItemMetadataSpecTest</pitest.excludedTestClasses>
     </properties>
 
     <!--
@@ -346,12 +385,7 @@
         Add new lib modules HERE, and to coverage/pom.xml's <dependencies> as
         well - the enforcer rule there fails the build if you forget.
     -->
-    <modules>
-        <module>lib/cumba-oss-corej-rules</module>
-        <module>dist/cumba-oss-corej-rules-dist</module>
 
-        <module>coverage</module>
-    </modules>
 
 
     <profiles>
@@ -974,7 +1008,32 @@
                                     <fail>true</fail>
                                 </configuration>
                             </execution>
-                        </executions>
+                        
+                    <!-- From the former dist module: the corpus must exist before the
+                         assembly copies it. An assembly fileSet whose <directory> is
+                         missing is SILENTLY skipped and ships an empty archive. Merged
+                         into THIS plugin element: two <plugin> entries for one plugin is
+                         invalid and Maven only warns. -->
+                    <execution>
+                        <id>require-generated-rule-corpus</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireFilesExist>
+                                    <files>
+                                        <file>${project.build.directory}/rules/packages.json</file>
+                                        <file>${project.build.directory}/rules-define/packages.json</file>
+                                    </files>
+                                    <message>The generated rule corpus is missing. It is produced by cumba-oss-corej-rules' build into its target/ and is not committed — it is produced by this module at process-test-classes, so a scoped run that skips that phase will trip this.</message>
+                                </requireFilesExist>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -1185,10 +1244,10 @@
                                 and it fails late — a scoped verify still passes.
                             -->
                             <excludeArtifacts>
-                                <excludeArtifact>coverage</excludeArtifact>
+                                <!-- Nothing here goes to Maven Central. Single module now, so the former
+                                     parent, the dist module and the coverage aggregator are gone from this
+                                     list; what remains is this repo's own (empty) jar. -->
                                 <excludeArtifact>cumba-oss-corej-rules</excludeArtifact>
-                                <excludeArtifact>cumba-oss-corej-rules-parent</excludeArtifact>
-                                <excludeArtifact>cumba-oss-corej-rules-dist</excludeArtifact>
                             </excludeArtifacts>
                         </configuration>
                     </plugin>
@@ -1399,6 +1458,170 @@
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
         </dependency>
+        <!-- ===== From the former lib/ and dist/ module poms. This repository is a
+             SINGLE MODULE now: the root pom IS the artifact, and the corpus is
+             generated (process-test-classes) and packaged (package) in one
+             lifecycle, so the reactor edge that used to order two modules is gone.
+             ===== -->
+
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-corej-core</artifactId>
+        </dependency>
+
+        <!--
+            Datatable test helpers (MockTable, TestMetadataFixtures) for the corpus tests.
+
+            This REPLACES the corej-cdisc-core test-jar dependency, deleted on
+            2026-09-01 (plans/done/PLAN-corej-restructure.md section 4). That dependency reached FOUR
+            cdisc-core test classes across the module boundary, not the two its own comment
+            named: MockTable and TestMetadataFixtures by import, StubMetadataProvider
+            fully-qualified, and the package-private SyntheticStringTable through a split
+            package. The first two became this published testkit; the other two are copied into
+            this module's own test tree (see the COPY headers on each).
+
+            ⚠⚠ A test-jar packages target/test-CLASSES, which carries RESOURCES too — so an
+            inventory of classes is not an inventory of what the dependency supplied. This one
+            also carried junit-platform.properties and
+            META-INF/services/org.junit.jupiter.api.extension.Extension, which together register
+            CompiledProgramCacheIsolationExtension. Losing them was SILENT (both went at once, so
+            no ServiceConfigurationError) and cost mutation attribution, not correctness. All
+            three are now copied into this module; see the header on the extension.
+        -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-datatable-testkit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-datatable</artifactId>
+        </dependency>
+
+        <!-- FindingsSnapshot (documentation/findings-snapshot.tsv): the study-level run over
+             testdata/study reads Dataset-JSON through the local manager, exactly as the CLI and
+             REST runs do. Test scope: the snapshot is a documentation tool, not shipped code. -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-datatable-manager-local</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-datatable-provider-dsj</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Folded in from corej-cdisc-core-ruletest-suites and corej-cdisc-core-rulespec.
+             All test scope: this module has no src/main. -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-datatable-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- The .cdt rule-test harness the ruletestsuites factories drive. -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-corej-ruletest</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Define-XML metadata for the .cdt fixtures. -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-cdisc-define</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- The Define-XML conformance model (ConformanceRule, CheckDefinition,
+             DefineRulePackage). The offline generator under rules-define-src/ parses the
+             authored YAML into these types and serialises them into rules-define/, so the
+             packaged form is produced by the same annotations the engine reads it with.
+
+             ONE DIRECTION ONLY: corej-define-conformance must never depend on this module.
+             It would be a reactor cycle, and it is why the corpus-driven Define-XML tests
+             live here rather than there (PLAN-rules-module-consolidation D12/D13). -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-corej-define-conformance</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JSpecify nullability annotations (NullAway). -->
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+
+        <!-- Lombok (@CustomLog in the tooling classes). -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Apache POI, TEST scope only: the rule-corpus workbook readers
+             (ShippedSourceBlockMatchesWorkbookTest,
+             ShippedSendSourceBlockMatchesWorkbookTest, OriginalTextBackfill,
+             StandardsLinkageBackfill, StandardsMembershipOracle and their tests) parse
+             the shipped .xlsx rule sources. No main source in this module touches POI.
+
+             ⚠ Declared explicitly since Fix #224. It used to arrive transitively
+             through corej-cdisc-core, which carried poi-ooxml for the XLSX report
+             writer; that writer moved to corej-cdisc-report-xlsx and the engine's
+             POI dependency was deleted, so this module's test compile broke. A
+             module that names a package must declare the dependency that provides
+             it - inheriting it from an unrelated consumer's transitive is what made
+             this an invisible coupling in the first place. -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- JSON-Schema validation of the shipped rule packages against
+             documentation/rule-format.schema.json (RuleFormatSchemaTest). -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -1562,10 +1785,17 @@
                             or the repo root anchor them via the system properties below
                             instead of relying on CWD.
                         -->
-                        <workingDirectory>${project.build.directory}/test-cwd</workingDirectory>
+                        <!-- ⚠ workingDirectory is the BASEDIR, not target/test-cwd: the corpus tests and
+                             generator tools resolve rules-src/, rulespec/ and documentation/ by
+                             module-relative paths. That used to be a child-pom override; flattened,
+                             it has to be stated here. The four systemPropertyVariables are the
+                             MERGE of what the parent and the child each declared. -->
+                        <workingDirectory>${project.basedir}</workingDirectory>
                         <systemPropertyVariables>
                             <projectBasedir>${project.basedir}</projectBasedir>
                             <repoRoot>${maven.multiModuleProjectDirectory}</repoRoot>
+                            <corpusDir>${corej.corpus.dir}</corpusDir>
+                            <defineCorpusDir>${corej.define.corpus.dir}</defineCorpusDir>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1932,6 +2162,134 @@
                 <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
 
+        
+        <!-- ===== From the former lib/ and dist/ module poms. This repository is a
+             SINGLE MODULE now: the root pom IS the artifact, and the corpus is
+             generated (process-test-classes) and packaged (package) in one
+             lifecycle, so the reactor edge that used to order two modules is gone.
+             ===== -->
+
+            <!--
+                GENERATE BOTH SHIPPED CORPORA, EVERY BUILD.
+
+                Until PLAN-rules-corpus-build-integration these two generators ran only from
+                scripts/regen-*.sh and their 80 MB of output was committed. Now the build
+                produces them into target/, they are gitignored, and a packaging change that
+                alters a rule shows up as a failing test instead of a silent diff.
+
+                WHY process-test-classes. Both generators are main() classes in src/test/java
+                (jackson-dataformat-yaml and the Define-XML model are test-scoped, so neither
+                may leak into a shipped jar). The binding therefore has to sit after
+                test-compile and before test — process-test-classes is the only phase between
+                them. Generation is a few seconds, so it is unconditional: no skip flag.
+
+                WHY exec:exec AND NOT exec:java. exec:java runs inside the Maven JVM, whose
+                working directory is wherever `mvn` was launched — the repo root for any normal
+                invocation. Both generators resolve their SOURCE relative to the CWD
+                (PackageStandardsMap.load(Path.of("")), DefineRuleCorpusGenerator.SOURCE), so
+                exec:java would read rules-src/ from the repo root and find nothing. exec:exec
+                honours <workingDirectory>, and forking also keeps the generators off Maven's
+                own classloader.
+
+                ⚠ This is a pom binding, not a script, so CorpusGenScriptGuardTest does not see
+                it — that test walks scripts/ only (SCRIPTS = Path.of("scripts")). The
+                stale-engine hazard it guards against does not arise here either: the reactor
+                has just compiled this tree's classes and <classpath/> is that reactor
+                classpath, never ~/.m2.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${plugin.exec-maven-plugin.version}</version>
+                <configuration>
+                    <executable>${java.home}/bin/java</executable>
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                    <classpathScope>test</classpathScope>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-rule-corpus</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>net.cumba.corej.core.expr.convert.RuleCorpusGenerator</argument>
+                                <argument>${corej.corpus.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-define-rule-corpus</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>net.cumba.corej.define.conformance.gen.DefineRuleCorpusGenerator</argument>
+                                <argument>${corej.define.corpus.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Both corpora must exist before the assembly copies them.
+
+                ⚠ An assembly <fileSet> whose <directory> does not exist is SILENTLY
+                skipped — the bundle builds green and ships EMPTY. Fail here instead,
+                before the assembly runs, naming the cause.
+            -->
+            
+
+            <!--
+                TWO archives, not one. The data corpus and the Define-XML corpus are on
+                different axes and a consumer may want either alone.
+
+                ⚠ finalName is set PER EXECUTION, not once for the module. With
+                appendAssemblyId=false (which the release glob's readable names depend on)
+                two executions sharing one finalName would write the same file twice, and
+                the second would silently win.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${plugin.maven-assembly-plugin.version}</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-rules-dist</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <finalName>cumba-oss-corej-rules-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>src/assembly/dist.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-rules-define-dist</id>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <finalName>cumba-oss-corej-rules-define-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>src/assembly/rules-define.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
     </build>

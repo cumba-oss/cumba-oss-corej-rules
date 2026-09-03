@@ -288,8 +288,8 @@ jobs:
       # alongside the real ones. Measured: a workspace that had built
       # 0.1.0-SNAPSHOT and then 9.9.9 matched 8 jars for 4 modules.
       # ⛔ The CORPUS ARCHIVES, not jars. This repository publishes nothing to Maven
-      #    Central and lib/cumba-oss-corej-rules' jar is EMPTY (no src/main) — shipping it
-      #    would be shipping nothing. The two zips built by dist/cumba-oss-corej-rules-dist
+      #    Central and this repo's jar is EMPTY (no src/main) — shipping it
+      #    would be shipping nothing. The two zips built by the assembly
       #    are the entire deliverable, so if-no-files-found: error, because a silent
       #    no-match here ships a release with no content at all.
       - name: Upload release archives
@@ -297,7 +297,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: release-archives
-          path: dist/*-dist/target/*-${{ steps.ver.outputs.version }}.zip
+          # ⚠ target/, not dist/*-dist/target/. Single module now.
+          path: target/*-${{ steps.ver.outputs.version }}.zip
           if-no-files-found: error
           retention-days: 2
 
