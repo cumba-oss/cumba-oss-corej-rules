@@ -513,6 +513,31 @@ jobs:
           name: release-archives
           path: release-archives
 
+      # ⛔ NORMALISE THE LAYOUT — do not guess it.
+      #
+      # act_runner's download-artifact does NOT collapse to the least-common-ancestor the
+      # way GitHub's does. Measured on v0.2.2: the download reported "Total number of files
+      # that will be downloaded: 2" and succeeded, and `release-archives/*.zip` STILL
+      # matched nothing — the files land under their original dist/<module>/target/ path
+      # inside release-archives/.
+      #
+      # That is why this step exists rather than a cleverer glob: the signing loop and the
+      # release action below each need a glob, they are checked by different code, and a
+      # no-match is silent in one of them. Flattening once here makes both deterministic.
+      # ⚠ The listing is deliberate: if this ever breaks again, the log shows the actual
+      #    layout instead of leaving the next person to infer it.
+      - name: Flatten downloaded archives
+        run: |
+          set -eo pipefail
+          echo "as downloaded:"
+          find release-archives -type f | sort
+          while IFS= read -r f; do
+              [ "$(dirname "$f")" = "release-archives" ] || mv -v "$f" release-archives/
+          done < <(find release-archives -type f -name '*.zip')
+          find release-archives -mindepth 1 -type d -empty -delete
+          echo "flattened:"
+          find release-archives -type f | sort
+
       # ⭐ Sign every archive with the same key as the Central artifacts, so consumers have
       #    ONE trust root. A release asset is mutable — unlike a Central artifact — so here
       #    the signature is the only thing between a consumer and a swapped archive.
