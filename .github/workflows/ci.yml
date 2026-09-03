@@ -84,9 +84,53 @@ jobs:
       # before any mutation work happens.
       MAVEN_CI_GATES: -Dmaven.compiler.failOnWarning=true -Dspotless.check=true -Dpmd.failOnViolation=true -Dspotbugs.failOnError=true
 
+      # CDISC pickle metadata cache (restore/fetch below, save at the end of the
+      # job). The parity suite reads .pkl files straight from this directory
+      # (PickleCache.CACHE_DIR_ENV). Without it 8 tests fail, not skip:
+      # PickleProviderGuardTest hard-fails by design, PickleMetadataReaderTest (3),
+      # StudyValidationServicePickleTest, and the three FDA/PMDA-SD9999 specs flip
+      # EXECUTED -> SKIPPED. The locator's only built-in default is a dev-host path
+      # no runner carries, so CI must supply it.
+      # JOB level, not per-step: Pitest forks its own test runs and must see it too.
+      # A literal path outside the checkout - `~` would not expand here, and Java
+      # reads the value verbatim.
+      CDISC_PICKLE_CACHE_DIR: /tmp/cdisc-pickle-cache
+      # The pinned PUBLIC upstream ref the pickles are fetched from; also keys the
+      # restore/save pair, so bumping the ref refetches cold.
+      CDISC_PICKLE_REF: v0.16.0
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      # The pickle cache must exist BEFORE the test passes. Keyed on the pinned
+      # upstream ref with NO restore-keys - a ref bump must refetch cold, never
+      # mix two refs' pickles in one directory. Saved at the end of the job, only
+      # after a successful fetch.
+      - name: Restore CDISC pickle cache
+        id: pickle-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.CDISC_PICKLE_CACHE_DIR }}
+          key: ${{ runner.os }}-cdisc-pickles-${{ env.CDISC_PICKLE_REF }}
+
+      # Cache miss -> fetch from the PUBLIC upstream, same archive shape and file
+      # filter as HttpArchivePickleSource. An EXPLICIT step, never a lazy fetch
+      # inside a test - a miss must be visible here, not as an unexplained slow
+      # gate. tar exits non-zero if any pattern matches nothing, so a ref that
+      # lacks the pickles fails THIS step, by name.
+      - name: Fetch CDISC pickle cache
+        id: pickle-fetch
+        if: ${{ steps.pickle-cache.outputs.cache-hit != 'true' }}
+        run: |
+          mkdir -p "${CDISC_PICKLE_CACHE_DIR}"
+          curl -fsSL --retry 3 \
+              "https://github.com/cdisc-org/cdisc-rules-engine/archive/${CDISC_PICKLE_REF}.tar.gz" \
+              | tar -xz -C "${CDISC_PICKLE_CACHE_DIR}" --strip-components=3 --wildcards \
+                  '*/resources/cache/standards_details.pkl' \
+                  '*/resources/cache/standards_models.pkl' \
+                  '*/resources/cache/*ct-*.pkl'
+          echo "pickles: $(ls "${CDISC_PICKLE_CACHE_DIR}" | wc -l) files, $(du -sh "${CDISC_PICKLE_CACHE_DIR}" | cut -f1)"
 
       - name: Set up JDK
         uses: actions/setup-java@v6
@@ -243,12 +287,18 @@ jobs:
       # different version — a bare `*.jar` would attach those to the release
       # alongside the real ones. Measured: a workspace that had built
       # 0.1.0-SNAPSHOT and then 9.9.9 matched 8 jars for 4 modules.
-      - name: Upload release jars
+      # ⛔ The CORPUS ARCHIVES, not jars. This repository publishes nothing to Maven
+      #    Central and lib/cumba-oss-cdisc-rules' jar is EMPTY (no src/main) — shipping it
+      #    would be shipping nothing. The two zips built by dist/cumba-oss-cdisc-rules-dist
+      #    are the entire deliverable, so if-no-files-found: error, because a silent
+      #    no-match here ships a release with no content at all.
+      - name: Upload release archives
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v7
         with:
-          name: release-jars
-          path: lib/*/target/*-${{ steps.ver.outputs.version }}.jar
+          name: release-archives
+          path: dist/*-dist/target/*-${{ steps.ver.outputs.version }}.zip
+          if-no-files-found: error
           retention-days: 2
 
       # Purge our own freshly-built artifacts BEFORE saving, so the cache holds
@@ -274,163 +324,70 @@ jobs:
           path: ~/.pitest-history
           key: ${{ runner.os }}-pitest-${{ github.run_id }}
 
-  # Publish to Maven Central on a tag, BEFORE the GitHub Release is cut, so a
-  # release is never announced for artifacts that failed to publish. `needs:
-  # build` means every gate is already green.
-  #
-  # ⚠ autoPublish is false in the pom: this uploads a STAGED bundle that must be
-  # released by hand at central.sonatype.com. Publishing is irreversible and
-  # versions are immutable — a bad 1.2.3 burns 1.2.3 forever — so the staged
-  # step exists to be inspected, and dropped if wrong. Do not automate this away
-  # until a release has gone through cleanly.
-  publish-central:
-    needs: build
-    if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      # setup-java writes the settings.xml <server id="central"> AND imports the
-      # GPG key, so neither a hand-rolled settings file nor a third-party GPG
-      # action is needed. server-username-env-var / server-password-env-var name
-      # the ENV VARS the generated settings.xml reads — not the values
-      # themselves. (They were `server-username` / `server-password` until
-      # setup-java deprecated those as aliases; the new names say what they are.
-      # `gpg-passphrase` is deprecated the same way, but is deliberately unused
-      # here — see below.)
-      - name: Set up JDK and signing key
-        uses: actions/setup-java@v6
+      # Only after a successful fetch: a cache hit must not re-save under the same
+      # key (the save would no-op), and a failed fetch must never persist a partial
+      # cache under the key every later run would then trust. always() so a
+      # successful fetch still saves when a later gate went red.
+      - name: Save CDISC pickle cache
+        uses: actions/cache/save@v6
+        if: ${{ always() && steps.pickle-fetch.conclusion == 'success' }}
         with:
-          distribution: temurin
-          java-version: '25'
-          server-id: central
-          server-username-env-var: CENTRAL_USERNAME
-          server-password-env-var: CENTRAL_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          # No gpg-passphrase here on purpose: that input makes setup-java write
-          # <gpg.passphrase> into settings.xml, and maven-gpg-plugin deprecated
-          # that property ("it may leak sensitive information"). The passphrase
-          # is passed as MAVEN_GPG_PASSPHRASE on the step below instead, which
-          # is what the plugin's own warning tells you to use. Importing the key
-          # does not need the passphrase.
+          path: ${{ env.CDISC_PICKLE_CACHE_DIR }}
+          key: ${{ runner.os }}-cdisc-pickles-${{ env.CDISC_PICKLE_REF }}
 
-      # A runner has no pinentry binary, so signing must never need a prompt.
-      #
-      # ⚠⚠ GNUPGHOME IS NOT ~/.gnupg HERE. setup-java imports the key into its
-      # own temp directory and exports GNUPGHOME to it, e.g.
-      #     /home/runner/work/_temp/setup-java-gpg-XXXXXX
-      # The first attempt at this step wrote the config to ~/.gnupg, which Maven
-      # never reads — so it changed nothing and the dry run failed again with
-      # "gpg: signing failed: No pinentry". Always use "$GNUPGHOME".
-      - name: Configure gpg for non-interactive signing
-        env:
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          set -eo pipefail
-          : "${GNUPGHOME:=$HOME/.gnupg}"
-          echo "GNUPGHOME=$GNUPGHOME"
-          mkdir -p "$GNUPGHOME"; chmod 700 "$GNUPGHOME"
-          {
-            echo "allow-loopback-pinentry"
-            # The signing pass spans minutes; do not let the cache expire
-            # between the first artifact and the last.
-            echo "default-cache-ttl 7200"
-            echo "max-cache-ttl 7200"
-          } >> "$GNUPGHOME/gpg-agent.conf"
-          echo "pinentry-mode loopback" >> "$GNUPGHOME/gpg.conf"
-          gpgconf --kill gpg-agent || true
-          gpgconf --launch gpg-agent || true
-
-          # Prime the agent by signing a throwaway byte with the passphrase
-          # supplied explicitly. maven-gpg-plugin's later calls are then served
-          # from the agent cache and never reach for a pinentry, whether or not
-          # the plugin forwards the passphrase itself.
-          echo priming | gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "$MAVEN_GPG_PASSPHRASE" --detach-sign -o /dev/null -
-          echo "agent primed OK"
-
-          echo "--- diagnostics ---"
-          gpg --version | head -2
-          gpg --batch --list-secret-keys --keyid-format=long
-          command -v pinentry || echo "(no pinentry binary on PATH - expected)"
-
-      - name: Determine revision
-        id: ver
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=0.0.0-DRYRUN" >> "$GITHUB_OUTPUT"
-          fi
-
-      # The gates already ran in `build`; this re-resolves and packages, then
-      # signs and uploads. -DskipTests avoids re-running the suite, and
-      # -DskipPmd/-DskipSpotbugs skip analysis already enforced above.
-      # -Dspotless.check=true only prevents a source rewrite.
-      #
-      # Loopback pinentry is set in the pom's gpg config: without it gpg tries
-      # an interactive prompt on a tty-less runner and hangs to the timeout.
-      - name: Publish to Maven Central
-        env:
-          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
-          # Read directly by maven-gpg-plugin in batch mode. Replaces
-          # -Dgpg.passphrase=..., which the plugin deprecated: a -D value lands
-          # in the process command line where any other process on the host can
-          # read it, hence its "Sensitive content loaded from Mojo
-          # configuration" warning.
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          set -eo pipefail
-          # A manual run signs everything but stops before uploading, so the gpg
-          # path is exercised on a real runner without spending a version.
-          # central.skipPublishing is the pom property the plugin's
-          # <skipPublishing> reads; signing happens at `verify`, before it.
-          SKIP=false
-          [ "${{ github.event_name }}" = "workflow_dispatch" ] && SKIP=true
-          echo "central.skipPublishing=$SKIP"
-          mvn -B -P deploy-central deploy \
-              -DskipTests -DskipPmd -DskipSpotbugs -Dspotless.check=true \
-              -Dcentral.skipPublishing="$SKIP" \
-              -Drevision=${{ steps.ver.outputs.version }} | tee maven-central.log
-          echo "--- signatures produced ---"
-          find . -name '*.asc' -path '*/target/*' | sort
-
-      - name: Upload Central publish log
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: maven-central-log
-          path: maven-central.log
-          if-no-files-found: warn
-          retention-days: 14
-
-  # Cut the GitHub Release only after every gate is green — `needs: build`
-  # makes that a guarantee rather than a convention, since the job cannot
-  # start otherwise.
-  #
-  # This is the PUBLIC release. The Gitea workflow cuts its own release for the
-  # same tag from the same jars, and additionally deploys to the internal Nexus.
-  # The two are independent: releases are not git refs, so nothing syncs them —
   # each platform's workflow builds and publishes its own.
   release:
-    needs: [build, publish-central]
+    needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
       # Overrides the workflow-level `contents: read`; creating a release writes.
       contents: write
     steps:
-      - name: Download release jars
+      - name: Download release archives
         uses: actions/download-artifact@v8
         with:
-          name: release-jars
-          path: release-jars
+          name: release-archives
+          path: release-archives
+
+      # ⭐ SIGN EVERY ARCHIVE — the reason is STRONGER here than on Maven Central.
+      #
+      # Central artifacts are immutable, so a signature there proves provenance on
+      # something that already cannot change. A GitHub release asset CAN be replaced in
+      # place by anyone with write access, so here the signature is the only thing standing
+      # between a consumer and a silently swapped archive. Same key as the Central
+      # artifacts, so consumers have ONE trust root rather than two.
+      #
+      # ⚠ Detached, ASCII-armoured (.asc) beside each archive, which is what the verify
+      #    command in the archive README and the repo README tells people to check.
+      # ⚠ --batch --yes --pinentry-mode loopback: there is no tty on a runner, and without
+      #    loopback gpg tries to prompt and hangs the job rather than failing it.
+      - name: Import signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          set -eo pipefail
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format=long
+
+      - name: Sign release archives
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          set -eo pipefail
+          shopt -s nullglob
+          archives=(release-archives/*.zip)
+          if [ ${#archives[@]} -eq 0 ]; then
+              echo "no archives to sign — the release would carry no content" >&2
+              exit 1
+          fi
+          for f in "${archives[@]}"; do
+              gpg --batch --yes --pinentry-mode loopback \
+                  --passphrase "$GPG_PASSPHRASE" \
+                  --armor --detach-sign "$f"
+              gpg --verify "$f.asc" "$f"
+              echo "signed: $f"
+          done
 
       # `gh` is preinstalled on GitHub-hosted runners, so this needs no
       # third-party action — one less dependency to pin and audit in a public
@@ -450,9 +407,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -eo pipefail
-          find release-jars -name '*.jar' -print
+          find release-archives -name '*.zip' -o -name '*.asc' | sort
           gh release create "${GITHUB_REF_NAME}" \
-              --title "Cumba OSS coreJ ${{ needs.build.outputs.version }}" \
+              --title "Cumba OSS CDISC Rules ${{ needs.build.outputs.version }}" \
               --generate-notes \
               --verify-tag \
-              $(find release-jars -name '*.jar' | sort)
+              $(find release-archives \( -name '*.zip' -o -name '*.asc' \) | sort)

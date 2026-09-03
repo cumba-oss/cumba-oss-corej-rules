@@ -86,6 +86,10 @@ for (int i = 0; i < parts.length; i++) {
     if (mod.length() == 0) continue;
     String art = mod.substring(mod.lastIndexOf('/') + 1);
     if (art.equals("coverage")) continue;
+    // dist/*-dist modules are packaging=pom assembly wrappers with no classes, so there is
+    // nothing for JaCoCo to cover and no dependency to declare here. Skipping them keeps the
+    // rule meaningful for code modules instead of forcing a nonsense entry.
+    if (art.endsWith("-dist")) continue;
     expected.add(art);
 }
 

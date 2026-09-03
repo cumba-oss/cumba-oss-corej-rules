@@ -172,6 +172,7 @@
         <plugin.spotless-maven-plugin.version>3.10.1</plugin.spotless-maven-plugin.version>
         <plugin.jacoco-maven-plugin.version>0.8.15</plugin.jacoco-maven-plugin.version>
         <plugin.maven-enforcer-plugin.version>3.6.3</plugin.maven-enforcer-plugin.version>
+        <plugin.maven-assembly-plugin.version>3.8.0</plugin.maven-assembly-plugin.version>
         <plugin.pitest-maven-plugin.version>1.30.0</plugin.pitest-maven-plugin.version>
         <plugin.pitest-junit5-plugin.version>1.2.3</plugin.pitest-junit5-plugin.version>
         <plugin.pitest-history.version>0.1.2</plugin.pitest-history.version>
@@ -315,6 +316,7 @@
     -->
     <modules>
         <module>lib/cumba-oss-cdisc-rules</module>
+        <module>dist/cumba-oss-cdisc-rules-dist</module>
 
         <module>coverage</module>
     </modules>
@@ -1132,8 +1134,30 @@
                                 upload but still writes target/central-publishing/
                                 central-bundle.zip — 54 files, zero coverage entries.
                             -->
+                            <!--
+                                ⛔ THIS REPOSITORY PUBLISHES NOTHING TO MAVEN CENTRAL.
+                                cumba-oss-cdisc-rules is packaging=jar with no src/main, so its
+                                Maven artifact is an EMPTY JAR. The rule content ships as tagged
+                                GitHub release assets instead. Without this exclusion a tag would
+                                publish that empty jar — public and immutable, exactly the way
+                                net.cumba:coverage:0.0.4 became permanent.
+
+                                ⚠ excludeArtifacts, NOT the central.skipPublishing property:
+                                excludeArtifacts is plugin CONFIGURATION and is out of reach of a
+                                command-line -D, whereas the property is a Maven USER property
+                                that a release job passing -Dcentral.skipPublishing=false
+                                silently overrides per module.
+
+                                ⛔ Also NOT <phase>none</phase> on the jar goal: with
+                                packaging=jar that makes `mvn install` fail outright ("the
+                                packaging plugin did not assign a file to the build artifact"),
+                                and it fails late — a scoped verify still passes.
+                            -->
                             <excludeArtifacts>
                                 <excludeArtifact>coverage</excludeArtifact>
+                                <excludeArtifact>cumba-oss-cdisc-rules</excludeArtifact>
+                                <excludeArtifact>cumba-oss-cdisc-rules-parent</excludeArtifact>
+                                <excludeArtifact>cumba-oss-cdisc-rules-dist</excludeArtifact>
                             </excludeArtifacts>
                         </configuration>
                     </plugin>

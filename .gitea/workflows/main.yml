@@ -64,10 +64,49 @@ jobs:
       #   pmd.failOnViolation          - fail on any PMD finding
       #   spotbugs.failOnError         - fail on any SpotBugs finding
       MAVEN_CI_GATES: -Dmaven.compiler.failOnWarning=true -Dspotless.check=true -Dpmd.failOnViolation=true -Dspotbugs.failOnError=true
+
+      # CDISC pickle metadata cache (restore/fetch below, save at the end of the
+      # job). The parity suite reads .pkl files straight from this directory
+      # (PickleCache.CACHE_DIR_ENV). Without it 8 tests FAIL, not skip:
+      # PickleProviderGuardTest hard-fails by design, PickleMetadataReaderTest (3),
+      # StudyValidationServicePickleTest, and the three FDA/PMDA-SD9999 specs flip
+      # EXECUTED -> SKIPPED. The locator's only built-in default is a dev-host path
+      # no runner carries, so CI must supply it.
+      # JOB level, not per-step: Pitest forks its own test runs and must see it too.
+      CDISC_PICKLE_CACHE_DIR: /tmp/cdisc-pickle-cache
+      # Pinned PUBLIC upstream ref; also keys the restore/save pair, so bumping
+      # the ref refetches cold.
+      CDISC_PICKLE_REF: v0.16.0
     steps:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      # The pickle cache must exist BEFORE the test passes. Keyed on the pinned
+      # upstream ref with NO restore-keys - a ref bump must refetch cold, never
+      # mix two refs' pickles in one directory.
+      - name: Restore CDISC pickle cache
+        id: pickle-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.CDISC_PICKLE_CACHE_DIR }}
+          key: ${{ runner.os }}-cdisc-pickles-${{ env.CDISC_PICKLE_REF }}
+
+      # Cache miss -> fetch from the PUBLIC upstream. An EXPLICIT step, never a
+      # lazy fetch inside a test. tar exits non-zero if any pattern matches
+      # nothing, so a ref that lacks the pickles fails THIS step, by name.
+      - name: Fetch CDISC pickle cache
+        id: pickle-fetch
+        if: ${{ steps.pickle-cache.outputs.cache-hit != 'true' }}
+        run: |
+          mkdir -p "${CDISC_PICKLE_CACHE_DIR}"
+          curl -fsSL --retry 3 \
+              "https://github.com/cdisc-org/cdisc-rules-engine/archive/${CDISC_PICKLE_REF}.tar.gz" \
+              | tar -xz -C "${CDISC_PICKLE_CACHE_DIR}" --strip-components=3 --wildcards \
+                  '*/resources/cache/standards_details.pkl' \
+                  '*/resources/cache/standards_models.pkl' \
+                  '*/resources/cache/*ct-*.pkl'
+          echo "pickles: $(ls "${CDISC_PICKLE_CACHE_DIR}" | wc -l) files, $(du -sh "${CDISC_PICKLE_CACHE_DIR}" | cut -f1)"
         with:
           # Sonar needs full history for blame / new-code detection
           fetch-depth: 0
@@ -424,6 +463,15 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 
+      # Only after a successful fetch: a cache hit must not re-save under the same
+      # key, and a failed fetch must never persist a partial cache.
+      - name: Save CDISC pickle cache
+        uses: actions/cache/save@v4
+        if: ${{ always() && steps.pickle-fetch.conclusion == 'success' }}
+        with:
+          path: ${{ env.CDISC_PICKLE_CACHE_DIR }}
+          key: ${{ runner.os }}-cdisc-pickles-${{ env.CDISC_PICKLE_REF }}
+
   # Cut the Gitea release LAST — only after every gate AND the Nexus deploy
   # succeeded, so a release is never announced without its artifacts behind it.
   # A separate job (rather than a step in `build`) is what makes that ordering
@@ -438,15 +486,47 @@ jobs:
       # build image — heavier than needed, but already pullable, no new dep.
       image: ${{ vars.DOCKER_REGISTRY_HOSTNAME }}/maven-with-nodejs:3.9-eclipse-temurin-25
     steps:
-      - name: Download release jars
+      - name: Download release archives
         uses: actions/download-artifact@v3
         with:
-          name: release-jars
-          path: release-jars
+          name: release-archives
+          path: release-archives
+
+      # ⭐ Sign every archive with the same key as the Central artifacts, so consumers have
+      #    ONE trust root. A release asset is mutable — unlike a Central artifact — so here
+      #    the signature is the only thing between a consumer and a swapped archive.
+      #    loopback pinentry because a runner has no tty; without it gpg hangs.
+      - name: Import signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          set -eo pipefail
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format=long
+
+      - name: Sign release archives
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          set -eo pipefail
+          shopt -s nullglob
+          archives=(release-archives/*.zip)
+          if [ ${#archives[@]} -eq 0 ]; then
+              echo "no archives to sign — the release would carry no content" >&2
+              exit 1
+          fi
+          for f in "${archives[@]}"; do
+              gpg --batch --yes --pinentry-mode loopback \
+                  --passphrase "$GPG_PASSPHRASE" \
+                  --armor --detach-sign "$f"
+              gpg --verify "$f.asc" "$f"
+              echo "signed: $f"
+          done
 
       - name: Create release
         uses: actions/gitea-release-action@main
         with:
-          name: "Cumba OSS coreJ ${{ needs.build.outputs.version }}"
+          name: "Cumba OSS CDISC Rules ${{ needs.build.outputs.version }}"
           files: |
-            release-jars/**/*.jar
+            release-archives/**/*.zip
+            release-archives/**/*.asc
