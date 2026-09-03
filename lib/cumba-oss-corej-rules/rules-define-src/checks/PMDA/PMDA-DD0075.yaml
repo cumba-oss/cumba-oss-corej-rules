@@ -1,0 +1,30 @@
+Rule_Id: "PMDA-DD0075"
+Sheet_Rule_Identifier: "DD0075"
+Rule_Set: "PMDA"
+Element: "Origin"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "For Define-XML v2.0, when def:Origin/@Type is 'CRF', then def:DocumentRef must match the def:DocumentRef in def:AnnotatedCRF element. For Define-XML v2.1, when def:Origin/@Type is 'Collected' and def:Origin/@Source is 'Investigator' or 'Subject', then def:DocumentRef must match the def:DocumentRef in def:AnnotatedCRF element."
+# Custom (budget 7/15): (a) membership against ALL AnnotatedCRF DocumentRef
+# leafIDs (compare would pin the first only), (b) the absent-DocumentRef shape
+# fires - a qualifying Origin with no def:DocumentRef cannot match the
+# AnnotatedCRF (review-pmda-p3 W1: this row owns the shape DD0035/DD0103
+# cannot reach). Version legs dispatched organically in this guard, DD0103's
+# corrected semantics: 2.0 Type='CRF'; 2.1 Type='Collected' with Source in
+# {Investigator, Subject} (bare Collected would over-fire on Vendor/Sponsor).
+# Related: DD0103 (missing AnnotatedCRF, page-referencing DocumentRefs),
+# DD0035 (Pages required) - different targets, partial overlap.
+Message: "CRF Origin is not referencing AnnotatedCRF"
+Check:
+  kind: "custom"
+  className: "net.cumba.corej.define.conformance.checks.CrfOriginAnnotatedCrfReferenceCheck"
+  when:
+    any:
+    - path: "@Type"
+      equals: "CRF"
+    - all:
+      - path: "@Type"
+        equals: "Collected"
+      - path: "@Source"
+        oneOf: ["Investigator", "Subject"]

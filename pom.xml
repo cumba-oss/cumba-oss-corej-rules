@@ -12,7 +12,7 @@
         ============================================================
     -->
     <groupId>net.cumba</groupId>
-    <artifactId>cumba-oss-cdisc-rules-parent</artifactId>
+    <artifactId>cumba-oss-corej-rules-parent</artifactId>
     <packaging>pom</packaging>
     <version>${revision}</version>
 
@@ -51,7 +51,7 @@
         <!-- failOnWarning is bound to a property so a CLI -D can flip it during lint sweeps -->
         <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
 
-        <sonar.projectKey>cumba-oss-cdisc-rules</sonar.projectKey>
+        <sonar.projectKey>cumba-oss-corej-rules</sonar.projectKey>
         <sonar.projectName>Cumba OSS coreJ</sonar.projectName>
         <sonar.sourceEncoding>${general.encoding}</sonar.sourceEncoding>
 
@@ -99,7 +99,7 @@
             artifacts: ${project.version} resolved to this repository's own revision and could
             only ever have matched by coincidence.
         -->
-        <dependency.cumba-oss-corej.version>0.2.0</dependency.cumba-oss-corej.version>
+        <dependency.cumba-oss-corej.version>0.3.0</dependency.cumba-oss-corej.version>
         <dependency.jackson.version>2.22.2</dependency.jackson.version>
         <dependency.pyrolite.version>1.5</dependency.pyrolite.version>
         <dependency.json-schema-validator.version>2.0.7</dependency.json-schema-validator.version>
@@ -149,7 +149,7 @@
             corej is not, and the difference is deliberate.
 
             4.10.4.0 adds detectors that report 186 findings in
-            cumba-oss-cdisc-core - 180 of them NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE
+            cumba-oss-corej-core - 180 of them NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE
             across 165 distinct sites in 28 files. They are REAL, not false
             positives: the model DTOs carry @Nullable fields (Jackson-deserialised
             rule JSON), Lombok copies the annotation onto the generated getters,
@@ -315,8 +315,8 @@
         well - the enforcer rule there fails the build if you forget.
     -->
     <modules>
-        <module>lib/cumba-oss-cdisc-rules</module>
-        <module>dist/cumba-oss-cdisc-rules-dist</module>
+        <module>lib/cumba-oss-corej-rules</module>
+        <module>dist/cumba-oss-corej-rules-dist</module>
 
         <module>coverage</module>
     </modules>
@@ -637,7 +637,7 @@
                                     of value is lost by excluding it.
                                 -->
                                 <excludedTestClasses>
-                                    <param>net.cumba.cdisc.core.exec.JoinCacheConcurrencyTest</param>
+                                    <param>net.cumba.corej.core.exec.JoinCacheConcurrencyTest</param>
                                 </excludedTestClasses>
                                 <!--
                                     Pin pitest's own `skipTests` to false. The plugin binds
@@ -987,13 +987,13 @@
                     <!--
                         Keep the test-jar OUT of the Central bundle.
 
-                        cumba-oss-cdisc-core attaches a test-jar so downstream modules can
+                        cumba-oss-corej-core attaches a test-jar so downstream modules can
                         reuse its test helpers. That is useful inside the build, but nothing
                         public consumes it today, and a Central artifact is immutable - so it
                         is not published until something actually needs it.
 
                         ⚠ excludeArtifacts (below) cannot express this: it matches on
-                        artifactId, so excluding cumba-oss-cdisc-core would drop the whole
+                        artifactId, so excluding cumba-oss-corej-core would drop the whole
                         module. Overriding the execution's phase to `none` is what keeps the
                         main jar published and the tests jar unattached. Normal builds are
                         unaffected - the test-jar is still produced and installed locally.
@@ -1136,7 +1136,7 @@
                             -->
                             <!--
                                 ⛔ THIS REPOSITORY PUBLISHES NOTHING TO MAVEN CENTRAL.
-                                cumba-oss-cdisc-rules is packaging=jar with no src/main, so its
+                                cumba-oss-corej-rules is packaging=jar with no src/main, so its
                                 Maven artifact is an EMPTY JAR. The rule content ships as tagged
                                 GitHub release assets instead. Without this exclusion a tag would
                                 publish that empty jar — public and immutable, exactly the way
@@ -1155,9 +1155,9 @@
                             -->
                             <excludeArtifacts>
                                 <excludeArtifact>coverage</excludeArtifact>
-                                <excludeArtifact>cumba-oss-cdisc-rules</excludeArtifact>
-                                <excludeArtifact>cumba-oss-cdisc-rules-parent</excludeArtifact>
-                                <excludeArtifact>cumba-oss-cdisc-rules-dist</excludeArtifact>
+                                <excludeArtifact>cumba-oss-corej-rules</excludeArtifact>
+                                <excludeArtifact>cumba-oss-corej-rules-parent</excludeArtifact>
+                                <excludeArtifact>cumba-oss-corej-rules-dist</excludeArtifact>
                             </excludeArtifacts>
                         </configuration>
                     </plugin>
@@ -1179,7 +1179,7 @@
         the attribute fixes the <scm> URLs but NOT the project <url> under Maven
         3.9.16 — hence <url> is also declared explicitly in each module pom.
     -->
-    <url child.project.url.inherit.append.path="false">https://github.com/cumba-oss/cumba-oss-cdisc-rules</url>
+    <url child.project.url.inherit.append.path="false">https://github.com/cumba-oss/cumba-oss-corej-rules</url>
     <organization>
         <name>P300</name>
         <url>https://www.p-300.com</url>
@@ -1220,14 +1220,14 @@
     <!--
         The child.scm.*.inherit.append.path attributes stop Maven appending each
         module's directory to the inherited SCM URLs, which would publish
-        unreachable paths like .../cumba-oss-cdisc-rules.git/lib/cumba-oss-cdisc-core.
+        unreachable paths like .../cumba-oss-corej-rules.git/lib/cumba-oss-corej-core.
     -->
     <scm child.scm.url.inherit.append.path="false"
          child.scm.connection.inherit.append.path="false"
          child.scm.developerConnection.inherit.append.path="false">
-        <connection>scm:git:https://github.com/cumba-oss/cumba-oss-cdisc-rules.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/cumba-oss/cumba-oss-cdisc-rules.git</developerConnection>
-        <url>https://github.com/cumba-oss/cumba-oss-cdisc-rules</url>
+        <connection>scm:git:https://github.com/cumba-oss/cumba-oss-corej-rules.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/cumba-oss/cumba-oss-corej-rules.git</developerConnection>
+        <url>https://github.com/cumba-oss/cumba-oss-corej-rules</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -1244,11 +1244,11 @@
             -->
 
             <!-- Upstream cumba-oss-corej modules (released separately). -->
-            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-core</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
-            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-report-json</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
-            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-report-xlsx</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
-            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-core-ruletest</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
-            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-define-conformance</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-core</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-report-json</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-report-xlsx</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-ruletest</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-define-conformance</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
 
             <!-- Upstream cumba-oss-commons modules (released separately). -->
             <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-cdisc-library</artifactId><version>${dependency.cumba-oss-commons.version}</version></dependency>

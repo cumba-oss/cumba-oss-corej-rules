@@ -1,0 +1,18 @@
+Rule_Id: "PMDA-DD0115"
+Sheet_Rule_Identifier: "DD0115"
+Rule_Set: "PMDA"
+Element: "ItemGroupDef"
+Attribute: null
+Applicable_Versions: ["2.0", "2.1"]
+Severity: "Error"
+Plain_Text_Rule: "Split and unsplit datasets cannot both be listed in Define.xml. For FDA submissions, Define.xml should only list unsplit datasets with split datasets placed in a separate sub-directory labeled 'split'."
+# Custom (budget 9/15): the conflict needs document-wide Domain grouping. The
+# unsplit member of a >1-IGD Domain group is recognised by Name = Domain
+# (split parts carry suffixed names, DD0050); the finding lands once per
+# conflict, on that unsplit ItemGroupDef. The row's FDA 'split' sub-directory
+# advice is submission-layout guidance, not checkable in the document. No
+# CDISC twin.
+Message: "Split and unsplit datasets are both listed"
+Check:
+  kind: "custom"
+  className: "net.cumba.corej.define.conformance.checks.SplitUnsplitConflictCheck"

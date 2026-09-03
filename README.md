@@ -22,20 +22,20 @@ root, not two:
 
 | Asset | Contents |
 |---|---|
-| `cumba-oss-cdisc-rules-<version>.zip` | the data rule packages + `packages.json` |
-| `cumba-oss-cdisc-rules-define-<version>.zip` | the Define-XML packages + `packages.json` |
+| `cumba-oss-corej-rules-<version>.zip` | the data rule packages + `packages.json` |
+| `cumba-oss-corej-rules-define-<version>.zip` | the Define-XML packages + `packages.json` |
 
 ```bash
 curl -sLO <asset-url> && curl -sLO <asset-url>.asc
 gpg --verify <asset>.asc <asset>
 ```
 
-They are built by `dist/cumba-oss-cdisc-rules-dist` from the corpus the main module
+They are built by `dist/cumba-oss-corej-rules-dist` from the corpus the main module
 generates, so `mvn package` reproduces exactly what a release carries:
 
 ```bash
 mvn -B clean package -Drevision=<version> -DskipTests
-ls dist/cumba-oss-cdisc-rules-dist/target/*.zip
+ls dist/cumba-oss-corej-rules-dist/target/*.zip
 ```
 
 ⚠ **Release assets are mutable**, unlike Central artifacts — anyone with write access can
@@ -131,7 +131,7 @@ cumba-oss-datatable   datatable · impl · cdisc-define · providers · manager-
       ▲
 cumba-oss-corej       cdisc-core · report-json · report-xlsx · ruletest · define-conformance
       ▲
-cumba-oss-cdisc-rules the rule corpus                      (publishes nothing to Central)
+cumba-oss-corej-rules the rule corpus                      (publishes nothing to Central)
 ```
 
 `cumba-oss-clients` (CLI + REST API) consumes the engine and loads this corpus at
