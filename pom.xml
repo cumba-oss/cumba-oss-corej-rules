@@ -25,6 +25,23 @@
         <!-- revision should be set externally; this is just a fallback -->
         <revision>0.3.0-SNAPSHOT</revision>
 
+        <!--
+            ⛔ THIS REPOSITORY PUBLISHES NO MAVEN ARTIFACTS ANYWHERE.
+        
+            lib/ has no src/main, so its jar is empty; the deliverable is the rule
+            corpus, which ships as signed release assets (runbook Phase 06b). Central
+            publishing was removed for exactly that reason.
+        
+            The per-module skips missed the PARENT, which has none, so a Nexus deploy
+            published one parent pom and nothing else - verified against v0.2.3, where
+            -parent-0.2.3.pom is present and no jar is. Nothing consumes it: no other
+            repo or the monorepo references it, and the modules resolve it through
+            relativePath and the reactor, never from a repository.
+        
+            Set here so every module inherits it and a future module cannot forget.
+        -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>

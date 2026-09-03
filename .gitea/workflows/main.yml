@@ -412,47 +412,19 @@ jobs:
       # upload; -DskipPmd/-DskipSpotbugs skip analysis the gates already ran,
       # and -Dspotless.check=true only prevents a source rewrite. The coverage
       # aggregators carry maven.deploy.skip=true, so only the four lib jars go.
-      # Tags deploy a RELEASE; pushes to main deploy a SNAPSHOT. Maven routes by
-      # version, so one step covers both -- deploy.snapshotUrl was always wired, it
-      # simply never had a snapshot to carry while this was tag-only.
-      # ⚠ Pull requests deliberately do NOT deploy.
-      - name: Deploy to Nexus
-        if: ${{ startsWith(github.ref, 'refs/tags/') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
-        env:
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PASS: ${{ secrets.DEPLOY_PASS }}
-          RELEASE_URL: ${{ vars.MAVEN_RELEASE_URL }}
-          SNAPSHOT_URL: ${{ vars.MAVEN_SNAPSHOT_URL }}
-        run: |
-          set -eo pipefail
-          if [ -z "$RELEASE_URL" ] || [ -z "$SNAPSHOT_URL" ]; then
-              echo "::error::MAVEN_RELEASE_URL / MAVEN_SNAPSHOT_URL Gitea variables are not set — cannot deploy."
-              exit 1
-          fi
-          cat > deploy-settings.xml <<'EOF'
-          <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-            <servers>
-              <server>
-                <id>nexus-deploy</id>
-                <username>${env.DEPLOY_USER}</username>
-                <password>${env.DEPLOY_PASS}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-          mvn -B -P deploy-nexus deploy \
-              -s deploy-settings.xml -DskipTests -DskipPmd -DskipSpotbugs -Dspotless.check=true \
-              -Ddeploy.releaseUrl="$RELEASE_URL" -Ddeploy.snapshotUrl="$SNAPSHOT_URL" \
-              -Drevision=${{ steps.ver.outputs.version }} | tee maven-deploy.log
-
-      - name: Upload Maven Deploy log
-        uses: actions/upload-artifact@v3
-        if: ${{ always() && startsWith(github.ref, 'refs/tags/') }}
-        with:
-          name: maven-deploy-log
-          path: maven-deploy.log
-          if-no-files-found: warn
-          retention-days: 14
+      # ⛔ NO DEPLOY STEP HERE, DELIBERATELY.
+      #
+      # This repository publishes no Maven artifacts: lib/ has no src/main so its jar
+      # is empty, and the corpus ships as signed release assets (Phase 06b). The only
+      # thing a deploy ever uploaded was the parent pom, which nothing consumes.
+      #
+      # ⚠ maven.deploy.skip alone does NOT make a deploy step harmless: `mvn deploy`
+      #   still RESOLVES the whole dependency graph before skipping the upload, and
+      #   that resolution is what failed on 2026-09-03 - the step passes
+      #   `-s deploy-settings.xml`, which replaces the user settings and so loses the
+      #   image's Nexus mirror, leaving Central as the only repository. corej 0.3.0 is
+      #   Nexus-only while the Central release budget is exhausted, so it was not
+      #   found. Removing the step is the fix; keeping it and skipping is not.
 
       # Hand the CORPUS ARCHIVES to the release job. Short-lived hand-off → low
       # retention.
