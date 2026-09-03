@@ -23,7 +23,7 @@
         <!-- project.basedir requires 3.9.12+ -->
         <maven.version>3.9.12</maven.version>
         <!-- revision should be set externally; this is just a fallback -->
-        <revision>0.1.0-SNAPSHOT</revision>
+        <revision>0.3.0-SNAPSHOT</revision>
 
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -1795,6 +1795,20 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion><version>${maven.version}</version></requireMavenVersion>
+                                <!--
+                                    ⛔ A RELEASE MUST NEVER DEPEND ON A SNAPSHOT.
+                                
+                                    Work now happens on -SNAPSHOT versions deployed to Nexus from main, so
+                                    the live hazard is tagging while a dependency.<repo>.version property
+                                    still points at one. Central rejects that, but LATE, after the whole
+                                    build, at publish, with a message about the bundle rather than the
+                                    property. onlyWhenRelease makes this inert on snapshot builds and an
+                                    early named failure on a tag.
+                                -->
+                                <requireReleaseDeps>
+                                    <onlyWhenRelease>true</onlyWhenRelease>
+                                    <message>A release must not depend on a SNAPSHOT. Point every dependency.*.version property at a released version before tagging.</message>
+                                </requireReleaseDeps>
                             </rules>
                             <fail>true</fail>
                         </configuration>

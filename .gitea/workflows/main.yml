@@ -140,7 +140,15 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             echo "Not called for a new tag."
-            VERSION="0.1.0-SNAPSHOT"
+            # ⛔ Read the dev version from the pom; do NOT hardcode it. Every repo said
+            # 0.1.0-SNAPSHOT here, so once snapshots are actually deployed they would all
+            # collide on one meaningless coordinate. The pom <revision> is the single
+            # source of truth for this repo's line.
+            VERSION="$(sed -n 's:.*<revision>\(.*\)</revision>.*:\1:p' pom.xml | head -1)"
+            if [[ -z "$VERSION" || "$VERSION" != *-SNAPSHOT ]]; then
+                echo "::error::pom.xml <revision> is '$VERSION' - expected a -SNAPSHOT dev version." >&2
+                exit 1
+            fi
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building version: $VERSION"
@@ -375,8 +383,12 @@ jobs:
       # upload; -DskipPmd/-DskipSpotbugs skip analysis the gates already ran,
       # and -Dspotless.check=true only prevents a source rewrite. The coverage
       # aggregators carry maven.deploy.skip=true, so only the four lib jars go.
-      - name: Deploy release artifacts
-        if: startsWith(github.ref, 'refs/tags/')
+      # Tags deploy a RELEASE; pushes to main deploy a SNAPSHOT. Maven routes by
+      # version, so one step covers both -- deploy.snapshotUrl was always wired, it
+      # simply never had a snapshot to carry while this was tag-only.
+      # ⚠ Pull requests deliberately do NOT deploy.
+      - name: Deploy to Nexus
+        if: ${{ startsWith(github.ref, 'refs/tags/') || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_PASS: ${{ secrets.DEPLOY_PASS }}
