@@ -496,6 +496,16 @@ jobs:
       # node runtime; the bare runner host has none. Reuse the node-bearing
       # build image — heavier than needed, but already pullable, no new dep.
       image: ${{ vars.DOCKER_REGISTRY_HOSTNAME }}/maven-with-nodejs:3.9-eclipse-temurin-25
+    # ⛔ bash, EXPLICITLY. Gitea's act_runner defaults a job's steps to `sh -e`, which is
+    # dash — it has no `pipefail` and no `shopt`, both of which the signing steps below
+    # use. GitHub defaults to bash, so this divergence is invisible in the .github file
+    # and fails ONLY here.
+    #   Measured 2026-09-03, cumba-oss-cdisc-rules v0.2.1:
+    #   "/var/run/act/workflow/1.sh: 2: set: Illegal option -o pipefail"
+    # The `build` job above already declares this; the release job was simply missed.
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Download release archives
         uses: actions/download-artifact@v3
@@ -507,11 +517,24 @@ jobs:
       #    ONE trust root. A release asset is mutable — unlike a Central artifact — so here
       #    the signature is the only thing between a consumer and a swapped archive.
       #    loopback pinentry because a runner has no tty; without it gpg hangs.
+      # ⚠ UNVERIFIED AS OF 2026-09-03: whether `gpg` exists in this build image at all.
+      #    This is the ONLY cumba-oss Gitea workflow that signs anything, and it has never
+      #    reached these steps (v0.2.0 died at the artifact download, v0.2.1 at `set -o
+      #    pipefail`), so the image has never had to provide gpg. A GitHub-hosted runner
+      #    has it preinstalled; a container need not. The preflight turns a bare
+      #    "gpg: command not found" into a named cause. If it fires, add gnupg to the
+      #    image (preferred) or install it in this step.
       - name: Import signing key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
           set -eo pipefail
+          if ! command -v gpg >/dev/null 2>&1; then
+              echo "::error::gpg is not installed in the build image. Release assets" \
+                   "cannot be signed. Add gnupg to maven-with-nodejs, or install it in" \
+                   "this step. Refusing to publish unsigned assets." >&2
+              exit 1
+          fi
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --list-secret-keys --keyid-format=long
 
