@@ -350,6 +350,29 @@ jobs:
           name: release-archives
           path: release-archives
 
+      # ⛔ NORMALISE THE LAYOUT — do not guess it.
+      #
+      # upload-artifact does NOT reliably collapse to the least-common-ancestor, on either
+      # forge. Measured 2026-09-03 on GitHub: "Upload release archives" and "Download
+      # release archives" both SUCCEEDED and the signing step still found nothing, because
+      # the files kept their dist/<module>/target/ path inside release-archives/.
+      #
+      # This step exists rather than a cleverer glob because the release job has two
+      # consumers of that directory — the signing loop and "Create GitHub Release" — and
+      # they are checked by different code. Flatten once; both can then assume it.
+      # (The release step already uses `find`, so it was immune; signing was not.)
+      - name: Flatten downloaded archives
+        run: |
+          set -eo pipefail
+          echo "as downloaded:"
+          find release-archives -type f | sort
+          while IFS= read -r f; do
+              [ "$(dirname "$f")" = "release-archives" ] || mv -v "$f" release-archives/
+          done < <(find release-archives -type f -name '*.zip')
+          find release-archives -mindepth 1 -type d -empty -delete
+          echo "flattened:"
+          find release-archives -type f | sort
+
       # ⭐ SIGN EVERY ARCHIVE — the reason is STRONGER here than on Maven Central.
       #
       # Central artifacts are immutable, so a signature there proves provenance on
