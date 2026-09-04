@@ -245,10 +245,10 @@ mvn -T6 -pl lib/net.cumba.corej.core test \
 
 # Python lane (engine venv — Python 3.12 required by cdisc-rules-engine)
 cd lib/net.cumba.corej.core/spec-runner/py
-/home/claude/.venvs/engine/bin/python -m pytest tests/test_specs_against_python.py -v
+"$ENGINE_VENV/bin/python" -m pytest tests/test_specs_against_python.py -v
 
 # Python meta tests (work on any Python 3.12+)
-/home/claude/.venvs/spec-runner/bin/python -m pytest \
+"$SPEC_RUNNER_VENV/bin/python" -m pytest \
     tests/test_canonical_byte_stability.py tests/test_loader.py tests/test_specgen.py
 ```
 
