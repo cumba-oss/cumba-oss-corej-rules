@@ -20,5 +20,7 @@ next `json.dump`):**
   **diff is still valid**, but the byte-unchanged guarantee **must not be used as an integrity
   check**.
 
-If a new measurement is ever needed, author a new tool against the expression corpus (the shared
-reader is `scripts/lib/check_expr.py`); do not resurrect the deleted parsers.
+If a new measurement is ever needed, author a new tool against the expression corpus; do not
+resurrect the deleted parsers. The Python reader those tools shared, `check_expr.py`, is no longer
+carried here — the analysis tooling lives in the internal monorepo, not in this publish-only
+repository.

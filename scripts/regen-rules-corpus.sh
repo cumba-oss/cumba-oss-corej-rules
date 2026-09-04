@@ -33,7 +33,6 @@
 #      generator. RulePackageLoader has its own skip for the paths that bypass this script
 #      (rule editor, CDISC-Library API, hand-authored packages); the two are NOT redundant —
 #      see RuleStorageAssembler.dropParkedRules.
-#   1. build-core-fixtures.py — refreshes the engine's curated fixture corpus.
 #
 #      ⚑ EVERY TRANSFORM BETWEEN rules-src AND rules/ EXCEPT ASSEMBLY IS RETIRED
 #      (PLAN-retire-corpus-transforms, 2026-08-26). The former stages 1 and 2
@@ -70,10 +69,12 @@
 # copy, and it is not missed — an artifact that cannot fall behind its source cannot go stale.
 # NativeCorpusRoundTripTest still asserts the round-trip contract from the build.
 #
-# WHAT THIS SCRIPT IS STILL FOR: stage 1. build-core-fixtures.py refreshes the engine's COMMITTED
-# fixture corpus in corej-cdisc-core, which the build does not and should not touch (it writes
-# into another module's source tree). Run this after changing the converter, the operation
-# printer/parser, or the rule source, and commit whatever stage 1 rewrites.
+# WHAT IS LEFT HERE. Stage 0 only. The former stage 1 (build-core-fixtures.py) refreshed the
+# engine's COMMITTED fixture corpus in a SIBLING module's source tree, which this publish-only
+# repository does not contain; it was removed with the rest of the Python analysis tooling. Stage 0
+# remains available for an out-of-band regeneration against this tree's engine, but the build
+# already runs RuleCorpusGenerator itself at process-test-classes, so a normal `mvn test` needs
+# nothing from here.
 #
 # Usage (from anywhere):
 #   lib/corej-cdisc-rules/scripts/regen-rules-corpus.sh
@@ -113,7 +114,3 @@ cgen_assert_fresh_engine "${CGEN_CP_TEST}" "stage-0 (test-scope) classpath"
 # in src/test because jackson-dataformat-yaml is a test-scoped dependency (YAML must not leak into
 # the engine jar).
 cgen_run_main_test net.cumba.corej.core.expr.convert.RuleCorpusGenerator
-# Stage 1 — refresh the engine's curated fixture corpus (PLAN-engine-rules-decoupling §4):
-# if a regenerated rule is pinned by an engine fixture, the fixtures must follow, or the
-# engine's FixtureCorpusIntegrityTest / this module's RulesFixtureSyncTest will fail.
-python3 "${MODULE_DIR}/scripts/build-core-fixtures.py"

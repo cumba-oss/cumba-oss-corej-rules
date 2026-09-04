@@ -21,9 +21,12 @@ import org.jspecify.annotations.Nullable;
 /**
  * Dual-form {@code Check} support for the raw-{@link JsonNode} corpus instruments
  * ({@code RuleEquivalenceInventory}, {@code RuleDocCensus}): the Java counterpart of
- * {@code scripts/lib/check_expr.py}'s {@code dual_form_check}. A legacy Check node passes through
- * unchanged; an {@code {expression}} Check is parsed with the shared parser and lowered back to the
- * legacy {@code all}/{@code any}/{@code not}/leaf shape those instruments' operator tables key on.
+ * {@code dual_form_check} in {@code check_expr.py}, the Python reference reader for the check
+ * corpus. That reader is an internal analysis tool and is not distributed with this repository, so
+ * every {@code check_expr.py} mention below names the reference implementation, not a file found
+ * here. A legacy Check node passes through unchanged; an {@code {expression}} Check is parsed with
+ * the shared parser and lowered back to the legacy {@code all}/{@code any}/{@code not}/leaf shape
+ * those instruments' operator tables key on.
  *
  * <p>
  * The lowering targets the image of the flip writer (plan §5, the RuleType-aware raise), so it is
