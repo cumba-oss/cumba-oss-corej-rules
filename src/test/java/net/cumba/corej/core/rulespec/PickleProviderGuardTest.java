@@ -103,8 +103,10 @@ class PickleProviderGuardTest
                             + "expected_status pin is invalid.\n"
                             + "Fix: set CDISC_PICKLE_CACHE_DIR (or "
                             + "-Dcdisc.pickle.cache.dir) to a Python-engine pickle cache "
-                            + "directory; the standard location on this project's hosts is "
-                            + "/data/cdisc.metadata.library-cache-pkl.");
+                            + "directory. There is deliberately no default — the cache is not "
+                            + "part of this repository, so the caller has to say where it is. "
+                            + "The CI workflow fetches it from the pinned public upstream and "
+                            + "exports the variable; a local run must do the same.");
         }
     }
 

@@ -67,11 +67,12 @@ jobs:
 
       # CDISC pickle metadata cache (restore/fetch below, save at the end of the
       # job). The parity suite reads .pkl files straight from this directory
-      # (PickleCache.CACHE_DIR_ENV). Without it 8 tests FAIL, not skip:
-      # PickleProviderGuardTest hard-fails by design, PickleMetadataReaderTest (3),
-      # StudyValidationServicePickleTest, and the three FDA/PMDA-SD9999 specs flip
-      # EXECUTED -> SKIPPED. The locator's only built-in default is a dev-host path
-      # no runner carries, so CI must supply it.
+      # (PickleCache.CACHE_DIR_ENV). Without it 4 tests FAIL, not skip (measured
+      # 2026-09-04): PickleProviderGuardTest, which hard-fails by design, and the
+      # three specs FDA-SD9999, FDA-SD9999-define-only-leak and PMDA-SD9999, which
+      # flip EXECUTED -> SKIPPED. Every other pickle-backed suite skips instead.
+      # PickleCacheLocator has NO built-in default — it deliberately resolves
+      # nothing unless a caller names a directory — so CI must supply this.
       # JOB level, not per-step: Pitest forks its own test runs and must see it too.
       CDISC_PICKLE_CACHE_DIR: /tmp/cdisc-pickle-cache
       # Pinned PUBLIC upstream ref; also keys the restore/save pair, so bumping

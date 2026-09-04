@@ -56,9 +56,10 @@ class CrossStandardCollapseCorpusTest
 {
 
     /**
-     * The companion SDTM domain catalogues, union of sdtmig 3-1-2 / 3-2 / 3-3 / 3-4 as read from
-     * {@code /data/cdisc.metadata.library-cache/api_mdr_sdtmig_<v>_datasets.json.gz} on 2026-08-11.
-     * {@code CompanionSdtmDefaults} maps adamig 1-0/1-1/1-2/1-3 onto exactly those four.
+     * The companion SDTM domain catalogues, union of sdtmig 3-1-2 / 3-2 / 3-3 / 3-4, read on
+     * 2026-08-11 from the CDISC Library API response cache ({@code $CDISC_API_CACHE}) — one
+     * {@code api_mdr_sdtmig_<v>_datasets.json.gz} per version. {@code CompanionSdtmDefaults} maps
+     * adamig 1-0/1-1/1-2/1-3 onto exactly those four.
      */
     private static final Set<String> SDTM = Set.of("AE", "AG", "BE", "BS", "CE", "CM", "CO", "CP",
             "CV", "DA", "DD", "DM", "DS", "DV", "EC", "EG", "EX", "FA", "FT", "GF", "HO", "IE",

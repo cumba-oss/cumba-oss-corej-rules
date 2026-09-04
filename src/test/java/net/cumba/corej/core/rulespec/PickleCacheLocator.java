@@ -2,7 +2,6 @@ package net.cumba.corej.core.rulespec;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 import net.cumba.corej.core.metadata.pickle.PickleCache;
 
@@ -12,17 +11,21 @@ import net.cumba.corej.core.metadata.pickle.PickleCache;
  *
  * <p>
  * Precedence — the {@code cdisc.pickle.cache.dir} system property, then the
- * {@code CDISC_PICKLE_CACHE_DIR} environment variable, then the built-in defaults, first existing
- * directory wins. Stage 4 phase 4 removed the two {@code cdisc-rules-engine} submodule entries
- * along with the fork itself, so the standalone cache is now the <b>only</b> default.
+ * {@code CDISC_PICKLE_CACHE_DIR} environment variable. <b>There is no built-in default.</b> Stage 4
+ * phase 4 removed the two {@code cdisc-rules-engine} submodule entries along with the fork itself;
+ * the one entry that survived it was an absolute path on a particular set of dev hosts, and it has
+ * now gone the same way. The pickle cache is an input this repository neither ships nor generates,
+ * so it has no location this repository is entitled to guess.
  * </p>
  *
  * <p>
- * ⚠ <b>That sole default is a path on this project's dev hosts, not a universal one.</b> A host
- * that does not carry {@code /data/cdisc.metadata.library-cache-pkl} — a CI runner, a fresh clone
- * on another machine — resolves nothing here and <b>must</b> set the property or the environment
- * variable. That is deliberate: {@code PickleProviderGuardTest} then fails loudly, naming the fix,
- * rather than letting the provider-less specs flip {@code EXECUTED} → {@code SKIPPED} silently.
+ * ⚠ <b>A caller that sets neither key resolves nothing here.</b> That is every caller that has not
+ * been told where a cache is — a CI runner, a fresh clone, and equally a dev host that happens to
+ * carry one. It is deliberate: {@code PickleProviderGuardTest} then fails loudly, naming both keys,
+ * rather than letting the provider-less specs flip {@code EXECUTED} → {@code SKIPPED} silently. The
+ * project's CI workflow fetches the pickles into a directory of its own and exports
+ * {@code CDISC_PICKLE_CACHE_DIR} for exactly that reason; a local run that wants the same coverage
+ * must do the same.
  * </p>
  *
  * <p>
@@ -48,15 +51,6 @@ import net.cumba.corej.core.metadata.pickle.PickleCache;
 public final class PickleCacheLocator
 {
 
-    /**
-     * Tried in order when neither the property nor the environment names a directory. The two
-     * fork-relative entries went with the submodule in stage 4 phase 4; the list shape is kept so a
-     * future default is one line, not a refactor.
-     */
-    private static final List<Path> DEFAULTS = List
-            // The standalone cache, which survived the fork's removal.
-            .of(Path.of("/data/cdisc.metadata.library-cache-pkl"));
-
     private PickleCacheLocator()
     {
     }
@@ -65,12 +59,14 @@ public final class PickleCacheLocator
     /**
      * Resolves the pickle metadata cache directory.
      *
-     * @return the first directory that exists, or empty when none does.
+     * @return the configured directory, absolutised, or empty when neither the property nor the
+     *         environment names one. Empty is never a silent success: every caller that cannot work
+     *         without a cache either fails (see {@code PickleProviderGuardTest}, which names both
+     *         keys in its message) or reports a visible skip.
      * @throws IllegalStateException
      *             when the property or the environment names a path that is not a directory. This
-     *             is deliberate and is half the anti-vacuity design: silently falling back to a
-     *             default is exactly how a typo'd path becomes a green, vacuous run, and after the
-     *             fork's removal that is the difference between a typo and a correct run.
+     *             is deliberate and is half the anti-vacuity design: silently falling back is
+     *             exactly how a typo'd path becomes a green, vacuous run.
      */
     public static Optional<Path> locate()
     {
@@ -79,21 +75,21 @@ public final class PickleCacheLocator
         {
             configured = System.getenv(PickleCache.CACHE_DIR_ENV);
         }
-        if (configured != null && !configured.isBlank())
+        if (configured == null || configured.isBlank())
         {
-            Path explicit = Path.of(configured);
-            if (!Files.isDirectory(explicit))
-            {
-                throw new IllegalStateException(PickleCache.CACHE_DIR_ENV + " / "
-                        + PickleCache.CACHE_DIR_PROPERTY + " is set to '" + configured
-                        + "', which is not a directory. Fix it or unset it — this is never "
-                        + "silently ignored, because a wrong path and no path look identical "
-                        + "in a test log.");
-            }
-            // Absolutised for the same reason the defaults are: a caller that stores the value
-            // must not have it re-resolve against a different working directory.
-            return Optional.of(explicit.toAbsolutePath());
+            return Optional.empty();
         }
-        return DEFAULTS.stream().map(Path::toAbsolutePath).filter(Files::isDirectory).findFirst();
+        Path explicit = Path.of(configured);
+        if (!Files.isDirectory(explicit))
+        {
+            throw new IllegalStateException(PickleCache.CACHE_DIR_ENV + " / "
+                    + PickleCache.CACHE_DIR_PROPERTY + " is set to '" + configured
+                    + "', which is not a directory. Fix it or unset it — this is never "
+                    + "silently ignored, because a wrong path and no path look identical "
+                    + "in a test log.");
+        }
+        // Absolutised so that a caller which stores the value does not have it re-resolve against
+        // a different working directory.
+        return Optional.of(explicit.toAbsolutePath());
     }
 }

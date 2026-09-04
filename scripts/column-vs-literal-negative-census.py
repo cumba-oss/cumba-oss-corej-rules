@@ -24,7 +24,7 @@ Usage::
 
     python3 column-vs-literal-negative-census.py \
         --corpus lib/corej-cdisc-rules/target/rules \
-        --pickle /data/cdisc.metadata.library-cache-pkl/variables_metadata.pkl \
+        --pickle "$CDISC_PICKLE_CACHE_DIR/variables_metadata.pkl" \
         --report text
 
 Exit status is always 0; this is a measurement, not a gate.
@@ -561,8 +561,12 @@ def leaf_keys(rows, pred):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default="lib/corej-cdisc-rules/target/rules")
+    # No default: the pickle cache is an external input this repository neither ships nor may
+    # assume the location of, so --pickle (or $CDISC_PICKLE_CACHE_DIR) has to say where it is.
     ap.add_argument("--pickle",
-                    default="/data/cdisc.metadata.library-cache-pkl/variables_metadata.pkl")
+                    default=(os.path.join(os.environ["CDISC_PICKLE_CACHE_DIR"],
+                                          "variables_metadata.pkl")
+                             if os.environ.get("CDISC_PICKLE_CACHE_DIR") else None))
     ap.add_argument("--report", choices=("text", "json"), default="text")
     ap.add_argument("--literal-mode", choices=("published", "shipped"),
                     default="published",
@@ -578,6 +582,11 @@ def main(argv=None):
     LITERAL_MODE = args.literal_mode
     OR_DEPTH = args.or_depth
     CROSS_CHECK = args.cross_check
+
+    if not args.pickle:
+        ap.error("no variables_metadata.pkl given. Pass --pickle PATH or set "
+                 "$CDISC_PICKLE_CACHE_DIR — the CDISC pickle cache is an external "
+                 "input this repository does not ship, so there is no default.")
 
     with open(args.pickle, "rb") as fh:
         meta = pickle.load(fh)

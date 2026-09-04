@@ -50,7 +50,9 @@
 # propagate the new fields into the generated rules/ corpus,
 # run scripts/regen-rules-corpus.sh afterwards.
 #
-# The source workbooks are read from /data/cdisc-docs (override with --docs-dir).
+# The source workbooks are named by --docs-dir, which stage 1 REQUIRES. There is no default:
+# they are a licensed external document set, not part of this repository and with no location
+# inside it.
 #
 # Usage (from anywhere):
 #   lib/corej-cdisc-rules/scripts/backfill-rules.sh [options]
@@ -62,7 +64,7 @@
 #                          NOTE: filters stage 1 only - see above
 #   -s, --stage LIST       run only these stages, comma-separated (1, 2, 3;
 #                          default 1,2,3). They always run in numeric order.
-#       --docs-dir DIR     source-workbook directory (default /data/cdisc-docs)
+#       --docs-dir DIR     source-workbook directory (REQUIRED for stage 1; no default)
 #       --checks-root DIR  checks root (default rules-src/checks, module-relative)
 #       --gap-log PATH     CG-linkage gap log (default
 #                          documentation/rule-review-results/CG-linkage-gaps.md)
@@ -78,6 +80,7 @@ usage() { sed -n '2,/^set -euo/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//; $d'
 
 DRY_RUN=false
 STAGES="1,2,3"
+DOCS_DIR_GIVEN=false
 PROPS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -98,6 +101,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     --docs-dir)
         PROPS+=("-Dcdisc.docs.dir=$2")
+        DOCS_DIR_GIVEN=true
         shift 2
         ;;
     --checks-root)
@@ -133,6 +137,15 @@ for stage in ${STAGES//,/ }; do
         ;;
     esac
 done
+
+# Stage 1 reads the workbooks and there is no default directory for them, so refuse HERE rather
+# than after the reactor build that precedes the stage. Stages 2 and 3 never open a workbook.
+if [[ ",${STAGES}," == *",1,"* ]] && [[ "${DOCS_DIR_GIVEN}" != true ]]; then
+    echo "backfill-rules.sh: stage 1 needs --docs-dir DIR." >&2
+    echo "  The source workbooks are a licensed external document set, not part of this" >&2
+    echo "  repository and with no location inside it, so there is no default to fall back to." >&2
+    exit 2
+fi
 
 # Runs stage $1 (main class $2, label $3) when --stage selected it; otherwise says so.
 run_stage() {

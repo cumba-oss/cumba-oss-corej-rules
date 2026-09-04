@@ -2,8 +2,8 @@
 # Six-step corpus regeneration with a per-step sentinel.
 #
 # ⛔ WHY THIS DERIVES ITS TREE INSTEAD OF HARD-CODING ONE (2026-08-27).
-# The predecessor baked in `W=/data/net.cumba.corej-wt-retire-transforms`. After the lane's work
-# was patched back into main, the script was reused unchanged: it regenerated the WORKTREE's
+# The predecessor baked in `W=<a worktree path from the lane that wrote it>`. After that lane's
+# work was patched back into main, the script was reused unchanged: it regenerated the WORKTREE's
 # corpus while the caller edited and gated MAIN. All six sentinels reported rc=0 and the log
 # showed every step running — truthfully, in the wrong tree. The corpus never moved, and the
 # gate went green over it. Only a round-trip test comparing rules-src against shipped rules/
@@ -38,8 +38,18 @@ fi
 TAG="$(basename "$W")"
 SENT="${SENT_DIR:-${TMPDIR:-/tmp}}/regen6-$TAG"
 mkdir -p "$SENT"
-export CDISC_PICKLE_CACHE_DIR="${CDISC_PICKLE_CACHE_DIR:-/data/cdisc.metadata.library-cache-pkl}"
-export CDISC_API_CACHE="${CDISC_API_CACHE:-/data/cdisc.metadata.library-cache}"
+# ⛔ NO DEFAULTS HERE, for the same reason the tree is not hard-coded above. Both caches are
+# external inputs this repository neither ships nor generates; a baked-in path is one that exists
+# on the authoring host and nowhere else, and a regen that quietly runs without a cache produces a
+# corpus missing every library-derived field while still reporting rc=0.
+for cache_var in CDISC_PICKLE_CACHE_DIR CDISC_API_CACHE; do
+    if [ -z "${!cache_var:-}" ]; then
+        echo "regen-corpus-all: $cache_var is not set — point it at your CDISC metadata cache." >&2
+        echo "  There is no default: the caches are not part of this repository." >&2
+        exit 2
+    fi
+done
+export CDISC_PICKLE_CACHE_DIR CDISC_API_CACHE
 
 echo "=== regen-corpus-all: TREE=$W   sentinels=$SENT"
 cd "$W" || exit 2

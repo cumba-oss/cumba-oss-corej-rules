@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fingerprints /data/cdisc-docs — the UNTRACKED, UN-PINNED workbook inputs.
+"""Fingerprints the conformance-workbook directory — the UNTRACKED, UN-PINNED workbook inputs.
+
+The directory is named by $CDISC_DOCS_DIR and has no default: the workbooks are a licensed
+external document set, not part of this repository and with no location inside it.
 
 WHY THIS EXISTS (finding P0-F1, plans/PLAN-source-proposed-block.md §3.1).
 STANDING-RULINGS.md §1 baseline condition 4 says a workbook refresh can turn a green gate red with zero
@@ -18,11 +21,16 @@ import hashlib
 import os
 import sys
 
-DOCS = os.environ.get('CDISC_DOCS_DIR', '/data/cdisc-docs')
+DOCS = os.environ.get('CDISC_DOCS_DIR')
 OUT = os.path.join('documentation', 'cdisc-docs-fingerprint.tsv')
 
 
 def main():
+    if not DOCS:
+        print('[docs-fingerprint] $CDISC_DOCS_DIR is not set — set it to the directory holding '
+              'the conformance workbooks. There is no default: they are a licensed external '
+              'document set, not part of this repository.', file=sys.stderr)
+        return 2
     if not os.path.isdir(DOCS):
         print('[docs-fingerprint] %s is not mounted — nothing to do' % DOCS, file=sys.stderr)
         return 2

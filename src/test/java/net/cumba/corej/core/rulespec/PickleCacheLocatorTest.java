@@ -1,7 +1,6 @@
 package net.cumba.corej.core.rulespec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -62,8 +61,14 @@ class PickleCacheLocatorTest
     @Test
     void configuredPropertyWins(@TempDir Path dir)
     {
-        withProperty(dir.toString(),
-                () -> assertEquals(Optional.of(dir), PickleCacheLocator.locate()));
+        withProperty(dir.toString(), () ->
+        {
+            Optional<Path> located = PickleCacheLocator.locate();
+            assertEquals(Optional.of(dir), located);
+            // Absolutised: a caller that stores the value must not have it re-resolve against a
+            // different working directory.
+            assertTrue(located.orElseThrow().isAbsolute());
+        });
     }
 
 
@@ -108,26 +113,16 @@ class PickleCacheLocatorTest
 
 
     @Test
-    void unconfiguredResolvesAnExistingDirectoryOrNothing()
+    void unconfiguredResolvesNothing()
     {
         assumeTrue(System.getenv(PickleCache.CACHE_DIR_ENV) == null,
                 "CDISC_PICKLE_CACHE_DIR set in environment");
         assumeTrue(System.getProperty(PickleCache.CACHE_DIR_PROPERTY) == null,
                 "cdisc.pickle.cache.dir set on the command line");
-        Optional<Path> located = PickleCacheLocator.locate();
-        if (located.isEmpty())
-        {
-            // Not vacuous: empty is only correct when NO default resolves. Asserting that keeps
-            // this test from passing silently on the one configuration the locator exists to make
-            // loud — a host with no cache at all.
-            assertFalse(Files.isDirectory(Path.of("/data/cdisc.metadata.library-cache-pkl")),
-                    "locate() returned empty while the standalone cache exists");
-            return;
-        }
-        // Whatever it finds must exist and be absolute — the defaults are resolved against
-        // surefire's working directory, so a caller that stores the value can rely on it.
-        Path p = located.orElseThrow();
-        assertTrue(Files.isDirectory(p), p + " must be an existing directory");
-        assertTrue(p.isAbsolute(), p + " must be absolute");
+        // Holds on EVERY host, because the locator has no built-in default any more — including a
+        // host that happens to carry a pickle cache somewhere. That is the point of the removal:
+        // the old default made this assertion, and the outcome of every pickle-backed test,
+        // depend on the machine the build ran on rather than on what the caller configured.
+        assertEquals(Optional.empty(), PickleCacheLocator.locate());
     }
 }

@@ -94,11 +94,13 @@ import org.jspecify.annotations.Nullable;
  * }</pre>
  *
  * <p>
- * The workbook directory defaults to {@code /data/cdisc-docs}; override with
- * {@code -Dcdisc.docs.dir=...}. The checks root defaults to {@code rules-src/checks} (relative to
- * the process working directory); override with {@code -Dbackfill.checksRoot=...}. Limit to one
- * binding with {@code -Dbackfill.binding=CDISC-AD} (a {@link SheetBinding#name()}). Compute and
- * report without writing with {@code -Dbackfill.dryRun=true}.
+ * The workbook directory is <b>required</b> and has no default — the conformance workbooks are a
+ * licensed external document set, not part of this repository and with no location inside it, so
+ * {@code -Dcdisc.docs.dir=...} must name one and the tool refuses to start without it. The checks
+ * root defaults to {@code rules-src/checks} (relative to the process working directory); override
+ * with {@code -Dbackfill.checksRoot=...}. Limit to one binding with
+ * {@code -Dbackfill.binding=CDISC-AD} (a {@link SheetBinding#name()}). Compute and report without
+ * writing with {@code -Dbackfill.dryRun=true}.
  * </p>
  *
  * <p>
@@ -129,6 +131,13 @@ public final class OriginalTextBackfill
             YAMLFactory.builder().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).build());
 
     private static final Path SRC_CHECKS = Path.of("rules-src", "checks");
+
+    /**
+     * System property naming the directory that holds the licensed conformance workbooks. Required,
+     * with no default: the workbooks are not in this repository, and a path outside it is not
+     * something this repository may assume exists.
+     */
+    private static final String DOCS_DIR_PROPERTY = "cdisc.docs.dir";
 
     private static final Pattern DOT = Pattern.compile("\\.");
 
@@ -393,7 +402,16 @@ public final class OriginalTextBackfill
      */
     public static void main(String[] args) throws IOException
     {
-        Path docsDir = Path.of(System.getProperty("cdisc.docs.dir", "/data/cdisc-docs"));
+        String configuredDocs = System.getProperty(DOCS_DIR_PROPERTY, "");
+        if (configuredDocs.isBlank())
+        {
+            throw new IllegalStateException("-D" + DOCS_DIR_PROPERTY + " is not set. The"
+                    + " conformance workbooks this tool transcribes are a licensed external"
+                    + " document set, not part of this repository and with no location inside it,"
+                    + " so there is no default to fall back to: point -D" + DOCS_DIR_PROPERTY
+                    + " at a directory holding them.");
+        }
+        Path docsDir = Path.of(configuredDocs);
         Path checksRoot = Path.of(System.getProperty("backfill.checksRoot", SRC_CHECKS.toString()));
         boolean dryRun = Boolean.getBoolean("backfill.dryRun");
         String only = System.getProperty("backfill.binding");

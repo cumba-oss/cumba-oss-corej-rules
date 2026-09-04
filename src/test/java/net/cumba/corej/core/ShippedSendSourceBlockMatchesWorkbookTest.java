@@ -95,10 +95,13 @@ import org.junit.jupiter.api.Test;
  * <h2>Absent workbook</h2>
  *
  * <p>
- * {@value #DEFAULT_DOCS_DIR} is a licensed external document set, not part of this repository.
- * Workbook absent ⇒ a reported {@link Assumptions#assumeTrue} skip naming the resolved path, never
- * a silent pass; {@code -Dcdisc.docs.required=true} promotes that one condition to a failure. Every
- * other problem (missing sheet, missing column, too few rows, a mismatched cell) is hard.
+ * The workbook belongs to a licensed external document set that is not part of this repository and
+ * has no location inside it, so this guard is told where it is by
+ * {@code -D}{@value #DOCS_DIR_PROPERTY} and has <b>no default</b>. Property unset, or no readable
+ * workbook under it ⇒ a reported {@link Assumptions#abort} skip naming the property (and the
+ * resolved path when there is one), never a silent pass; {@code -Dcdisc.docs.required=true}
+ * promotes that one condition to a failure. Every other problem (missing sheet, missing column, too
+ * few rows, a mismatched cell) is hard.
  * </p>
  *
  * <h2>Census — measured 2026-08-22, at the re-anchored corpus</h2>
@@ -139,8 +142,12 @@ import org.junit.jupiter.api.Test;
 class ShippedSendSourceBlockMatchesWorkbookTest
 {
 
-    /** The licensed conformance-document set. Not in this repository; override for a mount. */
-    static final String DEFAULT_DOCS_DIR = "/data/cdisc-docs";
+    /**
+     * System property naming the directory that holds the licensed conformance-document set.
+     * Deliberately un-defaulted: the documents are not in this repository, and a path outside it is
+     * not something this repository may assume exists.
+     */
+    static final String DOCS_DIR_PROPERTY = "cdisc.docs.dir";
 
     /** The workbook under guard. Named in every failure and skip message on purpose. */
     static final String WORKBOOK = "SEND_Conformance_Rules_v5.0.xlsx";
@@ -499,22 +506,17 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      */
     private static Scan scan() throws IOException
     {
-        Path docsDir = Path.of(System.getProperty("cdisc.docs.dir", DEFAULT_DOCS_DIR));
-        Path workbook = docsDir.resolve(WORKBOOK);
-        boolean readable = Files.isRegularFile(workbook);
-        String absent = "conformance workbook not found: " + workbook.toAbsolutePath()
-                + " — the SEND Source-block drift guard cannot run. " + DEFAULT_DOCS_DIR
-                + " is a licensed external document set, not part of this repository;"
-                + " point -Dcdisc.docs.dir at a mount.";
-        if (!readable && Boolean.getBoolean("cdisc.docs.required"))
+        String configured = System.getProperty(DOCS_DIR_PROPERTY, "");
+        if (configured.isBlank())
         {
-            throw new IllegalStateException(
-                    absent + " FAILING because -Dcdisc.docs.required=true was passed.");
+            unavailable("-D" + DOCS_DIR_PROPERTY + " is not set, so " + WORKBOOK
+                    + " cannot be located");
         }
-        Assumptions.assumeTrue(readable,
-                absent + " SKIPPED rather than passed; pass -Dcdisc.docs.required=true to make"
-                        + " this absence a build failure instead.");
-
+        Path workbook = Path.of(configured).resolve(WORKBOOK);
+        if (!Files.isRegularFile(workbook))
+        {
+            unavailable("conformance workbook not found: " + workbook.toAbsolutePath());
+        }
         Scan scan = cached;
         if (scan == null)
         {
@@ -522,6 +524,27 @@ class ShippedSendSourceBlockMatchesWorkbookTest
             cached = scan;
         }
         return scan;
+    }
+
+
+    /**
+     * The one skippable condition — no readable workbook — reported as a visible skip naming the
+     * property to set, or promoted to a failure by {@code -Dcdisc.docs.required=true}. Never
+     * returns normally.
+     */
+    private static void unavailable(String aWhy)
+    {
+        String absent = aWhy + " — the SEND Source-block drift guard cannot run. The conformance"
+                + " workbooks are a licensed external document set, not part of this repository"
+                + " and with no location inside it; point -D" + DOCS_DIR_PROPERTY
+                + " at a directory holding " + WORKBOOK + ".";
+        if (Boolean.getBoolean("cdisc.docs.required"))
+        {
+            throw new IllegalStateException(
+                    absent + " FAILING because -Dcdisc.docs.required=true was passed.");
+        }
+        Assumptions.abort(absent + " SKIPPED rather than passed; pass -Dcdisc.docs.required=true"
+                + " to make this absence a build failure instead.");
     }
 
 

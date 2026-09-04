@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * {@link OutputVariableDeriver#derivedOnly} over every rule of the shipped packages in
  * {@code rules/} and writes the authored-vs-derived delta to
  * {@code target/output-variable-derivation-report.md} — the in-repo replacement for the Phase-0b
- * scratch probe ({@code /home/claude/ov-derivation-phase0/OvProbe.java}).
+ * scratch probe, since discarded.
  *
  * <p>
  * <b>Report-only.</b> The corpus legitimately omits derivable entries (that is what the derivation

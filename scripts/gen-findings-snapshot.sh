@@ -8,8 +8,8 @@
 # and DIFF it after (FindingsSnapshotDriftTest, -Dcorej.findingsSnapshot=true).
 #
 # Usage (from anywhere, MAIN tree only — testdata/ is untracked):
-#   CDISC_PICKLE_CACHE_DIR=/data/cdisc.metadata.library-cache-pkl \
-#   CDISC_API_CACHE=/data/cdisc.metadata.library-cache \
+#   CDISC_PICKLE_CACHE_DIR=<your CDISC pickle cache> \
+#   CDISC_API_CACHE=<your CDISC Library API cache> \
 #   lib/corej-cdisc-rules/scripts/gen-findings-snapshot.sh
 #
 # WHY IT EXISTS (PLAN-leaf-scope-domain-inference.md §7a gap 1, owner ruling 13).

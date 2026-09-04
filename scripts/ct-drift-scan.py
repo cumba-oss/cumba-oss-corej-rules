@@ -28,8 +28,10 @@ Usage
 
 Run it from anywhere; every path is resolved from this file's location. Options:
 
-    --ct-cache DIR   CDISC pickle cache (default: $CDISC_PICKLE_CACHE_DIR, else
-                     /data/cdisc.metadata.library-cache-pkl)
+    --ct-cache DIR   CDISC pickle cache. REQUIRED, defaulting only to
+                     $CDISC_PICKLE_CACHE_DIR: the cache is an external input
+                     this repository does not ship, so there is no built-in
+                     location to fall back to.
     --checks DIR     rules corpus (default: ../rules-src/checks beside this file)
     --out PATH       report path (default: ../documentation/ct-drift-scan-report.md)
     --tsv PATH       also write the per-row table as TSV (optional; off by default)
@@ -79,8 +81,8 @@ CT by construction.
 Data sources, and how coarse each one is
 ----------------------------------------
 
-1. **CT change dates** — the local CDISC Library pickle cache
-   (`$CDISC_PICKLE_CACHE_DIR`, normally `/data/cdisc.metadata.library-cache-pkl`).
+1. **CT change dates** — a local CDISC Library pickle cache, wherever the
+   caller keeps it (`--ct-cache`, or `$CDISC_PICKLE_CACHE_DIR`).
    Each `sdtmct-YYYY-MM-DD.pkl` / `sendct-*` / `adamct-*` / `cdashct-*` holds
    one published CT package: `{'package': …, 'codelists': [ {conceptId,
    submissionValue, extensible, terms:[{conceptId, submissionValue, …}]}, … ]}`.
@@ -152,8 +154,10 @@ MODULE = os.path.normpath(os.path.join(HERE, os.pardir))
 CHECKS = os.path.join(MODULE, "rules-src", "checks")
 DOCS = os.path.join(MODULE, "documentation")
 REPORT = os.path.join(DOCS, "ct-drift-scan-report.md")
-DEFAULT_CACHE = os.environ.get("CDISC_PICKLE_CACHE_DIR",
-                               "/data/cdisc.metadata.library-cache-pkl")
+#: No built-in fallback: the pickle cache is an external input this repository neither ships nor
+#: generates, so its location comes from the caller (--ct-cache) or the environment, or the scan
+#: refuses to start.
+DEFAULT_CACHE = os.environ.get("CDISC_PICKLE_CACHE_DIR")
 
 sys.path.insert(0, os.path.join(HERE, "lib"))
 import check_expr as ce  # noqa: E402  (path is set above, as the sibling tools do)
@@ -1004,8 +1008,8 @@ def main():
                     "their authority sheet was written. Periodic tool — "
                     "never run in the build gate.")
     parser.add_argument("--ct-cache", default=DEFAULT_CACHE,
-                        help="CDISC pickle cache directory (default: "
-                             "$CDISC_PICKLE_CACHE_DIR or %s)" % DEFAULT_CACHE)
+                        help="CDISC pickle cache directory (required; "
+                             "defaults to $CDISC_PICKLE_CACHE_DIR)")
     parser.add_argument("--checks", default=CHECKS,
                         help="rules-src/checks directory")
     parser.add_argument("--out", default=REPORT, help="report path")
@@ -1017,6 +1021,12 @@ def main():
 
     if not os.path.isdir(args.checks):
         print("error: rules corpus not found: %s" % args.checks, file=sys.stderr)
+        return 2
+
+    if not args.ct_cache:
+        print("error: no CT pickle cache given. Pass --ct-cache DIR or set "
+              "$CDISC_PICKLE_CACHE_DIR — the cache is an external input this "
+              "repository does not ship, so there is no default.", file=sys.stderr)
         return 2
 
     try:

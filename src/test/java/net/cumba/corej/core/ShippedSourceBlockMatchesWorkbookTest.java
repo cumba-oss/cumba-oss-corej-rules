@@ -101,14 +101,17 @@ import org.junit.jupiter.api.Test;
  * <h2>Absent workbook</h2>
  *
  * <p>
- * {@value #DEFAULT_DOCS_DIR} is a licensed external document set, not part of this repository, and
- * no CI job mounts it today. Making its absence a hard failure would newly couple every build to
- * it. So: <strong>workbook absent ⇒ {@link Assumptions#assumeTrue} with the resolved path in the
- * message</strong> — a skip that names itself in the surefire report, never a green tick. Pass
- * {@code -Dcdisc.docs.required=true} to promote that skip to a failure (the setting a CI job that
- * <em>does</em> mount the docs should use). ⚠ The skip is available for <em>one</em> condition only
- * — the workbook file not existing. Once the file is readable every other problem (missing sheet,
- * missing header label, too few rows, an unresolvable rule, a mismatched cell) is a hard failure.
+ * The workbook belongs to a licensed external document set that is not part of this repository and
+ * has no location inside it, so this guard is <em>told</em> where it is by
+ * {@code -D}{@value #DOCS_DIR_PROPERTY} and has <strong>no default</strong>. No CI job mounts the
+ * documents today, and making their absence a hard failure would newly couple every build to them.
+ * So: <strong>property unset, or no readable workbook under it ⇒ {@link Assumptions#abort}, naming
+ * the property and the resolved path when there is one</strong> — a skip that names itself in the
+ * surefire report, never a green tick. Pass {@code -Dcdisc.docs.required=true} to promote that skip
+ * to a failure (the setting a CI job that <em>does</em> mount the docs should use). ⚠ The skip is
+ * available for that <em>one</em> condition only — no readable workbook. Once the file is readable
+ * every other problem (missing sheet, missing header label, too few rows, an unresolvable rule, a
+ * mismatched cell) is a hard failure.
  * </p>
  *
  * <h2>Measurements — re-derived 2026-08-10 (wave 29 lane D)</h2>
@@ -142,8 +145,12 @@ import org.junit.jupiter.api.Test;
 class ShippedSourceBlockMatchesWorkbookTest
 {
 
-    /** The licensed conformance-document set. Not in this repository; override for a mount. */
-    static final String DEFAULT_DOCS_DIR = "/data/cdisc-docs";
+    /**
+     * System property naming the directory that holds the licensed conformance-document set.
+     * Deliberately un-defaulted: the documents are not in this repository, and a path outside it is
+     * not something this repository may assume exists.
+     */
+    static final String DOCS_DIR_PROPERTY = "cdisc.docs.dir";
 
     /** The workbook under guard. Named in every failure and skip message on purpose. */
     static final String WORKBOOK = "PMDA-ValidationRules-v6-0.xlsx";
@@ -458,23 +465,17 @@ class ShippedSourceBlockMatchesWorkbookTest
      */
     private static Scan scan() throws IOException
     {
-        Path docsDir = Path.of(System.getProperty("cdisc.docs.dir", DEFAULT_DOCS_DIR));
-        Path workbook = docsDir.resolve(WORKBOOK);
-        boolean readable = Files.isRegularFile(workbook);
-        String absent = "conformance workbook not found: " + workbook.toAbsolutePath()
-                + " — the Source-block drift guard cannot run. " + DEFAULT_DOCS_DIR
-                + " is a licensed external document set, not part of this repository;"
-                + " point -Dcdisc.docs.dir at a mount.";
-        if (!readable && Boolean.getBoolean("cdisc.docs.required"))
+        String configured = System.getProperty(DOCS_DIR_PROPERTY, "");
+        if (configured.isBlank())
         {
-            throw new IllegalStateException(
-                    absent + " FAILING because -Dcdisc.docs.required=true was passed.");
+            unavailable("-D" + DOCS_DIR_PROPERTY + " is not set, so " + WORKBOOK
+                    + " cannot be located");
         }
-        // Reported skip, never a silent pass: drop -Dcdisc.docs.required=true to see it fail here.
-        Assumptions.assumeTrue(readable,
-                absent + " SKIPPED rather than passed; pass -Dcdisc.docs.required=true to make"
-                        + " this absence a build failure instead.");
-
+        Path workbook = Path.of(configured).resolve(WORKBOOK);
+        if (!Files.isRegularFile(workbook))
+        {
+            unavailable("conformance workbook not found: " + workbook.toAbsolutePath());
+        }
         Scan scan = cached;
         if (scan == null)
         {
@@ -482,6 +483,28 @@ class ShippedSourceBlockMatchesWorkbookTest
             cached = scan;
         }
         return scan;
+    }
+
+
+    /**
+     * The one skippable condition — no readable workbook — reported as a visible skip naming the
+     * property to set, or promoted to a failure by {@code -Dcdisc.docs.required=true}. Never
+     * returns normally.
+     */
+    private static void unavailable(String aWhy)
+    {
+        String absent = aWhy + " — the Source-block drift guard cannot run. The conformance"
+                + " workbooks are a licensed external document set, not part of this repository"
+                + " and with no location inside it; point -D" + DOCS_DIR_PROPERTY
+                + " at a directory holding " + WORKBOOK + ".";
+        if (Boolean.getBoolean("cdisc.docs.required"))
+        {
+            throw new IllegalStateException(
+                    absent + " FAILING because -Dcdisc.docs.required=true was passed.");
+        }
+        // Reported skip, never a silent pass: drop -Dcdisc.docs.required=true to see it fail here.
+        Assumptions.abort(absent + " SKIPPED rather than passed; pass -Dcdisc.docs.required=true"
+                + " to make this absence a build failure instead.");
     }
 
 
