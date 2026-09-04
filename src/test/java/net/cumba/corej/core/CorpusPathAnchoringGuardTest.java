@@ -3,8 +3,6 @@ package net.cumba.corej.core;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,11 +39,17 @@ import org.junit.jupiter.api.Test;
  * {@code src/test/resources/fixtures/rules}.
  * <li>Prose: javadoc and comments may name {@code rules/} freely. Only code is checked.
  * </ul>
+ *
+ * <p>
+ * ⚠ The source-tree lint that once lived here — walking {@code src/test/java} and failing any test
+ * that named a generated-corpus directory by a hand-built path — is <b>deliberately not carried in
+ * this repository</b>. Corpus paths are authored upstream, in the monorepo, which still runs it;
+ * here the corpus is build output and there is nothing to anchor. The two checks below are the
+ * detector's own self-tests and are kept because they are repo-local.
+ * </p>
  */
 class CorpusPathAnchoringGuardTest
 {
-
-    private static final Path SOURCES = Path.of("src", "test", "java");
 
     /** A string literal, with escapes. */
     private static final Pattern LITERAL = Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"");
@@ -63,21 +67,6 @@ class CorpusPathAnchoringGuardTest
      */
     private static final Pattern JSON_ACCESSOR = Pattern.compile(
             "\\.(get|path|has|remove|set|put|putArray|with|findValue|findPath|required)\\s*\\($");
-
-    /** Source directories, which did not move and must not be flagged. */
-    private static final Pattern SOURCE_TREES = Pattern
-            .compile("rules-src|rules-org|rules-define-src|fixtures/rules|rulespec|\"fixtures\"");
-
-    /**
-     * The one file allowed to name the generated directories in code.
-     *
-     * <p>
-     * ⚠ If you are about to add a name here, you almost certainly want {@link CorpusPaths} instead.
-     * The whole point is that the next move of these directories is a one-line change.
-     * </p>
-     */
-    private static final List<String> ALLOWED = List.of("CorpusPaths.java",
-            "CorpusPathAnchoringGuardTest.java");
 
     /**
      * Whether a line of code builds a path to a generated corpus directory.
@@ -116,19 +105,6 @@ class CorpusPathAnchoringGuardTest
             }
         }
         return false;
-    }
-
-
-    /** Drops {@code //} and whole-line {@code *} javadoc/comment text; prose may say anything. */
-    private static String stripComment(String aLine)
-    {
-        String trimmed = aLine.strip();
-        if (trimmed.startsWith("*") || trimmed.startsWith("/*") || trimmed.startsWith("//"))
-        {
-            return "";
-        }
-        int slashes = aLine.indexOf("//");
-        return slashes < 0 ? aLine : aLine.substring(0, slashes);
     }
 
 
