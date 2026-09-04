@@ -292,7 +292,7 @@ src/test/resources/net/cumba/corej/core/ruletestsuites/
 
 The subtree name is simultaneously the **assembled-package prefix**: a
 `<family>/` scenario resolves its rule out of
-`lib/corej-cdisc-rules/rules/rules-<family>-*.json` and nothing else. That is
+the generated `target/rules/rules-<family>-*.json` and nothing else. That is
 what routes the CDISC-SEND rules — they are `CDISC-*` ids assembled into
 `rules-cdisc-sendig-*.json`, so they live under `cdisc/` and declare
 `#library standard=sendig version=…` (or `sendig-dart` / `sendig-genetox` /
@@ -410,7 +410,8 @@ scenario keeps passing while exercising nothing. `violation` / `noViolation` now
 engine's own skip reason when the rule does not run.
 
 The requirements a `skipped` scenario can be built on
-(spec [Field: `Requirements`](../../../../../../../../../corej-cdisc-rules/documentation/CORE-RULES-SPECIFICATION.md#field-requirements)):
+(spec `CORE-RULES-SPECIFICATION.md`, "Field: `Requirements`" — kept in the internal
+monorepo and not redistributed here):
 
 | requirement | the scenario withholds | the rule skips because |
 |---|---|---|
@@ -493,7 +494,7 @@ block, or on its own `#`-leading line.
   rule-class list below), not a data row. A green scenario is therefore not
   evidence that an exclusion took effect; assert it in a Java test on
   `violation.getValues().containsKey(...)` (pinned by
-  `ExcludedOutputVariablePinFallbackTest` in `corej-cdisc-core-ruletest`).
+  `ExcludedOutputVariablePinFallbackTest` in `cumba-oss-corej-ruletest`).
 
 **Pick the addressing by rule class:**
 
@@ -519,7 +520,7 @@ engine currently produces; `-Dbackfill.dryRun=true` reports without writing).
 
 A rule may state a different check **per severity level** — a `Check:` whose keys are `REJECT` /
 `ERROR` / `WARNING` / `INFO` rather than a single condition (spec:
-[Level-keyed `Check`](../../../../../../../../../corej-cdisc-rules/documentation/CORE-RULES-SPECIFICATION.md#level-keyed-check)).
+`CORE-RULES-SPECIFICATION.md`, "Level-keyed `Check`" — internal monorepo only).
 A rule with a plain `Check:` declares exactly one level, at its `Severity`, which is every rule in
 the corpus today. Two directives address that:
 
@@ -593,7 +594,7 @@ scenario opts in with:
 ```
 
 `dummy` — the only supported value — loads the checked-in dummy bundle
-`lib/corej-cdisc-core/dictionaries/*.json` (all types above) via
+`src/test/resources/dictionaries/*.json` (all types above) via
 `RuntimeDictionaryProvider.loadDirectory` and hands it to the engine.
 Scenario data must use terms/codes from those dummy files. Without the
 directive no provider is supplied, so a dictionary-dependent rule **SKIPs**

@@ -30,13 +30,19 @@ curl -sLO <asset-url> && curl -sLO <asset-url>.asc
 gpg --verify <asset>.asc <asset>
 ```
 
-They are built by `dist/cumba-oss-corej-rules-dist` from the corpus the main module
-generates, so `mvn package` reproduces exactly what a release carries:
+Both are assembled by this repository's own `package` phase, from the corpus the
+same build generates, so `mvn package` reproduces exactly what a release carries:
 
 ```bash
 mvn -B clean package -Drevision=<version> -DskipTests
-ls dist/cumba-oss-corej-rules-dist/target/*.zip
+ls target/*.zip
 ```
+
+⚠ **`target/`, not a `dist/` module.** The repository was flattened to a single
+module: the two assembly executions write into this module's own `target/`, which
+is exactly what the release workflow uploads (`target/*-<version>.zip`). Corpus
+generation is bound to `process-test-classes` and has **no** skip flag, so
+`-DskipTests` still produces the corpus — it only skips the test run.
 
 ⚠ **Release assets are mutable**, unlike Central artifacts — anyone with write access can
 replace one. The signature proves an archive is authentic; **your pinned hash proves
@@ -93,7 +99,7 @@ mvn -B clean install -Drevision=<version> \
     -Dpmd.failOnViolation=true -Dspotbugs.failOnError=true
 ```
 
-Requires **`cumba-oss-corej` 0.2.0** and its upstreams on Central; the engine version is
+Requires **`cumba-oss-corej` 0.3.0** and its upstreams on Central; the engine version is
 pinned by `dependency.cumba-oss-corej.version` in the root pom.
 
 ### ⚠ The build needs the CDISC pickle metadata cache
@@ -125,27 +131,34 @@ a directory — a wrong path and no path look identical in a test log otherwise.
 ```
 cumba-oss-commons     help · web-api · cdisc-library · bootstrap
       ▲
-cumba-oss-formats     sas-utils · datasetjson              (independent leaf)
+cumba-oss-formats     sas-utils · cdisc-dsj                (independent leaf)
       ▲
 cumba-oss-datatable   datatable · impl · cdisc-define · providers · manager-local · testkit
       ▲
-cumba-oss-corej       cdisc-core · report-json · report-xlsx · ruletest · define-conformance
+cumba-oss-corej       corej-core · report-json · report-xlsx · ruletest · define-conformance
       ▲
 cumba-oss-corej-rules the rule corpus                      (publishes nothing to Central)
 ```
 
-`cumba-oss-clients` (CLI + REST API) consumes the engine and loads this corpus at
-runtime from a rules directory — it does not depend on this repository at build time.
+`cumba-oss-corej-cli` (the validation CLI) and `cumba-oss-corej-rest` (the REST API,
+with `cumba-oss-corej-web` as its browser SPA) consume the engine and load this corpus
+at runtime from a rules directory — none of them depends on this repository at build
+time.
 
 ## Build conventions
 
 Java 25, `<revision>` + `flatten-maven-plugin`, Spotless-on-save at `process-sources`,
-SpotBugs and PMD report-only by default, JaCoCo per-module minimum, Surefire test-CWD
-pinned to `target/test-cwd/` with `projectBasedir` / `repoRoot` exposed as system
+SpotBugs and PMD report-only by default, a JaCoCo line-coverage minimum, with
+`projectBasedir` / `repoRoot` / `corpusDir` / `defineCorpusDir` exposed as system
 properties. Same conventions as the rest of the stack — see
 [`cumba-oss-corej`](https://github.com/cumba-oss/cumba-oss-corej)'s README for the full
 table of gate toggles.
 
+⚠ **Surefire's working directory is the module basedir here, not the stack-wide
+`target/test-cwd/`.** The corpus tests and the generator tools resolve `rules-src/`,
+`rulespec/` and `schema/` by module-relative paths, so this repository overrides the
+convention; the system properties above are still set.
+
 ⚠ **Do not pass `-Djacoco.line.coverage=…` or `-Dpitest.mutation.threshold=…` on the
-command line.** A CLI `-D` is a Maven *user* property and clobbers every module's
-deliberate per-module override at once.
+command line.** A CLI `-D` is a Maven *user* property and clobbers the pom's
+deliberate override.

@@ -1,25 +1,30 @@
 # CDISC rule corpus
 
-The rule packages coreJ executes, as released.
+The rule packages coreJ executes, as released. Two archives are published per release
+and **this file ships in both**; the directory beside it says which one you are holding.
 
 ## What is in here
 
-| File | What it is |
-|---|---|
-| `packages.json` | the manifest: one entry per package, naming its family, standard, version and rule count |
-| `rules-<family>-<standard>-<version>.json` | one rule package |
+| Archive | Directory beside this file | What it holds |
+|---|---|---|
+| `cumba-oss-corej-rules-<version>.zip` | `rules/` | `rules-<family>-<standard>-<version>.json`, one per data rule package |
+| `cumba-oss-corej-rules-define-<version>.zip` | `rules-define/` | `rules-define-<family>-<version>.json`, one per Define-XML rule package |
 
-Point a coreJ run at this directory:
+Either directory also carries a `packages.json` manifest: one entry per package, naming
+its family, standard, version and rule count.
+
+Point a coreJ run at the directory you have:
 
 ```bash
-CdiscValidate --rules-dir <this directory> ...
+# data rules
+CdiscValidate --rules-dir <this archive>/rules ...
+# Define-XML conformance rules (-vx also needs -dxp <define.xml>)
+CdiscValidate -vx --define-rules-dir <this archive>/rules-define ...
 ```
 
-or set `COREJ_RULES_DIR` to it.
+or set `COREJ_RULES_DIR` / `COREJ_DEFINE_RULES_DIR` to them.
 
-The Define-XML conformance corpus ships as a **separate** archive
-(`cumba-oss-corej-rules-define-<version>.zip`), because a consumer may want one without
-the other.
+The two corpora ship separately because a consumer may want one without the other.
 
 ## ⚠ Which rules am I actually running?
 
