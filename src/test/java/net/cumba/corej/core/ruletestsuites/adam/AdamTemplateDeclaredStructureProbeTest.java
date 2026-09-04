@@ -25,9 +25,9 @@ import org.junit.jupiter.api.TestFactory;
  * <h2>What it pins</h2>
  *
  * <p>
- * {@code lib/corej-cdisc-rules/scripts/adam-classes-to-structures-instrument-holds.tsv} <b>used to
- * record 15</b> rules under {@code instrument = adam-template-suite}: rules that carried
- * {@code Scope.Classes} and could not migrate to the semantically correct
+ * The instrument-holds census — a frozen internal measurement, kept in the monorepo and not carried
+ * here — <b>recorded 15</b> rules under {@code instrument = adam-template-suite}: rules that
+ * carried {@code Scope.Classes} and could not migrate to the semantically correct
  * {@code Scope.Data_Structures}, because the migrated form went SKIPPED in the template suites and
  * turned their {@code _invalid} assertion red. The recorded cause was <i>"the template-expanded
  * ADLBC table carries no BDS indicator column"</i> — i.e. the fixture is synthesised from the

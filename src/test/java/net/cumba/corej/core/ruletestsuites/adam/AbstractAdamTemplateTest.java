@@ -259,8 +259,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * heuristic. The fixtures here are synthesised by {@link #buildInvalidTable} /
      * {@code buildValidTable} and carry only the rule's own leaf columns, so that heuristic answers
      * {@code ADAM OTHER} for almost all of them — which is why 15 rules are recorded
-     * {@code INSTRUMENT-HELD} in {@code adam-classes-to-structures-instrument-holds.tsv} and could
-     * not migrate from {@code Scope.Classes} to {@code Scope.Data_Structures}.
+     * {@code INSTRUMENT-HELD} in the instrument-holds census — a frozen internal measurement, kept
+     * in the monorepo and not carried here — and could not migrate from {@code Scope.Classes} to
+     * {@code Scope.Data_Structures}.
      * </p>
      *
      * <h4>⚠ Why the LIBRARY slot and not a {@code defineProvider}</h4>
