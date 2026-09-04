@@ -23,9 +23,10 @@ import org.junit.jupiter.api.Test;
  * the CDISC corpus.
  *
  * <p>
- * This is what stops the corpus going stale. {@code scripts/regen-rules-define-corpus.sh} is a
- * developer tool nobody is obliged to remember; this test reds when a rule is authored, edited or
- * parked without regenerating, and it reds in the ordinary build.
+ * This is what stops the corpus going stale. The generated corpus it compares against is written by
+ * the build itself ({@link DefineRuleCorpusGenerator}, bound to {@code process-test-classes}), so
+ * this test reds when a rule is authored, edited or parked against a stale {@code target/}, and it
+ * reds in the ordinary build.
  * </p>
  *
  * <p>
@@ -37,6 +38,16 @@ import org.junit.jupiter.api.Test;
  */
 class DefineRuleCorpusRoundTripTest
 {
+
+    /**
+     * The remedy every staleness failure below shares. Named once so all three read the same, and
+     * so none of them points at a regeneration entry point this repository does not contain.
+     */
+    private static final String REGENERATE = "target/rules-define/ is written by this build's"
+            + " DefineRuleCorpusGenerator binding (exec-maven-plugin, process-test-classes), so a"
+            + " target/ left over from an earlier build is the usual cause — re-run `mvn clean"
+            + " test` to regenerate it. If it still differs, rules-define-src/ and the generator"
+            + " genuinely disagree; authoring changes belong upstream, in the monorepo.";
 
     @Test
     void regeneratingFromSourceReproducesTheCommittedCorpusByteForByte() throws IOException
@@ -112,9 +123,8 @@ class DefineRuleCorpusRoundTripTest
     private static void assertSameText(Path aCommitted, String aRegenerated) throws IOException
     {
         assertTrue(Files.isRegularFile(aCommitted),
-                "the generator produced " + aCommitted.getFileName()
-                        + " but it is not committed under " + DefineRuleCorpusGenerator.target()
-                        + " — run scripts/regen-rules-define-corpus.sh");
+                "the generator produced " + aCommitted.getFileName() + " but it is missing from "
+                        + DefineRuleCorpusGenerator.target() + " — " + REGENERATE);
         String committed = Files.readString(aCommitted, StandardCharsets.UTF_8);
         if (committed.equals(aRegenerated))
         {
@@ -128,14 +138,12 @@ class DefineRuleCorpusRoundTripTest
         {
             if (!a[i].equals(b[i]))
             {
-                throw new AssertionError(aCommitted + " is stale at line " + (i + 1)
-                        + " — run scripts/regen-rules-define-corpus.sh\n  committed:   " + a[i]
-                        + "\n  regenerated: " + b[i]);
+                throw new AssertionError(aCommitted + " is stale at line " + (i + 1) + " — "
+                        + REGENERATE + "\n  on disk:     " + a[i] + "\n  regenerated: " + b[i]);
             }
         }
-        throw new AssertionError(
-                aCommitted + " is stale: committed has " + a.length + " lines, regenerated has "
-                        + b.length + " — run scripts/regen-rules-define-corpus.sh");
+        throw new AssertionError(aCommitted + " is stale: the file on disk has " + a.length
+                + " lines, regenerated has " + b.length + " — " + REGENERATE);
     }
 
 }

@@ -2172,8 +2172,9 @@
             <!--
                 GENERATE BOTH SHIPPED CORPORA, EVERY BUILD.
 
-                Until PLAN-rules-corpus-build-integration these two generators ran only from
-                scripts/regen-*.sh and their 80 MB of output was committed. Now the build
+                Until PLAN-rules-corpus-build-integration these two generators ran only from the
+                internal regen-* developer workflow (not present in this repository) and their
+                80 MB of output was committed. Now the build
                 produces them into target/, they are gitignored, and a packaging change that
                 alters a rule shows up as a failing test instead of a silent diff.
 
@@ -2191,11 +2192,11 @@
                 honours <workingDirectory>, and forking also keeps the generators off Maven's
                 own classloader.
 
-                ⚠ This is a pom binding, not a script, so CorpusGenScriptGuardTest does not see
-                it — that test walks scripts/ only (SCRIPTS = Path.of("scripts")). The
-                stale-engine hazard it guards against does not arise here either: the reactor
-                has just compiled this tree's classes and <classpath/> is that reactor
-                classpath, never ~/.m2.
+                ⚠ The stale-engine hazard that the upstream regeneration workflow has to guard
+                against — a generator run against an engine resolved from ~/.m2, rewriting part
+                of the corpus before anything notices — does not arise here: the reactor has
+                just compiled this tree's classes and <classpath/> is that reactor classpath,
+                never ~/.m2.
             -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

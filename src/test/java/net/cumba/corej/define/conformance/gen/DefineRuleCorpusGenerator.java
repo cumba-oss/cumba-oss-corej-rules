@@ -63,10 +63,11 @@ import net.cumba.corej.define.conformance.rule.RuleSet;
  *
  * <p>
  * The <em>source</em> path resolves against the module base directory, so the working directory
- * must be the module root — the build's exec binding sets it, and
- * {@code scripts/regen-rules-define-corpus.sh} {@code cd}s there. The <em>output</em> directory is
- * {@link #target()}; it is {@code target/rules-define/} under the build, and nothing generated is
- * committed any more ({@code plans/PLAN-rules-corpus-build-integration.md}).
+ * must be the module root — the build's exec binding sets it, and the internal
+ * {@code regen-rules-define-corpus} workflow, which is not distributed with this repository,
+ * {@code cd}s there. The <em>output</em> directory is {@link #target()}; it is
+ * {@code target/rules-define/} under the build, and nothing generated is committed any more
+ * ({@code plans/PLAN-rules-corpus-build-integration.md}).
  * </p>
  */
 public final class DefineRuleCorpusGenerator

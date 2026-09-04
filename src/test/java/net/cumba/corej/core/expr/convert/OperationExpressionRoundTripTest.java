@@ -225,10 +225,11 @@ class OperationExpressionRoundTripTest
      * <p>
      * {@link OperationExpressionPrinter#print} is a hand-written field-by-field emitter, and the
      * corpus in {@code rules/} is stored <em>entirely</em> in the form it produces — so a field it
-     * forgets is erased from every rule the next {@code regen-rules-corpus.sh} run touches, with no
-     * error anywhere. This enumerates {@link Operation}'s declared fields reflectively and asserts
-     * each one reaches the printed string, so the next field cannot be lost the way {@code offset}
-     * was.
+     * forgets is erased from every rule the next corpus regeneration touches — the build's
+     * {@link RuleCorpusGenerator} binding here, the internal {@code regen-rules-corpus} workflow
+     * upstream — with no error anywhere. This enumerates {@link Operation}'s declared fields
+     * reflectively and asserts each one reaches the printed string, so the next field cannot be
+     * lost the way {@code offset} was.
      * </p>
      */
     @Test

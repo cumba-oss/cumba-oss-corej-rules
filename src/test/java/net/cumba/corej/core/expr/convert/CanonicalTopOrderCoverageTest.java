@@ -26,9 +26,10 @@ import org.junit.jupiter.api.Test;
  * canonicaliser — it is silently <em>relocated</em> to just before {@code Source} with a warning
  * nobody reads ({@code RuleCanonicalizer}'s unknown-key scan). And nothing else catches it:
  * {@code RuleCanonicalizerTest} is {@code @TempDir}-fixture only, never reading {@code rules-src/},
- * and the class's sole production caller is {@code scripts/backfill-rules.sh}. So forgetting a new
- * field here fails <b>silently, at the next backfill run</b>, long after the plan that added the
- * field is closed. That is precisely the shape this test converts into a build failure.
+ * and the class's sole production caller is the internal {@code backfill-rules} workflow, which is
+ * not distributed with this repository. So forgetting a new field here fails <b>silently, at the
+ * next backfill run</b>, long after the plan that added the field is closed. That is precisely the
+ * shape this test converts into a build failure.
  * </p>
  *
  * <h2>✅ The named exception EXPIRED as designed (2026-08-25)</h2>

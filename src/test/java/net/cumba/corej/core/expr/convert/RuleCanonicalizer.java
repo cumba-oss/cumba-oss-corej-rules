@@ -24,7 +24,8 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Offline developer tool — stage 3 of {@code scripts/backfill-rules.sh}: normalises every
+ * Offline developer tool — stage 3 of the internal {@code backfill-rules} workflow (an internal
+ * developer pipeline that is not distributed with this repository): normalises every
  * {@code rules-src/checks/*.yaml} to a defined top-level field order and a single canonical YAML
  * style (plan {@code plans/done/PLAN-source-block-migration.md}). It is schema-aware of the
  * post-backfill layout: {@code Source} is second-to-last (immediately before {@code Standards}, as
@@ -137,7 +138,7 @@ public final class RuleCanonicalizer
      * {@code Requirements} what it needs in order to answer at all
      * ({@code plans/PLAN-scope-requirements-split.md} §4.1). Omitting it here would not fail any
      * gate: an unlisted key is merely relocated to just before {@code Source} with a warning, at
-     * the next {@code scripts/backfill-rules.sh} run and nowhere else — which is why
+     * the next {@code backfill-rules} run and nowhere else — which is why
      * {@code CanonicalTopOrderCoverageTest} asserts {@code TOP_ORDER} covers every key the corpus
      * actually carries.
      * </p>

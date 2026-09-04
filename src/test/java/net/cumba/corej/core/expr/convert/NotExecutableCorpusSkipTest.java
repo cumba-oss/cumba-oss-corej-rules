@@ -20,12 +20,12 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * <p>
  * A rule declaring {@code Executability: "Not Executable"} must never reach a shipped package.
- * {@link RuleStorageAssembler} loads {@code rules-src/} for stage 0 of
- * {@code scripts/regen-rules-corpus.sh} ({@code RuleCorpusGenerator}), and the skip sits on that
- * loaded {@code checks} map — <em>upstream of the fan-out</em>, so the rule reaches neither the
- * legacy branch nor the native one. That is what parks it in the Python fork as well, since
- * {@code rules-legacy/} is the fork's corpus and the fork has no {@code Executability}-driven load
- * behaviour of its own.
+ * {@link RuleStorageAssembler} loads {@code rules-src/} for stage 0 of corpus generation
+ * ({@code RuleCorpusGenerator} — bound to the build here, and to the internal
+ * {@code regen-rules-corpus} workflow upstream), and the skip sits on that loaded {@code checks}
+ * map — <em>upstream of the fan-out</em>, so the rule reaches neither the legacy branch nor the
+ * native one. That is what parks it in the Python fork as well, since {@code rules-legacy/} is the
+ * fork's corpus and the fork has no {@code Executability}-driven load behaviour of its own.
  * </p>
  *
  * <p>

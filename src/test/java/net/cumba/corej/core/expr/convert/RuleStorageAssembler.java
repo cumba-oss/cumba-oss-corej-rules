@@ -61,9 +61,11 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * Run it through {@code lib/corej-cdisc-rules/scripts/regen-rules-corpus.sh}, which drives
- * {@link RuleCorpusGenerator} on a classpath guarded against a stale, installed engine
- * ({@code scripts/lib/corpus-gen-env.sh}). There is deliberately no standalone entry point here.
+ * Run it through {@link RuleCorpusGenerator} and never directly: in this repository the build's
+ * {@code exec-maven-plugin} binding at {@code process-test-classes} drives that generator on the
+ * reactor classpath, and upstream the internal {@code regen-rules-corpus} workflow (not distributed
+ * with this repository) drives it on a classpath guarded against a stale, installed engine. There
+ * is deliberately no standalone entry point here.
  * </p>
  */
 public final class RuleStorageAssembler

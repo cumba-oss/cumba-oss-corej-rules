@@ -331,9 +331,11 @@ class ShippedSendSourceBlockMatchesWorkbookTest
                 scan.mismatches().size() + " of " + scan.comparisons() + " Source cells no longer"
                         + " match the rule's own primary row on '" + SHEET + "' in " + WORKBOOK
                         + ". The Source block is a transcription written by the offline tool"
-                        + " OriginalTextBackfill and must NEVER be hand-edited — re-run"
-                        + " scripts/backfill-rules.sh --stage 1 -b CDISC-SEND instead. If the row"
-                        + " policy itself is what changed, re-read"
+                        + " OriginalTextBackfill and must NEVER be hand-edited. Re-transcribing"
+                        + " is an upstream authoring step — stage 1 of the internal"
+                        + " backfill-rules workflow, restricted to CDISC-SEND, run over the"
+                        + " monorepo's rules-src/ — and this repository only gates the result."
+                        + " If the row policy itself is what changed, re-read"
                         + " plans/done/PLAN-send-source-backfill-reanchor.md §5.1 before re-pinning"
                         + " anything.");
     }

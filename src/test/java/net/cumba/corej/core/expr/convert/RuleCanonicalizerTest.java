@@ -146,7 +146,8 @@ class RuleCanonicalizerTest
      * ordering of a rule carrying <em>no</em> {@code Requirements}, which stays true and is the
      * shape of every corpus file until phase 4. The failure this guards against is silent — no
      * Maven gate runs the canonicalizer over the real corpus, so a missing key would surface only
-     * as a warning at the next {@code scripts/backfill-rules.sh} run.
+     * as a warning at the next run of the internal {@code backfill-rules} workflow, which is not
+     * distributed with this repository.
      * </p>
      */
     @Test

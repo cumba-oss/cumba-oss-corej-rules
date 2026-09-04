@@ -44,7 +44,8 @@ import org.jspecify.annotations.Nullable;
  * The {@code Source} block is <strong>verbatim own-sheet text only</strong> — it carries no
  * cross-family linkage keys. Cross-family provenance (FDA→CG, FDA→FDA-Business, PMDA→FDA) is
  * expressed structurally as {@code References[]} under {@code Standards[]} by the sibling
- * {@link StandardsLinkageBackfill} tool (stage 2 of {@code scripts/backfill-rules.sh}).
+ * {@link StandardsLinkageBackfill} tool (stage 2 of the internal {@code backfill-rules} workflow,
+ * an internal developer pipeline that is not distributed with this repository).
  * </p>
  *
  * <p>
