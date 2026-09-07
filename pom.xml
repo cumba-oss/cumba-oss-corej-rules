@@ -336,6 +336,10 @@
         -->
         <corej.corpus.dir>${project.build.directory}/rules</corej.corpus.dir>
         <corej.define.corpus.dir>${project.build.directory}/rules-define</corej.define.corpus.dir>
+        <!-- The release-scoped copy of the data corpus: every family EXCEPT DRAFT. The tests read
+             corej.corpus.dir (all families, so the drafts stay lint-scanned and executed); the
+             assembly packs THIS one. See CorpusPaths.releaseRules(). -->
+        <corej.release.corpus.dir>${project.build.directory}/rules-release</corej.release.corpus.dir>
 
         <!--
             DO NOT DEPLOY THIS MODULE'S JAR (PLAN-rules-corpus-build-integration §5).
@@ -1025,6 +1029,7 @@
                                 <requireFilesExist>
                                     <files>
                                         <file>${project.build.directory}/rules/packages.json</file>
+                                        <file>${project.build.directory}/rules-release/packages.json</file>
                                         <file>${project.build.directory}/rules-define/packages.json</file>
                                     </files>
                                     <message>The generated rule corpus is missing. It is produced by cumba-oss-corej-rules' build into its target/ and is not committed — it is produced by this module at process-test-classes, so a scoped run that skips that phase will trip this.</message>
@@ -1796,6 +1801,7 @@
                             <repoRoot>${maven.multiModuleProjectDirectory}</repoRoot>
                             <corpusDir>${corej.corpus.dir}</corpusDir>
                             <defineCorpusDir>${corej.define.corpus.dir}</defineCorpusDir>
+                            <releaseCorpusDir>${corej.release.corpus.dir}</releaseCorpusDir>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -2220,6 +2226,7 @@
                                 <classpath />
                                 <argument>net.cumba.corej.core.expr.convert.RuleCorpusGenerator</argument>
                                 <argument>${corej.corpus.dir}</argument>
+                                <argument>${corej.release.corpus.dir}</argument>
                             </arguments>
                         </configuration>
                     </execution>
