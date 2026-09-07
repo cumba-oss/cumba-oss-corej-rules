@@ -558,13 +558,16 @@ jobs:
       #    ONE trust root. A release asset is mutable — unlike a Central artifact — so here
       #    the signature is the only thing between a consumer and a swapped archive.
       #    loopback pinentry because a runner has no tty; without it gpg hangs.
-      # ⚠ UNVERIFIED AS OF 2026-09-03: whether `gpg` exists in this build image at all.
-      #    This is the ONLY cumba-oss Gitea workflow that signs anything, and it has never
-      #    reached these steps (v0.2.0 died at the artifact download, v0.2.1 at `set -o
-      #    pipefail`), so the image has never had to provide gpg. A GitHub-hosted runner
-      #    has it preinstalled; a container need not. The preflight turns a bare
-      #    "gpg: command not found" into a named cause. If it fires, add gnupg to the
-      #    image (preferred) or install it in this step.
+      # ✅ RESOLVED 2026-09-07: `gpg` IS present. maven-with-nodejs installs gnupg
+      #    explicitly, alongside bzip2, zip/unzip, docker.io, python3 and jq. This comment
+      #    previously read UNVERIFIED, which was honest at the time -- this is the ONLY
+      #    cumba-oss Gitea workflow that signs anything and it had never reached these
+      #    steps (v0.2.0 died at the artifact download, v0.2.1 at `set -o pipefail`), so
+      #    the image had never had to provide gpg.
+      #    ⚠ Still UNEXERCISED: present in the image is not the same as proven in a run.
+      #    These steps have yet to execute end to end here. The preflight therefore stays
+      #    -- it costs one `command -v` and turns a future image change into a named cause
+      #    rather than a bare "gpg: command not found" three steps later.
       - name: Import signing key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
