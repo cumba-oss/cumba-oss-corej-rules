@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG9672 expect=violation domain=QS
+#note "The deliberate, documented residual: QS scores are numeric and unitless, so the rule fires although a unit is genuinely not applicable - hence Executability 'Possible Overreporting' and Severity Warning. What the design buys is granularity: ONE dataset-level warning instead of the one-per-record flood CG0425 produced here before the split. Narrowing further needs the sheet's undefined 'units are applicable for the result' clause, which is sheet issue #171."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset QS class=FINDINGS label="Questionnaires"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSTESTCD type=Char label="Question Short Name"
+col QSSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | QS | 01-701-1015 | 1 | ADAS01 | 3
+CDISCPILOT01 | QS | 01-701-1015 | 2 | ADAS02 | 5

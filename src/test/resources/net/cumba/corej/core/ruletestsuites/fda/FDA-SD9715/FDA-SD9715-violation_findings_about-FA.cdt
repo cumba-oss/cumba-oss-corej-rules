@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD9715 expect=violation domain=FA
+#note "Pins the FINDINGS ABOUT class entry, which the FDA sheet names explicitly ('FINDINGS, FINDINGS ABOUT') and the CDISC sister cannot carry - the CDISC workbook's Class vocabulary has no Findings-About code. FA carries the full FASTRESC/FASTRESN/FASTRESU set (FASTRESU is Permissible), so the same absence is reachable here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FAOBJ    type=Char label="Object of the Observation"
+col FASTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | SEV | RASH | 3
+CDISCPILOT01 | FA | 01-701-1015 | 2 | SEV | NAUSEA | 2

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG9672 expect=violation domain=LB
+#note "The sister half of the CG0425 pair (minted 2026-09-07). LB reports numeric standardised results but ships no LBSTRESU column at all. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify - which is the whole point of the split: CG0425 keeps per-row precision where the column exists, this rule reports its absence once instead of flooding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 5.5
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | 40
