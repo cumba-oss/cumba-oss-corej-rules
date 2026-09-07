@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0288 expect=violation domain=TS
+#note "Row 1 populates BOTH TSVAL and TSVALNF, which the sheet's 'Either TSVAL or TSVALNF is populated, but not both' forbids. Since the R-5.25 split (2026-09-07) this rule owns ONLY that half; the both-empty half is CDISC-SEND-0288-A. The two halves are mutually exclusive, so no record can be reported by both. Rows 2 and 3 populate exactly one each and stay clean."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | SPECIES | RAT   | NA
+S1 | TS | 2 | STRAIN  | WISTAR |
+S1 | TS | 3 | STSTDTC |       | NA
