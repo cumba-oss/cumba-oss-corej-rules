@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0029 expect=skipped domain=LB
+#note "dataset LB without the LBSTRESU column. Requirements.Variables.All [--STRESU] gates the rule out -> auditable skip, not a finding on the numeric row 1. Distinct from the QS scenario, which skips on Domains.Exclude instead. Mirrors PMDA-SD0026-skipped_no_orresu_column-LB: the earlier fire-on-absent arm was an authoring asymmetry, not a sheet difference - both sheets say the unit 'should not be null' and neither mentions column absence."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+---
+S1 | LB | 001 | 1 | GLUC  | 7.2
+S1 | LB | 001 | 2 | HBSAG | NEGATIVE

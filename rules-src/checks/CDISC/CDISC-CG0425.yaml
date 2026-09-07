@@ -2,18 +2,24 @@ Core:
   Id: "CDISC-CG0425"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when Character Result/Finding in Standard Format (--STRESC)\
-  \ is populated but Standard Units (--STRESU) is empty."
-Executability: "Partially Executable - Possible Overreporting"
+Description: "Raise a warning when a numeric Character Result/Finding in Standard Format\
+  \ (--STRESC) is populated but Standard Units (--STRESU) is empty."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
     - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESU"
+    - "--STRESC"
 Check:
   expression: >-
-    not empty(--STRESC) and empty(--STRESU)
+    not empty(--STRESC) and --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/ and empty(--STRESU)
 Outcome:
-  Message: "--STRESU is empty when --STRESC is populated."
+  Message: "--STRESU is empty when a numeric --STRESC is provided."
   Output_Variables:
   - "--STRESC"
   - "--STRESU"
