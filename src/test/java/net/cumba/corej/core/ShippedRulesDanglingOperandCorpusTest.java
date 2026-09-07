@@ -77,7 +77,6 @@ class ShippedRulesDanglingOperandCorpusTest
     {
         List<String> errors = new ArrayList<>();
         int packages = 0;
-        int rules = 0;
         for (Path file : listRulePackages(folder))
         {
             packages++;
@@ -88,7 +87,6 @@ class ShippedRulesDanglingOperandCorpusTest
                 {
                     continue;
                 }
-                rules++;
                 String loadError = rule.getLoadError();
                 if (loadError != null && loadError.contains(MARKER))
                 {

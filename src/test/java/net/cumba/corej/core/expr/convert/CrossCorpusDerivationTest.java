@@ -200,7 +200,6 @@ class CrossCorpusDerivationTest
 
         List<String> diffs = new ArrayList<>();
         List<String> loadErrors = new ArrayList<>();
-        int entries = 0;
         for (Path pkgFile : packages)
         {
             RulePackage pkg = loadStripped(pkgFile, null);
@@ -208,7 +207,6 @@ class CrossCorpusDerivationTest
             {
                 String id = e.getKey();
                 Rule rule = e.getValue();
-                entries++;
                 if (rule.getLoadError() != null)
                 {
                     loadErrors.add(pkgFile.getFileName() + " " + id + ": " + rule.getLoadError());
@@ -362,13 +360,11 @@ class CrossCorpusDerivationTest
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
         List<String> offenders = new ArrayList<>();
-        int entries = 0;
         for (Path pkgFile : packages)
         {
             JsonNode rules = JSON.readTree(pkgFile.toFile()).get("rules");
             for (Map.Entry<String, JsonNode> e : rules.properties())
             {
-                entries++;
                 if (e.getValue().has("Rule_Type"))
                 {
                     offenders.add(pkgFile.getFileName() + " " + e.getKey() + ": Rule_Type");

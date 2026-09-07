@@ -60,10 +60,8 @@ class ExpressionTextIdempotenceTest
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    /** Floors, not equalities: both corpora grow. */
-    private static final int MIN_SHIPPED = 3700;
-
-    private static final int MIN_AUTHORED = 3700;
+    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
+    // which this subset deliberately is not. Enforced internally over the whole corpus.
 
     @Test
     void p4aShippedExpressionsAreAFixedPointOfPrintAfterParse()

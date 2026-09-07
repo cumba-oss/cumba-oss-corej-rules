@@ -507,16 +507,11 @@ class DefineDatasetChannelTest
 
     // --- the shipped corpus is unaffected ---------------------------------------------
 
-    /**
-     * The specs that carried a {@code define_xml} block when P1.1 landed — all variable level. New
-     * dataset-level specs belong to P2/P3/P5 and do not need to be added here; this list pins the
-     * pre-existing seven against a silent shape reinterpretation.
-     */
-    private static final List<String> SHIPPED_DEFINE_SPECS = List.of("CORE-000929.yaml",
-            "CORE-001081.yaml", "DRAFT-900021.yaml", "DRAFT-900022.yaml", "DRAFT-900023.yaml",
-            "DRAFT-900024.yaml", "FDA-SD0059.yaml");
+    // ⚠ The SHIPPED_DEFINE_SPECS pin was dropped on extraction: it named the specs present
+    // when P1.1 landed internally, which this filtered subset deliberately does not mirror.
 
     // --- helpers ----------------------------------------------------------------------
+
 
     private static SpecSchema load(Path tmp, String defineBlock) throws IOException
     {

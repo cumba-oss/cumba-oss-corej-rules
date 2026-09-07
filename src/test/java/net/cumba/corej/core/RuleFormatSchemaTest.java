@@ -35,13 +35,8 @@ class RuleFormatSchemaTest
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /**
-     * Floor on the number of packages the manifest must declare — the shipped corpus is 58
-     * family-scoped packages plus the {@code packages.json} manifest itself. ⚑ It grew from 56 when
-     * {@code DRAFT-900044} declared ADaMIG 1.0 / 1.1, for which the DRAFT family previously shipped
-     * no package at all. Deliberately a FLOOR, so corpus growth does not red it.
-     */
-    private static final int SHIPPED_PACKAGES = 56;
+    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
+    // which this subset deliberately is not. Enforced internally over the whole corpus.
 
     private static Schema schema() throws Exception
     {

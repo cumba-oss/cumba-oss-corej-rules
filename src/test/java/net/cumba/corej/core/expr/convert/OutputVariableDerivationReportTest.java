@@ -51,7 +51,7 @@ class OutputVariableDerivationReportTest
 
     private static final Path REPORT = Path.of("target", "output-variable-derivation-report.md");
 
-    private record Info(String family, List<String> authored, List<String> delta,
+    private record FamilyDerivation(String family, List<String> authored, List<String> delta,
             List<String> pureDerived)
     {
     }
@@ -59,7 +59,7 @@ class OutputVariableDerivationReportTest
     @Test
     void writeDerivationReport() throws IOException
     {
-        Map<String, Info> byRule = new LinkedHashMap<>();
+        Map<String, FamilyDerivation> byRule = new LinkedHashMap<>();
         List<Path> packages;
         try (Stream<Path> s = Files.list(RULES_DIR))
         {
@@ -104,7 +104,7 @@ class OutputVariableDerivationReportTest
     }
 
 
-    private static Info analyse(Rule rule, String family)
+    private static FamilyDerivation analyse(Rule rule, String family)
     {
         List<String> authored = rule.getOutcome() != null
                 && rule.getOutcome().getOutputVariables() != null
@@ -126,12 +126,13 @@ class OutputVariableDerivationReportTest
             pureDerived = OutputVariableDeriver.derive(rule);
             outcome.setOutputVariables(saved);
         }
-        return new Info(family, authored, delta, pureDerived);
+        return new FamilyDerivation(family, authored, delta, pureDerived);
     }
 
 
     /** Specs whose {@code coreId} names a rule with a non-empty delta — the lane-C cost. */
-    private static List<String> parityCrossCheck(Map<String, Info> byRule) throws IOException
+    private static List<String> parityCrossCheck(Map<String, FamilyDerivation> byRule)
+        throws IOException
     {
         if (!Files.isDirectory(SPECS_DIR))
         {
@@ -150,7 +151,7 @@ class OutputVariableDerivationReportTest
             JsonNode coreId = root.path("rule").path("coreId");
             if (coreId.isTextual())
             {
-                Info info = byRule.get(coreId.asText());
+                FamilyDerivation info = byRule.get(coreId.asText());
                 if (info != null && !info.delta().isEmpty())
                 {
                     affected.add(spec.getFileName().toString() + " (" + coreId.asText() + ": "
@@ -186,7 +187,7 @@ class OutputVariableDerivationReportTest
     }
 
 
-    private static String render(Map<String, Info> byRule, List<String> affectedSpecs)
+    private static String render(Map<String, FamilyDerivation> byRule, List<String> affectedSpecs)
     {
         int total = byRule.size();
         int noDelta = 0;
@@ -197,7 +198,7 @@ class OutputVariableDerivationReportTest
         Map<String, int[]> perFamily = new TreeMap<>(); // family -> [rules, withDelta, entries]
         Map<String, Integer> classCount = new TreeMap<>();
         Map<Integer, Integer> sizeHistogram = new TreeMap<>();
-        for (Info info : byRule.values())
+        for (FamilyDerivation info : byRule.values())
         {
             int[] fam = perFamily.computeIfAbsent(info.family(), _ -> new int[3]);
             fam[0]++;
@@ -278,7 +279,7 @@ class OutputVariableDerivationReportTest
             sb.append("- ").append(line).append('\n');
         }
         sb.append("\n## 7. Full delta list\n\n| rule | family | delta |\n|---|---|---|\n");
-        for (Map.Entry<String, Info> e : byRule.entrySet())
+        for (Map.Entry<String, FamilyDerivation> e : byRule.entrySet())
         {
             if (!e.getValue().delta().isEmpty())
             {

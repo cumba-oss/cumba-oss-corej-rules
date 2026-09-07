@@ -37,20 +37,18 @@ class SplitByOperationCorpusGateTest
 
     private static final Path SRC_CHECKS = Path.of("rules-src", "checks");
 
-    /** Floor against a vacuously-green scan over an empty or mis-pointed corpus. */
-    private static final int MIN_SCANNED = 3700;
+    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
+    // which this subset deliberately is not. Enforced internally over the whole corpus.
 
     @Test
     void noRuleDeclaresASplitByOperation() throws IOException
     {
         List<String> offenders = new ArrayList<>();
-        int scanned = 0;
         try (Stream<Path> files = Files.walk(SRC_CHECKS))
         {
             for (Path file : files.filter(p -> p.getFileName().toString().endsWith(".yaml"))
                     .sorted().toList())
             {
-                scanned++;
                 JsonNode rule = YAML.readTree(Files.readString(file));
                 JsonNode ops = rule.get("Operations");
                 if (ops == null || !ops.isArray())

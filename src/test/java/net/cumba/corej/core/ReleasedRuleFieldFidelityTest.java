@@ -54,9 +54,6 @@ class ReleasedRuleFieldFidelityTest
 
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory());
 
-    /** Floor on the population, so a run that read nothing cannot pass. */
-    private static final int MIN_RULES = 3700;
-
     /**
      * Entries whose {@code Outcome.Output_Variables} is absent or empty, measured 2026-09-02:
      * <b>493 absent + 6 empty = 499</b>, across 123 distinct rule ids.
@@ -91,7 +88,6 @@ class ReleasedRuleFieldFidelityTest
     {
         Map<String, String> authored = authoredDescriptions();
         List<String> offenders = new ArrayList<>();
-        int checked = 0;
 
         for (Map.Entry<String, Rule> e : shippedRules().entrySet())
         {
@@ -101,7 +97,6 @@ class ReleasedRuleFieldFidelityTest
                 offenders.add(coreId + ": shipped but has no rules-src/checks source file");
                 continue;
             }
-            checked++;
             String want = authored.get(coreId);
             String got = e.getValue().getDescription();
             if (want == null ? got != null : !want.equals(got))
@@ -112,6 +107,8 @@ class ReleasedRuleFieldFidelityTest
 
         // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
         // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // The MIN_RULES constant and the population counter it compared against were removed
+        // with it (2026-09-07) -- they had been left behind, unread, by that extraction.
         assertEquals(List.of(), offenders.size() > 25 ? offenders.subList(0, 25) : offenders,
                 offenders.size() + " shipped rules do not carry their authored Description. It is"
                         + " report content and no scenario fixture asserts on it, so a"
@@ -136,7 +133,6 @@ class ReleasedRuleFieldFidelityTest
     {
         List<String> noMessage = new ArrayList<>();
         List<String> notDerived = new ArrayList<>();
-        int entries = 0;
         int derivedEntries = 0;
 
         for (Path pkg : shippedPackages())
@@ -148,7 +144,6 @@ class ReleasedRuleFieldFidelityTest
 
             for (Map.Entry<String, Rule> e : rules.entrySet())
             {
-                entries++;
                 String coreId = e.getKey();
                 Rule rule = e.getValue();
                 String where = pkg.getFileName() + " / " + coreId;
@@ -181,6 +176,8 @@ class ReleasedRuleFieldFidelityTest
 
         // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
         // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // The MIN_RULES constant and the population counter it compared against were removed
+        // with it (2026-09-07) -- they had been left behind, unread, by that extraction.
         assertEquals(List.of(), noMessage.size() > 25 ? noMessage.subList(0, 25) : noMessage,
                 noMessage.size() + " shipped rules have no Outcome.Message. Every row of the"
                         + " Rules Report falls back to it, so a rule without one reports blank.");

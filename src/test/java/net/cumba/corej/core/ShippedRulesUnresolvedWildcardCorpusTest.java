@@ -89,7 +89,6 @@ class ShippedRulesUnresolvedWildcardCorpusTest
     {
         List<String> findings = new ArrayList<>();
         int packages = 0;
-        int rules = 0;
         for (Path file : listRulePackages(folder))
         {
             packages++;
@@ -100,7 +99,6 @@ class ShippedRulesUnresolvedWildcardCorpusTest
                 {
                     continue;
                 }
-                rules++;
                 collect(findings, file, rule, rule.getLoadError());
                 collect(findings, file, rule, rule.getLoadWarning());
             }

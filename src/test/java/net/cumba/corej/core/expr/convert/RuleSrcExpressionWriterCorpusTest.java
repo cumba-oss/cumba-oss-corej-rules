@@ -58,8 +58,8 @@ class RuleSrcExpressionWriterCorpusTest
 
     private static final Path RULES_DIR = CorpusPaths.rules();
 
-    /** Floor, not an equality: the corpus grows (3 781 at authoring time). */
-    private static final int MIN_AUTHORED = 3700;
+    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
+    // which this subset deliberately is not. Enforced internally over the whole corpus.
 
     /**
      * The five parked rules (§2): converted in place, still parked. {@code CDISC-SEND-0202} &ndash;

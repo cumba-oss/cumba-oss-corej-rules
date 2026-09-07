@@ -25,7 +25,6 @@ import net.cumba.corej.core.expr.eval.DomainScan;
 import net.cumba.corej.core.expr.eval.OperationKinds;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Sensitivity;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -150,8 +149,9 @@ class DerivedFieldEquivalenceTest
      *
      * <ol>
      * <li>a rule carrying no {@code Sensitivity} gets it derived;</li>
-     * <li><i>(clause 2 — an authored value wins — is
-     * {@link #anAuthoredValueSurvivesTheDerivation})</i>;</li>
+     * <li><i>(clause 2 — an authored value wins — is {@code anAuthoredValueSurvivesTheDerivation},
+     * which is internal-only: the test was dropped by the OSS extraction, so this cannot be a
+     * resolvable link here)</i>;</li>
      * <li><i>(clause 3 — the seeding order — is
      * {@link #theSensitivityDerivationIsTypeFreeBecauseTheGenericPresenceOperatorIsRetired})</i>;</li>
      * <li>an applied derivation records a <b>rationale</b>;</li>
@@ -261,17 +261,6 @@ class DerivedFieldEquivalenceTest
                 Rule.class);
         assertEquals(Sensitivity.DATASET, RuleClassifier.deriveSensitivity(column).value(),
                 "a column-presence leaf reads the dataset under evaluation");
-    }
-
-
-    /** The first {@code rules-src} file whose name is {@code id}.yaml, or {@code null}. */
-    private static @Nullable Path locate(String id) throws IOException
-    {
-        try (Stream<Path> walk = Files.walk(CHECKS_DIR))
-        {
-            return walk.filter(p -> p.getFileName().toString().equals(id + ".yaml")).findFirst()
-                    .orElse(null);
-        }
     }
 
 
