@@ -1,0 +1,72 @@
+Core:
+  Id: "CDISC-CG0033-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Visits (SV) dataset carries no SVPRESP\
+  \ variable and VISITNUM is populated for a visit whose VISIT name does not mark it\
+  \ unscheduled or unplanned, but its value does not match any VISITNUM value in the\
+  \ Trial Visits (TV) dataset."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "USUBJID"
+  - "VISITNUM"
+  Name: "SV"
+Operations:
+- id: "$tv_visitnum"
+  expression: "distinct(VISITNUM, domain=\"TV\")"
+Check:
+  expression: >-
+    var_exists(TV.VISITNUM) and not empty(VISITNUM) and not var_exists(SV.SVPRESP) and not
+    empty(VISIT) and not contains(upper(VISIT), upper("UNSCHEDUL")) and not contains(upper(VISIT),
+    upper("UNPLAN")) and VISITNUM not in $tv_visitnum
+Outcome:
+  Message: "SVPRESP is not available, and VISITNUM for a visit whose VISIT name does\
+    \ not mark it unscheduled or unplanned does not match any VISITNUM value in the TV\
+    \ dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "$tv_visitnum"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISITNUM"
+  Condition: "VISITNUM ^= null and is planned"
+  Rule: "VISITNUM in TV.VISITNUM"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0033"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0033"
+        Version: "2"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0033"
+        Version: "2"
+      Version: "2.0"
