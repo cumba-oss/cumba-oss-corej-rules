@@ -1,0 +1,40 @@
+#!RuleTest
+#test CDISC-CG0031 expect=violation domain=LB
+#note "Positive control for the SVPRESP-available arm, replacing the coverage that left when CDISC-CG0031-invalid_svpresp_not_in_ig-LB moved to the sibling (R-5.25 split, sheet issue #176). SV carries SVPRESP and row 2's visit is flagged Y, so this rule owns the record: WEEK 99 is not in TV -> fires. ⚠ Note the precedence the split makes explicit - this arm trusts SVPRESP and never reads the VISIT name, so a visit flagged Y still fires however it is named."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 2  | BASELINE | Y
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99  | Y
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

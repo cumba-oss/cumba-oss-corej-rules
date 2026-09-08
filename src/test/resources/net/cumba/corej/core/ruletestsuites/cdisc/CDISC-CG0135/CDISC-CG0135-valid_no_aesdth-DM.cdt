@@ -1,6 +1,6 @@
 #!RuleTest
-#test CDISC-CG0135 expect=noViolation domain=DM
-#note "ADAPTED-FROM fda/FDA-SD1255/FDA-SD1255-valid-no_aesdth-DM.cdt (verbatim; renamed). AE without the AESDTH column - the AUTHORED var_exists(AE.AESDTH) guard keeps it silent."
+#test CDISC-CG0135 expect=skipped domain=DM
+#note "⚠ RE-CUT 2026-09-08 (R-4.12 hoist): expect moved noViolation -> skipped. `var_exists(AE.AESDTH)` was a top-level conjunct, so an absent AE made the whole AND false and the rule reported a SILENT ZERO -- which is what this scenario used to pin. It is now Requirements.Variables.All ["AE.AESDTH"], so the rule is gated out and reports SKIPPED naming the variable. Same violations either way; only the status channel moves, which is R-4.11's whole argument. If this EXECUTES again the entry was dropped -- escalate, do not rewrite the pin. PRIOR NOTE: ADAPTED-FROM fda/FDA-SD1255/FDA-SD1255-valid-no_aesdth-DM.cdt (verbatim; renamed). AE without the AESDTH column - the AUTHORED var_exists(AE.AESDTH) guard keeps it silent."
 #library standard=sdtmig version=3-4
 dataset DM class="SPECIAL PURPOSE" label="Demographics"
 col STUDYID type=Char label="Study Identifier"

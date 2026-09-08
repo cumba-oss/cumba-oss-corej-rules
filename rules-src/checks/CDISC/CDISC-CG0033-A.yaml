@@ -15,6 +15,7 @@ Requirements:
   Variables:
     All:
     - "VISITNUM"
+    - "TV.VISITNUM"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -26,9 +27,9 @@ Operations:
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    var_exists(TV.VISITNUM) and not empty(VISITNUM) and not var_exists(SV.SVPRESP) and not
-    empty(VISIT) and not contains(upper(VISIT), upper("UNSCHEDUL")) and not contains(upper(VISIT),
-    upper("UNPLAN")) and VISITNUM not in $tv_visitnum
+    not empty(VISITNUM) and not var_exists(SV.SVPRESP) and not empty(VISIT) and not
+    contains(upper(VISIT), upper("UNSCHEDUL")) and not contains(upper(VISIT), upper("UNPLAN")) and
+    VISITNUM not in $tv_visitnum
 Outcome:
   Message: "SVPRESP is not available, and VISITNUM for a visit whose VISIT name does\
     \ not mark it unscheduled or unplanned does not match any VISITNUM value in the TV\

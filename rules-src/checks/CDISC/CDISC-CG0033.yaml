@@ -14,6 +14,8 @@ Requirements:
   Variables:
     All:
     - "VISITNUM"
+    - "TV.VISITNUM"
+    - "SV.SVPRESP"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -25,8 +27,7 @@ Operations:
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    var_exists(TV.VISITNUM) and not empty(VISITNUM) and var_exists(SV.SVPRESP) and SV.SVPRESP == "Y"
-    and VISITNUM not in $tv_visitnum
+    not empty(VISITNUM) and SV.SVPRESP == "Y" and VISITNUM not in $tv_visitnum
 Outcome:
   Message: "VISITNUM for a visit flagged pre-specified in SV does not match any VISITNUM\
     \ value in the TV dataset."
