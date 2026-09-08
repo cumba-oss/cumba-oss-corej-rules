@@ -19,7 +19,12 @@ Requirements:
     - "DOMAIN"
 Operations:
 - id: "$domain_codes"
-  expression: "codelist_terms(codelists=[DOMAIN], level=\"term\", returntype=\"code\"\
+  # Re-authored returntype "code" -> "value" when coreJ began honouring the parameter
+  # (PLAN-codelist-terms-returntype.md P4): `suffix(DOMAIN, 2)` is a 2-character SDTM domain
+  # SUBMISSION VALUE (AE, CM, VS), so the comparison list must be submission values. The rule
+  # was correct before only because coreJ ignored returntype and always answered values;
+  # Python's "code" would hand it NCI C-codes and flag every conformant AP-- dataset.
+  expression: "codelist_terms(codelists=[DOMAIN], level=\"term\", returntype=\"value\"\
     )"
 Check:
   expression: >-

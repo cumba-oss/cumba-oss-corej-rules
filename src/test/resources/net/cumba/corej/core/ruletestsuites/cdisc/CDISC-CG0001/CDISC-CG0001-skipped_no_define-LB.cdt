@@ -1,8 +1,10 @@
 #!RuleTest
 #test CDISC-CG0001 expect=skipped domain=LB
-#note "Full #library block present, but no Define-XML channel at all -> the Check's DEFINE-level accessors make the rule SKIP."
+#note "Full #library block present, but no Define-XML channel at all -> the Check's DEFINE-level accessors make the rule SKIP. ⚠ Channel split (PLAN-codelist-terms-returntype.md P2): the real 2-letter submission values (AE, LB) ride #library codelist-terms, the NCI C-codes ride #library codelist-term-ccodes, and the codelist's own ccode/preferred term ride #library codelist-meta. Do NOT put C-codes back into codelist-terms -- feeding C-codes down the submission-value channel was the self-disarming fixture shape this replaces."
 #library standard=sdtmig version=3-4
-#library codelist-terms DOMAIN C11111 C22222
+#library codelist-terms DOMAIN AE LB
+#library codelist-term-ccodes DOMAIN AE=C22222 LB=C11111
+#library codelist-meta DOMAIN ccode=C66734 pref="SDTM Domain Abbreviation"
 dataset LB class=FINDINGS
 col STUDYID  type=Char
 col DOMAIN   type=Char

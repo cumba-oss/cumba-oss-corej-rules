@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0155 expect=skipped domain=APRELSUB
+#note "Pins `Scope.Domains.Exclude: [APRELSUB]`. APRELSUB is a real Associated Persons dataset whose DOMAIN is 8 characters, so it would fire the first disjunct of the Check if it were in scope; the explicit exclusion is the only thing keeping it silent, and `expect=skipped` asserts the rule never executed rather than merely finding nothing. Delete the exclusion from the rule and this scenario must go RED. ⚠ The scope pre-gate matches on the DOMAIN CELL as well as the dataset name (`describeScopeMismatch` feeds `OperationExecutor.unsplitNameFromData`), so renaming only the dataset does not take this fixture out of the exclusion — verified 2026-09-08 by mutating both name and cell to `APCM`, which reddens it with `expect=skipped but the rule executed`. ⚠⚠ The `#library codelist-terms DOMAIN` line carries real 2-letter SDTM SUBMISSION VALUES, never NCI C-codes — see the sibling scenarios. The rule's operation declares `returntype=\"value\"` and coreJ honours it. See plans/PLAN-codelist-terms-returntype.md."
+#library standard=sdtmig version=3-3
+#library codelist-terms DOMAIN AE CM VS LB
+dataset APRELSUB label="Associated Persons Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+---
+CDISCPILOT01 | APRELSUB | AP-701-1015 | 01-701-1015
