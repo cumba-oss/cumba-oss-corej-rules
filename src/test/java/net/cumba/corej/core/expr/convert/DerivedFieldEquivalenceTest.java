@@ -92,7 +92,15 @@ class DerivedFieldEquivalenceTest
             // message directs to "declare a dataset-level Sensitivity instead". The finding (TV
             // absent while SV is present) attaches to SV, so the authored `Dataset` is correct
             // and the derivation is documented-wrong for this shape.
-            "CDISC-CG9671", "CORE-009705", "FDA-SD9713", "PMDA-SD9713");
+            "CDISC-CG9671", "CORE-009705", "FDA-SD9713", "PMDA-SD9713",
+            // 12 -> 15 on 2026-09-07 (R-4.11b, the --STRESU presence sisters): the finding is that
+            // the --STRESU COLUMN is not in the dataset — one dataset-level fact. The derivation
+            // reads `Record` because the existential witness is a per-record leaf
+            // (`--STRESC =~ /numeric/`), so the per-record reading would multiply one
+            // column-absence finding by the number of numeric results — the flood these rules
+            // exist to replace. Authored `Dataset` is correct; the derivation is documented-wrong
+            // for this shape. Kept in step with CrossCorpusDerivationTest.
+            "CDISC-CG9672", "FDA-SD9715", "PMDA-SD9715");
 
     /**
      * One {@code rules-src} fixture per evaluation domain ({@code {}}, {@code {VAR}},

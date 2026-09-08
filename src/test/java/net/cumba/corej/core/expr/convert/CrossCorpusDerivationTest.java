@@ -109,7 +109,13 @@ class CrossCorpusDerivationTest
             // 8 -> 12 on 2026-08-19 (wave TA-6, review H2): the SV-scoped conditional TV
             // presence mints author `Dataset` because the derivation's `Study` would trip the
             // loader's unrestricted-scope gate; see DerivedFieldEquivalenceTest.
-            "CDISC-CG9671", "CORE-009705", "FDA-SD9713", "PMDA-SD9713");
+            "CDISC-CG9671", "CORE-009705", "FDA-SD9713", "PMDA-SD9713",
+            // 12 -> 15 on 2026-09-07 (R-4.11b, the --STRESU presence sisters): the finding is that
+            // the --STRESU COLUMN is absent — one dataset-level fact — while the existential
+            // witness is a per-record leaf, so the derivation reads `Record` and the per-record
+            // reading would multiply the finding by the number of numeric results. Kept in step
+            // with DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
+            "CDISC-CG9672", "FDA-SD9715", "PMDA-SD9715");
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}
