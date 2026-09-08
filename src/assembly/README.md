@@ -68,3 +68,9 @@ Nothing the validation report prints is affected; the published rule ids (`CG017
 
 ⛔ The **CORE rule family is not redistributed** in this archive. It is externally sourced
 and may not be redistributed as a set.
+
+⛔ The **DRAFT family is not released**. Those are candidate rules that are still being
+worked on — they are generated and tested in the repository, but deliberately kept out of
+every release archive, so no run against this corpus can execute an unpublished draft.
+One consequence is visible in `packages.json`: this archive carries **no TIG 1.0 package**,
+because the only non-CORE TIG rules are still drafts.

@@ -53,11 +53,20 @@ public final class CorpusPaths
     /** System property naming the generated Define-XML rule corpus directory. */
     public static final String DEFINE_RULES_PROPERTY = "defineCorpusDir";
 
+    /** System property naming the release-scoped copy of the CDISC rule corpus. */
+    public static final String RELEASE_RULES_PROPERTY = "releaseCorpusDir";
+
     /** Directory name of the generated CDISC rule corpus, under {@code target/}. */
     public static final String RULES_DIR_NAME = "rules";
 
     /** Directory name of the generated Define-XML rule corpus, under {@code target/}. */
     public static final String DEFINE_RULES_DIR_NAME = "rules-define";
+
+    /** Directory name of the release-scoped CDISC rule corpus, under {@code target/}. */
+    public static final String RELEASE_RULES_DIR_NAME = "rules-release";
+
+    /** The rule family that is authored and tested here but never released. */
+    public static final String UNRELEASED_FAMILY = "DRAFT";
 
     private CorpusPaths()
     {
@@ -97,6 +106,30 @@ public final class CorpusPaths
     public static Path rules(String aFile)
     {
         return rules().resolve(aFile);
+    }
+
+
+    /**
+     * The <b>release-scoped</b> CDISC rule corpus — {@link #rules()} minus every package of the
+     * {@link #UNRELEASED_FAMILY}. This is the tree the assembly packs into the release archive
+     * (under the archive-internal name {@code rules/}, unchanged for consumers); {@link #rules()}
+     * is the full corpus the test suite reads.
+     *
+     * <p>
+     * ⭐ <b>Two trees, and the full one is the default on purpose.</b> The DRAFT family is a live
+     * authoring lane: its rules are generated, schema-validated, lint-scanned and executed by their
+     * {@code .cdt} scenarios and specs exactly like any other family, and every corpus test reads
+     * {@link #rules()} to keep it that way. Excluding DRAFT from {@link #rules()} instead would
+     * have taken 30-odd corpus lints off the drafts in one move, silently — the drafts would rot
+     * unwatched, which is the opposite of why they are kept. So the exclusion happens once, at the
+     * release boundary, and is asserted there by {@code ReleaseCorpusTest}.
+     * </p>
+     *
+     * @return the release corpus root
+     */
+    public static Path releaseRules()
+    {
+        return resolve(RELEASE_RULES_PROPERTY, RELEASE_RULES_DIR_NAME);
     }
 
 

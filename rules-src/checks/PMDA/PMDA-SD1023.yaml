@@ -11,14 +11,17 @@ Scope:
   Domains:
     Exclude:
     - "TV"
+Requirements:
+  Variables:
+    All:
+    - "TV.VISIT"
 Operations:
 - id: "$tv_visit_keys"
   expression: "distinct([VISIT, VISITNUM], domain=\"TV\")"
 Check:
   expression: >-
-    var_exists(TV.VISIT) and not empty(VISIT) and not empty(VISITNUM) and not contains(upper(VISIT),
-    upper("UNSCHEDUL")) and not contains(upper(VISIT), upper("UNPLAN")) and tuple(VISIT, VISITNUM)
-    not in $tv_visit_keys
+    not empty(VISIT) and not empty(VISITNUM) and not contains(upper(VISIT), upper("UNSCHEDUL")) and
+    not contains(upper(VISIT), upper("UNPLAN")) and tuple(VISIT, VISITNUM) not in $tv_visit_keys
 Outcome:
   Message: "The (VISIT, VISITNUM) combination does not match any planned visit defined\
     \ in the Trial Visits (TV) dataset."

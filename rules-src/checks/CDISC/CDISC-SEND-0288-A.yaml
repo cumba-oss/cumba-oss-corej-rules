@@ -1,0 +1,81 @@
+Core:
+  Id: "CDISC-SEND-0288-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both the Parameter Value (TSVAL) and the Parameter\
+  \ Null Flavor (TSVALNF) variables are empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSVALNF"
+    - "TSVAL"
+Check:
+  expression: >-
+    empty(TSVAL) and empty(TSVALNF)
+Outcome:
+  Message: "Both TSVAL and TSVALNF are empty."
+  Output_Variables:
+  - "TSVAL"
+  - "TSVALNF"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVAL, TSVALNF"
+  Plain_Text_Explanation: "Either TSVAL or TSVALNF is populated, but not both."
+  Rule: "Either TSVAL or TSVALNF is populated, but not both."
+Source_Proposed:
+  Sheet_Issue: "#175"
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSVALNF"
+  Plain_Text_Explanation: "TSVALNF is populated when TSVAL is null."
+  Condition: "TSVAL = null"
+  Rule: "TSVALNF ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND288"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND288"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND288"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND288"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND288"
+        Version: "1"
+      Version: "5.0"

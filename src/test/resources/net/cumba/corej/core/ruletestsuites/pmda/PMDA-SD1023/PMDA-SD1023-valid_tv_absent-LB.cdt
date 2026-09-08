@@ -1,6 +1,6 @@
 #!RuleTest
-#test PMDA-SD1023 expect=noViolation domain=LB
-#note "CL-G.1 / EC-82 option (a) (wave TA-4): PMDA-SD1023 completes the Fix #246 family. TV is absent entirely, so $tv_visit_keys is the empty set and the vacuous-on-empty membership would be true on every row with a populated (VISIT, VISITNUM) - the flood EC-82 records. The top-level var_exists(TV.VISIT) guard, now byte-identical with FDA-SD1023's, resolves TV through the dataset resolver, finds nothing, and suppresses the rule with no finding."
+#test PMDA-SD1023 expect=skipped domain=LB
+#note "⚠ RE-CUT 2026-09-08 (R-4.12 hoist): expect moved noViolation -> skipped. `var_exists(TV.VISIT)` was a top-level conjunct, so an absent TV made the whole AND false and the rule reported a SILENT ZERO -- which is what this scenario used to pin. It is now Requirements.Variables.All ["TV.VISIT"], so the rule is gated out and reports SKIPPED naming the variable. Same violations either way; only the status channel moves, which is R-4.11's whole argument. If this EXECUTES again the entry was dropped -- escalate, do not rewrite the pin. PRIOR NOTE: CL-G.1 / EC-82 option (a) (wave TA-4): PMDA-SD1023 completes the Fix #246 family. TV is absent entirely, so $tv_visit_keys is the empty set and the vacuous-on-empty membership would be true on every row with a populated (VISIT, VISITNUM) - the flood EC-82 records. The top-level var_exists(TV.VISIT) guard, now byte-identical with FDA-SD1023's, resolves TV through the dataset resolver, finds nothing, and suppresses the rule with no finding."
 #library standard=sdtmig version=3-4
 dataset LB label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"

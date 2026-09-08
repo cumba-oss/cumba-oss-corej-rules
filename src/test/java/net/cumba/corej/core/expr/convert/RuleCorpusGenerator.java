@@ -31,7 +31,8 @@ import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
  *            │                                   · Sensitivity derive-and-validate
  *            │                                   · Requirements materialisation
  *            │
- *            └── RuleExprGenerator.generate ──&gt; rules/ + packages.json
+ *            ├── RuleExprGenerator.generate ──&gt; rules/ + packages.json          (all families)
+ *            └── RuleExprGenerator.generate ──&gt; rules-release/ + packages.json  (minus DRAFT)
  * </pre>
  *
  * <p>
@@ -75,13 +76,25 @@ public final class RuleCorpusGenerator
 
 
     /**
-     * Rebuilds the generated corpus from {@code rules-src/}.
+     * Rebuilds the generated corpus from {@code rules-src/}, in <b>two</b> scopes.
+     *
+     * <p>
+     * ⭐ <b>The full corpus and the release corpus.</b> {@code rules/} holds every family and is
+     * what the test suite reads; {@code rules-release/} holds the same packages minus
+     * {@link CorpusPaths#UNRELEASED_FAMILY}, and is what the assembly packs. Both are written from
+     * the <em>same</em> assembled nodes in the same run, so the released package bytes are the very
+     * bytes the corpus tests validated — the release tree is a subset, never a re-derivation. See
+     * {@link CorpusPaths#releaseRules()} for why the exclusion sits here and not in the assembler.
+     * </p>
      *
      * @param args
-     *            optionally the output directory. When absent the destination comes from
-     *            {@link CorpusPaths#rules()} — the {@code corpusDir} system property, else
-     *            {@code <module>/target/rules}. The build passes it explicitly (see this module's
-     *            pom); the {@code regen-rules-corpus} workflow does not, and gets the same default.
+     *            optionally the full-corpus output directory, then the release-corpus output
+     *            directory. When absent the destinations come from {@link CorpusPaths#rules()} and
+     *            {@link CorpusPaths#releaseRules()} — the {@code corpusDir} /
+     *            {@code releaseCorpusDir} system properties, else {@code <module>/target/rules} and
+     *            {@code <module>/target/rules-release}. The build passes both explicitly (see this
+     *            module's pom); the {@code regen-rules-corpus} workflow passes neither, and gets
+     *            the same defaults.
      * @throws IOException
      *             if the source corpus cannot be read or the output cannot be written
      */
@@ -89,6 +102,8 @@ public final class RuleCorpusGenerator
     {
         Path outputDir = args.length > 0 && !args[0].isBlank() ? Path.of(args[0])
                 : CorpusPaths.rules();
+        Path releaseDir = args.length > 1 && !args[1].isBlank() ? Path.of(args[1])
+                : CorpusPaths.releaseRules();
 
         RuleStorageAssembler assembler = new RuleStorageAssembler();
         // R9 — the ADaMIG->SDTMIG pairing (and every package's primary product) is DATA read here
@@ -123,6 +138,25 @@ public final class RuleCorpusGenerator
 
         ConversionReport report = RuleExprGenerator.generate(nativeShaped, manifest, outputDir);
         System.out.printf(Locale.ROOT, "[gen] %s%n", report);
+
+        // The release scope: the same nodes, minus the unreleased family. Filtering the already
+        // emitted list (not re-assembling) is what makes the two trees provably the same bytes.
+        Map<String, String> releaseShaped = new LinkedHashMap<>();
+        List<RulePackageManifest.Entry> releaseEntries = new ArrayList<>();
+        for (RulePackageManifest.Entry e : entries)
+        {
+            if (!CorpusPaths.UNRELEASED_FAMILY.equals(e.family()))
+            {
+                releaseShaped.put(e.file(), nativeShaped.get(e.file()));
+                releaseEntries.add(e);
+            }
+        }
+        System.out.printf(Locale.ROOT, "[release] %d of %d packages (%s excluded)%n",
+                releaseEntries.size(), entries.size(), CorpusPaths.UNRELEASED_FAMILY);
+        RulePackageManifest releaseManifest = new RulePackageManifest("rules-src", releaseEntries);
+        ConversionReport releaseReport = RuleExprGenerator.generate(releaseShaped, releaseManifest,
+                releaseDir);
+        System.out.printf(Locale.ROOT, "[release] %s%n", releaseReport);
     }
 
 }

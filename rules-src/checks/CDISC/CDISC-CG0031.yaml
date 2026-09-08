@@ -3,8 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when VISIT is populated with a value that does not match\
-  \ any VISIT value defined in the Trial Visits (TV) dataset, for a record where SVPRESP\
-  \ is not present or equals 'Y'."
+  \ any VISIT value defined in the Trial Visits (TV) dataset, for a visit the Subject\
+  \ Visits (SV) dataset flags as pre-specified (SVPRESP equals 'Y')."
 Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
@@ -14,6 +14,8 @@ Requirements:
   Variables:
     All:
     - "VISIT"
+    - "TV.VISIT"
+    - "SV.SVPRESP"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -25,11 +27,10 @@ Operations:
   expression: "distinct(VISIT, domain=\"TV\")"
 Check:
   expression: >-
-    var_exists(TV.VISIT) and (not var_exists(SV.SVPRESP) or SV.SVPRESP == "Y") and not empty(VISIT)
-    and VISIT not in $tv_visit
+    SV.SVPRESP == "Y" and not empty(VISIT) and VISIT not in $tv_visit
 Outcome:
-  Message: "VISIT value for a planned visit does not match any VISIT value in the\
-    \ TV dataset."
+  Message: "VISIT value for a visit flagged pre-specified in SV does not match any\
+    \ VISIT value in the TV dataset."
   Output_Variables:
   - "VISITNUM"
   - "VISIT"

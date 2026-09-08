@@ -1,6 +1,6 @@
 #!RuleTest
-#test CDISC-CG0031 expect=violation domain=LB
-#note "SDTMIG 3.2 has no SVPRESP in SV at all, so the not_exists arm of the pre-specified gate is true for every row. That is the authored fallback, not a flood: the Description states that when SVPRESP is not present all non-missing VISIT values are checked against TV.VISIT, and the two surviving conjuncts still decide. Row 1's BASELINE is in TV -> clean. Row 2's WEEK 99 is not -> fires. Row 3's VISIT is empty -> clean. One violation out of three rows, not three."
+#test CDISC-CG0031-A expect=violation domain=LB
+#note "SDTMIG 3.2 has no SVPRESP in SV at all, so this dataset is the SVPRESP-unavailable arm and belongs to this rule. ⚠ MOVED FROM CDISC-CG0031 2026-09-08 (R-5.25 split, sheet issue #176): it used to pin the parent's fallback, whose note read that when SVPRESP is not present all non-missing VISIT values are checked against TV.VISIT. That fallback was the maximum-overreporting assumption and is gone; planned-ness is now read from the VISIT name, the operationalisation FDA/PMDA-SD1023 already carry. The verdict is unchanged on this data: row 1 BASELINE is in TV -> clean; row 2 WEEK 99 marks nothing so it is treated as scheduled and is not in TV -> fires; row 3 VISIT empty -> clean. One violation out of three rows, not three."
 #library standard=sdtmig version=3-2
 #expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"

@@ -65,6 +65,33 @@ tag returns the same bytes.
 `packages.json` manifest. Generating rather than committing is deliberate: it keeps
 ~80 MB of derived JSON out of the repository's history, where it could never be removed.
 
+The same run also writes **`target/rules-release/`** — the same packages minus the `DRAFT`
+family, 32 of the 47 — and that is the tree the release archive packs. See below.
+
+## ⛔ The DRAFT family is generated and tested here, but never released
+
+`rules-src/checks/DRAFT/` holds candidate rules that are not ready to be published:
+unfinished scope, unproven checks, or an authority row that does not exist yet. They are
+kept because they are meant to be revisited and promoted — not because they are done.
+
+**They are not in any release archive.** The exclusion happens once, at the release
+boundary: `RuleCorpusGenerator` writes the full corpus to `target/rules/` and the
+release-scoped subset to `target/rules-release/`, and `src/assembly/dist.xml` packs only
+the latter. `ReleaseCorpusTest` pins all of it — that the released tree is byte-identical
+to the validated one, that it carries no `DRAFT-` package or rule id, and, crucially, that
+the full corpus still *has* a DRAFT family, so the exclusion can never quietly become an
+exclusion of nothing.
+
+⚠ **The drafts stay fully wired into the test suite on purpose.** Every corpus test, lint
+and `.cdt` scenario reads `target/rules/`, so a draft rule is schema-validated, lint-scanned
+and executed exactly like a published one. Excluding DRAFT from the generated corpus itself
+would have been a smaller change and would have taken some thirty corpus checks off the
+drafts in one edit, with nothing red — parked rules that nothing verifies rot in place.
+
+⚠ **This is why the public corpus has no TIG packages.** `rules-draft-tig-1-0.json` is the
+only TIG 1.0 package outside the unredistributable CORE family, so TIG coverage is absent
+from the released archive until those rules are promoted out of DRAFT.
+
 ## ⛔ The CORE rule family is not redistributed here
 
 `rules-src/checks/CORE/` and everything derived from it — its generated packages, its
@@ -76,7 +103,8 @@ own work. What is not shipped is the packaged CORE rule family.
 
 Consequences you will see in the code:
 
-- 47 rule packages here, against 59 internally — the 12 CORE-family packages are absent.
+- 47 generated packages here, against 58 internally — the 11 CORE-family packages are
+  absent. Of the 47, **32 are released** (the other 15 are the DRAFT family, see above).
 - Corpus-size floors that asserted the **full** internal corpus were removed from the
   package-generation validators rather than lowered, because this subset deliberately is
   not that corpus. A subset-safe non-vacuity check (`packages > 0`) was kept, so an

@@ -22,9 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
-import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.RulePackageManifest;
-import net.cumba.corej.core.exec.ProviderRequirements;
 import net.cumba.corej.core.exec.RuleClassifier;
 import net.cumba.corej.core.model.Executability;
 import net.cumba.corej.core.model.Rule;
@@ -64,8 +62,10 @@ import org.jspecify.annotations.Nullable;
  * Run it through {@link RuleCorpusGenerator} and never directly: in this repository the build's
  * {@code exec-maven-plugin} binding at {@code process-test-classes} drives that generator on the
  * reactor classpath, and upstream the internal {@code regen-rules-corpus} workflow (not distributed
- * with this repository) drives it on a classpath guarded against a stale, installed engine. There
- * is deliberately no standalone entry point here.
+ * with this repository) drives it on a classpath resolved from that tree. There is deliberately no
+ * standalone entry point here. ⚑ That upstream workflow's stale-engine guard was RETIRED
+ * 2026-09-08: the shipped corpus no longer carries anything the engine derived, so a stale engine
+ * can only crash a generator rather than silently write a different corpus.
  * </p>
  */
 public final class RuleStorageAssembler
@@ -373,80 +373,24 @@ public final class RuleStorageAssembler
             // position like any other field (PLAN-retire-corpus-transforms.md phase 1, #10).
             derive(check);
         }
-        ProviderRequirements providers = deriveProviders(check);
-        boolean requirementsPlaced = false;
+        // ⚑ PROVIDER REQUIREMENTS ARE NO LONGER MATERIALISED (owner ruling 2026-09-08).
+        // Requirements.Library / .Define / .Dictionary DOCUMENT a fact the engine computes
+        // (ProviderRequirements); they never declare one. RulePackageLoader's gate R5 says so in
+        // terms: "Omitting it is always legal ... the runtime arms read the derivation
+        // regardless". Materialising them was the last step that made the SHIPPED BYTES depend on
+        // the engine's semantics -- the same YAML through a different engine produced a different
+        // corpus, silently. They are now passed through exactly like Sensitivity: authored ships,
+        // absent stays absent. No rule authors them, so the corpus simply stops carrying them.
+        // Gate R5 still validates an AUTHORED value against the derivation.
         for (Map.Entry<String, JsonNode> field : check.properties())
         {
             if ("Standards".equals(field.getKey()))
             {
                 continue;
             }
-            if ("Requirements".equals(field.getKey()) && field.getValue().isObject())
-            {
-                rule.set("Requirements",
-                        materialiseProviders((ObjectNode) field.getValue().deepCopy(), providers));
-                requirementsPlaced = true;
-                continue;
-            }
             rule.set(field.getKey(), field.getValue().deepCopy());
-            if ("Scope".equals(field.getKey()) && !check.has("Requirements"))
-            {
-                // canonical field position: Scope, Requirements, Match_Datasets (TOP_ORDER)
-                ObjectNode materialised = materialiseProviders(JSON.createObjectNode(), providers);
-                if (!materialised.isEmpty())
-                {
-                    rule.set("Requirements", materialised);
-                }
-                requirementsPlaced = true;
-            }
-        }
-        if (!requirementsPlaced
-                && (providers.library() || providers.define() || providers.dictionary()))
-        {
-            // Every authored rule carries a top-level Scope: (3 804/3 804, measured 2026-08-24), so
-            // the loop above always finds the anchor. A rule that does not would silently lose its
-            // derived providers, which is the one outcome option (c) cannot tolerate.
-            throw new IllegalStateException("Rule " + check.path("Core").path("Id").asText("<none>")
-                    + ": no Scope block to anchor the derived Requirements block after");
         }
         return rule;
-    }
-
-
-    /**
-     * Writes the <b>derived</b> provider dependencies into a rule's {@code Requirements} block —
-     * the assembler half of owner ruling Q4 option (c)
-     * ({@code plans/PLAN-scope-requirements-split.md} &#167;4.5, phase 4b).
-     *
-     * <p>
-     * The three booleans are facts the engine computes from the rule's {@code Operations} and
-     * {@code Check} and acts on regardless of what is authored; {@code rules-src} may omit them
-     * (all 3 804 authored files do), and the assembled package makes them explicit — exactly the
-     * mechanism {@link #derive} already uses for {@code Sensitivity}.
-     * </p>
-     *
-     * <p>
-     * ⚠ <b>Only a {@code true} is written.</b> A derived boolean that is {@code false} carries no
-     * information a reader does not already have from the absent key, and writing three
-     * {@code false}s onto every one of the ~14 400 shipped records would bury the facts that do
-     * exist under noise. An <em>authored</em> value is never touched — loader gate R5 already
-     * forces it to equal the derivation, so copying it through is exact.
-     * </p>
-     *
-     * @param requirements
-     *            the rule's {@code Requirements} node — the authored one, deep-copied, or a fresh
-     *            empty node when the rule authors none
-     * @param providers
-     *            the derived dependencies
-     * @return {@code requirements}, for chaining
-     */
-    private static ObjectNode materialiseProviders(ObjectNode requirements,
-            ProviderRequirements providers)
-    {
-        putProviderFlag(requirements, "Library", providers.library());
-        putProviderFlag(requirements, "Define", providers.define());
-        putProviderFlag(requirements, "Dictionary", providers.dictionary());
-        return requirements;
     }
 
 
@@ -456,54 +400,6 @@ public final class RuleStorageAssembler
         if (!requirements.has(name) && derivedValue)
         {
             requirements.put(name, true);
-        }
-    }
-
-
-    /**
-     * The derived provider dependencies of one authored check node.
-     *
-     * <p>
-     * ⚠ Derived from the <b>authored</b> rule, which is what {@code rules/} must agree with once
-     * loaded: {@link ProviderRequirements} reads all three surfaces (declared {@code Operations},
-     * bare {@code library_*} / {@code define_*} operand prefixes, inlined operation calls), and the
-     * union of the three is invariant under a move of an operation from the {@code Operations}
-     * table into the {@code Check} — which is precisely why gate R5 can be evaluated on either view
-     * without disagreeing.
-     * </p>
-     *
-     * <p>
-     * ⚠⚠ {@link RulePackageLoader#normalizeOperations(Rule)} <b>must</b> run before the derivation.
-     * Surface 1 reads {@code Operation.getOperationType()}, which a <b>Form B</b> operation
-     * ({@code expression:} set, {@code operator:} absent) does not have until that pass rewrites it
-     * to the field form — so without it a Form-B carrier derives {@code library=false} and the
-     * assembled record silently under-documents a real library dependency. Loader gate R5 would not
-     * catch it either: R5 compares an <em>authored</em> declaration against this derivation, and
-     * nothing was authored to disagree with. This is the same pass {@code RulePackageLoader:221}
-     * and {@code RuleScaffold:247} run for the same reason.
-     * </p>
-     *
-     * <p>
-     * ⚑ <b>The latch is SPRUNG and the call is LOAD-BEARING</b> (T2 review M6 corrected the
-     * inverted paragraph that stood here): since {@code PLAN-retire-corpus-transforms.md} phase 8
-     * the corpus authors <b>Form B only</b> — measured at the migration, 0 Form A / 1 000 Form B
-     * across 819 operation-carrying files — so without this normalization every operation reads
-     * {@code getOperationType() == null} and all 141 Library / 98 Dictionary / 44 Define carriers
-     * would derive {@code false}. Do not remove it.
-     * </p>
-     */
-    private static ProviderRequirements deriveProviders(JsonNode check)
-    {
-        try
-        {
-            Rule rule = LENIENT.treeToValue(check, Rule.class);
-            RulePackageLoader.normalizeOperations(rule);
-            return ProviderRequirements.of(rule);
-        }
-        catch (JsonProcessingException e)
-        {
-            throw new IllegalStateException(
-                    "cannot bind rule for the provider derivation: " + check.get("Core"), e);
         }
     }
 

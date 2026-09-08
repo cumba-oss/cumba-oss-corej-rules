@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-CG0033-A expect=noViolation domain=LB
+#note "⭐ THE POINT OF THE SPLIT. Identical to the violation fixture except row 2's VISIT reads \"UNSCHEDULED VISIT 1\". An unscheduled visit is not in TV by definition, so this is conformant data - and before the split CDISC-CG0033 reported it, because with SVPRESP absent it treated every visit as planned. ⚠ The test is a substring match on free text: VISIT is Permissible with no controlled terminology, so \"UNSCHED\", \"ADDITIONAL VISIT\" and \"EARLY TERMINATION\" still miss it. That residual is why Executability stays Possible Overreporting."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | UNSCHEDULED VISIT 1
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 2  | BASELINE
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD2018 expect=skipped domain=TS
+#note "Gate pin for TSVAL, the mirror of CDISC-CG0260-skipped_no_tsvalnf-TS. TS deliberately carries no TSVAL column, so Requirements.Variables.All [TSVALNF, TSVAL] rejects the dataset and the rule reports SKIPPED naming TSVAL. ⚠ RE-CUT 2026-09-08 by the owner ruling on EQ-0437 (was PMDA-SD2018-valid_no_tsval_column_silent-TS, expect=noViolation). It used to pin the OPPOSITE and was named for it: with only TSVALNF gated the rule EXECUTED, the ungated `not empty(TSVAL)` folded FALSE on the absent column and the conjunction short-circuited to zero findings WITH EXECUTION - a silent zero. Both leaves are `not empty`, so neither can be true on an absent column and the rule can never fire without both: both are required-variable gates by R-4.11, and all five members of the class now gate both. If this scenario EXECUTES again, a gate entry has been dropped - escalate, do not rewrite the pin."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | AGEMAX | Planned Max Age | NA
+S1 | TS | 2 | AGEMIN | Planned Min Age | NI

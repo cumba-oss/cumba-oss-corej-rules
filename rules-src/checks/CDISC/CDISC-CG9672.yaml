@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9672"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Standard Units (--STRESU) is not present in the\
+  \ dataset although a numeric Character Result/Finding in Standard Format (--STRESC)\
+  \ is reported."
+Sensitivity: "Dataset"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESC"
+Check:
+  expression: >-
+    not var_exists("--STRESU") and --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/
+Outcome:
+  Message: "--STRESU is not present in the dataset although numeric standardised results\
+    \ are reported."
+  Output_Variables:
+  - "--STRESC"
+Source_Proposed:
+  Sheet_Issue: "#172,#173,#174"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESU"
+  Condition: "--STRESC ^= null and units are applicable for the result"
+  Rule: "--STRESU is present in the dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

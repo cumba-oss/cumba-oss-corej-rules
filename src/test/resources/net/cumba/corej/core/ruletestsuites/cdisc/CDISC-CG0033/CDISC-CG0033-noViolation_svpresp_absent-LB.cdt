@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-CG0033 expect=skipped domain=LB
+#note "⚠ RE-CUT 2026-09-08 (R-4.12 hoist): expect moved noViolation -> skipped. `var_exists(SV.SVPRESP)` was a top-level conjunct, so an absent SV made the whole AND false and the rule reported a SILENT ZERO -- which is what this scenario used to pin. It is now Requirements.Variables.All ["SV.SVPRESP"], so the rule is gated out and reports SKIPPED naming the variable. Same violations either way; only the status channel moves, which is R-4.11's whole argument. If this EXECUTES again the entry was dropped -- escalate, do not rewrite the pin. PRIOR NOTE: SV carries no SVPRESP column. Since the R-5.25 split (2026-09-07) this rule owns ONLY the SVPRESP-is-available arm, so it is silent here and CDISC-CG0033-A owns the dataset. Before the split the Check read \"(not var_exists(SV.SVPRESP) or SV.SVPRESP == 'Y')\", which treated EVERY visit as planned when SVPRESP was absent - the maximum-overreporting assumption, taken exactly when the least is known. The discriminator against the sibling: the same dataset must produce exactly one finding from CDISC-CG0033-A."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 2  | BASELINE
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+
