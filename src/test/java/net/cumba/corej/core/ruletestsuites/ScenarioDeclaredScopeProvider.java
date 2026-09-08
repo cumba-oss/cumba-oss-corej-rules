@@ -3,7 +3,6 @@ package net.cumba.corej.core.ruletestsuites;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import net.cumba.corej.core.exec.DatasetResolver;
@@ -12,7 +11,6 @@ import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.datatable.DataTableMeta;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.impl.support.OverlayDataTable;
-import net.cumba.datatable.metadata.ICodeList;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -576,25 +574,6 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
     public Map<String, String> getCodelistTermMappings(String aCodelistName)
     {
         return base.getCodelistTermMappings(aCodelistName);
-    }
-
-
-    /**
-     * ⚠⚠ Delegated — the sibling of the four codelist accessors around it, and the one that was
-     * missed. Its interface default is {@code Optional.empty()} ("I have no rich codelist view"),
-     * which is honest for a leaf and silently wrong here: only the {@code (term, value)} shape of
-     * {@code codelist_terms} is served through {@link MetadataProvider#getCodelistTerms}; every
-     * other {@code (level, returntype)} shape reads this accessor, and an empty answer becomes
-     * {@code LIBRARY_NOT_AVAILABLE} ⇒ a SKIP. {@link #install} puts this decorator on the
-     * <b>library</b> slot for every ADaM {@code structure=} / {@code subclass=} scenario that has
-     * no define block, so inheriting the default made those scenarios SKIP the shape under test
-     * while an {@code expect=noViolation} scenario went green anyway — the exact Fix #368 failure
-     * mode recorded above, one accessor later.
-     */
-    @Override
-    public Optional<ICodeList> getCodelist(String aCodelistName)
-    {
-        return base.getCodelist(aCodelistName);
     }
 
 

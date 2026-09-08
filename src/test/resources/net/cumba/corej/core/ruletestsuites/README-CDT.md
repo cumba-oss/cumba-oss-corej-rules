@@ -630,14 +630,10 @@ assert `"My Label"` against `"Other Label"`.
 #library variable-metadata      DOMAIN VAR key=value key=value ...
 #library dataset-metadata       DOMAIN key=value key=value ...
 #library codelist-codes         DOMAIN VARIABLE TERM=Cxxxxxx TERM=Cxxxxxx ...
-#library codelist-term-ccodes   CODELIST TERM=Cxxxxxx TERM=Cxxxxxx ...
-#library codelist-meta          CODELIST ccode=Cxxxxxx pref="NCI Preferred Term"
 ```
 
-The last four keyword-payload kinds (`codelist-extensible`,
-`codelist-term-mappings`, `variable-metadata`, `dataset-metadata`) plus the
-2026-09 codelist channels (`codelist-term-ccodes`, `codelist-meta`) are the
-most recent additions.
+The last four kinds (`codelist-extensible`, `codelist-term-mappings`,
+`variable-metadata`, `dataset-metadata`) are the most recent additions.
 
 - **`standard-domains`** declares the library's canonical dataset (domain)
   names — what `MetadataProvider.getStandardDatasetNames()` serves. A rule
@@ -683,37 +679,6 @@ most recent additions.
   (partner found by stripping the `CD` suffix) and once with `variable_name=LBTEST`
   (partner found by the unique-concept-set fallback in
   `ExprCompiler.resolvePartner`). Pin both, or the exact-set location check fails.
-
-- **`codelist-term-ccodes`** declares one codelist's **term submission value →
-  NCI concept id ("C-code")** map — the term-conceptId channel of
-  `MetadataProvider.getCodelist`, which is what
-  `codelist_terms(level="term", returntype="code")` resolves through
-  (`CDISC-CG0001`). Same shape as `codelist-term-mappings`:
-  codelist key folds to upper case, term keys are verbatim.
-
-  ⚠⚠ **Not `codelist-codes`**, despite the near-identical name: that kind is
-  *(domain, variable)*-scoped and feeds only `getCodelistCodeMap` / CT2003.
-  The two are not interchangeable and must not be conflated.
-
-  ⚠ **Route each representation down its own channel.** `codelist-terms`
-  carries real submission values (`AE`, `LB`), `codelist-term-ccodes` carries
-  the C-codes. Feeding C-codes through `codelist-terms` is the self-disarming
-  fixture shape that kept CDISC-CG0001 green while production was
-  wrong (PLAN-codelist-terms-returntype.md §2.3) — the suites now discriminate.
-
-  A codelist declared on none of the codelist channels has **no**
-  `getCodelist` view: every `codelist_terms` shape other than
-  `(level="term", returntype="value")` then degrades to
-  `LIBRARY_NOT_AVAILABLE` and the rule SKIPs (the engine's honest-degradation
-  contract). A codelist declared with terms but no ccodes yields an **empty**
-  `(term, code)` projection — also a SKIP — exactly like a real library that
-  does not model the field.
-
-- **`codelist-meta`** declares the codelist's **own** attributes: `ccode=` its
-  NCI concept id, `pref=` its NCI preferred term. The codelist's own submission
-  value is the directive key itself. These feed the
-  `codelist_terms(level="codelist", ...)` shapes.
-
   An undeclared variable has an empty map, so it never fires — that is also why an
   `expect=skipped` is *not* reachable here: the skip gate is a **null Library
   provider**, and every `fda` / `pmda` scenario must declare `#library standard=…`.
@@ -777,9 +742,6 @@ codelists:
     terms: [ Y, N, U ]
     extensible: false
     term-mappings: { Y: "Yes", N: "No" }
-    term-ccodes:   { Y: C49488, N: C49487 }   # mirrors #library codelist-term-ccodes
-    ccode: C66742                             # mirrors #library codelist-meta ccode=
-    pref: "No Yes Response"                   # mirrors #library codelist-meta pref=
 ```
 
 Unknown keys are rejected (typos fail loudly). When a scenario has both a

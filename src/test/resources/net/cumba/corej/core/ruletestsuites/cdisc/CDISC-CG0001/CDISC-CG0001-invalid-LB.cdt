@@ -1,10 +1,8 @@
 #!RuleTest
 #test CDISC-CG0001 expect=violation domain=LB
-#note "Non-custom LB domain: the define's DOMAIN item is bound to the SDTM Domain Abbreviations codelist (ccode C66734), whose declared CodedValue LB carries alias C99999 -- not among the library's published domain codes {C11111, C22222} -> fires. Authored Sensitivity Dataset caps the finding at one. ⚠ Channel split (PLAN-codelist-terms-returntype.md P2): the real 2-letter submission values (AE, LB) ride #library codelist-terms, the NCI C-codes ride #library codelist-term-ccodes, and the codelist's own ccode/preferred term ride #library codelist-meta. Do NOT put C-codes back into codelist-terms -- feeding C-codes down the submission-value channel was the self-disarming fixture shape this replaces."
+#note "Non-custom LB domain: the define's DOMAIN item is bound to the SDTM Domain Abbreviations codelist (ccode C66734), whose declared CodedValue LB carries alias C99999 -- not among the library's published domain codes {C11111, C22222} -> fires. Authored Sensitivity Dataset caps the finding at one."
 #library standard=sdtmig version=3-4
-#library codelist-terms DOMAIN AE LB
-#library codelist-term-ccodes DOMAIN AE=C22222 LB=C11111
-#library codelist-meta DOMAIN ccode=C66734 pref="SDTM Domain Abbreviation"
+#library codelist-terms DOMAIN C11111 C22222
 #define-xml CDISC-CG0001-define.xml
 #expectViolationCount 1
 #expectViolationAt define_variable_ccode=C66734
