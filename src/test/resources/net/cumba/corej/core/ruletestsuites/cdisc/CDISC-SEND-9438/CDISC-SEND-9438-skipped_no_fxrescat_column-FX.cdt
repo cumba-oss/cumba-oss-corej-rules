@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-9438 expect=skipped domain=FX
+#note "The FXRESCAT column is absent along with both exemption columns: Requirements.Variables.All [FXRESCAT] is unsatisfied, so the sister skips naming FXRESCAT. Without the subject column the sister has no emptiness to report; FXRESCAT is Expected in FX in SENDIG-DART, so the column's own absence is reported by the generic Expected-variable rules, not by this family."
+#library standard=sendig-dart version=1-2
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+---
+S1 | FX | 001 | 1 | FPEXAM

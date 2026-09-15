@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0659-A expect=skipped domain=RS
+#note "S1 (2026-09-14): RS without an RSCAT column. RSCAT is the ONLY thing that distinguishes the Clinical Classification use case from Disease Response, so without it the rule genuinely cannot decide -- Requirements.Variables.All [RSCAT] records one auditable skip instead of guessing. ⚑ RSEVAL is deliberately NOT gated: it is the rule's SUBJECT, and gating the leaf that makes a rule fire trades a finding for silence, which is what D-6's bound forbids."
+#library standard=sdtmig version=3-4
+#library codelist-terms CCCAT "CHILD-PUGH CLASSIFICATION" "H SCORE TOTAL SCORE" "PROTOCOL DEFINED RESPONSE CRITERIA"
+dataset RS class=FINDINGS label="Disease Response and Clinical Classifications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RSSEQ    type=Num  label="Sequence Number"
+col RSTESTCD type=Char label="Short Name of Measurement"
+col RSEVAL   type=Char label="Evaluator"
+---
+S1 | RS | 001 | 1 | ADAS | INVESTIGATOR

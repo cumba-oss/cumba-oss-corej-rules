@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0318 expect=violation domain=DS
+# Rule:Description: --NOMDY is populated with a value that is not an integer.
+#note "Added 2026-09-14. Two things this file covers that the PC pair does not. (1) The EVENTS leg of Scope.Classes — DS is SEND's only Events domain, and --NOMDY is a different wildcard expansion there (DSNOMDY), so the FINDINGS scenarios say nothing about it. (2) The CHARACTER read: a Char-shipped --NOMDY is nonconformant data but it is the shape the retired regex was written for, and it is the only shape where is_integer's string path runs at all. Row 1 is text that is not a number and fires; row 2 is text that parses whole and must not — the same permissive acceptance recorded for TAETORD in CDISC-SEND-0221-invalid_char_shipped-TA."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 DSSEQ=1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSNOMDY type=Char label="Nominal Study Day for Tabulations"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | DAY8
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | 8
+---

@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when DSSCAT is present in the DS dataset but empty on\
   \ a record with DSCAT = 'DISPOSITION EVENT' for a subject that has more than one\
   \ such record per Epoch."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -18,6 +18,7 @@ Requirements:
   Variables:
     All:
     - "DSCAT"
+    - "DSSCAT"
 Check:
   expression: >-
     not is_unique_set([DSCAT, USUBJID, EPOCH]) and DSCAT == "DISPOSITION EVENT" and empty(DSSCAT)

@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-CG9677 expect=skipped domain=DM
+#note "THE ALL-FACET GATE, PINNED AT THE MINT (D-17, 2026-09-13). This rule's Check is empty(ARM) and a populated ARMCD, so on a DM without the ARM column every ARMCD-populated row would fire (absent = all-missing). Requirements.Variables.All [ARMCD, ARM] rejects the dataset instead - the same pin the whole CDISC-CG0521/FDA/PMDA class carries (D-16, documentation/derivation/absent-column-verdicts.tsv). If this scenario EXECUTES, the gate has been removed: escalate, do not rewrite the pin."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | B

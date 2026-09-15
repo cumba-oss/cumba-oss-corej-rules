@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1212 expect=executionError domain=LB
+#expect-execution-error "LBSTRESN is declared Char"
+#note "R7 (PLAN-column-type-conformance): LBSTRESN shipped as Char is nonconformant data (SDTMIG declares it Num). The migrated comparison --STRESN != num(--STRESC) reads --STRESN as one side of a numeric-vs-character equality, so per R4/R9 the engine must ERROR instead of comparing a number's text rendering. LBSTRESC=40 keeps the is_numeric guard true, so the equality is genuinely reached."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Char label="Numeric Result/Finding in Standard Units"
+---
+S1 | LB | 001 | 1 | ALB | 40 | 40
+---

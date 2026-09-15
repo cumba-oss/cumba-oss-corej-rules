@@ -3,20 +3,23 @@ package net.cumba.corej.core.ruletestsuites.adam;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.cumba.corej.core.exec.DatasetRuleResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
 import net.cumba.corej.core.expr.eval.Domain;
+import net.cumba.corej.core.gen.GeneratedRuleInfo;
+import net.cumba.corej.core.gen.GeneratedRulePackage;
 import net.cumba.corej.core.gen.RuleCategory;
-import net.cumba.corej.core.gen.RuleGenerator;
 import net.cumba.corej.core.model.CheckCondition;
 import net.cumba.corej.core.model.CheckConditionAll;
 import net.cumba.corej.core.model.CheckConditionAny;
@@ -37,36 +40,88 @@ import org.junit.jupiter.api.DynamicTest;
 /**
  * Shared base class for ADaM template rule tests (Phase 5).
  * <p>
- * Uses {@link RuleGenerator} with only {@link RuleCategory#WILDCARD_EXPANSION} enabled to expand
- * template rules (those whose Check tree carries wildcard variables) into concrete rules by
- * matching wildcard variable names against real dataset columns. Each expanded rule is tested
- * dynamically via JUnit 5 {@code @TestFactory}.
+ * Uses {@link DatasetRuleResolver} to expand template rules (those whose Check tree carries
+ * wildcard variables) into concrete rules by matching wildcard variable names against real dataset
+ * columns. Each expanded rule is tested dynamically via JUnit 5 {@code @TestFactory}.
+ *
+ * <p>
+ * ⚑ This used to pass {@code EnumSet.of(RuleCategory.WILDCARD_EXPANSION)} to select one of the
+ * generator's categories. {@code plans/PLAN-remove-rule-generator.md} deleted the in-Java
+ * generators and with them the category set, so there is nothing left to select — the class now
+ * does only wildcard expansion and {@code --}-prefix delivery.
+ * </p>
  */
 abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 {
 
-    /** Expanded rules produced by the RuleGenerator for the target dataset. */
+    /** Expanded rules produced by the DatasetRuleResolver for the target dataset. */
     List<Rule> expandedRules = List.of();
 
     /**
-     * Runs the RuleGenerator wildcard expansion for the given domain. Call this from
+     * Runs the DatasetRuleResolver wildcard expansion for the given domain. Call this from
      * {@code @BeforeAll} in subclasses.
      *
      * <p>
      * Uses {@link #getLibraryMock()} so wildcard expansion sees a populated library — both for
-     * {@code libraryDefinedVars} filtering inside {@code RuleGenerator} and for the runtime
+     * {@code libraryDefinedVars} filtering inside {@code DatasetRuleResolver} and for the runtime
      * resolution of {@code library_variable_*} fields against ADaM-IG canonical labels.
      * </p>
      */
     static List<Rule> expandRules(String domainName, String className, IDataTable table)
     {
-        RuleGenerator gen = new RuleGenerator(getLibraryMock(), null, null, "adamct-2025-09-26",
-                EnumSet.of(RuleCategory.WILDCARD_EXPANSION));
+        DatasetRuleResolver gen = new DatasetRuleResolver(getLibraryMock());
         gen.setStaticRules(ownedTemplateRules());
         gen.setDomainName(domainName);
         gen.setClassName(className);
         gen.setDatasetResolver(resolver);
-        return gen.generate(table).getRules();
+        GeneratedRulePackage pkg = gen.generate(table);
+
+        // ⚠ ALIASING, newly reachable here and deliberately accepted. expandSdtmPrefixRules adds
+        // non-`--` rules BY REFERENCE, and doGenerate's tail then calls installNativeExpr and
+        // deriveOutputVariables on every delivered rule — so those calls now land on the very Rule
+        // objects held in AbstractAdamRuleTest.rulesByCoreId, a static map shared by every ADaM
+        // suite in the JVM. Before PLAN-remove-rule-generator.md this harness passed
+        // EnumSet.of(WILDCARD_EXPANSION), which kept the pass-through rules out entirely.
+        // Both calls are idempotent — installNativeExpr is guarded by `getCheckExpr() == null` and
+        // deriveOutputVariables documents idempotent re-derivation — and PRODUCTION has always run
+        // this tail over the same pass-through rules, so the harness is now more faithful to the
+        // engine, not less. Recorded because the aliasing itself has bitten before: see
+        // AdamTemplateDeclaredStructureProbeTest's warning about an un-restored setScope leaking
+        // into rulesByCoreId.
+
+        // ⚠⚠ Keep ONLY the wildcard expansion children. This suite is tuned per template: each
+        // expanded rule gets a fixture built for its wildcard shape, so a rule that never carried a
+        // wildcard has no fixture and reads as "should fire but found no violations".
+        //
+        // Until plans/PLAN-remove-rule-generator.md this filtering was implicit and accidental: the
+        // harness passed EnumSet.of(RuleCategory.WILDCARD_EXPANSION), which ALSO switched off
+        // SDTM_PREFIX_EXPANSION — and that category is what copies the scoped concrete rules into
+        // the executed set at all. With the category set gone (the resolver always does both
+        // halves, as production always did), the concrete rules arrive too and must be filtered
+        // out explicitly. 94 of this suite's cases failed exactly that way.
+        Set<String> expansionIds = pkg.getReport().getGeneratedRules().stream()
+                .filter(g -> g.category() == RuleCategory.WILDCARD_EXPANSION)
+                .map(GeneratedRuleInfo::ruleId).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // ⚠⚠ The report is ALMOST a faithful index of the expansions, but not quite:
+        // DatasetRuleResolver.applyTemplatePostFilters keeps an expansion WITHOUT recording a
+        // report entry when `expCoreId == null || origCoreId == null`. Such an expansion is dropped
+        // by the filter below, shrinking this suite's coverage with nothing going red.
+        //
+        // ⭐ Assert the PREMISE, not the symptom. The first half of that condition is unreachable:
+        // WildcardExpander builds the child id as `origCoreId + "-" + primaryCol`, a string
+        // concatenation, so a null template id yields the literal "null-<COL>" — non-null. Only
+        // `origCoreId == null` can fire, and it produces a child whose own core id IS non-null.
+        // So asserting on the delivered rules' ids cannot detect it; the real premise is that every
+        // TEMPLATE handed in has an effectiveId(). ownedTemplateRules() enforces that today by
+        // construction, which makes this a ratchet on that filter, not a restatement of it.
+        assertTrue(ownedTemplateRules().stream().allMatch(r -> r.effectiveId() != null),
+                "a template with no effectiveId() reached the resolver: its expansions are recorded"
+                        + " under no report entry and would be filtered out of this suite silently");
+
+        return pkg.getRules().stream().filter(r -> expansionIds.contains(r.getCore().getId()))
+                .toList();
     }
 
 
@@ -253,15 +308,15 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * <p>
      * Each suite already states its structure — {@code AdamTemplatesBdsRuleTest}'s
      * {@code CLASS_NAME = "BASIC DATA STRUCTURE"} and its two siblings — but before Fix #227 that
-     * constant was handed to the {@link RuleGenerator} alone. Execution ran on the six-argument
-     * {@code RuleRunner.execute}, so at execution time <em>nobody had said what structure the table
-     * was</em>, and {@code RuleRunner}'s {@code Scope.Data_Structures} gate fell back to the column
-     * heuristic. The fixtures here are synthesised by {@link #buildInvalidTable} /
-     * {@code buildValidTable} and carry only the rule's own leaf columns, so that heuristic answers
-     * {@code ADAM OTHER} for almost all of them — which is why 15 rules are recorded
-     * {@code INSTRUMENT-HELD} in the instrument-holds census — a frozen internal measurement, kept
-     * in the monorepo and not carried here — and could not migrate from {@code Scope.Classes} to
-     * {@code Scope.Data_Structures}.
+     * constant was handed to the {@link DatasetRuleResolver} alone. Execution ran on the
+     * six-argument {@code RuleRunner.execute}, so at execution time <em>nobody had said what
+     * structure the table was</em>, and {@code RuleRunner}'s {@code Scope.Data_Structures} gate
+     * fell back to the column heuristic. The fixtures here are synthesised by
+     * {@link #buildInvalidTable} / {@code buildValidTable} and carry only the rule's own leaf
+     * columns, so that heuristic answers {@code ADAM OTHER} for almost all of them — which is why
+     * 15 rules are recorded {@code INSTRUMENT-HELD} in
+     * {@code adam-classes-to-structures-instrument-holds.tsv} and could not migrate from
+     * {@code Scope.Classes} to {@code Scope.Data_Structures}.
      * </p>
      *
      * <h4>⚠ Why the LIBRARY slot and not a {@code defineProvider}</h4>
@@ -344,6 +399,11 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 RuleExecutionResult result = RuleRunner.execute(rule, table,
                         resolverWith(domainName, table), domainName,
                         declaringLibrary(table, declaredStructure), null);
+                // An ERROR also carries the "__error__" sentinel, so without this the failure
+                // message below would blame a phantom "1 violation(s)" for what is really an
+                // execution failure — loud either way, but pointing at the wrong thing.
+                assertFalse(result.isError(),
+                        ruleId + " ERRORED on valid data: " + result.getStatusMessage());
                 assertFalse(result.hasViolations(),
                         ruleId + " should NOT fire on valid data but found "
                                 + result.getViolationCount() + " violation(s)");
@@ -378,6 +438,17 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 RuleExecutionResult result = RuleRunner.execute(rule, table,
                         resolverWith(domainName, table), domainName,
                         declaringLibrary(table, declaredStructure), null);
+                // ⚠⚠ The not-errored assertion comes FIRST and is not decoration. RuleRunner
+                // emits an "__error__" sentinel Violation on every ERROR path, so
+                // hasViolations() is TRUE for a rule that errored — and this assertTrue would
+                // pass VACUOUSLY, reporting a detection that never happened. That went from
+                // theoretical to reachable when PLAN-column-type-conformance's ColumnTypeGate
+                // added a new ERROR path these all-Char harness tables walk straight into.
+                assertFalse(result.isError(),
+                        ruleId + " ERRORED on invalid data rather than firing: "
+                                + result.getStatusMessage()
+                                + " — an error emits the __error__ sentinel, so asserting"
+                                + " hasViolations() alone would have passed on it");
                 assertTrue(result.hasViolations(),
                         ruleId + " should fire on invalid data but found " + "no violations");
             });
@@ -1517,9 +1588,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 
 
         @Override
-        public boolean isCodelistExtensible(String codelistName)
+        public java.util.Optional<Boolean> isCodelistExtensible(String codelistName)
         {
-            return true;
+            return java.util.Optional.of(true);
         }
 
 

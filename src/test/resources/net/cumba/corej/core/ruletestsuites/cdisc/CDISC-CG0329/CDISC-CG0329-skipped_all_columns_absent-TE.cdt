@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0329 expect=skipped domain=TE
-#note "AUTHORED BY Plan B phase 4d. CDISC-CG0329 had NO column-absence scenario at all before this: its only skipped fixture (-skipped_non_te_primary-DM) is a Scope.Domains gate, not a requirement gate. NEITHER TEENRL nor TEDUR is declared here, so Requirements.Variables.Any [TEENRL, TEDUR] is unmet and the rule SKIPS instead of folding dataset-constant TRUE and emitting one finding at row 1. The all-absent case is nothing-to-check, not a defect (M2-D24 / M3-F.1). DIRECTION PIN: read with -invalid_teenrl_absent-TE, authored alongside this file for exactly that purpose -- with only TEENRL withheld the Any leg is still satisfied and the rule must FIRE. Were the Any leg wired as a conjunction (skip as soon as ANY entry is absent) that sibling would go SKIPPED and RED; were the leg dropped altogether this file would fire and go RED. Neither file alone pins the direction, which is why the pair was authored together. The Check is byte-identical to CDISC-CG0328's, CORE-000027's, FDA-SD0089's and PMDA-SD0089's. Both findings snapshots are structurally blind (te.json and phuse's te.xpt each carry both columns) -- Gate C evidence."
+#note "NEITHER column is declared, so the All leg is unmet and the parent skips - unchanged in verdict from the Any gate, but the state is no longer silent: the dataset sister CDISC-CG9676 (Sensitivity Dataset) reports the absent pair once. The old DIRECTION-PIN reasoning written for the Any leg is retired with the wave E Any -> All rewrite; the direction is now pinned by the four-state set (parent + two R-5.25 siblings + sister), whose scenarios each name the member owning the neighbouring state."
 #library standard=sdtmig version=3-4
 dataset TE label="Trial Elements"
 col STUDYID type=Char label="Study Identifier"
@@ -10,4 +10,4 @@ col ELEMENT type=Char label="Description of Element"
 col TESTRL  type=Char label="Rule for Start of Element"
 ---
 CDISCPILOT01 | TE | SCRN | Screening | Informed consent
-CDISCPILOT01 | TE | TRT  | Treatment | First dose
+CDISCPILOT01 | TE | TRT | Treatment | First dose

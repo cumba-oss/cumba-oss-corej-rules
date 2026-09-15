@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0659-A expect=violation domain=RS
+#note "S1 (2026-09-14): RS carries TWO use cases and the discriminator is RSCAT, which is observable rather than a judgement call: RSCAT in codelist CCCAT means Clinical Classification, in ONCRSCAT means oncology Disease Response (SDTMIG v3.4 p. 330:9-13, 330:27). Row 1 is a Clinical Classification record that populates RSEVAL, which the SDTM Model restricts with usageRestrictions \"Not in QS, FT, and clinical classifications use case of RS\". Row 2 is a Disease Response record, where RSEVAL is a specified Perm variable and must NOT be reported. ⛔ That asymmetry is why RS needs a RECORD-level rule of its own: the parent's column-level var_exists(\"--EVAL\") would fire on every legitimate oncology RS dataset. ⚠ The CCCAT list below is a representative subset declared inline because .cdt scenarios are hermetic -- codelist_terms resolves from this line, not from the CT store -- and it MUST carry submission values, never NCI C-codes."
+#library standard=sdtmig version=3-4
+#library codelist-terms CCCAT "CHILD-PUGH CLASSIFICATION" "H SCORE TOTAL SCORE" "PROTOCOL DEFINED RESPONSE CRITERIA"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset RS class=FINDINGS label="Disease Response and Clinical Classifications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RSSEQ    type=Num  label="Sequence Number"
+col RSTESTCD type=Char label="Short Name of Measurement"
+col RSCAT    type=Char label="Category for Response"
+col RSEVAL   type=Char label="Evaluator"
+---
+S1 | RS | 001 | 1 | ADAS | CHILD-PUGH CLASSIFICATION | INVESTIGATOR
+S1 | RS | 001 | 2 | OVRLRESP | ONCOLOGY RESPONSE | INVESTIGATOR

@@ -2,25 +2,23 @@ Core:
   Id: "CDISC-CG0659"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when --EVAL is present in a QS or FT dataset. --EVAL\
-  \ must not be used to model QRS (Questionnaires, Ratings, and Scales) data. This\
-  \ also applies to the RS domain for the Clinical Classification Use Case, which\
-  \ is a human-judgement condition not evaluated by this rule."
-Executability: "Partially Executable"
+Description: "Raise an error when the --EVAL variable (QSEVAL or FTEVAL) is present\
+  \ in a QS or FT dataset. --EVAL must not be used to model QRS (Questionnaires, Ratings,\
+  \ and Scales) data. The RS domain is covered by this rule's -A sibling, which tests\
+  \ the Clinical Classification use case at record level."
+Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "QS"
     - "FT"
-    - "RS"
 Check:
   expression: >-
-    var_exists("QSEVAL") or var_exists("FTEVAL")
+    var_exists("--EVAL")
 Outcome:
   Message: "--EVAL is present. --EVAL must not be used to model QRS data."
   Output_Variables:
-  - "QSEVAL"
-  - "FTEVAL"
+  - "--EVAL"
 Source:
   Class: "FND"
   Domain: "QS, FT, RS"

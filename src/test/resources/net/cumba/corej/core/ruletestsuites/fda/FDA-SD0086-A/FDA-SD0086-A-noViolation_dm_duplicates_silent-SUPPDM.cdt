@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0086-A expect=noViolation domain=SUPPDM
+#note "The R-5.25 wave-3 split's discriminator, sibling side: QNAM RACEOTH repeats for subject 001 with IDVAR/IDVARVAL blank - the parent FDA-SD0086's violation data, and the five-member tuple (USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM) IS duplicated - but every row has RDOMAIN=DM, so the non-DM half's RDOMAIN != 'DM' conjunct is false and the sibling is SILENT. DM-parent duplicates belong to the bare id alone."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset SUPPDM class=RELATIONSHIP label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | DM | 001 |  |  | RACEOTH | Other race A
+S1 | DM | 001 |  |  | RACEOTH | Other race B

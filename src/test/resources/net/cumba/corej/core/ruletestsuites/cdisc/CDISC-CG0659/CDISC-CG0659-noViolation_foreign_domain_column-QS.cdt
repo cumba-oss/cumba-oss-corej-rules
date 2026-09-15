@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0659 expect=noViolation domain=QS
+#note "S1 (2026-09-14): ⭐ THIS IS THE DEFECT THE CHANGE FIXES. A QS dataset that wrongly carries an FTEVAL column and NO QSEVAL. The old Check was varname() in [\"QSEVAL\", \"FTEVAL\"] -- a hard-coded union across the domains in scope -- so the cursor landing on FTEVAL MATCHED and the rule fired, attributing an --EVAL violation to a column that is not this domain's --EVAL at all. The new Check is var_exists(\"--EVAL\"), and -- resolves to the CURRENT domain, so in QS it asks only about QSEVAL. A mis-prefixed FTEVAL column in QS is a different defect (a wrong-domain variable) and belongs to whichever rule reports that, not to this one. ⚑ The same closed list is why the rule was inert on RS: no RSEVAL arm. Both faults have one cause, and one fix."
+#library standard=sdtmig version=3-4
+dataset QS class=FINDINGS label="Questionnaires"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSTESTCD type=Char label="Question Short Name"
+col FTEVAL   type=Char label="Evaluator"
+---
+S1 | QS | 001 | 1 | ADAS01 | INVESTIGATOR

@@ -10,9 +10,12 @@ datasets:
     row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
     column_types:
       AVISITN: LONG
+      CNSR: LONG
     rows:
-      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, CNSR: '0'}   # ok
-      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, CNSR: '-1'}  # bad
+      # CNSR is Num in every ADaMIG; PLAN-column-type-conformance (R5) corrected the fixture,
+      # which had shipped it as Char and relied on the retired Char->Num parse fallback.
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', AVISITN: 1, CNSR: 0}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', AVISITN: 1, CNSR: -1}  # bad
 config:
   standard: adamig
   standard_version: '1.3'

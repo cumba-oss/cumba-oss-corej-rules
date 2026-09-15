@@ -10,13 +10,17 @@ Scope:
   Data_Structures:
     Include:
     - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DM.ARM"
 Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "DM"
 Check:
   expression: >-
-    var_exists(DM.ARM) and not empty(ARM) and ARM != DM.ARM
+    not empty(ARM) and ARM != DM.ARM
 Outcome:
   Message: "For the same USUBJID, the ADSL ARM does not equal the DM ARM."
   Output_Variables:

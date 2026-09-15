@@ -3,8 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when --STAT equals 'NOT DONE' but the Reason Not Done\
-  \ (--REASND) variable is empty or not present."
-Executability: "Partially Executable - Possible Overreporting"
+  \ (--REASND) variable is empty."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -16,11 +16,12 @@ Requirements:
   Variables:
     All:
     - "--STAT"
+    - "--REASND"
 Check:
   expression: >-
     --STAT == "NOT DONE" and empty(--REASND)
 Outcome:
-  Message: "--REASND is empty or not present when --STAT equals 'NOT DONE'."
+  Message: "--REASND is empty when --STAT equals 'NOT DONE'."
   Output_Variables:
   - "--STAT"
   - "!--REASND"

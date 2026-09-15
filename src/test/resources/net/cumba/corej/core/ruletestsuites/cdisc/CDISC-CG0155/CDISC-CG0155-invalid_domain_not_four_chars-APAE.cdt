@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0155 expect=violation domain=APAE
+#expectViolationCount 1
+#note "Isolates the FIRST disjunct, `DOMAIN !~ /^AP..$/`. DOMAIN is 5 characters (`APXAE`), so the regex arm is true and the rule fires — the Check states the error condition, so a true disjunct is a violation, not a pass. The suffix was chosen deliberately: `suffix(\"APXAE\", 2)` = `AE`, which IS in the codelist below, so the SECOND disjunct is false and this scenario fails only for the length/prefix reason. Change the DOMAIN cell to a 4-character `APAE` and it must go green — that is what proves the regex arm, not the codelist lookup, is what fires here. ⚠⚠ The `#library codelist-terms DOMAIN` line MUST carry real 2-letter SDTM SUBMISSION VALUES (`AE`, `CM`, `VS`, `LB`), never NCI C-codes: with C-codes the second disjunct would also be true and this scenario would stop isolating anything. The CDISC-CG0001 / CORE-000929 fixtures are the pattern to FOLLOW, not to avoid: they were re-authored in ca63ebf5 and now split the three channels properly — submission values on `#library codelist-terms`, NCI C-codes on `#library codelist-term-ccodes`, the codelist's own ccode / preferred term on `#library codelist-meta`. Copy that shape if this fixture ever needs C-codes. ⚠ The rule's operation declares `returntype=\"value\"` and coreJ HONOURS the parameter (ca63ebf5), so `codelist_terms` yields term submission values here by contract rather than by accident — which is why the list below must be submission values. See plans/PLAN-codelist-terms-returntype.md."
+#library standard=sdtmig version=3-3
+#library codelist-terms DOMAIN AE CM VS LB
+dataset APAE label="Associated Persons Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+---
+CDISCPILOT01 | APXAE | AP-701-1015

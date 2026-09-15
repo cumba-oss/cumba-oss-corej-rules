@@ -3,9 +3,9 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when the End Date/Time of Observation (--ENDTC) is populated\
-  \ but the Date/Time of Collection (--DTC) is empty or not present."
+  \ but the Date/Time of Collection (--DTC) is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -15,6 +15,7 @@ Requirements:
   Variables:
     All:
     - "--ENDTC"
+    - "--DTC"
 Check:
   expression: >-
     not empty(--ENDTC) and empty(--DTC)

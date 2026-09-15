@@ -1,8 +1,9 @@
 #!RuleTest
 #test FDA-SD1073-A expect=violation domain=TR
-#note "TRLOC is present in TR although the IG prohibits it (TR does not include anatomical location information) -> one dataset-level finding."
+#note "TRLOC is present in TR although the IG prohibits it (TR does not include anatomical location information). Since the D-15 rewrite (2026-09-12) the Check is varname() in [TRLOC, TRLAT, TRDIR, TRPORTOT], routed as Variable Metadata Check / Record and evaluated per variable -> exactly ONE finding for the one prohibited column, pinned by variable_name (no row= pin: Violation.row carries the colIndex)."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
+#expectViolationAt variable_name=TRLOC
 dataset TR label="Tumor Results"
 col STUDYID  type=Char
 col DOMAIN   type=Char

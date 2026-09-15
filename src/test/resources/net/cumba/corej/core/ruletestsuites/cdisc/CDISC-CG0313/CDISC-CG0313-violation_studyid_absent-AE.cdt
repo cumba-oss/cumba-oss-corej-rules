@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0313 expect=violation domain=AE
+#note "R-5.25 wave-3 group K split of CG0313 (each missing key variable is its own defect): the STUDYID column is not in the dataset. The Check is the absence assertion itself (the CG0554 / M15 shape), every leaf a dataset-level fact, so Sensitivity derives Dataset and the absence is reported ONCE although both rows lack it."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+AE | 001 | 1 | Headache
+AE | 001 | 2 | Nausea

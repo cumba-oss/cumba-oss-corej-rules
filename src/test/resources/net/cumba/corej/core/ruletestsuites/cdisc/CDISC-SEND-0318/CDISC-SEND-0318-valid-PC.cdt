@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0318 expect=noViolation domain=PC
+# Rule:Description: --NOMDY is populated with a value that is not an integer.
+#note "Added 2026-09-14, the silent half. Rows 1-2 are conformant nominal days, including a NEGATIVE one — SEND day numbering has no day 0 and pre-dose days are negative, so -1 must be an integer here and not a finding. Row 3 leaves PCNOMDY missing: the Check opens with `not empty(--NOMDY)`, so a blank is deliberately not this rule's business. ⚠ noViolation also asserts the rule EXECUTED, so a gate that started erroring on the Num read would red this file rather than sliding through as 'no violations'."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ   type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | PC | 001 | 1 | DRUGX | -1
+S1 | PC | 001 | 2 | DRUGX | 3
+S1 | PC | 001 | 3 | DRUGX | .
+---

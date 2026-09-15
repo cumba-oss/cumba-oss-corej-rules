@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0425 expect=noViolation domain=LB
+#note "Both columns present, so the rule runs. Row 1: numeric LBSTRESC with LBSTRESU populated -> the empty(--STRESU) arm is false. Row 2: negative numeric, unit populated -> clean. Row 3: LBSTRESC empty, so the not empty(--STRESC) arm is false and the missing unit is not this rule's business. All clean."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | 7.2  | mmol/L
+S1 | LB | 001 | 2 | BASE | -1.5 | mmol/L
+S1 | LB | 001 | 3 | CHOL |      |

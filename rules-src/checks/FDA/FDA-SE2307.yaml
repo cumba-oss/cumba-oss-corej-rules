@@ -2,23 +2,26 @@ Core:
   Id: "FDA-SE2307"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when --DY or --ENDY is missing or not present; both required\
-  \ timing variables must be populated."
+Description: "Raise an error when the required timing variable --DY is not populated;\
+  \ the required timing variables identify the day on which group summaries are calculated\
+  \ for data associated with a time interval."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "BG"
     - "FW"
+Requirements:
+  Variables:
+    All:
+    - "--DY"
 Check:
   expression: >-
-    empty(--DY) or empty(--ENDY)
+    empty(--DY)
 Outcome:
-  Message: "--DY or --ENDY is missing or not present; both required timing variables\
-    \ must be populated."
+  Message: "--DY, a required timing variable, is not populated."
   Output_Variables:
   - "--DY"
-  - "--ENDY"
 Source:
   FDA_Validator_Rule_Message: "Missing values for all required timing variables: --DY\
     \ & --ENDY"

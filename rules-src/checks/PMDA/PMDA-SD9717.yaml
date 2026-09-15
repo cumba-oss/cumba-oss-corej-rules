@@ -1,0 +1,56 @@
+Core:
+  Id: "PMDA-SD9717"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when Toxicity (--TOX) is not present in the dataset\
+  \ although a Toxicity Grade (--TOXGR) value reports a grade greater than 0."
+Sensitivity: "Dataset"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "CP"
+    - "CV"
+    - "EG"
+    - "LB"
+    - "MI"
+    - "MO"
+    - "PC"
+    - "PP"
+    - "RE"
+    - "VS"
+Requirements:
+  Variables:
+    None:
+    - "--TOX"
+    All:
+    - "--TOXGR"
+Check:
+  expression: >-
+    --TOXGR =~ /[1-9]/
+Outcome:
+  Message: "--TOX is not present in the dataset although toxicity grades greater than\
+    \ 0 are reported."
+  Output_Variables:
+  - "--TOXGR"
+Source_Proposed:
+  Sheet_Issue: "#180"
+  Message: "Toxicity (--TOX) is not present in the dataset when --TOXGR is populated\
+    \ and greater than 0"
+  Description: "The Toxicity (--TOX) variable must be present in the dataset when\
+    \ a Toxicity Grade (--TOXGR) variable value is populated and greater than 0."
+  Domains: "CP, CV, EG, LB, MI, MO, PC, PP, RE, VS"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+  - Name: "SDTMIG"
+    Version: "3.1.2"

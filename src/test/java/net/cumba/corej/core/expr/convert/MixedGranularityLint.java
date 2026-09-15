@@ -424,6 +424,13 @@ final class MixedGranularityLint
         {
         case Expr.Call c -> BroadcastFold.isExistsCall(c)
                 || BroadcastFold.isWholeColumnVerdictCall(c)
+            // A broadcast column predicate (var_is_null) is one dataset-wide fact about a
+            // named column. ⚠ Wiring it here is NOT optional bookkeeping: the lint fires only
+            // on `Or`, and every var_is_null rule in the corpus is a conjunction, so leaving
+            // it out would have left the lint calling it a RECORD leaf while both routers call
+            // it a dataset fact — with nothing red. That silent disagreement is the exact bug
+            // class the var_is_null registration cured.
+                || BroadcastFold.isBroadcastColumnPredicate(c)
                 || BroadcastFold.isDatasetFactBoolCall(c) || BroadcastFold.isLibraryGateCall(c);
         // A comparison is broadcast exactly when neither side reads a row.
         case Expr.Binary b -> BroadcastFold.isDatasetFactOperand(b.left())

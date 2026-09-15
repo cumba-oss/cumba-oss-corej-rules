@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2307-A expect=violation domain=BG
+#note "The half this R-5.25 split sibling owns (top-level-or board wave 2, group J): row 2 is missing BGENDY -> fires, named against --ENDY alone. Row 3 (BGDY missing) is the parent FDA-SE2307's state and must NOT fire here - the discriminator, on the byte-identical dataset the parent's invalid fixture uses; row 1 is complete."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 BGSEQ=2
+dataset BG class=FINDINGS label="Body Weight Gain"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BGSEQ    type=Num  label="Sequence Number"
+col BGTESTCD type=Char label="Test Short Name"
+col BGDY     type=Num  label="Study Day of Start of Interval"
+col BGENDY   type=Num  label="Study Day of End of Weight Interval"
+---
+S1 | BG | 001 | 1 | BWGAIN | 1 | 8
+S1 | BG | 001 | 2 | BWGAIN | 8 | .
+S1 | BG | 001 | 3 | BWGAIN | . | 22

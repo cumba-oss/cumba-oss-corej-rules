@@ -20,8 +20,9 @@ import org.junit.jupiter.api.io.TempDir;
  * be set portably in-process, and the two neuter arms of the plan's phase 2 exercise it from the
  * outside (a partial cache directory and a non-existent one, both passed as
  * {@code CDISC_PICKLE_CACHE_DIR}). Every test that reads the un-configured resolution therefore
- * {@code assumeTrue}s the variable is unset, exactly as {@code PickleMetadataProviderFactoryTest}
- * does.
+ * {@code assumeTrue}s the variable is unset, exactly as the deleted
+ * {@code PickleMetadataProviderFactoryTest} did (its store-side successor,
+ * {@code StoreMetadataProviderFactoryTest} in the engine repo, guards the same way).
  * </p>
  *
  * <p>

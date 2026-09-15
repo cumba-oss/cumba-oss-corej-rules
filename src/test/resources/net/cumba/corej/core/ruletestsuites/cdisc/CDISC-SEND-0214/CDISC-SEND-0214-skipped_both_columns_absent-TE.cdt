@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0214 expect=skipped domain=TE
+#note "NEITHER column is declared, so the All leg is unmet and the parent skips - unchanged in verdict from the Any gate, but the state is no longer silent: the dataset sister CDISC-SEND-9440 (Sensitivity Dataset) reports the absent pair once. The old DIRECTION-PIN reasoning written for the Any leg is retired with the wave E Any -> All rewrite; the direction is now pinned by the four-state set (parent + two R-5.25 siblings + sister), whose scenarios each name the member owning the neighbouring state."
+#library standard=sendig version=3-1-1
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent
+CDISCPILOT01 | TE | TRT | Treatment | First dose

@@ -2,10 +2,9 @@ Core:
   Id: "PMDA-SD0092"
   Status: "Published"
   Version: "1"
-Description: "Raise a warning when ETCD is equal to 'UNPLAN' but SEUPDES is empty\
-  \ or not present."
+Description: "Raise a warning when ETCD is equal to 'UNPLAN' but SEUPDES is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -14,11 +13,12 @@ Requirements:
   Variables:
     All:
     - "ETCD"
+    - "SEUPDES"
 Check:
   expression: >-
     ETCD == "UNPLAN" and empty(SEUPDES)
 Outcome:
-  Message: "SEUPDES is empty or not present when ETCD is equal to 'UNPLAN'."
+  Message: "SEUPDES is empty when ETCD is equal to 'UNPLAN'."
   Output_Variables:
   - "ETCD"
   - "SEUPDES"

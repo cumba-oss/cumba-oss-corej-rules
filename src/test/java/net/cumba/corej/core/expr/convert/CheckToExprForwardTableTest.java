@@ -84,7 +84,9 @@ class CheckToExprForwardTableTest
                       - "Y"
                       - "N"
                     """,
-            "ends_with(varname(), \"FL\") and not empty(value()) and value() not in [\"Y\", \"N\"]"),
+            // A .+ fill deliberately stays as regex since cumba-corej 77619d1 (F-corej-L1-01):
+            // ends_with is true for a name EQUAL to the literal, where ^.+FL$ is false.
+            "varname() =~ /^.+FL$/ and not empty(value()) and value() not in [\"Y\", \"N\"]"),
             new Fixture("suffix_matches_regex forms (CDISC-CG0140)", """
                     all:
                     - name: "DM.RACE"

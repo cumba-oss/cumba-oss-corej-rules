@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0112-A expect=skipped domain=ADLBC
+#note "ARELTM is not declared, so Requirements.Variables.All [ARELTM, ARELTMU] gates the rule to SKIPPED naming the absent variable. The gate is load-bearing on THIS half: its Check is empty(ARELTM) with a populated ARELTMU, which on an absent ARELTM column would fire on both rows (absent = all-missing). Mirror of the parent's skipped_no_areltmu fixture - the two halves pin the two one-absent states between them."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | HOURS
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 | HOURS

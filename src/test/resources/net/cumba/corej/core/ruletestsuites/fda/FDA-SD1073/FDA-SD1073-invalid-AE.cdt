@@ -1,8 +1,9 @@
 #!RuleTest
 #test FDA-SD1073 expect=violation domain=AE
-#note "AEOCCUR is present in AE although the IG prohibits it (AEs are always occurring events) -> one dataset-level finding."
+#note "AEOCCUR is present in AE although the IG prohibits it (AEs are always occurring events). Since the D-15 rewrite (2026-09-12) the Check is varname() in [AEOCCUR, AESTAT, AEREASND], routed as Variable Metadata Check / Record and evaluated per variable -> exactly ONE finding for the one prohibited column, pinned by variable_name (no row= pin: Violation.row carries the colIndex)."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
+#expectViolationAt variable_name=AEOCCUR
 dataset AE label="Adverse Events"
 col STUDYID type=Char
 col DOMAIN  type=Char

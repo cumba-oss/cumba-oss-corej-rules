@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0359-E expect=skipped domain=FM
+#note "THE R-4.11 HOIST PIN (top-level-or board wave 2, group J): the pre-split rule guarded each branch with an in-Check var_exists; the split hoists each guard to Requirements.Variables.All [own variable], so with no FMRPENDY column this half SKIPs, naming the variable, instead of executing silently. DISCRIMINATOR: FMRPDY carries the non-integer '3.5' and is deliberately present - that is CDISC-SEND-0359-C's state, reported there and never here. If this EXECUTES, the hoisted gate has been removed - escalate, do not rewrite."
+#library standard=sendig-dart version=1-2
+dataset FM class=FINDINGS label="Fetal Measurements"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FMSEQ    type=Num  label="Sequence Number"
+col FMTESTCD type=Char label="Test Short Name"
+col FMRPDY type=Num label="Repro Phase Day Timing"
+---
+S1 | FM | 001 | 1 | BWFET | 3.5
+S1 | FM | 001 | 2 | BWFET | 12

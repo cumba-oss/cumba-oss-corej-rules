@@ -242,6 +242,15 @@ public final class RuleCanonicalizer
             if (hasComment(text))
             {
                 comments++;
+                // ⚠⚠ NAMED, never only counted. The rewrite below deletes a YAML comment without
+                // a word, and on 2026-09-11 CDISC-CG0155's five-line rationale went exactly that
+                // way — hidden inside a count of 9 whose other 8 hits were a '#' inside a quoted
+                // value and lost nothing. A count cannot tell those apart; a name can, because
+                // the caller can diff that one file.
+                System.out.printf(Locale.ROOT,
+                        "[canonicalize] %s: '#' outside quotes — VERIFY with a diff before"
+                                + " rewriting; a real comment is deleted without further notice%n",
+                        name(file));
             }
             List<String> warnings = new ArrayList<>();
             String canonical;

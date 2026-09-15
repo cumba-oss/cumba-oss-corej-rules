@@ -3,6 +3,7 @@ package net.cumba.corej.core.ruletestsuites;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import net.cumba.corej.core.exec.DatasetResolver;
@@ -11,6 +12,7 @@ import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.datatable.DataTableMeta;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.impl.support.OverlayDataTable;
+import net.cumba.datatable.metadata.ICodeList;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -158,7 +160,7 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
      * (there is no separate ADaM {@code Class} — see
      * {@code plans/PLAN-adam-structure-set-valued.md} §7.1), and one value feeds both gates:
      * {@code LibraryValidator} resolves the class name from {@code getDatasetClass} while
-     * {@code RuleGenerator} / {@code RuleRunner} read the same declaration through
+     * {@code DatasetRuleResolver} / {@code RuleRunner} read the same declaration through
      * {@code getDeclaredDatasetClass}. A {@code .cdt} {@code class="BASIC DATA STRUCTURE"} is
      * therefore a structure declaration whether or not the author also wrote {@code structure=},
      * and treating it as one is what makes the fixture mean in the harness what it would mean in a
@@ -230,11 +232,12 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
      * <p>
      * The ADaM <em>template</em> suites ({@code …ruletestsuites.adam.AbstractAdamTemplateTest}) sit
      * in a sub-package and declare their data structure as a {@code CLASS_NAME} constant that,
-     * until Fix #227, reached only the {@code RuleGenerator}. They now set {@link #STRUCTURE_KEY}
-     * on the synthesised fixture and wrap their <b>already-occupied library slot</b> with this
-     * decorator — the same channel {@code CdtLoader} uses, so the harness declares the way the rest
-     * of the system declares. {@link #install} is deliberately <em>not</em> what they call: those
-     * suites always supply a library provider, so there is no empty slot to refuse over.
+     * until Fix #227, reached only the {@code DatasetRuleResolver}. They now set
+     * {@link #STRUCTURE_KEY} on the synthesised fixture and wrap their <b>already-occupied library
+     * slot</b> with this decorator — the same channel {@code CdtLoader} uses, so the harness
+     * declares the way the rest of the system declares. {@link #install} is deliberately
+     * <em>not</em> what they call: those suites always supply a library provider, so there is no
+     * empty slot to refuse over.
      * </p>
      */
     public static MetadataProvider wrap(OverlayDataTable aPrimary, MetadataProvider aDelegate)
@@ -564,7 +567,7 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
 
 
     @Override
-    public boolean isCodelistExtensible(String aCodelistName)
+    public java.util.Optional<Boolean> isCodelistExtensible(String aCodelistName)
     {
         return base.isCodelistExtensible(aCodelistName);
     }
@@ -574,6 +577,25 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
     public Map<String, String> getCodelistTermMappings(String aCodelistName)
     {
         return base.getCodelistTermMappings(aCodelistName);
+    }
+
+
+    /**
+     * ⚠⚠ Delegated — the sibling of the four codelist accessors around it, and the one that was
+     * missed. Its interface default is {@code Optional.empty()} ("I have no rich codelist view"),
+     * which is honest for a leaf and silently wrong here: only the {@code (term, value)} shape of
+     * {@code codelist_terms} is served through {@link MetadataProvider#getCodelistTerms}; every
+     * other {@code (level, returntype)} shape reads this accessor, and an empty answer becomes
+     * {@code LIBRARY_NOT_AVAILABLE} ⇒ a SKIP. {@link #install} puts this decorator on the
+     * <b>library</b> slot for every ADaM {@code structure=} / {@code subclass=} scenario that has
+     * no define block, so inheriting the default made those scenarios SKIP the shape under test
+     * while an {@code expect=noViolation} scenario went green anyway — the exact Fix #368 failure
+     * mode recorded above, one accessor later.
+     */
+    @Override
+    public Optional<ICodeList> getCodelist(String aCodelistName)
+    {
+        return base.getCodelist(aCodelistName);
     }
 
 

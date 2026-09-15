@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1361-A expect=violation domain=DM
+#note "The half this R-5.25 split sibling owns: row 2 has ARMCD without ARM -> fires. Row 1 (ARM without ARMCD) is the PARENT FDA-SD1361's state and must NOT fire here - the discriminator of the split, on the same dataset the parent's own violation fixture uses. Rows 3/4 are the paired cases."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 |   | Treatment A
+S1 | DM | 002 | B |
+S1 | DM | 003 | C | Treatment C
+S1 | DM | 004 |   |

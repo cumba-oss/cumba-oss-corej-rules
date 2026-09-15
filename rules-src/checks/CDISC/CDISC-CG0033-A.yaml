@@ -3,9 +3,9 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when the Subject Visits (SV) dataset carries no SVPRESP\
-  \ variable and VISITNUM is populated for a visit whose VISIT name does not mark it\
-  \ unscheduled or unplanned, but its value does not match any VISITNUM value in the\
-  \ Trial Visits (TV) dataset."
+  \ variable and VISITNUM is populated for a visit whose VISIT name does not mark\
+  \ it unscheduled or unplanned, but its value does not match any VISITNUM value in\
+  \ the Trial Visits (TV) dataset."
 Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
@@ -32,25 +32,25 @@ Check:
     VISITNUM not in $tv_visitnum
 Outcome:
   Message: "SVPRESP is not available, and VISITNUM for a visit whose VISIT name does\
-    \ not mark it unscheduled or unplanned does not match any VISITNUM value in the TV\
-    \ dataset."
+    \ not mark it unscheduled or unplanned does not match any VISITNUM value in the\
+    \ TV dataset."
   Output_Variables:
   - "VISITNUM"
   - "VISIT"
   - "$tv_visitnum"
-Source:
-  Class: "ALL"
-  Domain: "ALL"
-  Variable: "VISITNUM"
-  Condition: "VISITNUM ^= null and is planned"
-  Rule: "VISITNUM in TV.VISITNUM"
 Source_Proposed:
   Sheet_Issue: "#176"
   Class: "ALL"
   Domain: "ALL"
   Variable: "VISITNUM"
-  Condition: "VISITNUM ^= null and SVPRESP is not present and VISIT does not identify the visit\
-    \ as unscheduled or unplanned"
+  Condition: "VISITNUM ^= null and SVPRESP is not present and VISIT does not identify\
+    \ the visit as unscheduled or unplanned"
+  Rule: "VISITNUM in TV.VISITNUM"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISITNUM"
+  Condition: "VISITNUM ^= null and is planned"
   Rule: "VISITNUM in TV.VISITNUM"
 Standards:
 - Organization: "CDISC"

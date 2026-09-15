@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  * </ul>
  *
  * <p>
- * Both rules used to depend on hardcoded {@code RuleGenerator} handlers
+ * Both rules used to depend on hardcoded {@code DatasetRuleResolver} handlers
  * ({@code generateFlagPresenceCheck}, {@code generateTreatmentPresenceCheck}) that injected
  * synthetic {@code IDX-FLPRES}/{@code IDX-TRTPRES} rules with placeholder {@code USUBJID exists}
  * checks. The handlers were retired 2026-04-28 in favour of these JSON-authored rules.

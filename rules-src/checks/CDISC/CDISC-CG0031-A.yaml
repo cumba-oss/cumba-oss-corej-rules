@@ -4,8 +4,8 @@ Core:
   Version: "1"
 Description: "Raise an error when the Subject Visits (SV) dataset carries no SVPRESP\
   \ variable and VISIT is populated with a value that does not match any VISIT value\
-  \ defined in the Trial Visits (TV) dataset, for a visit whose name does not mark it\
-  \ unscheduled or unplanned."
+  \ defined in the Trial Visits (TV) dataset, for a visit whose name does not mark\
+  \ it unscheduled or unplanned."
 Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
@@ -36,19 +36,19 @@ Outcome:
   - "VISITNUM"
   - "VISIT"
   - "$tv_visit"
-Source:
-  Class: "ALL"
-  Domain: "ALL"
-  Variable: "VISIT"
-  Condition: "VISIT ^= null and is planned"
-  Rule: "VISIT in TV.VISIT"
 Source_Proposed:
   Sheet_Issue: "#176"
   Class: "ALL"
   Domain: "ALL"
   Variable: "VISIT"
-  Condition: "VISIT ^= null and SVPRESP is not present and VISIT does not identify the visit as\
-    \ unscheduled or unplanned"
+  Condition: "VISIT ^= null and SVPRESP is not present and VISIT does not identify\
+    \ the visit as unscheduled or unplanned"
+  Rule: "VISIT in TV.VISIT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISIT"
+  Condition: "VISIT ^= null and is planned"
   Rule: "VISIT in TV.VISIT"
 Standards:
 - Organization: "CDISC"

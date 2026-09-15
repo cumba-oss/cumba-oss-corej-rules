@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SE2308-A expect=violation domain=PC
+#note "The half this R-5.25 split sibling owns (top-level-or board wave 2, group J): row 2 has neither VISITDY nor PCNOMDY populated - no day anchor - and fires ONCE, as one condition (the within-branch and-group stays whole; R-5.25 splits conditions, not leaves). Row 1 (PCELTM empty, VISITDY populated) is the parent FDA-SE2308's state and must NOT fire here - the discriminator, on the byte-identical dataset the parent's invalid fixture uses."
+#library standard=sendig version=3-1
+#expectViolationCount 1
+#expectViolationAt row=2 PCSEQ=2
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col VISITDY type=Num  label="Planned Study Day of Visit"
+col PCNOMDY type=Num  label="Nominal Study Day for Tabulations"
+col PCELTM  type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | PC | 001 | 1 | 3 | 1 |
+S1 | PC | 001 | 2 | . | . | PT1H
+S1 | PC | 001 | 3 | 3 | 1 | PT0H

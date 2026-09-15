@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0429 expect=violation domain=AE
+#note "Both columns present (the Requirements.Variables.All [--SCAT, --CAT] gate is satisfied): row 1 has AESCAT populated with AECAT empty -> fires. Row 2: both populated -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESCAT=MIGRAINE
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AECAT   type=Char label="Category for Adverse Event"
+col AESCAT  type=Char label="Subcategory for Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE |            | MIGRAINE
+S1 | AE | 002 | 1 | NAUSEA   | GI         | MILD

@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when the Outcome of Adverse Event (AEOUT) is equal to\
   \ 'RECOVERED/RESOLVED' but neither an End Date/Time of Adverse Event (AEENDTC) nor\
   \ a Duration of Adverse Event (AEDUR) is provided."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -14,6 +14,9 @@ Requirements:
   Variables:
     All:
     - "AEOUT"
+    Any:
+    - "AEENDTC"
+    - "AEDUR"
 Check:
   expression: >-
     AEOUT == "RECOVERED/RESOLVED" and empty(AEENDTC) and empty(AEDUR)

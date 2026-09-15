@@ -1,9 +1,10 @@
 #!RuleTest
 #test FDA-SD1122 expect=violation domain=LB
-#note "Row 2 has a numeric standardized character result LBSTRESC='5.5' but leaves the numeric counterpart LBSTRESN missing."
+#note "Row 2 has a numeric standardized character result LBSTRESC='5.5' but leaves the numeric counterpart LBSTRESN missing. ⭐ Row 3 added 2026-09-14: this rule is the FDA twin of PMDA-SD1122 — byte-identical expression — and when engine ef60470 made is_numeric parse-based, the PMDA scenario went red and THIS ONE STAYED GREEN. Not because the change does not reach it: because no row here held a value where the two grammars disagree. A suite that is green for want of a boundary value is not evidence, so the boundary is now in it. '1.23E-4' is a numeric result under the rule's original regex and under today's is_numeric, and its missing LBSTRESN is the defect the rule exists to find."
 #library standard=sdtmig version=3-4
-#expectViolationCount 1
+#expectViolationCount 2
 #expectViolationAt row=2 LBSTRESC=5.5 LBSTRESN=
+#expectViolationAt row=3 LBSTRESC=1.23E-4 LBSTRESN=
 dataset LB class=FINDINGS label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"
@@ -15,3 +16,4 @@ col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
 ---
 CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | 40  | 40
 CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 5.5 |
+CDISCPILOT01 | LB | 01-701-1015 | 3 | TSH  | 1.23E-4 |

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1465 expect=skipped domain=CO
+#note "S4 (2026-09-14): IDVARVAL is absent while RDOMAIN is present but empty. Requirements.Variables.All names BOTH columns, so the engine records one auditable skip naming the missing variable. Before the gate the rule did not fire here either -- not empty(IDVARVAL) is FALSE on an absent column (R-5.22), so the trigger could never hold -- but it failed SILENTLY, as a zero rather than as a skip. That is the whole R-4.11 point, and the whole change: the gate is coextensive with the rule's inability to fire (the CDISC-CG0087 shape), so no verdict moves and Executability stays put; only the reported STATUS becomes auditable. Its analogue CORE-000090 already gates its trigger the same way."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO |    | 001 | 1 | AESEQ | Related comment whose key value column is absent
+S1 | CO | AE | 001 | 2 | AESEQ | Properly keyed comment

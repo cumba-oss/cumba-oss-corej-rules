@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0086 expect=skipped domain=CE
+#note "CEOCCUR column absent while CEPRESP=Y with CESTAT empty. Requirements.Variables.All [--PRESP, --OCCUR] gates the rule out -> auditable skip naming the absent variable, instead of one finding per pre-specified row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-2 (--OCCUR): the sheet Condition declares '--OCCUR is present in dataset', so absence is out of scope by the authority's own words; no sister. --STAT stays UNGATED by the same board (Type 1): its absence means no record is exempted, which is the population the rule is for."
+#library standard=sdtmig version=3-4
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CESEQ    type=Num  label="Sequence Number"
+col CETERM   type=Char label="Reported Term for the Clinical Event"
+col CEPRESP  type=Char label="Clinical Event Pre-Specified"
+col CESTAT   type=Char label="Completion Status"
+---
+S1 | CE | 001 | 1 | FEVER | Y |

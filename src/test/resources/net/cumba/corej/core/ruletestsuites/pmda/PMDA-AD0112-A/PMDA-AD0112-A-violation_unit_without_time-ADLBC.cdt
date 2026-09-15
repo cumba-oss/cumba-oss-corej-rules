@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0112-A expect=violation domain=ADLBC
+#note "The half this R-5.25 split sibling owns: row 2 has ARELTMU with no ARELTM -> fires. Row 1 (a time with no unit) is the PARENT PMDA-AD0112's state and must NOT fire here - the discriminator of the split, on the same dataset the parent's violation fixture uses. Rows 3/4 are the conformant states. Record granularity -> exactly 1 violation."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 ARELTMU=HOURS
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col ARELTM  type=Num
+col ARELTMU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 2.5 | 4 |
+CDISCPILOT01 | 01-701-1023 | ALT | 7.0 |   | HOURS
+CDISCPILOT01 | 01-701-1034 | ALT | 9.9 | 8 | HOURS
+CDISCPILOT01 | 01-701-1045 | ALT | 1.1 |   |

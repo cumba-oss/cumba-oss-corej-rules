@@ -1,0 +1,93 @@
+Core:
+  Id: "CDISC-SEND-0214-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Duration of Element (TEDUR) variable\
+  \ is not present in the Trial Elements (TE) dataset and TEENRL is not populated;\
+  \ with no TEDUR column, TEENRL must be populated for each Element."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Requirements:
+  Variables:
+    None:
+    - "TEDUR"
+    All:
+    - "TEENRL"
+Check:
+  expression: >-
+    empty(TEENRL)
+Outcome:
+  Message: "TEDUR is not present in the dataset and TEENRL is not populated."
+  Output_Variables:
+  - "TEENRL"
+Source_Proposed:
+  Sheet_Issue: "#212"
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL"
+  Plain_Text_Explanation: "When the TEDUR variable is not present in the dataset,\
+    \ TEENRL must be populated for each Element so that every Element carries an end\
+    \ rule or a planned duration"
+  Condition: "TEDUR variable is not present in the dataset"
+  Rule: "TEENRL ^= null"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL, TEDUR"
+  Plain_Text_Explanation: "Either TEENRL or TEDUR (or both) must be populated for\
+    \ each Element."
+  Rule: "TEENRL ^= null AND/OR TEDUR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND214"
+        Version: "1"
+      Version: "5.0"

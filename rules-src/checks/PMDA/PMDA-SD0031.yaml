@@ -6,7 +6,7 @@ Description: "Raise a warning when an end timepoint (--ENDTC, --ENRF or --ENRTPT
   \ is populated but none of the related start timepoints (--STDTC, --STRF or --STRTPT)\
   \ is populated."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -17,11 +17,16 @@ Scope:
     Exclude:
     - "CO"
     - "DM"
+Requirements:
+  Variables:
+    Any:
+    - "--STDTC"
+    - "--STRF"
+    - "--STRTPT"
 Check:
   expression: >-
-    (var_exists("--ENDTC") and not empty(--ENDTC) or var_exists("--ENRF") and not empty(--ENRF) or
-    var_exists("--ENRTPT") and not empty(--ENRTPT)) and empty(--STDTC) and empty(--STRF) and
-    empty(--STRTPT)
+    (not empty(--ENDTC) or not empty(--ENRF) or not empty(--ENRTPT)) and empty(--STDTC) and
+    empty(--STRF) and empty(--STRTPT)
 Outcome:
   Message: "An end timepoint is populated but no start timepoint is populated."
   Output_Variables:

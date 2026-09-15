@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0397 expect=violation domain=FX
+#note "Pins R-5.22 on the exemption leaves, per the B4 ruling that KEPT the Any gate: FXSTAT is absent entirely but FXSTRESC is present, so Requirements.Variables.Any [FXSTRESC, FXSTAT] is satisfied and the rule RUNS. The negative leaf FXSTAT != \"NOT DONE\" is TRUE on the absent column (a missing value is not \"NOT DONE\" -- nothing is excused, the same reading C1 took for --OCCUR), FXSTRESC is MALFORMATION (not UNREMARKABLE), and FXRESCAT is present but empty -> row 1 fires. Row 2 has FXRESCAT populated and stays silent, so the fixture cannot pass vacuously."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=1 FXSEQ=1
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+col FXSTRESC type=Char label="Character Result/Finding in Std Format"
+col FXRESCAT type=Char label="Result Category"
+---
+S1 | FX | 001 | 1 | FPEXAM | MALFORMATION | 
+S1 | FX | 002 | 2 | FPEXAM | MALFORMATION | SKELETAL

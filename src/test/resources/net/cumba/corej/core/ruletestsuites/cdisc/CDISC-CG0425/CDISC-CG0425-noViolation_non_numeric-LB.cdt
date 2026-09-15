@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0425 expect=noViolation domain=LB
+#note "The regex arm alone, with LBSTRESU present-but-empty on every row so ONLY /^-?[0-9]+(\\.[0-9]+)?$/ can hold the verdict back. Row 1 'POSITIVE': no digits. Row 2 '1+': pins the trailing $ anchor - a numeric PREFIX is not a numeric result. Row 3 '>100': pins the leading ^ anchor. Row 4 '7.2 mmol/L': a numeric value carrying its unit inline is still not a match, and it is the shape that would most plausibly be mis-parsed. None fires; the same rows with a bare numeric would, which CDISC-CG0425-violation-LB pins."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | HBSAG   | POSITIVE   |
+S1 | LB | 001 | 2 | PROT    | 1+         |
+S1 | LB | 001 | 3 | CHOL    | >100       |
+S1 | LB | 001 | 4 | GLUC    | 7.2 mmol/L |

@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9724 expect=violation domain=AE
+#note "The sister half of the FDA-SD1333 pair (minted 2026-09-11, M14/T1-30). Neither AEENDTC nor AEDUR is in the dataset (None satisfied) while rows 1 and 2 report AEOUT='RECOVERED/RESOLVED', so the remaining condition holds on two rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify. Same dataset shape as the parent's skipped_no_end_columns scenario: the parent skips, this rule reports. AEENDTC is Expected and AEDUR Permissible in AE in every SDTMIG this pair ships into (measured), so shipping neither is a sponsor's choice, not the data model."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | RECOVERED/RESOLVED
+CDISCPILOT01 | AE | 01-701-1016 | 2 | NAUSEA   | RECOVERED/RESOLVED

@@ -1,0 +1,21 @@
+#!RuleTest
+#test FDA-SD1037 expect=violation domain=LB
+#runLevel Info
+#library standard=sdtmig version=3-4
+#note "F14 (owner ruling D-13): --TOXGR is Char with NO codelist in SDTMIG 3.4, so a sponsor writing CTCAE grades as text makes the numeric leg silent on exactly the records the rule exists for. Row 1: LBTOXGR='GRADE 3' with LBTOX empty -> the INFO heuristic leg (--TOXGR =~ /[1-9]/) reports it. Row 2: LBTOXGR=2 with LBTOX empty -> claimed at ERROR; RuleRunner first-claim-wins arbitration means it is NOT re-reported at INFO, which is why neither leg needs an is_numeric conjunct. Row 3: LBTOXGR='SEVERE' with LBTOX empty -> silent on both legs, pinning the heuristic's documented blindness to digit-free text grades (accepted, not a defect). Row 4: LBTOXGR='GRADE 3' with LBTOX populated -> both legs false. Runs at #runLevel Info because the engine default (Warning) never evaluates an INFO level."
+#expectViolationCount 2
+#expectViolationAt row=1 severity=INFO
+#expectViolationAt row=2 severity=ERROR
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTOXGR type=Char label="Standard Toxicity Grade"
+col LBTOX   type=Char label="Toxicity"
+---
+S1 | LB | 001 | 1 | GRADE 3 |
+S1 | LB | 001 | 2 | 2 |
+S1 | LB | 001 | 3 | SEVERE |
+S1 | LB | 001 | 4 | GRADE 3 | Grade 3
+---

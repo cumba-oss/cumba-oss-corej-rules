@@ -1,0 +1,40 @@
+Core:
+  Id: "CDISC-CG0313-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the variable DOMAIN is not present in a dataset\
+  \ based on one of the three SDTM general observation classes."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+Check:
+  expression: >-
+    not var_exists("DOMAIN")
+Outcome:
+  Message: "DOMAIN is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#247"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "DOMAIN"
+  Rule: "DOMAIN exists"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "STUDYID, USUBJID or POOLID, DOMAIN, and --SEQ exist"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0313"
+        Version: "1"
+      Version: "2.0"

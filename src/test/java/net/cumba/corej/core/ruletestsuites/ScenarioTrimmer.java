@@ -65,7 +65,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * Run with:
  *
  * <pre>
- * mvn -P main -pl lib/corej-cdisc-rules test \
+ * mvn test \
  *     -Dtest=ScenarioTrimmer -Dtrim.scenarios=true
  * </pre>
  *
@@ -87,7 +87,7 @@ class ScenarioTrimmer
      * Anchored on projectBasedir, never on the CWD: the root pom pins surefire's
      * <workingDirectory> to ${project.build.directory}/test-cwd for every module, and its own
      * comment states the convention -- a test that needs the module dir anchors on the
-     * projectBasedir / repoRoot system properties instead. corej-cdisc-rules happens to override
+     * projectBasedir / repoRoot system properties instead. corej-rules happens to override
      * workingDirectory back to ${project.basedir}, but that override is documented as being for
      * the corpus tests and could be removed; a bare relative path would then silently resolve to
      * an empty directory and this tool would reach zero files, which is exactly the state it was
@@ -109,8 +109,7 @@ class ScenarioTrimmer
             throw new IllegalStateException("The 'projectBasedir' system property is not set. "
                     + "ScenarioTrimmer resolves the corpus and the rule packages against the "
                     + "MODULE directory; surefire sets this property, a bare IDE run does not. "
-                    + "Run it with: mvn -P main -pl lib/corej-cdisc-rules test "
-                    + "-Dtest=ScenarioTrimmer -Dtrim.scenarios=true");
+                    + "Run it with: mvn test " + "-Dtest=ScenarioTrimmer -Dtrim.scenarios=true");
         }
         return Path.of(base);
     }

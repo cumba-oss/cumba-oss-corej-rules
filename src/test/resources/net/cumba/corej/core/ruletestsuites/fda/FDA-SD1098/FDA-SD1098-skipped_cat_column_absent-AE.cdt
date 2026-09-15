@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1098 expect=skipped domain=AE
+#note "AECAT column absent while AESCAT is populated. Requirements.Variables.All [--SCAT, --CAT] gates the rule out -> auditable skip naming the absent variable, instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed, so this scenario is the discriminator for it. Verdict 2-1' (absent-column register): FDA-SD1099 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESCAT  type=Char label="Subcategory for Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | MIGRAINE

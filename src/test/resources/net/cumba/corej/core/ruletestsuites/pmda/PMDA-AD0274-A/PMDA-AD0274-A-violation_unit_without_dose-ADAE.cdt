@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0274-A expect=violation domain=ADAE
+#note "The half this R-5.25 split sibling owns: row 2 has DOSAEONU with no DOSEAEON -> fires. Row 1 (the dose with no unit) is the PARENT PMDA-AD0274's state and must NOT fire here - the discriminator of the split. Record granularity -> exactly 1 violation."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 DOSAEONU=mg
+dataset ADAE
+col STUDYID  type=Char
+col USUBJID  type=Char
+col AEDECOD  type=Char
+col DOSEAEON type=Num
+col DOSAEONU type=Char
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE |  50 |
+CDISCPILOT01 | 01-701-1023 | NAUSEA   |     | mg
+CDISCPILOT01 | 01-701-1034 | RASH     | 100 | mg
+CDISCPILOT01 | 01-701-1045 | FEVER    |     |

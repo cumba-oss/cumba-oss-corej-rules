@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0280 expect=skipped domain=LB
+#note "LBREASND is not in the dataset at all while LBSTAT says NOT DONE -- the guarded variable's column is ABSENT ENTIRELY. Since 2026-09-11 the rule gates on Requirements.Variables.All [--STAT, --REASND] again (R-4.11b, the F3 carry-over of verdict T1-11 to SENDIG), so the run is an auditable SKIP naming the missing column. This SUPERSEDES the 2026-08-27 gate-REMOVAL rationale this note used to carry: that ruling's premise -- 'NO rule anywhere reports its absence' -- was true then and is exactly what the minted sister CDISC-SEND-9437 now supplies, reporting the absence ONCE at dataset level while the parent skips audibly instead of flooding one finding per NOT DONE row."
+#library standard=sendig version=3-1-1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | ALB | NOT DONE

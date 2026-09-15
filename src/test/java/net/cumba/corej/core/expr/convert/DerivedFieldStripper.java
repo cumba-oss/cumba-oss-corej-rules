@@ -43,8 +43,8 @@ import net.cumba.corej.core.model.Sensitivity;
  * </p>
  *
  * <pre>{@code
- * cd lib/corej-cdisc-rules
- * mvn -P main -q org.codehaus.mojo:exec-maven-plugin:3.6.3:java \
+ * cd cumba-corej-rules
+ * mvn -q org.codehaus.mojo:exec-maven-plugin:3.6.3:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.DerivedFieldStripper
  * }</pre>

@@ -2,9 +2,8 @@ Core:
   Id: "CDISC-SEND-0061"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a duration variable (--EVLINT, --ELTM, or --DUR)\
-  \ mixes a week (W) component with any other ISO 8601 date/time component (Y, M,\
-  \ D, H, or S)."
+Description: "Raise an error when the duration variable --EVLINT mixes a week (W)\
+  \ component with any other ISO 8601 date/time component (Y, M, D, H, or S)."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -12,19 +11,18 @@ Scope:
     - "INTERVENTIONS"
     - "EVENTS"
     - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--EVLINT"
 Check:
   expression: >-
-    var_exists("--EVLINT") and not empty(--EVLINT) and --EVLINT =~ /.*[0-9]W/ and --EVLINT =~
-    /.*[0-9][DHMSY]/ or var_exists("--ELTM") and not empty(--ELTM) and --ELTM =~ /.*[0-9]W/ and
-    --ELTM =~ /.*[0-9][DHMSY]/ or var_exists("--DUR") and not empty(--DUR) and --DUR =~ /.*[0-9]W/
-    and --DUR =~ /.*[0-9][DHMSY]/
+    not empty(--EVLINT) and --EVLINT =~ /.*[0-9]W/ and --EVLINT =~ /.*[0-9][DHMSY]/
 Outcome:
-  Message: "--EVLINT, --ELTM, or --DUR mixes a week (W) component with another date/time\
-    \ component, which is not permitted in an ISO 8601 duration."
+  Message: "--EVLINT mixes a week (W) component with another date/time component,\
+    \ which is not permitted in an ISO 8601 duration."
   Output_Variables:
   - "--EVLINT"
-  - "--ELTM"
-  - "--DUR"
 Source:
   Class: "INT, EVT, FND"
   Domain: "ALL"

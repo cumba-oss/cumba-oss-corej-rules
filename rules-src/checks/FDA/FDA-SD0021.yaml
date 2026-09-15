@@ -5,16 +5,23 @@ Core:
 Description: "Raise an error when no End Time-Point variable (--ENDTC, --ENRF, or\
   \ --ENRTPT) is populated and the event/intervention is not excepted by --OCCUR equals\
   \ 'N', a populated --STAT, or a populated --DUR."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
     - "INTERVENTIONS"
     - "EVENTS"
+Requirements:
+  Variables:
+    Any:
+    - "--ENDTC"
+    - "--ENRF"
+    - "--ENRTPT"
+    - "--DUR"
 Check:
   expression: >-
-    empty(--ENDTC) and empty(--ENRF) and empty(--ENRTPT) and (not var_exists("--OCCUR") or --OCCUR
-    != "N") and empty(--STAT) and empty(--DUR)
+    empty(--ENDTC) and empty(--ENRF) and empty(--ENRTPT) and --OCCUR != "N" and empty(--STAT) and
+    empty(--DUR)
 Outcome:
   Message: "No End Time-Point variable (--ENDTC, --ENRF, or --ENRTPT) is populated."
   Output_Variables:

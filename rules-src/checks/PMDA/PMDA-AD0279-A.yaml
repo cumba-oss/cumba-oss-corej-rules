@@ -1,0 +1,69 @@
+Core:
+  Id: "PMDA-AD0279-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Analysis Severity/Intensity (N) (ASEVN) variable\
+  \ holds a populated value that is not 1, 2, or 3. ASEVN is a numeric severity code\
+  \ whose only permitted populated values are 1, 2, and 3."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "OCCURRENCE DATA STRUCTURE"
+    - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
+Check:
+  expression: >-
+    not empty(ASEVN) and ASEVN not in [1, 2, 3]
+Outcome:
+  Message: "ASEVN has a populated value that is not 1, 2, or 3."
+  Output_Variables:
+  - "ASEVN"
+Source_Proposed:
+  Sheet_Issue: "#244"
+  Message: "ASEVN value != 1, 2, 3, or null"
+  Description: "Analysis Severity/Intensity (N) (ASEVN) variable must have values\
+    \ in [1, 2, 3] when populated."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Source:
+  Message: "Variable value != 1, 2, 3, or null"
+  Description: "Severity/Intensity (N) (AESEVN) and Analysis Severity/Intensity (N)\
+    \ (ASEVN) variables must have values in [1, 2, 3] when populated. AESEVN can be\
+    \ null. ASEVN cannot be null."
+  Domains: "OCCDS, ADAE, MDOCCDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0279"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0279"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0279"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0279"
+        Version: "1"
+      Version: "6.0"

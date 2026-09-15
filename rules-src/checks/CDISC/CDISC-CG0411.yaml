@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-CG0411"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when the combination of RDOMAIN, IDVAR, IDVARVAL, and\
-  \ QNAM is not unique for a parent subject record in a Supplemental Qualifiers (SUPP--)\
-  \ dataset."
+Description: "Raise an error when, for a DM-related record (RDOMAIN = 'DM') in a Supplemental\
+  \ Qualifiers (SUPP--) dataset, the combination of RDOMAIN and QNAM is not unique\
+  \ for the parent subject record."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -17,15 +17,12 @@ Requirements:
     - "RDOMAIN"
 Check:
   expression: >-
-    RDOMAIN == "DM" and not is_unique_set([USUBJID, RDOMAIN, QNAM]) or RDOMAIN != "DM" and not
-    is_unique_set([USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM])
+    RDOMAIN == "DM" and not is_unique_set([USUBJID, RDOMAIN, QNAM])
 Outcome:
-  Message: "RDOMAIN, IDVAR, IDVARVAL, and QNAM are not a unique combination for the\
-    \ parent subject record."
+  Message: "RDOMAIN and QNAM are not a unique combination for the parent subject record\
+    \ (RDOMAIN = 'DM')."
   Output_Variables:
   - "RDOMAIN"
-  - "IDVAR"
-  - "IDVARVAL"
   - "QNAM"
 Source:
   Class: "ALL"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0252-C expect=noViolation domain=ADSL
+#note "A conformant ADSL carrying neither prohibited variable. Since the D-15 rewrite (2026-09-12) the wildcard-free varname() Check EXECUTES per variable and stays silent -> the rule's first true noViolation state; pre-rewrite the WildcardExpander returned NoMatch here and the rule could only report SKIPPED (the no-noViolation carve-out is retired for this family, as it was for PMDA-AD0252/-B/-D by Fix #270)."
+#library standard=adamig version=1-3
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+col SEX     type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 56 | F | Y
+CDISCPILOT01 | 01-701-1023 | 64 | M | Y

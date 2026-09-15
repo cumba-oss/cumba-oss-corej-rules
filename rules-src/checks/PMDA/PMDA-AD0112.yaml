@@ -2,10 +2,10 @@ Core:
   Id: "PMDA-AD0112"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when, on a record, exactly one of Analysis Relative Time\
-  \ (ARELTM, numeric, missing when absent) and Analysis Relative Time unit (ARELTMU,\
-  \ character, empty when absent) is populated. If either variable is populated, both\
-  \ must be populated together."
+Description: "Raise an error when, on a record, Analysis Relative Time (ARELTM, numeric,\
+  \ missing when absent) is populated but Analysis Relative Time unit (ARELTMU, character,\
+  \ empty when absent) is empty. If either variable is populated, both must be populated\
+  \ together."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -19,9 +19,9 @@ Requirements:
     - "ARELTMU"
 Check:
   expression: >-
-    not empty(ARELTM) and empty(ARELTMU) or not empty(ARELTMU) and empty(ARELTM)
+    not empty(ARELTM) and empty(ARELTMU)
 Outcome:
-  Message: "Only one of these variables is populated: ARELTM, ARELTMU"
+  Message: "ARELTM is populated but ARELTMU is empty."
   Output_Variables:
   - "ARELTM"
   - "ARELTMU"

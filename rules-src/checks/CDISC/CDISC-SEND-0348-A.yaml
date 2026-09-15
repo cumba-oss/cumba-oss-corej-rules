@@ -1,0 +1,68 @@
+Core:
+  Id: "CDISC-SEND-0348-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a Pharmacokinetics Concentrations (PC) record,\
+  \ the timing variable Planned Time Point Reference (PCTPTREF), required to build\
+  \ a time-concentration profile, is not populated."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCTPTREF"
+Check:
+  expression: >-
+    empty(PCTPTREF)
+Outcome:
+  Message: "PCTPTREF, a PC timing variable needed for a time-concentration profile,\
+    \ is not populated."
+  Output_Variables:
+  - "PCTPTREF"
+Source_Proposed:
+  Sheet_Issue: "#236"
+  Class: "FND"
+  Domain: "PC, PP"
+  Variable: "PCTPTREF"
+  Plain_Text_Explanation: "For PC records contributing to a time concentration profile,\
+    \ the timing variable PCTPTREF must be populated."
+  Condition: "PC records contribute to a time concentration profile in PP"
+  Rule: "PCTPTREF ^= null"
+Source:
+  Class: "FND"
+  Domain: "PC, PP"
+  Variable: "PCNOMDY, PCTPTREF, PCELTM"
+  Plain_Text_Explanation: "For PC records contributing to a time concentration profile,\
+    \ the timing variables PCNOMDY, PCTPTREF, and PCELTM must all be populated."
+  Condition: "PC records contribute to a time concentration profile in PP"
+  Rule: "PCNOMDY ^= null AND PCTPTREF  ^= null AND PCELTM  ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND348"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND348"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND348"
+        Version: "1"
+      Version: "5.0"

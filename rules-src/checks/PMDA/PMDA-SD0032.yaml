@@ -2,10 +2,10 @@ Core:
   Id: "PMDA-SD0032"
   Status: "Published"
   Version: "1"
-Description: "Raise a warning when Planned Time Point Name (--TPT) is empty or not\
-  \ present while Planned Time Point Number (--TPTNUM) is populated."
+Description: "Raise a warning when Planned Time Point Name (--TPT) is empty while\
+  \ Planned Time Point Number (--TPTNUM) is populated."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -21,6 +21,7 @@ Requirements:
   Variables:
     All:
     - "--TPTNUM"
+    - "--TPT"
 Check:
   expression: >-
     not empty(--TPTNUM) and empty(--TPT)

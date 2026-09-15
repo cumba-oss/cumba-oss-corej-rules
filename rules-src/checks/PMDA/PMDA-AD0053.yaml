@@ -12,6 +12,10 @@ Scope:
     Include:
     - "SUBJECT LEVEL ANALYSIS DATASET"
     - "DEVICE LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DM.USUBJID"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -20,7 +24,7 @@ Match_Datasets:
   Name: "DM"
 Check:
   expression: >-
-    var_exists(DM.USUBJID) and empty(DM.DOMAIN)
+    empty(DM.DOMAIN)
 Outcome:
   Message: "The combination of STUDYID and USUBJID does not exist in the SDTM DM domain."
   Output_Variables:

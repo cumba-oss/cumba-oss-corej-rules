@@ -8,9 +8,7 @@ import java.util.Map;
 
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleExecutionStatus;
-import net.cumba.corej.core.exec.RuleRunner;
 import net.cumba.corej.core.model.Rule;
-import net.cumba.datatable.IDataTable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -239,6 +237,37 @@ class ExpectedErrorsTest
 
 
         @Test
+        void aColumnTypeMismatchIsRecognisedByItsFixedHead()
+        {
+            // PLAN-column-type-conformance Phase 3. The TAIL is data-dependent -- it names the
+            // variable and both types -- so unlike the split-domain case the classification
+            // matches the engine-fixed HEAD. Both directions produce the same prefix.
+            Assertions.assertEquals(
+                    List.of(ViolationNormaliser.ErrorReason.COLUMN_TYPE_MISMATCH.name()),
+                    ViolationNormaliser.reasonsFrom(error("column-type mismatch: column DOSE is "
+                            + "declared STRING but a numeric operand is required here; author "
+                            + "num(DOSE)"), null));
+            Assertions.assertEquals(
+                    List.of(ViolationNormaliser.ErrorReason.COLUMN_TYPE_MISMATCH.name()),
+                    ViolationNormaliser.reasonsFrom(
+                            error("column-type mismatch: column CNSR is declared LONG but a "
+                                    + "character operand is required here"),
+                            null));
+        }
+
+
+        @Test
+        void aRewordedColumnTypeMismatchDegradesToOtherRatherThanMisclassifying()
+        {
+            // The prefix match is the whole contract: if the engine rewords the head, this must
+            // become a VISIBLE divergence, never a silent mis-bucketing into the wrong reason.
+            Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.OTHER.name()),
+                    ViolationNormaliser.reasonsFrom(
+                            error("column type mismatch: column DOSE is declared STRING"), null));
+        }
+
+
+        @Test
         void anUnrecognisedMessageIsOther()
         {
             Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.OTHER.name()),
@@ -288,14 +317,22 @@ class ExpectedErrorsTest
 
 
         @Test
-        void theVocabularyHasExactlyFiveTokens()
+        void theVocabularyHasExactlySixTokens()
         {
             // Widened 4 → 5 by Fix #358: INVALID_SPLIT_DOMAIN covers the split-domain
             // union-failure ERROR (ruling 1 of PLAN-match-datasets-split-union.md).
-            Assertions.assertEquals(5, ViolationNormaliser.ErrorReason.values().length,
+            // Widened 5 → 6 on 2026-09-13 by PLAN-column-type-conformance Phase 3:
+            // COLUMN_TYPE_MISMATCH covers the new ColumnTypeGate ERROR site in RuleRunner.
+            // ⭐ This ratchet did its job — it caught the widening in the same run that first
+            // exercised the gate, which is exactly the point of an exact-equality census.
+            // ⚑ Note for whoever follows the message's advice: PLAN-match-datasets-split-union.md
+            // is NOT in <meta>/plans/ or plans/done/ — a dangling citation, like
+            // PLAN-date-diff-foreign-offset.md. The vocabulary that is actually authoritative is
+            // this enum plus ViolationNormaliser.classify.
+            Assertions.assertEquals(6, ViolationNormaliser.ErrorReason.values().length,
                     "A new ErrorReason means a new classification branch and, most likely, a new "
-                            + "RuleRunner ERROR site — update EngineContract below and the plan's "
-                            + "D4 vocabulary before widening this.");
+                            + "RuleRunner ERROR site — update EngineContract below before widening "
+                            + "this, and add a classify() case or it silently buckets as OTHER.");
         }
 
 
@@ -447,8 +484,12 @@ class ExpectedErrorsTest
             // were written; PLAN-scope-requirements-split moved it to Requirements.Variables.)
             //
             // OPGAP-shares-at-least-one-element-with is the odd one out and the important one: it
-            // is the only entry where JAVA produces the reason and Python does not, i.e. the only
-            // spec that exercises this channel on the Java lane at all.
+            // was the only entry where JAVA produces the reason and Python does not — the only
+            // spec exercising this channel on the Java lane — until PLAN-column-type-conformance
+            // (2026-09-13) added CDISC-AD0361/-AD0362: their fixtures ship ASTDT(M)/AENDT(M) as
+            // Char date strings on purpose, and the column-type gate (R4/R5) now ERRORs a numeric
+            // order comparison over a Char-declared column, so coreJ reports a rule error where
+            // the Python oracle parsed both sides and executed to zero findings.
             List<String> claiming = BaselineManifest.loadDefault().knownDivergences().stream()
                     .filter(d -> d.divergesOn(BaselineManifest.ERRORS_CHANNEL))
                     .map(BaselineManifest.KnownDivergence::spec).sorted().toList();
@@ -460,9 +501,9 @@ class ExpectedErrorsTest
             // CDISC-AD0497 left this cohort when the fork gained dataset_class_from_library
             // (EC-33 Q-C residual, 2026-08-02) — same three-guard retirement as FDA-SD1063.
             Assertions.assertEquals(List.of("CDISC-AD0132", "CDISC-AD0223", "CDISC-AD0225",
-                    "CDISC-AD0500", "CDISC-AD0582", "CDISC-AD0586", "CDISC-AD0700", "CDISC-AD0701",
-                    "CDISC-AD0704", "CDISC-AD0705", "CDISC-AD0720", "CDISC-AD0897",
-                    "OPGAP-shares-at-least-one-element-with"), claiming);
+                    "CDISC-AD0361", "CDISC-AD0362", "CDISC-AD0500", "CDISC-AD0582", "CDISC-AD0586",
+                    "CDISC-AD0700", "CDISC-AD0701", "CDISC-AD0704", "CDISC-AD0705", "CDISC-AD0720",
+                    "CDISC-AD0897", "OPGAP-shares-at-least-one-element-with"), claiming);
         }
     }
 
@@ -478,27 +519,26 @@ class ExpectedErrorsTest
     class EngineContract
     {
 
-        @Test
-        void aRealEngineLoadErrorClassifiesAsLoadError() throws Exception
-        {
-            // End-to-end against the actual engine, not a hand-built result: this is the one
-            // ERROR site whose message is authored rather than constant, so it is the site a
-            // string-matching classifier is most likely to get wrong.
-            Rule rule = new Rule();
-            rule.setLoadError("off-diagonal operator 'equal_to' on a date operand");
-            IDataTable table = FixtureLoader.build(Map.of("AE", new SpecSchema.SpecDataset(null,
-                    List.of(Map.of("STUDYID", "S1", "USUBJID", "001")), List.of("STUDYID"), null)))
-                    .get("AE");
-
-            RuleExecutionResult result = RuleRunner.execute(rule, table);
-
-            Assertions.assertNotNull(result);
-            Assertions.assertEquals(RuleExecutionStatus.ERROR, result.getStatus(),
-                    "a rule carrying a loadError must execute to ERROR");
-            Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.LOAD_ERROR.name()),
-                    ViolationNormaliser.reasonsFrom(result, rule));
-        }
-
+        /*
+         * ⚠⚠ THREE DRIFT GUARDS MOVED OUT OF THIS CLASS.
+         *
+         * theEngineStillHasExactlyFiveErrorSites, theInvalidSplitDomainSuffixStillMatchesTheEngine
+         * Source and theNoNativeCheckExprMessageConstantStillMatchesTheEngineSource all read the
+         * ENGINE'S SOURCE TEXT -- RuleRunner.java and SplitDomainResolution.java -- because the
+         * messages they pin are inline literals with no constant to import. In the coreJ monorepo
+         * that was a relative path to a sibling module.
+         *
+         * corej-core is a separate repository now and this build never checks it out. The sources
+         * jar is not an option either: cumba-corej attaches it on the deploy path only, by an
+         * explicit decision in its root pom, and a test convenience is not a reason to reverse it.
+         *
+         * → They live in cumba-corej now, beside the source they read, as
+         *   cumba-corej-core/src/test/java/net/cumba/corej/core/exec/EngineErrorMessageContractTest.
+         *   That copy carries its own copies of the two message literals; ViolationNormaliser here
+         *   is the other half of the pair, and the two MUST be changed together. A reworded engine
+         *   message that this classifier no longer recognises degrades every affected ERROR to
+         *   OTHER -- silently, which is exactly what the guards exist to prevent.
+         */
 
         @Test
         void theCorpusErrorPinObservesExactlyTheTokenItClaims() throws Exception

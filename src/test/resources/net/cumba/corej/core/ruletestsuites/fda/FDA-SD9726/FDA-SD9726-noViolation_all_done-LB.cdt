@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD9726 expect=noViolation domain=LB
+#note "LBREASND is not in the dataset, but no row reports LBSTAT='NOT DONE' - every test was performed, so an absent reason column is unremarkable. The sister fires only where its parent would have fired (R-4.11c)."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB |  | 4.1

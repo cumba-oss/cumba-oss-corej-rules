@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0221 expect=violation domain=TA
+# Rule:Description: TAETORD is populated with a value that is not an integer.
+#note "Added 2026-09-14. ⭐ This file pins a DECISION, not just a behaviour. TAETORD is Num in the standard but ships Char in 6 of this corpus's fixtures (plan §3 Q4, 4%), and Char is the only shape where the migration changed what the rule ACCEPTS: the retired regex ^(-?[1-9]\\d*|0)$ was a canonical-form constraint that rejected leading zeros and -0, while is_integer is Double.parseDouble-backed and takes them. The corpus already held both opinions — CDISC-SEND-0221 itself used the permissive regex — and the migration adopted the permissive one for all five TAETORD rules WITHOUT recording the choice. Row 2 is that choice, executable: 007 is accepted as an integer and must NOT fire. Row 1 is not an integer under either reading and does. ⚠ If is_integer is ever narrowed to is_numeric's hand-rolled grammar (the open carried-forward item), this file is what tells you TAETORD's acceptance changed rather than letting it change in silence."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=A TAETORD=2a
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Char label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 2a  | SCRN
+S1 | TA | A | Arm A | 007 | TRT
+---

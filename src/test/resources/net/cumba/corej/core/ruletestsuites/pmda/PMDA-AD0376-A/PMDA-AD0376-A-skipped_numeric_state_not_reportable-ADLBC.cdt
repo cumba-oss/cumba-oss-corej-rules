@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0376-A expect=skipped domain=ADLBC
+#note "DISCRIMINATOR of the R-5.25 split, on the byte-identical dataset of the parent's violation fixture: AVISITN is present-and-blank while the primary AVISIT is populated - the *N state, owned by the parent PMDA-AD0376. This sibling owns only the *C arm, and the dataset carries NO *C candidate at all, so the wildcard expansion set is empty -> NoMatch -> SKIPPED (the same mechanism as the parent's -skipped_excluded_secondary). The parent's state is never reported by this rule, which is the point."
+#library standard=adamig version=1-3
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVISIT  type=Char
+col AVISITN type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | WEEK2 |
+CDISCPILOT01 | 01-701-1023 | ALB | WEEK4 | 4

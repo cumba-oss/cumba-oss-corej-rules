@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD9718 expect=noViolation domain=DS
+#note "The discriminator that keeps the pair from double-reporting: the DSSTDTC column EXISTS (blank on every row), so not var_exists(--STDTC) is false and the sister stays silent - the parent's Any gate is satisfied and PMDA-SD1118 reports each all-blank row with its location."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | COMPLETED |

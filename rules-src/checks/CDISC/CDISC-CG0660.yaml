@@ -2,25 +2,23 @@ Core:
   Id: "CDISC-CG0660"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when --EVALID is present in a QS or FT dataset. --EVALID\
-  \ must not be used to model QRS (Questionnaires, Ratings, and Scales) data. This\
-  \ also applies to the RS domain for the Clinical Classification Use Case, which\
-  \ is a human-judgement condition not evaluated by this rule."
-Executability: "Partially Executable"
+Description: "Raise an error when the --EVALID variable (QSEVALID or FTEVALID) is\
+  \ present in a QS or FT dataset. --EVALID must not be used to model QRS (Questionnaires,\
+  \ Ratings, and Scales) data. The RS domain is covered by this rule's -A sibling,\
+  \ which tests the Clinical Classification use case at record level."
+Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "QS"
     - "FT"
-    - "RS"
 Check:
   expression: >-
-    var_exists("QSEVALID") or var_exists("FTEVALID")
+    var_exists("--EVALID")
 Outcome:
   Message: "--EVALID is present. --EVALID must not be used to model QRS data."
   Output_Variables:
-  - "QSEVALID"
-  - "FTEVALID"
+  - "--EVALID"
 Source:
   Class: "FND"
   Domain: "QS, FT, RS"

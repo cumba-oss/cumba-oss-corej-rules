@@ -1,10 +1,13 @@
 #!RuleTest
 #test PMDA-SD1464 expect=violation domain=EX
-#note "The row set is the is_numeric truth-table pin (function-examples.md): row 1 '500' pure numeric -> fires; row 2 '500 mg' has_alpha -> no; row 3 '.5' accepted (lone leading dot) -> fires; row 4 empty -> no; row 5 '1e5' exponent rejected by the strict scan -> no; row 6 '1.' trailing dot rejected -> no."
+#note "The row set is the is_numeric truth-table pin (function-examples.md), re-derived 2026-09-14 for the parse-based is_numeric of engine ef60470 (owner ruling: true for anything parsable to a Double or long). Count 2 -> 5. Row 1 '500' pure numeric -> fires; row 2 '500 mg' has alpha -> no; row 3 '.5' leading dot -> fires; row 4 empty -> no (a missing cell is not numeric, so the rule stays out of the 'must be populated' business); row 5 '1e5' exponent -> NOW fires; row 6 '1.' trailing dot -> NOW fires; row 7 '+1' leading plus -> NOW fires. ⚠ Read rows 5 and 7 apart from row 6: '1e5' and '+1' are RESTORATIONS — the rule's original regex /^[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?$/ accepted both, and only wave TA-4's hand-rolled scan rejected them — whereas '1.' is a GENUINE WIDENING past even that regex, which required a digit after the dot. It is accepted deliberately (Double.parseDouble does) and is defensible for this rule, whose point is that a pure number does not belong in --DOSTXT at all; but it is not the same kind of change as the other two and should not be recorded as if it were. Row 7 moved here from -valid_textual_dose, whose premise it stopped satisfying."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 5
 #expectViolationAt row=1 EXDOSTXT=500
 #expectViolationAt row=3 EXDOSTXT=.5
+#expectViolationAt row=5 EXDOSTXT=1e5
+#expectViolationAt row=6 EXDOSTXT=1.
+#expectViolationAt row=7 EXDOSTXT=+1
 dataset EX class=INTERVENTIONS label="Exposure"
 col STUDYID  type=Char
 col DOMAIN   type=Char
@@ -19,3 +22,4 @@ S1 | EX | 001 | 3 | DRUGA | .5
 S1 | EX | 001 | 4 | DRUGA |
 S1 | EX | 001 | 5 | DRUGA | 1e5
 S1 | EX | 001 | 6 | DRUGA | 1.
+S1 | EX | 001 | 7 | DRUGA | +1

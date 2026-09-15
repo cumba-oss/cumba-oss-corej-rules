@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0169 expect=violation domain=ADLBC
+# Rule:Description: The value of CNSR is not a positive integer or 0
+#note "Added 2026-09-14 (PLAN-column-type-conformance carried-forward). CNSR is Num in the standard but was measured Char x3 across this corpus's own fixtures (plan §3 Q4), and on a Char column `num(CNSR)` is the conversion ruling R2 restored rather than the identity it is on every other CNSR fixture. Row 1 is a negative integer shipped as text: it fires through `num(CNSR) < 0` only if the conversion happens — with num() still a no-op tag the comparison reads a character cell, gets NaN, and the rule silently stops firing. Row 2 is a conformant 0 as text and must not fire."
+#expectViolationCount 1
+#expectViolationAt row=1 CNSR=-1
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col CNSR type=Char
+---
+-1
+0
+---

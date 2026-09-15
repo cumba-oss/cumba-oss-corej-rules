@@ -2,8 +2,8 @@ Core:
   Id: "PMDA-SD1073"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when any of the IG-prohibited qualifiers AEOCCUR, AESTAT\
-  \ or AEREASND is present in the AE dataset."
+Description: "Raise an error for each of the IG-prohibited qualifiers AEOCCUR, AESTAT\
+  \ and AEREASND that is present in the AE dataset."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -11,14 +11,12 @@ Scope:
     - "AE"
 Check:
   expression: >-
-    var_exists("AEOCCUR") or var_exists("AESTAT") or var_exists("AEREASND")
+    varname() in ["AEOCCUR", "AESTAT", "AEREASND"]
 Outcome:
-  Message: "An IG-prohibited variable (AEOCCUR, AESTAT or AEREASND) is present in\
-    \ the AE dataset."
+  Message: "The variable is prohibited in the AE dataset: AEOCCUR, AESTAT and AEREASND\
+    \ are IG-prohibited qualifiers."
   Output_Variables:
-  - "AEOCCUR"
-  - "AESTAT"
-  - "AEREASND"
+  - "variable_name"
 Source:
   Message: "Variable prohibited for use in SDTM"
   Description: "Variables described in IG as inappropriate for usage must be not included\

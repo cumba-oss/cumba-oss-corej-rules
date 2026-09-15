@@ -62,13 +62,16 @@ class RuleSrcExpressionWriterCorpusTest
     // which this subset deliberately is not. Enforced internally over the whole corpus.
 
     /**
-     * The five parked rules (§2): converted in place, still parked. {@code CDISC-SEND-0202} &ndash;
-     * {@code 0205} are parked on EC-47; {@code DRAFT-900027} was authored
-     * {@code Executability: "Not Executable"} with an {@code ExecutabilityHint} (no operator
-     * detects an imputed date) &mdash; added 2026-08-22.
+     * ⚠ CORE-000029 and CORE-000067 are in the internal parked set and are NOT here: this
+     * repository does not redistribute the CORE rule family, so those checks never reach the
+     * writer. Otherwise identical to internal.
      */
-    private static final Set<String> PARKED = Set.of("CDISC-SEND-0202", "CDISC-SEND-0203",
-            "CDISC-SEND-0204", "CDISC-SEND-0205", "DRAFT-900027");
+    private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0120", "CDISC-CG0126",
+            "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361", "CDISC-CG0622",
+            "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636", "CDISC-CG0640",
+            "CDISC-CG0642", "CDISC-CG0643", "CDISC-CG0644", "CDISC-SEND-0202", "CDISC-SEND-0203",
+            "CDISC-SEND-0204", "CDISC-SEND-0205", "CDISC-SEND-0268", "DRAFT-900027", "FDA-SD0063",
+            "PMDA-SD0063");
 
     /**
      * Ordinary authored-text pins for the three formerly-curated rules. ⚠ These are, and always
@@ -82,7 +85,7 @@ class RuleSrcExpressionWriterCorpusTest
      */
     private static final Map<String, String> CURATED_BY_ID = Map.of("CORE-000335",
             "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
-                    + "and (TSVAL <= 0 or TSVAL > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
+                    + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
             "CORE-000539",
             "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ "
                     + "and prefix(dataset_name, 2) not in [\"AP\", \"FA\"] "

@@ -1,9 +1,8 @@
 #!RuleTest
 #test FDA-SE2307 expect=violation domain=BG
-#note "Row 2 is missing BGENDY and row 3 is missing BGDY -> each fires (both interval timing variables are required). Row 1 is complete."
+#note "Since the R-5.25 split (top-level-or board wave 2, group J) this rule owns ONLY the --DY half: row 3 (BGDY missing) fires. Row 2 (BGENDY missing) is the split sibling FDA-SE2307-A's state and must NOT fire here - the discriminator; row 1 is complete."
 #library standard=sendig version=3-1-1
-#expectViolationCount 2
-#expectViolationAt row=2 BGSEQ=2
+#expectViolationCount 1
 #expectViolationAt row=3 BGSEQ=3
 dataset BG class=FINDINGS label="Body Weight Gain"
 col STUDYID  type=Char label="Study Identifier"

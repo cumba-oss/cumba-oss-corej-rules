@@ -1,0 +1,73 @@
+Core:
+  Id: "FDA-SD1362-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Actual Arm Code (ACTARMCD) is populated but Description\
+  \ of Actual Arm (ACTARM) is empty; both must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+    - "ACTARM"
+Check:
+  expression: >-
+    not empty(ACTARMCD) and empty(ACTARM)
+Outcome:
+  Message: "ACTARMCD is populated but ACTARM is empty."
+  Output_Variables:
+  - "ACTARMCD"
+  - "ACTARM"
+Source_Proposed:
+  Sheet_Issue: "#221"
+  FDA_Validator_Rule_Message: "ACTARMCD is populated, but ACTARM is null"
+  FDA_Validator_Rule_Description: "Description of Actual Arm (ACTARM) must be populated,\
+    \ when Actual Arm Code (ACTARMCD) is populated."
+  Domains: "DM"
+Source:
+  FDA_Validator_Rule_Message: "ACTARM is populated, but ACTARMCD is null, or vice\
+    \ versa"
+  FDA_Validator_Rule_Description: "Description of Actual Arm (ACTARM) must be populated,\
+    \ when Actual Arm Code (ACTARMCD) is populated, and vice versa."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1362"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0522"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0522"
+        Version: "1"
+      Version: "2.0"

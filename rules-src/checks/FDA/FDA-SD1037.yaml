@@ -4,7 +4,7 @@ Core:
   Version: "1"
 Description: "Raise an error when --TOXGR is populated with a value greater than 0\
   \ but --TOX is not populated."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -26,9 +26,16 @@ Requirements:
   Variables:
     All:
     - "--TOXGR"
+    - "--TOX"
 Check:
-  expression: >-
-    not empty(--TOXGR) and --TOXGR > 0 and empty(--TOX)
+  ERROR:
+    expression: >-
+      num(--TOXGR) > 0 and empty(--TOX)
+  INFO:
+    expression: >-
+      --TOXGR =~ /[1-9]/ and empty(--TOX)
+    Message: "--TOX is not populated and --TOXGR appears to record a non-zero grade as\
+      \ text (a digit 1-9 in a value the numeric comparison cannot read)."
 Outcome:
   Message: "--TOX is not populated when --TOXGR is populated."
   Output_Variables:

@@ -382,8 +382,9 @@ col DOMAIN  type=Char
 | Directive | Required | Meaning |
 |-----------|----------|---------|
 | `#!RuleTest` | yes (first non-blank line) | marks the file as a scenario |
-| `#test <coreId> expect=violation\|noViolation\|skipped domain=<NAME>` | yes | rule to run (by `Core.Id`), expected verdict, and the *primary* dataset (matched case-insensitively to a `dataset` name in the file) |
+| `#test <coreId> expect=violation\|noViolation\|skipped\|executionError domain=<NAME>` | yes | rule to run (by `Core.Id`), expected verdict, and the *primary* dataset (matched case-insensitively to a `dataset` name in the file) |
 | `#note "<text>"` | no | human-readable description |
+| `#expect-execution-error "<substring>"` | no | assert the engine's error message contains `<substring>`; requires `expect=executionError` (see *The `executionError` verdict*) |
 | `#expectViolationCount <N>` | no | assert the rule fires exactly `N` times (see *Asserting where a rule fires*) |
 | `#expectViolationAt [row=<N>] [severity=<LEVEL>] [COL=value ...]` | no | assert one fired location, and optionally the check level it fired at; repeatable, exact-set match |
 | `#library <kind> ...` | no | inline CDISC-Library metadata (see below) |
@@ -400,6 +401,7 @@ The verdict asserts both the rule's **execution state** and its violations:
 | `violation` | have **executed** | fired at least once |
 | `noViolation` | have **executed** | not fired |
 | `skipped` | **not** have executed | — |
+| `executionError` | have **failed** — the engine reported `RuleExecutionStatus.ERROR` | — |
 
 `skipped` is the deliberate *unmet-requirement* contract: a rule that cannot answer on this
 dataset must skip, and the scenario exists to prove it. Before this verdict existed such
@@ -494,7 +496,7 @@ block, or on its own `#`-leading line.
   rule-class list below), not a data row. A green scenario is therefore not
   evidence that an exclusion took effect; assert it in a Java test on
   `violation.getValues().containsKey(...)` (pinned by
-  `ExcludedOutputVariablePinFallbackTest` in `cumba-oss-corej-ruletest`).
+  `ExcludedOutputVariablePinFallbackTest` in `corej-ruletest`).
 
 **Pick the addressing by rule class:**
 
@@ -594,7 +596,7 @@ scenario opts in with:
 ```
 
 `dummy` — the only supported value — loads the checked-in dummy bundle
-`src/test/resources/dictionaries/*.json` (all types above) via
+`lib/corej-core/dictionaries/*.json` (all types above) via
 `RuntimeDictionaryProvider.loadDirectory` and hands it to the engine.
 Scenario data must use terms/codes from those dummy files. Without the
 directive no provider is supplied, so a dictionary-dependent rule **SKIPs**
@@ -630,10 +632,14 @@ assert `"My Label"` against `"Other Label"`.
 #library variable-metadata      DOMAIN VAR key=value key=value ...
 #library dataset-metadata       DOMAIN key=value key=value ...
 #library codelist-codes         DOMAIN VARIABLE TERM=Cxxxxxx TERM=Cxxxxxx ...
+#library codelist-term-ccodes   CODELIST TERM=Cxxxxxx TERM=Cxxxxxx ...
+#library codelist-meta          CODELIST ccode=Cxxxxxx pref="NCI Preferred Term"
 ```
 
-The last four kinds (`codelist-extensible`, `codelist-term-mappings`,
-`variable-metadata`, `dataset-metadata`) are the most recent additions.
+The last four keyword-payload kinds (`codelist-extensible`,
+`codelist-term-mappings`, `variable-metadata`, `dataset-metadata`) plus the
+2026-09 codelist channels (`codelist-term-ccodes`, `codelist-meta`) are the
+most recent additions.
 
 - **`standard-domains`** declares the library's canonical dataset (domain)
   names — what `MetadataProvider.getStandardDatasetNames()` serves. A rule
@@ -679,6 +685,37 @@ The last four kinds (`codelist-extensible`, `codelist-term-mappings`,
   (partner found by stripping the `CD` suffix) and once with `variable_name=LBTEST`
   (partner found by the unique-concept-set fallback in
   `ExprCompiler.resolvePartner`). Pin both, or the exact-set location check fails.
+
+- **`codelist-term-ccodes`** declares one codelist's **term submission value →
+  NCI concept id ("C-code")** map — the term-conceptId channel of
+  `MetadataProvider.getCodelist`, which is what
+  `codelist_terms(level="term", returntype="code")` resolves through
+  (`CDISC-CG0001` / `CORE-000929`). Same shape as `codelist-term-mappings`:
+  codelist key folds to upper case, term keys are verbatim.
+
+  ⚠⚠ **Not `codelist-codes`**, despite the near-identical name: that kind is
+  *(domain, variable)*-scoped and feeds only `getCodelistCodeMap` / CT2003.
+  The two are not interchangeable and must not be conflated.
+
+  ⚠ **Route each representation down its own channel.** `codelist-terms`
+  carries real submission values (`AE`, `LB`), `codelist-term-ccodes` carries
+  the C-codes. Feeding C-codes through `codelist-terms` is the self-disarming
+  fixture shape that kept CDISC-CG0001/CORE-000929 green while production was
+  wrong (PLAN-codelist-terms-returntype.md §2.3) — the suites now discriminate.
+
+  A codelist declared on none of the codelist channels has **no**
+  `getCodelist` view: every `codelist_terms` shape other than
+  `(level="term", returntype="value")` then degrades to
+  `LIBRARY_NOT_AVAILABLE` and the rule SKIPs (the engine's honest-degradation
+  contract). A codelist declared with terms but no ccodes yields an **empty**
+  `(term, code)` projection — also a SKIP — exactly like a real library that
+  does not model the field.
+
+- **`codelist-meta`** declares the codelist's **own** attributes: `ccode=` its
+  NCI concept id, `pref=` its NCI preferred term. The codelist's own submission
+  value is the directive key itself. These feed the
+  `codelist_terms(level="codelist", ...)` shapes.
+
   An undeclared variable has an empty map, so it never fires — that is also why an
   `expect=skipped` is *not* reachable here: the skip gate is a **null Library
   provider**, and every `fda` / `pmda` scenario must declare `#library standard=…`.
@@ -742,6 +779,9 @@ codelists:
     terms: [ Y, N, U ]
     extensible: false
     term-mappings: { Y: "Yes", N: "No" }
+    term-ccodes:   { Y: C49488, N: C49487 }   # mirrors #library codelist-term-ccodes
+    ccode: C66742                             # mirrors #library codelist-meta ccode=
+    pref: "No Yes Response"                   # mirrors #library codelist-meta pref=
 ```
 
 Unknown keys are rejected (typos fail loudly). When a scenario has both a

@@ -2,9 +2,9 @@ Core:
   Id: "PMDA-AD0275"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when only one of Cumulative Study Drug Dose (DOSECUM)\
-  \ and Cumulative Study Drug Dose Unit (DOSECUMU) is populated. If either variable\
-  \ is populated, both must be populated together."
+Description: "Raise an error when Cumulative Study Drug Dose (DOSECUM) is populated\
+  \ but Cumulative Study Drug Dose Unit (DOSECUMU) is empty. If either variable is\
+  \ populated, both must be populated together."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -17,9 +17,9 @@ Requirements:
     - "DOSECUMU"
 Check:
   expression: >-
-    not empty(DOSECUM) and empty(DOSECUMU) or empty(DOSECUM) and not empty(DOSECUMU)
+    not empty(DOSECUM) and empty(DOSECUMU)
 Outcome:
-  Message: "Only one of DOSECUMU, DOSECUM is populated"
+  Message: "DOSECUM is populated but DOSECUMU is empty."
   Output_Variables:
   - "DOSECUM"
   - "DOSECUMU"

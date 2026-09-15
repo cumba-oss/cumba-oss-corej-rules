@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD9728 expect=skipped domain=CO
+#note "The discriminator that keeps the family from double-reporting: the RDOMAIN column EXISTS (blank on the keyed row), so Requirements.Variables.None [RDOMAIN] skips this sister with a reason naming the column, and the parent(s) PMDA-SD1065 and PMDA-SD1465 own the case -- their All gates are satisfied by the same present column, and they report the offending row with its location."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 |  |  | 1 | AESEQ | 1 | Comment on the AE record

@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD0089 expect=skipped domain=TE
-#note "AUTHORED BY Plan B phase 4d -- the FDA half of the SD0089 mirrored pair. FDA-SD0089's Check is BYTE-IDENTICAL to PMDA-SD0089's -- `(empty(TEDUR) or not var_exists(\"TEDUR\")) and (empty(TEENRL) or not var_exists(\"TEENRL\"))` -- and both now declare Requirements.Variables.Any [TEENRL, TEDUR], but only the PMDA copy had all-absent scenarios to flip when 4d landed; the FDA copy shipped the semantic change with NOTHING witnessing it. NEITHER listed column is declared here, so the Any leg is unmet and the rule SKIPS instead of folding dataset-constant TRUE and emitting one finding at row 1. That is the deliberate change the adoption exists for -- the all-absent case is nothing-to-check, not a defect (M2-D24 / M3-F.1). DIRECTION PIN: read this together with FDA-SD0089-invalid_tedur_absent-TE, which keeps expect=violation with only TEDUR withheld. Were the Any leg ever wired as a conjunction (skip as soon as ANY entry is absent) that sibling would go SKIPPED and RED; were the leg dropped altogether this scenario would fire and go RED. The pair, not either file alone, pins the direction. Three rows deliberately, mirroring PMDA-SD0089-invalid_both_absent-TE: on a one-row table a skip could not be told from a fold that happens to report nothing. Both findings snapshots are structurally blind here (te.json and phuse's te.xpt each carry both columns), so this is Gate C evidence -- the only kind 4d has."
+#note "NEITHER column is declared, so the All leg is unmet and the parent skips - unchanged in verdict from the Any gate, but the state is no longer silent: the dataset sister FDA-SD9729 (Sensitivity Dataset) reports the absent pair once. The old DIRECTION-PIN reasoning written for the Any leg is retired with the wave E Any -> All rewrite; the direction is now pinned by the four-state set (parent + two R-5.25 siblings + sister), whose scenarios each name the member owning the neighbouring state."
 #library standard=sdtmig version=3-4
 dataset TE label="Trial Elements"
 col STUDYID type=Char label="Study Identifier"
@@ -10,5 +10,4 @@ col ELEMENT type=Char label="Description of Element"
 col TESTRL  type=Char label="Rule for Start of Element"
 ---
 CDISCPILOT01 | TE | SCRN | Screening | Informed consent
-CDISCPILOT01 | TE | TRT  | Treatment | First dose
-CDISCPILOT01 | TE | FUP  | Follow-up | Last dose
+CDISCPILOT01 | TE | TRT | Treatment | First dose

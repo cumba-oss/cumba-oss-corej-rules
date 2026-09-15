@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-9437 expect=violation domain=LB
+#note "The sister half of the CDISC-SEND-0280 pair (minted 2026-09-11, M7b - the F3 carry-over of T1-11 to SENDIG, scoped LB/MI). LBREASND is not in the dataset (None satisfied) while rows 1 and 2 report LBSTAT='NOT DONE', so the remaining condition holds on two rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify. Same dataset shape as the parent's skipped_no_reasnd_column scenario: the parent skips, this rule reports - which supplies exactly the missing half of the 2026-08-27 gate-removal rationale ('NO rule anywhere reports its absence')."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | ALB  | NOT DONE
+S1 | LB | 001 | 2 | GLUC | NOT DONE

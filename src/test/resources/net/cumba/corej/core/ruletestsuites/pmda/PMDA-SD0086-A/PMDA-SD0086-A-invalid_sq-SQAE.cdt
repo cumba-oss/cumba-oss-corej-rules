@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD0086-A expect=violation domain=SQAE
+#note "FRESH. Pins the SECOND Scope.Domains token, SQ--, which 97 rules in the corpus declare and ZERO scenarios in the tree exercise (finding SD0086-F2). SQAE is 4 characters starting SQ, the only shape the strict '--' contract admits; with no DOMAIN column, unsplitNameFromData returns 'SQ' + row-0 RDOMAIN = 'SQAE' = the name, so the dataset is not treated as a split and matches the Include entry directly. Rows 1/2 duplicate (USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM), both fire; row 3 is a different parent record, silent. This is the corpus's first SQ-- fixture. If this comes back SKIPPED, escalate to stage R — do not rename the dataset or drop the scenario."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 QNAM=AEREAS
+#expectViolationAt row=2 QNAM=AEREAS
+dataset SQAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AEREAS  | reason A
+S1 | AE | 001 | AESEQ | 1 | AEREAS  | reason B
+S1 | AE | 001 | AESEQ | 2 | AEREAS  | reason C

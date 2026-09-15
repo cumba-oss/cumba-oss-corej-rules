@@ -382,6 +382,11 @@ abstract class AbstractSdtmRuleTest
     {
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainPrefix);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)
@@ -418,6 +423,11 @@ abstract class AbstractSdtmRuleTest
     {
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainPrefix, customResolver);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)
@@ -456,6 +466,11 @@ abstract class AbstractSdtmRuleTest
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainPrefix, customResolver,
                 libraryProvider);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)

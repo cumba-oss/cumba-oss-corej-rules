@@ -10,13 +10,17 @@ Scope:
   Data_Structures:
     Include:
     - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DM.SITEID"
 Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "DM"
 Check:
   expression: >-
-    var_exists(DM.SITEID) and not empty(SITEID) and SITEID != DM.SITEID
+    not empty(SITEID) and SITEID != DM.SITEID
 Outcome:
   Message: "For the same USUBJID, the ADSL SITEID does not equal the DM SITEID."
   Output_Variables:

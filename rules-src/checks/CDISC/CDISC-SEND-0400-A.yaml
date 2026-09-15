@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-SEND-0400-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Repro Paths (TP) dataset is not present\
+  \ in the study; TP is a required domain for a reproductive/developmental toxicology\
+  \ (DART) submission."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not ds_exists("TP")
+Outcome:
+  Message: "The required DART dataset TP (Trial Repro Paths) is not present in the\
+    \ study."
+Source_Proposed:
+  Sheet_Issue: "#249"
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "ALL"
+  Plain_Text_Explanation: "TP domain must be present."
+  Rule: "TP is present"
+Source:
+  Class: "TDM, SPC"
+  Domain: "TT, TP, SJ"
+  Variable: "ALL"
+  Plain_Text_Explanation: "TT, TP, and SJ domains must be present."
+  Rule: "TT, TP, and SJ are present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND400"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND400"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-CG0166 expect=skipped domain=CO
+#note "Neither IDVARVAL nor RDOMAIN column (a study whose comments are all subject-level). Requirements.Variables.All is [IDVARVAL, RDOMAIN] and both columns are absent, so the engine returns SKIPPED naming the variables, before any evaluation -- the pre-C3 gate already covered IDVARVAL; this pins that the wave-C3 addition of RDOMAIN did not disturb it."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | 001 | 1 | General subject comment

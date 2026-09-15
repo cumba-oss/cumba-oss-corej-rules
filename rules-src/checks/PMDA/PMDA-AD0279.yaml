@@ -2,10 +2,9 @@ Core:
   Id: "PMDA-AD0279"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when the Severity/Intensity (N) (AESEVN) or Analysis\
-  \ Severity/Intensity (N) (ASEVN) variable holds a populated value that is not 1,\
-  \ 2, or 3. AESEVN and ASEVN are numeric severity codes whose only permitted populated\
-  \ values are 1, 2, and 3."
+Description: "Raise an error when the Severity/Intensity (N) (AESEVN) variable holds\
+  \ a populated value that is not 1, 2, or 3. AESEVN is a numeric severity code whose\
+  \ only permitted populated values are 1, 2, and 3."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -14,12 +13,11 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    not empty(AESEVN) and AESEVN not in [1, 2, 3] or not empty(ASEVN) and ASEVN not in [1, 2, 3]
+    not empty(AESEVN) and AESEVN not in [1, 2, 3]
 Outcome:
-  Message: "AESEVN or ASEVN has a populated value that is not 1, 2, or 3."
+  Message: "AESEVN has a populated value that is not 1, 2, or 3."
   Output_Variables:
   - "AESEVN"
-  - "ASEVN"
 Source:
   Message: "Variable value != 1, 2, 3, or null"
   Description: "Severity/Intensity (N) (AESEVN) and Analysis Severity/Intensity (N)\

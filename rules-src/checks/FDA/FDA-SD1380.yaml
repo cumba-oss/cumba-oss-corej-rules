@@ -4,7 +4,7 @@ Core:
   Version: "1"
 Description: "Raise an error when none of USUBJID, APID, SPDEVID, or POOLID is populated\
   \ for a record; at least one of these subject/device/pool identifiers must be populated."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -20,6 +20,13 @@ Scope:
     - "DM"
     - "SE"
     - "SM"
+Requirements:
+  Variables:
+    Any:
+    - "USUBJID"
+    - "APID"
+    - "SPDEVID"
+    - "POOLID"
 Check:
   expression: >-
     empty(USUBJID) and empty(APID) and empty(SPDEVID) and empty(POOLID)

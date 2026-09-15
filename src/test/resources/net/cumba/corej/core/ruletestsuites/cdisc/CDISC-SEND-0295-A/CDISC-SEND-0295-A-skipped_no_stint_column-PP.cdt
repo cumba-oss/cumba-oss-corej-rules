@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0295-A expect=skipped domain=PP
+#note "--STINT is not declared, so the inherited Requirements.Variables.All [--STINT, --ENINT] gates the rule to SKIPPED. Load-bearing on THIS half: its Check is empty(--STINT) with a populated --ENINT, which on an absent --STINT column would fire on every populated interval end (absent = all-missing) - the exact flood shape PLAN-top-level-or-split \u00a74 warns a split moves onto the empty()-side sibling."
+#library standard=sendig version=3-1-1
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPENINT  type=Char
+---
+S1 | PP | 001 | 1 | AUCALL | P24H

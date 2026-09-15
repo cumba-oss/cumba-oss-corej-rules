@@ -3,9 +3,9 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when --ENRTPT (End Relative to Reference Time Point)\
-  \ is populated but --ENTPT (End Reference Time Point) is not present or is empty."
+  \ is populated but --ENTPT (End Reference Time Point) is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -22,11 +22,12 @@ Requirements:
   Variables:
     All:
     - "--ENRTPT"
+    - "--ENTPT"
 Check:
   expression: >-
     not empty(--ENRTPT) and empty(--ENTPT)
 Outcome:
-  Message: "--ENTPT is empty or not present when --ENRTPT is populated."
+  Message: "--ENTPT is empty when --ENRTPT is populated."
   Output_Variables:
   - "--ENRTPT"
   - "--ENTPT"

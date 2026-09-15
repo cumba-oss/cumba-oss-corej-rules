@@ -1,0 +1,61 @@
+Core:
+  Id: "CDISC-SEND-0378-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Rule for End of Repro Stage (TTENRL) variable\
+  \ is not present in the Trial Repro Stages (TT) dataset and TTDUR is not populated;\
+  \ with no TTENRL column, TTDUR must be populated for each Repro Stage."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Requirements:
+  Variables:
+    None:
+    - "TTENRL"
+    All:
+    - "TTDUR"
+Check:
+  expression: >-
+    empty(TTDUR)
+Outcome:
+  Message: "TTENRL is not present in the dataset and TTDUR is not populated."
+  Output_Variables:
+  - "TTDUR"
+Source_Proposed:
+  Sheet_Issue: "#213"
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "TTDUR"
+  Plain_Text_Explanation: "When the TTENRL variable is not present in the dataset,\
+    \ TTDUR must be populated for each Repro Stage so that every Stage carries an\
+    \ end rule or a planned duration"
+  Condition: "TTENRL variable is not present in the dataset"
+  Rule: "TTDUR ^= null"
+Source:
+  Class: "TDM"
+  Domain: "TT"
+  Variable: "TTENRL, TTDUR"
+  Plain_Text_Explanation: "Either TTENRL or TTDUR (or both) must be populated for\
+    \ each Repro Stage."
+  Rule: "TTENRL ^= null AND/OR TTDUR ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND378"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND378"
+        Version: "1"
+      Version: "5.0"

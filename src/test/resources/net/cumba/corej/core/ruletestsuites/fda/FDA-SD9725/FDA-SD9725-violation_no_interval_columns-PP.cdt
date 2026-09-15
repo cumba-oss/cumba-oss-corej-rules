@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9725 expect=violation domain=PP
+#note "The sister half of the FDA-SD1348 pair (minted 2026-09-11, M4/T1-06+T1-15). Neither PPSTINT nor PPENINT is in the dataset (None satisfied) while rows 1 and 2 carry an interval test name matching /.+ to .+/, so the remaining condition holds on two rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify. Same dataset shape as the parent's skipped_no_interval_columns scenario: the parent skips, this rule reports. NEITHER-only by ruling: with exactly one of the pair absent this sister is silent (see skipped_only_enint_present) because FDA-SD1450/SD1451 already report the one-of-two cases -- a broader sister would duplicate them (R-5.26)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPTEST   type=Char label="Parameter Name"
+---
+S1 | PP | 001 | 1 | AUCINT | AUC from T1 to T2
+S1 | PP | 002 | 2 | AUCINT | AUC from T1 to T2

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0049 expect=skipped domain=CM
+#note "No CMSTTPT column at all while CMSTRTPT is populated. Requirements.Variables.All [--STRTPT, --STTPT] gates the rule out -> auditable skip naming the absent variable, instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': PMDA-SD1103 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTRTPT type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | BEFORE
+S1 | CM | 001 | 2 | IBUPROFEN |

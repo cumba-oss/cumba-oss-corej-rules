@@ -1,0 +1,65 @@
+Core:
+  Id: "CDISC-CG0328-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Duration of Element (TEDUR) variable\
+  \ is not present in the Trial Elements (TE) dataset and TEENRL is not populated;\
+  \ with no TEDUR column, TEENRL must be populated for each Element."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Requirements:
+  Variables:
+    None:
+    - "TEDUR"
+    All:
+    - "TEENRL"
+Check:
+  expression: >-
+    empty(TEENRL)
+Outcome:
+  Message: "TEDUR is not present in the dataset and TEENRL is not populated."
+  Output_Variables:
+  - "TEENRL"
+Source_Proposed:
+  Sheet_Issue: "#211"
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL"
+  Condition: "TEDUR variable is not present in the dataset"
+  Rule: "TEENRL ^= null"
+Source:
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL"
+  Condition: "TEDUR = null"
+  Rule: "TEENRL ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0328"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0328"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0328"
+        Version: "1"
+      Version: "2.0"

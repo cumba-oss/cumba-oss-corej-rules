@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0011-A expect=noViolation domain=DM
+#note "THE DISCRIMINATOR OF THE SPLIT: this is the PARENT PMDA-SD0011's violating dataset (row 1 has ARMCD='SCRNFAIL' with the wrong ARM text) and this sibling must stay silent on it - its own half needs ARM to equal 'Screen Failure' exactly, which no row here does. Executes without firing."
+#library standard=sdtmig version=3-2
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | SCRNFAIL | Screening Failure
+S1 | DM | 002 | SCRNFAIL | Screen Failure
+S1 | DM | 003 | A        | Placebo

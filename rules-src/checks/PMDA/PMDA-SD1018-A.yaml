@@ -1,0 +1,140 @@
+Core:
+  Id: "PMDA-SD1018-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when the Subject Visits (SV) dataset carries no SVUPDES\
+  \ variable and, for a visit whose VISIT name does not mark it unscheduled or unplanned,\
+  \ the combination of Visit Number (VISITNUM), Visit Name (VISIT), and Planned Study\
+  \ Day of Visit (VISITDY) does not match an entry in the Trial Visits (TV) dataset."
+Severity: "Warning"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SV"
+Requirements:
+  Variables:
+    All:
+    - "VISITNUM"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "VISITNUM"
+  - "VISIT"
+  - "VISITDY"
+  Name: "TV"
+Check:
+  expression: >-
+    not var_exists("SVUPDES") and not empty(VISITNUM) and not empty(VISIT) and not
+    contains(upper(VISIT), upper("UNSCHEDUL")) and not contains(upper(VISIT), upper("UNPLAN")) and
+    empty(TV.VISITNUM)
+Outcome:
+  Message: "SVUPDES is not available, and the combination of VISITNUM, VISIT, and\
+    \ VISITDY for a visit whose VISIT name does not mark it unscheduled or unplanned\
+    \ does not match any entry in the Trial Visits (TV) dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "VISITDY"
+  - "TV.VISITNUM"
+Source_Proposed:
+  Sheet_Issue: "#209"
+  Message: "VISITNUM/VISIT/VISITDY values do not match TV domain data"
+  Description: "The combination of Visit Number (VISITNUM), Visit Name (VISIT), and\
+    \ Planned Study Day of Visit (VISITDY) values should match entries in the Trial\
+    \ Visits (TV) dataset when the SVUPDES variable is not present in the dataset\
+    \ and the Visit Name (VISIT) does not identify the visit as unscheduled or unplanned."
+  Domains: "SV"
+  Severity: "Warning"
+Source:
+  Message: "VISITNUM/VISIT/VISITDY values do not match TV domain data"
+  Description: "The combination of Visit Number (VISITNUM), Visit Name (VISIT), and\
+    \ Planned Study Day of Visit (VISITDY) values should match entries in the Trial\
+    \ Visits (TV) dataset when they are planned visits (SVUPDES = null)."
+  Domains: "SV"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1018"
+        Version: "1"
+      Version: "1.6"

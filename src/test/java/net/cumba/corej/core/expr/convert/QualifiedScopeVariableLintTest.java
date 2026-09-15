@@ -1,5 +1,6 @@
 package net.cumba.corej.core.expr.convert;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -38,8 +39,28 @@ import org.junit.jupiter.api.Test;
  * Two things are linted:
  * </p>
  * <ol>
- * <li><b>Unknown qualifier</b> — the qualifier names neither a {@code Match_Datasets.Name} nor an
- * {@code Operations} {@code domain:} of the same rule. Reported so a typo fails CI.</li>
+ * <li><b>Unknown qualifier</b> — the qualifier is a dataset name <b>no rule anywhere in the corpus
+ * declares</b>. Reported so a typo fails CI.
+ * <p>
+ * ⭐ <b>Widened 2026-09-10 from per-rule to corpus-wide</b> (owner ruling, disposition (a) of
+ * {@code plans/PLAN-qualified-requirements-cross-standard.md} §8.4). It used to require the
+ * qualifier to be declared by the <em>same</em> rule's {@code Match_Datasets} or {@code Operations}
+ * {@code domain:}, which made a legitimate <b>resolver-only</b> reference a finding — and its own
+ * suggested remedy (<i>"add the dataset to the rule's Match_Datasets"</i>) was actively harmful:
+ * declaring the join is what keeps a rule in the cross-standard collapse population (§8.3 of that
+ * plan), so taking the advice would have converted six sound rules into the shape whose control arm
+ * floods. {@code R-4.12} already sanctions the resolver-only form, citing {@code CDISC-AD0643}'s
+ * {@code AE.AEDUR} with neither declaration.
+ * </p>
+ * <p>
+ * The typo net is kept by the <em>corpus-wide</em> vocabulary instead: a misspelled dataset has to
+ * coincide with a name some other rule declares, and {@code DM}/{@code AE} are declared by
+ * hundreds. ⚠ That makes the vocabulary load-bearing, so
+ * {@link #qualifiedScopeVariableEntriesAreWellFormed} asserts it is non-trivially large — a
+ * vocabulary that silently collapsed to a handful would turn this lint into a pass-everything
+ * no-op, which is the failure mode this corpus has already shipped seven times.
+ * </p>
+ * </li>
  * <li><b>{@code ${…}} operand template</b> — variable-requirement matching has no per-row
  * substitution context, so a template in a scope entry stays literal and can never match. Dotted
  * {@code ${…}} names are legitimate in a {@code Check} (33 rule files use them); in a scope entry
@@ -60,35 +81,94 @@ import org.junit.jupiter.api.Test;
 class QualifiedScopeVariableLintTest
 {
 
+    /**
+     * ⭐ <b>The resolver-only ratchet</b> — every qualified entry whose dataset the rule does not
+     * itself declare, as {@code <rule id>|<entry>}. Added 2026-09-10 by review finding 6.
+     *
+     * <p>
+     * ⚠⚠ <b>It exists because widening the unknown-qualifier check from per-rule to corpus-wide
+     * gave up the likeliest typo in this family.</b> The corpus-wide check catches a qualifier
+     * naming <em>no</em> dataset; it cannot catch one naming a <b>real but wrong</b> dataset — and
+     * {@code AE.AGE} mistyped on {@code CDISC-AD0204} (whose join is {@code DM}) is exactly the
+     * copy-paste the 2026-09-10 hoist made easy, since it touched the {@code DM.*} and {@code AE.*}
+     * families in one change. Such an entry is in the vocabulary, so it lands here instead — and an
+     * exact-equality set makes the build red until someone states that the new reference is
+     * deliberate.
+     * </p>
+     *
+     * <p>
+     * Pairs, not package-qualified keys: the same six rules ship in four {@code adamig} packages,
+     * so a package-keyed set would move 24 → 30 the day {@code adamig 1-4} is added, for no reason
+     * related to what this ratchet is about. ⛔ Adding a line here is a decision, not a chore: it
+     * asserts the qualifier is the dataset the author meant, which nothing else in the repo checks.
+     * </p>
+     */
+    private static final Set<String> EXPECTED_RESOLVER_ONLY = Set.of("CDISC-AD0640|AE.AETRTEM",
+            "CDISC-AD0641|AE.AESTDY", "CDISC-AD0642|AE.AEENDY", "CDISC-AD0643|AE.AEDUR",
+            "CDISC-AD0644|AE.AESEV", "CDISC-AD0645|AE.AETOXGR");
+
     @Test
     void qualifiedScopeVariableEntriesAreWellFormed() throws Exception
     {
         Path rulesDir = CorpusPaths.rules();
         List<String> unknownQualifier = new ArrayList<>();
         List<String> operandTemplate = new ArrayList<>();
+        List<String> resolverOnly = new ArrayList<>();
+        Set<String> resolverOnlyPairs = new java.util.TreeSet<>();
         int rulesScanned = 0;
 
+        List<Path> packages;
         try (Stream<Path> files = Files.list(rulesDir))
         {
-            for (Path file : files.filter(p -> p.getFileName().toString().startsWith("rules-")
-                    && p.toString().endsWith(".json")).sorted().toList())
+            packages = files.filter(p -> p.getFileName().toString().startsWith("rules-")
+                    && p.toString().endsWith(".json")).sorted().toList();
+        }
+
+        // Pass 1 — the corpus-wide dataset vocabulary every qualifier is checked against. Built
+        // from the same declaredDatasets() the per-rule check used, so the two cannot drift.
+        Set<String> vocabulary = new LinkedHashSet<>();
+        for (Path file : packages)
+        {
+            for (Rule rule : RulePackageLoader.load(file).getRules().values())
             {
-                RulePackage pkg = RulePackageLoader.load(file);
-                for (Rule rule : pkg.getRules().values())
+                if (rule != null)
                 {
-                    if (rule == null)
-                    {
-                        continue;
-                    }
-                    rulesScanned++;
-                    lintRule(rule, file.getFileName().toString(), unknownQualifier,
-                            operandTemplate);
+                    vocabulary.addAll(declaredDatasets(rule));
                 }
             }
         }
 
+        // Pass 2 — the lint proper.
+        for (Path file : packages)
+        {
+            RulePackage pkg = RulePackageLoader.load(file);
+            for (Rule rule : pkg.getRules().values())
+            {
+                if (rule == null)
+                {
+                    continue;
+                }
+                rulesScanned++;
+                lintRule(rule, file.getFileName().toString(), vocabulary, unknownQualifier,
+                        operandTemplate, resolverOnly, resolverOnlyPairs);
+            }
+        }
+        System.out.println("### dataset vocabulary: " + vocabulary.size() + " name(s)");
+        System.out.println(
+                "### resolver-only qualified entries (legitimate, R-4.12): " + resolverOnly.size());
+        resolverOnly.forEach(e -> System.out.println("###   " + e));
+
         assertTrue(rulesScanned > 3000, "corpus scan looks broken: only " + rulesScanned
                 + " rules loaded — expected the full assembled corpus");
+
+        // ⛔ Non-vacuity of the instrument itself. The vocabulary is what makes a corpus-wide
+        // qualifier check a check at all: if it collapsed — a model rename, a getter returning
+        // null, a package glob that stopped matching — every qualifier would pass and this lint
+        // would report green while checking nothing. MEASURED 2026-09-10: 39 names.
+        assertTrue(vocabulary.size() >= 25,
+                "the dataset vocabulary collapsed to " + vocabulary.size()
+                        + " name(s), so the unknown-qualifier assertion below can no longer fail — "
+                        + "fix the derivation, never this floor");
 
         assertTrue(operandTemplate.isEmpty(),
                 "Requirements.Variables entries must not carry a ${…} operand template — requirement matching "
@@ -96,17 +176,27 @@ class QualifiedScopeVariableLintTest
                         + "matches (" + operandTemplate.size() + "):\n"
                         + String.join("\n", operandTemplate));
 
+        assertEquals(EXPECTED_RESOLVER_ONLY, resolverOnlyPairs,
+                "the set of qualified entries whose dataset the rule does not declare has changed. A"
+                        + " resolver-only reference is LEGAL (R-4.12, CDISC-AD0643) — but this is"
+                        + " also where a qualifier naming a real-but-wrong dataset lands, and the"
+                        + " corpus-wide check above cannot see that one. Confirm the qualifier names"
+                        + " the dataset the author meant, then add it to EXPECTED_RESOLVER_ONLY.");
+
         assertTrue(unknownQualifier.isEmpty(),
-                "qualified Requirements.Variables entry whose dataset is named by neither Match_Datasets "
-                        + "nor an Operations domain — check for a typo. A resolver-only reference "
-                        + "is legitimate (see CDISC-AD0643); if this entry is one, add the "
-                        + "dataset to the rule's Match_Datasets or adjust this lint ("
+                "qualified Requirements.Variables entry whose dataset NO rule in the corpus declares "
+                        + "— almost certainly a typo in the qualifier. ⛔ Do not fix it by adding the "
+                        + "dataset to this rule's Match_Datasets: declaring a join changes which "
+                        + "population the rule belongs to (PLAN-qualified-requirements-cross-standard "
+                        + "§8.3). A resolver-only reference is legitimate per R-4.12 (CDISC-AD0643) "
+                        + "and is NOT reported here — this list is spelling only ("
                         + unknownQualifier.size() + "):\n" + String.join("\n", unknownQualifier));
     }
 
 
-    private static void lintRule(Rule rule, String file, List<String> unknownQualifier,
-            List<String> operandTemplate)
+    private static void lintRule(Rule rule, String file, Set<String> vocabulary,
+            List<String> unknownQualifier, List<String> operandTemplate, List<String> resolverOnly,
+            Set<String> resolverOnlyPairs)
     {
         VariableRequirement variables = rule.effectiveVariableRequirement();
         if (variables == null)
@@ -130,9 +220,22 @@ class QualifiedScopeVariableLintTest
                 }
                 ScopeVariableEntry entry = ScopeVariableEntry.parse(raw);
                 String qualifier = entry.qualifier();
-                if (qualifier != null && !declared.contains(qualifier.toUpperCase(Locale.ROOT)))
+                if (qualifier == null)
+                {
+                    continue;
+                }
+                String name = qualifier.toUpperCase(Locale.ROOT);
+                if (!vocabulary.contains(name))
                 {
                     unknownQualifier.add(file + "|" + id + "|" + raw);
+                }
+                else if (!declared.contains(name))
+                {
+                    // A resolver-only reference (R-4.12) — legitimate per se, but it is also where
+                    // a qualifier naming a real-but-wrong dataset lands, so the SET is ratcheted
+                    // below rather than merely printed.
+                    resolverOnly.add(file + "|" + id + "|" + raw);
+                    resolverOnlyPairs.add(id + "|" + raw);
                 }
             }
         }

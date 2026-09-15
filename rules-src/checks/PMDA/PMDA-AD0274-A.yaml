@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-AD0274-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Drug Dose at AE Onset Units (DOSAEONU) is\
+  \ populated but Study Drug Dose at AE Onset (DOSEAEON) is empty. If either variable\
+  \ is populated, both must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "DOSEAEON"
+    - "DOSAEONU"
+Check:
+  expression: >-
+    empty(DOSEAEON) and not empty(DOSAEONU)
+Outcome:
+  Message: "DOSAEONU is populated but DOSEAEON is empty."
+  Output_Variables:
+  - "DOSEAEON"
+  - "DOSAEONU"
+Source_Proposed:
+  Sheet_Issue: "#228"
+  Message: "DOSAEONU is populated, but DOSEAEON is not populated"
+  Description: "If Study Drug Dose at AE Onset Units (DOSAEONU) is populated, then\
+    \ Study Drug Dose at AE Onset (DOSEAEON) must be populated."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Source:
+  Message: "Only one of DOSEAEON, DOSAEONU is populated"
+  Description: "If Study Drug Dose at AE Onset Units (DOSAEONU) or Study Drug Dose\
+    \ at AE Onset (DOSEAEON) variable is populated, then both variables must be populated\
+    \ together."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0274"
+        Version: "1"
+      Version: "6.0"

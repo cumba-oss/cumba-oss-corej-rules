@@ -2,20 +2,23 @@ Core:
   Id: "FDA-SD1362"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when exactly one of Actual Arm Code (ACTARMCD) and Description\
-  \ of Actual Arm (ACTARM) is populated while the other is empty; both must be populated\
-  \ together."
+Description: "Raise an error when Description of Actual Arm (ACTARM) is populated\
+  \ but Actual Arm Code (ACTARMCD) is empty; both must be populated together."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+    - "ACTARM"
 Check:
   expression: >-
-    empty(ACTARMCD) and not empty(ACTARM) or not empty(ACTARMCD) and empty(ACTARM)
+    empty(ACTARMCD) and not empty(ACTARM)
 Outcome:
-  Message: "ACTARM is populated but ACTARMCD is empty, or ACTARMCD is populated but\
-    \ ACTARM is empty."
+  Message: "ACTARM is populated but ACTARMCD is empty."
   Output_Variables:
   - "ACTARMCD"
   - "ACTARM"

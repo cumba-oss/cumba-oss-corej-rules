@@ -21,7 +21,7 @@ import net.cumba.corej.core.model.RulePackage;
 import org.junit.jupiter.api.Test;
 
 /**
- * §9a and §9b of {@code plans/PLAN-rules-corpus-build-integration.md} — the fields the
+ * §9a and §9b of {@code plans/done/PLAN-rules-corpus-build-integration.md} — the fields the
  * <b>report</b> reads, which no scenario fixture can protect.
  *
  * <h2>Why these two need their own guard</h2>
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  * <h2>⚠ Genuinely uncovered today, despite appearances</h2>
  *
  * <p>
- * {@code OutputVariableDeriverTest} (in {@code corej-cdisc-core}) unit-tests the derivation
+ * {@code OutputVariableDeriverTest} (in {@code corej-core}) unit-tests the derivation
  * <em>logic</em> on hand-built rules, and the rulespec suite uses {@code Outcome} only as fixture
  * input with no derivation assertions. {@code OutputVariableDerivationReportTest} looks like the
  * missing coverage but is a <b>report generator</b>: its own javadoc says "nothing about the delta
@@ -64,7 +64,32 @@ class ReleasedRuleFieldFidelityTest
      * The number is an upper bound, not an equality: rules acquiring an explicit list is progress.
      * </p>
      */
-    private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 499;
+    // 499 -> 513 on 2026-09-11 (R-4.11c wave A): FDA/PMDA-SD9718, the minted M19 sisters, ship
+    // with no authored Output_Variables — deliberately, following their model CDISC-CG0554: every
+    // column the Check names is absent from the dataset by definition, so there is no witness
+    // column to output. 14 = FDA-SD9718 x 9 packages + PMDA-SD9718 x 5. Re-measured, not nudged.
+    // 513 -> 519 on 2026-09-11 (R-4.11c wave C3): FDA/PMDA-SD9727, the minted M15 sisters, are
+    // the same shape as the M19 pair — all four columns their Check names (USUBJID/APID/SPDEVID/
+    // POOLID) are absent from the dataset by definition, so like their model CDISC-CG0554 they
+    // author no Output_Variables. 6 = FDA-SD9727 x 4 packages + PMDA-SD9727 x 2. Re-measured
+    // against target/rules (519 entries / 127 distinct rules), not nudged.
+    // 519 -> 556 on 2026-09-11 (wave E — the B1/B2/B3 four-state decomposition): the seven minted
+    // neither-column sisters, all the M15 shape and all authoring no Output_Variables — both
+    // columns their Check names are absent from the dataset by definition, so there is no witness
+    // column to output (the CDISC-CG0554 / SD9718 / SD9727 model). 37 = CDISC-CG9676 x 3 +
+    // CDISC-SEND-9440 x 6 + CDISC-SEND-9441 x 2 + CORE-009708 x 10 + FDA-SD9729 x 10 +
+    // PMDA-SD9729 x 5 + FDA-SD9730 x 1 packages. The fourteen R-5.25 split siblings of the same
+    // wave each output their present column and do not move this bound. Re-measured against
+    // target/rules (556 entries / 134 distinct rules), not nudged.
+    // 556 -> 572 on 2026-09-12 (top-level-or wave 3, R-5.25 group K): the eleven
+    // required-structure split siblings follow their parents' — and the model CDISC-CG0554's —
+    // own convention: every column the Check names is absent from the dataset by definition, so
+    // there is no witness column to output and no Output_Variables is authored. 16 =
+    // CDISC-CG0313-A/-B/-C x 1 package + CDISC-CG0554-A/-B/-C x 2 + CORE-000585-A/-B/-C x 1 +
+    // CDISC-SEND-0400-A/-B x 2. The wave's five OTHER siblings (F1's four and X's
+    // CORE-000107-A) each author their own Output_Variables and do not move this bound.
+    // Re-measured against target/rules by run, not nudged.
+    private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 572;
 
     /**
      * ⚠ A FLOOR as well as a ceiling. The derivation arm below only asserts anything about entries
@@ -88,6 +113,7 @@ class ReleasedRuleFieldFidelityTest
     {
         Map<String, String> authored = authoredDescriptions();
         List<String> offenders = new ArrayList<>();
+        int checked = 0;
 
         for (Map.Entry<String, Rule> e : shippedRules().entrySet())
         {
@@ -97,6 +123,7 @@ class ReleasedRuleFieldFidelityTest
                 offenders.add(coreId + ": shipped but has no rules-src/checks source file");
                 continue;
             }
+            checked++;
             String want = authored.get(coreId);
             String got = e.getValue().getDescription();
             if (want == null ? got != null : !want.equals(got))
@@ -106,9 +133,9 @@ class ReleasedRuleFieldFidelityTest
         }
 
         // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
-        // The MIN_RULES constant and the population counter it compared against were removed
-        // with it (2026-09-07) -- they had been left behind, unread, by that extraction.
+        // which this subset deliberately is not — this repository ships the corpus MINUS the
+        // CORE family, so the internal population can never be reached here. Enforced
+        // internally over the whole corpus. Re-applied 2026-09-15 after a sync restored it.
         assertEquals(List.of(), offenders.size() > 25 ? offenders.subList(0, 25) : offenders,
                 offenders.size() + " shipped rules do not carry their authored Description. It is"
                         + " report content and no scenario fixture asserts on it, so a"
@@ -133,6 +160,7 @@ class ReleasedRuleFieldFidelityTest
     {
         List<String> noMessage = new ArrayList<>();
         List<String> notDerived = new ArrayList<>();
+        int entries = 0;
         int derivedEntries = 0;
 
         for (Path pkg : shippedPackages())
@@ -144,6 +172,7 @@ class ReleasedRuleFieldFidelityTest
 
             for (Map.Entry<String, Rule> e : rules.entrySet())
             {
+                entries++;
                 String coreId = e.getKey();
                 Rule rule = e.getValue();
                 String where = pkg.getFileName() + " / " + coreId;
@@ -175,9 +204,9 @@ class ReleasedRuleFieldFidelityTest
         }
 
         // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
-        // The MIN_RULES constant and the population counter it compared against were removed
-        // with it (2026-09-07) -- they had been left behind, unread, by that extraction.
+        // which this subset deliberately is not — this repository ships the corpus MINUS the
+        // CORE family, so the internal population can never be reached here. Enforced
+        // internally over the whole corpus. Re-applied 2026-09-15 after a sync restored it.
         assertEquals(List.of(), noMessage.size() > 25 ? noMessage.subList(0, 25) : noMessage,
                 noMessage.size() + " shipped rules have no Outcome.Message. Every row of the"
                         + " Rules Report falls back to it, so a rule without one reports blank.");

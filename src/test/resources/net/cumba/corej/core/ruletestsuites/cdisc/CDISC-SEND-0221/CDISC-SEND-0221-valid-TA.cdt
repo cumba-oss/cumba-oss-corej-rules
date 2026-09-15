@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0221 expect=noViolation domain=TA
+# Rule:Description: TAETORD is populated with a value that is not an integer.
+#note "Added 2026-09-14, the silent half of the pair. Rows 1-2 are the ordinary conformant shape. Row 3 leaves TAETORD missing: the Check opens with `not empty(TAETORD)`, so a blank is deliberately NOT a finding here — TAETORD's presence is somebody else's rule, and without this row nothing pins that this one stays out of that business. ⚠ noViolation also asserts the rule EXECUTED, so if the gate ever started erroring on a Num TAETORD this file reds rather than passing as 'no violations'."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1 | SCRN
+S1 | TA | A | Arm A | 2 | TRT
+S1 | TA | B | Arm B | . | SCRN
+---

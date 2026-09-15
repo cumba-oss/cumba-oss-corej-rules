@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0196 expect=violation domain=ADLBC
+#note "THE SPLIT'S COVERAGE PIN (top-level-or board wave 2, group J): before the split the two-variable All [PARAM, PARAMCD] gate SKIPPED this dataset (no PARAMCD column) and row 2's empty PARAM went unreported. Each half now gates only the variable it reads - the parent All [PARAM] - so the PARAM check runs here and fires on row 2. The PARAMCD absence itself is the sibling PMDA-AD0196-A's SKIP, not a lost signal. Strictly more coverage; finding count can only go up."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAM   type=Char
+col AVAL    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Alanine | 2.5
+CDISCPILOT01 | 01-701-1023 |         | 7.0

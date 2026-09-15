@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0032 expect=skipped domain=LB
+#note "LBTPT is not present in the dataset while LBTPTNUM is populated. Requirements.Variables.All [--TPTNUM, --TPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': FDA-SD1244 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTPTNUM type=Num  label="Planned Time Point Number"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | 1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC |

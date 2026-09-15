@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0059.1-A expect=noViolation domain=PC
+#note "Negative control: every populated PCELTM value is conformant, and the blank row pins that a missing value never fires."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCELTM type=Char label="Planned Elapsed Time"
+---
+S1 | PC | 001 | 1 | DRUGX | P1D
+S1 | PC | 001 | 2 | DRUGX | -P1D
+S1 | PC | 001 | 3 | DRUGX | P2DT6H
+S1 | PC | 001 | 4 | DRUGX | 

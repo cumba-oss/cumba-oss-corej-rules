@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-SEND-0057"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a combined --LAT, --DIR, or --PORTOT value, whose\
-  \ terms are separated by a semicolon (;), contains a token that is not a submission\
-  \ value in the corresponding (LAT), (DIR), or (PORTOT) controlled terminology codelist."
+Description: "Raise an error when a combined --LAT value, whose terms are separated\
+  \ by a semicolon (;), contains a token that is not a submission value in the (LAT)\
+  \ controlled terminology codelist."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -14,25 +14,14 @@ Operations:
 - id: "$lat_terms"
   expression: "codelist_terms(codelists=[LAT], level=\"term\", returntype=\"value\"\
     )"
-- id: "$dir_terms"
-  expression: "codelist_terms(codelists=[DIR], level=\"term\", returntype=\"value\"\
-    )"
-- id: "$portot_terms"
-  expression: "codelist_terms(codelists=[PORTOT], level=\"term\", returntype=\"value\"\
-    )"
 Check:
   expression: >-
     not empty(--LAT) and contains(--LAT, ";") and not contains_all($lat_terms, split_by(--LAT, ";"))
-    or not empty(--DIR) and contains(--DIR, ";") and not contains_all($dir_terms, split_by(--DIR,
-    ";")) or not empty(--PORTOT) and contains(--PORTOT, ";") and not contains_all($portot_terms,
-    split_by(--PORTOT, ";"))
 Outcome:
-  Message: "A semicolon-separated --LAT, --DIR, or --PORTOT token is not a submission\
-    \ value in the corresponding controlled terminology codelist."
+  Message: "A semicolon-separated --LAT token is not a submission value in the (LAT)\
+    \ controlled terminology codelist."
   Output_Variables:
   - "--LAT"
-  - "--DIR"
-  - "--PORTOT"
 Source:
   Class: "ALL"
   Domain: "ALL"

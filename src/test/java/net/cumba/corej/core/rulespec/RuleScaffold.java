@@ -135,8 +135,9 @@ public final class RuleScaffold
         }
         // The scaffold bypasses RulePackageLoader, so a built rule carries no native checkExpr and
         // would dispatch on the legacy engine. Install it here through the SAME single retention
-        // decision the loader uses, mirroring the per-dataset RuleGenerator seam for generated
-        // rules that likewise bypass the loader (RuleGenerator:
+        // decision the loader uses, mirroring the per-dataset DatasetRuleResolver seam for
+        // generated
+        // rules that likewise bypass the loader (DatasetRuleResolver:
         // RulePackageLoader.installNativeExpr). This makes a parity-harness rule dispatch natively
         // exactly as a loader-loaded production rule does; installNativeExpr is a no-op when a
         // checkExpr is already present.

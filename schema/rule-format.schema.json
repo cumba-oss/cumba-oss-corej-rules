@@ -2,189 +2,71 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cumba.net/corej/rule-format.schema.json",
   "title": "coreJ CDISC rule package",
-  "description": "Machine-readable schema for the rule packages under rules-legacy/ and rules/ (R-P5). Deliberately permissive where the engine is lenient (the loader disables FAIL_ON_UNKNOWN_PROPERTIES, so extra fields are allowed everywhere); strict on the shapes the engine actually dispatches on: the package envelope, the Check tree (all/any/not/expression/operator-leaf), Operations, Match_Datasets, the Outcome, and the Sensitivity / Executability / Variable_Universe enums (Phase 2 of : the loader fails loud — Rule.loadError, executed as ERROR — on a present-but-unrecognized value for these fields; an absent or null field stays legal). Rule_Type is no longer a rule field: a rule carrying it fails to load.",
+  "description": "Machine-readable schema for the rule packages under rules-legacy/ and rules/ (R-P5, plans/done/PLAN-native-engine-residuals.md). Deliberately permissive where the engine is lenient (the loader disables FAIL_ON_UNKNOWN_PROPERTIES, so extra fields are allowed everywhere); strict on the shapes the engine actually dispatches on: the package envelope, the Check tree (all/any/not/expression/operator-leaf), Operations, Match_Datasets, the Outcome, and the Sensitivity / Executability / Variable_Universe enums (Phase 2 of plans/PLAN-extend-expression-engine.md: the loader fails loud — Rule.loadError, executed as ERROR — on a present-but-unrecognized value for these fields; an absent or null field stays legal). Rule_Type is no longer a rule field (plans/PLAN-leaf-scope-domain-inference.md phase 7): a rule carrying it fails to load.",
   "type": "object",
-  "required": [
-    "rules"
-  ],
+  "required": ["rules"],
   "properties": {
     "rules": {
       "type": "object",
       "additionalProperties": {
-        "anyOf": [
-          {
-            "$ref": "#/$defs/rule"
-          },
-          {
-            "type": "null"
-          }
-        ]
+        "anyOf": [{ "$ref": "#/$defs/rule" }, { "type": "null" }]
       }
     }
   },
   "$defs": {
     "requirements": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "description": "What the rule needs in order to be able to answer AT ALL. An unmet requirement is a SKIPPED status naming it, never a finding. All facets are ANDed with each other and with Scope. Typed strictly - unlike the rule level, this block has no legacy shapes to tolerate, and the loader itself rejects an unknown key under it (gate R2).",
+      "type": ["object", "null"],
+      "description": "What the rule needs in order to be able to answer AT ALL (plans/PLAN-scope-requirements-split.md section 4). An unmet requirement is a SKIPPED status naming it, never a finding. All facets are ANDed with each other and with Scope. Typed strictly - unlike the rule level, this block has no legacy shapes to tolerate, and the loader itself rejects an unknown key under it (gate R2).",
       "additionalProperties": false,
       "properties": {
         "Variables": {
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": ["object", "null"],
           "description": "Column-presence requirements; the successor of the retired Scope.Variables (Include -> All, Exclude -> None). Entry vocabulary is unchanged: literal, `--` domain-prefix placeholder, qualified DATASET.VARIABLE (Fix #124), glob and /regex/. A requirement is for a thing whose absence means NOTHING TO CHECK - a presence rule must never list the variable it reports.",
           "additionalProperties": false,
           "properties": {
-            "All": {
-              "type": [
-                "array",
-                "null"
-              ],
-              "items": {
-                "type": "string"
-              },
-              "description": "Every entry must be present. Byte-for-byte the former Scope.Variables.Include."
-            },
-            "Any": {
-              "type": [
-                "array",
-                "null"
-              ],
-              "items": {
-                "type": "string"
-              },
-              "minItems": 2,
-              "description": "At least one entry must be present; unmet only when EVERY entry is absent. Two entries minimum (loader gate R4): a one-entry Any is All with extra ceremony."
-            },
-            "None": {
-              "type": [
-                "array",
-                "null"
-              ],
-              "items": {
-                "type": "string"
-              },
-              "description": "No entry may be present. Byte-for-byte the former Scope.Variables.Exclude."
-            }
+            "All": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Every entry must be present. Byte-for-byte the former Scope.Variables.Include." },
+            "Any": { "type": ["array", "null"], "items": { "type": "string" }, "minItems": 2, "description": "At least one entry must be present; unmet only when EVERY entry is absent. Two entries minimum (loader gate R4): a one-entry Any is All with extra ceremony." },
+            "None": { "type": ["array", "null"], "items": { "type": "string" }, "description": "No entry may be present. Byte-for-byte the former Scope.Variables.Exclude." }
           }
         },
         "Datasets": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
+          "type": ["array", "null"],
+          "items": { "type": "string" },
           "description": "Every listed dataset must be present in the run. Presence is the WIDENED fact ds_exists has tested since Fix #358 - a split domain counts as present - except where the rule reaches the dataset only through a surface that resolves exact (AbsentDatasetSkip.resolvesExactOnly). Entries accept the `--` wildcard, resolved against the primary."
         },
-        "Library": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "Whether a CDISC Library metadata provider is required. DERIVED: the assembler materialises it and the engine behaves on the derivation regardless; an authored value that disagrees is a load error (gate R5)."
-        },
-        "Define": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "Whether a sponsor Define-XML overlay is required. Derived - see Library."
-        },
-        "Dictionary": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "Whether at least one external dictionary is required. A boolean, not a list of external_dictionary_type values - the types are already in Operations and a second copy would only give them a second chance to drift. Derived - see Library."
-        }
+        "Library": { "type": ["boolean", "null"], "description": "Whether a CDISC Library metadata provider is required. DERIVED: the assembler materialises it and the engine behaves on the derivation regardless; an authored value that disagrees is a load error (gate R5)." },
+        "Define": { "type": ["boolean", "null"], "description": "Whether a sponsor Define-XML overlay is required. Derived - see Library." },
+        "Dictionary": { "type": ["boolean", "null"], "description": "Whether at least one external dictionary is required. A boolean, not a list of external_dictionary_type values - the types are already in Operations and a second copy would only give them a second chance to drift. Derived - see Library." }
       }
     },
     "datasetScope": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "description": "Scope.Datasets (owner requirement #5) - selection by the dataset NAME. Deliberately not the Domains shape: there is no split-base re-test (Domains: [LB] selects LB1/LB2; Datasets: [LB] selects the file called LB and nothing else) and no include_split_datasets, which is a statement about domain families and means nothing on a name axis. Entry vocabulary is Domains': ALL / NONE sentinels, /regex/, glob, the strict `--` token, literal. Glob, regex and NONE are coreJ-only and not upstream-portable.",
       "additionalProperties": false,
       "properties": {
-        "Include": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "Exclude": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        }
+        "Include": { "type": ["array", "null"], "items": { "type": "string" } },
+        "Exclude": { "type": ["array", "null"], "items": { "type": "string" } }
       }
     },
     "rule": {
       "type": "object",
-      "required": [
-        "Check"
-      ],
+      "required": ["Check"],
       "properties": {
         "Core": {
           "type": "object",
           "properties": {
-            "Id": {
-              "type": "string"
-            },
-            "Status": {
-              "type": "string"
-            },
-            "Version": {
-              "type": [
-                "string",
-                "number"
-              ]
-            }
+            "Id": { "type": "string" },
+            "Status": { "type": "string" },
+            "Version": { "type": ["string", "number"] }
           }
         },
-        "Description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
+        "Description": { "type": ["string", "null"] },
         "Severity": {
           "description": "Rule severity: the level this rule's finding reports at. Absent means Error, and Error is therefore never written (RuleCanonicalizer strips it). Notice is a report-only kind and is not authorable.",
-          "enum": [
-            "Reject",
-            "Error",
-            "Warning",
-            "Info"
-          ]
+          "enum": ["Reject", "Error", "Warning", "Info"]
         },
         "Sensitivity": {
-          "anyOf": [
-            {
-              "enum": [
-                "Record",
-                "Dataset",
-                "Group",
-                "Study"
-              ]
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "anyOf": [{ "enum": ["Record", "Dataset", "Group", "Study"] }, { "type": "null" }]
         },
         "Executability": {
           "anyOf": [
@@ -197,169 +79,86 @@
                 "Not Executable"
               ]
             },
-            {
-              "type": "null"
-            }
+            { "type": "null" }
           ]
         },
-        "ExecutabilityHint": {
-          "type": [
-            "object",
-            "string",
-            "null"
-          ]
-        },
-        "Authorities": {
-          "type": [
-            "array",
-            "null"
-          ]
-        },
+        "ExecutabilityHint": { "type": ["object", "string", "null"] },
+        "Authorities": { "type": ["array", "null"] },
         "Scope": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "description": "Which datasets the rule is ABOUT - selection, never a verdict (section 4.1). Classes, Domains, Datasets, Data_Structures, Subclasses, Use_Case. Deliberately left untyped apart from Datasets: the axes are validated byte-exactly at load, and a schema copy of the closed vocabularies would be a second place to drift. Scope carries NO Variables block: it retired to Requirements.Variables, and a surviving one is a load error on a corpus rule (loader gate R1) because the engine model no longer binds it.",
+          "type": ["object", "null"],
+          "description": "Which datasets the rule is ABOUT - selection, never a verdict (plans/PLAN-scope-requirements-split.md section 4.1). Classes, Domains, Datasets, Data_Structures, Subclasses, Use_Case. Deliberately left untyped apart from Datasets (PLAN-scope-data-structures-subclasses.md): the axes are validated byte-exactly at load, and a schema copy of the closed vocabularies would be a second place to drift. Scope carries NO Variables block: it retired to Requirements.Variables, and a surviving one is a load error on a corpus rule (loader gate R1) because the engine model no longer binds it.",
           "properties": {
-            "Datasets": {
-              "$ref": "#/$defs/datasetScope"
-            }
+            "Datasets": { "$ref": "#/$defs/datasetScope" }
           }
         },
-        "Requirements": {
-          "$ref": "#/$defs/requirements"
-        },
-        "Check": {
-          "$ref": "#/$defs/checkOrLevels"
-        },
+        "Requirements": { "$ref": "#/$defs/requirements" },
+        "Check": { "$ref": "#/$defs/checkOrLevels" },
         "Precondition": {
           "$ref": "#/$defs/check",
           "readOnly": true,
           "$comment": "Deliberately the PLAIN check, never checkOrLevels: a Precondition is a property of the rule, not of a level. It is evaluated ONCE, before any level runs.",
-          "description": "ENGINE-INTERNAL, not an authorable field (owner ruling Q3, loader gate R8). It carries machine-emitted dependency-availability gates - library_available / dictionary_available(<type>) / available(<call>) - which RulePackageLoader injects at load and OperationInliner bakes into the shipped packages offline. It is declared here because this schema validates the assembled rules/ view, where such a term is legitimate; deleting the definition would red every dictionary-gated package. An AUTHORED Precondition in rules-src/checks fails to load - see rule-check.schema.json, which does not declare the field."
+          "description": "ENGINE-INTERNAL, not an authorable field (owner ruling Q3, loader gate R8). It carries machine-emitted dependency-availability gates - library_available() / dictionary_available(<type>) / available(<call>) - which RulePackageLoader injects at load and OperationInliner bakes into the shipped packages offline. It is declared here because this schema validates the assembled rules/ view, where such a term is legitimate; deleting the definition would red every dictionary-gated package. An AUTHORED Precondition in rules-src/checks fails to load - see rule-check.schema.json, which does not declare the field."
         },
         "Outcome": {
           "type": "object",
           "properties": {
-            "Message": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
+            "Message": { "type": ["string", "null"] },
             "Output_Variables": {
               "description": "The variables a finding reports. A leading `!` marks an EXCLUSION (`!X` removes the auto-derived X from the effective list; `!--X`, `!$id`, `!DS.COL` likewise) — `--X` is always an include. Every entry must be double-quoted in YAML (an unquoted `!X` is a YAML tag). The pattern rejects a bare `!` and a stacked `!!X`; the loader's E-3 validation judges the rest.",
-              "type": [
-                "array",
-                "null"
-              ],
-              "items": {
-                "type": "string",
-                "pattern": "^!?[^!].*$"
-              }
+              "type": ["array", "null"],
+              "items": { "type": "string", "pattern": "^!?[^!].*$" }
             }
           }
         },
         "Operations": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "$ref": "#/$defs/operation"
-          }
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/operation" }
         },
         "Match_Datasets": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "$ref": "#/$defs/match"
-          }
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/match" }
         },
         "Expansion": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "description": "Fix #147 / EC-56 - declared-token template expansion. Java-only: the Python reference engine ignores the block and reads the template literally. See CORE-RULES-SPECIFICATION.md, Extension Fields - Expansion.",
-          "items": {
-            "$ref": "#/$defs/expansion"
-          }
+          "items": { "$ref": "#/$defs/expansion" }
         },
         "Grouping_Variables": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "description": "The flat, legacy spelling of the rule-level grouping key. Still accepted by the Java loader, and the only spelling the Python-facing rules-legacy/ view carries (LegacyGroupingDegrader flattens the block back to it). Mutually exclusive with Grouping - declaring both is a load error.",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "Grouping": {
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": ["object", "null"],
           "description": "Fix #180 - the rule-level grouping block: the grouping key plus its keep_missings disposition. Java-only: the Python reference engine has no channel for keep_missings, so the legacy view is degraded back to the flat Grouping_Variables and the parameter is dropped. Mutually exclusive with Grouping_Variables.",
           "properties": {
             "Variables": {
-              "type": [
-                "array",
-                "null"
-              ],
-              "items": {
-                "type": "string"
-              }
+              "type": ["array", "null"],
+              "items": { "type": "string" }
             },
-            "keep_missings": {
-              "type": [
-                "boolean",
-                "null"
-              ]
-            }
+            "keep_missings": { "type": ["boolean", "null"] }
           }
         },
         "Variable_Universe": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "Data",
-            "Define",
-            null
-          ],
-          "description": "section 3.7 - which variables the VAR cursor iterates for a rule whose evaluation domain carries that cursor: Data (default when absent; the dataset's columns in column order) or Define (the Define-XML ItemDefs of the domain in ItemDef order; no Define-XML provider means SKIPPED). Iteration only - Requirements.Variables still filters within the universe. Never derived from operand classes. Define on a Check with no variable cursor is a load error."
+          "type": ["string", "null"],
+          "enum": ["Data", "Define", null],
+          "description": "PLAN-leaf-scope-domain-inference.md section 3.7 - which variables the VAR cursor iterates for a rule whose evaluation domain carries that cursor: Data (default when absent; the dataset's columns in column order) or Define (the Define-XML ItemDefs of the domain in ItemDef order; no Define-XML provider means SKIPPED). Iteration only - Requirements.Variables still filters within the universe. Never derived from operand classes. Define on a Check with no variable cursor is a load error."
         }
       }
     },
     "checkOrLevels": {
-      "description": "A rule's Check is EITHER one condition OR a map of check levels (section 3.3). A Check whose keys are ALL ladder level names is a level map; a Check with NO level-name key is a plain condition, exactly as before. A MIXED map ({ERROR:.., expression:..}) and an UNKNOWN level name are load errors - the discrimination is total and free because every condition key is lower-case and every level name UPPER-case. A single Check: is one level, at the rule's effective Severity; the strictest declared level of a level map MUST equal the rule's Severity, and disagreeing is a load error. Operations, Scope, Requirements, Grouping, Match_Datasets, Precondition and Outcome.Output_Variables are shared across all of a rule's levels - a rule that needs different ones is two rules. NOTE the run severity threshold is NOT expressible here or anywhere else in a package: it is a RUN option only (CLI --severity-level / REST CheckRunRequest.severityThreshold /.cdt #runLevel), and a package or rule declaring any spelling of it is a load error.",
+      "description": "A rule's Check is EITHER one condition OR a map of check levels (plans/done/PLAN-severity-and-check-levels.md section 3.3). A Check whose keys are ALL ladder level names is a level map; a Check with NO level-name key is a plain condition, exactly as before. A MIXED map ({ERROR: ..., expression: ...}) and an UNKNOWN level name are load errors - the discrimination is total and free because every condition key is lower-case and every level name UPPER-case. A single Check: is one level, at the rule's effective Severity; the strictest declared level of a level map MUST equal the rule's Severity, and disagreeing is a load error. Operations, Scope, Requirements, Grouping, Match_Datasets, Precondition and Outcome.Output_Variables are shared across all of a rule's levels - a rule that needs different ones is two rules. NOTE the run severity threshold is NOT expressible here or anywhere else in a package: it is a RUN option only (CLI --severity-level / REST CheckRunRequest.severityThreshold / .cdt #runLevel), and a package or rule declaring any spelling of it is a load error.",
       "oneOf": [
-        {
-          "$ref": "#/$defs/levelMap"
-        },
-        {
-          "$ref": "#/$defs/plainCheck"
-        }
+        { "$ref": "#/$defs/levelMap" },
+        { "$ref": "#/$defs/plainCheck" }
       ]
     },
     "plainCheck": {
-      "description": "A Check that declares no level at all - one condition, one level, at the rule's effective Severity. The propertyNames clause is what makes a MIXED map ({ERROR:.., expression:..}) invalid: without it the mixed map would satisfy this branch (the condition shapes tolerate extra keys, because the loader runs with FAIL_ON_UNKNOWN_PROPERTIES off) and the oneOf would match exactly once and pass. It uses the ^[A-Z][A-Z0-9_]*$ level-SHAPED test the deserialiser (RuleCheckDeserializer.LEVEL_SHAPED) uses, not an enumeration of the four canonical names: enumerating the names accepted a mixed map whose level key was misspelled or non-canonical ({CRITICAL:.., expression:..}), which the loader rejects. Every legitimate condition key (all/any/not/expression, the leaf fields) is lower-case, so no well-formed plain Check carries an all-caps key. Known residual: a mixed-CASE mis-spelt level key ({Error:..}) is not level-shaped and still passes this branch - the loader's parseOrNull dispatch catches it.",
+      "description": "A Check that declares no level at all - one condition, one level, at the rule's effective Severity. The propertyNames clause is what makes a MIXED map ({ERROR: ..., expression: ...}) invalid: without it the mixed map would satisfy this branch (the condition shapes tolerate extra keys, because the loader runs with FAIL_ON_UNKNOWN_PROPERTIES off) and the oneOf would match exactly once and pass. It uses the ^[A-Z][A-Z0-9_]*$ level-SHAPED test the deserialiser (RuleCheckDeserializer.LEVEL_SHAPED) uses, not an enumeration of the four canonical names: enumerating the names accepted a mixed map whose level key was misspelled or non-canonical ({CRITICAL: ..., expression: ...}), which the loader rejects. Every legitimate condition key (all/any/not/expression, the leaf fields) is lower-case, so no well-formed plain Check carries an all-caps key. Known residual: a mixed-CASE mis-spelt level key ({Error: ...}) is not level-shaped and still passes this branch - the loader's parseOrNull dispatch catches it.",
       "allOf": [
+        { "$ref": "#/$defs/check" },
         {
-          "$ref": "#/$defs/check"
-        },
-        {
-          "propertyNames": {
-            "not": {
-              "pattern": "^[A-Z][A-Z0-9_]*$"
-            }
-          }
+          "propertyNames": { "not": { "pattern": "^[A-Z][A-Z0-9_]*$" } }
         }
       ]
     },
@@ -369,380 +168,110 @@
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
-        "REJECT": {
-          "$ref": "#/$defs/levelCheck"
-        },
-        "ERROR": {
-          "$ref": "#/$defs/levelCheck"
-        },
-        "WARNING": {
-          "$ref": "#/$defs/levelCheck"
-        },
-        "INFO": {
-          "$ref": "#/$defs/levelCheck"
-        }
+        "REJECT": { "$ref": "#/$defs/levelCheck" },
+        "ERROR": { "$ref": "#/$defs/levelCheck" },
+        "WARNING": { "$ref": "#/$defs/levelCheck" },
+        "INFO": { "$ref": "#/$defs/levelCheck" }
       }
     },
     "levelCheck": {
       "type": "object",
       "description": "One level's value: the Check condition that level evaluates, optionally carrying that level's own Message. A level that declares no Message falls back to the rule's Outcome.Message, resolved at report time from the claiming level - the rule message is never copied into the levels.",
-      "allOf": [
-        {
-          "$ref": "#/$defs/check"
-        }
-      ],
+      "allOf": [{ "$ref": "#/$defs/check" }],
       "properties": {
-        "Message": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "This level's message; absent means the rule's Outcome.Message."
-        }
+        "Message": { "type": ["string", "null"], "description": "This level's message; absent means the rule's Outcome.Message." }
       }
     },
     "check": {
       "type": "object",
       "properties": {
-        "all": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/check"
-          }
-        },
-        "any": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/check"
-          }
-        },
-        "not": {
-          "$ref": "#/$defs/check"
-        },
-        "expression": {
-          "type": "string"
-        }
+        "all": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+        "any": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+        "not": { "$ref": "#/$defs/check" },
+        "expression": { "type": "string" }
       },
       "anyOf": [
-        {
-          "required": [
-            "all"
-          ]
-        },
-        {
-          "required": [
-            "any"
-          ]
-        },
-        {
-          "required": [
-            "not"
-          ]
-        },
-        {
-          "required": [
-            "expression"
-          ]
-        },
-        {
-          "$ref": "#/$defs/leaf"
-        }
+        { "required": ["all"] },
+        { "required": ["any"] },
+        { "required": ["not"] },
+        { "required": ["expression"] },
+        { "$ref": "#/$defs/leaf" }
       ]
     },
     "leaf": {
       "type": "object",
-      "required": [
-        "operator"
-      ],
+      "required": ["operator"],
       "properties": {
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "operator": {
-          "type": "string"
-        },
+        "name": { "type": ["string", "null"] },
+        "operator": { "type": "string" },
         "value": {},
-        "value_is_literal": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "value_is_reference": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "type_insensitive": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "negative": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "regex": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "prefix": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "suffix": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
+        "value_is_literal": { "type": ["boolean", "null"] },
+        "value_is_reference": { "type": ["boolean", "null"] },
+        "type_insensitive": { "type": ["boolean", "null"] },
+        "negative": { "type": ["boolean", "null"] },
+        "regex": { "type": ["string", "null"] },
+        "prefix": { "type": ["integer", "null"] },
+        "suffix": { "type": ["integer", "null"] },
         "within": {
           "$comment": "EC-24: a within entry is a single column (string) or a coalesce-group (array of column strings, first-populated wins); the top-level may be a string, a null, or an array of those entries.",
           "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "type": "string"
-            },
+            { "type": "null" },
+            { "type": "string" },
             {
               "type": "array",
               "items": {
                 "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
+                  { "type": "string" },
+                  { "type": "array", "items": { "type": "string" } }
                 ]
               }
             }
           ]
         },
-        "ordering": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "ordering": { "type": ["string", "null"] }
       }
     },
     "operation": {
       "type": "object",
       "anyOf": [
-        {
-          "required": [
-            "operator"
-          ]
-        },
-        {
-          "required": [
-            "expression"
-          ]
-        }
+        { "required": ["operator"] },
+        { "required": ["expression"] }
       ],
       "properties": {
-        "id": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "operator": {
-          "type": "string"
-        },
-        "expression": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "domain": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "group": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "filter": {
-          "type": [
-            "object",
-            "null"
-          ]
-        },
-        "codelists": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "level": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "returntype": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "key_name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "qualifying_any_populated": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "missing_values": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "skip",
-            "indeterminate",
-            null
-          ]
-        },
-        "value": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        }
+        "id": { "type": ["string", "null"] },
+        "operator": { "type": "string" },
+        "expression": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] },
+        "domain": { "type": ["string", "null"] },
+        "group": { "type": ["array", "null"], "items": { "type": "string" } },
+        "filter": { "type": ["object", "null"] },
+        "codelists": { "type": ["array", "null"], "items": { "type": "string" } },
+        "level": { "type": ["string", "null"] },
+        "returntype": { "type": ["string", "null"] },
+        "key_name": { "type": ["string", "null"] },
+        "qualifying_any_populated": { "type": ["array", "null"], "items": { "type": "string" } },
+        "missing_values": { "type": ["string", "null"], "enum": ["skip", "indeterminate", null] },
+        "value": { "type": ["array", "null"], "items": { "type": "string" } }
       }
     },
     "expansion": {
       "type": "object",
-      "required": [
-        "token",
-        "over"
-      ],
+      "required": ["token", "over"],
       "properties": {
-        "token": {
-          "type": "string",
-          "description": "The exact string substituted wherever it occurs in the rule body. Author-chosen; must carry a non-alphanumeric sigil so it can never collide with a CDISC variable name (R-5.17)."
-        },
-        "over": {
-          "enum": [
-            "shared_variables",
-            "domain_from_variable"
-          ],
-          "description": "The binding source. Closed and extensible: a third source costs one new value here plus its resolver in TokenExpander."
-        },
-        "with": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "shared_variables only - the foreign dataset whose variables are intersected with the dataset under validation."
-        },
-        "pattern": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "domain_from_variable only - the column-name shape the token appears in; the token position is the capture. Must contain the token."
-        },
-        "known_domain_only": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "domain_from_variable only - keep only captures the library attests as dataset names. This is what excludes ADaM's own ASEQ / SRCSEQ / RECSEQ."
-        }
+        "token": { "type": "string", "description": "The exact string substituted wherever it occurs in the rule body. Author-chosen; must carry a non-alphanumeric sigil so it can never collide with a CDISC variable name (R-5.17)." },
+        "over": { "enum": ["shared_variables", "domain_from_variable"], "description": "The binding source. Closed and extensible: a third source costs one new value here plus its resolver in TokenExpander." },
+        "with": { "type": ["string", "null"], "description": "shared_variables only - the foreign dataset whose variables are intersected with the dataset under validation." },
+        "pattern": { "type": ["string", "null"], "description": "domain_from_variable only - the column-name shape the token appears in; the token position is the capture. Must contain the token." },
+        "known_domain_only": { "type": ["boolean", "null"], "description": "domain_from_variable only - keep only captures the library attests as dataset names. This is what excludes ADaM's own ASEQ / SRCSEQ / RECSEQ." }
       }
     },
     "match": {
       "type": "object",
       "properties": {
-        "Name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "Keys": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "left": {
-                    "type": "string"
-                  },
-                  "right": {
-                    "type": "string"
-                  }
-                }
-              }
-            ]
-          }
-        },
-        "Child": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "Wildcard": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "Name": { "type": ["string", "null"] },
+        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
+        "Child": { "type": ["boolean", "null"] },
+        "Wildcard": { "type": ["string", "null"] }
       }
     }
   }

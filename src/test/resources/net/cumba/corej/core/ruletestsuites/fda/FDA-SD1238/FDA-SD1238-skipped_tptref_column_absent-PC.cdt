@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1238 expect=skipped domain=PC
+#note "PCTPTREF column absent while PCRFTDTC is populated. Requirements.Variables.All [--RFTDTC, --TPTREF] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': FDA-SD1245 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Pharmacokinetic Test Short Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+S1 | PC | 001 | 1 | DRUGA | 2020-01-02T08:00

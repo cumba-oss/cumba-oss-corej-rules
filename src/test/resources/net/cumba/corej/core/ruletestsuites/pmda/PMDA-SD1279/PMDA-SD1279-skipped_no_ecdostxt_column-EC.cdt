@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1279 expect=skipped domain=EC
+#note "ECDOSTXT column absent while row 1 has ECDOSE missing, ECOCCUR=Y (!=N) and ECSTAT blank (the D-5 leaf ECSTAT != 'NOT DONE' is true on a missing value, R-5.22). Requirements.Variables.All [ECDOSTXT] now gates the rule out -> auditable skip naming the column. Verdict 2-1 (T1-32): the absence is itself reportable, and the minted sister PMDA-SD9722 reports it ONCE for this dataset. This suite had no ECDOSTXT-absent scenario before the gate landed."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECOCCUR type=Char label="Occurrence"
+col ECDOSE  type=Num  label="Dose"
+col ECSTAT  type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | . |
+S1 | EC | 001 | 2 | DRUG A | Y | 5 |

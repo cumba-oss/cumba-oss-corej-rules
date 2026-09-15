@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0348-B expect=skipped domain=PC
+#note "THE R-4.11 HOIST PIN (top-level-or board wave 2, group J): the pre-split var_exists guard is hoisted to Requirements.Variables.All [PCELTM], so a PC dataset without the column SKIPs, naming the variable, instead of executing silently (the Fix #331 empty-under-gate shape). DISCRIMINATOR: PCNOMDY is present and empty on row 1 - that is CDISC-SEND-0348's state, reported there and never here. If this EXECUTES, the hoisted gate has been removed - escalate, do not rewrite."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY type=Num label="PC Timing Variable"
+---
+S1 | PC | 001 | 1 | DRUGX | .
+S1 | PC | 001 | 2 | DRUGX | 1

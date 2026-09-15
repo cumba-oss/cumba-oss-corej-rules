@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-9438 expect=violation domain=FX
+#note "The sister half of the CDISC-SEND-0397 pair (minted 2026-09-11, M18/B4). Neither FXSTRESC nor FXSTAT is in the dataset (None satisfied) while rows 1 and 2 have FXRESCAT present but empty, so the remaining condition holds on two rows. Sensitivity is Dataset, so the defect is reported ONCE although both rows qualify: with no exemption column in the dataset no record can be excused, and the parent - whose Any gate wants at least one exemption column - skips this shape audibly rather than firing per row under R-5.22."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+col FXRESCAT type=Char label="Result Category"
+---
+S1 | FX | 001 | 1 | FPEXAM |
+S1 | FX | 002 | 2 | FPEXAM |

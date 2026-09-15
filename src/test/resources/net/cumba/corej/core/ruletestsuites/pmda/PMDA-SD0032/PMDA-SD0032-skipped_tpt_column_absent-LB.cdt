@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0032 expect=skipped domain=LB
+#note "No LBTPT column at all while LBTPTNUM is populated. Requirements.Variables.All [--TPTNUM, --TPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': PMDA-SD1244 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBTPTNUM type=Num
+---
+S1 | LB | 001 | 1 | GLUC | 1
+S1 | LB | 001 | 2 | GLUC | .

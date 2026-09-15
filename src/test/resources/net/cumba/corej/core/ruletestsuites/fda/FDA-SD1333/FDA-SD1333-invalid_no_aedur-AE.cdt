@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1333 expect=violation domain=AE
-#note "AEDUR (Permissible) is not collected at all, so the bare empty(AEDUR) leaf is TRUE on every row (absent = all-missing, EC-43; Plan B phase 4d' deleted the not var_exists(AEDUR) disjunct that used to make this a separate 'not present' branch): row 1 is RECOVERED/RESOLVED with an empty AEENDTC and no duration anywhere -> fires."
+#note "AEDUR (Permissible) is not collected at all, so the bare empty(AEDUR) leaf is TRUE on every row (absent = all-missing, EC-43; Plan B phase 4d' deleted the not var_exists(AEDUR) disjunct that used to make this a separate 'not present' branch): row 1 is RECOVERED/RESOLVED with an empty AEENDTC and no duration anywhere -> fires. Since 2026-09-11 this ALSO pins the R-4.11b gate as Any, not All (T1-30): the present AEENDTC column satisfies Requirements.Variables.Any [AEENDTC, AEDUR], so the verdict is UNCHANGED -- only a dataset with NEITHER column skips (skipped_no_end_columns), and the sister FDA-SD9724 reports that case."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 #expectViolationAt row=1 AESEQ=1

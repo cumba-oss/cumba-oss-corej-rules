@@ -2,22 +2,23 @@ Core:
   Id: "FDA-SE2308"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when the required PC timing variables are not present\
-  \ and populated: PCELTM together with either VISITDY or PCNOMDY must be populated."
+Description: "Raise an error when the required PC timing variable Planned Elapsed\
+  \ Time (PCELTM) is not populated."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCELTM"
 Check:
   expression: >-
-    empty(PCELTM) or empty(VISITDY) and empty(PCNOMDY)
+    empty(PCELTM)
 Outcome:
-  Message: "The required PC timing variables are not populated: PCELTM together with\
-    \ VISITDY or PCNOMDY must be present and populated."
+  Message: "PCELTM, a required PC timing variable, is not populated."
   Output_Variables:
-  - "VISITDY"
-  - "PCNOMDY"
   - "PCELTM"
 Source:
   FDA_Validator_Rule_Message: "Missing values for required timing variables: (VISITDY\

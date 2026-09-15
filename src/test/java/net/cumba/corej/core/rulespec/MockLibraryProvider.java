@@ -147,7 +147,12 @@ public final class MockLibraryProvider implements MetadataProvider
         }
         out.put("codelist_coded_values", net.cumba.corej.core.metadata.DefineMetadataListCodec
                 .encode(getCodelistTerms(codelist)));
-        out.put("codelist_extensible", String.valueOf(isCodelistExtensible(codelist)));
+        // F-corej-ct-02: the var_codelist_extensible attribute channel shares the miss behaviour
+        // of the accessor above — production's MetadataLibraryProvider.codelistExtensible does
+        // `isCodelistExtensible(name).map(String::valueOf).orElse(null)`, so an UNRESOLVABLE
+        // codelist leaves the key ABSENT rather than stringifying a defaulted boolean.
+        isCodelistExtensible(codelist)
+                .ifPresent(e -> out.put("codelist_extensible", String.valueOf(e)));
         return out;
     }
 
@@ -327,10 +332,50 @@ public final class MockLibraryProvider implements MetadataProvider
     }
 
 
+    /**
+     * F-corej-ct-02 — mirrors {@code MetadataLibraryProvider.isCodelistExtensible}'s two cases
+     * rather than the old fixture-friendly default-to-true.
+     *
+     * <ul>
+     * <li>The codelist is <b>not held</b> by this spec's mocks at all ⇒
+     * {@link java.util.Optional#empty()} — unresolvable, and the engine surfaces it as a rule SKIP.
+     * A defaulted {@code true} here silently disarmed every shipped {@code == false} guard.</li>
+     * <li>The codelist <b>is held</b> (declared on any codelist channel) but carries no
+     * {@code codelist_extensible} flag ⇒ {@code Optional.of(TRUE)} — a real answer, exactly as
+     * production treats a found codelist whose {@code ICodeList.isExtensible()} is null. This is
+     * <em>not</em> the unresolvable case and must not become empty.</li>
+     * </ul>
+     */
     @Override
-    public boolean isCodelistExtensible(String codelistName)
+    public java.util.Optional<Boolean> isCodelistExtensible(String codelistName)
     {
-        return get(mocks.codelistExtensible(), codelistName, true);
+        Boolean flag = get(mocks.codelistExtensible(), codelistName, null);
+        if (flag != null)
+        {
+            return java.util.Optional.of(flag);
+        }
+        return holdsCodelist(codelistName) ? java.util.Optional.of(Boolean.TRUE)
+                : java.util.Optional.empty();
+    }
+
+
+    /**
+     * Whether the spec declares {@code codelistName} on any codelist channel — the mock's analogue
+     * of {@code MetadataLibraryProvider.findCodelist} being present. Used only to separate "found,
+     * flag unspecified" from "not resolvable" above.
+     */
+    private boolean holdsCodelist(String codelistName)
+    {
+        return declares(mocks.codelistExtensible(), codelistName)
+                || declares(mocks.codelistTerms(), codelistName)
+                || declares(mocks.codelistTermCodes(), codelistName)
+                || declares(mocks.codelistTermMappings(), codelistName);
+    }
+
+
+    private static boolean declares(Map<String, ?> map, String key)
+    {
+        return map != null && map.containsKey(key);
     }
 
 

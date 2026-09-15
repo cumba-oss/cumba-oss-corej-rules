@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD9717 expect=skipped domain=LB
+#note "The discriminator that keeps the pair from double-reporting: the LBTOX column EXISTS (blank on row 2), so Requirements.Variables.None [--TOX] skips this sister with a reason naming the column, and PMDA-SD1037 owns the case, reporting row 2 with its location."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOX    type=Char label="Toxicity"
+col LBTOXGR  type=Char label="Toxicity Grade"
+---
+S1 | LB | 001 | 1 | ALT | HYPERTRANSAMINASEMIA | 2
+S1 | LB | 001 | 2 | ALT |                      | 3

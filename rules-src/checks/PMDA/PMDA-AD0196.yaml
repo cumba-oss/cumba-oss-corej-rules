@@ -2,10 +2,8 @@ Core:
   Id: "PMDA-AD0196"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a required ADaM analysis parameter variable that\
-  \ CDISC affirms must be populated is empty. Parameter (PARAM) and Parameter Code\
-  \ (PARAMCD) must always be populated; this rule flags any record where either is\
-  \ empty."
+Description: "Raise an error when the required ADaM analysis parameter variable Parameter\
+  \ (PARAM), which CDISC affirms must always be populated, is empty."
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Data_Structures:
@@ -16,16 +14,14 @@ Requirements:
   Variables:
     All:
     - "PARAM"
-    - "PARAMCD"
 Check:
   expression: >-
-    empty(PARAM) or empty(PARAMCD)
+    empty(PARAM)
 Outcome:
-  Message: "A required analysis parameter variable (PARAM or PARAMCD) is empty; both\
-    \ must be populated."
+  Message: "PARAM, a required analysis parameter variable, is empty; it must always\
+    \ be populated."
   Output_Variables:
   - "PARAM"
-  - "PARAMCD"
 Source:
   Message: "Required Variable value is null"
   Description: "Unlike SDTM, only some of ADaM Required variables (where Core attribute\

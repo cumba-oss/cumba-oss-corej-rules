@@ -1,0 +1,85 @@
+Core:
+  Id: "CDISC-SEND-0324-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a Pharmacokinetic Concentrations (PC) result is\
+  \ quantifiably above the upper limit of quantitation - PCORRES above PCULOQ, where\
+  \ provided - but PCSTRESC does not carry the 'ALQ' token."
+Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Above-limit detection is only possible for numerically comparable results:\
+    \ a textual PCORRES (e.g. a literal 'ALQ') skips the row, so token omissions on\
+    \ non-numeric results are not reported. The comparison requires the model-permissible\
+    \ PCULOQ (SDTM model 1.4+), which no SENDIG version enumerates in PC, and PCULOQ\
+    \ is gated by Requirements.Variables.All (R-4.11): on a PC dataset without it\
+    \ - the normal SENDIG shape - this half takes an auditable SKIP naming the column\
+    \ instead of running to silence. No finding changes either way, because no row\
+    \ can fire without the limit. Token comparison is exact ('ALQ' per controlled\
+    \ terminology). The below-limit half of the published SEND324 row is carried by\
+    \ the parent CDISC-SEND-0324."
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCORRES"
+    - "PCSTRESC"
+    - "PCULOQ"
+Check:
+  expression: >-
+    num(PCORRES) > PCULOQ and PCSTRESC != "ALQ"
+Outcome:
+  Message: "PCORRES is above the upper limit of quantitation but PCSTRESC does not\
+    \ carry the 'ALQ' token."
+  Output_Variables:
+  - "PCSTRESC"
+  - "PCORRES"
+  - "PCULOQ"
+Source_Proposed:
+  Sheet_Issue: "#219"
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCSTRESC"
+  Plain_Text_Explanation: "For results above the upper Limit of Quantitation PCSTRESC\
+    \ should be populated with \"ALQ\"."
+  Condition: "Result is above the upper Limit of Quantification"
+  Rule: "PCSTRESC = \"ALQ\""
+Source:
+  Class: "FND"
+  Domain: "PC"
+  Variable: "PCSTRESC"
+  Plain_Text_Explanation: "For results outside the Limit of Quantitation PCSTRESC\
+    \ should be populated with \"BLQ\" for results below the limit or PCSTRESC should\
+    \ be populated with \"ALQ\" for results above the limit."
+  Condition: "Result is outside the Limit of Quantification"
+  Rule: "PCSTRESC = \"BLQ\" or PCSTRESC = \"ALQ\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND324"
+        Version: "1"
+      Version: "5.0"

@@ -1,9 +1,11 @@
 #!RuleTest
 #test CDISC-CG0001 expect=noViolation domain=XX
-#note "XX is declared a custom domain (#library custom-domain XX) so $domain_is_custom=true, and the Check's leading conjunct silences the rule even though the define's DOMAIN item carries the unpublished alias C99999 -- pins the non-custom gate."
+#note "XX is declared a custom domain (#library custom-domain XX) so $domain_is_custom=true, and the Check's leading conjunct silences the rule even though the define's DOMAIN item carries the unpublished alias C99999 -- pins the non-custom gate. ⚠ Channel split (PLAN-codelist-terms-returntype.md P2): the real 2-letter submission values (AE, LB) ride #library codelist-terms, the NCI C-codes ride #library codelist-term-ccodes, and the codelist's own ccode/preferred term ride #library codelist-meta. Do NOT put C-codes back into codelist-terms -- feeding C-codes down the submission-value channel was the self-disarming fixture shape this replaces."
 #library standard=sdtmig version=3-4
 #library custom-domain XX
-#library codelist-terms DOMAIN C11111
+#library codelist-terms DOMAIN LB
+#library codelist-term-ccodes DOMAIN LB=C11111
+#library codelist-meta DOMAIN ccode=C66734 pref="SDTM Domain Abbreviation"
 #define-xml CDISC-CG0001-custom-define.xml
 dataset XX
 col STUDYID type=Char

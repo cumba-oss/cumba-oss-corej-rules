@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-SEND-0400 expect=violation domain=TP
+#note "R-5.25 wave-3 group K split of SEND400 (all three DART datasets absent is three defects, not one): the study ships TP but no TT (Trial Repro Stages) dataset. Sensitivity is Study, so the absence is reported ONCE for the study; the missing TP/SJ of a barer study would be the siblings' findings, not extra findings of this half."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col TPSEQ   type=Num  label="Sequence Number"
+---
+S1 | TP | 1

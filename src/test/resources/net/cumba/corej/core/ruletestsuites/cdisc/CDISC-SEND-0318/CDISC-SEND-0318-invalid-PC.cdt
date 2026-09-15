@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0318 expect=violation domain=PC
+# Rule:Description: --NOMDY is populated with a value that is not an integer.
+#note "Added 2026-09-14 (PLAN-column-type-conformance carried-forward). This rule had NO .cdt scenario at all while its semantics were rewritten from an integer-shaped regex to `not is_integer` — the CORE-000587 shape. --NOMDY is Num throughout SEND (PC/PP/DS fixtures in this corpus all declare it Num), and on a Num column the retired regex subject now ERRORS under the R9 gate, so this fixture is what distinguishes the migrated rule from the unmigrated one. ⭐ MEASURED 2026-09-14, not argued: restoring `--NOMDY !~ /^-?[0-9]+$/` reds this file and its -valid- twin with the gate's own message. Row 1 is a fractional nominal day and fires; row 2 is whole and must not. ⚠ This covers the FINDINGS leg of Scope.Classes; the EVENTS leg has its own file on DS — the two legs are separate wildcard expansions and a scenario on one proves nothing about the other."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 PCSEQ=1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ   type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY type=Num  label="Nominal Study Day for Tabulations"
+---
+S1 | PC | 001 | 1 | DRUGX | 1.5
+S1 | PC | 001 | 2 | DRUGX | 3
+---

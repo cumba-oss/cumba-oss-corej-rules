@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-SD0021 expect=violation domain=CM
-#note "Interventions branch, no end-timepoint / STAT / DUR columns. Row 1: CMOCCUR=Y (!= 'N') -> fires. Row 2: CMOCCUR=N is the exception -> clean. Row 3: CMOCCUR empty -> empty != 'N' is TRUE (operator-examples B.1) -> fires. Only OCCUR exactly 'N' excepts."
+#note "Interventions branch, no STAT / DUR columns; the CMENDTC column is present but blank on every row, satisfying the Any gate [--ENDTC, --ENRF, --ENRTPT, --DUR] while leaving the end-timepoint leaves empty-true. Row 1: CMOCCUR=Y (!= 'N') -> fires. Row 2: CMOCCUR=N is the exception -> clean. Row 3: CMOCCUR empty -> empty != 'N' is TRUE (operator-examples B.1) -> fires. Only OCCUR exactly 'N' excepts."
 #library standard=sdtmig version=3-4
 #expectViolationCount 2
 #expectViolationAt row=1 CMSEQ=1
@@ -12,7 +12,8 @@ col USUBJID  type=Char
 col CMSEQ    type=Num
 col CMTRT    type=Char
 col CMOCCUR  type=Char
+col CMENDTC  type=Char
 ---
-S1 | CM | 001 | 1 | ASPIRIN     | Y
-S1 | CM | 001 | 2 | IBUPROFEN   | N
-S1 | CM | 001 | 3 | PARACETAMOL |
+S1 | CM | 001 | 1 | ASPIRIN     | Y |
+S1 | CM | 001 | 2 | IBUPROFEN   | N |
+S1 | CM | 001 | 3 | PARACETAMOL |   |

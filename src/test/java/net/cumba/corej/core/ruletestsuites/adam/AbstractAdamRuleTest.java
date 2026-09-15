@@ -175,11 +175,60 @@ abstract class AbstractAdamRuleTest
         var table = OverlayDataTable.empty(domain, domain, rowCount);
         for (String col : columns)
         {
-            table.addColumn(col);
+            // ⚠⚠ addColumn's default is STRING, and a synthetic table that declares EVERY column
+            // Char is a fixture that lies about the standard. ADaM's convention pairs a character
+            // flag `xxxFL` with a NUMERIC `xxxFN` (0/1) — CDISC-AD0006's own message says so
+            // ("a variable with a suffix of FN is populated with a value other than 0 or 1").
+            // Measured 2026-09-14: with everything Char, 24 `CDISC-AD0006-*FN` template tests were
+            // passing VACUOUSLY — the rule ERRORED on the column-type gate, RuleRunner's
+            // "__error__" sentinel made hasViolations() true, and `assertTrue(hasViolations())`
+            // read that as a detection. The guard in AbstractAdamTemplateTest catches it now; this
+            // stops manufacturing it.
+            if (isAdamNumericFlag(col))
+            {
+                table.addColumn(col, net.cumba.datatable.values.DataValueType.DOUBLE, col);
+            }
+            else
+            {
+                table.addColumn(col);
+            }
         }
         return table;
     }
 
+
+    /**
+     * Whether {@code column} is an ADaM numeric flag — the {@code xxxFN} counterpart of a character
+     * {@code xxxFL}. Deliberately narrow: it types only the family this harness was measured to
+     * mis-declare, rather than inventing a general type oracle the tests would then silently depend
+     * on. A broader fix reads the CDISC Library metadata.
+     *
+     * @param column
+     *            the column name.
+     * @return {@code true} when the name follows the numeric-flag convention.
+     */
+    private static boolean isAdamNumericFlag(String column)
+    {
+        return column.length() > 2 && column.endsWith("FN")
+                && !SDTM_EXTERNAL_FILE_NAMES.contains(column)
+                && column.chars().allMatch(c -> Character.isLetterOrDigit(c) || c == '_');
+    }
+
+    /**
+     * SDTM's {@code --XFN} "External File Name" family — the one {@code FN}-suffixed group that is
+     * <b>Char</b>, not a numeric flag.
+     * <p>
+     * ⚠⚠ Without this exclusion the suffix test would manufacture the inverse of the defect it was
+     * written to remove: a fixture declaring a Char variable numeric. Measured against the CDISC
+     * Library cache, {@code FN}-suffixed variables split 21 Num / 7 Char, and the seven are exactly
+     * these. ⚠ A suffix test cannot separate them on shape — ADaM's own {@code NCAXFN} and
+     * {@code PKSUMXFN} are also {@code …XFN} and genuinely Num — so the separation has to be by
+     * name. None of the seven appears in any authored check today; the exclusion exists so the
+     * first ADaM rule to reference one does not get a silently mistyped fixture.
+     * </p>
+     */
+    private static final java.util.Set<String> SDTM_EXTERNAL_FILE_NAMES = java.util.Set.of("EGXFN",
+            "FTXFN", "GFXFN", "MOXFN", "MSXFN", "OEXFN", "PTXFN");
 
     /**
      * Loads a {@code .cdt} test data file from the classpath. The file is expected under
@@ -374,6 +423,11 @@ abstract class AbstractAdamRuleTest
     {
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainName);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)
@@ -404,6 +458,11 @@ abstract class AbstractAdamRuleTest
     {
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainName, customResolver);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)
@@ -442,6 +501,11 @@ abstract class AbstractAdamRuleTest
         Rule rule = getRule(coreId);
         RuleExecutionResult result = execute(rule, table, domainName, customResolver,
                 libraryProvider);
+        // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so hasViolations()
+        // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+        // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same discipline as
+        // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+        assertFalse(result.isError(), "ERRORED rather than firing: " + result.getStatusMessage());
         assertTrue(result.hasViolations(),
                 coreId + " should fire on invalid data but found no violations");
         if (ScenarioCapture.isEnabled() && table instanceof OverlayDataTable t)

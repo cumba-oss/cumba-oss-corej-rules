@@ -3,9 +3,9 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when --ELTM (Planned Elapsed Time from Time Point Reference)\
-  \ is populated but --TPTREF (Time Point Reference) is not present or is empty."
+  \ is populated but --TPTREF (Time Point Reference) is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -20,6 +20,7 @@ Requirements:
   Variables:
     All:
     - "--ELTM"
+    - "--TPTREF"
 Check:
   expression: >-
     not empty(--ELTM) and empty(--TPTREF)

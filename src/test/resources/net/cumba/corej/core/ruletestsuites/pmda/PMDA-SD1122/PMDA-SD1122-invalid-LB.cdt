@@ -1,10 +1,11 @@
 #!RuleTest
 #test PMDA-SD1122 expect=violation domain=LB
-#note "CL-A A.12 (wave TA-4): the hand-authored numeric regex became the native is_numeric predicate FDA/CORE already use. Rows 1-2 (plain and leading-zero decimals) carry numeric LBSTRESC with LBSTRESN empty -> fire. Row 3's scientific notation '1.23E-4' was accepted by the replaced regex but is REJECTED by is_numeric (probe delta of record, resolution toward is_numeric by ruling) -> no longer fires."
+#note "Rows 1-2 (plain and leading-zero decimals) carry numeric LBSTRESC with LBSTRESN empty -> fire. ⭐ ROW 3 FIRES AGAIN as of 2026-09-14 (count 2 -> 3), and this is a RESTORATION, not a new behaviour. The history in three steps, because the middle one is what this note used to record: the rule was authored with /^[+-]?(\\d+(\\.\\d+)?|\\.\\d+)([eE][+-]?\\d+)?$/, which ACCEPTS exponents, so '1.23E-4' always was a numeric result whose missing LBSTRESN is a defect; wave TA-4 swapped that regex for is_numeric, whose hand-rolled scan rejected exponents, and the finding was lost — re-pinned here as 'probe delta of record'; engine ef60470 made is_numeric parse-based (owner ruling 2026-09-14: 'even string values with exponents are numeric values'), which puts the rule back where it was authored. ⚠ A numeric lab result is routinely written in exponent form — that is what --STRESC is FOR — so this row is the rule's core case, not an edge one."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 3
 #expectViolationAt row=1 LBSTRESC=5.5
 #expectViolationAt row=2 LBSTRESC=007
+#expectViolationAt row=3 LBSTRESC=1.23E-4
 dataset LB class=FINDINGS label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

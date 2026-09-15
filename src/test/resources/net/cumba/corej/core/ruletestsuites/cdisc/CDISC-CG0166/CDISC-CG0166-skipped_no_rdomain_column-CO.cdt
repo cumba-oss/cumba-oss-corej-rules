@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0166 expect=skipped domain=CO
+#note "GATED 2026-09-11 (wave C3, T1-36): RDOMAIN joined Requirements.Variables.All, so the RDOMAIN column absent altogether SKIPS with a reason naming the column instead of firing per IDVARVAL-populated row -- before the gate the bare empty() leaf on the absent column was TRUE on every row (absent = all-missing, EC-43). The absence itself is reported once per dataset by the minted sister CDISC-CG9675 on this same shape."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 |  | 1 | AESEQ | 1 | Comment on the AE record

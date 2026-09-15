@@ -193,12 +193,21 @@ class ShippedSendSourceBlockMatchesWorkbookTest
 
     /**
      * The complete set of shipped {@code CDISC-SEND*} rules that resolve to <em>no</em> sheet row.
-     * All nine are coreJ-minted {@code 94xx} rules with no CDISC SEND row behind them; they carry
+     * All eight are coreJ-minted {@code 94xx} rules with no CDISC SEND row behind them; they carry
      * no {@code Source} block and none is owed. Pinned exactly (not as a floor) so a rule that
      * <em>should</em> resolve and silently stops cannot hide among them.
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
-            "CDISC-SEND-9424", "CDISC-SEND-9425");
+            "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9437", "CDISC-SEND-9438",
+            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441");
+    // ⭐ Re-derived 2026-09-12, 3 -> 8 (top-level-or wave 2 close, repairing a pin the minting
+    // waves owed): the five CDISC-SEND-943x sisters minted by the absent-column board on
+    // 2026-09-11 — 9437/9438 (wave C2), 9439 (wave D, sheet issue #210), 9440/9441 (wave E,
+    // #212/#213) — are R-4.11c presence sisters for which the SEND catalogue publishes no row
+    // (each proposes one; see their Source_Proposed blocks and minted-rule-parentage.tsv). This
+    // opt-in test does not run in the default gate, so the drift surfaced only when wave 2
+    // re-ran it against the workbooks. None of wave 2's own 24 split siblings lands here: a
+    // split sibling carries its parent's row verbatim and resolves to it.
     // ⭐ Re-derived 2026-08-26, 9 -> 3 (plans/PLAN-source-proposed-block.md ruling I). The six
     // CDISC-SEND-943x rules LEFT this set: they operationalise the generic published row SEND12
     // ("Variable Core Status = Required" / "Variable present in dataset and ^= null"), every
@@ -249,8 +258,14 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      * Recorded rather than fixed — the citation half belongs to the review lane, not to this plan.
      * </p>
      */
+    // ⚑ 5 -> 7 on 2026-09-12 (top-level-or wave 2): the R-5.25 split siblings
+    // CDISC-SEND-0057-A/-B carry their parent's Standards block VERBATIM (the minted-sibling
+    // convention), so they inherit the parent's standing condition — a SENDIG v3.0 entry citing
+    // SEND57, whose .1 row exists only from v3.1. Same defect, same review-lane owner, three
+    // spellings of one citation question.
     private static final List<String> EXPECTED_PARTIALLY_UNDECLARED = List.of("CDISC-SEND-0056",
-            "CDISC-SEND-0057", "CDISC-SEND-0268", "CDISC-SEND-0269", "CDISC-SEND-0270");
+            "CDISC-SEND-0057", "CDISC-SEND-0057-A", "CDISC-SEND-0057-B", "CDISC-SEND-0268",
+            "CDISC-SEND-0269", "CDISC-SEND-0270");
 
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory());
 

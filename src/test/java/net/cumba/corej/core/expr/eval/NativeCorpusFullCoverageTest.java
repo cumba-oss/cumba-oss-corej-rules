@@ -13,10 +13,12 @@ import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.NativeExecutionRecorder;
+import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
 import net.cumba.corej.core.gen.WildcardExpander;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
+import net.cumba.datatable.testkit.SyntheticDataTable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -85,6 +87,7 @@ class NativeCorpusFullCoverageTest
         // RuleRunner over a synthetic table; the recorder must never report LEGACY or MIXED.
         Path rulesDir = CorpusPaths.rules();
         List<String> legacyRuns = new ArrayList<>();
+        List<String> unreadable = new ArrayList<>();
         int executed = 0;
         try (Stream<Path> files = Files.list(rulesDir))
         {
@@ -107,15 +110,13 @@ class NativeCorpusFullCoverageTest
                     {
                         cols.add("X");
                     }
-                    SyntheticStringTable table = new SyntheticStringTable("DM", List.copyOf(cols),
-                            new String[]
-                            {
-                                    "A", "", "1", "2024-01-01", "Y"
-                            }, 5);
                     NativeExecutionRecorder.enable();
                     try
                     {
-                        RuleRunner.execute(rule, table, _ -> null, "DM", null, null, null);
+                        if (!runAgainstATableTheRuleCanRead(rule, cols))
+                        {
+                            unreadable.add(file.getFileName() + "/" + ruleIdOf(rule));
+                        }
                         executed++;
                     }
                     catch (RuntimeException _)
@@ -137,6 +138,13 @@ class NativeCorpusFullCoverageTest
             }
         }
         assertTrue(executed > 1500, "expected a substantial executed count, got " + executed);
+        // ⛔ A rule that cannot be given a readable table never reaches NativeExecutionRecorder,
+        // so legacyRuns below would not cover it — and an emptiness assertion is most comfortable
+        // when nothing was observed. Pinned explicitly so that erosion cannot be silent again.
+        assertTrue(unreadable.isEmpty(),
+                "rule(s) could not be handed a table whose column types they can read, so their "
+                        + "dispatch was never observed (" + unreadable.size() + "):\n"
+                        + String.join("\n", unreadable.stream().limit(20).toList()));
         assertTrue(legacyRuns.isEmpty(),
                 "native-dispatched rules recorded a LEGACY/MIXED execution (" + legacyRuns.size()
                         + "):\n" + String.join("\n", legacyRuns.stream().limit(40).toList()));
@@ -155,6 +163,7 @@ class NativeCorpusFullCoverageTest
         Path rulesDir = CorpusPaths.rules();
         net.cumba.corej.core.exec.MetadataProvider stub = stubProvider();
         List<String> legacyRuns = new ArrayList<>();
+        List<String> unreadable = new ArrayList<>();
         int executed = 0;
         try (Stream<Path> files = Files.list(rulesDir))
         {
@@ -177,15 +186,13 @@ class NativeCorpusFullCoverageTest
                     {
                         cols.add("STUDYID");
                     }
-                    SyntheticStringTable table = new SyntheticStringTable("DM", List.copyOf(cols),
-                            new String[]
-                            {
-                                    "A", "", "1", "2024-01-01", "Y"
-                            }, 5);
                     NativeExecutionRecorder.enable();
                     try
                     {
-                        RuleRunner.execute(rule, table, _ -> null, "DM", stub, null, stub);
+                        if (!runAgainstATableTheRuleCanRead(rule, cols, stub))
+                        {
+                            unreadable.add(file.getFileName() + "/" + ruleIdOf(rule));
+                        }
                         executed++;
                     }
                     catch (RuntimeException _)
@@ -207,6 +214,13 @@ class NativeCorpusFullCoverageTest
             }
         }
         assertTrue(executed > 700, "expected a substantial executed count, got " + executed);
+        // ⛔ A rule that cannot be given a readable table never reaches NativeExecutionRecorder,
+        // so legacyRuns below would not cover it — and an emptiness assertion is most comfortable
+        // when nothing was observed. Pinned explicitly so that erosion cannot be silent again.
+        assertTrue(unreadable.isEmpty(),
+                "rule(s) could not be handed a table whose column types they can read, so their "
+                        + "dispatch was never observed (" + unreadable.size() + "):\n"
+                        + String.join("\n", unreadable.stream().limit(20).toList()));
         assertTrue(legacyRuns.isEmpty(),
                 "metadata-family rules recorded a LEGACY/MIXED execution (" + legacyRuns.size()
                         + "):\n" + String.join("\n", legacyRuns.stream().limit(40).toList()));
@@ -285,9 +299,9 @@ class NativeCorpusFullCoverageTest
 
 
             @Override
-            public boolean isCodelistExtensible(String aCodelistName)
+            public java.util.Optional<Boolean> isCodelistExtensible(String aCodelistName)
             {
-                return true;
+                return java.util.Optional.of(true);
             }
 
 
@@ -363,4 +377,94 @@ class NativeCorpusFullCoverageTest
 
     }
 
+    /**
+     * The rule's reportable id — {@code Core.Id} where present, else the internal id.
+     *
+     * @param aRule
+     *            the rule.
+     * @return the id for a failure message.
+     */
+    private static String ruleIdOf(Rule aRule)
+    {
+        return aRule.getCore() != null && aRule.getCore().getId() != null ? aRule.getCore().getId()
+                : String.valueOf(aRule.getId());
+    }
+
+    /**
+     * The column-type gate's message prefix. Pinned engine-side by
+     * {@code EngineErrorMessageContractTest} at its three builder sites, which is what makes
+     * matching on it a contract rather than a guess — the same basis {@code ViolationNormaliser}
+     * uses to classify this ERROR.
+     */
+    private static final String TYPE_MISMATCH = "column-type mismatch: ";
+
+    /**
+     * Executes {@code rule} against a synthetic table whose column TYPES the rule can actually
+     * read, retrying with one more column declared numeric each time the column-type gate rejects
+     * the table.
+     *
+     * <p>
+     * ⚠⚠ Why this exists. The table used to declare <b>every</b> column {@code STRING}. Once
+     * {@code PLAN-column-type-conformance}'s gate landed, 78 correctly-authored rules — reading
+     * {@code AGE}, {@code EXDOSE}, {@code PCLLOQ}, {@code ASTDT} and friends — errored on the
+     * fixture rather than executing. ⛔ And the damage was <em>not</em> to the {@code executed}
+     * count, which is incremented for any call that does not throw and so never noticed:
+     * {@code RuleRunner} returns the mismatch as an ERROR result. The damage was to
+     * {@link NativeExecutionRecorder}, which records nothing for a rule that never dispatches — so
+     * this class's real assertion, {@code legacyRuns.isEmpty()}, silently stopped covering those 78
+     * rules. An emptiness assertion passes most comfortably when nothing was observed at all.
+     * </p>
+     * <p>
+     * Declaring a column numeric here is not a claim about the standard — it is the harness
+     * adapting its fixture to the rule under test, which is the right behaviour for a
+     * <em>dispatch</em> harness. Type correctness is asserted by the {@code .cdt} corpus scenarios,
+     * against real declared types.
+     * </p>
+     *
+     * @param aRule
+     *            the rule to execute.
+     * @param aColumns
+     *            the columns its Check reads.
+     */
+    private static boolean runAgainstATableTheRuleCanRead(Rule aRule, Set<String> aColumns)
+    {
+        return runAgainstATableTheRuleCanRead(aRule, aColumns, null);
+    }
+
+
+    /**
+     * As above, with a metadata provider for the {@code library_*} / {@code define_*} rules.
+     *
+     * @param aRule
+     *            the rule to execute.
+     * @param aColumns
+     *            the columns its Check reads.
+     * @param aProvider
+     *            the metadata provider stub, or {@code null}.
+     */
+    private static boolean runAgainstATableTheRuleCanRead(Rule aRule, Set<String> aColumns,
+            net.cumba.corej.core.exec.@org.jspecify.annotations.Nullable MetadataProvider aProvider)
+    {
+        Set<String> numeric = new LinkedHashSet<>();
+        // Bounded by the column count: each retry declares one more column numeric, so the loop
+        // cannot outlive the columns it has to convert.
+        for (int attempt = 0; attempt <= aColumns.size(); attempt++)
+        {
+            SyntheticDataTable table = SyntheticDataTable.withNumeric("DM", List.copyOf(aColumns),
+                    numeric, 5);
+            RuleExecutionResult res = RuleRunner.execute(aRule, table, _ -> null, "DM", aProvider,
+                    null, aProvider);
+            String msg = res.getStatusMessage();
+            if (!res.isError() || msg == null || !msg.startsWith(TYPE_MISMATCH))
+            {
+                return true;
+            }
+            String offender = msg.substring(TYPE_MISMATCH.length()).split(" ", 2)[0];
+            if (!numeric.add(offender))
+            {
+                return false; // already flipped and still rejected — not fixable here
+            }
+        }
+        return false;
+    }
 }

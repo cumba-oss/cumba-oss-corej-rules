@@ -22,6 +22,7 @@ import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.testkit.MockTable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -56,10 +57,9 @@ class CrossStandardCollapseCorpusTest
 {
 
     /**
-     * The companion SDTM domain catalogues, union of sdtmig 3-1-2 / 3-2 / 3-3 / 3-4, read on
-     * 2026-08-11 from the CDISC Library API response cache ({@code $CDISC_API_CACHE}) — one
-     * {@code api_mdr_sdtmig_<v>_datasets.json.gz} per version. {@code CompanionSdtmDefaults} maps
-     * adamig 1-0/1-1/1-2/1-3 onto exactly those four.
+     * The companion SDTM domain catalogues, union of sdtmig 3-1-2 / 3-2 / 3-3 / 3-4 as read from
+     * {@code /data/cdisc.metadata.library-cache/api_mdr_sdtmig_<v>_datasets.json.gz} on 2026-08-11.
+     * {@code CompanionSdtmDefaults} maps adamig 1-0/1-1/1-2/1-3 onto exactly those four.
      */
     private static final Set<String> SDTM = Set.of("AE", "AG", "BE", "BS", "CE", "CM", "CO", "CP",
             "CV", "DA", "DD", "DM", "DS", "DV", "EC", "EG", "EX", "FA", "FT", "GF", "HO", "IE",
@@ -344,6 +344,66 @@ class CrossStandardCollapseCorpusTest
         return p == null ? new Probe("ERROR", 0, "ERROR", 0, "-") : p;
     }
 
+    /**
+     * ⭐ <b>Inventory-capable, and that is load-bearing</b> (2026-09-10, phase (a) of
+     * {@code plans/PLAN-qualified-requirements-cross-standard.md} §8.4).
+     *
+     * <p>
+     * The probe used to pass the bare lambda {@code _ -> null}. That is a resolver which resolves
+     * nothing <em>and cannot enumerate</em>, so {@code ScopeVariableSource.of} returns null for it
+     * and a qualified {@code Requirements.Variables} entry could not be decided at all — which made
+     * this harness <b>structurally incapable of measuring a guard hoisted out of the Check</b>: the
+     * hoist read here as "the guard was deleted", the control arm flooded, and the diff blamed
+     * {@code Fix #218} for it. §8 of that plan is the measurement.
+     * </p>
+     *
+     * <p>
+     * This resolver resolves the <b>primary probe table only</b>: every foreign dataset is still
+     * absent (that is the premise of a cross-standard probe), but the absence is now
+     * <em>decidable</em>, so a hoisted qualified entry skips the rule on <b>both</b> arms exactly
+     * as the {@code Check}-side {@code var_exists} guard used to. ⛔ Do not give it the SDTM tables:
+     * that would make the cross-standard dataset present and the whole probe vacuous.
+     * </p>
+     */
+    private record ProbeResolver(String name,
+            IDataTable primary) implements DatasetResolver.WithInventory
+    {
+
+        @Override
+        public @Nullable IDataTable resolve(String datasetName)
+        {
+            return name.equalsIgnoreCase(datasetName) ? primary : null;
+        }
+
+
+        @Override
+        public Set<String> availableDatasets()
+        {
+            return Set.of(name);
+        }
+
+
+        /**
+         * ⛔ <b>Nothing, deliberately</b> (review finding 5, 2026-09-10).
+         * {@code ScopeVariableSource.resolveMetas} tries the exact name and then — for a
+         * <b>two-character</b> qualifier, i.e. every SDTM domain code — falls through to
+         * {@code tablesForDomain}, which compares each available table's {@code DOMAIN}
+         * <em>cell</em> against it. The inherited default would therefore resolve {@code DM.AGE}
+         * against the <b>ADSL probe table</b> the moment {@code CYCLES} grew a domain-shaped value
+         * ({@code "DM"}, {@code "AE"}, {@code "VS"}, …), breaching this record's "foreign datasets
+         * stay absent" premise with nobody having handed it an SDTM table. Today's cycles happen to
+         * hold no two-character value, which is a coincidence and not a design.
+         *
+         * @param domain
+         *            ignored
+         * @return always empty
+         */
+        @Override
+        public java.util.Collection<IDataTable> tablesForDomain(String domain)
+        {
+            return List.of();
+        }
+    }
 
     private static Probe runPair(Rule rule, String tableName, List<String> cols, String[] cycle,
             Set<String> read, Set<String> reported)
@@ -352,10 +412,12 @@ class CrossStandardCollapseCorpusTest
         {
             IDataTable t1 = table(tableName, cols, cycle);
             IDataTable t2 = table(tableName, cols, cycle);
-            RuleExecutionResult ctl = RuleRunner.execute(rule, t1, _ -> null, tableName, null, null,
-                    null, Integer.MAX_VALUE, null, null, null, reported, Set.of());
-            RuleExecutionResult now = RuleRunner.execute(rule, t2, _ -> null, tableName, null, null,
-                    null, Integer.MAX_VALUE, null, null, null, reported, read);
+            RuleExecutionResult ctl = RuleRunner.execute(rule, t1, new ProbeResolver(tableName, t1),
+                    tableName, null, null, null, Integer.MAX_VALUE, null, null, null, reported,
+                    Set.of());
+            RuleExecutionResult now = RuleRunner.execute(rule, t2, new ProbeResolver(tableName, t2),
+                    tableName, null, null, null, Integer.MAX_VALUE, null, null, null, reported,
+                    read);
             return new Probe(String.valueOf(ctl.getStatus()), ctl.getViolations().size(),
                     String.valueOf(now.getStatus()), now.getViolations().size(),
                     tableName + ":" + String.join("|", cycle));

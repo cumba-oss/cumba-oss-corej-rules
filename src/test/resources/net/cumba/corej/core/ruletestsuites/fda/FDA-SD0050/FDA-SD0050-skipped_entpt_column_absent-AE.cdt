@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0050 expect=skipped domain=AE
+#note "AEENTPT is not present in the dataset while AEENRTPT is populated. Requirements.Variables.All [--ENRTPT, --ENTPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': FDA-SD1101 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEENRTPT type=Char label="End Relative to Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | ONGOING
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA   |

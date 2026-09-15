@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0295 expect=violation domain=PP
+#note "The half this rule owns since the R-5.25 split: row 1 populates --STINT with an empty --ENINT -> fires. Row 2 (--ENINT without --STINT) is the SIBLING CDISC-SEND-0295-A's state and must NOT fire here - the discriminator of the split. Rows 3/4 are the conformant states (both populated / both empty)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPSTINT  type=Char
+col PPENINT  type=Char
+---
+S1 | PP | 001 | 1 | AUCALL | P0H  |
+S1 | PP | 002 | 1 | AUCALL |      | P24H
+S1 | PP | 003 | 1 | AUCALL | P0H  | P24H
+S1 | PP | 004 | 1 | CMAX   |      |

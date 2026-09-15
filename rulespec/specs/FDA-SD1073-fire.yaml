@@ -1,11 +1,12 @@
 name: FDA-SD1073-fire
 kind: rule
 description: |
-  FDA-SD1073 (re-authored, FDA run-2 W-lane T8): the AE prohibition presence check -
-  fires when any of the prohibited variables AEOCCUR, AESTAT or AEREASND exists in the
-  AE dataset (CDISC refs CG0040/44/304). The rule is Sensitivity=Dataset: the
-  fixture's AE carries an AEOCCUR column, so one dataset-level finding is expected
-  regardless of the row count (the second row pins exactly that).
+  FDA-SD1073 (re-authored, FDA run-2 W-lane T8; D-15 varname() rewrite 2026-09-12): the
+  AE prohibition presence check - varname() in [AEOCCUR, AESTAT, AEREASND] fires once
+  per prohibited variable present in the AE dataset (CDISC refs CG0040/44/304). The rule
+  routes as Variable Metadata Check / Record ({VAR} domain): the fixture's AE carries an
+  AEOCCUR column, so one per-variable finding is expected regardless of the row count
+  (the second row pins exactly that), carried by variable_name with no row anchor.
 python_source: rules-sdtmig-3-4.json (FDA-SD1073)
 rule:
   coreId: FDA-SD1073
@@ -24,8 +25,8 @@ library_mocks:
 expected_violations:
   - rule_id: FDA-SD1073
     dataset: AE
-    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
     status: SUCCESS
     output_variables:
-      AEOCCUR: Y
+      variable_name: AEOCCUR
 expected_errors: []

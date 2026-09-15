@@ -1,0 +1,33 @@
+Core:
+  Id: "CDISC-CG9676"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when neither the Rule for End of Element (TEENRL) nor\
+  \ the Planned Duration of Element (TEDUR) variable is present in the Trial Elements\
+  \ (TE) dataset; at least one of the two must be populated for each Element."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TE"
+Check:
+  expression: >-
+    not var_exists("TEENRL") and not var_exists("TEDUR")
+Outcome:
+  Message: "Neither the TEENRL nor the TEDUR variable is present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#211"
+  Class: "TDM"
+  Domain: "TE"
+  Variable: "TEENRL, TEDUR"
+  Condition: ""
+  Rule: "at least one of the TEENRL and TEDUR variables is present in the dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

@@ -1,0 +1,74 @@
+Core:
+  Id: "PMDA-AD0196-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the required ADaM analysis parameter variable Parameter\
+  \ Code (PARAMCD), which CDISC affirms must always be populated, is empty."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "PARAMCD"
+Check:
+  expression: >-
+    empty(PARAMCD)
+Outcome:
+  Message: "PARAMCD, a required analysis parameter variable, is empty; it must always\
+    \ be populated."
+  Output_Variables:
+  - "PARAMCD"
+Source_Proposed:
+  Sheet_Issue: "#243"
+  Message: "Required Variable PARAMCD value is null"
+  Description: "Unlike SDTM, only some of ADaM Required variables (where Core attribute\
+    \ is 'Req') must be populated. CDISC ADaM rules affirm that PARAMCD must be populated."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Source:
+  Message: "Required Variable value is null"
+  Description: "Unlike SDTM, only some of ADaM Required variables (where Core attribute\
+    \ is 'Req') must be populated. CDISC ADaM rules affirm that PARAM and PARAMCD\
+    \ must be populated, while others are populated as appropriate. Known Exceptions:\
+    \ TRTP, TRTxxP, AGE, AGEU, RACE, SUBJID, AESER."
+  Domains: "ADSL, ADDL, BDS, ADNCA, MDBDS"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0196"
+        Version: "1"
+      Version: "6.0"

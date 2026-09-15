@@ -1,0 +1,49 @@
+Core:
+  Id: "PMDA-AD0267-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Analysis Duration (N) (ADURN) is populated but Analysis\
+  \ Duration Units (ADURU) is empty. If either variable is populated, both must be\
+  \ populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "ADURU"
+    - "ADURN"
+Check:
+  expression: >-
+    empty(ADURU) and not empty(ADURN)
+Outcome:
+  Message: "ADURN is populated but ADURU is empty."
+  Output_Variables:
+  - "ADURN"
+  - "ADURU"
+Source_Proposed:
+  Sheet_Issue: "#227"
+  Message: "ADURN is populated, but ADURU is not populated"
+  Description: "If Analysis Duration (N) (ADURN) is populated, then Analysis Duration\
+    \ Units (ADURU) must be populated."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Source:
+  Message: "Only one of these variables is populated: ADURU, ADURN"
+  Description: "If any of Analysis Duration Units (ADURU) or Analysis Duration (N)\
+    \ (ADURN) variables is populated, then both must be populated together."
+  Domains: "ADAE, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0267"
+        Version: "1"
+      Version: "6.0"

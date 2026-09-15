@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SE2281 expect=skipped domain=PC
+#note "FLIPPED violation -> skipped by the R-5.25 split (top-level-or board wave 2, group J, plan §4). PCNOMDY is not present in the dataset; the pre-split rule's bare empty() leaf was TRUE on every row (absent = all-missing, EC-43) and fired even though PCELTM/PCTPTREF are populated - the absent-column flood. The ruled disposition is Requirements.Variables.All [PCNOMDY] on this half: an auditable SKIP naming the column, with the absence itself left to the presence machinery (the Fix #331 bucket-2 shape). If this EXECUTES (violation or silent pass), the gate has been removed - escalate, do not rewrite."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+S1 | PC | 001 | 1 | PT0H | DOSE 1

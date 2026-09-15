@@ -1,0 +1,16 @@
+#!RuleTest
+#test DRAFT-900043 expect=violation domain=DS
+#note "FRESH 2026-09-11 (wave C3) -- the gate-does-not-fire half of the pair, and the family's discriminator: the DSSCAT column EXISTS but is blank on both duplicated DISPOSITION EVENT records, so the gate (All [DSCAT, DSSCAT]) is satisfied and the parent reports each offending ROW with its location; on this shape the sister DRAFT-900045 is skipped by its None [DSSCAT]. Column present-but-blank belongs to the parent, column absent to the sister."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset DS class=EVENTS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col DSSCAT   type=Char label="Subcategory for Disposition Event"
+col EPOCH    type=Char label="Epoch"
+---
+S1 | DS | 001 | 1 | DISPOSITION EVENT |  | TREATMENT
+S1 | DS | 001 | 2 | DISPOSITION EVENT |  | TREATMENT

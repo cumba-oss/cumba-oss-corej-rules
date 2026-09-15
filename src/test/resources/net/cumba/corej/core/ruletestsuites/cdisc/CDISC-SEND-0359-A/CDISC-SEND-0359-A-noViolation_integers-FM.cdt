@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0359-A expect=noViolation domain=FM
+#note "Negative control: every populated RPPLSTDY value is an integer (positive, negative and blank all conformant) -> the rule executes without firing."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 0
+dataset FM class=FINDINGS label="Fetal Measurements"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FMSEQ    type=Num  label="Sequence Number"
+col FMTESTCD type=Char label="Test Short Name"
+col RPPLSTDY type=Num label="Repro Phase Day Timing"
+---
+S1 | FM | 001 | 1 | BWFET | 12
+S1 | FM | 001 | 2 | BWFET | -3
+S1 | FM | 001 | 3 | BWFET | 

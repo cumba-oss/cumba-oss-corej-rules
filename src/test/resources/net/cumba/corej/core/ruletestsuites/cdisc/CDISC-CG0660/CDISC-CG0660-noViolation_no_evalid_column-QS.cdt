@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0660 expect=noViolation domain=QS
+#note "A QS dataset with no --EVALID column at all: no variable name is a member of [QSEVALID, FTEVALID], so the rule executes over every variable and reports nothing. The rule is in scope and runs - this is silence, not a skip. ⚠ QSEVAL is deliberately NOT declared here either: it would be CDISC-CG0659's culprit, not this rule's."
+#library standard=sdtmig version=3-4
+dataset QS label=Questionnaires
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSTESTCD type=Char label="Question Short Name"
+col QSORRES  type=Char label="Finding in Original Units"
+---
+CDISCPILOT01 | QS | 01-701-1015 | 1 | ADAS01 | 5

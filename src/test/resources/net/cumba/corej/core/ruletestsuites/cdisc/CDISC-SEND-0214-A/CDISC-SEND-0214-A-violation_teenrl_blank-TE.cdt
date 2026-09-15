@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0214-A expect=violation domain=TE
+#note "TEDUR is not present in the dataset (Requirements.Variables.None satisfied) and TEENRL is blank on row 2 -> that Element has neither an end rule nor a planned duration, and this R-5.25 split sibling reports it AT ITS ROW. Row 1 populates TEENRL and stays silent. This is the state the parent's All [TEENRL, TEDUR] gate now skips - the finding moved here, it was not lost (wave E four-state decomposition)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 ETCD=TRT TEENRL=
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent | End of screening
+CDISCPILOT01 | TE | TRT | Treatment | First dose |

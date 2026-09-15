@@ -1,0 +1,133 @@
+Core:
+  Id: "PMDA-SD0086-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the combination of STUDYID, USUBJID, IDVAR, IDVARVAL,\
+  \ and QNAM is not unique for a SUPPQUAL parent record not related to DM (RDOMAIN\
+  \ is not 'DM'; QNAM must be unique for each parent record)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "SUPP--"
+    - "SQ--"
+Requirements:
+  Variables:
+    All:
+    - "RDOMAIN"
+Check:
+  expression: >-
+    RDOMAIN != "DM" and not is_unique_set([USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM])
+Outcome:
+  Message: "Duplicate SUPPQUAL records found for the same non-DM parent record and\
+    \ QNAM."
+  Output_Variables:
+  - "RDOMAIN"
+  - "IDVAR"
+  - "IDVARVAL"
+  - "QNAM"
+Source_Proposed:
+  Sheet_Issue: "#251"
+  Message: "SUPPQUAL duplicate records for a non-DM parent record"
+  Description: "All SUPPQUAL Domains records not related to DM (RDOMAIN is not 'DM')\
+    \ are associated with a single parent record and must have a unique combination\
+    \ of Study Identifier (STUDYID), Unique Subject Identifier (USUBJID), Identifying\
+    \ Variable (IDVAR), Identifying Variable Value (IDVARVAL) and Qualifier Variable\
+    \ Name (QNAM) variable value. The QNAM variable should be unique for each parent\
+    \ record."
+  Domains: "SUPPQUAL"
+  Severity: "Error"
+Source:
+  Message: "SUPPQUAL duplicate records"
+  Description: "All SUPPQUAL Domains records are associated with a single parent record\
+    \ and must have a unique combination of Study Identifier (STUDYID), Unique Subject\
+    \ Identifier (USUBJID), Identifying Variable (IDVAR), Identifying Variable Value\
+    \ (IDVARVAL) and Qualifier Variable Name (QNAM) variable value. For all SUPPQUAL\
+    \ domain record all The QNAM variable should be unique for each parent record."
+  Domains: "SUPPQUAL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0086"
+        Version: "1"
+      Version: "1.6"

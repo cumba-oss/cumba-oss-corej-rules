@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0221 expect=violation domain=TA
+# Rule:Description: TAETORD is populated with a value that is not an integer.
+#note "Added 2026-09-14 (PLAN-column-type-conformance carried-forward). This rule had NO .cdt scenario at all while its semantics were rewritten from an integer-shaped regex to `not is_integer` — the shape CORE-000587 showed the cost of: a rule with no scenario is not covered by the corpus gate, however green the build is. TAETORD is Num in every SEND standard and in 153 of this corpus's own fixtures, and on a Num column the OLD regex subject would now ERROR under the R9 gate (a numeric column's text form is formatting-dependent), so this conformant-typed fixture is what distinguishes the migrated rule from the unmigrated one. ⭐ MEASURED 2026-09-14, not argued: restoring `TAETORD !~ /^-?[0-9]+$/` reds this file and its -valid- twin with the gate's own message, and nothing else about this rule changes colour — there was no other test that could see it. Row 1 is a fractional order and fires; row 2 is a whole number and must not."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=A TAETORD=1.5
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+S1 | TA | A | Arm A | 1.5 | SCRN
+S1 | TA | A | Arm A | 2   | TRT
+---

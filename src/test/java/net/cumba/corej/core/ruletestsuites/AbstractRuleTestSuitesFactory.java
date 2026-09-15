@@ -38,6 +38,7 @@ import net.cumba.corej.core.metadata.VlmResolver;
 import net.cumba.corej.core.model.ClassScope;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
+import net.cumba.corej.ruletest.cdt.ruletest.ExecutionVerdictCheck;
 import net.cumba.corej.ruletest.cdt.ruletest.LibraryRef;
 import net.cumba.corej.ruletest.cdt.ruletest.MapBackedLibraryMetadataProvider;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
@@ -55,9 +56,9 @@ import org.junit.jupiter.api.TestFactory;
  * scenarios shipped in this suites module. The scenario tree is <em>family-based</em>: each rule
  * family (cdisc / core / draft / fda / pmda) owns one resource subtree named after it, and its
  * factory resolves rules from that family's assembled packages
- * ({@code lib/corej-cdisc-rules/rules/rules-<family>-*.json}), loaded per standard+version: the
- * executed view is the declared standard's package when the scenario declares one, else a
- * deterministic canonical fallback (see {@code resolveRule}).
+ * ({@code target/rules/rules-<family>-*.json}), loaded per standard+version: the executed view is
+ * the declared standard's package when the scenario declares one, else a deterministic canonical
+ * fallback (see {@code resolveRule}).
  *
  * <p>
  * Every {@code .cdt} file under the family subtree that carries a {@code #!RuleTest} shebang
@@ -76,7 +77,7 @@ import org.junit.jupiter.api.TestFactory;
  *
  * <p>
  * A scenario carrying {@code #dictionaries dummy} runs with the checked-in dummy
- * external-dictionary bundle ({@code lib/corej-cdisc-core/dictionaries}) wired into the engine via
+ * external-dictionary bundle ({@code src/test/resources/dictionaries}) wired into the engine via
  * {@link RuntimeDictionaryProvider}; without the directive no provider is supplied and
  * dictionary-dependent rules SKIP — the declared ({@code $}-ref) form every shipped rule uses via
  * {@code RuleRunner}'s eager dictionary arm ({@code Fix #268}), an inlined call via its injected
@@ -92,16 +93,21 @@ abstract class AbstractRuleTestSuitesFactory
             "src/test/resources/net/cumba/corej/core/ruletestsuites");
 
     /**
-     * The dummy external-dictionary bundle, <b>vendored into this module</b>.
+     * The checked-in dummy external-dictionary bundle.
      *
      * <p>
-     * ⚠ This used to resolve as {@code repoRoot + "lib/corej-cdisc-core/dictionaries"} — a monorepo
-     * sibling path. The engine now lives in its own repository, so that path resolves to nothing
-     * here and every {@code #dictionaries dummy} scenario SKIPs instead of executing. Measured
-     * 2026-09-02: 187 of this module's scenarios failed that way, all reporting "external
-     * dictionary &lt;name&gt; is not installed" rather than a real assertion. The bundle is 7 small
-     * stub files of coreJ's own making — not the licensed MedDRA / WHODrug distributions — so
-     * vendoring it costs 4 KB and removes a cross-repository dependency.
+     * ⚠ In the coreJ monorepo this resolved a SIBLING MODULE's directory,
+     * {@code <repoRoot>/lib/corej-core/dictionaries}. The split put corej-core in the separate
+     * cumba-corej repository, which this repo's build never checks out, so the bundle is carried
+     * here as a test resource instead — byte-identical, 7 files, 60 KB.
+     * </p>
+     *
+     * <p>
+     * ⚠⚠ Its absence is NOT silent in the sense that matters, but it is misleading: a rule needing
+     * an uninstalled dictionary is SKIPPED, and a scenario declaring {@code expect=violation} then
+     * fails with "the rule never executed" rather than with anything naming the dictionaries. 187
+     * of the 8 824 scenarios failed exactly that way while this path was still pointing at the
+     * other repo.
      * </p>
      */
     private static final Path DUMMY_DICTIONARIES_DIR = Path.of(System.getProperty("projectBasedir"),
@@ -305,7 +311,7 @@ abstract class AbstractRuleTestSuitesFactory
                 + " but no such dataset is present in the file");
 
         // Production enforces the Domains/Classes scope axes upstream of RuleRunner
-        // (RuleGenerator -> ScopeMatcher), so mirror that gate here: an out-of-scope primary
+        // (DatasetRuleResolver -> ScopeMatcher), so mirror that gate here: an out-of-scope primary
         // dataset means the rule never runs -> "executed, zero violations". This makes Scope
         // fixes testable (an expect=noViolation scenario on out-of-scope data). The class axis
         // is only judged when the scenario declares a dataset class (`dataset NAME class=...`).
@@ -314,7 +320,8 @@ abstract class AbstractRuleTestSuitesFactory
         {
             // Review F2: an out-of-scope primary is a NON-EXECUTION, exactly like a
             // Requirements.Variables
-            // skip — in production RuleGenerator never even emits the rule for this dataset. It
+            // skip — in production DatasetRuleResolver never even emits the rule for this dataset.
+            // It
             // must therefore be declared, not silently accepted: an `expect=noViolation` scenario
             // here passes while exercising nothing, which is the same rot the verdict switch below
             // exists to prevent. `expect=skipped` is the honest contract.
@@ -387,34 +394,20 @@ abstract class AbstractRuleTestSuitesFactory
         // keeps passing while testing nothing. `expect=skipped` is the positive form: the
         // deliberate absent-optional-variable scenarios assert the skip instead of borrowing
         // `noViolation`.
-        switch (s.getExpect())
-        {
-        case VIOLATION ->
-        {
-            assertExecuted(s, outcome);
-            assertTrue(outcome.violated(), s.getCoreId() + " expected a violation but got none");
-        }
-        case NO_VIOLATION ->
-        {
-            assertExecuted(s, outcome);
-            assertFalse(outcome.violated(), s.getCoreId() + " expected no violation but got "
-                    + outcome.totalCount() + " violation(s)");
-        }
-        case SKIPPED ->
-        {
-            assertFalse(outcome.errored(),
-                    s.getCoreId() + " declares expect=skipped but the rule ERRORED rather than"
-                            + " being skipped: " + outcome.notExecutedReason()
-                            + " — a broken rule must not satisfy a skip contract");
-            assertFalse(outcome.executed(),
-                    s.getCoreId() + " declares expect=skipped but the rule executed"
-                            + (outcome.violated()
-                                    ? " and produced " + outcome.totalCount() + " violation(s)"
-                                    : " (and produced no violation)")
-                            + " — either the scenario now exercises the rule (change the expect) or"
-                            + " the gate it was testing no longer fires");
-        }
-        }
+        // Phase 4b: the verdict judgement moved to ExecutionVerdictCheck (cumba-corej-ruletest),
+        // so the parse side and the assert side can no longer disagree — they used to live in two
+        // repos, and an `expect=` constant added on one side fell through this switch SILENTLY.
+        // ⚠ Java does NOT require an arrow switch STATEMENT over an enum to be exhaustive, so
+        // adding `executionError` compiled clean here and a scenario written with it would have
+        // passed while asserting nothing. That is the exact fixture-rot the execution-state check
+        // above exists to prevent, reintroduced one level up.
+        // ⚠ notExecutedReason is `status + ": " + statusMessage`, so the engine's own status word
+        // rides along in the detail. Deliberate: in a failure message that word is the first thing
+        // the reader needs.
+        ExecutionVerdictCheck.Result verdict = ExecutionVerdictCheck.verify(s,
+                new ExecutionVerdictCheck.Outcome(outcome.executed(), outcome.errored(),
+                        outcome.violated(), outcome.totalCount(), outcome.notExecutedReason()));
+        assertTrue(verdict.pass(), verdict.detail());
 
         // Optional location assertions (#expectViolationCount / #expectViolationAt); a no-op for
         // verdict-only scenarios. Violations are aggregated across wildcard expansions.
@@ -439,23 +432,6 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
     /**
-     * Fails when the rule did not run. The engine already states exactly why
-     * ("Requirements.Variables.All variable LBLOBXFL not present in dataset", "no Library access"),
-     * so surfacing {@code statusMessage} turns an otherwise baffling failure into a self-explaining
-     * one, and names the two legitimate resolutions.
-     */
-    private static void assertExecuted(RuleTestScenario aScenario, EvalOutcome aOutcome)
-    {
-        assertTrue(aOutcome.executed(),
-                aScenario.getCoreId() + " declares expect=" + aScenario.getExpect().token()
-                        + " but the rule never executed: " + aOutcome.notExecutedReason()
-                        + " — the scenario is not exercising the rule. Give the fixture what the"
-                        + " rule needs, or declare 'expect=skipped' if not executing IS the"
-                        + " contract under test.");
-    }
-
-
-    /**
      * Evaluates a rule against the scenario's primary dataset. {@code wildcards} template rules are
      * expanded against the present columns ({@link WildcardExpander}) and every concrete expansion
      * is executed; results aggregate across expansions.
@@ -470,7 +446,8 @@ abstract class AbstractRuleTestSuitesFactory
         // (StudyValidationParams / LibraryValidator both default nativeEval=true; the legacy
         // engine has been removed). Mirrors AbstractSdtmRuleTest.execute.
         // Fix #147: the three-arg entry point, so a declared-token `Expansion:` template expands
-        // here exactly as it does in RuleGenerator. With the two-arg form an Expansion-bearing
+        // here exactly as it does in DatasetRuleResolver. With the two-arg form an
+        // Expansion-bearing
         // rule falls through as NotApplicable and the scenario silently executes the TEMPLATE —
         // testing a column literally named '&VAR', which no fixture can have.
         TokenExpander.Context expansionContext = new TokenExpander.Context(
@@ -560,9 +537,9 @@ abstract class AbstractRuleTestSuitesFactory
     /**
      * The production scope verdict for the scenario's primary dataset, or {@code null} when in
      * scope. Five axes, in the production order — Domains, <b>Datasets</b>, Classes,
-     * Data_Structures, Subclasses — matching {@code RuleGenerator.describeScopeSkip} call for call.
-     * ⚠ An axis missing from this list is an axis the pre-gate does not judge, and a scenario would
-     * then pass because the gate was off for it rather than because the rule was in scope;
+     * Data_Structures, Subclasses — matching {@code DatasetRuleResolver.describeScopeSkip} call for
+     * call. ⚠ An axis missing from this list is an axis the pre-gate does not judge, and a scenario
+     * would then pass because the gate was off for it rather than because the rule was in scope;
      * {@code Scope.Datasets} was exactly that hole until phase 5 of
      * {@code plans/PLAN-scope-requirements-split.md}.
      *
@@ -609,7 +586,8 @@ abstract class AbstractRuleTestSuitesFactory
     // judged scenarios (Fix #206), deleting the call below would otherwise redden nothing.
     static @Nullable String describeScopeMismatch(Rule aRule, OverlayDataTable aPrimary)
     {
-        // Same inputs as production (RuleGenerator.describeScopeSkip): the dataset name plus the
+        // Same inputs as production (DatasetRuleResolver.describeScopeSkip): the dataset name plus
+        // the
         // DOMAIN/RDOMAIN-derived unsplit name, so split datasets (LBHEMAT with DOMAIN=LB) match
         // their parent domain's scope.
         String mismatch = ScopeMatcher.describeDomainMismatch(aRule,
@@ -620,7 +598,8 @@ abstract class AbstractRuleTestSuitesFactory
             return mismatch;
         }
         // Scope.Datasets (owner requirement #5, PLAN-scope-requirements-split phase 5) —
-        // immediately after Domains, exactly where RuleGenerator.describeScopeSkip puts it, and on
+        // immediately after Domains, exactly where DatasetRuleResolver.describeScopeSkip puts it,
+        // and on
         // the MEMBER file name with no split-base re-test. Without this leg every .cdt scenario on
         // a Datasets-scoped rule is pre-gated wrong, and silently: the axis simply would not be
         // judged, so a fixture would pass because the gate was off for it. Inert while the corpus
@@ -672,7 +651,7 @@ abstract class AbstractRuleTestSuitesFactory
      * Reached only when the scenario declares no {@code class=}. Until Fix #206 that meant the
      * class axis was <em>not judged at all</em>, which is the harness/production divergence wave 27
      * recorded as {@code R-d}: a fixture passed because the gate was off for it, not because the
-     * rule was in scope. Production has no such hole — {@code RuleGenerator} judges
+     * rule was in scope. Production has no such hole — {@code DatasetRuleResolver} judges
      * {@code Scope.Classes} for every dataset, strict-on-null (Fix #41).
      * </p>
      *
@@ -769,7 +748,7 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
 
-    /** Column names in declared order — mirrors {@code RuleGenerator.doGenerate}. */
+    /** Column names in declared order — mirrors {@code DatasetRuleResolver.doGenerate}. */
     private static List<String> scopeColumnNames(OverlayDataTable aPrimary)
     {
         DataTableMeta meta = aPrimary.getMetaData();

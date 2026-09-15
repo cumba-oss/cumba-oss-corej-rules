@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-AD0204 expect=skipped domain=ADSL
+#note "DM block WITHOUT the AGE column. ⭐ Rewritten 2026-09-10: the applicability guard moved out of the Check into Requirements.Variables.All [DM.AGE] (R-4.12 hoist, owner ruling, PLAN-qualified-requirements-cross-standard §8.4). The qualified entry resolves against DM's schema, finds no AGE column, and reports an AUDITABLE SKIP naming the dataset — where the Check-side var_exists(DM.AGE) used to execute and silently report nothing. The skip is the improvement: a reader can now tell 'checked and clean' from 'could not check'. FAMILY guard pin; not mirrored on AD0205-0207."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 99
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015

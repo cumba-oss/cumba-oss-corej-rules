@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0166 expect=violation domain=CO
+#note "FRESH 2026-09-11 (wave C3) -- this rule had no .cdt suite at all. Row 1: IDVARVAL populated but RDOMAIN present-and-empty -> fires; row 2 is conformant. Gate does not fire: both IDVARVAL and RDOMAIN columns are present."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVARVAL=1
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 |    |  | 1 | AESEQ | 1 | Comment on the AE record
+S1 | CM |  | 2 | CMSEQ | 3 | Comment on the CM record

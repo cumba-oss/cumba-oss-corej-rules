@@ -1,0 +1,98 @@
+Core:
+  Id: "FDA-SE2308-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a PC record has no populated day anchor: neither\
+  \ Planned Study Day of Visit (VISITDY) nor Study Day of Nominal Reference Point\
+  \ (PCNOMDY) is populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "PC"
+Requirements:
+  Variables:
+    Any:
+    - "VISITDY"
+    - "PCNOMDY"
+Check:
+  expression: >-
+    empty(VISITDY) and empty(PCNOMDY)
+Outcome:
+  Message: "Neither VISITDY nor PCNOMDY is populated on the PC record; one of the\
+    \ two day anchors must be populated together with PCELTM."
+  Output_Variables:
+  - "VISITDY"
+  - "PCNOMDY"
+Source_Proposed:
+  Sheet_Issue: "#240"
+  FDA_Validator_Rule_Message: "Missing values for required timing variables: VISITDY\
+    \ or --NOMDY"
+  FDA_Validator_Rule_Description: "VISITDY or PCNOMDY must be present and populated\
+    \ in PC together with PCELTM. These are the required timing variables for identification\
+    \ of the day on which group summaries (Group Means and Incidences) are calculated\
+    \ for pharmacokinetic concentrations."
+  Domains: "PC"
+Source:
+  FDA_Validator_Rule_Message: "Missing values for required timing variables: (VISITDY\
+    \ and --ELTM) or (--NOMDY and --ELTM)"
+  FDA_Validator_Rule_Description: "PCNOMDY and PCELTM or VISITDY and PCELTM must be\
+    \ present and populated in PC.   These are the required timing variables for identification\
+    \ of the day on which group summaries (Group Means and Incidences) are calculated\
+    \ for pharmacokinetic concentrations."
+  Domains: "PC"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2308"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2308"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2308"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2308"
+        Version: "1"
+      Version: "1.6"
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB047"
+        Version: "1"
+      Version: "1.5"

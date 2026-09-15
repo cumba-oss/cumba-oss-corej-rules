@@ -2,9 +2,9 @@ Core:
   Id: "FDA-SD1339"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when EPOCH is empty or not present even though a start\
-  \ date (--STDTC) or a collection date (--DTC) is populated."
-Executability: "Fully Executable"
+Description: "Raise an error when EPOCH is empty even though a start date (--STDTC)\
+  \ or a collection date (--DTC) is populated."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -18,6 +18,10 @@ Scope:
     - "CO"
     - "DM"
     - "SV"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
 Check:
   expression: >-
     empty(EPOCH) and (var_exists("--STDTC") and not empty(--STDTC) or var_exists("--DTC") and not

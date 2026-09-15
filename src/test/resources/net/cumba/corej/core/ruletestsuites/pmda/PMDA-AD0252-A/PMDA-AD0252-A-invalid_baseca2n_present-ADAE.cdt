@@ -1,9 +1,9 @@
 #!RuleTest
 #test PMDA-AD0252-A expect=violation domain=ADAE
-#note "Isolates the `var_exists(\"BASECAyN\")` arm. AVALCA2N is NOT declared; the single expansion (y=2) is seeded by BASECA2N with AVALCA2N synthesised as an absent column, so it is the SECOND disjunct that fires. Dataset granularity -> exactly one violation for the two rows, reported at row=1. BASECA2N is pinned because it is present and its value comes from data row 1; AVALCA2N is deliberately NOT pinned - an unresolved output variable is omitted from the value map entirely."
+#note "Isolates the BASECAyN arm. AVALCA2N is NOT declared; BASECA2N matches the second varname() regex (D-15 rewrite, 2026-09-12) and the per-variable evaluation emits exactly ONE finding for that one column, pinned by variable_name. No expansion and no wildcards block remain - the y range 1-99 lives in the regex ([1-9]|[1-9][0-9])."
 #library standard=adamig version=1-3
 #expectViolationCount 1
-#expectViolationAt row=1 BASECA2N=1
+#expectViolationAt variable_name=BASECA2N
 dataset ADAE structure=OCCDS
 col STUDYID  type=Char
 col USUBJID  type=Char

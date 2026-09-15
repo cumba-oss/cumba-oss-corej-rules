@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0313-A expect=noViolation domain=AE
+#note "The R-5.25 wave-3 split's discriminator, sibling side: the dataset carries the PARENT's defect (no STUDYID column, CDISC-CG0313's violation data) while DOMAIN is present, so the DOMAIN half is SILENT. The missing STUDYID is the parent's finding alone."
+#library standard=sdtmig version=3-2
+#expectViolationCount 0
+dataset AE class=EVENTS label="Adverse Events"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+AE | 001 | 1 | Headache

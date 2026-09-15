@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0425 expect=skipped domain=LB
+#note "The gate's SECOND member, pinned separately because it is not redundant: with LBSTRESC absent and LBSTRESU present the rule is gated out, but were --STRESC dropped from Requirements.Variables.All the rule would RUN and read the absent column as all-missing, so not empty(--STRESC) would be false on every row and the scenario would report noViolation instead of skipped. The runner distinguishes the two, so this file is what tells a silent gate erosion from a silent pass. Nothing here is a finding either way: a dataset with no standardised character result has nothing for this rule to check."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | 7.2 | mmol/L
+S1 | LB | 001 | 2 | ALB  | 40  | g/L

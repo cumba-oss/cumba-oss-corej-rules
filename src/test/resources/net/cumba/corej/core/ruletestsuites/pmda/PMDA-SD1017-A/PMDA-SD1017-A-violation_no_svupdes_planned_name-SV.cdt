@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1017-A expect=violation domain=SV
+#note "The record half of the R-5.25 split (wave D, T1-39, sheet issue #209): SV carries no SVUPDES column, so the gated parent PMDA-SD1017 skips this dataset -- and this sibling re-derives planned-ness from the VISIT name instead. Row 2 reads WEEK 99, which marks nothing, so it is treated as planned; its VISITNUM 99 is not declared in TV -> fires. Row 1 matches TV -> clean. Same operationalisation as PMDA-SD1023 and CDISC-CG0031-A/CG0033-A."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=001 VISITNUM=99
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | SV | 001 | 1  | SCREENING
+S1 | SV | 001 | 99 | WEEK 99
+---
+
+dataset TV class="TRIAL DESIGN" label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | TV | 1 | SCREENING
+S1 | TV | 2 | WEEK 2
+---

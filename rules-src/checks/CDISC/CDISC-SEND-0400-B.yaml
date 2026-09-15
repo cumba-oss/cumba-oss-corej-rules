@@ -1,0 +1,50 @@
+Core:
+  Id: "CDISC-SEND-0400-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Reproductive Stages (SJ) dataset is\
+  \ not present in the study; SJ is a required domain for a reproductive/developmental\
+  \ toxicology (DART) submission."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    not ds_exists("SJ")
+Outcome:
+  Message: "The required DART dataset SJ (Subject Reproductive Stages) is not present\
+    \ in the study."
+Source_Proposed:
+  Sheet_Issue: "#249"
+  Class: "SPC"
+  Domain: "SJ"
+  Variable: "ALL"
+  Plain_Text_Explanation: "SJ domain must be present."
+  Rule: "SJ is present"
+Source:
+  Class: "TDM, SPC"
+  Domain: "TT, TP, SJ"
+  Variable: "ALL"
+  Plain_Text_Explanation: "TT, TP, and SJ domains must be present."
+  Rule: "TT, TP, and SJ are present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND400"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND400"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1351 expect=skipped domain=PP
+#note "PPSTINT column absent while PPENINT is populated. Requirements.Variables.All [--ENINT, --STINT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': FDA-SD1451 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPSTRESC type=Char label="Character Result/Finding in Std Format"
+col PPENINT  type=Char label="Planned End of Assessment Interval"
+---
+S1 | PP | 001 | 1 | AUCALL | 120.5 | P7D

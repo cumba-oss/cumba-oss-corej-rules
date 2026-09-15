@@ -2,9 +2,8 @@ Core:
   Id: "FDA-SD0092"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when ETCD is equal to 'UNPLAN' but SEUPDES is empty or\
-  \ not present."
-Executability: "Fully Executable"
+Description: "Raise an error when ETCD is equal to 'UNPLAN' but SEUPDES is empty."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -13,11 +12,12 @@ Requirements:
   Variables:
     All:
     - "ETCD"
+    - "SEUPDES"
 Check:
   expression: >-
     ETCD == "UNPLAN" and empty(SEUPDES)
 Outcome:
-  Message: "SEUPDES is empty or not present when ETCD is equal to 'UNPLAN'."
+  Message: "SEUPDES is empty when ETCD is equal to 'UNPLAN'."
   Output_Variables:
   - "ETCD"
   - "SEUPDES"

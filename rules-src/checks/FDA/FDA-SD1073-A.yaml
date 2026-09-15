@@ -2,8 +2,8 @@ Core:
   Id: "FDA-SD1073-A"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when any of the IG-prohibited qualifiers TRLOC, TRLAT,\
-  \ TRDIR or TRPORTOT is present in the TR dataset."
+Description: "Raise an error for each of the IG-prohibited qualifiers TRLOC, TRLAT,\
+  \ TRDIR and TRPORTOT that is present in the TR dataset."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -11,15 +11,12 @@ Scope:
     - "TR"
 Check:
   expression: >-
-    var_exists("TRLOC") or var_exists("TRLAT") or var_exists("TRDIR") or var_exists("TRPORTOT")
+    varname() in ["TRLOC", "TRLAT", "TRDIR", "TRPORTOT"]
 Outcome:
-  Message: "An IG-prohibited variable (TRLOC, TRLAT, TRDIR or TRPORTOT) is present\
-    \ in the TR dataset."
+  Message: "The variable is prohibited in the TR dataset: TRLOC, TRLAT, TRDIR and\
+    \ TRPORTOT are IG-prohibited qualifiers."
   Output_Variables:
-  - "TRLOC"
-  - "TRLAT"
-  - "TRDIR"
-  - "TRPORTOT"
+  - "variable_name"
 Source_Proposed:
   FDA_Validator_Rule_Message: "An IG-prohibited variable (TRLOC, TRLAT, TRDIR or TRPORTOT)\
     \ is present in the TR dataset."

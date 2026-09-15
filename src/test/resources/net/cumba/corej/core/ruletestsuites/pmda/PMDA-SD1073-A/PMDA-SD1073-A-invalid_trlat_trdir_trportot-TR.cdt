@@ -1,8 +1,11 @@
 #!RuleTest
 #test PMDA-SD1073-A expect=violation domain=TR
-#note "The OTHER THREE prohibited qualifiers (TRLAT, TRDIR, TRPORTOT) present, deliberately NO TRLOC. Predicted VIOLATION with count EXACTLY 1, NOT 3: the whole four-way or-tree is a single dataset-level constant (BroadcastFold), so three matching disjuncts still yield one finding. Pins disjuncts 2-4, which the twin leaves entirely untested, and pins the count semantics at the same time."
+#note "The OTHER THREE prohibited qualifiers (TRLAT, TRDIR, TRPORTOT) present, deliberately NO TRLOC. Since the D-15 rewrite (2026-09-12) the membership Check is evaluated per variable, so three prohibited columns are THREE findings, each naming its culprit - the pre-rewrite dataset-level or-tree (BroadcastFold) collapsed exactly this dataset to a single anonymous finding (count was 1). This scenario is the count-direction witness: the rewrite can only keep or RAISE the finding count, never lower it."
 #library standard=sdtmig version=3-4
-#expectViolationCount 1
+#expectViolationCount 3
+#expectViolationAt variable_name=TRLAT
+#expectViolationAt variable_name=TRDIR
+#expectViolationAt variable_name=TRPORTOT
 dataset TR label="Tumor Results"
 col STUDYID  type=Char
 col DOMAIN   type=Char

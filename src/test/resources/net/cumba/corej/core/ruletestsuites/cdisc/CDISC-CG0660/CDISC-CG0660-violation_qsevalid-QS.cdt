@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0660 expect=violation domain=QS
+#note "S1 (2026-09-14): the pin moved from variable_name to the RESOLVED column, because the Check moved from varname() per-variable iteration to var_exists(\"--EVAL\") / var_exists(\"--EVALID\"). The -- prefix resolves to the current domain, so this rule can no longer cross-match a foreign-domain column (a stray FTEVAL in a QS dataset used to satisfy the old hard-coded membership list). QSEVALID is declared in a QS dataset. Since the group-P varname() rewrite (D-15, 2026-09-12) the Check is the per-variable membership test varname() in [QSEVALID, FTEVALID] with Output_Variables [variable_name], so the finding is pinned by the culprit's NAME rather than by a row. Modelled on the CORE twin CORE-000032's suite, whose post-rewrite Check is byte-identical."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 QSEVALID=RATER01
+dataset QS label=Questionnaires
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSEVALID type=Char label="Evaluator Identifier"
+---
+CDISCPILOT01 | QS | 01-701-1015 | 1 | RATER01

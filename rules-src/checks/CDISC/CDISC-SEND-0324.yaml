@@ -3,18 +3,19 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when a Pharmacokinetic Concentrations (PC) result is\
-  \ quantifiably outside the limit of quantitation - PCORRES below PCLLOQ, or above\
-  \ PCULOQ where provided - but PCSTRESC does not carry the matching 'BLQ' or 'ALQ'\
-  \ token."
+  \ quantifiably below the lower limit of quantitation - PCORRES below PCLLOQ - but\
+  \ PCSTRESC does not carry the 'BLQ' token."
 Executability: "Partially Executable - Possible Underreporting"
 ExecutabilityHint:
   Category: "partially executable"
-  Detail: "Out-of-range detection is only possible for numerically comparable results:\
-    \ a textual PCORRES (e.g. a literal 'BLQ') or a missing limit skips the row, so\
-    \ token omissions on non-numeric results are not reported. The above-limit branch\
-    \ requires the model-permissible PCULOQ (SDTM model 1.4+), which no SENDIG version\
-    \ enumerates in PC; without it only the below-limit half runs. Token comparison\
-    \ is exact ('BLQ'/'ALQ' per controlled terminology)."
+  Detail: "Below-limit detection is only possible for numerically comparable results:\
+    \ a textual PCORRES (e.g. a literal 'BLQ') skips the row, so token omissions on\
+    \ non-numeric results are not reported. PCLLOQ is the limit the comparison reads\
+    \ and is gated by Requirements.Variables.All (R-4.11), so a PC dataset that omits\
+    \ it takes an auditable SKIP naming the column instead of running to silence;\
+    \ no finding changes either way, because no row can fire without the limit. Token\
+    \ comparison is exact ('BLQ' per controlled terminology). The above-limit half\
+    \ of the published SEND324 row is carried by the split sibling CDISC-SEND-0324-A."
 Scope:
   Domains:
     Include:
@@ -24,18 +25,17 @@ Requirements:
     All:
     - "PCORRES"
     - "PCSTRESC"
+    - "PCLLOQ"
 Check:
   expression: >-
-    var_exists("PCLLOQ") and PCORRES < PCLLOQ and PCSTRESC != "BLQ" or var_exists("PCULOQ") and
-    PCORRES > PCULOQ and PCSTRESC != "ALQ"
+    num(PCORRES) < PCLLOQ and PCSTRESC != "BLQ"
 Outcome:
-  Message: "PCORRES is outside the limit of quantitation but PCSTRESC does not carry\
-    \ the matching 'BLQ'/'ALQ' token."
+  Message: "PCORRES is below the lower limit of quantitation but PCSTRESC does not\
+    \ carry the 'BLQ' token."
   Output_Variables:
   - "PCSTRESC"
   - "PCORRES"
   - "PCLLOQ"
-  - "PCULOQ"
 Source:
   Class: "FND"
   Domain: "PC"

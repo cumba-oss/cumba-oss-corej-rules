@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 /**
- * Phase 5: Template rule tests expanded via RuleGenerator for ADSL.
+ * Phase 5: Template rule tests expanded via DatasetRuleResolver for ADSL.
  * <p>
  * Expands template rules (those whose Check tree carries wildcard variables) against the real ADSL
  * test dataset. Template rules contain wildcard variable names like {@code *FL}, {@code *DT},

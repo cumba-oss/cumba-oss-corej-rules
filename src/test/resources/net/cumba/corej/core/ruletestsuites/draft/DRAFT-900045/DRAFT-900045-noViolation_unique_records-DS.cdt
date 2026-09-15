@@ -1,0 +1,16 @@
+#!RuleTest
+#test DRAFT-900045 expect=noViolation domain=DS
+#note "DSSCAT is absent but no subject has more than one DISPOSITION EVENT record per Epoch, so the [DSCAT, USUBJID, EPOCH] key set is unique and the trigger cannot hold -- with a single disposition per epoch there is nothing for DSSCAT to distinguish, and omitting it is legitimate. The sister fires only where its parent would have fired (R-4.11c)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset DS class=EVENTS label="Disposition"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DSSEQ    type=Num  label="Sequence Number"
+col DSCAT    type=Char label="Category for Disposition Event"
+col EPOCH    type=Char label="Epoch"
+---
+S1 | DS | 001 | 1 | DISPOSITION EVENT | TREATMENT
+S1 | DS | 001 | 2 | DISPOSITION EVENT | FOLLOW-UP
+S1 | DS | 002 | 3 | DISPOSITION EVENT | TREATMENT

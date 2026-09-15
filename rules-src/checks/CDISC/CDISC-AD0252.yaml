@@ -2,7 +2,7 @@ Core:
   Id: "CDISC-AD0252"
   Status: "Published"
   Version: "2"
-Description: "Raise an error when AVAL is present or AVALC is present."
+Description: "Raise an error for each of the variables AVAL and AVALC that is present."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -11,12 +11,11 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    var_exists("AVAL") or var_exists("AVALC")
+    varname() in ["AVAL", "AVALC"]
 Outcome:
-  Message: "At least one of AVAL or AVALC is present."
+  Message: "AVAL or AVALC is present."
   Output_Variables:
-  - "AVAL"
-  - "AVALC"
+  - "variable_name"
 Source:
   Class: "OCCURRENCE DATA STRUCTURE; MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
   Variable_or_Item: "AVAL; AVALC"

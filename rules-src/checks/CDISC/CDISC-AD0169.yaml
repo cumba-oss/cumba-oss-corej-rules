@@ -16,7 +16,7 @@ Requirements:
     - "CNSR"
 Check:
   expression: >-
-    not empty(CNSR) and CNSR !~ /^\\d+$/
+    not empty(CNSR) and (not is_integer(CNSR) or num(CNSR) < 0)
 Outcome:
   Message: "CNSR is populated, but its value is not a positive integer or 0"
   Output_Variables:

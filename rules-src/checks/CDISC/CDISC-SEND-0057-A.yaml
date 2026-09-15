@@ -1,0 +1,98 @@
+Core:
+  Id: "CDISC-SEND-0057-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a combined --DIR value, whose terms are separated\
+  \ by a semicolon (;), contains a token that is not a submission value in the (DIR)\
+  \ controlled terminology codelist."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Operations:
+- id: "$dir_terms"
+  expression: "codelist_terms(codelists=[DIR], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    not empty(--DIR) and contains(--DIR, ";") and not contains_all($dir_terms, split_by(--DIR, ";"))
+Outcome:
+  Message: "A semicolon-separated --DIR token is not a submission value in the (DIR)\
+    \ controlled terminology codelist."
+  Output_Variables:
+  - "--DIR"
+Source_Proposed:
+  Sheet_Issue: "#233"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DIR"
+  Plain_Text_Explanation: "When a --DIR value comprises multiple individual values,\
+    \ each contributing value must be included as its (DIR) controlled terminology\
+    \ submission value, and delimited from other terms by a semicolon."
+  Condition: "A --DIR value is composed of multiple individual values and CDISC published\
+    \ Controlled Terminology applies to the value"
+  Rule: "Multiple individual --DIR values are separated by \";\""
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "In some cases, a variable value may comprise multiple individual\
+    \ values. In these cases, each contributing value is a separately collected or\
+    \ analyzed item...In these scenarios, when controlled terminology applies to the\
+    \ corresponding variable, each contributing value must be included as its controlled\
+    \ terminology submission value, and delimited from other terms by a semicolon."
+  Condition: "A variable value is composed of multiple individual values and CDISC\
+    \ published Controlled Terminology applies to the value"
+  Rule: "Multiple individual values are separated by \";\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND57"
+        Version: "1"
+      Version: "5.0"

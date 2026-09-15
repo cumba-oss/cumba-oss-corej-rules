@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1339 expect=skipped domain=LB
+#note "EPOCH is not present in the dataset while the collection date LBDTC is populated. Requirements.Variables.All [EPOCH] gates the rule out -> auditable skip instead of one finding per row with a populated date under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-2: in INTERVENTIONS/FINDINGS/EVENTS the absence is still reported by FDA-SD1077; an SE dataset's absent EPOCH going unreported is the ruling's recorded consequence."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB  | 2023-06-01
+S1 | LB | 001 | 2 | GLUC |

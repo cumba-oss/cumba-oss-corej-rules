@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD0086-A expect=noViolation domain=SUPPQUAL
+#note "R-5.25 wave-3 sibling copy of the parent's W3 group-key regression pin - the non-DM half's five-member key keeps RDOMAIN too: RDOMAIN is part of both uniqueness keys, so a DM qualifier and an LB qualifier sharing only USUBJID+QNAM don't collide in a combined SUPPQUAL. THE COLUMN SET AND ROW ORDER ARE LOAD-BEARING: no DOMAIN column, and RDOMAIN=DM on row 0 — that is the only way an 8-character name (SUPPQUAL) reaches the strict SUPP-- token, via OperationExecutor.unsplitNameFromData's 'SUPP' + row-0 RDOMAIN fallback. ADAPTED-FROM fda/FDA-SD0086/FDA-SD0086-valid-crossdomain-SUPPQUAL.cdt (verbatim)."
+#library standard=sdtmig version=3-4
+dataset SUPPQUAL class=RELATIONSHIP label="Supplemental Qualifiers"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | DM | 001 |       |   | COMMENT | subject-level comment
+S1 | LB | 001 | LBSEQ | 1 | COMMENT | record-level comment

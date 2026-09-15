@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1037 expect=executionError domain=LB
+#runLevel Info
+#expect-execution-error "LBTOXGR is declared Num"
+#note "R7 (PLAN-column-type-conformance): LBTOXGR shipped as Num is nonconformant data (SDTMIG declares it Char). The strict leg num(--TOXGR) > 0 reads it legally, but the INFO heuristic leg (--TOXGR =~ /[1-9]/) is a regex over its text form, which per R9 is formatting-dependent -> the engine must ERROR. Runs at #runLevel Info because the default (Warning) never evaluates the INFO leg that carries the regex."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+col LBTOXGR type=Num  label="Standard Toxicity Grade"
+col LBTOX   type=Char label="Toxicity"
+---
+S1 | LB | 001 | 1 | 2 |
+---

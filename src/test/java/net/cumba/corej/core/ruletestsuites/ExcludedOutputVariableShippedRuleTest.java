@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * {@code Fix #355} half (i), plan A Phase 4 step 5 — the <b>positive</b> acceptance of the first
  * {@code !X} authoring pass, asserted against the <b>shipped</b> packages under
- * {@code lib/corej-cdisc-rules/rules}, not a hand-built rule.
+ * {@code target/rules}, not a hand-built rule.
  *
  * <p>
  * Three rules carry the five pure-gate {@code $}-operation exclusions (§5.9 item 9): the operation
@@ -138,11 +138,11 @@ class ExcludedOutputVariableShippedRuleTest
 
     /**
      * {@code Fix #357} — the class-(c) apply: 109 guard-only {@code Output_Variables} entries over
-     * 90 rules, ruling (A) of the class-(c) exclusions proposal (owner 2026-08-24, Message-usage
-     * criterion). The three cases above cover {@code $}-operation results; these cover the other
-     * two token shapes the ruling introduces — <b>plain columns</b> and <b>{@code --} wildcard
-     * columns</b>, plus the two dotted {@code DM.ARM} references — where the projection key is the
-     * <em>resolved</em> name, not the authored token.
+     * 90 rules, ruling (A) of {@code rule-review-results-r3/PROPOSAL-plan-A-class-c-exclusions.md}
+     * (owner 2026-08-24, Message-usage criterion). The three cases above cover {@code $}-operation
+     * results; these cover the other two token shapes the ruling introduces — <b>plain columns</b>
+     * and <b>{@code --} wildcard columns</b>, plus the two dotted {@code DM.ARM} references — where
+     * the projection key is the <em>resolved</em> name, not the authored token.
      *
      * <p>
      * ⚠ The wildcard half of this ruling was blocked until {@code Fix #356}: the per-domain

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0397 expect=skipped domain=FX
+#note "The FXRESCAT column -- the SUBJECT of the rule -- is absent entirely. Since 2026-09-11 the rule gates on Requirements.Variables.All [FXRESCAT] (R-4.11b, verdict 2-1, B4: the subject was not gated at all, while the existing Any on the exemption columns was measured fine), so the run is an auditable SKIP naming FXRESCAT instead of one finding per non-exempt row (absent = all-missing, EC-43 made empty(FXRESCAT) TRUE everywhere). With the exemption columns present the absence case belongs to the generic Expected-variable reporting; the minted sister CDISC-SEND-9438 covers the no-exemption-columns shape."
+#library standard=sendig-dart version=1-2
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+col FXSTRESC type=Char label="Character Result/Finding in Std Format"
+col FXSTAT   type=Char label="Completion Status"
+---
+S1 | FX | 001 | 1 | FPEXAM | MALFORMATION | 

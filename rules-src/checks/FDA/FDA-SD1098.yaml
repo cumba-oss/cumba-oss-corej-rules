@@ -4,7 +4,7 @@ Core:
   Version: "1"
 Description: "Raise an error when Subcategory (--SCAT) is populated but Category (--CAT)\
   \ is not populated."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -12,6 +12,11 @@ Scope:
     - "EVENTS"
     - "FINDINGS"
     - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "--CAT"
 Check:
   expression: >-
     not empty(--SCAT) and empty(--CAT)

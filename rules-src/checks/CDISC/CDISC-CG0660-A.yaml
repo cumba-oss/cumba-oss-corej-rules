@@ -1,0 +1,55 @@
+Core:
+  Id: "CDISC-CG0660-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Evaluator variable RSEVALID is populated on\
+  \ a Clinical Classification record -- RSCAT is a term in codelist CCCAT -- of a\
+  \ Disease Response and Clinical Classifications (RS) dataset. --EVALID must not\
+  \ be used to model QRS (Questionnaires, Ratings, and Scales) data."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "RS"
+Requirements:
+  Variables:
+    All:
+    - "RSCAT"
+Operations:
+- id: "$cc_categories"
+  expression: "codelist_terms(codelists=[CCCAT], level=\"term\", returntype=\"value\"\
+    )"
+Check:
+  expression: >-
+    RSCAT in $cc_categories and not empty(RSEVALID)
+Outcome:
+  Message: "RSEVALID is populated on a Clinical Classification record. --EVALID must\
+    \ not be used to model QRS data."
+  Output_Variables:
+  - "RSCAT"
+  - "RSEVALID"
+Source_Proposed:
+  Class: "FND"
+  Domain: "RS"
+  Variable: "--EVALID"
+  Condition: "Domain = 'RS' and RSCAT is a term in codelist CCCAT (the Clinical Classification\
+    \ use case)"
+  Rule: "--EVALID not populated"
+Source:
+  Class: "FND"
+  Domain: "QS, FT, RS"
+  Variable: "--EVALID"
+  Condition: "Domain in ('QS', 'FT') or (Domain = 'RS' and it's the Clinical Classification\
+    \ Use Case)"
+  Rule: "--EVALID not present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0660"
+        Version: "1"
+      Version: "2.0"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0378 expect=skipped domain=TT
+#note "TTENRL is not present in the dataset, so the wave E Requirements.Variables.All [TTENRL, TTDUR] leg is unmet and the parent SKIPS - before the Any -> All rewrite this file expected a violation at row 2. The finding is NOT lost: this dataset is byte-for-byte the R-5.25 split sibling CDISC-SEND-0378-B's -violation_ttdur_blank scenario, which reports row 2 at its location. Four disjoint states: both present -> parent; one absent -> that column's sibling; neither -> the dataset sister."
+#library standard=sendig-dart version=1-2
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTDUR   type=Char label="Planned Duration of Repro Stage"
+---
+S1 | TT | ST1 | Premating | P14D
+S1 | TT | ST2 | Gestation |

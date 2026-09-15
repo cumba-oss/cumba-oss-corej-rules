@@ -157,10 +157,64 @@ final class CompositeMetadataProvider implements MetadataProvider
     }
 
 
+    // Same precedence as getCodelistTerms: an explicit spec mock wins, the pickle-backed library
+    // answers otherwise. Inheriting the interface's honest-empty default here would flip every
+    // non-(term,value) codelist_terms shape to LIBRARY_NOT_AVAILABLE on behalf of a pickle
+    // provider that CAN answer — exactly the shape the Fix #368 note above warns about.
+    @Override
+    public java.util.Optional<net.cumba.datatable.metadata.ICodeList> getCodelist(
+            String aCodelistName)
+    {
+        for (MetadataProvider p : new MetadataProvider[]
+        {
+                mock, pickle
+        })
+        {
+            if (p != null)
+            {
+                java.util.Optional<net.cumba.datatable.metadata.ICodeList> cl = p
+                        .getCodelist(aCodelistName);
+                if (cl.isPresent())
+                {
+                    return cl;
+                }
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
+
     @Override
     public Map<String, String> getCodelistTermMappings(String codelistName)
     {
         return firstNonEmptyMap(p -> p.getCodelistTermMappings(codelistName), mock, pickle);
+    }
+
+
+    /**
+     * ⚠⚠ Delegated — the sibling of {@link #getCodelistTermMappings} above, and the one that was
+     * missed. The interface default is {@code Map.of()} ("I have no code map"), which is honest for
+     * a leaf and silently wrong here: {@code MetadataLibraryProvider} — the pickle half every spec
+     * naming a standard/version composes in — <b>does</b> implement it, so inheriting the default
+     * made {@code library_variable_code_pair_matches} (FDA-CT2003 / PMDA-CT2003) see no concept ids
+     * on the spec path, with no diagnostic. Same shape as the {@code getCodelist} case closed in
+     * 4b710bc2, one accessor over.
+     *
+     * <p>
+     * Merge semantics: {@link #firstNonEmptyMap}, i.e. <b>whole-answer precedence</b>, not a
+     * per-key union of the two halves — the same helper every other {@code Map<String, String>}
+     * accessor on this class uses ({@code getCodelistTermMappings}, {@code getVariableMetadata},
+     * {@code getDatasetMetadata}). Deliberate rather than incidental: the class contract above is
+     * that the spec's explicit mock is authoritative and the pickle answers only what the mock does
+     * not, so a union would let pickle-derived concept ids leak into a map a spec deliberately
+     * mocked and silently change that spec's verdict. An empty map here is "cannot answer" (see the
+     * interface javadoc), never a meaningful answer, so folding it into the fallback loses nothing.
+     * </p>
+     */
+    @Override
+    public Map<String, String> getCodelistCodeMap(String aDomain, String aVariable)
+    {
+        return firstNonEmptyMap(p -> p.getCodelistCodeMap(aDomain, aVariable), mock, pickle);
     }
 
 
@@ -274,11 +328,24 @@ final class CompositeMetadataProvider implements MetadataProvider
     }
 
 
+    /**
+     * F-corej-ct-02 — strictly mock-primary, and deliberately <em>not</em> a {@code firstNonEmpty}
+     * fallback onto the pickle half.
+     *
+     * <p>
+     * The mock now answers {@link java.util.Optional#empty()} for a codelist it does not hold, so
+     * an empty answer here is an honest "the spec's metadata cannot resolve this codelist" and the
+     * engine surfaces it as a rule SKIP. Deferring to the offline pickle library on empty would let
+     * real CT answer where the scenario deliberately declares its own metadata, which can make a
+     * rule <em>fire</em> where the spec never described the codelist at all.
+     * </p>
+     */
     @Override
-    public boolean isCodelistExtensible(String codelistName)
+    public java.util.Optional<Boolean> isCodelistExtensible(String codelistName)
     {
         MetadataProvider primary = mock != null ? mock : pickle;
-        return primary != null && primary.isCodelistExtensible(codelistName);
+        return primary != null ? primary.isCodelistExtensible(codelistName)
+                : java.util.Optional.empty();
     }
 
     // ---- study/dataset queries: mock first, pickle fallback ----

@@ -276,6 +276,13 @@ public final class GuardPositionAudit
     private static CheckCondition lowered(CheckConditionExpression expression)
     {
         CheckCondition condition = DualFormCheckNode.lowerConditionOrNull(expression.expr());
+        if (condition == null)
+        {
+            // Retry with num() conversions erased — a num(X) read is transparent to this
+            // instrument's classification; see DualFormCheckNode.stripNumConversions.
+            condition = DualFormCheckNode
+                    .lowerConditionOrNull(DualFormCheckNode.stripNumConversions(expression.expr()));
+        }
         if (condition != null)
         {
             return condition;
@@ -456,12 +463,14 @@ public final class GuardPositionAudit
      *
      * <p>
      * A presence leaf on a dataset the rule never otherwise touches is not a misplaced guard
-     * &mdash; it is <b>the rule's own assertion</b>. {@code CDISC-SEND-0400} is
+     * &mdash; it is <b>the rule's own assertion</b>. {@code CDISC-SEND-0400} was
      * {@code any[ TT ds_not_exists, TP ds_not_exists, SJ ds_not_exists ]} and its whole purpose is
-     * to report a missing DART domain; every one of its three leaves sits under a top-level
-     * {@code any} and none of them is a guard in any sense. Position alone puts all three in bucket
-     * (b) &mdash; <b>3 false positives out of 9</b>, measured 2026-08-12 before this clause
-     * existed. A guard protects a <em>read</em>, so requiring the read is what separates the two.
+     * to report a missing DART domain; every one of its three leaves sat under a top-level
+     * {@code any} and none of them was a guard in any sense (since the 2026-09-12 R-5.25 wave-3
+     * split each leaf is the whole {@code Check} of its own rule, still no guard). Position alone
+     * puts all three in bucket (b) &mdash; <b>3 false positives out of 9</b>, measured 2026-08-12
+     * before this clause existed. A guard protects a <em>read</em>, so requiring the read is what
+     * separates the two.
      * </p>
      */
     private static Set<String> guardable(Rule rule, Map<String, Operation> operations)

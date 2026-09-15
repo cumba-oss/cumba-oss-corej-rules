@@ -1,0 +1,95 @@
+Core:
+  Id: "CDISC-SEND-0250-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Trial Summary (TS) dataset contains neither\
+  \ a record with TSPARMCD equal to 'AGE' nor a record with TSPARMCD equal to 'AGETXT';\
+  \ exactly one of the two must be present."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$age_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGE\"\
+    ))"
+- id: "$agetxt_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGETXT\"\
+    ))"
+Check:
+  expression: >-
+    $age_count == 0 and $agetxt_count == 0
+Outcome:
+  Message: "TS contains neither a TSPARMCD 'AGE' record nor a TSPARMCD 'AGETXT' record;\
+    \ exactly one must be present."
+  Output_Variables:
+  - "$age_count"
+  - "$agetxt_count"
+Source_Proposed:
+  Sheet_Issue: "#218"
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "Either a record with TSPARMCD of AGE or a record with TSPARMCD\
+    \ of AGETXT should be present."
+  Rule: "A record with TSPARMCD = AGE or a record with TSPARMCD = AGETXT is present"
+Source:
+  Class: "TDM"
+  Domain: "TS"
+  Variable: "TSPARMCD"
+  Plain_Text_Explanation: "Either a record with TSPARMCD of AGE or TSPARMCD of AGETXT\
+    \ should be present, but not both."
+  Rule: "Either a record with TSPARMCD = AGE or TSPARMCD = AGETXT is present; both\
+    \ are not present"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND250"
+        Version: "1"
+      Version: "5.0"

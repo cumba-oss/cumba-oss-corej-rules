@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1362-A expect=violation domain=DM
+#note "The half this R-5.25 split sibling owns: row 2 has ACTARMCD without ACTARM -> fires. Row 1 (ACTARM without ACTARMCD) is the PARENT FDA-SD1362's state and must NOT fire here - the discriminator of the split. Rows 3/4 are the paired cases."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=002
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+S1 | DM | 001 |   | Treatment A
+S1 | DM | 002 | B |
+S1 | DM | 003 | C | Treatment C
+S1 | DM | 004 |   |

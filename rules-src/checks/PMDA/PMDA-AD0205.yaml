@@ -10,13 +10,17 @@ Scope:
   Data_Structures:
     Include:
     - "SUBJECT LEVEL ANALYSIS DATASET"
+Requirements:
+  Variables:
+    All:
+    - "DM.AGEU"
 Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "DM"
 Check:
   expression: >-
-    var_exists(DM.AGEU) and not empty(AGEU) and AGEU != DM.AGEU
+    not empty(AGEU) and AGEU != DM.AGEU
 Outcome:
   Message: "ADSL.AGEU does not match DM.AGEU for the same subject (USUBJID)."
   Output_Variables:

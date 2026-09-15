@@ -227,6 +227,13 @@ public final class ViolationNormaliser
          */
         INVALID_SPLIT_DOMAIN,
         /**
+         * A column's shipped type does not match the operand position it is used in, and the rule
+         * did not convert it — {@code PLAN-column-type-conformance} Phase 3, rulings R4/R5/R9/R12.
+         * A numeric operation on a {@code Char} column must be authored {@code num(X)}; a numeric
+         * column read as text has no legal authoring and the rule is simply broken.
+         */
+        COLUMN_TYPE_MISMATCH,
+        /**
          * An {@code ERROR} this classifier does not recognise — including a null status message.
          */
         OTHER
@@ -253,6 +260,19 @@ public final class ViolationNormaliser
      * degrades to {@link ErrorReason#OTHER}, a visible divergence.
      */
     static final String INVALID_SPLIT_DOMAIN_MESSAGE_SUFFIX = "; the domain cannot be joined";
+
+    /**
+     * Verbatim copy of the fixed prefix every {@code ColumnTypeMismatchException} message opens
+     * with ({@code ColumnTypeGate}, three builder sites, pinned there by
+     * {@code EngineErrorMessageContractTest}).
+     * <p>
+     * ⚠ Matched by <b>prefix</b>, not exactly, and that is forced rather than sloppy: the message
+     * names the offending variable and both types, so there is no fixed string to compare. Same
+     * shape as {@link #INVALID_SPLIT_DOMAIN_MESSAGE_SUFFIX}'s suffix match. A reworded prefix
+     * degrades to {@link ErrorReason#OTHER} — a visible divergence — rather than a silent
+     * misclassification.
+     */
+    static final String COLUMN_TYPE_MISMATCH_MESSAGE_PREFIX = "column-type mismatch: ";
 
     /**
      * Classifies an execution result into the closed {@link ErrorReason} vocabulary and returns the
@@ -309,6 +329,10 @@ public final class ViolationNormaliser
         if (statusMessage.endsWith(INVALID_SPLIT_DOMAIN_MESSAGE_SUFFIX))
         {
             return ErrorReason.INVALID_SPLIT_DOMAIN;
+        }
+        if (statusMessage.startsWith(COLUMN_TYPE_MISMATCH_MESSAGE_PREFIX))
+        {
+            return ErrorReason.COLUMN_TYPE_MISMATCH;
         }
         // Checked last: a load error's text is authored, so it could in principle collide with a
         // fixed engine message. Preferring the fixed messages keeps the classification stable.

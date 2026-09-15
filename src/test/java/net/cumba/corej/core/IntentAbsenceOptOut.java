@@ -237,6 +237,13 @@ public final class IntentAbsenceOptOut
             return node;
         }
         CheckCondition lowered = DualFormCheckNode.lowerConditionOrNull(expression.expr());
+        if (lowered == null)
+        {
+            // Retry with num() conversions erased — a num(X) read is transparent to this
+            // instrument's classification; see DualFormCheckNode.stripNumConversions.
+            lowered = DualFormCheckNode
+                    .lowerConditionOrNull(DualFormCheckNode.stripNumConversions(expression.expr()));
+        }
         if (lowered != null)
         {
             return lowered;

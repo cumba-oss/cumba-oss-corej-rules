@@ -1,0 +1,87 @@
+Core:
+  Id: "CDISC-SEND-0059.1-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --ELTM is populated with a value that is not a valid\
+  \ ISO 8601 duration; the negative-interval extension format is accepted."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ELTM"
+Check:
+  expression: >-
+    not empty(--ELTM) and invalid_duration(--ELTM, negative=true)
+Outcome:
+  Message: "--ELTM is not a valid ISO 8601 duration value."
+  Output_Variables:
+  - "--ELTM"
+Source_Proposed:
+  Sheet_Issue: "#234"
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--ELTM"
+  Plain_Text_Explanation: "--ELTM must be in ISO 8601 duration format, including the\
+    \ additional format that allows the representation of  \"negative\" intervals\
+    \ of time."
+  Rule: "--ELTM must be in ISO 8601 duration format, including the additional format\
+    \ that allows the representation of  \"negative\" intervals of time."
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--EVLINT, --ELTM, --DUR"
+  Plain_Text_Explanation: "--EVLINT, --ELTM, --DUR must be in ISO 8601 duration format,\
+    \ including the additional format that allows the representation of  \"negative\"\
+    \ intervals of time."
+  Rule: "--EVLINT, --ELTM, --DUR must be in ISO 8601 duration format, including the\
+    \ additional format that allows the representation of  \"negative\" intervals\
+    \ of time."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND59.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND59.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND59.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND59.1"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND59.1"
+        Version: "1"
+      Version: "5.0"

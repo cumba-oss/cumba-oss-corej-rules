@@ -179,6 +179,7 @@ class ScenarioDeclaredScopeProviderTest
         assertFalse(result.isSkipped(),
                 "Fix #154: the declaration must override the columns by default: "
                         + statusOf(result));
+        assertFalse(result.isError(), statusOf(result));
         assertTrue(result.hasViolations(),
                 "CDISC-AD0261 fires when AEDECOD is absent; got " + result.getViolationCount());
     }
@@ -457,7 +458,9 @@ class ScenarioDeclaredScopeProviderTest
         RuleExecutionResult result = RuleRunner.execute(rule, declared, resolverFor(declared),
                 "ADAE", slots.library(), null, slots.define());
         assertFalse(result.isSkipped(), statusOf(result));
-        assertTrue(result.hasViolations());
+        assertFalse(result.isError(), statusOf(result));
+        assertTrue(result.hasViolations(),
+                "CDISC-AD0261 must FIRE here, not merely produce the __error__ sentinel");
     }
 
 

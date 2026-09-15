@@ -2,23 +2,25 @@ Core:
   Id: "FDA-SD1135"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a Study Day variable (--STDY or --ENDY) has a negative\
-  \ value in the EC or EX dataset."
+Description: "Raise an error when the Study Day variable --STDY has a negative value\
+  \ in the EC or EX dataset."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "EC"
     - "EX"
+Requirements:
+  Variables:
+    All:
+    - "--STDY"
 Check:
   expression: >-
-    not empty(--STDY) and var_exists("--STDY") and --STDY < 0 or not empty(--ENDY) and
-    var_exists("--ENDY") and --ENDY < 0
+    not empty(--STDY) and --STDY < 0
 Outcome:
-  Message: "Negative value for Study Day variable (--STDY or --ENDY)."
+  Message: "Negative value for Study Day variable --STDY."
   Output_Variables:
   - "--STDY"
-  - "--ENDY"
 Source:
   FDA_Validator_Rule_Message: "Negative value of Study Day variable"
   FDA_Validator_Rule_Description: "Study Day variables (*DY) value should not be negative\

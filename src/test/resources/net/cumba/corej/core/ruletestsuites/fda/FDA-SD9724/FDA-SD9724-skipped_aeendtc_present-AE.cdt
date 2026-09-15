@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD9724 expect=skipped domain=AE
+#note "The discriminator that keeps the family from double-reporting: the AEENDTC column EXISTS (blank on the resolved row), so Requirements.Variables.None [AEENDTC, AEDUR] skips this sister with a reason naming the column, and the parent FDA-SD1333 owns the case -- its Any gate is satisfied by the same present column, and it reports row 1 with its location."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | RECOVERED/RESOLVED |

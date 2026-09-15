@@ -115,7 +115,50 @@ class CrossCorpusDerivationTest
             // witness is a per-record leaf, so the derivation reads `Record` and the per-record
             // reading would multiply the finding by the number of numeric results. Kept in step
             // with DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-CG9672", "FDA-SD9715", "PMDA-SD9715");
+            "CDISC-CG9672", "FDA-SD9715", "PMDA-SD9715",
+            // 15 -> 19 on 2026-09-11 (R-4.11c wave A, the M1/M13 presence sisters): the finding is
+            // that the --BODSYS / --TOX COLUMN is absent — one dataset-level fact — while the
+            // existential witness is a per-record leaf, so the derivation reads `Record`. The M19
+            // pair FDA/PMDA-SD9718 is deliberately absent: all-var_exists Checks derive `Dataset`
+            // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
+            // rules-src half of the same list.
+            "FDA-SD9716", "PMDA-SD9716", "FDA-SD9717", "PMDA-SD9717",
+            // 19 -> 25 on 2026-09-11 (R-4.11c wave B, the M3/M11/M11b/M8 presence sisters): the
+            // finding is that the end- or start-timepoint COLUMN SET is absent — one
+            // dataset-level fact — while every trigger leaf is per-row, so the derivation reads
+            // `Record`. Kept in step with DerivedFieldEquivalenceTest, which holds the
+            // rules-src half of the same list.
+            "FDA-SD9719", "PMDA-SD9719", "FDA-SD9720", "PMDA-SD9720", "FDA-SD9721", "CORE-009707",
+            // 25 -> 31 on 2026-09-11 (R-4.11c wave C1, the M9/M10 presence sisters): the finding
+            // is that the ECDOSTXT (M9) or SEUPDES (M10) COLUMN is absent — one dataset-level
+            // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
+            // Kept in step with DerivedFieldEquivalenceTest, which holds the rules-src half of
+            // the same list.
+            "CDISC-CG9673", "FDA-SD9722", "PMDA-SD9722", "CDISC-CG9674", "FDA-SD9723",
+            "PMDA-SD9723",
+            // 31 -> 36 on 2026-09-11 (R-4.11c wave C2, the M4/M7/M7b/M14/M18 presence sisters):
+            // the finding is that the AEENDTC/AEDUR (M14), --STINT/--ENINT (M4), --REASND
+            // (M7/M7b) or FXSTRESC/FXSTAT (M18) COLUMN SET is absent — one dataset-level fact —
+            // while every trigger leaf is per-row, so the derivation reads `Record`. Kept in
+            // step with DerivedFieldEquivalenceTest, which holds the rules-src half of the same
+            // list.
+            "FDA-SD9724", "PMDA-SD9724", "FDA-SD9725", "FDA-SD9726", "CDISC-SEND-9437",
+            "CDISC-SEND-9438",
+            // 36 -> 40 on 2026-09-11 (R-4.11c wave C3, the M16/M17 presence sisters): the finding
+            // is that the RDOMAIN (M16) or DSSCAT (M17) COLUMN is absent — one dataset-level
+            // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
+            // DRAFT-900045 ships only into the draft packages, which this scan walks too. The M15
+            // pair FDA/PMDA-SD9727 is deliberately absent: all-var_exists Checks derive `Dataset`
+            // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
+            // rules-src half of the same list.
+            "CDISC-CG9675", "FDA-SD9728", "PMDA-SD9728", "DRAFT-900045",
+            // 40 -> 41 on 2026-09-11 (wave D, the M10 SENDIG carry-over): CDISC-SEND-9439,
+            // sister of CDISC-SEND-0125.1 — the SEUPDES COLUMN absence is one dataset-level
+            // fact while the ETCD == "UNPLAN" trigger leaf is per-row, so the derivation
+            // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
+            // are record-level by design and deliberately absent. Kept in step with
+            // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
+            "CDISC-SEND-9439");
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}
@@ -366,11 +409,13 @@ class CrossCorpusDerivationTest
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
         List<String> offenders = new ArrayList<>();
+        int entries = 0;
         for (Path pkgFile : packages)
         {
             JsonNode rules = JSON.readTree(pkgFile.toFile()).get("rules");
             for (Map.Entry<String, JsonNode> e : rules.properties())
             {
+                entries++;
                 if (e.getValue().has("Rule_Type"))
                 {
                     offenders.add(pkgFile.getFileName() + " " + e.getKey() + ": Rule_Type");

@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1135 expect=skipped domain=EC
+#note "THE R-4.11 HOIST PIN (top-level-or board wave 2, group J): the pre-split in-Check var_exists(\"--STDY\") guard is hoisted to Requirements.Variables.All [--STDY], so with no ECSTDY column the parent SKIPs, naming the variable, instead of executing silently. ECENDY carries -1 - that is the split sibling FDA-SD1135-A's state, reported there and never here. If this EXECUTES, the hoisted gate has been removed - escalate, do not rewrite."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECENDY  type=Num  label="Study Day of End of Treatment"
+---
+S1 | EC | 001 | 1 | DRUG A | -1
+S1 | EC | 001 | 2 | DRUG A | 5

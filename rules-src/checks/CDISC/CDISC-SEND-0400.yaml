@@ -2,9 +2,8 @@ Core:
   Id: "CDISC-SEND-0400"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when any of the Trial Repro Stages (TT), Trial Repro\
-  \ Paths (TP), or Subject Reproductive Stages (SJ) datasets is not present in the\
-  \ study; all three are required domains for a reproductive/developmental toxicology\
+Description: "Raise an error when the Trial Repro Stages (TT) dataset is not present\
+  \ in the study; TT is a required domain for a reproductive/developmental toxicology\
   \ (DART) submission."
 Executability: "Fully Executable"
 Scope:
@@ -13,10 +12,10 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    not ds_exists("TT") or not ds_exists("TP") or not ds_exists("SJ")
+    not ds_exists("TT")
 Outcome:
-  Message: "One or more of the required DART datasets (TT, TP, SJ) is not present\
-    \ in the study."
+  Message: "The required DART dataset TT (Trial Repro Stages) is not present in the\
+    \ study."
 Source:
   Class: "TDM, SPC"
   Domain: "TT, TP, SJ"

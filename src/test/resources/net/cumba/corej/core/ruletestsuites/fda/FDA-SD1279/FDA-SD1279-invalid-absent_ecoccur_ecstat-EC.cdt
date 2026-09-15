@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1279 expect=violation domain=EC
-#note "ECOCCUR and ECSTAT columns not present (Perm/model-level): ECOCCUR is carried by its SURVIVING authored `not var_exists(ECOCCUR) or` arm and ECSTAT by the bare empty(ECSTAT) leaf, TRUE on an absent column (absent = all-missing, EC-43; Plan B phase 4d' deleted only ECSTAT's presence half); ECDOSE missing + ECDOSTXT present-but-empty -> fires on row 1 only"
+#note "ECOCCUR and ECSTAT columns not present (Perm/model-level): ECOCCUR is carried by its SURVIVING authored `not var_exists(ECOCCUR) or` arm and ECSTAT by the D-5 leaf ECSTAT != 'NOT DONE', TRUE on an absent column (R-5.22: a negative leaf fires on a missing value; before D-5 the leaf was empty(ECSTAT), true under absent = all-missing, EC-43 - same verdict, which is the D-5 behaviour-preservation claim this fixture pins); ECDOSE missing + ECDOSTXT present-but-empty -> fires on row 1 only"
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 #expectViolationAt row=1 ECSEQ=1

@@ -2,10 +2,9 @@ Core:
   Id: "PMDA-SD1241"
   Status: "Published"
   Version: "1"
-Description: "Raise a warning when --BDSYCD is populated but --BODSYS is empty or\
-  \ not present."
+Description: "Raise a warning when --BDSYCD is populated but --BODSYS is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -16,11 +15,12 @@ Requirements:
   Variables:
     All:
     - "--BDSYCD"
+    - "--BODSYS"
 Check:
   expression: >-
     not empty(--BDSYCD) and empty(--BODSYS)
 Outcome:
-  Message: "--BODSYS is empty or not present when --BDSYCD is populated."
+  Message: "--BODSYS is empty when --BDSYCD is populated."
   Output_Variables:
   - "--BODSYS"
   - "--BDSYCD"

@@ -48,6 +48,11 @@ class ShippedDictionaryRuleSkipTest
     private static final Path SHIPPED_PMDA_SDTMIG_3_4 = CorpusPaths
             .rules("rules-pmda-sdtmig-3-4.json");
 
+    /**
+     * ⚠ Was {@code <repoRoot>/lib/corej-core/dictionaries/meddra.json} in the coreJ monorepo. The
+     * split moved corej-core to its own repository, so the dummy dictionary bundle is carried in
+     * this module's test resources instead — see {@code AbstractRuleTestSuitesFactory}.
+     */
     private static final Path DUMMY_MEDDRA = Path.of(System.getProperty("projectBasedir"),
             "src/test/resources/dictionaries/meddra.json");
 

@@ -3,8 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when --ELTM (Planned Elapsed Time from Time Point Reference)\
-  \ is populated but --TPTREF (Time Point Reference) is not present or is empty."
-Executability: "Fully Executable"
+  \ is populated but --TPTREF (Time Point Reference) is empty."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -13,6 +13,7 @@ Requirements:
   Variables:
     All:
     - "--ELTM"
+    - "--TPTREF"
 Check:
   expression: >-
     not empty(--ELTM) and empty(--TPTREF)

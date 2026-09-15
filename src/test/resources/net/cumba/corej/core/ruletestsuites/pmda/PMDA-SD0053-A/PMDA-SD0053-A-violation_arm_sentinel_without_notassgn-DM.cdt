@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0053-A expect=violation domain=DM
+#note "The half this R-5.25 split sibling owns (formerly PMDA-SD0053's 'invalid_reverse_arm_not_assigned' fixture): row 1 has ARM='Not Assigned' while ARMCD='NOTASGN' is a near-miss (one S) for the sentinel 'NOTASSGN' -> fires. This fixture exercised the second half of the old or-tree; it is now that half's own rule."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 ARMCD=NOTASGN ARM="Not Assigned"
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+col ARM     type=Char
+---
+S1 | DM | 001 | NOTASGN  | Not Assigned
+S1 | DM | 002 | NOTASSGN | Not Assigned
+S1 | DM | 003 | A        | Placebo

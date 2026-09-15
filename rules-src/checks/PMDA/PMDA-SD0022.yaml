@@ -6,16 +6,21 @@ Description: "Raise a warning when no Start Time-Point variable (--STDTC, --STRF
   \ or --STRTPT) is populated and the event/intervention is not excepted by --OCCUR\
   \ equals 'N' or a populated --STAT."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
     - "INTERVENTIONS"
     - "EVENTS"
+Requirements:
+  Variables:
+    Any:
+    - "--STDTC"
+    - "--STRF"
+    - "--STRTPT"
 Check:
   expression: >-
-    empty(--STDTC) and empty(--STRF) and empty(--STRTPT) and (not var_exists("--OCCUR") or --OCCUR
-    != "N") and empty(--STAT)
+    empty(--STDTC) and empty(--STRF) and empty(--STRTPT) and --OCCUR != "N" and empty(--STAT)
 Outcome:
   Message: "No Start Time-Point variable (--STDTC, --STRF, or --STRTPT) is populated."
   Output_Variables:

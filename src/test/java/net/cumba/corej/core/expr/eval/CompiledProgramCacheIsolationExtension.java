@@ -1,18 +1,18 @@
 /*
- * COPY. The original lives in corej-cdisc-core's test tree
- * (lib/corej-cdisc-core/src/test/java/net/cumba/corej/core/expr/eval/
+ * COPY. The original lives in corej-core's test tree
+ * (lib/corej-core/src/test/java/net/cumba/corej/core/expr/eval/
  * CompiledProgramCacheIsolationExtension.java).
  *
  * Copied here on 2026-09-01 by plans/done/PLAN-corej-restructure.md section 4, the same change that
- * deleted this module's <type>test-jar</type> dependency on corej-cdisc-core. That dependency was
- * how this extension reached this module at all: a test-jar packages target/test-classes, so it
- * carried the two JUnit RESOURCES that register this class (junit-platform.properties and
+ * deleted this module's <type>test-jar</type> dependency on corej-core. That dependency was how
+ * this extension reached this module at all: a test-jar packages target/test-classes, so it carried
+ * the two JUnit RESOURCES that register this class (junit-platform.properties and
  * META-INF/services/org.junit.jupiter.api.extension.Extension) as well as the class itself. The pom
  * comment on that deleted dependency enumerated four CLASSES and missed the resources.
  *
  * It stays in package net.cumba.corej.core.expr.eval because
- * NativeExprEvaluator.clearCacheForTesting() is package-private in corej-cdisc-core's MAIN jar, and
- * this module's test tree already shares that package (see SyntheticStringTable).
+ * NativeExprEvaluator.clearCacheForTesting() is package-private in corej-core's MAIN jar, and this
+ * module's test tree already shares that package (see SyntheticDataTable).
  *
  * ACCEPTED COST: like the other two copies, this one can drift from the original.
  */

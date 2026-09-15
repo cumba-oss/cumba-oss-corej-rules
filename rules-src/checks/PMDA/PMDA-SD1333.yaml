@@ -6,7 +6,7 @@ Description: "Raise a warning when the Outcome of Adverse Event (AEOUT) is equal
   \ 'RECOVERED/RESOLVED' but neither an End Date/Time of Adverse Event (AEENDTC) nor\
   \ a Duration of Adverse Event (AEDUR) is provided."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -15,6 +15,9 @@ Requirements:
   Variables:
     All:
     - "AEOUT"
+    Any:
+    - "AEENDTC"
+    - "AEDUR"
 Check:
   expression: >-
     AEOUT == "RECOVERED/RESOLVED" and empty(AEENDTC) and empty(AEDUR)

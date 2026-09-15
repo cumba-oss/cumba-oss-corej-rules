@@ -2,9 +2,8 @@ Core:
   Id: "CDISC-CG0554"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when one or more of the variables STUDYID, DOMAIN, or\
-  \ --SEQ is not present, or when none of USUBJID, APID, SPDEVID, or POOLID is present,\
-  \ in a domain based on one of the three SDTM general observation classes."
+Description: "Raise an error when the variable STUDYID is not present in a domain\
+  \ based on one of the three SDTM general observation classes."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -15,13 +14,9 @@ Scope:
     - "FINDINGS ABOUT"
 Check:
   expression: >-
-    not var_exists("STUDYID") or not var_exists("DOMAIN") or not var_exists("--SEQ") or not
-    var_exists("USUBJID") and not var_exists("APID") and not var_exists("SPDEVID") and not
-    var_exists("POOLID")
+    not var_exists("STUDYID")
 Outcome:
-  Message: "One or more of the variables STUDYID, DOMAIN, or --SEQ is not present,\
-    \ or none of the subject identifiers USUBJID, APID, SPDEVID, or POOLID is present,\
-    \ in the dataset."
+  Message: "STUDYID is not present in the dataset."
 Source:
   Class: "ALL"
   Domain: "ALL"

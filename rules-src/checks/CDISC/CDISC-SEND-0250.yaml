@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-SEND-0250"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when the Trial Summary (TS) dataset does not contain\
-  \ exactly one of a record with TSPARMCD equal to 'AGE' and a record with TSPARMCD\
-  \ equal to 'AGETXT' (i.e. both are present, or neither is present)."
+Description: "Raise an error when the Trial Summary (TS) dataset contains both a record\
+  \ with TSPARMCD equal to 'AGE' and a record with TSPARMCD equal to 'AGETXT'; exactly\
+  \ one of the two must be present."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -19,10 +19,10 @@ Operations:
     ))"
 Check:
   expression: >-
-    $age_count > 0 and $agetxt_count > 0 or $age_count == 0 and $agetxt_count == 0
+    $age_count > 0 and $agetxt_count > 0
 Outcome:
-  Message: "TS does not contain exactly one of a TSPARMCD 'AGE' record and a TSPARMCD\
-    \ 'AGETXT' record."
+  Message: "TS contains both a TSPARMCD 'AGE' record and a TSPARMCD 'AGETXT' record;\
+    \ exactly one must be present."
   Output_Variables:
   - "$age_count"
   - "$agetxt_count"

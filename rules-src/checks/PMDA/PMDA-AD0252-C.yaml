@@ -2,10 +2,10 @@ Core:
   Id: "PMDA-AD0252-C"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a subject-level or device-level analysis dataset\
-  \ (ADSL or ADDL) contains the basic-data-structure numeric-code analysis variables\
-  \ AVALCAyN or BASECAyN (introduced in ADaMIG 1.1), which are prohibited at subject\
-  \ and device level."
+Description: "Raise an error for each variable in a subject-level or device-level\
+  \ analysis dataset (ADSL or ADDL) whose name is one of the basic-data-structure\
+  \ numeric analysis-category variables AVALCAyN or BASECAyN (introduced in ADaMIG\
+  \ 1.1), which are prohibited at subject and device level."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -14,25 +14,21 @@ Scope:
     - "DEVICE LEVEL ANALYSIS DATASET"
 Check:
   expression: >-
-    var_exists("AVALCAyN") or var_exists("BASECAyN")
+    varname() =~ /^AVALCA([1-9]|[1-9][0-9])N$/ or varname() =~ /^BASECA([1-9]|[1-9][0-9])N$/
 Outcome:
-  Message: "A variable that is prohibited in the subject-level analysis dataset is\
-    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
-    \ variables AVALCAyN and BASECAyN."
+  Message: "The variable is prohibited in the subject-level analysis dataset: its\
+    \ name is one of the basic-data-structure numeric analysis-category variables\
+    \ AVALCAyN and BASECAyN."
   Output_Variables:
-  - "AVALCAyN"
-  - "BASECAyN"
-wildcards:
-  "y":
-    min: 1
-    max: 99
+  - "variable_name"
 Source_Proposed:
-  Message: "A variable that is prohibited in the subject-level analysis dataset is\
-    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
-    \ variables AVALCAyN and BASECAyN."
-  Description: "A subject-level or device-level analysis dataset (ADSL or ADDL) contains\
-    \ the basic-data-structure numeric-code analysis variables AVALCAyN or BASECAyN\
-    \ (introduced in ADaMIG 1.1), which are prohibited at subject and device level."
+  Message: "The variable is prohibited in the subject-level analysis dataset: its\
+    \ name is one of the basic-data-structure numeric analysis-category variables\
+    \ AVALCAyN and BASECAyN."
+  Description: "Raise an error for each variable in a subject-level or device-level\
+    \ analysis dataset (ADSL or ADDL) whose name is one of the basic-data-structure\
+    \ numeric analysis-category variables AVALCAyN or BASECAyN (introduced in ADaMIG\
+    \ 1.1), which are prohibited at subject and device level."
   Domains: "SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET"
   Severity: "Error"
 Source:

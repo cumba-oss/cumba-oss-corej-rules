@@ -97,9 +97,9 @@ import org.junit.jupiter.api.TestFactory;
  * <p>
  * ⚠ The rules are mutated in place and restored in a {@code finally}: {@code WildcardExpander
  * .expandScope} returns the <em>template's own</em> {@link Scope} object when the rule declares no
- * {@code Requirements.Variables}, and {@code RuleGenerator} may pass a non-template rule through by
- * reference, so an un-restored {@code setScope} would leak into {@code rulesByCoreId} — which every
- * other ADaM suite in this JVM shares.
+ * {@code Requirements.Variables}, and {@code DatasetRuleResolver} may pass a non-template rule
+ * through by reference, so an un-restored {@code setScope} would leak into {@code rulesByCoreId} —
+ * which every other ADaM suite in this JVM shares.
  * </p>
  */
 class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
@@ -332,6 +332,14 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
                 {
                     RuleExecutionResult result = executeWithScope(c, preMigrationScope(c.rule()),
                             getLibraryMock());
+                    // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so
+                    // hasViolations()
+                    // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+                    // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same
+                    // discipline as
+                    // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+                    assertFalse(result.isError(),
+                            "ERRORED rather than firing: " + result.getStatusMessage());
                     assertTrue(result.hasViolations(),
                             c.ruleId() + " does not fire on its own invalid fixture even with the "
                                     + "pre-migration Scope.Classes — arms 2 and 3 would be vacuous "
@@ -356,6 +364,14 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
                     assertFalse(result.isSkipped(),
                             c.ruleId() + " SKIPPED with the structure declared as '"
                                     + c.suite().structure() + "': " + result.getStatusMessage());
+                    // ⚠ An ERROR carries RuleRunner's "__error__" sentinel Violation, so
+                    // hasViolations()
+                    // is TRUE for a rule that errored and the assertion below would pass VACUOUSLY.
+                    // Reachable since PLAN-column-type-conformance's ColumnTypeGate. Same
+                    // discipline as
+                    // ScenarioDeclaredScopeProviderTest, which already guarded this way.
+                    assertFalse(result.isError(),
+                            "ERRORED rather than firing: " + result.getStatusMessage());
                     assertTrue(result.hasViolations(), c.ruleId()
                             + " does not fire on Scope.Data_Structures, even with the structure "
                             + "declared");

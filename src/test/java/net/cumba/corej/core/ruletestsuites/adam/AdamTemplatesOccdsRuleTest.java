@@ -8,7 +8,8 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 /**
- * Phase 5: Template rule tests expanded via RuleGenerator for OCCDS (Occurrence Data Structure).
+ * Phase 5: Template rule tests expanded via DatasetRuleResolver for OCCDS (Occurrence Data
+ * Structure).
  * <p>
  * Expands template rules (those whose Check tree carries wildcard variables) against the real ADAE
  * test dataset. Template rules contain wildcard variable names like {@code *FL}, {@code *DT}, etc.

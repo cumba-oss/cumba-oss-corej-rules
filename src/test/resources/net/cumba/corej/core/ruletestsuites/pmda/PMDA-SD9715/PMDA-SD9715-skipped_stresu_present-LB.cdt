@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD9715 expect=skipped domain=LB
+#note "The LBSTRESU column exists and is blank on row 1. Since the D-6 hoist (2026-09-12) the discriminator is Requirements.Variables.None [--STRESU], so the sister reports an auditable SKIPPED instead of running to silence - a skip is better than a silenced run, and no finding changes: PMDA-SD0029 reports row 1 with its location. Keeps the pair from double-reporting."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+col LBSTRESU type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 7.2 |
+S1 | LB | 001 | 2 | ALB  | 40  | g/L

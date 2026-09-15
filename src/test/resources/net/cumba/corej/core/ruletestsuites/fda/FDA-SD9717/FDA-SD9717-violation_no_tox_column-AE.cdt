@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9717 expect=violation domain=AE
+#note "The sister half of the FDA-SD1037 pair (minted 2026-09-11, M13/T1-24). AETOX is not present in the dataset while grades 3 and 2 are reported. Sensitivity is Dataset, so the absence is reported ONCE although both graded rows qualify. The trigger is the regex /[1-9]/ alone: --TOXGR > 0 is a subset of it (any positive number's string carries a digit 1-9), and the regex additionally catches text grades like GRADE 3 that > 0 silently misses, --TOXGR being Char with no codelist."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AETOXGR type=Char label="Standard Toxicity Grade"
+---
+S1 | AE | 001 | 1 | HEADACHE | 3
+S1 | AE | 002 | 1 | NAUSEA   | 2

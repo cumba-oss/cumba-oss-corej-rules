@@ -3,8 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when --ENRTPT (End Relative to Reference Time Point)\
-  \ is populated but --ENTPT (End Reference Time Point) is not present or is empty."
-Executability: "Fully Executable"
+  \ is populated but --ENTPT (End Reference Time Point) is empty."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -13,6 +13,7 @@ Requirements:
   Variables:
     All:
     - "--ENRTPT"
+    - "--ENTPT"
 Check:
   expression: >-
     not empty(--ENRTPT) and empty(--ENTPT)

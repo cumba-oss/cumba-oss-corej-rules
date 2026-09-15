@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0086 expect=violation domain=CE
+#note "Both gate columns present (Requirements.Variables.All [--PRESP, --OCCUR] satisfied): row 1 has CEPRESP=Y with CESTAT and CEOCCUR empty -> fires. Row 2: CEOCCUR populated -> clean. Row 3: CEPRESP not Y -> clean. CE is EVENTS and outside the rule's AE/DS/DV/EX domain exclusions."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 CEPRESP=Y
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CESEQ    type=Num  label="Sequence Number"
+col CETERM   type=Char label="Reported Term for the Clinical Event"
+col CEPRESP  type=Char label="Clinical Event Pre-Specified"
+col CEOCCUR  type=Char label="Clinical Event Occurrence"
+col CESTAT   type=Char label="Completion Status"
+---
+S1 | CE | 001 | 1 | FEVER    | Y |   |
+S1 | CE | 001 | 2 | HEADACHE | Y | N |
+S1 | CE | 001 | 3 | RASH     |   |   |

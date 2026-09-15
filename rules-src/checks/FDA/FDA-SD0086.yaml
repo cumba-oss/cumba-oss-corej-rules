@@ -2,9 +2,9 @@ Core:
   Id: "FDA-SD0086"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when the combination of STUDYID, USUBJID, IDVAR, IDVARVAL,\
-  \ and QNAM is not unique for a SUPPQUAL parent record (QNAM must be unique for each\
-  \ parent record)."
+Description: "Raise an error when the combination of STUDYID, USUBJID, and QNAM is\
+  \ not unique for a DM-related SUPPQUAL record (RDOMAIN = 'DM'; QNAM must be unique\
+  \ for each parent subject record)."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -17,14 +17,12 @@ Requirements:
     - "RDOMAIN"
 Check:
   expression: >-
-    RDOMAIN == "DM" and not is_unique_set([USUBJID, RDOMAIN, QNAM]) or RDOMAIN != "DM" and not
-    is_unique_set([USUBJID, RDOMAIN, IDVAR, IDVARVAL, QNAM])
+    RDOMAIN == "DM" and not is_unique_set([USUBJID, RDOMAIN, QNAM])
 Outcome:
-  Message: "Duplicate SUPPQUAL records found for the same parent record and QNAM."
+  Message: "Duplicate SUPPQUAL records found for the same DM parent subject record\
+    \ and QNAM."
   Output_Variables:
   - "RDOMAIN"
-  - "IDVAR"
-  - "IDVARVAL"
   - "QNAM"
 Source:
   FDA_Validator_Rule_Message: "SUPPQUAL duplicate records"

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD9720 expect=violation domain=AE
+#note "The merged M11 sister (one sister per (target variable, package)), PMDA-SD0022 branch: none of AESTDTC/AESTRF/AESTRTPT is present (None satisfied), the exemption columns AEOCCUR/AESTAT are absent (R-5.22: --OCCUR != 'N' fires on a missing value; empty(--STAT) true), and AEENDTC exists but is BLANK, pinning that the PMDA-SD0031 branch of the union trigger contributes nothing here. Sensitivity is Dataset: reported ONCE although both rows qualify. Same dataset shape as the parent's skipped_no_start_columns scenario."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE |
+S1 | AE | 001 | 2 | NAUSEA   |

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0086 expect=noViolation domain=CE
+#note "Row 1: CEPRESP=Y with CEOCCUR populated -> clean. Row 2: CEPRESP=Y with CESTAT=NOT DONE (the exemption the sheet writes into its own Condition) -> clean."
+#library standard=sdtmig version=3-4
+dataset CE class=EVENTS label="Clinical Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CESEQ    type=Num  label="Sequence Number"
+col CETERM   type=Char label="Reported Term for the Clinical Event"
+col CEPRESP  type=Char label="Clinical Event Pre-Specified"
+col CEOCCUR  type=Char label="Clinical Event Occurrence"
+col CESTAT   type=Char label="Completion Status"
+---
+S1 | CE | 001 | 1 | FEVER    | Y | Y |
+S1 | CE | 001 | 2 | HEADACHE | Y |   | NOT DONE

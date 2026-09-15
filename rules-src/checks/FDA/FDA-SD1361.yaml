@@ -2,20 +2,23 @@ Core:
   Id: "FDA-SD1361"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when exactly one of Planned Arm Code (ARMCD) and Description\
-  \ of Planned Arm (ARM) is populated while the other is empty; both must be populated\
-  \ together."
+Description: "Raise an error when Description of Planned Arm (ARM) is populated but\
+  \ Planned Arm Code (ARMCD) is empty; both must be populated together."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ARM"
 Check:
   expression: >-
-    empty(ARMCD) and not empty(ARM) or not empty(ARMCD) and empty(ARM)
+    empty(ARMCD) and not empty(ARM)
 Outcome:
-  Message: "ARM is populated but ARMCD is empty, or ARMCD is populated but ARM is\
-    \ empty."
+  Message: "ARM is populated but ARMCD is empty."
   Output_Variables:
   - "ARMCD"
   - "ARM"

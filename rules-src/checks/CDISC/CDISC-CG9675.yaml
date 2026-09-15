@@ -1,0 +1,44 @@
+Core:
+  Id: "CDISC-CG9675"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Related Domain Abbreviation (RDOMAIN) is not present\
+  \ in the dataset although a record populates Identifying Variable (IDVAR) or Identifying\
+  \ Variable Value (IDVARVAL)."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Requirements:
+  Variables:
+    None:
+    - "RDOMAIN"
+    Any:
+    - "IDVAR"
+    - "IDVARVAL"
+Check:
+  expression: >-
+    not empty(IDVAR) or not empty(IDVARVAL)
+Outcome:
+  Message: "RDOMAIN is not present in the dataset although IDVAR or IDVARVAL is populated."
+  Output_Variables:
+  - "IDVAR"
+  - "IDVARVAL"
+Source_Proposed:
+  Sheet_Issue: "#205"
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "RDOMAIN"
+  Condition: "IDVAR ^= null or IDVARVAL ^= null"
+  Rule: "RDOMAIN variable is present in the dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

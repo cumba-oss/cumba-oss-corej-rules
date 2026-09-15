@@ -1,10 +1,9 @@
 #!RuleTest
 #test PMDA-AD0274 expect=violation domain=ADAE
-#note "Paired-population shape on the DOSEAEON / DOSAEONU pair: exactly one of the two populated is non-conformant. No structure= is needed - the Scope is Domains.Include [ALL] plus Requirements.Variables, so the gate is the presence of the pair, not an ADaM data structure. Row 1 has the dose without its unit and row 2 the unit without the dose, so both fire; row 3 carries the pair and row 4 carries neither. Record granularity -> 2 violations."
+#note "Since the R-5.25 split this rule owns ONLY the dose-without-unit half: row 1 (DOSEAEON with no DOSAEONU) fires. Row 2 (the unit without the dose) is the SIBLING PMDA-AD0274-A's state and must NOT fire here - the discriminator of the split. Row 3 carries the pair and row 4 carries neither. Record granularity -> 1 violation."
 #library standard=adamig version=1-0
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-701-1015 DOSEAEON=50
-#expectViolationAt row=2 USUBJID=01-701-1023 DOSAEONU=mg
 dataset ADAE
 col STUDYID  type=Char
 col USUBJID  type=Char

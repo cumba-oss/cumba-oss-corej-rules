@@ -3,10 +3,9 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when a Toxicity Grade (--TOXGR) variable is populated\
-  \ and greater than 0 but the corresponding Toxicity (--TOX) variable is empty or\
-  \ not present."
+  \ and greater than 0 but the corresponding Toxicity (--TOX) variable is empty."
 Severity: "Warning"
-Executability: "Partially Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -24,9 +23,16 @@ Requirements:
   Variables:
     All:
     - "--TOXGR"
+    - "--TOX"
 Check:
-  expression: >-
-    not empty(--TOXGR) and --TOXGR > 0 and empty(--TOX)
+  WARNING:
+    expression: >-
+      num(--TOXGR) > 0 and empty(--TOX)
+  INFO:
+    expression: >-
+      --TOXGR =~ /[1-9]/ and empty(--TOX)
+    Message: "--TOX is empty and --TOXGR appears to record a non-zero grade as text (a\
+      \ digit 1-9 in a value the numeric comparison cannot read)."
 Outcome:
   Message: "--TOX is empty when --TOXGR is populated and greater than 0."
   Output_Variables:

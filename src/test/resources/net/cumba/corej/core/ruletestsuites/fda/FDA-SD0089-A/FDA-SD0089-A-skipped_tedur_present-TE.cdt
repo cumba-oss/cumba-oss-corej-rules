@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0089-A expect=skipped domain=TE
+#note "DISCRIMINATOR (R-5.26): both columns are present, so Requirements.Variables.None [TEDUR] is unmet and this sibling SKIPS even though row 2 leaves both blank - that record is the parent FDA-SD0089's finding, not this sibling's. The four states are disjoint: no dataset is reported by two members of the family."
+#library standard=sdtmig version=3-4
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+col TEENRL  type=Char label="Rule for End of Element"
+col TEDUR   type=Char label="Planned Duration of Element"
+---
+CDISCPILOT01 | TE | SCRN | Screening | Informed consent | End of screening | P14D
+CDISCPILOT01 | TE | TRT | Treatment | First dose |  |

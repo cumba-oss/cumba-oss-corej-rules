@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0061 expect=skipped domain=PC
+#note "THE R-4.11 HOIST PIN (top-level-or board wave 2, group J): the pre-split in-Check var_exists guard is hoisted to Requirements.Variables.All [own variable], so with no PCEVLINT column this half SKIPs, naming the variable, instead of executing silently. DISCRIMINATOR: PCELTM deliberately carries the malformed value 'P1W2D' - that is CDISC-SEND-0061-A's state, reported there and never here. If this EXECUTES, the hoisted gate has been removed - escalate, do not rewrite."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCELTM type=Char label="Duration Variable"
+---
+S1 | PC | 001 | 1 | DRUGX | P1W2D
+S1 | PC | 001 | 2 | DRUGX | P2W

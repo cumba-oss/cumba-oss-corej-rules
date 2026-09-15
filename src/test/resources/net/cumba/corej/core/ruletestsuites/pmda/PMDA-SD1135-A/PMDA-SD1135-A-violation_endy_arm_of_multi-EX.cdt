@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD1135-A expect=violation domain=EX
+#note "Per-row multiplicity, the --ENDY arm (twin fixture of the parent's invalid_multi): rows 2 and 3 carry a negative EXENDY -> two findings here. Row 1 (negative EXSTDY only) is the parent's state; row 3 is reported by BOTH rules at the same row - deliberately: a negative start AND a negative end are two sponsor errors, so this is two findings for two defects, not one defect reported twice (no keep-case 1)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 EXENDY=-2
+#expectViolationAt row=3 EXENDY=-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDY  type=Num  label="Study Day of Start of Treatment"
+col EXENDY  type=Num  label="Study Day of End of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | -1 | 5
+S1 | EX | 001 | 2 | DRUG A | 2  | -2
+S1 | EX | 001 | 3 | DRUG A | -4 | -4

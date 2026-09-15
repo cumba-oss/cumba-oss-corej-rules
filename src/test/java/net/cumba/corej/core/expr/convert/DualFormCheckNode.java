@@ -141,6 +141,69 @@ public final class DualFormCheckNode
     }
 
 
+    /**
+     * The expression with every {@code num(...)} conversion erased: {@code num(X)} is a numeric
+     * READ of column {@code X} ({@code PLAN-column-type-conformance} R3/R10), and the legacy
+     * operator-leaf vocabulary these instruments key on has no conversion spelling — the
+     * pre-migration corpus authored the very same comparison bare. For a scan that classifies
+     * presence guards, guard positions or column reads the conversion is therefore transparent, and
+     * stripping it restores exactly the operator-leaf surface the corpus carried before the Phase 6
+     * migration authored {@code num()} in.
+     *
+     * <p>
+     * ⚠ Deliberately NOT wired into {@link #lowerOrNull} / {@link #lowerConditionOrNull}
+     * themselves: the equivalence and census instruments mirror {@code scripts/lib/check_expr.py}'s
+     * {@code dual_form_check}, and a Java-only strip inside the shared lowering would make the Java
+     * and Python fingerprint halves bucket differently — the exact defect
+     * {@code RuleEquivalenceDriftTest}'s diagnosis note warns regeneration would hide. Callers that
+     * only AUDIT (GuardPositionAudit, IntentAbsenceOptOut, SilencingGuardScan) retry their lowering
+     * through this strip; callers that FINGERPRINT do not.
+     * </p>
+     *
+     * @param e
+     *            the raised expression
+     * @return the expression with {@code num(X)} rewritten to {@code X}, recursively
+     */
+    public static Expr stripNumConversions(Expr e)
+    {
+        return switch (e)
+        {
+        case Expr.Call c when "num".equals(c.name()) && c.kwargs().isEmpty()
+                && c.args().size() == 1 -> stripNumConversions(c.args().get(0));
+        case Expr.Call c -> new Expr.Call(c.name(),
+                c.args().stream().map(DualFormCheckNode::stripNumConversions).toList(),
+                stripKwargs(c.kwargs()));
+        case Expr.And a -> new Expr.And(
+                a.parts().stream().map(DualFormCheckNode::stripNumConversions).toList());
+        case Expr.Or o -> new Expr.Or(
+                o.parts().stream().map(DualFormCheckNode::stripNumConversions).toList());
+        case Expr.Not n -> new Expr.Not(stripNumConversions(n.inner()));
+        case Expr.Binary b -> new Expr.Binary(b.op(), stripNumConversions(b.left()),
+                stripNumConversions(b.right()));
+        case Expr.Lit(Expr.LitKind kind, Object value) when kind == Expr.LitKind.LIST ->
+        {
+            @SuppressWarnings("unchecked")
+            List<Expr> items = (List<Expr>) value;
+            yield new Expr.Lit(Expr.LitKind.LIST,
+                    items.stream().map(DualFormCheckNode::stripNumConversions).toList());
+        }
+        default -> e;
+        };
+    }
+
+
+    private static Map<String, Expr> stripKwargs(Map<String, Expr> kwargs)
+    {
+        if (kwargs.isEmpty())
+        {
+            return kwargs;
+        }
+        java.util.LinkedHashMap<String, Expr> out = new java.util.LinkedHashMap<>();
+        kwargs.forEach((k, v) -> out.put(k, stripNumConversions(v)));
+        return out;
+    }
+
+
     /** Whether any {@code exists}-family call appears anywhere in the expression. */
     public static boolean carriesPresenceCall(Expr e)
     {

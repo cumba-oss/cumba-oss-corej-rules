@@ -2,15 +2,26 @@ Core:
   Id: "CDISC-CG0328"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when both TEENRL and TEDUR are empty or not present."
-Executability: "Fully Executable"
+Description: "Raise an error when both TEENRL and TEDUR are present in the dataset\
+  \ but neither is populated; at least one of the two must be populated for each Element."
+Executability: "Not Executable"
+ExecutabilityHint:
+  Category: "not executable"
+  Detail: "Parked as an R-5.26 duplicate of CDISC-CG0329 (owner ruling D-8, 2026-09-12):\
+    \ the two rules are byte-identical in Scope, Requirements, Check, Message and\
+    \ Output_Variables — the sheet decomposes one sentence by subject, CG0328 keyed\
+    \ on TEENRL and CG0329 on TEDUR — and both ship into cdisc-sdtmig-3-2/-3-3/-3-4,\
+    \ so a dataset with both columns present and blank reported the same finding twice.\
+    \ The row stays documented here while CDISC-CG0329 carries the executable check;\
+    \ the one-column-absent states are covered by CDISC-CG0328-A / CDISC-CG0329-A\
+    \ and the neither-present state by CDISC-CG9676."
 Scope:
   Domains:
     Include:
     - "TE"
 Requirements:
   Variables:
-    Any:
+    All:
     - "TEENRL"
     - "TEDUR"
 Check:

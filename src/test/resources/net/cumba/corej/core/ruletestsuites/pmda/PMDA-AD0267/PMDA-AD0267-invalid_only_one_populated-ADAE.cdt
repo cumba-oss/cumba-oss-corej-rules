@@ -1,9 +1,8 @@
 #!RuleTest
 #test PMDA-AD0267 expect=violation domain=ADAE
-#note "Paired-population shape: exactly one of ADURN / ADURU populated is non-conformant. No structure= is needed because the Scope is Domains.Include [ALL] plus Requirements.Variables - the rule is gated by the presence of the pair, not by an ADaM data structure. Row 1 has ADURN without ADURU and row 2 has ADURU without ADURN, so both fire; row 3 has the pair populated and row 4 has both blank, and neither arm of the disjunction holds there. Record granularity -> 2 violations."
+#note "Since the R-5.25 split this rule owns ONLY the units-without-duration half: row 2 (ADURU with no ADURN) fires. Row 1 (ADURN without ADURU) is the SIBLING PMDA-AD0267-A's state and must NOT fire here - the discriminator of the split. No structure= is needed because the Scope is Domains.Include [ALL] plus Requirements.Variables. Row 3 has the pair populated and row 4 has both blank. Record granularity -> 1 violation."
 #library standard=adamig version=1-0
-#expectViolationCount 2
-#expectViolationAt row=1 USUBJID=01-701-1015 ADURN=5
+#expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-701-1023 ADURU=DAYS
 dataset ADAE
 col STUDYID type=Char

@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9674"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Unplanned Element (SEUPDES) is not\
+  \ present in the dataset although an Element Code (ETCD) equal to 'UNPLAN' is reported."
+Sensitivity: "Dataset"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+Requirements:
+  Variables:
+    None:
+    - "SEUPDES"
+    All:
+    - "ETCD"
+Check:
+  expression: >-
+    ETCD == "UNPLAN"
+Outcome:
+  Message: "SEUPDES is not present in the dataset although ETCD is equal to 'UNPLAN'."
+  Output_Variables:
+  - "ETCD"
+Source_Proposed:
+  Sheet_Issue: "#191"
+  Class: "SPC"
+  Domain: "SE"
+  Variable: "SEUPDES"
+  Condition: "ETCD = 'UNPLAN'"
+  Rule: "SEUPDES variable is present in the dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

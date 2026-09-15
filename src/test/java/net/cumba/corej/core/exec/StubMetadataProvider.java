@@ -1,17 +1,17 @@
 /*
- * COPY. The original lives in corej-cdisc-core's test tree
- * (lib/corej-cdisc-core/src/test/java/net/cumba/corej/core/exec/StubMetadataProvider.java).
+ * COPY. The original lives in corej-core's test tree
+ * (lib/corej-core/src/test/java/net/cumba/corej/core/exec/StubMetadataProvider.java).
  *
  * Copied here on 2026-09-01 by plans/done/PLAN-corej-restructure.md section 4, which deleted this
- * module's <type>test-jar</type> dependency on corej-cdisc-core. That dependency existed so four
+ * module's <type>test-jar</type> dependency on corej-core. That dependency existed so four
  * cdisc-core test classes could be reached across the module boundary; two of them (MockTable,
  * TestMetadataFixtures) became the published corej-datatable-testkit, but neither of the remaining
  * two belongs in a DATATABLE testkit -- this one is a cdisc-core metadata SPI stub -- and there are
  * only 1 call site here, so a copy is cheaper than a second published artifact.
  *
  * ACCEPTED COST: the two copies can drift. That is tolerable for a test stub. If this class ever
- * starts carrying real behaviour, revisit -- the alternative is a corej-cdisc-core-testkit
- * alongside the datatable one.
+ * starts carrying real behaviour, revisit -- the alternative is a corej-core-testkit alongside the
+ * datatable one.
  */
 package net.cumba.corej.core.exec;
 
@@ -290,9 +290,9 @@ public final class StubMetadataProvider implements MetadataProvider
 
 
     @Override
-    public boolean isCodelistExtensible(String codelistName)
+    public java.util.Optional<Boolean> isCodelistExtensible(String codelistName)
     {
-        return codelistExtensible.getOrDefault(codelistName, Boolean.FALSE);
+        return java.util.Optional.of(codelistExtensible.getOrDefault(codelistName, Boolean.FALSE));
     }
 
 

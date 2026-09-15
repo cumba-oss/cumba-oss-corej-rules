@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0388 expect=noViolation domain=TP
+# Rule:Description: TPSTGORD is populated with a value that is not an integer.
+#note "Added 2026-09-14, the silent half of the pair. Rows 1-2 are the ordinary conformant shape; row 3 leaves TPSTGORD missing, which the Check's opening `not empty(TPSTGORD)` deliberately passes over — whether the column must be populated is somebody else's rule. ⚠ noViolation also asserts the rule EXECUTED, so if the gate ever started erroring on a Num TPSTGORD this file reds rather than passing as 'no violations'."
+#library standard=sendig-dart version=1-1
+#expectViolationCount 0
+dataset TP class="TRIAL DESIGN" label="Trial Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TPSEQ    type=Num  label="Sequence Number"
+col RSTGCD   type=Char label="Repro Stage Code"
+col TPSTGORD type=Num  label="Planned Order of Repro Stage"
+---
+S1 | TP | 1 | F0 | 1
+S1 | TP | 2 | F1 | 2
+S1 | TP | 3 | F2 | .
+---

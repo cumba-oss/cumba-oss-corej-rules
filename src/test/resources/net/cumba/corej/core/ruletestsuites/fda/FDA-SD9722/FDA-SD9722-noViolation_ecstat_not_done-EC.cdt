@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD9722 expect=noViolation domain=EC
+#note "ECDOSTXT is not in the dataset, but no row qualifies: row 1's dose-less record carries ECSTAT='NOT DONE', so the D-5 leaf ECSTAT != 'NOT DONE' is false (FDA-SD1279's own sheet spelling - the record was not done, so no dose description is owed); row 2 carries a populated ECDOSE. Pins the D-5 spelling on the sister: with a non-missing ECSTAT of 'NOT DONE' the sister stays silent exactly as the parent would."
+#library standard=sdtmig version=3-4
+dataset EC class=INTERVENTIONS label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ   type=Num  label="Sequence Number"
+col ECTRT   type=Char label="Name of Treatment"
+col ECOCCUR type=Char label="Occurrence"
+col ECDOSE  type=Num  label="Dose"
+col ECSTAT  type=Char label="Completion Status"
+---
+S1 | EC | 001 | 1 | DRUG A | Y | . | NOT DONE
+S1 | EC | 001 | 2 | DRUG A | Y | 5 |

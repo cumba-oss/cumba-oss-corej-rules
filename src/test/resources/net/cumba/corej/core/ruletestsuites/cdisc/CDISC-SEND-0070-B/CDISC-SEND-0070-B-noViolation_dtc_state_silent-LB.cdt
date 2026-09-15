@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0070-B expect=noViolation domain=LB
+#note "DISCRIMINATOR of the R-5.25 split: LBDTC carries the precision-mismatching interval - the parent CDISC-SEND-0070's state - while LBENDTC is a clean interval. This sibling owns only $interval_mismatch_endtc and must stay silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Test Short Name"
+col LBDTC    type=Char label="Date/Time of Specimen Collection"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2023-01-15/2023-01 | 2023-01-15/2023-01-20

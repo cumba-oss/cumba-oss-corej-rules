@@ -3,20 +3,24 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when ECDOSE is missing, ECOCCUR is not equal to 'N',\
-  \ ECSTAT is empty, and ECDOSTXT is empty or not present."
+  \ ECSTAT does not equal 'NOT DONE', and ECDOSTXT is empty."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
     - "EC"
+Requirements:
+  Variables:
+    All:
+    - "ECDOSTXT"
 Check:
   expression: >-
-    empty(ECDOSE) and (not var_exists("ECOCCUR") or ECOCCUR != "N") and empty(ECSTAT) and
+    empty(ECDOSE) and (not var_exists("ECOCCUR") or ECOCCUR != "N") and ECSTAT != "NOT DONE" and
     empty(ECDOSTXT)
 Outcome:
-  Message: "ECDOSTXT is empty or not present when ECDOSE is missing, ECOCCUR does\
-    \ not equal 'N' and ECSTAT is empty."
+  Message: "ECDOSTXT is empty when ECDOSE is missing, ECOCCUR does not equal 'N' and\
+    \ ECSTAT does not equal 'NOT DONE'."
   Output_Variables:
   - "ECOCCUR"
   - "ECDOSE"

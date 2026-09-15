@@ -1,10 +1,9 @@
 #!RuleTest
 #test FDA-SE2308 expect=violation domain=PC
-#note "Row 1 PCELTM empty -> fires; row 2 PCELTM populated but VISITDY and PCNOMDY both missing -> fires; row 3 PCELTM with PCNOMDY -> ok."
+#note "Since the R-5.25 split (top-level-or board wave 2, group J) this rule owns ONLY the PCELTM half: row 1 (PCELTM empty) fires. Row 2 (no day anchor: VISITDY and PCNOMDY both missing) is the split sibling FDA-SE2308-A's state and must NOT fire here - the discriminator; row 3 is complete."
 #library standard=sendig version=3-1
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 PCSEQ=1
-#expectViolationAt row=2 PCSEQ=2
 dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

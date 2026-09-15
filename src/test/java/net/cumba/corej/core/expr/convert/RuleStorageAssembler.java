@@ -375,13 +375,15 @@ public final class RuleStorageAssembler
         }
         // ⚑ PROVIDER REQUIREMENTS ARE NO LONGER MATERIALISED (owner ruling 2026-09-08).
         // Requirements.Library / .Define / .Dictionary DOCUMENT a fact the engine computes
-        // (ProviderRequirements); they never declare one. RulePackageLoader's gate R5 says so in
-        // terms: "Omitting it is always legal ... the runtime arms read the derivation
+        // (ProviderRequirements); they never declare one, and RulePackageLoader's gate R5 says so
+        // in terms: "Omitting it is always legal ... the runtime arms read the derivation
         // regardless". Materialising them was the last step that made the SHIPPED BYTES depend on
         // the engine's semantics -- the same YAML through a different engine produced a different
         // corpus, silently. They are now passed through exactly like Sensitivity: authored ships,
-        // absent stays absent. No rule authors them, so the corpus simply stops carrying them.
-        // Gate R5 still validates an AUTHORED value against the derivation.
+        // absent stays absent. rules-src authors none today (measured 2026-09-08: 0 files), so the
+        // shipped corpus simply stops carrying the 1 366 derived flag instances it used to.
+        // Gate R5 still validates an AUTHORED value against the derivation, so a rule whose
+        // declaration lies about what it does is still a load error.
         for (Map.Entry<String, JsonNode> field : check.properties())
         {
             if ("Standards".equals(field.getKey()))

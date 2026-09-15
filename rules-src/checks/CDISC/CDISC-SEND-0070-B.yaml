@@ -1,0 +1,97 @@
+Core:
+  Id: "CDISC-SEND-0070-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when an end date/time (--ENDTC) expresses an interval\
+  \ of uncertainty as its beginning and end concatenated with a solidus (/), and the\
+  \ two sides are represented with different levels of completeness (precision)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Operations:
+- id: "$interval_mismatch_endtc"
+  expression: "interval_uncertainty_precision_mismatch(--ENDTC, delimiter=\"/\")"
+Check:
+  expression: >-
+    $interval_mismatch_endtc == true
+Outcome:
+  Message: "The beginning and end of the interval of uncertainty in --ENDTC have different\
+    \ levels of completeness."
+  Output_Variables:
+  - "--ENDTC"
+Source_Proposed:
+  Sheet_Issue: "#237"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENDTC"
+  Plain_Text_Explanation: "The completeness of the representation of the date/time\
+    \ must be the same on both sides of the solidus when a concatenation of the beginning\
+    \ and end of an interval of uncertainty are used to present an interval in --ENDTC."
+  Condition: "--ENDTC includes an interval of uncertainty"
+  Rule: "Interval of uncertainty is presented by concatenating the beginning and end\
+    \ of the interval with a solidus; the level of completeness for the beginning\
+    \ and the end of the interval of uncertainty are the same"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Plain_Text_Explanation: "The completeness of the representation of the date/time\
+    \ must be the same on both sides of the solidus when a concatenation of the beginning\
+    \ and end of an interval of uncertainty are used to present an interval."
+  Condition: "Date/time includes an interval of uncertainty"
+  Rule: "Interval of uncertainty is presented by concatenating the beginning and end\
+    \ of the interval with a solidus; the level of completeness for the beginning\
+    \ and the end of the interval of uncertainty are the same"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND70"
+        Version: "1"
+      Version: "5.0"

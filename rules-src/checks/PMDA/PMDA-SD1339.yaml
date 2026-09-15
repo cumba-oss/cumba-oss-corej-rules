@@ -2,10 +2,10 @@ Core:
   Id: "PMDA-SD1339"
   Status: "Published"
   Version: "1"
-Description: "Raise a warning when EPOCH is empty or not present even though a start\
-  \ date (--STDTC) or a collection date (--DTC) is populated."
+Description: "Raise a warning when EPOCH is empty even though a start date (--STDTC)\
+  \ or a collection date (--DTC) is populated."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -26,6 +26,10 @@ Scope:
     - "DS"
     - "DT"
     - "MH"
+Requirements:
+  Variables:
+    All:
+    - "EPOCH"
 Check:
   expression: >-
     empty(EPOCH) and (var_exists("--STDTC") and not empty(--STDTC) or var_exists("--DTC") and not

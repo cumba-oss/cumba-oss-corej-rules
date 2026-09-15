@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1348 expect=skipped domain=PP
+#note "PPSTINT and PPENINT columns are absent from the dataset: since 2026-09-11 the rule gates on Requirements.Variables.All [--TEST, --STINT, --ENINT] (R-4.11b, verdict 2-1, T1-06/T1-15), so the run is an auditable SKIP naming the missing column instead of one finding per interval-test row. The absence itself is reported ONCE by the minted sister FDA-SD9725, whose violation_no_interval_columns scenario carries this same dataset shape. Before the gate, both bare empty() leaves were TRUE on every row (absent = all-missing, EC-43) and row 1 fired."
+#library standard=sdtmig version=3-4
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPTEST   type=Char label="Parameter Name"
+---
+S1 | PP | 001 | 1 | AUCINT | AUC from T1 to T2
+S1 | PP | 001 | 2 | CMAX   | Maximum Concentration

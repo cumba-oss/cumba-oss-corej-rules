@@ -5,7 +5,7 @@ Core:
 Description: "Raise a warning when Subcategory (--SCAT) is populated but Category\
   \ (--CAT) is not populated."
 Severity: "Warning"
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Classes:
     Include:
@@ -13,6 +13,11 @@ Scope:
     - "FINDINGS"
     - "EVENTS"
     - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    All:
+    - "--SCAT"
+    - "--CAT"
 Check:
   expression: >-
     not empty(--SCAT) and empty(--CAT)

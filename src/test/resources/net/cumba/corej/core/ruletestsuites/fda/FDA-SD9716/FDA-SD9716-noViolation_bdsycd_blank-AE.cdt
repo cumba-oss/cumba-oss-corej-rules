@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD9716 expect=noViolation domain=AE
+#note "AEBODSYS is absent (None satisfied) and the AEBDSYCD column exists (All satisfied), so the sister RUNS - but no row populates AEBDSYCD, so the parent's remaining condition not empty(--BDSYCD) holds nowhere and the sister stays silent. R-4.11c containment: the parent would not fire on this dataset either."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+---
+S1 | AE | 001 | 1 | HEADACHE |

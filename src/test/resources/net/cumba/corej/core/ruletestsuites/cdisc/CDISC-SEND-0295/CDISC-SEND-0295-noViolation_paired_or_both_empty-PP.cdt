@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0295 expect=noViolation domain=PP
+#note "Both assessment-interval variables populated together (row 1) or both empty (row 2) -> the rule executes without firing."
+#library standard=sendig version=3-1-1
+dataset PP class=FINDINGS label="Pharmacokinetic Parameters"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PPSEQ    type=Num
+col PPTESTCD type=Char
+col PPSTINT  type=Char
+col PPENINT  type=Char
+---
+S1 | PP | 001 | 1 | AUCALL | P0H |  P24H
+S1 | PP | 002 | 1 | CMAX   |     |

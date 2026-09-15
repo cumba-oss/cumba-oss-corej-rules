@@ -21,7 +21,7 @@ import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.exec.StubMetadataProvider;
 import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.corej.core.metadata.AdamSubclassDetector;
-import net.cumba.corej.core.metadata.pickle.PickleMetadataProviderFactory;
+import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.datatable.IDataTable;
 import org.jspecify.annotations.Nullable;
@@ -225,9 +225,9 @@ public final class SpecRunner
 
         DatasetResolver resolver = inventoryResolver(tables);
         MetadataProvider mock = MockLibraryProvider.of(spec.libraryMocks(), spec.config());
-        MetadataProvider pickle = pickleProviderFor(spec.config());
-        MetadataProvider library = pickle == null ? mock
-                : new CompositeMetadataProvider(mock, pickle);
+        MetadataProvider stored = libraryProviderFor(spec.config());
+        MetadataProvider library = stored == null ? mock
+                : new CompositeMetadataProvider(mock, stored);
 
         List<String> rowKey = spec.datasets().get(primaryDomain).rowKey();
         if (rowKey == null)
@@ -236,7 +236,7 @@ public final class SpecRunner
         }
 
         // Scope check, mirroring Python's `is_suitable_for_validation`. The Java engine's
-        // production rule-execution path (RuleGenerator) consults ScopeMatcher upstream of
+        // production rule-execution path (DatasetRuleResolver) consults ScopeMatcher upstream of
         // RuleRunner; the parity-test framework used to bypass that filter and call
         // RuleRunner directly, which made rules with `Domains.Exclude` /
         // `include_split_datasets` constraints fire in tests on datasets that wouldn't be
@@ -247,7 +247,7 @@ public final class SpecRunner
         // Split detection is data-driven (mirrors Python SDTMDatasetMetadata.is_split): pass the
         // primary dataset's canonical base name, read from its DOMAIN/RDOMAIN columns, so a
         // letter-suffix split like FAAE (DOMAIN=FA) is recognised as a split of FA exactly as the
-        // production RuleGenerator path now does.
+        // production DatasetRuleResolver path now does.
         String primaryUnsplit = OperationExecutor.unsplitNameFromData(primaryTable);
         String scopeSkipReason = spec.kind() == SpecSchema.Kind.RULE
                 ? describeSpecScopeMismatch(rule, primaryDomain, primaryUnsplit, primaryTable,
@@ -346,7 +346,7 @@ public final class SpecRunner
      * scope. Mirrors Python's {@code is_suitable_for_validation} chain:
      * {@code rule_applies_to_domain} → {@code rule_applies_to_data_structure} →
      * {@code rule_applies_to_subclass}, plus the Java-only {@code Scope.Datasets} axis, which
-     * {@code RuleGenerator.describeScopeSkip} evaluates immediately after {@code Domains}.
+     * {@code DatasetRuleResolver.describeScopeSkip} evaluates immediately after {@code Domains}.
      *
      * <p>
      * <b>Fix #235 — the declared tier is now consulted, exactly as production does it.</b> This
@@ -391,7 +391,8 @@ public final class SpecRunner
             return mismatch;
         }
         // Scope.Datasets (owner requirement #5, PLAN-scope-requirements-split phase 5) —
-        // immediately after Domains, exactly where RuleGenerator.describeScopeSkip puts it, and on
+        // immediately after Domains, exactly where DatasetRuleResolver.describeScopeSkip puts it,
+        // and on
         // the MEMBER name with no split-base re-test. This mirror is "call-for-call" (Fix #235) or
         // it is not a mirror: an axis missing here is an axis this pre-gate does not judge, and a
         // spec would then pass because the gate was off for it rather than because the rule was in
@@ -426,7 +427,7 @@ public final class SpecRunner
     }
 
 
-    /** Column names in declared order — mirrors {@code RuleGenerator.doGenerate}. */
+    /** Column names in declared order — mirrors {@code DatasetRuleResolver.doGenerate}. */
     private static List<String> scopeColumnNames(IDataTable table)
     {
         var meta = table.getMetaData();
@@ -476,15 +477,18 @@ public final class SpecRunner
 
 
     /**
-     * Builds an offline pickle-backed library provider for the spec's standard/version, or
-     * {@code null} when unavailable (no cache, unsupported standard) — callers then fall back to
-     * the mock alone. SDTM-family only for now (the ADaM pickle path is not wired in the harness).
+     * Builds an offline store-backed library provider for the spec's standard/version, or
+     * {@code null} when unavailable (no seeded store, unsupported standard) — callers then fall
+     * back to the mock alone. The store is seeded once per JVM from the pickle corpus by
+     * {@link MetadataStoreFixture} (cache plan step 8g — this harness no longer reads pickles
+     * directly). SDTM-family only, exactly as the pickle-backed provider it replaced (the ADaM path
+     * is not wired in the harness).
      */
-    // Package-private (was private) so PickleProviderGuardTest can assert the provider actually
+    // Package-private (was private) so LibraryProviderGuardTest can assert the provider actually
     // resolves: 61 specs declare no `library_mocks` and are SDTM-family, so for exactly those the
-    // pickle cache is the ONLY library provider — without it RuleRunner's library gates flip them
+    // seeded store is the ONLY library provider — without it RuleRunner's library gates flip them
     // EXECUTED → SKIPPED and every expected_status pin silently becomes invalid.
-    static @Nullable MetadataProvider pickleProviderFor(SpecSchema.SpecConfig aConfig)
+    static @Nullable MetadataProvider libraryProviderFor(SpecSchema.SpecConfig aConfig)
     {
         if (aConfig == null || aConfig.standard() == null || aConfig.standardVersion() == null)
         {
@@ -495,33 +499,17 @@ public final class SpecRunner
         {
             return null;
         }
-        Path cacheDir = pickleCacheDir();
-        if (cacheDir == null)
+        StoreMetadataProviderFactory factory = MetadataStoreFixture.factory().orElse(null);
+        if (factory == null)
         {
             return null;
         }
+        // The pickle-era harness passed only the FIRST declared CT package; kept identical so no
+        // spec's codelist environment changes with the store migration.
         List<String> ctPackages = aConfig.ctPackages();
         String ctPackage = ctPackages != null && !ctPackages.isEmpty() ? ctPackages.get(0) : null;
-        return PickleMetadataProviderFactory.open(cacheDir)
-                .forSdtm(aConfig.standard(), aConfig.standardVersion(), ctPackage).orElse(null);
-    }
-
-
-    /**
-     * The pickle cache directory — see {@link PickleCacheLocator}: an explicit
-     * {@code cdisc.pickle.cache.dir} / {@code CDISC_PICKLE_CACHE_DIR} wins, otherwise the first
-     * default directory that exists.
-     *
-     * <p>
-     * ⚠ Behaviour change from the inlined resolution this replaced: a property/environment value
-     * naming something that is <b>not</b> a directory now throws instead of returning {@code null}.
-     * A typo and an absent cache used to be indistinguishable in a test log, and after the fork's
-     * removal that distinction is the difference between a broken run and a correct one.
-     * </p>
-     */
-    private static @Nullable Path pickleCacheDir()
-    {
-        return PickleCacheLocator.locate().orElse(null);
+        return factory.forSdtm(aConfig.standard(), aConfig.standardVersion(),
+                ctPackage == null ? List.<String> of() : List.of(ctPackage)).orElse(null);
     }
 
 

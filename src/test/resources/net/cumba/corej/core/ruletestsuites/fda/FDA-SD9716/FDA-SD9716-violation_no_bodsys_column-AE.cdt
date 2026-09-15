@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9716 expect=violation domain=AE
+#note "The sister half of the FDA-SD1241 pair (minted 2026-09-11, M1/T1-01). AEBODSYS is not present in the dataset while AEBDSYCD is populated on both rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify - the parent keeps per-row precision where the column exists, this rule reports its absence once instead of flooding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEBDSYCD type=Num  label="Body System or Organ Class Code"
+---
+S1 | AE | 001 | 1 | HEADACHE | 10029205
+S1 | AE | 002 | 1 | NAUSEA   | 10017947

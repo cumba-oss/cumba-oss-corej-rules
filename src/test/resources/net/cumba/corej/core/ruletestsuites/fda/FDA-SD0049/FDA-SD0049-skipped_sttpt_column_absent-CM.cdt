@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0049 expect=skipped domain=CM
+#note "CMSTTPT is not present in the dataset while CMSTRTPT is populated. Requirements.Variables.All [--STRTPT, --STTPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': FDA-SD1103 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN   | BEFORE
+CDISCPILOT01 | CM | 01-701-1015 | 2 | IBUPROFEN |

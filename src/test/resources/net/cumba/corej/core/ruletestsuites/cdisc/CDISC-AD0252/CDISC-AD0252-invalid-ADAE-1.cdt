@@ -1,9 +1,9 @@
 #!RuleTest
 #test CDISC-AD0252 expect=violation domain=ADAE
 # Rule:Description: AVAL is present or AVALC is present
-#note "AVAL column present -> any(exists) true -> rule fires (violation); AVAL branch"
+#note "AVAL column present in an OCCDS dataset, where it is prohibited. Per-variable membership Check (D-15 rewrite, 2026-09-12): varname() in [AVAL, AVALC] -> one finding pinned by variable_name=AVAL."
 #expectViolationCount 1
-#expectViolationAt AVAL=12.5
+#expectViolationAt variable_name=AVAL
 # Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
 # #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
 #define standard=adamig version=1-3

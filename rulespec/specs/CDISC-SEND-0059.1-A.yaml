@@ -1,0 +1,35 @@
+name: CDISC-SEND-0059.1-A
+kind: rule
+description: |
+  The --ELTM half of SEND59.1, minted as the R-5.25 split sibling CDISC-SEND-0059.1-A
+  (top-level-or board wave 2, 2026-09-12). Same dataset shape as the parent's spec, so the
+  two specs pin the discriminator together: a malformed PCELTM fires HERE and never on the
+  parent, and the parent's malformed-PCEVLINT row stays silent here. Gated
+  Requirements.Variables.All [--ELTM] (the hoisted pre-split guard); PCELTM is present, so
+  the rule executes. Row 1: PCELTM "-P1D" is valid under negative: true (the EC-22 signed
+  grammar). Row 2: PCELTM malformed -> fires, output_variables PCELTM alone. Row 2's
+  PCEVLINT is malformed too - the PARENT's finding at the same row, deliberately: two
+  malformed durations are two defects (no keep-case 1).
+python_source: rules-sendig-3-1-1.json (CDISC-SEND-0059.1-A, minted 2026-09-12)
+rule:
+  coreId: CDISC-SEND-0059.1-A
+datasets:
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCEVLINT: 'P1D', PCELTM: '-P1D', PCDUR: 'P2D'}
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '002', PCSEQ: 2, PCEVLINT: 'not-a-dur', PCELTM: 'not-a-dur', PCDUR: 'P2D'}
+config:
+  standard: sendig
+  standard_version: '3.1.1'
+library_mocks:
+  classes:
+    findings: [PC]
+expected_violations:
+  - rule_id: CDISC-SEND-0059.1-A
+    dataset: PC
+    row_key: {STUDYID: S1, USUBJID: '002', PCSEQ: 2}
+    status: SUCCESS
+    output_variables:
+      PCELTM: not-a-dur
+expected_errors: []

@@ -1,0 +1,93 @@
+Core:
+  Id: "CDISC-SEND-0061-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the duration variable --DUR mixes a week (W) component\
+  \ with any other ISO 8601 date/time component (Y, M, D, H, or S)."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--DUR"
+Check:
+  expression: >-
+    not empty(--DUR) and --DUR =~ /.*[0-9]W/ and --DUR =~ /.*[0-9][DHMSY]/
+Outcome:
+  Message: "--DUR mixes a week (W) component with another date/time component, which\
+    \ is not permitted in an ISO 8601 duration."
+  Output_Variables:
+  - "--DUR"
+Source_Proposed:
+  Sheet_Issue: "#235"
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--DUR"
+  Plain_Text_Explanation: "Weeks cannot be mixed with any other date/time components\
+    \ such as days or months in --DUR duration expressions."
+  Rule: "Weeks cannot be mixed with any other date/time components such as days or\
+    \ months in --DUR duration expressions."
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--EVLINT, --ELTM, --DUR"
+  Plain_Text_Explanation: "Weeks cannot be mixed with any other date/time components\
+    \ such as days or months in duration expressions."
+  Rule: "Weeks cannot be mixed with any other date/time components such as days or\
+    \ months in duration expressions."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND61"
+        Version: "1"
+      Version: "5.0"

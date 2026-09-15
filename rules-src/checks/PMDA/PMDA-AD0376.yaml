@@ -3,8 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when a primary analysis variable is populated on a record\
-  \ but its corresponding secondary variable (the same root name with an N or C suffix)\
-  \ is not populated."
+  \ but its corresponding numeric secondary variable (the same root name with an N\
+  \ suffix) is not populated."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -12,14 +12,13 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    not empty(*) and var_exists(*N) and empty(*N) or not empty(*) and var_exists(*C) and empty(*C)
+    not empty(*) and var_exists(*N) and empty(*N)
 Outcome:
   Message: "A primary analysis variable is populated on a record, but its corresponding\
-    \ secondary variable is not populated."
+    \ numeric (N) secondary variable is not populated."
   Output_Variables:
   - "*"
   - "*N"
-  - "*C"
 wildcardExclude:
 - "*DTC"
 - "*FN"

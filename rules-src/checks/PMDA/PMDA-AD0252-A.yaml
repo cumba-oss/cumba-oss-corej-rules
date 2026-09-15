@@ -2,9 +2,10 @@ Core:
   Id: "PMDA-AD0252-A"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when an occurrence-data-structure (OCCDS) dataset contains\
-  \ the basic-data-structure numeric-code analysis variables AVALCAyN or BASECAyN\
-  \ (introduced in ADaMIG 1.1), which are prohibited in OCCDS datasets."
+Description: "Raise an error for each variable in an occurrence-data-structure (OCCDS)\
+  \ dataset whose name is one of the basic-data-structure numeric analysis-category\
+  \ variables AVALCAyN or BASECAyN (introduced in ADaMIG 1.1), which are prohibited\
+  \ in OCCDS datasets."
 Executability: "Fully Executable"
 Scope:
   Data_Structures:
@@ -13,25 +14,21 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    var_exists("AVALCAyN") or var_exists("BASECAyN")
+    varname() =~ /^AVALCA([1-9]|[1-9][0-9])N$/ or varname() =~ /^BASECA([1-9]|[1-9][0-9])N$/
 Outcome:
-  Message: "A variable that is prohibited in occurrence-data-structure datasets is\
-    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
-    \ variables AVALCAyN and BASECAyN."
+  Message: "The variable is prohibited in occurrence-data-structure datasets: its\
+    \ name is one of the basic-data-structure numeric analysis-category variables\
+    \ AVALCAyN and BASECAyN."
   Output_Variables:
-  - "AVALCAyN"
-  - "BASECAyN"
-wildcards:
-  "y":
-    min: 1
-    max: 99
+  - "variable_name"
 Source_Proposed:
-  Message: "A variable that is prohibited in occurrence-data-structure datasets is\
-    \ present. The prohibited variables are the basic-data-structure numeric analysis-category\
-    \ variables AVALCAyN and BASECAyN."
-  Description: "An occurrence-data-structure (OCCDS) dataset contains the basic-data-structure\
-    \ numeric-code analysis variables AVALCAyN or BASECAyN (introduced in ADaMIG 1.1),\
-    \ which are prohibited in OCCDS datasets."
+  Message: "The variable is prohibited in occurrence-data-structure datasets: its\
+    \ name is one of the basic-data-structure numeric analysis-category variables\
+    \ AVALCAyN and BASECAyN."
+  Description: "Raise an error for each variable in an occurrence-data-structure (OCCDS)\
+    \ dataset whose name is one of the basic-data-structure numeric analysis-category\
+    \ variables AVALCAyN or BASECAyN (introduced in ADaMIG 1.1), which are prohibited\
+    \ in OCCDS datasets."
   Domains: "OCCURRENCE DATA STRUCTURE, MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
   Severity: "Error"
 Source:

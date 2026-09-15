@@ -1,0 +1,74 @@
+Core:
+  Id: "PMDA-SD1361-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Arm Code (ARMCD) is populated but Description\
+  \ of Planned Arm (ARM) is empty; both must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ARM"
+Check:
+  expression: >-
+    empty(ARM) and not empty(ARMCD)
+Outcome:
+  Message: "ARMCD is populated but ARM is empty."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+Source_Proposed:
+  Sheet_Issue: "#224"
+  Message: "ARMCD is populated, but ARM is null"
+  Description: "Description of Planned Arm (ARM) must be populated when Planned Arm\
+    \ Code (ARMCD) is populated."
+  Domains: "DM"
+  Severity: "Error"
+Source:
+  Message: "ARM is populated, but ARMCD is null, or vice versa"
+  Description: "Description of Planned Arm (ARM) must be populated when Planned Arm\
+    \ Code (ARMCD) is populated, and vice versa."
+  Domains: "DM"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1361"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD1361"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1361"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1361"
+        Version: "1"
+      Version: "1.6"

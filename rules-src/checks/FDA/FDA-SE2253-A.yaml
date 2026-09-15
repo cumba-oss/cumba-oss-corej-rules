@@ -1,0 +1,48 @@
+Core:
+  Id: "FDA-SE2253-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Planned Duration of Repro Stage (TTDUR) variable\
+  \ is not present in the Trial Repro Stages (TT) dataset and TTENRL is not populated;\
+  \ with no TTDUR column, TTENRL must be populated for each Repro Stage."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TT"
+Requirements:
+  Variables:
+    None:
+    - "TTDUR"
+    All:
+    - "TTENRL"
+Check:
+  expression: >-
+    empty(TTENRL)
+Outcome:
+  Message: "TTDUR is not present in the dataset and TTENRL is not populated."
+  Output_Variables:
+  - "TTENRL"
+Source_Proposed:
+  Sheet_Issue: "#215"
+  FDA_Validator_Rule_Message: "Missing values for TTENRL and TTDUR"
+  FDA_Validator_Rule_Description: "Rule for End of Repro Stage (TTENRL) should be\
+    \ populated when the Planned Duration of Repro Stage (TTDUR) variable is not present\
+    \ in the dataset."
+  Domains: "TT"
+Source:
+  FDA_Validator_Rule_Message: "Missing values for TTENRL and TTDUR"
+  FDA_Validator_Rule_Description: "At least one of Rule for End of Repro Stage (TTENRL)\
+    \ or Planned Duration of Repro Stage (TTDUR) should be populated."
+  Domains: "TT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SE2253"
+        Version: "1"
+      Version: "1.6"

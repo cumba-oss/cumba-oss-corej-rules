@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1339 expect=skipped domain=LB
+#note "EPOCH column is not present in the dataset while the collection date LBDTC is populated. Requirements.Variables.All [EPOCH] gates the rule out -> auditable skip instead of one finding per row with a populated date under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-2: in INTERVENTIONS/FINDINGS/EVENTS the absence is still reported by PMDA-SD1077; an SE dataset's absent EPOCH going unreported is the ruling's recorded consequence."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBDTC    type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 2020-06-01
+S1 | LB | 001 | 2 | ALB  |

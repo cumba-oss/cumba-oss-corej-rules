@@ -94,7 +94,7 @@ public final class RuleRunnerExample
             // the name, so a SUPP/AP letter-suffix split such as SUPPLBHM resolves to SUPPLBH
             // (7 characters) instead of the data-derived SUPPLB (6), and a rule scoped
             // Include: ["SUPP--"] is then silently skipped for it. The engine's own path
-            // (RuleGenerator) passes OperationExecutor.unsplitNameFromData(table) to the
+            // (DatasetRuleResolver) passes OperationExecutor.unsplitNameFromData(table) to the
             // three-argument ScopeMatcher.describeDomainMismatch and does not have this gap;
             // real callers with a table in hand should do the same.
             if (!ScopeMatcher.matchesDomain(rule, domainName))

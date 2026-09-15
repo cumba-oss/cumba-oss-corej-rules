@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0250-A expect=noViolation domain=TS
+#note "THE DISCRIMINATOR OF THE SPLIT: both an AGE and an AGETXT record are present - the PARENT CDISC-SEND-0250's state. This sibling owns only the neither-present half and must stay silent here."
+#library standard=sendig version=3-1-1
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | AGE    | 8
+S1 | TS | 2 | AGETXT | 6-10

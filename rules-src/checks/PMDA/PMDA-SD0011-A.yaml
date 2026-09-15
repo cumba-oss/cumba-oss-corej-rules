@@ -1,0 +1,91 @@
+Core:
+  Id: "PMDA-SD0011-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Arm Code (ARMCD) is not 'SCRNFAIL' while\
+  \ Description of Planned Arm (ARM) equals 'Screen Failure'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+    - "TA"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+    - "ARM"
+Check:
+  expression: >-
+    ARM == "Screen Failure" and ARMCD != "SCRNFAIL"
+Outcome:
+  Message: "ARMCD is not 'SCRNFAIL' when ARM equals 'Screen Failure'."
+  Output_Variables:
+  - "ARMCD"
+  - "ARM"
+Source_Proposed:
+  Sheet_Issue: "#230"
+  Message: "ARMCD is not 'SCRNFAIL' when ARM equals 'Screen Failure'"
+  Description: "Arm Code (ARMCD) must equal 'SCRNFAIL' when Description of Arm (ARM)\
+    \ is 'Screen Failure'."
+  Domains: "DM, TA"
+  Severity: "Error"
+Source:
+  Message: "ARM is not 'Screen Failure' when ARMCD equals 'SCRNFAIL', or vice versa"
+  Description: "Description of Arm (ARM) must equal 'Screen Failure' when Arm Code\
+    \ (ARMCD) is 'SCRNFAIL', and vice versa."
+  Domains: "DM, TA"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0011"
+        Version: "1"
+      Version: "1.6"

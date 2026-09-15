@@ -1,8 +1,10 @@
 #!RuleTest
 #test PMDA-SD1073 expect=violation domain=AE
-#note "FRESH: the OTHER TWO prohibited qualifiers, AESTAT and AEREASND, and deliberately NO AEOCCUR. Predicted VIOLATION with count EXACTLY 1, not 2: the whole three-way or-tree is one dataset-level constant, so two matching disjuncts still yield a single finding. Pins disjuncts 2 and 3, which the twin leaves untested, and pins the count semantics at the same time. Count-only pin, matching the twin."
+#note "The OTHER TWO prohibited qualifiers, AESTAT and AEREASND, and deliberately NO AEOCCUR. Since the D-15 rewrite (2026-09-12) the membership Check is evaluated per variable, so two prohibited columns are TWO findings, each naming its culprit - the pre-rewrite dataset-level or-tree collapsed exactly this dataset to a single anonymous finding (count was 1). This scenario is the count-direction witness: the rewrite can only keep or RAISE the finding count, never lower it."
 #library standard=sdtmig version=3-4
-#expectViolationCount 1
+#expectViolationCount 2
+#expectViolationAt variable_name=AESTAT
+#expectViolationAt variable_name=AEREASND
 dataset AE label="Adverse Events"
 col STUDYID  type=Char
 col DOMAIN   type=Char

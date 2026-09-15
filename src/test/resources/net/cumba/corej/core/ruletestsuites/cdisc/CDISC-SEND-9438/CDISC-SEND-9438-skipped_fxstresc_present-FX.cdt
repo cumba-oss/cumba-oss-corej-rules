@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-9438 expect=skipped domain=FX
+#note "The discriminator that keeps the family from double-reporting: the FXSTRESC column EXISTS (populated, non-exempt value), so Requirements.Variables.None [FXSTRESC, FXSTAT] skips this sister with a reason naming the column, and the parent CDISC-SEND-0397 owns the case - its Any gate is satisfied by the same present column, and it reports row 1 with its location (the invalid_no_fxstat_column scenario is this exact shape)."
+#library standard=sendig-dart version=1-2
+dataset FX class=FINDINGS label="Fetal Pathology Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FXSEQ    type=Num  label="Sequence Number"
+col FXTESTCD type=Char label="Fetal Pathology Test Short Name"
+col FXSTRESC type=Char label="Character Result/Finding in Std Format"
+col FXRESCAT type=Char label="Result Category"
+---
+S1 | FX | 001 | 1 | FPEXAM | MALFORMATION |

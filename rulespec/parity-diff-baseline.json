@@ -263,6 +263,28 @@
       "notes": "Deliberate Java-only enhancement; no fork change planned (plan §10.4)."
     },
     {
+      "spec": "CDISC-AD0361",
+      "lane": "java",
+      "channels": [
+        "status",
+        "errors"
+      ],
+      "fix_ref": "PLAN-column-type-conformance rulings R3/R4/R9 (owner, 2026-09-13) - java-only-accepted 2026-09-13: coreJ's column-type gate ERRORs a numeric order comparison over a Char-declared column (ScalarSemantics' Char->Num parse fallback, which existed 'matching the Python oracle, which parses both sides', is retired). The retired vendored Python engine parsed both sides and EXECUTED to zero findings on unparseable date strings. Deliberate parity break, catalogued in parity-baseline-divergence-catalog.md (2026-09-13 entry); resolves only if the spec fixture is re-authored with Num *DT columns, at which point the bad row FIRES and expected_violations must be re-derived, not merely deleted.",
+      "description": "STATUS+ERRORS divergence, violations agree (both report nothing). The spec deliberately ships ASTDT/AENDT as Char date strings and documented that 'Java's numeric operator rejects unparseable strings' so both engines emitted zero violations. Under the column-type gate (R4/R5: the shipped type is authoritative) a Char column in a numeric order comparison is now RuleExecutionStatus.ERROR - 'column-type mismatch: ASTDT is declared Char (STRING) but an order comparison expects a numeric value'. The rule itself is correctly authored: ASTDT/AENDT are Num in every ADaMIG, so conformant data never errors; only this fixture's nonconformant Char dates do, and erroring on them is the ruled behaviour.",
+      "notes": "Kept as a live divergence rather than re-authoring the fixture: the spec exists to document the historical bare-leaf 'greater_than on date strings' quirk, and its zero-violation expectation is part of that record. An executionError-shaped re-derivation is the follow-up if the record is ever modernised."
+    },
+    {
+      "spec": "CDISC-AD0362",
+      "lane": "java",
+      "channels": [
+        "status",
+        "errors"
+      ],
+      "fix_ref": "PLAN-column-type-conformance rulings R3/R4/R9 (owner, 2026-09-13) - java-only-accepted 2026-09-13: coreJ's column-type gate ERRORs a numeric order comparison over a Char-declared column (ScalarSemantics' Char->Num parse fallback, which existed 'matching the Python oracle, which parses both sides', is retired). The retired vendored Python engine parsed both sides and EXECUTED to zero findings on unparseable date strings. Deliberate parity break, catalogued in parity-baseline-divergence-catalog.md (2026-09-13 entry); resolves only if the spec fixture is re-authored with Num *DT columns, at which point the bad row FIRES and expected_violations must be re-derived, not merely deleted.",
+      "description": "STATUS+ERRORS divergence, violations agree (both report nothing). The spec deliberately ships ASTDTM/AENDTM as Char date strings and documented that 'Java's numeric operator rejects unparseable strings' so both engines emitted zero violations. Under the column-type gate (R4/R5: the shipped type is authoritative) a Char column in a numeric order comparison is now RuleExecutionStatus.ERROR - 'column-type mismatch: ASTDTM is declared Char (STRING) but an order comparison expects a numeric value'. The rule itself is correctly authored: ASTDTM/AENDTM are Num in every ADaMIG, so conformant data never errors; only this fixture's nonconformant Char dates do, and erroring on them is the ruled behaviour.",
+      "notes": "Kept as a live divergence rather than re-authoring the fixture: the spec exists to document the historical bare-leaf 'greater_than on date strings' quirk, and its zero-violation expectation is part of that record. An executionError-shaped re-derivation is the follow-up if the record is ever modernised."
+    },
+    {
       "spec": "CDISC-AD0373",
       "lane": "python",
       "fix_ref": "Python success-record output_variables decoration — java-only-accepted (reporting-surface) 2026-08-04: Python decorates a SUCCESS (non-violation) record's output_variables; coreJ emits {} on success records. Both engines agree there is no violation, so this is reporting-only. 2026-07-22 P0 baseline decision; NOT scheduled for repair under the Java-first direction of 2026-08-03.",
@@ -864,6 +886,46 @@
       "fix_ref": "EC-37 / Fix #127 (load-time derived effective Output_Variables) — java-only-accepted (reporting-surface) 2026-08-04: Java derives the effective Output_Variables at load time and reports the derived columns alongside the row-key columns; Python consumes the authored list verbatim. Both lanes fire on exactly the same rows - the divergence is which columns decorate the finding record. NOT scheduled for repair under the Java-first direction of 2026-08-03.",
       "description": "EC43-absent-equals-blank-control: not_equal_to over a column that is PRESENT but blank on every row. BOTH lanes fire exactly the same two rows with the same row_keys and status - the only difference is the derived output_variables key: Java derives the effective Output_Variables at load time and reports TSVAL (null) alongside the row-key columns, Python consumes the authored list verbatim and omits it. Expected is Java-canonical; Python XFAILs on the missing derived TSVAL key only. This is the EC-37 class, NOT an EC-43 divergence - its sibling spec EC43-not-equal-absent passes both lanes unbaselined precisely because an ABSENT column yields no TSVAL key on either engine.",
       "notes": "Added 2026-08-03 with the EC-43 matched pair. The pair asserts that absent and present-but-blank evaluate identically; they do - the residual is the derived-output-variable difference already owned by EC-37 / Fix #127 (see the EMPTYSTR-* entries with the same fix_ref)."
+    },
+    {
+      "spec": "EC46-offset-and-masked-selection",
+      "lane": "python",
+      "channels": [
+        "violations"
+      ],
+      "fix_ref": "EC-52 java-only-accepted - EC-46's interval-based date-extreme selection is coreJ-only by the Java-first direction (2026-08-03). NOT scheduled for repair; reopened only by a decision to restore cross-lane parity as a requirement.",
+      "description": "EC-46 Defects C and D - the two families that break MIN without any right-truncated partial. C: UTC offsets were never normalised; subject 001 pairs '2012-06-15T00:00:00Z' with '2012-06-15T01:00:00+02:00', and the offset value is the EARLIER instant (23:00Z the previous day) although it sorts second. coreJ normalises before bounding and selects it; the fork keeps the Z value and fires. D: subject 002 pairs '2012---15' (month masked, hull [2012-01-15, 2012-12-15]) with '2012-01-10'; the hull opens AFTER 2012-01-10 so coreJ determines the minimum is 2012-01-10, while the fork returns '2012---15' because hyphens sort below every digit. The fork reports TWO violations coreJ does not. Expected is Java-canonical.",
+      "notes": "A masked value does NOT automatically poison a group - only a YEAR-masked one is unpositionable (see EC46-unpositionable-value-wins). A bounded mask obeys the same test as any partial and matters only when its hull reaches past the complete candidate. An earlier draft asserted a violation on subject 002 assuming any mask poisons the group; the engine disagreed and the engine was right. Subject 004 is a genuine violation on both lanes so the spec cannot pass vacuously."
+    },
+    {
+      "spec": "EC46-partial-date-max-indeterminate",
+      "lane": "python",
+      "channels": [
+        "violations"
+      ],
+      "fix_ref": "EC-52 java-only-accepted - EC-46's interval-based date-extreme selection is coreJ-only by the Java-first direction (2026-08-03). NOT scheduled for repair; reopened only by a decision to restore cross-lane parity as a requirement.",
+      "description": "EC-46 Defect A, MAX side - the unsound direction and the larger half of the exposure (22 of 35 affected rules). A partial sorts before every completion of itself, so a lexicographic max always prefers the complete date even when the partial could be later. Subject 001 {2012-06, 2012-06-15}: the partial's latest completion is 2012-06-30, so coreJ finds the max indeterminate and publishes no value; date_greater_than is POSITIVE-polarity and no-fires against the missing $-ref. The fork picks 2012-06-15 and fires. Subject 002 is the benign tie {2012-06, 2012-06-30}, where both lanes agree. Expected is Java-canonical.",
+      "notes": "Also covers EC-46's single rule change (OQ4): CORE-000717 now authors max_date instead of the GENERIC max over a date column, matching DRAFT-110006 which was already written that way. The generic operator's string fallback is not date-only - ANRIND (5 rules) and ATOXGR (4) reach it with Char category codes - so the date intent belongs in the rule. NOTE the rule YAML is SHARED corpus, so that half of EC-46 moves both lanes; only the engine change is Java-only."
+    },
+    {
+      "spec": "EC46-partial-date-min-indeterminate",
+      "lane": "python",
+      "channels": [
+        "violations"
+      ],
+      "fix_ref": "EC-52 java-only-accepted - EC-46's interval-based date-extreme selection is coreJ-only by the Java-first direction (2026-08-03). NOT scheduled for repair; reopened only by a decision to restore cross-lane parity as a requirement.",
+      "description": "EC-46 Defect A, MIN side. coreJ selects a date extreme by the determinacy rule (a value only when a COMPLETE candidate wins against every possible completion of every other candidate); the fork keeps pandas .min() over raw text, where a right-truncated partial always sorts before every completion of itself. Subject 001 {2012-06, 2012-06-01}: coreJ determines the minimum is 2012-06-01 (no completion of 2012-06 precedes it) and RFXSTDTC matches, so no violation; the fork picks '2012-06' and fires. Subjects 002/003 agree on both lanes and prove the rule still runs. Expected is Java-canonical; Python XFAILs on the one extra violation.",
+      "notes": "First parity spec in this operator family to put a PARTIAL date in an extreme-read column - before EC-46 all 10 specs reaching min_date/max_date/date_diff_days carried only complete YYYY-MM-DD. Deliberately a NEW file: 4 of those 10 already claim the violations channel, so adding partial data to one would have been absorbed silently. Retiring this entry requires the fork to gain interval semantics; it claims only `violations`, so neither MEASURED_PYTHON_REASONS nor the ExpectedErrorsTest cohort is involved."
+    },
+    {
+      "spec": "EC46-unpositionable-value-wins",
+      "lane": "python",
+      "channels": [
+        "violations"
+      ],
+      "fix_ref": "EC-52 java-only-accepted - EC-46's interval-based date-extreme selection is coreJ-only by the Java-first direction (2026-08-03). NOT scheduled for repair; reopened only by a decision to restore cross-lane parity as a requirement.",
+      "description": "EC-46 Defect E (OQ6+OQ7). A PRESENT but unpositionable value - year-masked '----06-15', unparseable 'UNKNOWN', structurally-invalid '2012-13-45' - has an UNBOUNDED hull, so no complete candidate can dominate it and coreJ publishes no value for the group. The fork orders all three lexicographically and computes a determinate-looking minimum (measured: $min_ex_exstdtc = '----06-15' for subject 001), so the two lanes fire on different rows. Expected is Java-canonical.",
+      "notes": "Subject 004 is the load-bearing CONTROL and must never be inverted: an EMPTY cell is 'no data', not 'an unknown date', so it stays SKIPPED and the minimum resolves normally. Both lanes agree there because EC-51 / Fix #141 already aligned the blank filter. If blanks ever became indeterminate too, nearly every group would be (most contain a blank date) and all 35 rules in this family would fire almost everywhere."
     },
     {
       "spec": "EC49-affix-not-equal-empty",

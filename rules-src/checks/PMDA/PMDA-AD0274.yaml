@@ -2,8 +2,8 @@ Core:
   Id: "PMDA-AD0274"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when only one of Study Drug Dose at AE Onset (DOSEAEON)\
-  \ and Study Drug Dose at AE Onset Units (DOSAEONU) is populated. If either variable\
+Description: "Raise an error when Study Drug Dose at AE Onset (DOSEAEON) is populated\
+  \ but Study Drug Dose at AE Onset Units (DOSAEONU) is empty. If either variable\
   \ is populated, both must be populated together."
 Executability: "Fully Executable"
 Scope:
@@ -17,9 +17,9 @@ Requirements:
     - "DOSAEONU"
 Check:
   expression: >-
-    not empty(DOSEAEON) and empty(DOSAEONU) or empty(DOSEAEON) and not empty(DOSAEONU)
+    not empty(DOSEAEON) and empty(DOSAEONU)
 Outcome:
-  Message: "Only one of DOSEAEON, DOSAEONU is populated"
+  Message: "DOSEAEON is populated but DOSAEONU is empty."
   Output_Variables:
   - "DOSEAEON"
   - "DOSAEONU"

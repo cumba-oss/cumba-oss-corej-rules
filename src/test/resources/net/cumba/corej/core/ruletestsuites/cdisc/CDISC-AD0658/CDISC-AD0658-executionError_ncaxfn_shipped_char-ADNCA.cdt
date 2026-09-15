@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0658 expect=executionError domain=ADNCA
+#expect-execution-error "NCAXFN is declared Char"
+#note "R7 (PLAN-column-type-conformance): NCAXFN shipped as Char is nonconformant data (ADNCA v1.0 declares it Num). The comparison NCAXFN != 1 puts a character column against a numeric literal, so per R4 the engine must ERROR instead of silently text-comparing. This fixture is the shape the pre-gate invalid scenario shipped: the gate turned that silent text compare into the error pinned here."
+dataset ADNCA
+col STUDYID type=Char
+col USUBJID type=Char
+col NCAXFN type=Char
+col PARAMCD type=Char
+col NFRLT type=Num
+col AFRLT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2 | CONC | 0 | 0.5
+---

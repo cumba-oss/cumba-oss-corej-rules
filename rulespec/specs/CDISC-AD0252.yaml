@@ -1,8 +1,9 @@
 name: CDISC-AD0252
 kind: rule
 description: |
-  Wave D2 port — T3-VMC. OCCDS/ADAE: any(AVAL exists, AVALC exists).
-  Baselined on Python lane under Finding #9 (VMC dataset projection divergence).
+  Wave D2 port — T3-VMC; D-15 varname() rewrite 2026-09-12. OCCDS/ADAE:
+  varname() in [AVAL, AVALC], one finding per prohibited variable present,
+  carried by variable_name with no row anchor.
 python_notes: |
   Known divergence (Finding #9): Python swaps the dataset for a
   VariablesMetadataDatasetBuilder projection and yields 0 violations.
@@ -27,8 +28,8 @@ library_mocks:
 expected_violations:
   - rule_id: CDISC-AD0252
     dataset: ADAE
-    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
     status: SUCCESS
     output_variables:
-      AVAL: '1'
+      variable_name: AVAL
 expected_errors: []

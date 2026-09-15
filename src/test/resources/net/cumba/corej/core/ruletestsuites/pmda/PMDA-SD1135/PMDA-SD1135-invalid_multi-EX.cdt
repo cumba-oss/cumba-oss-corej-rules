@@ -1,10 +1,9 @@
 #!RuleTest
 #test PMDA-SD1135 expect=violation domain=EX
-#note "FRESH: per-row multiplicity. Row 1 fires the EXSTDY branch, row 2 fires the EXENDY branch, row 3 has BOTH branches true but a Check is one boolean per row -> fires once. Three findings total."
+#note "Per-row multiplicity, narrowed to the --STDY half by the R-5.25 split (top-level-or board wave 2, group J): rows 1 and 3 carry a negative EXSTDY -> two findings. Row 2 (negative EXENDY only) is the split sibling PMDA-SD1135-A's state and must NOT fire here; row 3's negative EXENDY is reported by the sibling AT THE SAME ROW - two rules, two defects, no double-report of one defect (both being negative is two sponsor errors)."
 #library standard=sdtmig version=3-4
-#expectViolationCount 3
+#expectViolationCount 2
 #expectViolationAt row=1 EXSTDY=-1
-#expectViolationAt row=2 EXENDY=-2
 #expectViolationAt row=3 EXSTDY=-4
 dataset EX class=INTERVENTIONS label="Exposure"
 col STUDYID type=Char label="Study Identifier"

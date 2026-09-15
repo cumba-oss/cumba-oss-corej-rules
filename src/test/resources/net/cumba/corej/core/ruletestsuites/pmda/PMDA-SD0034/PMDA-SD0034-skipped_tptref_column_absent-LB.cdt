@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0034 expect=skipped domain=LB
+#note "No LBTPTREF column at all while LBELTM is populated. Requirements.Variables.All [--ELTM, --TPTREF] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': PMDA-SD1246 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBELTM   type=Char
+---
+S1 | LB | 001 | 1 | GLUC | PT1H
+S1 | LB | 001 | 2 | GLUC |

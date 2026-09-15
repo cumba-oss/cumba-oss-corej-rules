@@ -1,0 +1,62 @@
+Core:
+  Id: "CDISC-SEND-0359-C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Repro Phase Day timing variable --RPDY is populated\
+  \ with a value that is not an integer."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--RPDY"
+Check:
+  expression: >-
+    not empty(--RPDY) and not is_integer(--RPDY)
+Outcome:
+  Message: "A populated --RPDY value is not an integer."
+  Output_Variables:
+  - "--RPDY"
+Source_Proposed:
+  Sheet_Issue: "#232"
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "--RPDY"
+  Plain_Text_Explanation: "When populated, values for the Repro Phase Day timing variable\
+    \ --RPDY are integers."
+  Condition: "--RPDY ^= null"
+  Rule: "--RPDY = integer"
+Source:
+  Class: "INT, EVT, FND"
+  Domain: "ALL"
+  Variable: "RPPLDY, RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY, --RPENDY"
+  Plain_Text_Explanation: "When populated, values for all Repro Phase Day timing variables\
+    \ are integers."
+  Condition: "Repro Phase Day timing variables (RPPLDY, RPPLSTDY, RPPLENDY, --RPDY,\
+    \ --RPSTDY, --RPENDY) ^= null"
+  Rule: "Repro Phase Day timing variables (RPPLDY, RPPLSTDY, RPPLENDY, --RPDY, --RPSTDY,\
+    \ --RPENDY) = integer"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND359"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND359"
+        Version: "1"
+      Version: "5.0"

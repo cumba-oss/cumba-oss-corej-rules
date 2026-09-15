@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0057-B expect=violation domain=MA
+#note "R-5.25 split of SEND57.1 (top-level-or board wave 2, group J), the --PORTOT split sibling: row 2 combines a lawful (PORTOT) term with a token that is no (PORTOT) submission value -> fires, and the finding names MAPORTOT and its own codelist instead of the three-variable disjunction. Row 1 is a lawful semicolon combination and row 3 a single lawful term - both silent."
+#library standard=sendig version=3-1-1
+#library codelist-terms PORTOT WHOLE PARTIAL
+#expectViolationCount 1
+#expectViolationAt row=2 MASEQ=2
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MAPORTOT type=Char label="Finding Qualifier"
+---
+S1 | MA | 001 | 1 | GMACROS | WHOLE;PARTIAL
+S1 | MA | 001 | 2 | GMACROS | WHOLE;SOME
+S1 | MA | 001 | 3 | GMACROS | WHOLE

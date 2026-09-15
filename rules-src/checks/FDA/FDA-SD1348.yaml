@@ -4,8 +4,8 @@ Core:
   Version: "1"
 Description: "Raise an error when --TEST references a 'T1 to T2' interval but --STINT\
   \ (Planned Start of Assessment Interval) and/or --ENINT (Planned End of Assessment\
-  \ Interval) is not present or empty."
-Executability: "Partially Executable"
+  \ Interval) is empty."
+Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
@@ -14,12 +14,13 @@ Requirements:
   Variables:
     All:
     - "--TEST"
+    - "--STINT"
+    - "--ENINT"
 Check:
   expression: >-
     --TEST =~ /.+ to .+/ and (empty(--STINT) or empty(--ENINT))
 Outcome:
-  Message: "--STINT or --ENINT is not present or empty when --TEST references a 'T1\
-    \ to T2' interval."
+  Message: "--STINT or --ENINT is empty when --TEST references a 'T1 to T2' interval."
   Output_Variables:
   - "--TESTCD"
   - "--TEST"

@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-SEND-0295"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when exactly one of the assessment-interval start (--STINT)\
-  \ and end (--ENINT) variables is populated; both must be populated together or both\
-  \ be empty."
+Description: "Raise an error when the assessment-interval start (--STINT) variable\
+  \ is populated but the end (--ENINT) variable is empty; both must be populated together\
+  \ or both be empty."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -17,10 +17,10 @@ Requirements:
     - "--ENINT"
 Check:
   expression: >-
-    not empty(--STINT) and empty(--ENINT) or empty(--STINT) and not empty(--ENINT)
+    not empty(--STINT) and empty(--ENINT)
 Outcome:
-  Message: "Only one of --STINT and --ENINT is populated; both must be populated or\
-    \ both empty."
+  Message: "--STINT is populated but --ENINT is empty; both must be populated together\
+    \ or both empty."
   Output_Variables:
   - "--STINT"
   - "--ENINT"

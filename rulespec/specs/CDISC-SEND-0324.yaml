@@ -1,16 +1,16 @@
 name: CDISC-SEND-0324
 kind: rule
 description: |
-  SEND324 re-implemented as a genuine LOQ-detection rule (INFO-pass decision, 2026-07-26):
-  a PC result quantifiably outside the limit of quantitation must carry the matching
-  PCSTRESC token — PCORRES < PCLLOQ ⇒ 'BLQ'; PCORRES > PCULOQ (model-permissible, sponsor
-  -provided) ⇒ 'ALQ'. Both engines coerce the comparison numerically (Java
-  evalComparison Double-coerce, Python pd.to_numeric errors='coerce'), so a textual
-  PCORRES (e.g. a literal 'BLQ') skips — the disclosed under-reporting. Rows:
-  001 numeric below limit, token missing (fires); 002 numeric below limit, correct token
-  (no fire); 003 textual PCORRES 'BLQ' (skips, no fire); 004 above PCULOQ, token 'BLQ'
-  instead of 'ALQ' (fires via the upper branch); 005 in-range numeric (no fire);
-  006 PCLLOQ missing (comparison skips, no fire).
+  SEND324 re-implemented as a genuine LOQ-detection rule (INFO-pass decision, 2026-07-26),
+  and since the R-5.25 split (top-level-or board wave 1, 2026-09-12) this rule owns ONLY
+  the below-limit half: PCORRES < PCLLOQ with PCSTRESC not 'BLQ'. The above-PCULOQ half is
+  the split sibling CDISC-SEND-0324-A, with its own spec. Both engines coerce the
+  comparison numerically (Java evalComparison Double-coerce, Python pd.to_numeric
+  errors='coerce'), so a textual PCORRES (e.g. a literal 'BLQ') skips — the disclosed
+  under-reporting. Rows: 001 numeric below limit, token missing (fires); 002 numeric below
+  limit, correct token (no fire); 003 textual PCORRES 'BLQ' (skips, no fire); 004 above
+  PCULOQ, wrong token — the SIBLING's state, must NOT fire here (the discriminator);
+  005 in-range numeric (no fire); 006 PCLLOQ missing (comparison skips, no fire).
 python_source: rules-cdisc-sendig-3-1-1.json (CDISC-SEND-0324)
 rule:
   coreId: CDISC-SEND-0324
@@ -36,14 +36,4 @@ expected_violations:
       PCSTRESC: '2.5'
       PCORRES: '2.5'
       PCLLOQ: '5'
-      PCULOQ: '100'
-  - rule_id: CDISC-SEND-0324
-    dataset: PC
-    row_key: {STUDYID: S1, USUBJID: '004', PCSEQ: 1}
-    status: SUCCESS
-    output_variables:
-      PCSTRESC: BLQ
-      PCORRES: '250'
-      PCLLOQ: '5'
-      PCULOQ: '100'
 expected_errors: []

@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0050 expect=skipped domain=AE
+#note "No AEENTPT column at all while AEENRTPT is populated. Requirements.Variables.All [--ENRTPT, --ENTPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1': PMDA-SD1101 reports the absence itself."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col STUDYID   type=Char
+col DOMAIN    type=Char
+col USUBJID   type=Char
+col AESEQ     type=Num
+col AETERM    type=Char
+col AEENRTPT  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | ONGOING
+S1 | AE | 001 | 2 | NAUSEA   |

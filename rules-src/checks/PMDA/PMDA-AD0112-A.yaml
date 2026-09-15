@@ -1,0 +1,75 @@
+Core:
+  Id: "PMDA-AD0112-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, on a record, Analysis Relative Time unit (ARELTMU,\
+  \ character, empty when absent) is populated but Analysis Relative Time (ARELTM,\
+  \ numeric, missing when absent) is empty. If either variable is populated, both\
+  \ must be populated together."
+Executability: "Fully Executable"
+Scope:
+  Data_Structures:
+    Include:
+    - "BASIC DATA STRUCTURE"
+    - "MEDICAL DEVICE BASIC DATA STRUCTURE"
+Requirements:
+  Variables:
+    All:
+    - "ARELTM"
+    - "ARELTMU"
+Check:
+  expression: >-
+    not empty(ARELTMU) and empty(ARELTM)
+Outcome:
+  Message: "ARELTMU is populated but ARELTM is empty."
+  Output_Variables:
+  - "ARELTM"
+  - "ARELTMU"
+Source_Proposed:
+  Sheet_Issue: "#226"
+  Message: "ARELTMU is populated, but ARELTM is not populated"
+  Description: "If ARELTMU (Analysis Relative Time unit) is populated, then ARELTM\
+    \ (Analysis Relative Time) must be populated."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Source:
+  Message: "Only one of these variables is populated: ARELTM, ARELTMU"
+  Description: "If ARELTMU (Analysis Relative Time unit) or ARELTM (Analysis Relative\
+    \ Time) is populated, then both must be populated together."
+  Domains: "BDS, ADNCA, MDBDS, ADAMOTHER"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "ADaMIG"
+    Version: "1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0112"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0112"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.1"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0112"
+        Version: "1"
+      Version: "6.0"
+  - Name: "ADaMIG"
+    Version: "1.0"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "AD0112"
+        Version: "1"
+      Version: "6.0"

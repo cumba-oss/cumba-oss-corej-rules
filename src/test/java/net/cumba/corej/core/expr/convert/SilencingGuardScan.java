@@ -161,6 +161,13 @@ public final class SilencingGuardScan
             CheckConditionExpression expression)
     {
         CheckCondition condition = DualFormCheckNode.lowerConditionOrNull(expression.expr());
+        if (condition == null)
+        {
+            // Retry with num() conversions erased — a num(X) read is transparent to this
+            // instrument's classification; see DualFormCheckNode.stripNumConversions.
+            condition = DualFormCheckNode
+                    .lowerConditionOrNull(DualFormCheckNode.stripNumConversions(expression.expr()));
+        }
         if (condition != null)
         {
             return condition;

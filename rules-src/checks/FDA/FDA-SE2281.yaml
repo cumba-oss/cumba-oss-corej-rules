@@ -2,23 +2,24 @@ Core:
   Id: "FDA-SE2281"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a PC record does not have all of the required timing\
-  \ variables PCNOMDY, PCELTM and PCTPTREF present and populated."
+Description: "Raise an error when a PC record does not have the required timing variable\
+  \ PCNOMDY populated."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "PC"
+Requirements:
+  Variables:
+    All:
+    - "PCNOMDY"
 Check:
   expression: >-
-    empty(PCNOMDY) or empty(PCELTM) or empty(PCTPTREF)
+    empty(PCNOMDY)
 Outcome:
-  Message: "A required timing variable (PCNOMDY, PCELTM, or PCTPTREF) is not populated\
-    \ or not present in PC."
+  Message: "PCNOMDY, a required timing variable, is not populated in PC."
   Output_Variables:
   - "PCNOMDY"
-  - "PCELTM"
-  - "PCTPTREF"
 Source:
   FDA_Validator_Rule_Message: "Missing values for required timing variables: --NOMDY,\
     \ --ELTM, and --TPTREF"

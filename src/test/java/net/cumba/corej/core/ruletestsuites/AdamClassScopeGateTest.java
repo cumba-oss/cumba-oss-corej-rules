@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
  * Before Fix #206 the class axis was judged <em>only</em> when a {@code .cdt} fixture declared
  * {@code class=}, so an ADaM class-scoped rule on an undeclared fixture was never gated — wave 27's
  * {@code R-d}: the fixture passed because the gate was off, not because the rule was in scope.
- * Production ({@code RuleGenerator} → {@code ScopeMatcher.describeClassMismatch}) has no such hole.
- * The tests below pin both halves: the gate now fires (cases 2/4), and the three deliberate
+ * Production ({@code DatasetRuleResolver} → {@code ScopeMatcher.describeClassMismatch}) has no such
+ * hole. The tests below pin both halves: the gate now fires (cases 2/4), and the three deliberate
  * refusals still leave the pre-Fix-#206 behaviour in place (cases 5–8).
  * </p>
  */

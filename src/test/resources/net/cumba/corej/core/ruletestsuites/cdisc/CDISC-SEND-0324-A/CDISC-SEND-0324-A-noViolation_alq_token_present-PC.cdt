@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0324-A expect=noViolation domain=PC
+#note "Above-limit results carrying the correct 'ALQ' token (row 1) and in-range results (row 2) -> silent."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PCSEQ    type=Num
+col PCTESTCD type=Char
+col PCORRES  type=Char
+col PCLLOQ   type=Num
+col PCULOQ   type=Num
+col PCSTRESC type=Char
+---
+S1 | PC | 001 | 1 | DRUGX | 250 | 5 | 100 | ALQ
+S1 | PC | 002 | 1 | DRUGX | 50  | 5 | 100 | 50

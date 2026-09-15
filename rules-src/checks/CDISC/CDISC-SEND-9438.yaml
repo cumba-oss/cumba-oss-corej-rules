@@ -1,0 +1,47 @@
+Core:
+  Id: "CDISC-SEND-9438"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when neither a Character Result/Finding in Standard Format\
+  \ (FXSTRESC) nor a Completion Status (FXSTAT) variable is present in the dataset\
+  \ although a record has Result Category (FXRESCAT) empty; with no exemption column\
+  \ in the dataset, no record can be excused from populating FXRESCAT."
+Sensitivity: "Dataset"
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Include:
+    - "FX"
+Requirements:
+  Variables:
+    None:
+    - "FXSTRESC"
+    - "FXSTAT"
+    All:
+    - "FXRESCAT"
+Check:
+  expression: >-
+    empty(FXRESCAT)
+Outcome:
+  Message: "Neither FXSTRESC nor FXSTAT is present in the dataset although FXRESCAT\
+    \ is empty."
+  Output_Variables:
+  - "FXRESCAT"
+Source_Proposed:
+  Sheet_Issue: "#202"
+  Class: "FND"
+  Domain: "FX"
+  Variable: "FXRESCAT"
+  Plain_Text_Explanation: "FXRESCAT should be populated except when no abnormal findings\
+    \ were observed (FXSTRESC = \"UNREMARKABLE\") or the test was not done (FXSTAT\
+    \ = \"NOT DONE\"); when neither exemption column is present in the dataset, no\
+    \ record can qualify for an exemption"
+  Condition: "FXSTRESC and FXSTAT variables are not present in the dataset"
+  Rule: "FXRESCAT ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
