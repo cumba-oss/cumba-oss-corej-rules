@@ -396,16 +396,6 @@ public final class RuleStorageAssembler
     }
 
 
-    /** One provider flag: authored values are kept verbatim, {@code false} is left absent. */
-    private static void putProviderFlag(ObjectNode requirements, String name, boolean derivedValue)
-    {
-        if (!requirements.has(name) && derivedValue)
-        {
-            requirements.put(name, true);
-        }
-    }
-
-
     /**
      * A build gate wearing a derivation's clothes: verifies the {@code Sensitivity} a source rule
      * omits is derivable ({@code PLAN-derive-rule-type-sensitivity} phase 5;
