@@ -409,7 +409,72 @@ scenarios had to borrow `noViolation` — which asserted nothing, because a skip
 zero violations and is indistinguishable from one that ran and found nothing. That is how a
 fixture rots: tighten a rule's requirements, or trim away the column one of them needs, and the
 scenario keeps passing while exercising nothing. `violation` / `noViolation` now fail with the
-engine's own skip reason when the rule does not run.
+engine's own skip reason when the rule does not run, and with its **error message** when the rule
+errored.
+
+#### The `executionError` verdict
+
+A rule that **errors** is the same hole one step further along: it reports no real violations
+either, so before this verdict existed an error scenario had to borrow `noViolation` — and passed
+while exercising nothing, exactly as a skip scenario did. `executionError` is the positive form:
+*this rule is supposed to fail on this fixture, and here is why.*
+
+```
+#!RuleTest
+#test FDA-SD1212 expect=executionError domain=LB
+#expect-execution-error "LBSTRESN is declared Char"
+#note "LBSTRESN shipped as Char is nonconformant data (SDTMIG declares it Num), so the numeric
+       comparison --STRESN != num(--STRESC) must ERROR rather than compare a number's text"
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+col LBSTRESN type=Char
+---
+S1 | LB | 001 | 1 | ALB | 40 | 40
+---
+```
+
+(The shipped scenario is
+[`fda/FDA-SD1212/FDA-SD1212-executionError_stresn_shipped_char-LB.cdt`](fda/FDA-SD1212/FDA-SD1212-executionError_stresn_shipped_char-LB.cdt);
+its `#note` is a single line — wrapped above only to fit this page.)
+
+- **The rule must have been reached.** A rule that merely *skipped* does not satisfy the verdict —
+  the failure names the skip reason and tells you to write `expect=skipped` instead.
+- **`#expect-execution-error` is optional but strongly recommended.** Without it the scenario
+  asserts only *that* the rule failed, so an unrelated breakage — a typo in the fixture, a
+  `Match_Datasets` resolution failure, an NPE — keeps it green while the failure it was written to
+  pin has silently gone away. The payload is matched case-sensitively with `String.contains`,
+  because an error message is a sentence the engine may reword at the edges: pinning it whole makes
+  every wording improvement a corpus-wide edit, pinning nothing tells two different failures apart
+  not at all. A substring is the smallest thing that distinguishes them.
+- The directive is **rejected on any other verdict** — dead text that reads like an assertion is
+  worse than no assertion.
+- **Ruling R7** (owner, 2026-09-13): *a rule that can error needs a `.cdt` scenario proving it
+  errors.* The ruling and its column-type-conformance plan are kept in the internal monorepo and
+  are not redistributed here; the twelve `expect=executionError` scenarios in this suite are its
+  product.
+
+##### ⛔⛔ `executionError` is NOT `severity=ERROR` — the names collide, the meanings are opposite
+
+`ERROR` already occurs twice in this format and means a **check severity level** both times:
+
+| spelling | what it is |
+|---|---|
+| `#expectViolationAt severity=ERROR` | the level a violation **fired at** — the rule *ran and found something* |
+| `#runLevel ERROR` | the run's severity threshold — which levels are evaluated at all |
+| `expect=executionError` | the rule **could not run**: it was reached and it failed |
+
+The verdict is deliberately spelled with the longer `executionError` rather than `error` for this
+reason. `#expectViolationAt severity=ERROR` and `#test … expect=…` can sit two lines apart, and a
+verdict spelled `expect=error` beside them is the classic silent-disarming shape: the author writes
+the word they mean, lands on the wrong concept, and gets a green test asserting something else.
+`expect=error` is therefore **not accepted at all** — the parser rejects it and names
+`executionError` in the failure, rather than guessing which one was meant.
 
 The requirements a `skipped` scenario can be built on
 (spec `CORE-RULES-SPECIFICATION.md`, "Field: `Requirements`" — kept in the internal

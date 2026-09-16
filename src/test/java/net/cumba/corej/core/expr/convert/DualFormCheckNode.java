@@ -152,9 +152,10 @@ public final class DualFormCheckNode
      *
      * <p>
      * ⚠ Deliberately NOT wired into {@link #lowerOrNull} / {@link #lowerConditionOrNull}
-     * themselves: the equivalence and census instruments mirror {@code scripts/lib/check_expr.py}'s
-     * {@code dual_form_check}, and a Java-only strip inside the shared lowering would make the Java
-     * and Python fingerprint halves bucket differently — the exact defect
+     * themselves: the equivalence and census instruments mirror the dual-form lowering of the
+     * Python-lane corpus tooling (which is not part of this distribution), and a Java-only strip
+     * inside the shared lowering would make the Java and Python fingerprint halves bucket
+     * differently — the exact defect
      * {@code RuleEquivalenceDriftTest}'s diagnosis note warns regeneration would hide. Callers that
      * only AUDIT (GuardPositionAudit, IntentAbsenceOptOut, SilencingGuardScan) retry their lowering
      * through this strip; callers that FINGERPRINT do not.
