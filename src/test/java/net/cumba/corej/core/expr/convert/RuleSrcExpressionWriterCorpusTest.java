@@ -84,11 +84,11 @@ class RuleSrcExpressionWriterCorpusTest
      * must be accompanied by moving the pin.
      *
      * <p>
-     * ⚠ <b>Empty here, on purpose.</b> All three formerly-curated rules — CORE-000335,
-     * CORE-000539 and CORE-000540 — are CORE-family, and this repository does not redistribute
-     * that family, so none of their {@code rules-src/checks} files exists here and a pin keyed on
-     * their basenames could never fire. The three texts are pinned internally. The lookup below is
-     * kept wired so a future sync re-adds the entries rather than the mechanism.
+     * ⚠ <b>Empty here, on purpose.</b> All three formerly-curated rules — CORE-000335, CORE-000539
+     * and CORE-000540 — are CORE-family, and this repository does not redistribute that family, so
+     * none of their {@code rules-src/checks} files exists here and a pin keyed on their basenames
+     * could never fire. The three texts are pinned internally. The lookup below is kept wired so a
+     * future sync re-adds the entries rather than the mechanism.
      * </p>
      */
     private static final Map<String, String> CURATED_BY_ID = Map.of();
