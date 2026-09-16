@@ -70,8 +70,26 @@ class ScenarioFixtureCoverageRatchetTest
      * granted. <b>Re-derive it after any wave that adds scenarios</b>, the way the other ratchets
      * are re-derived; it does not maintain itself.
      * </p>
+     *
+     * <p>
+     * &#9888;&#9888; <b>683 since 2026-09-16, re-derived for THIS repository.</b> Every figure
+     * above was measured against the <i>internal</i> corpus, which ships the CORE family; this
+     * repository does not redistribute it. Carrying 761 across the extraction therefore handed the
+     * subset <b>78 rules of ceiling nobody granted</b> &mdash; the very erosion the paragraph above
+     * calls a defect, arriving in one step instead of drifting there. Measured here through the
+     * generated manifest, exactly as {@link #shippedRuleIds()} reads it: 3,396 shipped, 2,713
+     * covered, <b>683 uncovered</b>, 0 fixture-only.
+     * </p>
+     *
+     * <p>
+     * &#9888; The asymmetry that hid it: the extraction correctly <i>relaxed</i> every corpus-size
+     * <b>floor</b> for the subset (see the comment in the test body, and the sibling ratchets),
+     * because a smaller corpus can never reach the internal population. This is a <b>ceiling</b>,
+     * so the subset needed it moved in the opposite direction &mdash; <i>down</i> &mdash; and
+     * nothing in a "relax the floors" sweep prompts that.
+     * </p>
      */
-    private static final int MAX_UNCOVERED = 761;
+    private static final int MAX_UNCOVERED = 683;
 
     private static final Path SCENARIOS = Path
             .of("src/test/resources/net/cumba/corej/core/ruletestsuites");
