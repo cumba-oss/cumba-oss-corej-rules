@@ -113,7 +113,7 @@ class ReleasedRuleFieldFidelityTest
     {
         Map<String, String> authored = authoredDescriptions();
         List<String> offenders = new ArrayList<>();
-        int checked = 0;
+        // ⚠ No `checked` counter: its floor was removed on extraction — do not re-import.
 
         for (Map.Entry<String, Rule> e : shippedRules().entrySet())
         {
@@ -123,7 +123,7 @@ class ReleasedRuleFieldFidelityTest
                 offenders.add(coreId + ": shipped but has no rules-src/checks source file");
                 continue;
             }
-            checked++;
+            // ⚠ No `checked++`: the floor that read it went on extraction — do not re-import.
             String want = authored.get(coreId);
             String got = e.getValue().getDescription();
             if (want == null ? got != null : !want.equals(got))
@@ -160,7 +160,7 @@ class ReleasedRuleFieldFidelityTest
     {
         List<String> noMessage = new ArrayList<>();
         List<String> notDerived = new ArrayList<>();
-        int entries = 0;
+        // ⚠ No `entries` counter: its floor was removed on extraction — do not re-import.
         int derivedEntries = 0;
 
         for (Path pkg : shippedPackages())
@@ -172,7 +172,7 @@ class ReleasedRuleFieldFidelityTest
 
             for (Map.Entry<String, Rule> e : rules.entrySet())
             {
-                entries++;
+                // ⚠ No `entries++`: the floor that read it went on extraction.
                 String coreId = e.getKey();
                 Rule rule = e.getValue();
                 String where = pkg.getFileName() + " / " + coreId;

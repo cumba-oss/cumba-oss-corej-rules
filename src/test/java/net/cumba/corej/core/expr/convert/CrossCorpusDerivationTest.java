@@ -104,12 +104,11 @@ class CrossCorpusDerivationTest
      * </p>
      */
     private static final List<String> SENSITIVITY_OVERRIDES = List.of("CDISC-CG0001",
-            "CDISC-CG0077", "CDISC-CG0535", "CDISC-SEND-0153", "CDISC-SEND-0249.1", "CORE-000212",
-            "CORE-000365", "CORE-000929",
+            "CDISC-CG0077", "CDISC-CG0535", "CDISC-SEND-0153", "CDISC-SEND-0249.1",
             // 8 -> 12 on 2026-08-19 (wave TA-6, review H2): the SV-scoped conditional TV
             // presence mints author `Dataset` because the derivation's `Study` would trip the
             // loader's unrestricted-scope gate; see DerivedFieldEquivalenceTest.
-            "CDISC-CG9671", "CORE-009705", "FDA-SD9713", "PMDA-SD9713",
+            "CDISC-CG9671", "FDA-SD9713", "PMDA-SD9713",
             // 12 -> 15 on 2026-09-07 (R-4.11b, the --STRESU presence sisters): the finding is that
             // the --STRESU COLUMN is absent — one dataset-level fact — while the existential
             // witness is a per-record leaf, so the derivation reads `Record` and the per-record
@@ -128,7 +127,7 @@ class CrossCorpusDerivationTest
             // dataset-level fact — while every trigger leaf is per-row, so the derivation reads
             // `Record`. Kept in step with DerivedFieldEquivalenceTest, which holds the
             // rules-src half of the same list.
-            "FDA-SD9719", "PMDA-SD9719", "FDA-SD9720", "PMDA-SD9720", "FDA-SD9721", "CORE-009707",
+            "FDA-SD9719", "PMDA-SD9719", "FDA-SD9720", "PMDA-SD9720", "FDA-SD9721",
             // 25 -> 31 on 2026-09-11 (R-4.11c wave C1, the M9/M10 presence sisters): the finding
             // is that the ECDOSTXT (M9) or SEUPDES (M10) COLUMN is absent — one dataset-level
             // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
@@ -158,7 +157,13 @@ class CrossCorpusDerivationTest
             // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
             // are record-level by design and deliberately absent. Kept in step with
             // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-SEND-9439");
+            "CDISC-SEND-9439"
+    // ⚠ CORE-family ids removed on extraction (2026-09-16): this repository does not
+    // redistribute the CORE rule family, so no CORE rule reaches the shipped corpus this
+    // scan walks and the entries could never match. Internal keeps them; the override set
+    // is otherwise identical to DerivedFieldEquivalenceTest, which holds the rules-src half.
+    // Removed: CORE-000212, CORE-000365, CORE-000929, CORE-009705, CORE-009707
+    );
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}
@@ -409,13 +414,13 @@ class CrossCorpusDerivationTest
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
         List<String> offenders = new ArrayList<>();
-        int entries = 0;
+        // ⚠ No `entries` counter: its floor was removed on extraction — do not re-import.
         for (Path pkgFile : packages)
         {
             JsonNode rules = JSON.readTree(pkgFile.toFile()).get("rules");
             for (Map.Entry<String, JsonNode> e : rules.properties())
             {
-                entries++;
+                // ⚠ No `entries++`: the floor that read it went on extraction.
                 if (e.getValue().has("Rule_Type"))
                 {
                     offenders.add(pkgFile.getFileName() + " " + e.getKey() + ": Rule_Type");

@@ -82,24 +82,28 @@ class RuleSrcExpressionWriterCorpusTest
      * {@code PLAN-retire-corpus-transforms.md} phase 1 the registry is gone and this pin is the
      * deliberate replacement — an edit to one of these files that moves the text reds this run and
      * must be accompanied by moving the pin.
+     *
+     * <p>
+     * ⚠ <b>Empty here, on purpose.</b> All three formerly-curated rules — CORE-000335,
+     * CORE-000539 and CORE-000540 — are CORE-family, and this repository does not redistribute
+     * that family, so none of their {@code rules-src/checks} files exists here and a pin keyed on
+     * their basenames could never fire. The three texts are pinned internally. The lookup below is
+     * kept wired so a future sync re-adds the entries rather than the mechanism.
+     * </p>
      */
-    private static final Map<String, String> CURATED_BY_ID = Map.of("CORE-000335",
-            "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
-                    + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
-            "CORE-000539",
-            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ "
-                    + "and prefix(dataset_name, 2) not in [\"AP\", \"FA\"] "
-                    + "and prefix(dataset_name, 2) not in $list_dataset_names",
-            "CORE-000540",
-            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z]{1,2}$/ "
-                    + "and prefix(dataset_name, 2) == \"FA\" "
-                    + "and suffix(dataset_name, 2) not in $list_dataset_names");
+    private static final Map<String, String> CURATED_BY_ID = Map.of();
 
     /**
-     * The two carriers of the retired {@code does_not_equal_string_part} leaf-signature rewrite;
-     * their authored texts are pinned below as ordinary authored-text pins.
+     * The carriers of the retired {@code does_not_equal_string_part} leaf-signature rewrite; their
+     * authored texts are pinned below as ordinary authored-text pins.
+     *
+     * <p>
+     * ⚠ CORE-000538, the second carrier internally, is NOT here: this repository does not
+     * redistribute the CORE rule family, so its authored check never reaches the writer. Otherwise
+     * identical to internal.
+     * </p>
      */
-    private static final Set<String> CURATED_BY_LEAF = Set.of("CDISC-CG0334", "CORE-000538");
+    private static final Set<String> CURATED_BY_LEAF = Set.of("CDISC-CG0334");
 
     @Test
     void theWriterConvertsTheWholeAuthoredCorpusCleanly(@TempDir Path tempOut) throws IOException
