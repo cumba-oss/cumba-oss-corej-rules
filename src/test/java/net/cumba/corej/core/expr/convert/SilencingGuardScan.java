@@ -103,9 +103,9 @@ public final class SilencingGuardScan
     /**
      * The subset of {@link #PYTHON_GUARD_REQUIRED_OPERATORS} for which the carve-out is <b>not</b>
      * position-aware — Plan A D-8 (ruling 3, 2026-08-23,
-     * {@code plans/PLAN-authoring-grammar-unique-set-and-output-exclusion.md} §3.8): the engine
-     * builds ONE key tuple from every member of {@code is_(not_)unique_set} and drops an absent
-     * member uniformly wherever it sits (EC-53 / Fix #143 — the guard matrix's former
+     * {@code plans/done/PLAN-authoring-grammar-unique-set-and-output-exclusion.md} §3.8): the
+     * engine builds ONE key tuple from every member of {@code is_(not_)unique_set} and drops an
+     * absent member uniformly wherever it sits (EC-53 / Fix #143 — the guard matrix's former
      * {@code D-target} / {@code D-key} rows, "one contract since EC-53", now a single class
      * {@code D}), so a guard on the leaf's {@code name} is exactly as load-bearing as one on a
      * {@code value} member. {@code is_inconsistent_across_dataset} keeps the target/comparator

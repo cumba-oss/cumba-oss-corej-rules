@@ -233,7 +233,7 @@ class AbsentColumnExposureReportTest
      *
      * <p>
      * ⛔ A semantic re-ruling that came with {@code Requirements}
-     * ({@code plans/PLAN-scope-requirements-split.md} &#167;5 phase 5, row 9): under the old
+     * ({@code plans/done/PLAN-scope-requirements-split.md} &#167;5 phase 5, row 9): under the old
      * {@code Scope.Variables.Include} spelling "named in scope" implied "present", so the two were
      * the same set. They are not any more. {@code Any} is met when <em>one</em> entry is present,
      * so a named entry may well be absent; {@code None} guarantees the exact opposite. Feeding

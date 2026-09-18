@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Layered, canonical fingerprint of a rule — the comparison primitive behind
- * {@code plans/PLAN-rule-inventory.md}.
+ * {@code plans/done/PLAN-rule-inventory.md}.
  *
  * <p>
  * A single hash over a rule file conflates "these rules behave differently" with "these rules are
@@ -309,8 +309,8 @@ final class RuleFingerprint
      * generically, so {@code Scope.Datasets} needs no edit at all and joined L2 the day the axis
      * existed. What does need saying is that the variable requirement <em>leaves</em> {@code Scope}
      * in the migration, and without this term two rules differing only in their required variables
-     * would collapse into one equivalence class ({@code plans/PLAN-scope-requirements-split.md}
-     * phase 1 item 6).
+     * would collapse into one equivalence class
+     * ({@code plans/done/PLAN-scope-requirements-split.md} phase 1 item 6).
      * </p>
      *
      * <p>

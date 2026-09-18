@@ -40,7 +40,7 @@ import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
  * emitted twice, once through {@code applyLegacyDegradations} into the Python-facing
  * {@code rules-legacy/} corpus and once through {@link RuleExprGenerator} into {@code rules/}. That
  * branch, its five transforms and the corpus they wrote are gone with the Python parity lane
- * ({@code plans/PLAN-cut-rules-legacy.md}).
+ * ({@code plans/done/PLAN-cut-rules-legacy.md}).
  * </p>
  *
  * <p>
@@ -64,7 +64,7 @@ import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
  * directory — the build's exec binding sets it, and the {@code regen-rules-corpus} workflow
  * {@code cd}s there. The <em>output</em> directory is a parameter (see {@link #main}); it is
  * {@code target/rules/} under the build, and nothing generated is committed any more
- * ({@code plans/PLAN-rules-corpus-build-integration.md}).
+ * ({@code plans/done/PLAN-rules-corpus-build-integration.md}).
  * </p>
  */
 public final class RuleCorpusGenerator

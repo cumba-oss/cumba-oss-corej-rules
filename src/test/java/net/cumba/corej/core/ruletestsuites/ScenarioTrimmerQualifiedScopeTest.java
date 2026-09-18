@@ -112,7 +112,7 @@ class ScenarioTrimmerQualifiedScopeTest
      * ⚠ {@code Any} <b>is</b> collected — every entry of it. An {@code Any} list is unmet only when
      * EVERY entry is absent, so trimming the whole list away leaves the rule inapplicable exactly
      * as trimming an {@code All} entry would. The facet is new with {@code Requirements}
-     * ({@code plans/PLAN-scope-requirements-split.md}); nothing pinned it before.
+     * ({@code plans/done/PLAN-scope-requirements-split.md}); nothing pinned it before.
      */
     @Test
     void everyAnyEntryIsRetainedOnThePrimary()

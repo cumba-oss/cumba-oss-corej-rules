@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * ⚠ <b>One-shot corpus migration</b> — Plan B phase <b>4d′</b>
- * ({@code plans/PLAN-scope-requirements-split.md} §5, owner ruling <b>B-Q13</b>, 2026-08-24).
+ * ({@code plans/done/PLAN-scope-requirements-split.md} §5, owner ruling <b>B-Q13</b>, 2026-08-24).
  * Strips the <em>dead</em> absence-tolerant disjunct from every Check that carries it:
  *
  * <pre>

@@ -138,7 +138,7 @@ class RuleCanonicalizerTest
     /**
      * {@code Requirements} is a listed key and lands between {@code Scope} and
      * {@code Match_Datasets} — not relocated to just before {@code Source} as an unknown one
-     * ({@code plans/PLAN-scope-requirements-split.md} phase 3 item 1).
+     * ({@code plans/done/PLAN-scope-requirements-split.md} phase 3 item 1).
      *
      * <p>
      * A separate fixture rather than an edit to
@@ -206,8 +206,8 @@ class RuleCanonicalizerTest
 
     /**
      * {@code Source_Proposed} is a KNOWN top-level key and canonicalises immediately before the
-     * verbatim {@code Source} it proposes to replace ({@code plans/PLAN-source-proposed-block.md}
-     * §2.1, phase 1 item 1).
+     * verbatim {@code Source} it proposes to replace
+     * ({@code plans/done/PLAN-source-proposed-block.md} §2.1, phase 1 item 1).
      *
      * <p>
      * The input deliberately carries the block <em>after</em> {@code Standards} — the position a

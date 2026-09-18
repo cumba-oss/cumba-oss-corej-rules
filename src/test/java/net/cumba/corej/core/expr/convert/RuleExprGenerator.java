@@ -44,7 +44,7 @@ import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
  *
  * <p>
  * The output directory is no longer a constant: since
- * {@code plans/PLAN-rules-corpus-build-integration.md} the corpus is generated into
+ * {@code plans/done/PLAN-rules-corpus-build-integration.md} the corpus is generated into
  * {@code target/rules/} by the build rather than committed under the module directory, so
  * {@link RuleCorpusGenerator} passes the destination in and
  * {@link #generate(Map, RulePackageManifest, Path)} is the only entry point that writes.

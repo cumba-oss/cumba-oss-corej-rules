@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * {@code RuleCanonicalizer.TOP_ORDER} must name every top-level key the authored corpus actually
- * uses ({@code plans/PLAN-scope-requirements-split.md} phase 1 item 7, grounding {@code R-B6}).
+ * uses ({@code plans/done/PLAN-scope-requirements-split.md} phase 1 item 7, grounding
+ * {@code R-B6}).
  *
  * <p>
  * <b>Why this guard has to exist.</b> An unlisted top-level key is not rejected by the

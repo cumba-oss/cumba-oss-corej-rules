@@ -13,9 +13,9 @@ import net.cumba.corej.core.expr.ast.Expr;
 
 /**
  * ⚠ <b>One-shot corpus migration, already run</b> — Plan A Phase 2
- * ({@code plans/PLAN-authoring-grammar-unique-set-and-output-exclusion.md} §3.9(f), 2026-08-23).
- * Rewrites every {@code is_unique_set} / {@code is_not_unique_set} call site from the retired
- * privileged-first-operand spellings to the single-list form the engine accepts since
+ * ({@code plans/done/PLAN-authoring-grammar-unique-set-and-output-exclusion.md} §3.9(f),
+ * 2026-08-23). Rewrites every {@code is_unique_set} / {@code is_not_unique_set} call site from the
+ * retired privileged-first-operand spellings to the single-list form the engine accepts since
  * {@code Fix #352} / {@code #353}:
  *
  * <pre>

@@ -158,7 +158,7 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
      * from the columns. <b>Production has no such split.</b> Define-XML carries the ADaM data
      * structure in the very same {@code def:Class} element that carries an SDTM observation class
      * (there is no separate ADaM {@code Class} — see
-     * {@code plans/PLAN-adam-structure-set-valued.md} §7.1), and one value feeds both gates:
+     * {@code plans/done/PLAN-adam-structure-set-valued.md} §7.1), and one value feeds both gates:
      * {@code LibraryValidator} resolves the class name from {@code getDatasetClass} while
      * {@code DatasetRuleResolver} / {@code RuleRunner} read the same declaration through
      * {@code getDeclaredDatasetClass}. A {@code .cdt} {@code class="BASIC DATA STRUCTURE"} is

@@ -450,8 +450,8 @@ class CrossStandardCollapseCorpusTest
     /**
      * Local (unqualified) columns the Check reads, plus {@code USUBJID} and the structure columns.
      * ⚠ It does <b>not</b> read the rule's variable requirement — under either spelling. Recorded
-     * because {@code plans/PLAN-scope-requirements-split.md} §5 phase 5 listed this method as a
-     * {@code Scope.Variables} consumer; it never was one.
+     * because {@code plans/done/PLAN-scope-requirements-split.md} §5 phase 5 listed this method as
+     * a {@code Scope.Variables} consumer; it never was one.
      */
     private static List<String> columnsOf(Expr check, String prefix, List<String> structure)
     {

@@ -1392,7 +1392,7 @@ class OriginalTextBackfillTest
     }
 
     // ================================================================================
-    // Source_Proposed non-touch pins (plans/PLAN-source-proposed-block.md §4 item 7)
+    // Source_Proposed non-touch pins (plans/done/PLAN-source-proposed-block.md §4 item 7)
     //
     // ⚠ Before these, NO test covered a Source-sibling root key through the splice, so the plan's
     // §2.1 safety argument was INFERENCE. These make it evidence. The tool gains no functional

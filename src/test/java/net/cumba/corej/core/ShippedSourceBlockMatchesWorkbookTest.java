@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Standing drift guard for the {@code Source:} transcription — phase 1 of
- * {@code plans/PLAN-adam-sheet-scope-realignment.md}, {@code Fix #208}.
+ * {@code plans/done/PLAN-adam-sheet-scope-realignment.md}, {@code Fix #208}.
  *
  * <p>
  * Every shipped {@code PMDA-AD*} check carries a root-level {@code Source:} block holding the
@@ -214,7 +214,7 @@ class ShippedSourceBlockMatchesWorkbookTest
      * {@code SDTM Rules} tab, so the corpus carries {@code Domains: "ALL"} for all 22 and the
      * ADaM-tab variant is transcribed nowhere. That is faithful to the tab coreJ declares, but it
      * is a real information loss and it is unguarded — filed for
-     * {@code plans/PLAN-adam-sheet-scope-realignment.md}, not fixed here.
+     * {@code plans/done/PLAN-adam-sheet-scope-realignment.md}, not fixed here.
      */
     private static final TreeSet<String> NON_ADAM_SHEET_ROWS = new TreeSet<>(
             List.of("CT2001", "CT2002", "CT2003", "CT2004", "CT2005", "CT2006", "SD0001", "SD0037",

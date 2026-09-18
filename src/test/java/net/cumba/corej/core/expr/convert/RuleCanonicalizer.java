@@ -136,9 +136,9 @@ public final class RuleCanonicalizer
      * {@code Requirements} sits immediately after {@code Scope} because the two are read together
      * and in that order — {@code Scope} says which datasets the rule is <em>about</em>,
      * {@code Requirements} what it needs in order to answer at all
-     * ({@code plans/PLAN-scope-requirements-split.md} §4.1). Omitting it here would not fail any
-     * gate: an unlisted key is merely relocated to just before {@code Source} with a warning, at
-     * the next {@code backfill-rules} run and nowhere else — which is why
+     * ({@code plans/done/PLAN-scope-requirements-split.md} §4.1). Omitting it here would not fail
+     * any gate: an unlisted key is merely relocated to just before {@code Source} with a warning,
+     * at the next {@code backfill-rules} run and nowhere else — which is why
      * {@code CanonicalTopOrderCoverageTest} asserts {@code TOP_ORDER} covers every key the corpus
      * actually carries.
      * </p>
@@ -156,7 +156,7 @@ public final class RuleCanonicalizer
             "Expansion", "wildcards", "wildcardExclude", "wildcardPairCatalogue",
             // "Source_Proposed" — the row we ask the authority to publish, immediately BEFORE the
             // verbatim "Source" it proposes to replace, so the two read as original-then-proposal
-            // (plans/PLAN-source-proposed-block.md §2.1, owner ruling 1 of 2026-08-23).
+            // (plans/done/PLAN-source-proposed-block.md §2.1, owner ruling 1 of 2026-08-23).
             // ⚑ Deliberately a NO-OP on any file seeded before this entry existed: an unlisted key
             // is relocated to the unknown-key slot, which the loop below emits when it reaches
             // "Source" — i.e. the same position. That equivalence holds while the corpus carries no

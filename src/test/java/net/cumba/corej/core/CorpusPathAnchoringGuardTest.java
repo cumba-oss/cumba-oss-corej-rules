@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
  * <h2>⛔⛔ Why this test exists, in one paragraph</h2>
  *
  * <p>
- * {@code plans/PLAN-rules-corpus-build-integration.md} §2 collapsed three anchoring styles into one
- * and enumerated the consumers with a grep. The grep matched {@code Path.of("rules"…)},
+ * {@code plans/done/PLAN-rules-corpus-build-integration.md} §2 collapsed three anchoring styles
+ * into one and enumerated the consumers with a grep. The grep matched {@code Path.of("rules"…)},
  * {@code .resolve("rules")} and a quote immediately followed by {@code rules/}. It therefore missed
  * three files that built the path by <em>string concatenation</em> —
  * {@code System.getProperty("projectBasedir") + "/rules/rules-sdtmig-3-4.json"} — because the

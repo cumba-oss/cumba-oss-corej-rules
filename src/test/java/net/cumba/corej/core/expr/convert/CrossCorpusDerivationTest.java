@@ -32,8 +32,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * The cross-corpus derivation gate of {@code plans/PLAN-classifier-redesign.md} (&sect;6) — the
- * committed form of the &sect;0 {@code P0Remeasure} probe, whose absence is why the grounding
+ * The cross-corpus derivation gate of {@code plans/done/PLAN-classifier-redesign.md} (&sect;6) —
+ * the committed form of the &sect;0 {@code P0Remeasure} probe, whose absence is why the grounding
  * defect survived: Gate B ({@link DerivedFieldEquivalenceTest}) derives from {@code rules-src},
  * where the {@code Operations} declarations are still present, while the corpus the Java engine
  * actually ships ({@code rules/}) is the assembled node serialised as-is (the retired

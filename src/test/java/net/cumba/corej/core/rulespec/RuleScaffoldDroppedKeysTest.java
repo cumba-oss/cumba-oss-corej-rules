@@ -111,9 +111,9 @@ class RuleScaffoldDroppedKeysTest
 
     /**
      * Gate R1's shape, on this lane. {@code Scope.Variables} retired to
-     * {@code Requirements.Variables} ({@code plans/PLAN-scope-requirements-split.md}); {@link Rule}
-     * binds nothing for it, and the key lands in {@code Scope}'s own collector, which the
-     * {@code Rule}-level one never sees. Without the nested arm the spec runs with its variable
+     * {@code Requirements.Variables} ({@code plans/done/PLAN-scope-requirements-split.md});
+     * {@link Rule} binds nothing for it, and the key lands in {@code Scope}'s own collector, which
+     * the {@code Rule}-level one never sees. Without the nested arm the spec runs with its variable
      * requirement deleted.
      */
     @Test

@@ -109,7 +109,7 @@ import org.jspecify.annotations.Nullable;
  * Source} is tool-written from a workbook and is verbatim by contract; {@code Source_Proposed} is
  * the row we ask the authority to publish, hand-authored via
  * {@code documentation/rule-review-results/sheet-proposals.yaml} and applied by
- * {@code SourceProposedBackfill} ({@code plans/PLAN-source-proposed-block.md} §2.3). This tool
+ * {@code SourceProposedBackfill} ({@code plans/done/PLAN-source-proposed-block.md} §2.3). This tool
  * neither reads nor writes it — {@link #stripSource} matches {@code "Source:"} at indent 0, which
  * {@code "Source_Proposed:"} does not start with, so the block survives every run untouched. ⚠
  * Consequently the three spellings {@code stripSource} deletes unconditionally —
@@ -570,7 +570,7 @@ public final class OriginalTextBackfill
     {
         Map<String, List<SourceRow>> out = new HashMap<>();
         // ⛔⛔ READ-ONLY, and the third argument is the whole point (finding P0-F1,
-        // plans/PLAN-source-proposed-block.md §3.1). WorkbookFactory.create(File) opens
+        // plans/done/PLAN-source-proposed-block.md §3.1). WorkbookFactory.create(File) opens
         // READ_WRITE, so POI touches the workbook on close: measured 2026-08-26, a --dry-run
         // census - a run that writes nothing by design - moved the mtime of all five workbooks it
         // read. That destroyed the only signal STANDING-RULINGS.md §1 baseline condition 4 has (an
@@ -1066,7 +1066,7 @@ public final class OriginalTextBackfill
      * Generalised out of {@link #sourceBlock} so {@code SourceProposedBackfill} emits its
      * {@code Source_Proposed} block through the <em>same</em> writer, at the same fold points and
      * in the same quoting style, rather than through a second one that would drift from it
-     * ({@code plans/PLAN-source-proposed-block.md} §6.2).
+     * ({@code plans/done/PLAN-source-proposed-block.md} §6.2).
      * </p>
      */
     static List<String> block(String key, SequencedMap<String, String> fields)

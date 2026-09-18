@@ -541,7 +541,7 @@ abstract class AbstractRuleTestSuitesFactory
      * call. ⚠ An axis missing from this list is an axis the pre-gate does not judge, and a scenario
      * would then pass because the gate was off for it rather than because the rule was in scope;
      * {@code Scope.Datasets} was exactly that hole until phase 5 of
-     * {@code plans/PLAN-scope-requirements-split.md}.
+     * {@code plans/done/PLAN-scope-requirements-split.md}.
      *
      * <p>
      * The two axes differ in how an undeclared value is treated, deliberately:

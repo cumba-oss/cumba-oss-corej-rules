@@ -20,7 +20,7 @@ import net.cumba.corej.core.report.ReportAssembler;
 import org.junit.jupiter.api.Test;
 
 /**
- * §9c of {@code plans/PLAN-rules-corpus-build-integration.md} — <b>the guard that the R4 strip
+ * §9c of {@code plans/done/PLAN-rules-corpus-build-integration.md} — <b>the guard that the R4 strip
  * rests on</b>.
  *
  * <h2>What R4 promises</h2>

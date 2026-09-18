@@ -208,7 +208,7 @@ class ShippedSendSourceBlockMatchesWorkbookTest
     // opt-in test does not run in the default gate, so the drift surfaced only when wave 2
     // re-ran it against the workbooks. None of wave 2's own 24 split siblings lands here: a
     // split sibling carries its parent's row verbatim and resolves to it.
-    // ⭐ Re-derived 2026-08-26, 9 -> 3 (plans/PLAN-source-proposed-block.md ruling I). The six
+    // ⭐ Re-derived 2026-08-26, 9 -> 3 (plans/done/PLAN-source-proposed-block.md ruling I). The six
     // CDISC-SEND-943x rules LEFT this set: they operationalise the generic published row SEND12
     // ("Variable Core Status = Required" / "Variable present in dataset and ^= null"), every
     // variable they name is Core=Req, and their citation was repaired so they now resolve to it.

@@ -67,7 +67,7 @@ import net.cumba.corej.define.conformance.rule.RuleSet;
  * {@code regen-rules-define-corpus} workflow, which is not distributed with this repository,
  * {@code cd}s there. The <em>output</em> directory is {@link #target()}; it is
  * {@code target/rules-define/} under the build, and nothing generated is committed any more
- * ({@code plans/PLAN-rules-corpus-build-integration.md}).
+ * ({@code plans/done/PLAN-rules-corpus-build-integration.md}).
  * </p>
  */
 public final class DefineRuleCorpusGenerator
@@ -83,7 +83,7 @@ public final class DefineRuleCorpusGenerator
 
     /**
      * The generated corpus. <b>No longer a module-relative constant</b>: since
-     * {@code plans/PLAN-rules-corpus-build-integration.md} the corpus is generated into
+     * {@code plans/done/PLAN-rules-corpus-build-integration.md} the corpus is generated into
      * {@code target/rules-define/} by the build rather than committed under the module directory.
      * {@link CorpusPaths#defineRules()} is the single place that resolves it, and this accessor
      * exists so the round-trip and equivalence tests keep one name for the destination.

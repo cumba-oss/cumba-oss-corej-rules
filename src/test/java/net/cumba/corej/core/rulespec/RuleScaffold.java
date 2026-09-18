@@ -96,7 +96,7 @@ public final class RuleScaffold
      *
      * <p>
      * {@code Source_Proposed} is the same kind of key and joins it for the same reason
-     * ({@code plans/PLAN-source-proposed-block.md} §4 item 3): the row we ask the authority to
+     * ({@code plans/done/PLAN-source-proposed-block.md} §4 item 3): the row we ask the authority to
      * publish, unmodelled by the engine and dropped at load. Without the entry
      * {@link #rejectDroppedKeys} would throw the day a pinned spec's rule gains a proposal — the
      * five pinned specs are the only rules carrying an inline {@code Source:} inside their
@@ -165,10 +165,10 @@ public final class RuleScaffold
      * Four blocks below the top level own a {@code @JsonAnySetter} collector, and the
      * {@link Rule}-level one never sees their keys: {@link Scope} (a {@code Variables:} block
      * surviving the {@code Requirements} migration —
-     * {@code plans/PLAN-scope-requirements-split.md}), {@link DatasetScope}, {@link Requirements}
-     * (a misspelled block name) and {@link VariableRequirement} (a misspelled facet, e.g.
-     * {@code AnyOf:} for {@code Any:}). Together with {@link Rule} that is every collector the
-     * model has, i.e. the same reach as loader gates R1 and R2
+     * {@code plans/done/PLAN-scope-requirements-split.md}), {@link DatasetScope},
+     * {@link Requirements} (a misspelled block name) and {@link VariableRequirement} (a misspelled
+     * facet, e.g. {@code AnyOf:} for {@code Any:}). Together with {@link Rule} that is every
+     * collector the model has, i.e. the same reach as loader gates R1 and R2
      * ({@code RulePackageLoader.validateRetiredScopeVariables} /
      * {@code validateRequirementsShape}). Each is a <em>deleted</em> requirement rather than a
      * skipped rule: the spec then executes unrestricted, and on this lane that reads as a parity

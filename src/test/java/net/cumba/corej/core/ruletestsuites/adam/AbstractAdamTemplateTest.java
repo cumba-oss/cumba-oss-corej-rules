@@ -254,7 +254,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * which <i>can</i> express a join — {@code CDISC-AD0591} has three ({@code invalid} /
      * {@code valid} / {@code skipped-no-ADSL}). Retire this skip when the generator learns to build
      * the secondary dataset — {@code
-     * plans/PLAN-adam-template-secondary-dataset.md} (filed, no go).
+     * plans/done/PLAN-adam-template-secondary-dataset.md} (filed, no go).
      * </p>
      */
     private String unrepresentableJoinLeaf(Rule rule)

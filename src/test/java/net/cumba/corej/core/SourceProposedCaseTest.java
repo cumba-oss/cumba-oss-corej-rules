@@ -22,8 +22,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Unit tests for the plan's one decision function ({@code plans/PLAN-source-proposed-block.md} §4
- * item 8).
+ * Unit tests for the plan's one decision function ({@code plans/done/PLAN-source-proposed-block.md}
+ * §4 item 8).
  *
  * <p>
  * <b>Synthetic ids on purpose.</b> The corpus scan that consumes this classifier ships in phase 3;

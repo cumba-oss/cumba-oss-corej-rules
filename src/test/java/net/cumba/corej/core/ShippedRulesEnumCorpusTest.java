@@ -13,8 +13,8 @@ import net.cumba.corej.core.model.RulePackage;
 import org.junit.jupiter.api.Test;
 
 /**
- * Phase 2 of {@code plans/PLAN-extend-expression-engine.md} — corpus regression: every shipped rule
- * package loads without any present-but-unrecognized {@code Rule_Type} / {@code Sensitivity} /
+ * Phase 2 of {@code plans/done/PLAN-extend-expression-engine.md} — corpus regression: every shipped
+ * rule package loads without any present-but-unrecognized {@code Rule_Type} / {@code Sensitivity} /
  * {@code Executability} value. The 2026-06-12 corpus audit found exactly two offenders
  * (CDISC-AD0018 / CDISC-AD0708, {@code "Sensitivity": "Variable"}), fixed to {@code "Dataset"} in
  * the same change that introduced the fail-loud validation — so the corpus must be fully clean.
@@ -46,9 +46,10 @@ class ShippedRulesEnumCorpusTest
      * ⚠⚠ <b>Two different units, and both prior figures confused them.</b> A rule ships into
      * several packages, so counting {@code Match_Datasets} <em>entries</em> multiplies the rules.
      * Wave-34 lane D reported <i>"158 distinct rules"</i> and
-     * {@code plans/PLAN-expired-justifications-triage.md} §S2 said <i>"157"</i> — both were entry
-     * counts wearing a rule label. Measured 2026-08-12 over {@code rules/}: <b>158 entries</b>
-     * carrying {@code left}, across <b>38 distinct rules</b>; the remaining entries author nothing.
+     * {@code plans/done/PLAN-expired-justifications-triage.md} §S2 said <i>"157"</i> — both were
+     * entry counts wearing a rule label. Measured 2026-08-12 over {@code rules/}: <b>158
+     * entries</b> carrying {@code left}, across <b>38 distinct rules</b>; the remaining entries
+     * author nothing.
      * </p>
      *
      * <p>

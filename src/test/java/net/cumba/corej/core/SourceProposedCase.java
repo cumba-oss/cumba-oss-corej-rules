@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
 
 /**
- * The total taxonomy of {@code plans/PLAN-source-proposed-block.md} §0.1: which of the five cases a
- * rule falls into, and therefore whether it owes a {@code Source_Proposed} block.
+ * The total taxonomy of {@code plans/done/PLAN-source-proposed-block.md} §0.1: which of the five
+ * cases a rule falls into, and therefore whether it owes a {@code Source_Proposed} block.
  *
  * <p>
  * <b>Total and disjoint.</b> Every rule in {@code rules-src/checks/**} lands in exactly one case.

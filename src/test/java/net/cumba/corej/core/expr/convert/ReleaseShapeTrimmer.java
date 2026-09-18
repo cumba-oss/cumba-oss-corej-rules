@@ -16,7 +16,7 @@ import java.util.Set;
  * <p>
  * This is a <em>release-packaging</em> transform, not a content change. Every field it removes
  * stays in the authored source, in git, and available to the authoring tools; only the shipped
- * package is smaller. Option R4 of {@code plans/PLAN-rules-corpus-build-integration.md} §10,
+ * package is smaller. Option R4 of {@code plans/done/PLAN-rules-corpus-build-integration.md} §10,
  * decided 2026-09-02.
  * </p>
  *

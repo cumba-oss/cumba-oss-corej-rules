@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
  * <b>Fix #179's acceptance criterion, measured against the shipped corpus.</b>
  *
  * <p>
- * Phase 1 of {@code plans/PLAN-adam-structure-set-valued.md} must be <em>invisible</em>: making the
- * detected ADaM data structure a set may not change which rules a dataset selects. The argument is
- * "by construction" — a medical-device dataset used to detect as the folded base token and now
- * detects as {@code [variant, base]}, and since {@code Include}/{@code Exclude} both match on any
- * member, the decision can only change for a rule that <em>names</em> a variant token. This test
- * turns that argument into a measurement over every shipped rule.
+ * Phase 1 of {@code plans/done/PLAN-adam-structure-set-valued.md} must be <em>invisible</em>:
+ * making the detected ADaM data structure a set may not change which rules a dataset selects. The
+ * argument is "by construction" — a medical-device dataset used to detect as the folded base token
+ * and now detects as {@code [variant, base]}, and since {@code Include}/{@code Exclude} both match
+ * on any member, the decision can only change for a rule that <em>names</em> a variant token. This
+ * test turns that argument into a measurement over every shipped rule.
  * </p>
  *
  * <p>

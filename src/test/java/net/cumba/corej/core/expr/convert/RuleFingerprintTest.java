@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Every case here is drawn from a real corpus pair. The pairs named in the comments are the ones
- * that a naive comparison mis-buckets; see {@code plans/PLAN-rule-inventory.md} §2.2.
+ * that a naive comparison mis-buckets; see {@code plans/done/PLAN-rule-inventory.md} §2.2.
  */
 class RuleFingerprintTest
 {
@@ -903,7 +903,7 @@ class RuleFingerprintTest
 
     /**
      * ⭐ {@code Source_Proposed} is INVISIBLE to every fingerprint layer — asserted, not argued
-     * ({@code plans/PLAN-source-proposed-block.md} §4).
+     * ({@code plans/done/PLAN-source-proposed-block.md} §4).
      *
      * <p>
      * The two nodes are the same rule, one carrying the block and one not. If any layer saw it, the

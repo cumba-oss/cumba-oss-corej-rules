@@ -39,8 +39,8 @@ import net.cumba.corej.core.model.CheckCondition;
  * keep {@code rules-legacy/} — the Python fork's operator-leaf corpus — reachable from the
  * expression form, and {@code BackConversionCoverageTest} ratcheted its residual against a park
  * list. Corpus, fork, coverage gate and park list are all gone
- * ({@code plans/PLAN-cut-rules-legacy.md}), so nothing needs an inverse for its own sake any more.
- * The class survives because {@code ExpressionTextIdempotenceTest} builds on
+ * ({@code plans/done/PLAN-cut-rules-legacy.md}), so nothing needs an inverse for its own sake any
+ * more. The class survives because {@code ExpressionTextIdempotenceTest} builds on
  * {@link #shippedExpressions()} and {@link #loadBaseline(String)}, and because
  * {@link #lower(String, String, boolean)} still expresses a property of {@code rules/} alone: a
  * shipped expression must parse and lower without throwing. ⛔ Do not delete it on the strength of

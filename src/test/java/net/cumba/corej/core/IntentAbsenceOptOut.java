@@ -20,8 +20,8 @@ import net.cumba.corej.core.model.Scope;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The <b>intent opt-out</b> predicate of {@code plans/PLAN-absent-required-dataset-skip.md} — step
- * 1 of OPT-OUT &rarr; COVERAGE &rarr; SKIP, and gate <b>K5c</b>.
+ * The <b>intent opt-out</b> predicate of {@code plans/done/PLAN-absent-required-dataset-skip.md} —
+ * step 1 of OPT-OUT &rarr; COVERAGE &rarr; SKIP, and gate <b>K5c</b>.
  *
  * <p>
  * <b>What it identifies.</b> A rule whose Check declares <em>"this datum must exist somewhere"</em>
