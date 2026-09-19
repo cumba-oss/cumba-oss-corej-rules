@@ -89,7 +89,13 @@ class ReleasedRuleFieldFidelityTest
     // CDISC-SEND-0400-A/-B x 2. The wave's five OTHER siblings (F1's four and X's
     // CORE-000107-A) each author their own Output_Variables and do not move this bound.
     // Re-measured against target/rules by run, not nudged.
-    private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 572;
+    // ⭐ 572 -> 523, re-derived 2026-09-19 by PLAN-retire-core-family.md phase 8f, by RUN (the
+    // constant was probed to 0 and the assertion's own message read back), after phase 8b's port
+    // added the 21 mints. ⚑ 523 is EXACTLY the value the internal twin's phase 7 measured for its
+    // own corpus — the two now agree on this figure, which is the strongest available evidence
+    // that the Outcome/Output_Variables surface is fully ported. A ceiling goes SLACK rather than
+    // red, so nothing would have reported the 49 of false headroom.
+    private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 523;
 
     /**
      * ⚠ A FLOOR as well as a ceiling. The derivation arm below only asserts anything about entries

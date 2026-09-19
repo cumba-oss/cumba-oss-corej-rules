@@ -88,8 +88,35 @@ class ScenarioFixtureCoverageRatchetTest
      * so the subset needed it moved in the opposite direction &mdash; <i>down</i> &mdash; and
      * nothing in a "relax the floors" sweep prompts that.
      * </p>
+     *
+     * <p>
+     * &#11088; <b>683 &rarr; 566, re-derived 2026-09-19</b> by {@code PLAN-retire-core-family.md}
+     * phase 8f, which is deliberately run <i>after</i> phase 8b's port and never before it: 8b
+     * <i>adds</i> rules and scenarios, so measuring first would have pinned a number the same
+     * commit invalidated. The <b>566 is this assertion's own output</b>, read back after probing
+     * the constant to 0; the surrounding triple reconciles with it exactly &mdash; 47 packages,
+     * 3,417 shipped, 2,851 covered, 566 uncovered, 0 fixture-only. The movement decomposes exactly:
+     * 683 uncovered before the port, the 21 mints all arrived <i>with</i> scenarios so they added
+     * none, and 8b's 407 ported scenarios gave <b>117</b> already-shipped rules their first fixture
+     * &mdash; 683 &minus; 117 = 566.
+     * </p>
+     *
+     * <p>
+     * &#9888; Zero headroom, and that is the point: before the port the actual was <b>exactly
+     * 683</b> against a ceiling of 683. The mints-only intermediate step reddened this test at 704,
+     * which is what proved the ceiling was live rather than slack.
+     * </p>
+     *
+     * <p>
+     * &#9873; The internal twin's value is <b>544</b>, not 566, and the 22 are accounted for: this
+     * tree ships 6 rules the internal one deleted (the {@code -A} siblings retired by
+     * {@code PLAN-unplanned-visit-cascade.md} phase 2, all covered here) and lacks the 126
+     * internal-only scenarios other plans authored, whose OSS port is owed by
+     * {@code PLAN-typed-engine-oss-port.md}. &#8658; Expect the two to converge on the same number
+     * only once that plan lands; do not "align" this constant to 544 by hand.
+     * </p>
      */
-    private static final int MAX_UNCOVERED = 683;
+    private static final int MAX_UNCOVERED = 566;
 
     private static final Path SCENARIOS = Path
             .of("src/test/resources/net/cumba/corej/core/ruletestsuites");

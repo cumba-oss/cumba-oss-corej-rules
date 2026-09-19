@@ -72,8 +72,16 @@ class ShippedNumTagAbsentRatchetTest
      * Measured 2026-09-13 after the Phase 6 migration: {@code grep -rooF 'num(' rules/ | wc -l} →
      * 98 on the internal corpus, 63 excluding {@code rules-core-*.json}. Re-measure, never
      * arithmetic, before moving it.
+     * <p>
+     * &#11088; <b>63 &rarr; 83, re-derived 2026-09-19</b> by {@code PLAN-retire-core-family.md}
+     * phase 8f, by RUN. The 63 was sized as <i>"the internal corpus minus the CORE packages"</i> at
+     * a time when the internal corpus still had them; the CORE family has since been retired there,
+     * so both trees now measure the same <b>83</b> (verified with the documented command against
+     * each repo's {@code target/rules}). The floor had 20 of dead slack in <i>both</i> repos and
+     * neither could see it &mdash; a floor only reports a loss below itself.
+     * </p>
      */
-    private static final int CONVERSION_FLOOR = 63;
+    private static final int CONVERSION_FLOOR = 83;
 
     /**
      * Tags that are present, with floors re-sized 2026-08-31 on the smallest shipped corpus — the
