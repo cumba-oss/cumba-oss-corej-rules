@@ -28,16 +28,20 @@ description: |
       leaf is false, and the fork reports NOTHING.
 
   ⚠ A DETECTION divergence, not a reporting one — and specifically NOT the §25 output-surface
-  shape that the sibling `CORE-000238` spec's baseline entry carries. There the two lanes fire
+  shape that `CDISC-CG0147.yaml`'s baseline entry carries. There the two lanes fire
   the same violation on the same row and disagree only about which `$`-variables decorate it;
   here the fork produces no violation at all, so there are no columns to disagree about.
   Baselined `lane: python`, `channels: ["violations"]`.
 
-  ⚠ `CORE-000238` is this rule modulo `Scope.Use_Case: "INDH"` — its `Check` and `Operations`
-  are byte-identical in both `rules/` and `rules-legacy/` — so it deliberately gets no EC-51
-  spec of its own. Its existing spec populates `EXENDTC` on every `EX` row and therefore never
-  reaches an indeterminate group (measured 2026-08-08), which is why that spec's baseline entry
-  cites §25 alone and is correct as filed.
+  ⚠ The retired `CORE-000238` WAS this rule modulo `Scope.Use_Case: "INDH"` — its `Check` and
+  its bindings block (then spelled `Operations`) were byte-identical to this rule's — so it
+  deliberately got no EC-51 spec of its own. It was deleted 2026-09 with the CORE family, and
+  its spec was re-keyed onto THIS rule by phase 1 of that retirement
+  (`rulespec/specs/CORE-000238.yaml` -> `CDISC-CG0147.yaml`). ⛔ Do not "resolve" the id above
+  to `CDISC-CG0147`: the whole point of the sentence is the `Use_Case` this rule does NOT carry,
+  so the substitution would make it a tautology. That spec populates `EXENDTC` on every `EX` row
+  and therefore never reaches an indeterminate group (measured 2026-08-08), which is why its
+  baseline entry cites §25 alone and is correct as filed.
 
   ⚠ Fork repair is NOT scheduled — fork-only work drops off the active list under the Java-first
   direction of 2026-08-03. The three verbatim hops it would take (`models/rule.py` →
