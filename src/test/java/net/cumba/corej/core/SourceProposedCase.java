@@ -110,7 +110,7 @@ public enum SourceProposedCase
     public static final int MINTED_BAND_FLOOR = 9000;
 
     /**
-     * ⭐ The 31 minted-band rules that operationalise a <b>generic</b> published row, mapped to the
+     * ⭐ The 32 minted-band rules that operationalise a <b>generic</b> published row, mapped to the
      * row each one cites (owner ruling I, 2026-08-26 — plan §5.1, reading 1).
      *
      * <p>
@@ -122,7 +122,7 @@ public enum SourceProposedCase
      * </p>
      *
      * <p>
-     * ⛔ <b>Filing them as "the catalogue publishes no such row" would have been 31 escalations
+     * ⛔ <b>Filing them as "the catalogue publishes no such row" would have been 32 escalations
      * against rows that exist</b> — withdrawn ruling 6's failure at ten times the scale.
      * </p>
      *
@@ -130,7 +130,7 @@ public enum SourceProposedCase
      * ⚑ <b>The house had already split this very row twice.</b> {@code CDISC-CG0014-B} and
      * {@code CDISC-SEND-0012-A} are minted siblings of the same generic rules: the row's
      * {@code Rule} cell reads <i>"Variable present in dataset and ^= null"</i> — two conjuncts —
-     * and the corpus expresses them as two rules. These 31 continue that pattern, narrowed to one
+     * and the corpus expresses them as two rules. These 32 continue that pattern, narrowed to one
      * named variable so they can run <b>without the CDISC Library</b>: the generic rule is
      * {@code varname() in $required_variables and empty(value())}, and {@code required_variables}
      * is library-gated ({@code OperationInliner} wraps it in {@code library_available() and
@@ -145,6 +145,21 @@ public enum SourceProposedCase
      * and is not.
      * </p>
      */
+    // ⭐ 31 -> 32 on 2026-09-19 (review round 1): CDISC-SEND-9442, the GENETOX arm minted from
+    // CORE-009701 (GVMETHOD not populated in GV), which phase 4 had filed as a MISSING_ROW on a
+    // premise that was FALSE and measurably so. The recorded ground was that GVMETHOD's Core status
+    // "could not be read directly" because the CDISC Library cache's genetox RULES endpoint is
+    // empty -- but that is the wrong endpoint. The IG METADATA one,
+    // api_mdr_sendig_genetox-1-0%3Fexpand%3Dtrue.json.gz -> GV -> datasetVariables -> GVMETHOD,
+    // carries "core": "Req" (role Record Qualifier, ordinal 25) under CDISC_API_CACHE, the cache
+    // CrossStandardCollapseCorpusTest already reads for exactly this field. Ruling I's test --
+    // every
+    // variable the rule names is Core = Required -- therefore PASSES, and SEND12 IS published for
+    // SENDIG-GENETOX v1.0 (workbook sheet _GENETOXv1.0_DARTv1.2 row 66). CDISC-SEND-9430 is the
+    // direct precedent: same shape, GVTESTCD also Req. Sheet issue #272 was withdrawn with the move
+    // and the rule gained the row's verbatim six cells as Source plus the own-sheet SEND12
+    // reference, so it now resolves like the other 31 rather than sitting in
+    // ShippedSendSourceBlockMatchesWorkbookTest.MINTED_WITHOUT_A_SHEET_ROW.
     public static final java.util.Map<String, String> GENERIC_ROW_SPLITS = java.util.Map.ofEntries(
             java.util.Map.entry("FDA-SD9701", "SD0002"),
             java.util.Map.entry("FDA-SD9702", "SD0002"),
@@ -176,7 +191,8 @@ public enum SourceProposedCase
             java.util.Map.entry("CDISC-SEND-9433", "SEND12"),
             java.util.Map.entry("CDISC-SEND-9434", "SEND12"),
             java.util.Map.entry("CDISC-SEND-9435", "SEND12"),
-            java.util.Map.entry("CDISC-SEND-9436", "SEND12"));
+            java.util.Map.entry("CDISC-SEND-9436", "SEND12"),
+            java.util.Map.entry("CDISC-SEND-9442", "SEND12"));
 
     /**
      * The nine rules for which the catalogue genuinely publishes nothing — all of them
@@ -227,7 +243,7 @@ public enum SourceProposedCase
         }
         // MISSING_ROW is the minted band MINUS the three ids whose rows the authority does publish
         // (FDA-SD9999, PMDA-SD9999, PMDA-AD9999 — owner ruling A, 2026-08-25, which WITHDREW the
-        // ruling that had called their Source blocks fabricated) and MINUS the 31 above. Carrying a
+        // ruling that had called their Source blocks fabricated) and MINUS the 32 above. Carrying a
         // Source is what excludes the three, so that test is never a name list.
         if (numericTail(id) >= MINTED_BAND_FLOOR && !rule.hasNonNull("Source"))
         {

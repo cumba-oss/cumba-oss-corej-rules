@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0467 expect=noViolation domain=AE
 # Rule:Description: Raise an error when --STDTC is present in a Findings general observation class dataset, where its use is not recommended.
-#note "AESTDTC column absent from the dataset"
+#note "AESTDTC column absent from the dataset ⚠ CLASS-UNREACHABLE IN PRODUCTION, recorded 2026-09-19 (review round 1): CDISC-CG0467 scopes Classes.Include [FINDINGS] - inherited from CORE-000207, which this fixture was MIGRATED from by PLAN-retire-core-family phase 5 - and DomainClassMap resolves sdtm AE to EVENTS, not FINDINGS. So DatasetRuleResolver does not emit the rule for this dataset and the scenario cannot fail for the reason it was written. The harness cannot say so: with no class= declaration AbstractRuleTestSuitesFactory.describeScopeMismatch routes the class axis to describeAdamClassMismatch, which deliberately refuses SDTM class scopes and returns null. ⛔ Do NOT delete it - it is now this rule's only AE coverage and ScenarioFixtureCoverageRatchetTest credits it; the production-reachable pair is the two class=FINDINGS LB fixtures beside it. ⚑ Measured against the OFFLINE class path (DomainClassMap then CustomDomainClassDetector), which is what an unlicensed run and this harness both use; with the CDISC Library reachable the product reverse-walk runs first and may answer differently for a SUPP or AP dataset - it cannot for AE, which is EVENTS on every path."
 dataset AE label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

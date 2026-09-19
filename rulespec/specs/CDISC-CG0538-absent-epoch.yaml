@@ -4,7 +4,7 @@ description: |
   EC-44 / Fix #133 cross-lane pin — PARTIAL DROP: one of two `group:` columns is absent, and
   the survivor still partitions.
 
-  `CORE-000214` carries `record_count` with `filter: {DSCAT: DISPOSITION EVENT}` and
+  `CDISC-CG0538` carries `record_count` with `filter: {DSCAT: DISPOSITION EVENT}` and
   `group: [USUBJID, EPOCH]`. This fixture is a DS dataset with no `EPOCH` column. Under EC-44
   the absent column is dropped and the check REGROUPS ON THE SURVIVOR — `USUBJID` — rather
   than collapsing to one dataset-wide group or dying. The `is_not_unique_set` leaf keys on
@@ -31,7 +31,7 @@ description: |
   separately and by nothing that compared them — the same blind spot that let the original
   divergence (Java SUCCESS-with-no-findings vs fork `KeyError` ⇒ SKIPPED) live undetected.
 
-  CONTRAST WITH `CORE-000214.yaml`, the same rule with `EPOCH: SCREENING` present on both
+  CONTRAST WITH `CDISC-CG0538.yaml`, the same rule with `EPOCH: SCREENING` present on both
   rows of a single subject. The two must stay in step for subject `001`.
 python_source: rules-sdtmig-3-4.json (CORE-000214)
 rule:

@@ -1,10 +1,10 @@
 name: CDISC-CG0215
 kind: rule
 description: |
-  Record-Data + Operation port. CORE-000333: SV.VISIT must appear in TV.VISIT
+  Record-Data + Operation port. CDISC-CG0215: SV.VISIT must appear in TV.VISIT
   when SVUPDES is empty. Operation `distinct VISIT` over the TV domain builds
-  $visits_in_tv. Check leaves: VISIT exists AND (SVUPDES empty/not_exists) AND
-  VISIT is_not_contained_by $visits_in_tv. The SV row sets VISIT=WEEK 99 (absent
+  $tv_visit. Check leaves: VISIT exists AND (SVUPDES empty/not_exists) AND
+  VISIT is_not_contained_by $tv_visit. The SV row sets VISIT=WEEK 99 (absent
   from TV's [SCREENING, WEEK 1]) with empty SVUPDES, so it fires.
 python_source: rules-sdtmig-3-3.json (CORE-000333)
 rule:

@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0554-D expect=violation domain=APAE
 # Rule:Description: Raise an error when, in an Associated Persons dataset (DOMAIN starting with AP), APID is not present.
-#note "AP-domain branch: DOMAIN=APAE (prefix AP) but APID column is absent -> the associated-persons identifier requirement fires"
+#note "AP-domain branch: DOMAIN=APAE (prefix AP) but APID column is absent -> the associated-persons identifier requirement fires ⚠ CLASS-UNREACHABLE IN PRODUCTION: this rule inherits CDISC-CG0554's Scope.Classes.Include [EVENTS, INTERVENTIONS, FINDINGS, FINDINGS ABOUT], and APAE resolves to NO class - DomainClassMap carries no AP entry and CustomDomainClassDetector.detectClass finds none of APAETERM/APAETRT/APAEQNAM/APAETESTCD - so ScopeMatcher.describeClassMismatch is strict-on-null and DatasetRuleResolver never emits the rule for an APAE dataset. The harness cannot say so: with no class= declaration describeScopeMismatch routes the class axis to describeAdamClassMismatch, which deliberately refuses SDTM class scopes, so this fixture passes the pre-gate that production would fail. Kept as the AP-branch expression coverage it is; the production-reachable scenario is the -AE sibling in this directory. Do not change the Scope - it is inherited by the whole CG0554 family."
 #expectViolationCount 1
 #expectViolationAt row=1
 dataset APAE label="Associated Persons AE"

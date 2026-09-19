@@ -178,8 +178,8 @@ class SourceProposedCaseTest
 
 
     /**
-     * ⛔⛔ The 31 variable-population rules in the same band are <b>splits</b>, not missing rows —
-     * the ruling that stopped 31 escalations against rows that exist. Each operationalises a
+     * ⛔⛔ The 32 variable-population rules in the same band are <b>splits</b>, not missing rows —
+     * the ruling that stopped 32 escalations against rows that exist. Each operationalises a
      * generic published row so it can run without the CDISC Library.
      *
      * <p>
@@ -202,9 +202,9 @@ class SourceProposedCaseTest
 
 
     @Test
-    void theTwoBandPopulationsPartitionTheFortyAndNeitherIsEmpty()
+    void theTwoBandPopulationsPartitionTheFortyOneAndNeitherIsEmpty()
     {
-        assertEquals(31, SourceProposedCase.GENERIC_ROW_SPLITS.size());
+        assertEquals(32, SourceProposedCase.GENERIC_ROW_SPLITS.size());
         assertEquals(9, SourceProposedCase.MISSING_ROW_RULES.size());
         for (String id : SourceProposedCase.MISSING_ROW_RULES)
         {
