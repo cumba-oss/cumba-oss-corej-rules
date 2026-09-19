@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
  * re-derived here from the sheet plus the check's own {@code Standards[].Standards[]} block — is
  * transcribed into {@code Source} byte-for-byte on all six guarded keys, modulo the one documented
  * exception (line breaks, below). Plus five structural pins: every rule resolves to a sheet row (or
- * is one of the nine minted rules that have none); the split-suffix lookup fallback fires for
+ * is one of the eight minted rules that have none); the split-suffix lookup fallback fires for
  * nothing; no rule's primary row falls outside its declared versions; no {@code Source} key is
  * unguarded; and every SEND sheet id is claimed by a shipped rule or listed as knowingly
  * unimplemented.
@@ -199,18 +199,24 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
             "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9437", "CDISC-SEND-9438",
-            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441", "CDISC-SEND-9442");
-    // ⭐ Re-derived 2026-09-19, 8 -> 9 (PLAN-retire-core-family phase 4): CDISC-SEND-9442, the
-    // GENETOX arm minted from CORE-009701 (GVMETHOD not populated in GV), behind sheet issue #272.
-    // Measured over the 1 934 rows of the workbook's _GENETOXv1.0_DARTv1.2 sheet: the five GV rows
-    // are SEND407 (domain structure), SEND408/409 (GVCAT), SEND410 (USUBJID) and SEND411 (GVSCAT)
-    // --
-    // none names GVMETHOD, so the rule resolves to no row and carries no Source. ⚠ It is filed as
-    // rowless rather than as a SEND12 generic-row split because ruling I's test for that is
-    // "every variable the rule names is Core = Required", and GVMETHOD's Core status could NOT be
-    // read: no SENDIG-GENETOX v1.0 IG is mounted and the Library cache's genetox rules endpoint is
-    // empty. If it is Required, this entry moves to SourceProposedCase.GENERIC_ROW_SPLITS with
-    // SEND12 as its row, together with the side-car record and issue #272.
+            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441");
+    // ⭐ Re-derived 2026-09-19 twice, 8 -> 9 -> 8. Phase 4 added CDISC-SEND-9442 (the GENETOX arm
+    // minted from CORE-009701, GVMETHOD not populated in GV); review round 1 took it back out,
+    // because the premise behind it was FALSE and the instrument was to hand. Phase 4 filed the
+    // rule as rowless rather than as a SEND12 generic-row split on the ground that ruling I's test
+    // for that -- every variable the rule names is Core = Required -- could not be applied, since
+    // "the Library cache's genetox rules endpoint is empty". That is the wrong endpoint. The IG
+    // METADATA one, api_mdr_sendig_genetox-1-0%3Fexpand%3Dtrue.json.gz -> GV -> datasetVariables ->
+    // GVMETHOD, carries "core": "Req" (role Record Qualifier, ordinal 25); the cache is
+    // CDISC_API_CACHE, which CrossStandardCollapseCorpusTest already reads for this very field. So
+    // ruling I's test passes, SEND12 is published for SENDIG-GENETOX v1.0 (this sheet, row 66,
+    // version cell "SENDIG-GENETOX v1.0"), and the rule now carries that row's verbatim six cells
+    // as Source plus the own-sheet SEND12 reference -- so it RESOLVES and belongs here no longer.
+    // It moved to SourceProposedCase.GENERIC_ROW_SPLITS with sheet issue #272 withdrawn.
+    // ⚠ The measurement phase 4 recorded was itself correct and still holds: over the 1 934 rows of
+    // this sheet the five GV rows are SEND407 (domain structure), SEND408/409 (GVCAT), SEND410
+    // (USUBJID) and SEND411 (GVSCAT), and none names GVMETHOD. What was wrong was reading that as
+    // "no row reaches GVMETHOD" when the GENERIC row does -- which is the whole point of ruling I.
     // ⚑ This pin is exact, so the wave that mints a SEND rule owes it -- and the test is opt-in
     // (-Dcdisc.docs.dir), so nothing else would have reported the drift.
     // ⭐ Re-derived 2026-09-12, 3 -> 8 (top-level-or wave 2 close, repairing a pin the minting
@@ -370,8 +376,8 @@ class ShippedSendSourceBlockMatchesWorkbookTest
 
 
     /**
-     * Every {@code CDISC-SEND*} rule resolves to a sheet row, except the nine minted ones that have
-     * none. Pinned exactly, so a rule that stops resolving cannot hide.
+     * Every {@code CDISC-SEND*} rule resolves to a sheet row, except the eight minted ones that
+     * have none. Pinned exactly, so a rule that stops resolving cannot hide.
      */
     @Test
     void everySendRuleResolvesToASheetRowOrIsAKnownMintedRule() throws IOException

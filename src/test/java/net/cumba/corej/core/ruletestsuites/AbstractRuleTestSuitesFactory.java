@@ -229,7 +229,13 @@ abstract class AbstractRuleTestSuitesFactory
 
 
     /** Cheap prelude scan for the {@code #test <coreId> …} directive; null if absent. */
-    private static @Nullable String peekCoreId(Path aFile)
+    // ⛔ Package-visible, NOT private, since 2026-09-19: ScenarioFilenameBindsItsOwnRuleTest
+    // asserts the filename/directory/family invariant against the id THIS method reads, so that
+    // there is ONE `#test` parser and not two. The H-5 finding on the internal twin's
+    // OrderFlipGuardCoverageRatchetTest is exactly what a second copy costs: that ratchet called
+    // RuleTestCdt#hasShebang while this class filtered with a private re-implementation of its
+    // own, so the guard used the predicate the factory did not.
+    static @Nullable String peekCoreId(Path aFile)
     {
         try (BufferedReader r = Files.newBufferedReader(aFile, UTF_8))
         {

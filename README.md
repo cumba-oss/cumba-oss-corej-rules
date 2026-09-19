@@ -130,6 +130,37 @@ mvn -B clean install -Drevision=<version> \
 Requires **`cumba-oss-corej` 0.3.0** and its upstreams on Central; the engine version is
 pinned by `dependency.cumba-oss-corej.version` in the root pom.
 
+### ⛔⛔ Five of this repo's gates CANNOT FAIL — they are structurally inert
+
+**Recorded 2026-09-19. A statement of fact about the ladder above, not a proposal
+to change it.** The gate command runs the same tool set every repo in the stack
+runs, and five of those tools **have no population to judge**, because this repo
+has **no `src/main` directory at all** — everything it ships is YAML and JSON, and
+all of its Java is test code. Measured on the run of 2026-09-19: `target/classes`
+holds **0 `.class` files** and `target/pmd.xml` lists **0 `<file>` elements**.
+
+| tool | configured gate | what actually happens |
+|---|---|---|
+| **PMD** | `-Dpmd.failOnViolation=true` in the gate command and in CI | runs, **analyses 0 source files**. Zero violations out of zero files. |
+| **SpotBugs** | `-Dspotbugs.failOnError=true` | **0 classes** to analyse. |
+| **JaCoCo** | `<jacoco.line.coverage>0.80</jacoco.line.coverage>` | ⚠⚠ **The 0.80 line gate cannot fail, and it says the opposite.** The report goal logs *"Analyzed bundle 'Cumba OSS CDISC Rules' with 0 classes"* and `jacoco:check` then passes — a positive verdict over an empty measurement. The agent still attaches and a `jacoco.exec` is still written, so the build looks instrumented. |
+| **Pitest** | `<pitest.mutation.target>55</pitest.mutation.target>`, `<pitest.coverage.target>80</pitest.coverage.target>` | ⚠⚠ Not invoked by `install`/`verify` at all — it is a separate opt-in CI job (`mvn -B -P Pitest verify`) — and when it is, there is nothing to mutate. `<failWhenNoMutations>false</failWhenNoMutations>` turns that into a pass. **Those 55/80 thresholds have never been evaluated, not once.** |
+| **Error Prone / NullAway** | the `ErrPrn` profile | ⚠⚠ **Never activated.** `<activeByDefault>false</activeByDefault>`, and no workflow passes `-P ErrPrn`, so the canonical command runs without it. NullAway is an Error Prone plugin, so it is inert for the same reason — and both would have nothing to compile here regardless. ⛔ Do NOT arm it from this note: arming is `PLAN-arm-error-prone`'s scope, and arming a gate can red a repo that has zero findings. |
+
+⭐ **What does run and can red:** `spotless:check` over `src/test/java`,
+`-Dmaven.compiler.failOnWarning=true` over the test sources, the `enforcer` rules
+(`enforce-maven-version`, `enforce-deploy-urls`, `require-generated-rule-corpus`),
+the corpus-assembly `exec` steps — and above all **this repo's own test corpus**:
+the corpus lints, the ratchets, the `.cdt` scenario suites and the `rulespec`
+drift guards. Those are the real protection here.
+
+⇒ The point of this section is only that a green gate run in this repo carries
+**no** static-analysis, coverage or mutation signal, so *"the gates are green"*
+must never be read as *"the code was analysed"*. ⚑ The internal twin carries the
+same record for the same reason (it has a `src/main/`, but only `resources/` and
+`dist/` in it), where it names four rather than five — this repo additionally has
+`ErrPrn` unarmed.
+
 ### ⚠ The build needs the CDISC pickle metadata cache
 
 Eight tests read Python-engine `.pkl` metadata straight from a cache directory

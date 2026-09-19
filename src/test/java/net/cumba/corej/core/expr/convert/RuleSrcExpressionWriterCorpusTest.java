@@ -84,14 +84,44 @@ class RuleSrcExpressionWriterCorpusTest
      * must be accompanied by moving the pin.
      *
      * <p>
-     * ⚠ <b>Empty here, on purpose.</b> All three formerly-curated rules — CORE-000335, CORE-000539
-     * and CORE-000540 — are CORE-family, and this repository does not redistribute that family, so
-     * none of their {@code rules-src/checks} files exists here and a pin keyed on their basenames
-     * could never fire. The three texts are pinned internally. The lookup below is kept wired so a
-     * future sync re-adds the entries rather than the mechanism.
+     * ⛔⛔ <b>RE-POINTED 2026-09-19: the map was EMPTY, and the reason it gave was false.</b> It read
+     * <i>"empty here, on purpose — all three formerly-curated rules are CORE-family, and this
+     * repository does not redistribute that family, so a pin keyed on their basenames could never
+     * fire"</i>. Both premises are true and the conclusion is not: the three curated TEXTS never
+     * were CORE-only. Measured 2026-09-19 over this repository's own {@code rules-src/checks} —
+     * {@code CDISC-CG0280}, {@code FDA-SD1269} and {@code PMDA-SD1269} all carry the {@code RANDQT}
+     * text, {@code CDISC-CG0332} the {@code AP}/{@code FA}-exclusion text and {@code CDISC-CG0333}
+     * the {@code FA} one; all five are present here and all five convert. So the pin is re-pointed
+     * rather than left empty, and now covers five rules instead of nought. {@code CDISC-CG0281} is
+     * NOT a carrier: it is the {@code RANDQT} family's count-based split sibling
+     * ({@code $trt_count == 1 and $randqt_count < 1}), a different claim.
+     * </p>
+     *
+     * <p>
+     * ⚠ Ported from the internal twin's review round 1, which found the same map <em>inert</em>
+     * rather than empty — keyed on {@code CORE-000335} / {@code -000539} / {@code -000540}, so
+     * {@code CURATED_BY_ID.get(id)} returned {@code null} for every authored file while the
+     * constant still read as a live pin. An empty map and a dead-keyed map are one defect in two
+     * costumes, and only the {@code curatedHits} counter below can tell either from a pin that ran.
      * </p>
      */
-    private static final Map<String, String> CURATED_BY_ID = Map.of();
+    private static final Map<String, String> CURATED_BY_ID = Map.of("CDISC-CG0280",
+            "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
+                    + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
+            "FDA-SD1269",
+            "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
+                    + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
+            "PMDA-SD1269",
+            "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
+                    + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
+            "CDISC-CG0332",
+            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ "
+                    + "and prefix(dataset_name, 2) not in [\"AP\", \"FA\"] "
+                    + "and prefix(dataset_name, 2) not in $list_dataset_names",
+            "CDISC-CG0333",
+            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z]{1,2}$/ "
+                    + "and prefix(dataset_name, 2) == \"FA\" "
+                    + "and suffix(dataset_name, 2) not in $list_dataset_names");
 
     /**
      * The carriers of the retired {@code does_not_equal_string_part} leaf-signature rewrite; their
@@ -134,6 +164,12 @@ class RuleSrcExpressionWriterCorpusTest
         List<Path> files = sortedYamlFiles(checksRoot);
         assertEquals(r.filesIn(), files.size());
         int checked = 0;
+        // ⛔ Non-vacuity counters for the two curated pins below, added 2026-09-19 (review round
+        // 1) after all three CURATED_BY_ID keys had silently become dead ids and the byte-match
+        // assertion fired for no rule. A Map.get() that returns null is not a failure — it is the
+        // pin not existing — so the only way to know the pin ran is to count.
+        int curatedHits = 0;
+        int leafHits = 0;
         for (Path file : files)
         {
             Path rel = checksRoot.relativize(file);
@@ -166,11 +202,13 @@ class RuleSrcExpressionWriterCorpusTest
             String curated = CURATED_BY_ID.get(id);
             if (curated != null)
             {
+                curatedHits++;
                 assertEquals(curated, expression,
                         id + ": the written expression must byte-match the curated one");
             }
             if (CURATED_BY_LEAF.contains(id))
             {
+                leafHits++;
                 // The flip-day re-base of SpecialCaseLeafSignatureTest: the leaf-signature
                 // rewrite's product (chars 5-6 of $dataset_name) is pinned as authored text —
                 // the raw-leaf signature itself retired with the authored leaf corpus.
@@ -180,6 +218,16 @@ class RuleSrcExpressionWriterCorpusTest
             checked++;
         }
         assertEquals(r.filesOut(), checked);
+        assertEquals(CURATED_BY_ID.size(), curatedHits,
+                "every CURATED_BY_ID key must name a rule the authored corpus still carries; "
+                        + curatedHits + " of " + CURATED_BY_ID.size() + " were reached, so the"
+                        + " byte-match pin above ran for fewer rules than it names. A key the"
+                        + " corpus renamed or retired makes the pin inert WITHOUT failing — that is"
+                        + " what happened to all three CORE-* keys in 2026-09. Re-point the key to"
+                        + " the live carrier of the same text, or delete it deliberately.");
+        assertEquals(CURATED_BY_LEAF.size(), leafHits,
+                "every CURATED_BY_LEAF id must name a rule the authored corpus still carries; "
+                        + leafHits + " of " + CURATED_BY_LEAF.size() + " were reached");
 
         // On the writer-canonical corpus nothing may diverge from the plain typed raise except
         // the shapes the plain raise cannot reproduce (strict-lowering asymmetries of restored
