@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0200 expect=violation domain=RELREC
+# Rule:Description: Raise an error when, within a subject, a unique RELID is not present on multiple RELREC records.
+#note "RELID 01-701-1015-E10 appears on only one record within the subject (orphan)"
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1015
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 01-701-1015-E09
+CDISCPILOT01 | CM | 01-701-1015 | 01-701-1015-E09
+CDISCPILOT01 | AE | 01-701-1015 | 01-701-1015-E10
+---

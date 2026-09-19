@@ -1,0 +1,29 @@
+name: CDISC-CG0073
+kind: rule
+description: |
+  Record-Data. EPOCH must not be populated for a PROTOCOL MILESTONE record.
+  The DS row sets DSCAT='PROTOCOL MILESTONE' with a populated EPOCH, so the
+  rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000364)
+rule:
+  coreId: CDISC-CG0073
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: PROTOCOL MILESTONE, DSDECOD: INFORMED CONSENT OBTAINED, EPOCH: SCREENING}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0073
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DSCAT: PROTOCOL MILESTONE
+      EPOCH: SCREENING
+expected_errors: []

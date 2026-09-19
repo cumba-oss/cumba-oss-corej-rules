@@ -1,0 +1,29 @@
+name: CDISC-CG0522
+kind: rule
+description: |
+  Wave 13 port - ACTARMCD empty but ACTARM populated. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000120)
+rule:
+  coreId: CDISC-CG0522
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARMCD: TRT01, ACTARM: Actual Treatment 1}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ACTARMCD: '', ACTARM: Actual Treatment 1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0522
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ACTARM: Actual Treatment 1
+      ACTARMCD:
+expected_errors: []

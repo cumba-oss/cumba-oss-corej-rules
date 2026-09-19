@@ -1,0 +1,33 @@
+name: CDISC-CG0660
+kind: rule
+description: |
+  Wave 23 port - Variable Metadata Check. S1 (2026-09-14): the Check is now
+  var_exists("--EVALID"), the -- prefix resolving to the current domain, which
+  replaced the D-15 varname() in [QSEVALID, FTEVALID] membership list and its
+  cross-domain match. The finding is anchored to the row and carries the resolved
+  column. Re-shaped to use QS (which is in the rule's
+  Domains.Include=[QS, FT]); previously used LB which made the rule
+  out-of-scope and only fired in Java because the parity-test framework
+  bypassed scope filtering.
+python_source: rules-sdtmig-3-4.json (CORE-000032)
+rule:
+  coreId: CDISC-CG0660
+datasets:
+  QS:
+    row_key: [STUDYID, USUBJID, QSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: QS, USUBJID: '001', QSSEQ: 1, QSEVALID: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [QS]
+expected_violations:
+  - rule_id: CDISC-CG0660
+    dataset: QS
+    row_key: {QSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      QSEVALID: X
+expected_errors: []

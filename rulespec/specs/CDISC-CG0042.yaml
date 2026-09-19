@@ -1,0 +1,35 @@
+name: CDISC-CG0042
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000266)
+python_source: rules-sdtmig-3-4.json (CORE-000266)
+rule:
+  coreId: CDISC-CG0042
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESER: Y, AESCAN: Y, AESCONG: N, AESDISAB: N, AESDTH: N, AESHOSP: N, AESLIFE: N, AESOD: N, AESMIE: N}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESER: Y, AESCAN: N, AESCONG: N, AESDISAB: N, AESDTH: N, AESHOSP: N, AESLIFE: N, AESOD: N, AESMIE: N}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0042
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AESCAN: N
+      AESCONG: N
+      AESDISAB: N
+      AESDTH: N
+      AESER: Y
+      AESHOSP: N
+      AESLIFE: N
+      AESMIE: N
+      AESOD: N
+expected_errors: []

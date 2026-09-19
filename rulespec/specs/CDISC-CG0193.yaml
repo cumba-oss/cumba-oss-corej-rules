@@ -1,0 +1,31 @@
+name: CDISC-CG0193
+kind: rule
+description: |
+  Record-Data. CORE-000332: MB record with MBTESTCD=ORGANISM, MBSTRESC not 'NO GROWTH',
+  MBMETHOD not 'GRAM STAIN', and MBRESCAT empty. The row below satisfies every leaf
+  (MBRESCAT blank), so the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000332)
+rule:
+  coreId: CDISC-CG0193
+datasets:
+  MB:
+    row_key: [STUDYID, USUBJID, MBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: MB, USUBJID: '001', MBSEQ: 1, MBTESTCD: ORGANISM, MBSTRESC: E. COLI, MBMETHOD: CULTURE, MBRESCAT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    findings: [MB]
+expected_violations:
+  - rule_id: CDISC-CG0193
+    dataset: MB
+    row_key: {MBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      MBMETHOD: CULTURE
+      MBRESCAT:
+      MBSTRESC: E. COLI
+      MBTESTCD: ORGANISM
+expected_errors: []

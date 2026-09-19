@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0092 expect=violation domain=AE
+# Rule:Description: Raise an error when the Time Point Reference (--TPTREF) variable is not present in the dataset while the Planned Elapsed Time from Time Point Ref (--ELTM) variable is present.
+#note "AEELTM column is present but AETPTREF column is absent"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEELTM type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | PT1H
+CDISCPILOT01 | AE | 01-701-1015 | 2 | PT2H
+CDISCPILOT01 | AE | 01-701-1023 | 1 | PT1H
+---

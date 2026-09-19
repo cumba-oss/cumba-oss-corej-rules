@@ -1,0 +1,29 @@
+name: FDA-SD1335
+kind: rule
+description: |
+  Wave 7 port — DM: RFICDTC (informed consent) must be on or before RFXSTDTC
+  (first study treatment). Triple-leaf.
+python_source: rules-sdtmig-3-4.json (CORE-000658)
+rule:
+  coreId: FDA-SD1335
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFICDTC: '2023-01-01', RFXSTDTC: '2023-01-15'}      # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2023-02-01', RFXSTDTC: '2023-01-15'}      # bad
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFICDTC: '', RFXSTDTC: '2023-01-15'}                # empty → no fire
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1335
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      RFICDTC: '2023-02-01'
+      RFXSTDTC: '2023-01-15'
+expected_errors: []

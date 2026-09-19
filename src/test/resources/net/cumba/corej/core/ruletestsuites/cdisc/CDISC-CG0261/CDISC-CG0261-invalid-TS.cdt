@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0261 expect=violation domain=TS
+# Rule:Description: Raise an error when the overflow Parameter Value column (TSVAL1) is populated but the Parameter Value (TSVAL) is empty.
+#note "TSVAL1 is populated while the primary TSVAL is empty"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL type=Char label="Parameter Value"
+col TSVAL1 type=Char label="Parameter Value 1"
+---
+CDISCPILOT01 | TS | AGESPAN |  | ELDERLY (> 65)
+---

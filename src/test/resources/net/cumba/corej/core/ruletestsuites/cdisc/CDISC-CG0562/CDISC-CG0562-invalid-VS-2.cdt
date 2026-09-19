@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0562 expect=violation domain=VS
+# Rule:Description: Raise an error when REPNUM is in the dataset and there are multiple records for a subject for a test within the timeframe identified by the timing variables on the record, and --REPNUM is missing or not unique per subject per test per timing variables.
+#note "Two SYSBP records share the same VSDTC date but VSREPNUM is empty (null) within the timing group -> violation"
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 VSSEQ=1
+#expectViolationAt row=2 USUBJID=01-701-1015 VSSEQ=2
+#library standard=sdtmig version=3-4
+#library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing VSREPNUM:Qualifier DOMAIN:Identifier
+dataset VS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ type=Num label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSDTC type=Char label="Date/Time of Measurements"
+col VSREPNUM type=Char label="Repetition Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 2014-01-01 |
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 2014-01-01 |
+---

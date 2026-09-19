@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0627 expect=violation domain=LB
+# Rule:Description: Raise an error when --DTHREL is present in a Findings dataset, since --DTHREL is not permitted in human clinical trials.
+#note "LBDTHREL column is present in LB, so the rule fires"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBDTHREL type=Char label="Relationship to Death"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 |
+CDISCPILOT01 | LB | 01-701-1015 | 2 |
+---

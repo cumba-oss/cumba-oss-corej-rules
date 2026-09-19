@@ -1,0 +1,68 @@
+name: CDISC-CG0148-blank-exstdtc
+kind: rule
+description: |
+  EC-51 Phase 1 — the FIRST parity spec in this operator family with a MIXED
+  blank+populated group in the extreme-read column. Before this, 13 specs reached
+  min_date/max_date/date_diff_days and 0 of them had a mixed group, which is why a
+  live cross-lane divergence survived undetected.
+
+  CORE-000239 is `RFXSTDTC != min_date(EX.EXSTDTC grouped by USUBJID)`, so a wrong
+  grouped extreme shows up directly as a false violation on conformant data.
+
+  Three subjects, each discriminating one behaviour:
+
+  001 — EMPTY STRING alongside a populated date. The true earliest is 2026-01-05 and
+       RFXSTDTC matches it, so a correct engine reports nothing.
+       ⚠ The fork used to report a violation here: its grouped path is plain pandas
+       `.min()`, which skips NaN but NOT "", and "" sorts below every digit — so the
+       extreme came out as "" and `'2026-01-05' != ''` fired. coreJ always skipped the
+       blank. This row is the fork half of EC-51 Phase 1.
+
+  003 — WHITESPACE-ONLY alongside a populated date, same shape.
+       ⚠ coreJ used to report a violation here: its inlined candidate test used
+       `isEmpty()`, not `strip().isEmpty()`, so " " (0x20) beat every digit (0x30+) and
+       won the min. This row is the coreJ half, and it is EC-51's one deliberate
+       behaviour change.
+
+  002 — a GENUINE violation, so the spec cannot pass vacuously: if the rule stopped
+       firing altogether, this row would catch it.
+python_source: rules-sdtmig-3-4.json (CORE-000239)
+rule:
+  coreId: CDISC-CG0148
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2026-01-05'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2026-09-09'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXSTDTC: '2026-04-02'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      # 001 — blank EXSTDTC must not win the group's min.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2026-01-05', EXENDTC: '2026-01-20'}
+      # 002 — fully populated; RFXSTDTC genuinely disagrees with the earliest EXSTDTC.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-03-01', EXENDTC: '2026-03-10'}
+      # 003 — whitespace-only EXSTDTC must not win the group's min.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: ' ', EXENDTC: '2026-04-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2026-04-02', EXENDTC: '2026-04-20'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003]'
+      $min_ex_exstdtc: '2026-03-01'
+      RFXSTDTC: '2026-09-09'
+expected_errors: []

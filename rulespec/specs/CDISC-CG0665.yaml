@@ -1,0 +1,28 @@
+name: CDISC-CG0665
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000189)
+python_source: rules-sdtmig-3-4.json (CORE-000189)
+rule:
+  coreId: CDISC-CG0665
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', AGE: '35', AGEU: YEARS}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', AGE: '35', AGEU: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0665
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AGE: '35'
+      AGEU:
+expected_errors: []

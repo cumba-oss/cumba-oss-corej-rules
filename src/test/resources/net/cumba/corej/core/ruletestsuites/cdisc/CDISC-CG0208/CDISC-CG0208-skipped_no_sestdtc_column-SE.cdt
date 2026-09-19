@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0208 expect=skipped domain=SE
+# Rule:Description: Raise an error when Start Date/Time of Element (SESTDTC) is not populated.
+#note "THE SESTDTC ALL-FACET GATE (Fix #331 bucket 2, M2-D24 / M3-D18; pin owed by review S9 and authored by Fix #340). The SE dataset deliberately declares no SESTDTC column, so Requirements.Variables.All [SESTDTC] rejects the dataset and the rule is SKIPPED naming SESTDTC. Remove the All entry and the rule EXECUTES: since Fix #330 retired the injected var_exists guard, a bare empty(SESTDTC) is TRUE on every row of an absent column (absent = all-missing) and nothing else in the Check restricts the rows, so it would fire on EVERY row -- the flood the gate exists for. If this scenario EXECUTES (violation or silent pass), the gate has been removed -- escalate, do not rewrite the pin."
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1
+CDISCPILOT01 | SE | 01-701-1015 | 2
+---

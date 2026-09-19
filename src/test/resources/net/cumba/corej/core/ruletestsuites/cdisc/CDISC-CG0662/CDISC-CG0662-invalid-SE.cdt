@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0662 expect=violation domain=SE
+# Rule:Description: Raise an error when --SEQ is not in consistent chronological order (based on --STDTC) within USUBJID.
+#note "within the subject, ordering by SESTDTC asc yields a decreasing SESEQ (2 then 1)"
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+#expectViolationAt row=1 SESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 SESEQ=2 USUBJID=01-701-1015
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | 2024-02-01
+CDISCPILOT01 | SE | 01-701-1015 | 2 | 2024-01-01
+---

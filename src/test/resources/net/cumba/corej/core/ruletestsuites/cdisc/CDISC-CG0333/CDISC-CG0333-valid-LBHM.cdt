@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0333 expect=noViolation domain=LBHM
+# Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
+#note "In-scope no-violation control, added when `include_split_datasets: true` became a CONJUNCTIVE gate (match Include AND be a split) — it replaces the discrimination previously carried by -valid-DM, which is now legitimately out of scope because DM is not a split. LBHM carries DOMAIN=LB, so its data-derived base is LB and LBHM != LB makes it a genuine split; `Include: [ALL]` matches, so the rule really executes. The `prefix_equal_to 2 = FA` conjunct is then false (the prefix is LB), so the `all` block cannot fire -> no violation. This is the FA-prefix discrimination the rule needs, now exercised on a dataset the rule actually reaches."
+dataset LBHM label="Laboratory Test Results split by category"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+CDISCPILOT01 | LB | 01-701-1023
+---
+
+dataset LB label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+---

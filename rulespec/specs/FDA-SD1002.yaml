@@ -1,0 +1,29 @@
+name: FDA-SD1002
+kind: rule
+description: |
+  Wave 13 port - RFSTDTC after RFENDTC in DM. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000711)
+rule:
+  coreId: FDA-SD1002
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFSTDTC: '2026-01-01', RFENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFSTDTC: '2026-01-10', RFENDTC: '2026-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1002
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      RFENDTC: '2026-01-01'
+      RFSTDTC: '2026-01-10'
+expected_errors: []

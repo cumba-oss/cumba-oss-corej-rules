@@ -1,0 +1,29 @@
+name: CDISC-CG0440
+kind: rule
+description: |
+  Record-Data plain. CORE-000340: TSPARMCD='PLANSUB' and TSVAL not a positive
+  integer. TS row sets TSPARMCD=PLANSUB and TSVAL='abc' (does not match
+  ^[1-9]\d*$) so both leaves fire.
+python_source: rules-sdtmig-3-3.json (CORE-000340)
+rule:
+  coreId: CDISC-CG0440
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: PLANSUB, TSVAL: abc}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0440
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: PLANSUB
+      TSVAL: abc
+expected_errors: []

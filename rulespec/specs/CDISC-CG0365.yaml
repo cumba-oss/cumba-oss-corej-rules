@@ -1,0 +1,30 @@
+name: CDISC-CG0365
+kind: rule
+description: |
+  Record-Data port. CORE-000233: RDEVID and RSUBJID should not both be populated
+  on the same AP-- record. Two Check leaves: RSUBJID non_empty AND RDEVID
+  non_empty. Resolved AP-- to APRELSUB; the row populates both RSUBJID and RDEVID,
+  so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000233)
+rule:
+  coreId: CDISC-CG0365
+datasets:
+  APRELSUB:
+    row_key: [STUDYID, APID, RSUBJID, RDEVID]
+    rows:
+      - {STUDYID: S1, DOMAIN: APRELSUB, APID: AP01, RSUBJID: '001', RDEVID: DEV1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [APRELSUB]
+expected_violations:
+  - rule_id: CDISC-CG0365
+    dataset: APRELSUB
+    row_key: {APID: AP01, RDEVID: DEV1, RSUBJID: '001', STUDYID: S1}
+    status: SUCCESS
+    output_variables:
+      RDEVID: DEV1
+      RSUBJID: '001'
+expected_errors: []

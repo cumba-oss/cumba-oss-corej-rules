@@ -1,0 +1,29 @@
+name: CDISC-CG0142
+kind: rule
+description: |
+  Record-Data port. CORE-000378 (aligned to CDISC-CG0142 per D16): if ACTARMCD is
+  a real arm code (not SCRNFAIL/NOTASSGN) then RFENDTC must be populated. The DM row
+  sets ACTARMCD=ARM1 and leaves RFENDTC empty, so the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000378)
+rule:
+  coreId: CDISC-CG0142
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARMCD: ARM1, RFENDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0142
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      RFENDTC:
+      ACTARMCD: ARM1
+expected_errors: []

@@ -1,0 +1,44 @@
+name: CDISC-CG0151
+kind: rule
+description: |
+  Wave 1 port — simple shape.
+  CORE-000351: USUBJID must be unique across all studies.
+  Single domain (DM), single check leaf using is_not_unique_set against the (USUBJID, DOMAIN) tuple.
+  No Operations, no Match_Datasets. Library mock provides DM → "special-purpose" so the
+  Python engine's Scope.Classes.Include filter passes; Java's RuleRunner doesn't enforce
+  Classes scope so it runs the rule unconditionally.
+python_source: rules-sdtmig-3-4.json (CORE-000351)
+rule:
+  coreId: CDISC-CG0151
+datasets:
+  DM:
+    rows:
+    - {STUDYID: S1, DOMAIN: DM, USUBJID: '001'}
+    - {STUDYID: S1, DOMAIN: DM, USUBJID: '002'}
+      # Duplicate USUBJID — both rows should fire under is_not_unique_set:
+    - {STUDYID: S1, DOMAIN: DM, USUBJID: '003'}
+    - {STUDYID: S1, DOMAIN: DM, USUBJID: '003'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+- rule_id: CDISC-CG0151
+  dataset: DM
+  row_key:
+    STUDYID: S1
+    USUBJID: '003'
+  status: SUCCESS
+  output_variables:
+    DOMAIN: DM
+- rule_id: CDISC-CG0151
+  dataset: DM
+  row_key:
+    STUDYID: S1
+    USUBJID: '003'
+  status: SUCCESS
+  output_variables:
+    DOMAIN: DM
+expected_errors: []

@@ -1,0 +1,67 @@
+Core:
+  Id: "FDA-SD9743"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when both AGE and AGETXT are present in the list of TSPARMCDs\
+  \ with TSVAL populated (only one should be used)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Requirements:
+  Variables:
+    All:
+    - "TSPARMCD"
+Operations:
+- id: "$age_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGE\"\
+    ))"
+- id: "$agetxt_count"
+  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGETXT\"\
+    ))"
+Check:
+  expression: >-
+    (TSPARMCD == "AGE" or TSPARMCD == "AGETXT") and $age_count >= 1 and $agetxt_count >= 1 and not
+    empty(TSVAL)
+Outcome:
+  Message: "AGE and AGETXT are in the list of TSPARMCDs with TSVAL populated."
+  Output_Variables:
+  - "TSPARMCD"
+  - "TSVAL"
+  - "$age_count"
+  - "$agetxt_count"
+Source_Proposed:
+  Sheet_Issue: "#265"
+  FDA_Validator_Rule_Message: "AGE and AGETXT are both submitted in TS"
+  FDA_Validator_Rule_Description: "The Trial Summary (TS) dataset must submit either\
+    \ the AGE or the AGETXT Trial Summary Parameter, not both: only one of the two\
+    \ TSPARMCD values may be present with TSVAL populated."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

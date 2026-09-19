@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0112 expect=violation domain=CM
+# Rule:Description: Raise an error when Dose Description (--DOSTXT) value is numeric.
+#note "CMDOSTXT holds a purely-numeric value (10) -> matches the numeric regex -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 CMSEQ=1 USUBJID=01-701-1015
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num label="Sequence Number"
+col CMDOSTXT type=Char label="Dose Description"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | 10
+CDISCPILOT01 | CM | 01-701-1015 | 2 |
+---

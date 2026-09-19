@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0010 expect=noViolation domain=DM
+#note "Define roles equal the library roles on both USUBJID and ARMCD -> silent under both the current and the proposed rule."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM ARMCD name=ARMCD role=Identifier
+#library variable-metadata DM USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-dm-valid-define.xml
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+---
+S1 | DM | 001 | A

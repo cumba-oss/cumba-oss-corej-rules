@@ -1,0 +1,29 @@
+name: CDISC-CG0146
+kind: rule
+description: |
+  Record-Data port. CORE-000380: if ACTARM is NOT a non-treated value then RFSTDTC must
+  be populated. DM row sets ACTARM=Drug A (not a reserved value) and RFSTDTC empty, so
+  both leaves are satisfied and the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000380)
+rule:
+  coreId: CDISC-CG0146
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARM: Drug A, RFSTDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0146
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ACTARM: Drug A
+      RFSTDTC:
+expected_errors: []

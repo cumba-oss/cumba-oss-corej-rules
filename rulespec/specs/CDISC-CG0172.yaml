@@ -1,0 +1,37 @@
+name: CDISC-CG0172
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['max_date']).
+python_source: rules-sdtmig-3-4.json (CORE-000178)
+rule:
+  coreId: CDISC-CG0172
+datasets:
+  SS:
+    row_key: [STUDYID, USUBJID, SSSEQ]
+    column_types:
+      SSSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '001', SSSEQ: 1, SSSTRESC: DEAD, SSDTC: '2026-01-20'}
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '002', SSSEQ: 1, SSSTRESC: DEAD, SSDTC: '2025-12-01'}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: X, DSSTDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: X, DSSTDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [SS]
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0172
+    dataset: SS
+    row_key: {SSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $max_ds_dsstdtc: '2026-01-10'
+      SSDTC: '2025-12-01'
+      SSSTRESC: DEAD
+expected_errors: []

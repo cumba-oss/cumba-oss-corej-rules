@@ -1,0 +1,101 @@
+Core:
+  Id: "FDA-SD9746"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Normal Range Upper Limit (--ORNRHI) is less\
+  \ than or equal to the Normal Range Lower Limit (--ORNRLO)."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ORNRHI"
+    - "--ORNRLO"
+Check:
+  expression: >-
+    not empty(--ORNRLO) and is_numeric(--ORNRLO) and not empty(--ORNRHI) and is_numeric(--ORNRHI)
+    and num(--ORNRHI) <= num(--ORNRLO)
+Outcome:
+  Message: "--ORNRHI is less than or equal to --ORNRLO."
+  Output_Variables:
+  - "--TESTCD"
+  - "--ORNRLO"
+  - "--ORNRHI"
+Source_Proposed:
+  Sheet_Issue: "#268"
+  FDA_Validator_Rule_Message: "--ORNRHI is not greater than --ORNRLO"
+  FDA_Validator_Rule_Description: "The Reference Range Upper Limit in Original Units\
+    \ (--ORNRHI) must be greater than the Reference Range Lower Limit in Original\
+    \ Units (--ORNRLO) whenever both are submitted as numeric values; equal limits\
+    \ are a violation."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB039"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,28 @@
+name: CDISC-CG0216
+kind: rule
+description: |
+  Record-Data. CORE-000501: in SV, both SVUPDES and VISITDY are present and populated.
+  The SV row populates both so all four leaves fire.
+python_source: rules-sdtmig-3-3.json (CORE-000501)
+rule:
+  coreId: CDISC-CG0216
+datasets:
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, SVUPDES: Updated, VISITDY: 7}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+expected_violations:
+  - rule_id: CDISC-CG0216
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      SVUPDES: Updated
+      VISITDY: '7'
+expected_errors: []

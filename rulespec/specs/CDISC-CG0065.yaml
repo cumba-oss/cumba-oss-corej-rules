@@ -1,0 +1,29 @@
+name: CDISC-CG0065
+kind: rule
+description: |
+  Wave 13 port - DSTERM=COMPLETED but DSDECOD != COMPLETED. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000033)
+rule:
+  coreId: CDISC-CG0065
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSTERM: COMPLETED, DSDECOD: COMPLETED}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSTERM: COMPLETED, DSDECOD: WITHDREW}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0065
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DSDECOD: WITHDREW
+      DSTERM: COMPLETED
+expected_errors: []

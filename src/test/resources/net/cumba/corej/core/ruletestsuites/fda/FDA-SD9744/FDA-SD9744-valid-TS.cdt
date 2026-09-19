@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9744 expect=noViolation domain=TS
+# Rule:Description: Raise an error when the TS dataset contains a record with TSPARMCD='HLTSUBJI' and TSVAL='Y' (indicating a healthy-subjects study) but does not contain a record with TSPARMCD='INDIC' and TSVALNF='NA'.
+#note "HLTSUBJI=Y is present together with an INDIC record whose TSVALNF=NA, so the requirement is met"
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL type=Char label="Parameter Value"
+col TSVALNF type=Char label="Parameter Value Null Flavor"
+---
+CDISCPILOT01 | TS | HLTSUBJI | Y |
+CDISCPILOT01 | TS | INDIC |  | NA
+---

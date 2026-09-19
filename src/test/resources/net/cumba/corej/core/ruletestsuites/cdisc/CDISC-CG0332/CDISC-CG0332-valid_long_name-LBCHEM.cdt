@@ -1,0 +1,10 @@
+#!RuleTest
+#test CDISC-CG0332 expect=noViolation domain=LBCHEM
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "CL-C (wave TA-4): the CG0332-shape regex is anchored at both ends, so only three/four-character names are split-dataset candidates. The six-character name LBCHEM is not a legal split name and is no longer examined - under the old unanchored head its first characters matched and the rule fired for the missing LB parent."
+dataset LBCHEM label="Six-character dataset name (not a split-name shape)"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015

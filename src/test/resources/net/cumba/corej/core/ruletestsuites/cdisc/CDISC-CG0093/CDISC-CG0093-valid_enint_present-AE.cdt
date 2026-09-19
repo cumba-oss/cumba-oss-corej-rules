@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0093 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --ELTM, --TPTNUM, --TPT, --STINT, and --ENINT are not present in the dataset but --TPTREF is present.
+#note "AEENINT present alongside AETPTREF -> the new 'not var_exists(--ENINT)' conjunct is false, rule silent. Neuter target for the --ENINT half of D23."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEENINT type=Char label="End of Assessment Interval"
+col AETPTREF type=Char label="Time Point Reference"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | P1D | DOSING
+CDISCPILOT01 | AE | 01-701-1015 | 2 | P1D | DOSING
+---

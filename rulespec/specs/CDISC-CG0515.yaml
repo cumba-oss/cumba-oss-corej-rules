@@ -1,0 +1,30 @@
+name: CDISC-CG0515
+kind: rule
+description: |
+  Wave 3 port — two-leaf `empty` check.
+  CORE-000224: When ACTARM is empty in DM, ARMNRS must be populated (either ACTARM is set
+  OR the reason ARMNRS explains why). Fires when both are blank.
+python_source: rules-sdtmig-3-4.json (CORE-000224)
+rule:
+  coreId: CDISC-CG0515
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARM: Placebo, ARMNRS: ''}                   # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ACTARM: '', ARMNRS: NOT ASSIGNED}               # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', ACTARM: '', ARMNRS: ''}                         # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0515
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      ACTARM:
+      ARMNRS:
+expected_errors: []

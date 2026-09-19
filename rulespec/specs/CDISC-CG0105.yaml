@@ -1,0 +1,35 @@
+name: CDISC-CG0105
+kind: rule
+description: |
+  Wave 22 port — EX primary + EX match on USUBJID (self-match) + variable_exists
+  EXVAMT + EC exists.
+python_source: rules-sdtmig-3-4.json (CORE-000291)
+rule:
+  coreId: CDISC-CG0105
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXVAMT: '5'}
+  EC:
+    row_key: [STUDYID, USUBJID, ECSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EC, USUBJID: '001', ECSEQ: 1, ECTRT: DRUG}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX, EC]
+expected_violations:
+  - rule_id: CDISC-CG0105
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    # Wave 20 (PLAN-retired-operators-as-operations.md Phase 4): the retained `variable_exists`
+    # operation restores the authored `$EXVAMT_EXISTS`. Unlike CORE-000292 the derived half is
+    # unchanged — the lowered Check's `var_exists("EXVAMT")` already contributed the bare name.
+    output_variables:
+      $exvamt_exists: 'true'
+      EXVAMT: '5'
+expected_errors: []

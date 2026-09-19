@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0022 expect=violation domain=LB
+# Rule:Description: Raise an error when Link Group ID (--LNKGRP) is present in a domain but is not present in any other domain.
+#note "--LNKGRP present only in LB and no other dataset carries it -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBLNKGRP type=Char label="Link Group ID"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GRP1
+CDISCPILOT01 | LB | 01-701-1015 | 2 |
+---

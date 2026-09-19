@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-SEND-9442"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --METHOD is not populated."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "GV"
+Requirements:
+  Variables:
+    All:
+    - "--METHOD"
+Check:
+  expression: >-
+    empty(--METHOD)
+Outcome:
+  Message: "--METHOD is not populated."
+  Output_Variables:
+  - "--METHOD"
+Source_Proposed:
+  Sheet_Issue: "#272"
+  Class: "FND"
+  Domain: "GV"
+  Variable: "--METHOD"
+  Plain_Text_Explanation: "Where the Method of Test or Examination (GVMETHOD) variable\
+    \ is submitted in the Genetic Toxicology In Vivo Test Results (GV) domain it must\
+    \ be populated for every record, because the assay method is what makes a GV result\
+    \ interpretable."
+  Condition: "GVMETHOD variable is present in the dataset"
+  Rule: "GVMETHOD ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"

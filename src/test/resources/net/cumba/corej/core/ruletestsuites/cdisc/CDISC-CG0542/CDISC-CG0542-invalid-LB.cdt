@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0542 expect=violation domain=LB
+# Rule:Description: Raise an error when the ECG Beat Number (--BEATNO) variable is present in a general-observation-class dataset other than the ECG Test Results (EG) domain. Per SDTM Model v2.0, --BEATNO is an Identifier allowed for all general observation classes but restricted to the EG domain ('EG Domain only').
+#note "LBBEATNO column is present in LB, so the rule fires"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBBEATNO type=Char label="Beat Number"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 |
+CDISCPILOT01 | LB | 01-701-1015 | 2 |
+---

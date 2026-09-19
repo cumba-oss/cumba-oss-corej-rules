@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-CG0531 expect=violation domain=DM
+# Rule:Description: Raise an error when RACE in DM equals 'MULTIPLE' but multiple race records are not present in SUPPDM for the subject.
+#note "Subject 01-701-1015 has RACE=MULTIPLE but only one RACE record in SUPPDM"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE type=Char label=Race format=$RACE.
+---
+CDISCPILOT01 | DM | 01-701-1015 | MULTIPLE
+CDISCPILOT01 | DM | 01-701-1023 | WHITE
+---
+
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM type=Char label="Qualifier Variable Name"
+---
+CDISCPILOT01 | 01-701-1015 | RACE1
+CDISCPILOT01 | 01-701-1015 | SAFETY
+---

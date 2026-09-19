@@ -1,0 +1,37 @@
+name: CDISC-CG0060
+kind: rule
+description: |
+  Wave 12b port - --STTPT present but --STRTPT absent. Variable Metadata Check with
+  Dataset sensitivity; Java evaluates against the original dataset's column
+  metadata (correct), Python swaps to a metadata projection and reports 0
+  violations. Baselined on the Python lane under Finding #9.
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection before evaluating the Check,
+  so `exists(--COLNAME)` checks meta-field column names (variable_name,
+  variable_label, ...) instead of the original dataset columns and yields
+  0 violations. Java evaluates the `exists`/`not_exists` leaves against the
+  actual column metadata and fires correctly. expected_violations matches
+  Java; Python XFAILs on the asymmetric-lane baseline.
+python_source: rules-sdtmig-3-4.json (CORE-000261)
+rule:
+  coreId: CDISC-CG0060
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESTTPT: SCREENING}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0060
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AESTTPT: SCREENING
+expected_errors: []

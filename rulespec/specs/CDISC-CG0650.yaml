@@ -1,0 +1,32 @@
+name: CDISC-CG0650
+kind: rule
+description: |
+  Wave 18 port - Dataset-sensitivity rule. The rule scopes via
+  `Domains.Include: [AP--]` + `include_split_datasets: true`, so evaluation
+  is restricted to split AP datasets. Fixture uses APMHEX1 — a 7-char
+  digit-suffix split (Java's split detector accepts 1-2 trailing digits;
+  three+ digits would not match) whose unsplit base APMH matches the AP--
+  wildcard. Both lanes recognise it as in-scope and the `longer_than 6`
+  check fires once. APID is included so Python's data-driven `is_ap` matches.
+python_source: rules-sdtmig-3-4.json (CORE-000778)
+rule:
+  coreId: CDISC-CG0650
+datasets:
+  APMHEX1:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, DOMAIN: APMH, USUBJID: '001', APID: '1', APTERM: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [APMHEX1]
+expected_violations:
+- rule_id: CDISC-CG0650
+  dataset: APMHEX1
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    dataset_name: APMHEX1
+expected_errors: []

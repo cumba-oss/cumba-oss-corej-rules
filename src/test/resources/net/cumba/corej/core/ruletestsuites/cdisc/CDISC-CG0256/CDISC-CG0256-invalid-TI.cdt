@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0256 expect=violation domain=TI
+# Rule:Description: Raise an error when TIVERS is not present and IETESTCD is not unique within the TI dataset.
+#note "TIVERS column absent; IETESTCD=INCL01 repeats within the TI dataset"
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=2
+dataset TI label="Trial Inclusion/ Exclusion Criteria"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name" format=$IETESTCD.
+col IETEST type=Char label="Inclusion/Exclusion Criterion" format=$IETEST.
+---
+CDISCPILOT01 | TI | INCL01 | Males and postmenopausal females at least 50 years of age
+CDISCPILOT01 | TI | INCL01 | Males and postmenopausal females at least 50 years of age
+---

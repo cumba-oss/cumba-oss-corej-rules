@@ -1,0 +1,59 @@
+name: CDISC-CG0174
+kind: rule
+description: |
+  Wave 3 port — RELREC `**` per-row resolution (validation spec for Finding #12a).
+  CORE-000744: FA.FAOBJ must match one of --TERM / --TRT / --DECOD from the parent
+  domain paired via RELREC.
+
+  Test study pairs FA row 0 to AE (AEDECOD="ASPIRIN") via RELID=R1 and FA row 1 to CM
+  (CMDECOD="IBUPROFEN") via RELID=R2. FA row 0 matches AE's `**DECOD` → no violation;
+  FA row 1 (FAOBJ="MYSTERY") matches none of CM's `**TERM` / `**TRT` / `**DECOD` →
+  violation.
+
+  Depends on the static SDTM model_metadata mock in engine_adapter (Finding #12a).
+  Without it, Python's merge_on_relrec_record skips renaming AEDECOD→**DECOD and the
+  Check's output-variable lookup returns "Not in dataset" placeholders.
+python_source: rules-sdtmig-3-4.json (CORE-000744)
+rule:
+  coreId: CDISC-CG0174
+datasets:
+  FA:
+    row_key: [STUDYID, USUBJID, FASEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: FA, USUBJID: '001', FASEQ: 1, FAOBJ: ASPIRIN}
+      - {STUDYID: S1, DOMAIN: FA, USUBJID: '001', FASEQ: 2, FAOBJ: MYSTERY}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, AEDECOD: ASPIRIN, AETRT: ASA}
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMTERM: Ibuprofen dose, CMDECOD: IBUPROFEN, CMTRT: IBU}
+  RELREC:
+    row_key: [__row_number__]
+    rows:
+      - {STUDYID: S1, RDOMAIN: FA, USUBJID: '001', IDVAR: FASEQ, IDVARVAL: '1', RELID: R1}
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', RELID: R1}
+      - {STUDYID: S1, RDOMAIN: FA, USUBJID: '001', IDVAR: FASEQ, IDVARVAL: '2', RELID: R2}
+      - {STUDYID: S1, RDOMAIN: CM, USUBJID: '001', IDVAR: CMSEQ, IDVARVAL: '1', RELID: R2}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings about: [FA]
+    events: [AE]
+    interventions: [CM]
+    relationship: [RELREC]
+expected_violations:
+  - rule_id: CDISC-CG0174
+    dataset: FA
+    row_key: {FASEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      FAOBJ: MYSTERY
+      RELREC.**DECOD: IBUPROFEN
+      RELREC.**TERM: Ibuprofen dose
+      RELREC.**TRT: IBU
+expected_errors: []

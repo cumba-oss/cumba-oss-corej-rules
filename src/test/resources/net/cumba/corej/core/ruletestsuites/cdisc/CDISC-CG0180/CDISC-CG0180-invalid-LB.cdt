@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0180 expect=violation domain=LB
+# Rule:Description: Raise an error when Reference Range Lower Limit in Original Units (LBORNRLO) is populated while the Result or Finding in Original Units (LBORRES) is not a quantitative (continuous) measurement value. A numeric LBORRES value (optionally prefixed with a comparator) is used as a data proxy for a continuous result.
+#note "non-numeric LBORRES while LBORNRLO is populated -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1 USUBJID=01-701-1015
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBORRES type=Char label="Result or Finding in Original Units"
+col LBORNRLO type=Char label="Reference Range Lower Limit in Orig Unit"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | POSITIVE | 3.3
+CDISCPILOT01 | LB | 01-701-1015 | 2 | 3.8      | 3.3
+---

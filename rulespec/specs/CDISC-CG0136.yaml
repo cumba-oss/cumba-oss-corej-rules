@@ -1,0 +1,43 @@
+name: CDISC-CG0136
+kind: rule
+description: |
+  Wave 1 port — cross-dataset shape.
+  CORE-000252: When a record is present in the DS dataset where DSDECOD = 'DEATH'
+  then death flag (DTHFL) should be 'Y' in the DM dataset for the corresponding subject.
+  Primary domain DM, Match_Datasets join to DS on USUBJID. Two leaves combined with all:
+  DS.DSDECOD = "DEATH" AND DM.DTHFL != "Y".
+python_source: rules-sdtmig-3-4.json (CORE-000252)
+rule:
+  coreId: CDISC-CG0136
+datasets:
+  DM:
+    rows:
+      # Subject 001 — has death record in DS, DTHFL not 'Y'  → violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: ''}
+      # Subject 002 — has death record in DS, DTHFL is 'Y'   → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: Y}
+      # Subject 003 — DS record but not 'DEATH'              → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHFL: ''}
+      # Subject 004 — no DS record at all                    → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '004', DTHFL: ''}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: DEATH}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: DEATH}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 1, DSDECOD: ADVERSE EVENT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM, DS]
+expected_violations:
+  - rule_id: CDISC-CG0136
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DS.DSDECOD: DEATH
+      DTHFL:
+expected_errors: []

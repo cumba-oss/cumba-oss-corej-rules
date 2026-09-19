@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0650 expect=skipped domain=LBCHEMIST
+# Rule:Description: Raise an error when an Associated Persons non-supplemental qualifier dataset associated with a split dataset has a dataset name length shorter than or equal to 4 or greater than 6 characters.
+#note "⚑ THIS SCENARIO PINS THE OVER-FIRE THAT `include_split_datasets` USED TO CAUSE, and it is the executable proof that the conjunctive gate works. CDISC-CG0650 is scoped `Domains.Include: [AP--]` + `include_split_datasets: true`. While that flag was applied ADDITIVELY (mirroring Python `_handle_split_domains`), EVERY split dataset in the study was force-included regardless of Include, so the `AP--` token was inert and this rule ran study-wide: LBCHEMIST is a 9-character split of LB with nothing to do with Associated Persons, yet `longer_than 6` fired and produced the message 'Split dataset name length of an Associated Persons non-supplemental qualifier dataset ...' on a laboratory dataset. The flag is now CONJUNCTIVE — in scope iff the dataset matches Include AND is a split — so neither the name LBCHEMIST nor its data-derived base LB matches `AP--`, and the rule is correctly skipped. ⚠ Restoring the additive behaviour must turn this scenario red with 'declares expect=skipped but the rule executed'."
+dataset LBCHEMIST label="Laboratory Test Results split by category, over-long name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+CDISCPILOT01 | LB | 01-701-1023
+---

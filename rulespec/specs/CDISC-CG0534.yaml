@@ -1,0 +1,28 @@
+name: CDISC-CG0534
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000758)
+python_source: rules-sdtmig-3-4.json (CORE-000758)
+rule:
+  coreId: CDISC-CG0534
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMNRS: SCREEN FAILURE, RFSTDTC: ''}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMNRS: NOT ASSIGNED, RFSTDTC: '2026-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0534
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ARMNRS: NOT ASSIGNED
+      RFSTDTC: '2026-01-01'
+expected_errors: []

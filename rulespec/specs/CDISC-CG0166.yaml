@@ -1,0 +1,31 @@
+name: CDISC-CG0166
+kind: rule
+description: |
+  Wave 2 port — null-logic shape.
+  CORE-000017: When IDVARVAL is populated in CO, RDOMAIN must also be populated
+  (non-empty / exists). Demonstrates the `any: [empty, not_exists]` idiom.
+python_source: rules-sdtmig-3-4.json (CORE-000017)
+rule:
+  coreId: CDISC-CG0166
+datasets:
+  CO:
+    row_key: [STUDYID, USUBJID, COSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '001', COSEQ: 1, RDOMAIN: AE, IDVAR: AESEQ, IDVARVAL: '1'}          # ok
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '001', COSEQ: 2, RDOMAIN: '', IDVAR: AESEQ, IDVARVAL: '2'}          # bad
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '002', COSEQ: 1, RDOMAIN: AE, IDVAR: AESEQ, IDVARVAL: ''}            # IDVARVAL empty → no fire
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [CO]
+expected_violations:
+  - rule_id: CDISC-CG0166
+    dataset: CO
+    row_key: {COSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVARVAL: '2'
+      RDOMAIN:
+expected_errors: []

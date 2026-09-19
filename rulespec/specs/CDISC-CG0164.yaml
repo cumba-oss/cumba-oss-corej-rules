@@ -1,0 +1,29 @@
+name: CDISC-CG0164
+kind: rule
+description: |
+  Wave 13 port - IDVAR populated but RDOMAIN empty in CO. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000090)
+rule:
+  coreId: CDISC-CG0164
+datasets:
+  CO:
+    row_key: [STUDYID, USUBJID, COSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '001', COSEQ: 1, IDVAR: AESEQ, RDOMAIN: AE}
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '002', COSEQ: 1, IDVAR: AESEQ, RDOMAIN: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [CO]
+expected_violations:
+  - rule_id: CDISC-CG0164
+    dataset: CO
+    row_key: {COSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      IDVAR: AESEQ
+      RDOMAIN:
+expected_errors: []

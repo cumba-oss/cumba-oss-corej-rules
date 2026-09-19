@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD9739 expect=violation domain=AE
+# Rule:Description: Raise an error when Planned Start of Assessment Interval (--STINT) is populated but Time Point Reference (--TPTREF) is empty.
+#note "AESEQ=1 has AESTINT populated but AETPTREF empty"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETPTREF type=Char label="Time Point Reference"
+col AESTINT type=Char label="Planned Start of Assessment Interval"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 |  | 2014-01-01T08:00
+CDISCPILOT01 | AE | 01-701-1015 | 2 | SCREENING | 2014-01-02T08:00
+---

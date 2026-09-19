@@ -1,0 +1,33 @@
+name: CDISC-CG0531
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['record_count']).
+python_source: rules-sdtmig-3-4.json (CORE-000846)
+rule:
+  coreId: CDISC-CG0531
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RACE: WHITE}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RACE: MULTIPLE}
+  SUPPDM:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SUPPDM, USUBJID: '001', RDOMAIN: DM, IDVAR: USUBJID, IDVARVAL: '001', QNAM: RACE1, QLABEL: X, QVAL: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    relationship: [SUPPDM]
+expected_violations:
+  - rule_id: CDISC-CG0531
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $suppdm_race_count: '0'
+      RACE: MULTIPLE
+expected_errors: []

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0307 expect=noViolation domain=TS
+# Rule:Description: Raise an error when TSPARM and TSPARMCD do not have a one-to-one relationship.
+#note "Each TSPARMCD maps to a single consistent TSPARM, preserving the 1:1 relationship"
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM type=Char label="Trial Summary Parameter"
+---
+CDISCPILOT01 | TS | AGEMAX | Planned Maximum Age of Subjects
+CDISCPILOT01 | TS | AGEMIN | Planned Minimum Age of Subjects
+---

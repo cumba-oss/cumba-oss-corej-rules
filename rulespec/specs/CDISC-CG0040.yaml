@@ -1,0 +1,37 @@
+name: CDISC-CG0040
+kind: rule
+description: |
+  Wave 2 port — variable-metadata shape.
+  CORE-000012: AEOCCUR is forbidden in the AE dataset. Variable Metadata Check +
+  Dataset sensitivity — fires once per dataset that contains the AEOCCUR column.
+python_notes: |
+  Python-side divergence — baselined with `lane: "python"` in
+  parity-diff-baseline.json. The expected_violations below match Java's (correct)
+  output. Python diverges because `VariablesMetadataDatasetBuilder` swaps the
+  dataset for a metadata projection before evaluating the Check, so
+  `exists("AEOCCUR")` runs against a DataFrame whose columns are meta-field names
+  (variable_name, variable_label, ...), not the original dataset's columns →
+  AEOCCUR is "not found" and 0 violations emit. See Wave 2 Finding #9 in
+  lib/corej-rules/documentation/spec-runner-findings.md for the full trace.
+python_source: rules-sdtmig-3-4.json (CORE-000012)
+rule:
+  coreId: CDISC-CG0040
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, AEOCCUR: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0040
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AEOCCUR: Y
+expected_errors: []

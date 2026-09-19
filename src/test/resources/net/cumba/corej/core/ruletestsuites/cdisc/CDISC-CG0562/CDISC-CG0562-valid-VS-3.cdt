@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0562 expect=skipped domain=VS
+# Rule:Description: Raise an error when REPNUM is in the dataset and there are multiple records for a subject for a test within the timeframe identified by the timing variables on the record, and --REPNUM is missing or not unique per subject per test per timing variables.
+#note "VSREPNUM column is absent, so the --REPNUM gate stops the rule even with two same-timing SYSBP records. WHY skipped AND NOT noViolation (wave-17 lane A, R-4.11 hoist): the gate used to be a top-level `--REPNUM exists` leaf and this fixture then asserted expect=noViolation - the leading conjunct failed and the rule executed to a silent zero. It is now Requirements.Variables.All --REPNUM, so the same zero is reported as 'skipped - variable VSREPNUM absent'. Violations are 0 both ways; only the reporting changed."
+#library standard=sdtmig version=3-4
+#library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing DOMAIN:Identifier
+dataset VS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ type=Num label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSDTC type=Char label="Date/Time of Measurements"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 2014-01-01
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 2014-01-01
+---

@@ -1,0 +1,30 @@
+name: CDISC-CG0432
+kind: rule
+description: |
+  Record-Data plain. CORE-000452: when AGEU is empty, AGE or AGETXT must also
+  be empty. Check: (AGEU not_exists OR AGEU empty) AND (AGETXT non_empty OR AGE
+  non_empty). The DM row has empty AGEU but populated AGE, so the rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000452)
+rule:
+  coreId: CDISC-CG0432
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', AGE: 45, AGEU: '', AGETXT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0432
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AGE: '45'
+      AGETXT:
+      AGEU:
+expected_errors: []

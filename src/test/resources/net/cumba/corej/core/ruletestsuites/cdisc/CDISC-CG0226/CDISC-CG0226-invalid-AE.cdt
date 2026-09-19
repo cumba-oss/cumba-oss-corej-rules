@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-CG0226 expect=violation domain=AE
+# Rule:Description: Raise an error when Start Relative to Reference Period (--STRF) is populated for a subject with an empty Reference Start Date/Time (RFSTDTC) in the DM dataset.
+#note "DM.RFSTDTC empty for subject 01-701-1015 while AESTRF (--STRF) is populated -> violation; subject 01-701-1023 has RFSTDTC populated -> no finding. (Rule scope excludes DM itself: --STRF lives in the general-observation domains.)"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESTRF  type=Char label="Start Relative to Reference Period"
+---
+CDISCPILOT01 | AE | 01-701-1015 | BEFORE
+CDISCPILOT01 | AE | 01-701-1023 | BEFORE
+
+---
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | 01-701-1015 |
+CDISCPILOT01 | 01-701-1023 | 2012-08-05
+---

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0650 expect=violation domain=APTOOLONG
+# Rule:Description: Raise an error when an Associated Persons non-supplemental qualifier dataset associated with a split dataset has a dataset name length shorter than or equal to 4 or greater than 6 characters.
+#note "⚠ DOMAIN WAS `AE` AND THE SCENARIO PASSED ONLY BECAUSE OF AN ENGINE DEFECT. CDISC-CG0650 is scoped `Domains.Include: [AP--]` + `include_split_datasets: true`; ScopeMatcher used to apply that flag ADDITIVELY (mirroring Python `_handle_split_domains`), so EVERY split dataset in the study was force-included and the `AP--` token was inert. With DOMAIN=AE the data-derived base is `AE`, which matches neither `AP--` nor the name, so the only thing that kept this dataset in scope was the defect — the same defect that made the rule fire study-wide. The flag is now a CONJUNCTIVE gate (must match Include AND be a split), and DOMAIN is corrected to `APAE`: 4 characters, as CDISC-CG0309 / CDISC-CG0309 require of any AP-- dataset (`DOMAIN value length = 4`, SDTM and SDTMIG Conformance Rules v2.0, CG0309), so the base `APAE` matches strict `AP--` and APTOOLONG != APAE makes it a genuine split of APAE. The expectation is unchanged; only the invalid input data was corrected. Associated Persons split dataset name APTOOLONG is 9 characters (longer_than 6) -> violation"
+#expectViolationCount 1
+dataset APTOOLONG label="Associated Persons split dataset with an over-long name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col APID type=Char label="Associated Persons Identifier"
+---
+CDISCPILOT01 | APAE | AP-701-1015
+CDISCPILOT01 | APAE | AP-701-1023
+---

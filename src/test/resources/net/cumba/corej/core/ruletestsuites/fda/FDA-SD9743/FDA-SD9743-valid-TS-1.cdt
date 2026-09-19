@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9743 expect=noViolation domain=TS
+# Rule:Description: Raise an error when both AGE and AGETXT are present in the list of TSPARMCDs with TSVAL populated (only one should be used).
+#note "Only AGE is present (agetxt_count=0), so exactly one of the two is used -> no violation"
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSSEQ type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGE | 65
+CDISCPILOT01 | TS | 2 | AGEMIN | 50
+---

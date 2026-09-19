@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0467 expect=violation domain=AE
+# Rule:Description: Raise an error when --STDTC is present in a Findings general observation class dataset, where its use is not recommended.
+#note "AESTDTC column present in the dataset"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-03
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-09
+---

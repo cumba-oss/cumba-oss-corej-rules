@@ -1,0 +1,35 @@
+name: CDISC-CG0077
+kind: rule
+description: |
+  Wave 14 port — `has_same_values`. Every row's MHCAT must not be the single
+  same value — a dataset where every row has MHCAT="CARDIAC" is useless
+  categorisation. Dataset-wide uniformity check: the rule's Sensitivity is
+  "Dataset", so Java emits a single dataset-level finding when all non-empty
+  MHCAT values are identical (collapsed to the first violating row). Since the
+  rules.pkl regen the vendored Python engine also collapses to the single
+  dataset-level finding, so both lanes agree on the one expected violation
+  (previously Python broadcast per-row — that divergence is gone, baseline
+  removed).
+python_source: rules-sdtmig-3-4.json (CORE-000365)
+rule:
+  coreId: CDISC-CG0077
+datasets:
+  MH:
+    row_key: [STUDYID, USUBJID, MHSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: MH, USUBJID: '001', MHSEQ: 1, MHCAT: CARDIAC}
+      - {STUDYID: S1, DOMAIN: MH, USUBJID: '002', MHSEQ: 1, MHCAT: CARDIAC}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [MH]
+expected_violations:
+  - rule_id: CDISC-CG0077
+    dataset: MH
+    row_key: {MHSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      MHCAT: CARDIAC
+expected_errors: []

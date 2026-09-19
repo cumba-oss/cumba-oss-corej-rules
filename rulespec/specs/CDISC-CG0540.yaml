@@ -1,0 +1,34 @@
+name: CDISC-CG0540
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary DM checked
+  against distinct(DS.USUBJID).
+python_source: rules-sdtmig-3-4.json (CORE-000296)
+rule:
+  coreId: CDISC-CG0540
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARMCD: TRT01}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ACTARMCD: TRT01}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0540
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ds_usubjid: '[001]'
+      ACTARMCD: TRT01
+expected_errors: []

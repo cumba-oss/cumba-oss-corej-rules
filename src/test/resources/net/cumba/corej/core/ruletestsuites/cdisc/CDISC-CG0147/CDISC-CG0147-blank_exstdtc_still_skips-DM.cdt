@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0147 expect=noViolation domain=DM
+# Rule:Description: Raise an error when Exposure (EX) records are present for a subject, but the Subject Reference End Date/Time (RFXENDTC) in the Demographics (DM) domain does not equal the latest Exposure Start Date/Time (EXSTDTC) or the latest Exposure End Date/Time (EXENDTC) in the EX domain for that subject.
+#note "Pins the deliberate ASYMMETRY of the missing_values authoring: only $max_ex_exendtc declares `indeterminate`; $max_ex_exstdtc keeps the default `skip`. Subject 1015's first exposure has a BLANK EXSTDTC, so under `skip` the latest EXSTDTC is 2014-01-10, RFXENDTC matches it, and the rule stays silent. Declaring `indeterminate` on the EXSTDTC extreme as well would leave the rule with no surviving acceptance branch and it would fire here -- which is why this scenario exists. EXENDTC is populated on both rows, so the declared extreme cannot influence the verdict and only the EXSTDTC disposition can flip this file."
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-10
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+CDISCPILOT01 | EX | 01-701-1015 | 2014-01-16 |
+CDISCPILOT01 | EX | 01-701-1015 | 2014-01-16 | 2014-01-10
+---

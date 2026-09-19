@@ -1,0 +1,58 @@
+Core:
+  Id: "FDA-SD9737"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --CLASCD and --CLAS do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AG"
+    - "CM"
+    - "SU"
+Requirements:
+  Variables:
+    All:
+    - "--CLAS"
+    - "--CLASCD"
+Check:
+  expression: >-
+    not is_unique_relationship(--CLAS, --CLASCD)
+Outcome:
+  Message: "--CLASCD and --CLAS do not have a one-to-one relationship."
+  Output_Variables:
+  - "--CLAS"
+  - "--CLASCD"
+Source_Proposed:
+  Sheet_Issue: "#259"
+  FDA_Validator_Rule_Message: "--CLASCD and --CLAS do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of Medication Class Code (--CLASCD)\
+    \ and Medication Class (--CLAS) must have a one-to-one relationship."
+  Domains: "AG, CM, SU"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

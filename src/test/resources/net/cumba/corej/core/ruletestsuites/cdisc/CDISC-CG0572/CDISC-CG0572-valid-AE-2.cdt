@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0572 expect=noViolation domain=AE
+# Rule:Description: Raise an error when VISITNUM is not present in the dataset and --TPTREF is present in the dataset, and --TPT and --TPTNUM do not have a one-to-one relationship per unique value of --TPTREF.
+#note "guard: VISITNUM is present, so the VISITNUM not_exists conjunct is false and the rule cannot fire even though AETPT/AETPTNUM are inconsistent per AETPTREF"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col VISITNUM type=Num label="Visit Number"
+col AETPTREF type=Char label="Time Point Reference"
+col AETPT type=Char label="Planned Time Point Name"
+col AETPTNUM type=Num label="Planned Time Point Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 1 | DOSE1 | MORNING | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 1 | DOSE1 | EVENING | 1
+---

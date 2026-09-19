@@ -1,0 +1,39 @@
+name: CDISC-CG0068
+kind: rule
+description: |
+  Wave 21 port — DS primary + DM match + min_date. Fires when a subject has
+  multiple "INFORMED CONSENT OBTAINED" DS rows, the earliest DS.DSSTDTC does
+  not equal DM.RFICDTC, and the current row is the earliest.
+python_source: rules-sdtmig-3-4.json (CORE-000363)
+rule:
+  coreId: CDISC-CG0068
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      # Subject 002 has 2 INFORMED CONSENT OBTAINED rows; earliest is 2026-01-05.
+      # DM.RFICDTC=2026-01-10 → mismatch. Row with DSSTDTC==min fires.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-05'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 2, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-07'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0068
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $min_ds_dsstdtc: '2026-01-05'
+      DM.RFICDTC: '2026-01-10'
+      DSDECOD: INFORMED CONSENT OBTAINED
+      DSSTDTC: '2026-01-05'
+expected_errors: []

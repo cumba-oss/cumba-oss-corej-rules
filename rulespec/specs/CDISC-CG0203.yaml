@@ -1,0 +1,28 @@
+name: CDISC-CG0203
+kind: rule
+description: |
+  Record-Data. CORE-000134: in a SUPP-- dataset, RDOMAIN != 'DM' but IDVAR is empty.
+  The SUPPAE row sets RDOMAIN=AE and leaves IDVAR empty so both leaves fire.
+python_source: rules-sdtmig-3-4.json (CORE-000134)
+rule:
+  coreId: CDISC-CG0203
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '001', IDVAR: '', IDVARVAL: '', QNAM: AESEV1, QLABEL: Sev, QVAL: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+expected_violations:
+  - rule_id: CDISC-CG0203
+    dataset: SUPPAE
+    row_key: {IDVAR: '', IDVARVAL: '', QNAM: AESEV1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVAR:
+      RDOMAIN: AE
+expected_errors: []

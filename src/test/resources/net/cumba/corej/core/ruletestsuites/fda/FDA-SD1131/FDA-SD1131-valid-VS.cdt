@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1131 expect=noViolation domain=VS
+#note "Every baseline-flagged record carries a standardized result; row 2 is not a baseline record, so its empty VSSTRESC is not this rule's business."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSBLFL   type=Char label="Baseline Flag"
+col VSSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Y | 120
+CDISCPILOT01 | VS | 01-701-1015 | 2 | DIABP |   |

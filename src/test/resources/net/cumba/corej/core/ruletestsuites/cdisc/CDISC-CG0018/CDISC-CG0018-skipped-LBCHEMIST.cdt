@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0018 expect=skipped domain=LBCHEMIST
+# Rule:Description: Raise an error when a Supplemental Qualifier dataset associated with a split domain has a dataset name longer than 8 characters.
+#note "⚑ THIS SCENARIO PINS THE OVER-FIRE THAT `include_split_datasets` USED TO CAUSE. CDISC-CG0018 is scoped `Domains.Include: [SUPP--, SQ--, SUPPAPFA--]` + `include_split_datasets: true`. While that flag was applied ADDITIVELY (mirroring Python `_handle_split_domains`), EVERY split dataset in the study was force-included regardless of Include, so this rule ran on non-SUPP splits: LBCHEMIST is a 9-character split of LB, and `longer_than 8` fired with the message 'The split Supplemental Qualifier dataset name is longer than 8 characters.' on a laboratory dataset — duplicating the finding CDISC-CG0017 correctly reports for the same dataset, under a wrong description. The flag is now CONJUNCTIVE — in scope iff the dataset matches Include AND is a split — so neither the name LBCHEMIST nor its data-derived base LB matches `SUPP--` / `SQ--`, and the rule is correctly skipped. ⚠ Restoring the additive behaviour must turn this scenario red with 'declares expect=skipped but the rule executed'."
+dataset LBCHEMIST label="Laboratory Test Results split by category, over-long name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+CDISCPILOT01 | LB | 01-701-1023
+---

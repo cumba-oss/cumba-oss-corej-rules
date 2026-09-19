@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9746 expect=violation domain=LB
+# Rule:Description: Raise an error when the Normal Range Upper Limit (--ORNRHI) is less than or equal to the Normal Range Lower Limit (--ORNRLO).
+#note "Added 2026-09-14 (PLAN-column-type-conformance carried-forward). ⭐ This is the scenario that can tell the migrated rule from the unmigrated one: both pre-existing scenarios declare LBORNRLO/LBORNRHI as Num, where `num(...)` is the identity and `num(A) <= num(B)` and `A <= B` are indistinguishable. --ORNRLO/--ORNRHI are Char in SDTM and carry a number only by convention — the exact reference-range case ScalarSemantics:440's javadoc names as the motivating one — so a Char declaration is the CONFORMANT shape here, not a defect. Without the num() wrappers this fixture ERRORS under the R4 gate (an order comparison on a Char column); with them it compares 50 <= 100 and fires. ⭐ MEASURED, not argued: reverting the expression to `--ORNRHI <= --ORNRLO` and re-running reds exactly this file, with 'column-type mismatch: LBORNRHI is declared Char (STRING) but an order comparison expects a numeric value', while BOTH pre-existing Num scenarios stay green — i.e. before this file the rule had no test that could tell the migration apart. Row 2 is an ordinary in-range pair and must stay silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1 USUBJID=01-701-1015
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORNRLO type=Char label="Reference Range Lower Limit in Orig Unit"
+col LBORNRHI type=Char label="Reference Range Upper Limit in Orig Unit"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 100 | 50
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALP | 35  | 115
+---

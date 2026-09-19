@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9731 expect=violation domain=AE
+# Rule:Description: Raise an error when --LLTCD and --LLT do not have a one-to-one relationship.
+#note "AELLTCD=10003042 maps to two different AELLT values, breaking the one-to-one relationship"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELLT type=Char label="Lowest Level Term" format="$ADVERSE EVENT DICTIONARY."
+col AELLTCD type=Num label="Lowest Level Term Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | APPLICATION SITE REDNESS | 10003042
+CDISCPILOT01 | AE | 01-701-1015 | 2 | APPLICATION SITE ITCHING | 10003042
+---

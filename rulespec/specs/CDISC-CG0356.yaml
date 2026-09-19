@@ -1,0 +1,27 @@
+name: CDISC-CG0356
+kind: rule
+description: |
+  Record-Data plain `exists`. SPECIES must not be present in the DM dataset.
+  The DM row carries a SPECIES column, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000174)
+rule:
+  coreId: CDISC-CG0356
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', SPECIES: HUMAN}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0356
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      SPECIES: HUMAN
+expected_errors: []

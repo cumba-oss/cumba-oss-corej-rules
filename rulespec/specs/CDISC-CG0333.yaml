@@ -1,0 +1,33 @@
+name: CDISC-CG0333
+kind: rule
+description: |
+  Dataset Metadata Check (Dataset sensitivity, include_split_datasets: true).
+  Findings About (FA) split dataset whose referenced parent domain (2-char
+  suffix) is absent from the study. FAMH is a letter-suffix split (DOMAIN=FA);
+  the name matches the anchored CG0333-shape regex (repaired by the CL-C
+  twin-alignment ruling, 2026-08-18 - digit-suffix names such as FAMH1 no
+  longer match), the prefix equals FA, and its 2-char suffix MH is not
+  contained by the dataset list [FAMH], so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000540)
+rule:
+  coreId: CDISC-CG0333
+datasets:
+  FAMH:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: FA, USUBJID: '001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [FAMH]
+expected_violations:
+  - rule_id: CDISC-CG0333
+    dataset: FAMH
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $list_dataset_names: '[FAMH]'
+      dataset_name: FAMH
+expected_errors: []

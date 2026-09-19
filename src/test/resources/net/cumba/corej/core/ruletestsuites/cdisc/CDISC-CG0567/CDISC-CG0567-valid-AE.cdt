@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0567 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --EVDTYP is present in an Events-class dataset whose domain is not MH.
+#note "AEEVDTYP column is absent"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2
+---

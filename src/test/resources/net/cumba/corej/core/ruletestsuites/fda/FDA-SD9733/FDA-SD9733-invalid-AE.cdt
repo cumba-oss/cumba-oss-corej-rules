@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9733 expect=violation domain=AE
+# Rule:Description: Raise an error when --HLGTCD and --HLGT do not have a one-to-one relationship.
+#note "Two distinct AEHLGT values share the same AEHLGTCD 10019805"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLGT type=Char label="High Level Group Term"
+col AEHLGTCD type=Num label="High Level Group Term Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HLGT_0152 | 10019805
+CDISCPILOT01 | AE | 01-701-1015 | 2 | HLGT_0338 | 10019805
+---

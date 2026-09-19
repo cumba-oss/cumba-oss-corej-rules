@@ -1,0 +1,29 @@
+name: CDISC-CG0106
+kind: rule
+description: |
+  Wave 8 port — --TRTV empty but --VAMT populated. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000089)
+rule:
+  coreId: CDISC-CG0106
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRTV: SALINE, EXVAMT: '5'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRTV: '', EXVAMT: '5'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0106
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      EXTRTV:
+      EXVAMT: '5'
+expected_errors: []

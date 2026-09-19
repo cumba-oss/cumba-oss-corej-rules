@@ -1,0 +1,29 @@
+name: CDISC-CG0517
+kind: rule
+description: |
+  Wave 13 port - ARMCD and ARMNRS both empty in DM. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000045)
+rule:
+  coreId: CDISC-CG0517
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMCD: TRT01, ARMNRS: ''}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMCD: '', ARMNRS: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0517
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ARMCD:
+      ARMNRS:
+expected_errors: []

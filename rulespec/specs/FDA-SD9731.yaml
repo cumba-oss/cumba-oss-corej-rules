@@ -1,0 +1,39 @@
+name: FDA-SD9731
+kind: rule
+description: |
+  Wave 10 port - --LLT maps to multiple distinct --LLTCD values. Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000706)
+rule:
+  coreId: FDA-SD9731
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AELLT: HEADACHE, AELLTCD: '10001'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AELLT: NAUSEA, AELLTCD: '10002'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AELLT: NAUSEA, AELLTCD: '10099'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD9731
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AELLT: NAUSEA
+      AELLTCD: '10002'
+  - rule_id: FDA-SD9731
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AELLT: NAUSEA
+      AELLTCD: '10099'
+expected_errors: []

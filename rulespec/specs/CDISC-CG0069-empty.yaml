@@ -1,0 +1,59 @@
+name: CDISC-CG0069-empty
+kind: rule
+description: |
+  Empty-string parity demo for CORE-000034's date_not_equal_to leaf
+  (PLAN-empty-string-membership-parity, date-operator family).
+
+  Check.all: DSDECOD == "DEATH" AND DSSTDTC date_not_equal_to DM.DTHDTC.
+  When the date_not_equal_to TARGET (DSSTDTC) is empty, the honest coreJ engine
+  short-circuits to `negate` (true) and fires; Python's compare_dates returns False
+  for any non-comparable operand and does not fire. (Helpers: Java
+  Primitives.dateComparison returns `negate` on a missing target; Python
+  helpers.compare_dates `if not _dates_are_comparable: return False`.)
+
+  Asymmetry (verified): only an empty TARGET diverges. An empty COMPARATOR
+  (DM.DTHDTC) with a populated target does NOT diverge — both engines no-fire
+  (row R1 below). So the closing guard is non_empty(DSSTDTC) on the target only.
+python_notes: |
+  Captured-from-Java (lane: python). coreJ fires the empty-target rows (L1 target
+  empty, B1 both empty) and the populated control V1; Python fires only V1.
+python_source: rules-sdtmig-3-4.json (CORE-000034) + PLAN-empty-string-membership-parity.md
+rule:
+  coreId: CDISC-CG0069
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      # L1 — DSSTDTC (target) empty, DTHDTC populated → coreJ fires, Python does not. DIVERGENCE.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: L1, DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: ''}
+      # B1 — both empty → coreJ fires (missing target → negate), Python does not. DIVERGENCE.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: B1, DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: ''}
+      # R1 — DSSTDTC populated, DTHDTC (comparator) empty → both no-fire. CONTROL (agreement).
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: R1, DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: '2026-01-01'}
+      # V1 — both populated, dates differ → both fire. CONTROL (real violation).
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: V1, DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: '2026-01-01'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: L1, DTHDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: B1, DTHDTC: ''}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: R1, DTHDTC: ''}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: V1, DTHDTC: '2026-01-02'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+    special-purpose: [DM]
+expected_violations:
+  # L1 — DSSTDTC (target) empty. coreJ fires; Python does not.
+  - rule_id: CDISC-CG0069
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: V1}
+    status: SUCCESS
+    output_variables:
+      DM.DTHDTC: '2026-01-02'
+      DSDECOD: DEATH
+      DSSTDTC: '2026-01-01'
+expected_errors: []

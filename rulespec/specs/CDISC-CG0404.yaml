@@ -1,0 +1,44 @@
+name: CDISC-CG0404
+kind: rule
+description: |
+  Verifies row-level emission for a Record-Data rule whose Check mixes a
+  dataset-level leaf (--STAT not_exists) with row-level leaves
+  (--PRESP equal_to "Y", --OCCUR empty). With Sensitivity: Record (the
+  current bundled-rule value) both engines emit one violation per matching
+  row. NOTE: this used to cite "python-engine-fixes-plan.md Finding #25",
+  retired 2026-08-31. That finding was a DEFERRAL ("CORE-000118 has not been
+  ported into the spec-runner fixtures") which this very spec discharged, and
+  the Python lane it belonged to was removed in wave 33 — so the citation had
+  outlived both its subject and its engine. Fixture has 3 rows;
+  rows 0 and 2 match (AEPRESP=Y AND AEOCCUR empty AND no AESTAT column),
+  row 1 doesn't match (AEPRESP=N).
+python_source: rules-sdtmig-3-4.json (CORE-000118)
+rule:
+  coreId: CDISC-CG0404
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEPRESP: Y, AEOCCUR: '', AETERM: A}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, AEPRESP: N, AEOCCUR: '', AETERM: B}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEPRESP: Y, AEOCCUR: '', AETERM: C}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0404
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AEPRESP: Y
+  - rule_id: CDISC-CG0404
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEPRESP: Y
+expected_errors: []

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0026 expect=violation domain=AE
+# Rule:Description: Raise an error when Time Point Reference (--TPTREF) is not populated but Date/Time of Reference Time Point (--RFTDTC) is populated.
+#note "AERFTDTC populated but AETPTREF left empty"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETPTREF type=Char label="Time Point Reference"
+col AERFTDTC type=Char label="Date/Time of Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 |  | 2014-01-03T08:00
+CDISCPILOT01 | AE | 01-701-1015 | 2 | SCREENING | 2014-01-09T08:00
+---

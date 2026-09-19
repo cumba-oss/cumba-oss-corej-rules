@@ -1,0 +1,32 @@
+name: CDISC-CG0349
+kind: rule
+description: |
+  Variable Metadata Check (Dataset sensitivity). CORE-000376: within a CUSTOM domain
+  the first two characters of a prefixed variable must match the DOMAIN value.
+  Operation `distinct DOMAIN` builds $domain_list and `domain_is_custom` builds
+  $domain_is_custom. The Check fires when the domain is custom AND a variable (not in
+  the standard non-prefixed exception list) has a 2-char prefix absent from $domain_list.
+  The custom EVENTS domain XX (column XXTERM ⇒ EVENTS-class via column heuristics, and
+  absent from the library so domain_is_custom=true) carries an offending YYORRES column
+  whose YY prefix is not XX, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000376)
+rule:
+  coreId: CDISC-CG0349
+datasets:
+  XX:
+    row_key: [STUDYID, USUBJID, XXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: XX, USUBJID: '001', XXSEQ: 1, XXTERM: HEADACHE, YYORRES: ABNORMAL}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+  - rule_id: CDISC-CG0349
+    dataset: XX
+    row_key: {STUDYID: null, USUBJID: null, XXSEQ: null}
+    status: SUCCESS
+    output_variables:
+      $domain_is_custom: 'true'
+      $domain_list: '[XX]'
+      variable_name: YYORRES
+expected_errors: []

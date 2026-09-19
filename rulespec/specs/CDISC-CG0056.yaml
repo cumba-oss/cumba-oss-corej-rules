@@ -1,0 +1,28 @@
+name: CDISC-CG0056
+kind: rule
+description: |
+  Record Data. CORE-000081: --STAT present while --PRESP absent in an Events /
+  Interventions dataset. Check is all[ --PRESP not_exists, --STAT exists ]. The AE
+  row has AESTAT but no AEPRESP column, so both leaves are satisfied and it fires.
+python_source: rules-sdtmig-3-4.json (CORE-000081)
+rule:
+  coreId: CDISC-CG0056
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESTAT: NOT DONE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0056
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AESTAT: NOT DONE
+expected_errors: []

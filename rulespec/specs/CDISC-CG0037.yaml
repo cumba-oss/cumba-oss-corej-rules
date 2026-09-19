@@ -1,0 +1,31 @@
+name: CDISC-CG0037
+kind: rule
+description: |
+  Wave 10 port - --SOCCD does not match --BDSYCD (primary SOC code mismatch). Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000362)
+rule:
+  coreId: CDISC-CG0037
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESOCCD: '10001', AEBDSYCD: '10001'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESOCCD: '10001', AEBDSYCD: '20001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0037
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AEBDSYCD: '20001'
+      AESOCCD: '10001'
+expected_errors: []

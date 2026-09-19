@@ -1,0 +1,42 @@
+name: CDISC-CG0367
+kind: rule
+description: |
+  Trace spec — CORE-000235 AP-- primary + DM.USUBJID distinct. RSUBJID must
+  equal either POOLID or a member of DM.USUBJID.
+  ⚠ RE-CAPTURED 2026-08-09 for `Fix #192` (Q17-a): an unresolvable operation domain now
+  publishes the operator's DECLARED `EmptyResult` instead of an unclassified null. The
+  VERDICT is unchanged — same rows, same status; only the rendered $-value moves. The fork
+  still reports "no value", so this is a filed java-only divergence, not a regression.
+python_source: rules-sdtmig-3-4.json (CORE-000235)
+rule:
+  coreId: CDISC-CG0367
+datasets:
+  APAE:
+    row_key: [STUDYID, USUBJID, APAESEQ]
+    rows:
+      # USUBJID '001' valid, RSUBJID matches DM.USUBJID — ok
+      - {STUDYID: S1, DOMAIN: APAE, USUBJID: AP001, APAESEQ: 1, APID: A1, RSUBJID: '001', POOLID: ''}
+      # RSUBJID non-empty, != POOLID, not in DM.USUBJID — bad
+      - {STUDYID: S1, DOMAIN: APAE, USUBJID: AP002, APAESEQ: 1, APID: A2, RSUBJID: '999', POOLID: ''}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [APAE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0367
+    dataset: APAE
+    row_key: {APAESEQ: 1, STUDYID: S1, USUBJID: AP002}
+    status: SUCCESS
+    output_variables:
+      $dm_usubjid: '[001, 002]'
+      $pooldef_poolid: '[]'
+      RSUBJID: '999'
+expected_errors: []

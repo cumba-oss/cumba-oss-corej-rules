@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0010 expect=violation domain=DM
+#note "USUBJID Role=Identifier matches the library -> silent. ARMCD Role=Timing vs library Identifier -> fires (unguarded Check: any define role mismatch fires whenever a library role exists). Fires under both the current and the proposed rule."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM ARMCD name=ARMCD role=Identifier
+#library variable-metadata DM USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-dm-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=ARMCD define_variable_role=Timing
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ARMCD   type=Char
+---
+S1 | DM | 001 | A

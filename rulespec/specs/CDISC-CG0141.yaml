@@ -1,0 +1,29 @@
+name: CDISC-CG0141
+kind: rule
+description: |
+  Record-Data port. CORE-000369 (aligned to CDISC-CG0141 per D16): if RFENDTC is
+  populated then ACTARMCD must be empty or a non-treated code (SCRNFAIL, NOTASSGN).
+  The DM row sets ACTARMCD=SCRNFAIL and RFENDTC populated, so the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000369)
+rule:
+  coreId: CDISC-CG0141
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARMCD: SCRNFAIL, RFENDTC: '2020-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0141
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      RFENDTC: '2020-01-01'
+      ACTARMCD: SCRNFAIL
+expected_errors: []

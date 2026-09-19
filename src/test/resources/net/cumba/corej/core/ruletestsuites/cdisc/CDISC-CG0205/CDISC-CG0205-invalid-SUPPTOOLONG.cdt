@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0205 expect=violation domain=SUPPTOOLONG
+#note "⚠ RDOMAIN is REQUIRED in a SUPPQUAL dataset and is what makes this scenario realistic — and, since the SUPP/AP family wildcard was deleted, what keeps the rule in scope. `SUPP--` is strict (SUPP + exactly two characters), so a 11-character NAME never matches it; the dataset is reached through its DATA-DERIVED base, which OperationExecutor.unsplitNameFromData builds as SUPP + RDOMAIN = SUPPAE (6 characters). Without RDOMAIN the base falls back to the raw name and the rule is silently skipped — which is exactly how this fixture went red when the wildcard was removed. Dataset name SUPPTOOLONG is 11 characters, exceeding the 8-character limit"
+# Rule:Description: Raise an error when the length of a Supplemental Qualifier (SUPP--) dataset name is greater than 8 characters.
+#expectViolationCount 1
+dataset SUPPTOOLONG label="Supplemental Qualifiers for AE"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015
+CDISCPILOT01 | AE | 01-701-1023
+---

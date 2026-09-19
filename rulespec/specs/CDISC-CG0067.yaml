@@ -1,0 +1,37 @@
+name: CDISC-CG0067
+kind: rule
+description: |
+  Wave 19/22 port, re-shaped by FDA run-2 (T10 exact-membership + W9 Group
+  sensitivity): the operation is now `distinct` over DS.USUBJID filtered on
+  DSDECOD=DEATH ($ds_death_usubjid), and the check fires an SS subject with
+  SSSTRESC=DEAD whose USUBJID is_not_contained_by that set. Sensitivity is
+  Group over USUBJID (one finding per subject); Java-canonically the grouping
+  variable is not decorated into output_variables (python-lane baseline entry).
+python_source: rules-sdtmig-3-4.json (CORE-000251)
+rule:
+  coreId: CDISC-CG0067
+datasets:
+  SS:
+    row_key: [STUDYID, USUBJID, SSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '002', SSSEQ: 1, SSSTRESC: DEAD}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [SS]
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0067
+    dataset: SS
+    row_key: {SSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ds_death_usubjid: '[]'
+      SSSTRESC: DEAD
+expected_errors: []

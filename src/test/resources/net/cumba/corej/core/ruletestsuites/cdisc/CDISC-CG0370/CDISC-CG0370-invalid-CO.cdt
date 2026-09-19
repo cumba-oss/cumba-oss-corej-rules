@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0370 expect=violation domain=CO
+# Rule:Description: Part C - Raise and error when IDVAR in CO is not populated with a valid variable from the dataset referenced in RDOMAIN.
+#note "CO IDVAR=NONEXISTENT_VAR is not a column of the referenced RDOMAIN (DM) -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset CO label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL type=Char label="Comment"
+---
+CDISCPILOT01 | CO | 01-701-1015 | DM | NONEXISTENT_VAR | VALUE | Subject comment
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

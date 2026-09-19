@@ -1,0 +1,64 @@
+{
+  "Authorities": [
+    {
+      "Organization": "CDISC",
+      "Standards": [
+        {
+          "Name": "SDTMIG",
+          "References": [
+            {
+              "Citations": [
+                {
+                  "Cited_Guidance": "--LNKGRP is a grouping identifier used to identify a group of records in one domain that is related to a record in another domain, often forming a many-to-one relationship.",
+                  "Document": "SDTMIG v3.4",
+                  "Item": "2.E.2",
+                  "Section": "4.2.6"
+                }
+              ],
+              "Origin": "SDTM and SDTMIG Conformance Rules",
+              "Rule_Identifier": {
+                "Id": "CG0022",
+                "Version": "1"
+              },
+              "Version": "2.0"
+            }
+          ],
+          "Version": "3.4"
+        }
+      ]
+    }
+  ],
+  "Check": {
+    "expression": "var_exists(\"--LNKGRP\") and $VARIABLE_COUNT == 2"
+  },
+  "Core": {
+    "Id": "EC-VARIABLE-COUNT-SPLIT-FAMILY-DEDUP",
+    "Status": "Published",
+    "Version": "1"
+  },
+  "Description": "Raise an error when --LNKGRP is present in one domain but not in another domain.",
+  "Executability": "Fully Executable",
+  "Operations": [
+    {
+      "id": "$VARIABLE_COUNT",
+      "expression": "variable_count(--LNKGRP)"
+    }
+  ],
+  "Outcome": {
+    "Message": "LNKGRP variable is not found in any of the other domains.",
+    "Output_Variables": [
+      "--LNKGRP",
+      "$VARIABLE_COUNT"
+    ]
+  },
+  "Scope": {
+    "Domains": {
+      "Include": [
+        "ALL"
+      ]
+    },
+    "Use_Case": "INDH, PROD"
+  },
+  "Sensitivity": "Dataset",
+  "id": "062da4b3-0c48-4ed3-a97b-c1e92d7bcf96"
+}

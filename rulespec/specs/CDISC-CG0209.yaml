@@ -1,0 +1,33 @@
+name: CDISC-CG0209
+kind: rule
+description: |
+  Wave 7 port — SE: non-last element rows must have a SEENDTC. Exercises the
+  `empty_within_except_last_row` operator with per-USUBJID ordering.
+python_source: rules-sdtmig-3-4.json (CORE-000527)
+rule:
+  coreId: CDISC-CG0209
+datasets:
+  SE:
+    row_key: [STUDYID, USUBJID, ETCD]
+    rows:
+      # Subject 001 — two elements, earlier one has SEENDTC → ok; final one's SEENDTC blank → ok (last row exempt)
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', ETCD: SCRN, SESTDTC: '2023-01-01', SEENDTC: '2023-01-14'}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', ETCD: TRT, SESTDTC: '2023-01-15', SEENDTC: ''}
+      # Subject 002 — earlier element has empty SEENDTC → bad
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', ETCD: SCRN, SESTDTC: '2023-02-01', SEENDTC: ''}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', ETCD: TRT, SESTDTC: '2023-02-15', SEENDTC: '2023-03-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SE]
+expected_violations:
+  - rule_id: CDISC-CG0209
+    dataset: SE
+    row_key: {ETCD: SCRN, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      SEENDTC:
+      SESTDTC: '2023-02-01'
+expected_errors: []

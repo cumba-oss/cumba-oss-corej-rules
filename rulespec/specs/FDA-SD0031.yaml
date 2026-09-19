@@ -1,0 +1,30 @@
+name: FDA-SD0031
+kind: rule
+description: |
+  Wave 16 port - Fix17 leftover edge case. --ENDTC populated but no start-time marker (--STDTC/--STRF/--STRTPT all empty).
+python_source: rules-sdtmig-3-4.json (CORE-000892)
+rule:
+  coreId: FDA-SD0031
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEENDTC: '2026-01-10', AESTDTC: '2026-01-01', AESTRF: '', AESTRTPT: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEENDTC: '2026-01-10', AESTDTC: '', AESTRF: '', AESTRTPT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD0031
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026-01-10'
+      AESTDTC:
+      AESTRF:
+      AESTRTPT:
+expected_errors: []

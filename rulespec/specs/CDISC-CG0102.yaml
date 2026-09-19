@@ -1,0 +1,30 @@
+name: CDISC-CG0102
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000005)
+python_source: rules-sdtmig-3-4.json (CORE-000005)
+rule:
+  coreId: CDISC-CG0102
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXDOSE: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: PLACEBO, EXDOSE: 0}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: PLACEBO, EXDOSE: 10}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0102
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      EXDOSE: '10'
+      EXTRT: PLACEBO
+expected_errors: []

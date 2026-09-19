@@ -1,0 +1,33 @@
+name: FDA-SD2271
+kind: rule
+description: |
+  Wave 23 port - Variable Metadata Check with `exists`/`not_exists` on
+  `--`-resolved column names. Baselined on Python lane under Finding #9
+  (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `exists(--COLNAME)`
+  checks meta-field column names instead of dataset columns and yields
+  0 violations. Java fires correctly; expected matches Java.
+python_source: rules-sdtmig-3-4.json (CORE-000862)
+rule:
+  coreId: FDA-SD2271
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXSTDY: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: FDA-SD2271
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      EXSTDY: X
+expected_errors: []

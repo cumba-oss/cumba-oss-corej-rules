@@ -1,0 +1,41 @@
+name: CDISC-CG0417
+kind: rule
+description: |
+  Wave 6 port — SUPP-- QNAM format check (regex).
+  CORE-000221: QNAM must be ≤8 chars, start with upper-case letter or underscore,
+  followed by upper-case letters / digits / underscores only. Fires on QNAMs that
+  don't match `^[A-Z_][A-Z0-9_]{0,7}$`.
+python_source: rules-sdtmig-3-4.json (CORE-000221)
+rule:
+  coreId: CDISC-CG0417
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, RDOMAIN, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, QLABEL: L1, QVAL: x}
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: TOOLONG99, QLABEL: L2, QVAL: x}                 # 9 chars — bad
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: lower, QLABEL: L3, QVAL: x}                     # lowercase — bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+expected_violations:
+  - rule_id: CDISC-CG0417
+    dataset: SUPPAE
+    row_key: {IDVAR: AESEQ, IDVARVAL: '1', QNAM: TOOLONG99, RDOMAIN: AE, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVAR: AESEQ
+      IDVARVAL: '1'
+      QNAM: TOOLONG99
+  - rule_id: CDISC-CG0417
+    dataset: SUPPAE
+    row_key: {IDVAR: AESEQ, IDVARVAL: '1', QNAM: lower, RDOMAIN: AE, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVAR: AESEQ
+      IDVARVAL: '1'
+      QNAM: lower
+expected_errors: []

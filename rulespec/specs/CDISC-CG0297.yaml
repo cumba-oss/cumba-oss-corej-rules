@@ -1,0 +1,29 @@
+name: CDISC-CG0297
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000157)
+python_source: rules-sdtmig-3-4.json (CORE-000157)
+rule:
+  coreId: CDISC-CG0297
+datasets:
+  TV:
+    row_key: [STUDYID, ARMCD, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, ARMCD: TRT01, VISITNUM: 1, ARM: Treatment 1}
+      - {STUDYID: S1, DOMAIN: TV, ARMCD: AAAAAAAAAAAAAAAAAAAAA, VISITNUM: 1, ARM: Invalid}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0297
+    dataset: TV
+    row_key: {ARMCD: AAAAAAAAAAAAAAAAAAAAA, STUDYID: S1, VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      ARMCD: AAAAAAAAAAAAAAAAAAAAA
+expected_errors: []

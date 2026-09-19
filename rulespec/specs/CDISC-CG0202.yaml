@@ -1,0 +1,30 @@
+name: CDISC-CG0202
+kind: rule
+description: |
+  Record-Data. When QORIG equals 'ASSIGNED' (case-insensitive literal),
+  QEVAL must be populated. The SUPPAE row sets QORIG=ASSIGNED with an empty
+  QEVAL, so the rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000375)
+rule:
+  coreId: CDISC-CG0202
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, USUBJID, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESEV1, QLABEL: Severity 1, QVAL: MILD, QORIG: ASSIGNED, QEVAL: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+expected_violations:
+  - rule_id: CDISC-CG0202
+    dataset: SUPPAE
+    row_key: {QNAM: AESEV1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      QEVAL:
+      QNAM: AESEV1
+      QORIG: ASSIGNED
+expected_errors: []

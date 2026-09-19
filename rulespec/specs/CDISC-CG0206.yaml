@@ -1,0 +1,31 @@
+name: CDISC-CG0206
+kind: rule
+description: |
+  Wave 13 port - ETCD=UNPLAN and TAETORD populated. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000020)
+rule:
+  coreId: CDISC-CG0206
+datasets:
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    column_types:
+      TAETORD: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, ETCD: TRT01, TAETORD: 1}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', SESEQ: 1, ETCD: UNPLAN, TAETORD: 2}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SE]
+expected_violations:
+  - rule_id: CDISC-CG0206
+    dataset: SE
+    row_key: {SESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ETCD: UNPLAN
+      TAETORD: '2'
+expected_errors: []

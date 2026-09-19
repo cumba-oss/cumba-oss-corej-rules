@@ -1,0 +1,28 @@
+name: CDISC-CG0123
+kind: rule
+description: |
+  Wave 13 port - ACTARMCD longer than 20 characters. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000185)
+rule:
+  coreId: CDISC-CG0123
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARMCD: TRT01}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ACTARMCD: AAAAAAAAAAAAAAAAAAAAA}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0123
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ACTARMCD: AAAAAAAAAAAAAAAAAAAAA
+expected_errors: []

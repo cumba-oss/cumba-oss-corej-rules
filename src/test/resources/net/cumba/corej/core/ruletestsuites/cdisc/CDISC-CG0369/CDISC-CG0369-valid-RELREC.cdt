@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0369 expect=noViolation domain=RELREC
+# Rule:Description: Raise an error when Related Domain Abbreviation (RDOMAIN) is populated but does not represent a domain present in the study data.
+#note "RDOMAIN populated with AE, which is present as a dataset in the study"
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015
+CDISCPILOT01 | AE | 01-701-1023
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+---
+CDISCPILOT01
+---

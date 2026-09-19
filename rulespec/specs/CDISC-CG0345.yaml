@@ -1,0 +1,28 @@
+name: CDISC-CG0345
+kind: rule
+description: |
+  Wave 8 port — Single-leaf `--TRT = MULTIPLE` check on INTERVENTIONS class. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000163)
+rule:
+  coreId: CDISC-CG0345
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: MULTIPLE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0345
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      EXTRT: MULTIPLE
+expected_errors: []

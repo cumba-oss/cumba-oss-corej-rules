@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0227 expect=violation domain=AE
+# Rule:Description: Raise an error when End Relative to Reference Period (--ENRF) is populated for a subject with an empty Reference End Date/Time (RFENDTC) in the DM dataset.
+#note "AE.AEENRF (--ENRF) is populated while the subject's DM.RFENDTC is empty -> violation. Rule Scope excludes DM, so the check is exercised on AE (an --ENRF-bearing domain) against the DM reference dataset. Second subject has DM.RFENDTC populated, so its AE row stays silent (per-record discrimination)."
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEENRF type=Char label="End Relative to Reference Period"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | BEFORE
+CDISCPILOT01 | AE | 01-701-1023 | 1 | DURING
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFENDTC type=Char label="Subject Reference End Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 | 2012-09-02
+---

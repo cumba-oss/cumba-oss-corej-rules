@@ -1,0 +1,29 @@
+name: CDISC-CG0570
+kind: rule
+description: |
+  Wave 14 port — `is_contained_by_case_insensitive`. TA.ARM must not be a
+  disposition phrase (Screen Failure / Not Assigned / Not Treated / Unplanned
+  Treatment). Case-insensitive membership.
+python_source: rules-sdtmig-3-4.json (CORE-000115)
+rule:
+  coreId: CDISC-CG0570
+datasets:
+  TA:
+    row_key: [STUDYID, ARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: TRT01, ARM: Treatment 1}                  # ok
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: SCRFAIL, ARM: screen failure}              # bad (CI match)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TA]
+expected_violations:
+  - rule_id: CDISC-CG0570
+    dataset: TA
+    row_key: {ARMCD: SCRFAIL, STUDYID: S1}
+    status: SUCCESS
+    output_variables:
+      ARM: screen failure
+expected_errors: []

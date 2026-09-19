@@ -1,0 +1,29 @@
+name: CDISC-CG0309
+kind: rule
+description: |
+  Record-Data port. CORE-000181: AP-- domain DOMAIN value length must be 4.
+  Single leaf: DOMAIN has_not_equal_length 4. The APAE row sets DOMAIN=APAE (length 4)?
+  No: we need length != 4 to fire, so DOMAIN value must not be 4 chars. Use APRELSUB-style;
+  set DOMAIN to a 3-char value to trigger has_not_equal_length 4.
+python_source: rules-sdtmig-3-4.json (CORE-000181)
+rule:
+  coreId: CDISC-CG0309
+datasets:
+  APAE:
+    row_key: [STUDYID, USUBJID, APID, __row_number__]
+    rows:
+      - {STUDYID: S1, DOMAIN: APX, USUBJID: '001', APID: A1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [APAE]
+expected_violations:
+  - rule_id: CDISC-CG0309
+    dataset: APAE
+    row_key: {APID: A1, STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      DOMAIN: APX
+expected_errors: []

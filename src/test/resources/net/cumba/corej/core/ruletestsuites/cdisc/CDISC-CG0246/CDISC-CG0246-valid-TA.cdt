@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0246 expect=noViolation domain=TA
+# Rule:Description: Raise an error when the value of Element Code (ETCD) is longer than 8 characters.
+#note "all ETCD values are 8 chars or fewer"
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col ARMCD type=Char label="Planned Arm Code" format=$ARMCD.
+col ARM type=Char label="Description of Planned Arm" format=$ARM.
+col TAETORD type=Num label="Order of Element within Arm"
+col ETCD type=Char label="Element Code" format=$ETCD.
+col ELEMENT type=Char label="Description of Element" format=$ELEMENT.
+---
+CDISCPILOT01 | TA | Pbo | Placebo | 1 | SCRN | Screen
+CDISCPILOT01 | TA | Pbo | Placebo | 2 | PBO | Placebo
+---

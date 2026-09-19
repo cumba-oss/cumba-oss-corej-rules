@@ -1,0 +1,28 @@
+name: CDISC-CG0503
+kind: rule
+description: |
+  Record-Data plain. CORE-000193: when MIDSDTC is present, MIDS must also be
+  present. Two leaves: MIDSDTC exists AND MIDS not_exists. The DM row has
+  MIDSDTC but no MIDS column, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000193)
+rule:
+  coreId: CDISC-CG0503
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', MIDSDTC: '2020-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0503
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      MIDSDTC: '2020-01-01'
+expected_errors: []

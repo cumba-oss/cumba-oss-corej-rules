@@ -1,0 +1,35 @@
+name: CDISC-CG0234-guarded
+kind: rule
+description: |
+  Guarded counterpart to CORE-000324-empty — proves the date_equal_to empty-comparator
+  divergence disappears once non_empty(--DTC) is added on the comparator.
+
+  Same data as CORE-000324-empty. With the guard, the empty-AEDTC row (D1) fails
+  non_empty before the date comparison, so coreJ no longer fires it — matching Python.
+  The populated control (C1) still fires on both engines; N1 stays no-fire. Zero
+  divergence, NOT baselined, passes both lanes.
+python_notes: |
+  With non_empty(--DTC) both engines emit exactly one violation (C1).
+python_source: rules-sdtmig-3-4.json (CORE-000324) + PLAN-empty-string-membership-parity.md
+rule:
+  coreId: CDISC-CG0234
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: 'D1', AESEQ: 1, AEENTPT: '2026-01-01', AEDTC: '', AEENRTPT: AFTER}            # guarded out
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: 'C1', AESEQ: 1, AEENTPT: '2026-01-01', AEDTC: '2026-01-01', AEENRTPT: AFTER}  # real violation → fires (both)
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: 'N1', AESEQ: 1, AEENTPT: '2026-01-01', AEDTC: '2026-01-01', AEENRTPT: BEFORE} # no fire (both)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+  - rule_id: CDISC-CG0234
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: 'C1', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      AEDTC: '2026-01-01'
+      AEENRTPT: AFTER
+      AEENTPT: '2026-01-01'
+expected_errors: []

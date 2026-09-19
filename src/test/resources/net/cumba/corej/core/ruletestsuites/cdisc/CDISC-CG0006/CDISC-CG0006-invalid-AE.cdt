@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0006 expect=violation domain=AE
+# Rule:Description: Raise an error when the collection Study Day (--DY) is populated and both the date portion of --DTC and the date portion of RFSTDTC are complete dates, but --DY does not equal the value computed by the SDTM study day algorithm (a non-zero integer).
+#note "AEDTC and DM.RFSTDTC are complete but AEDY=999 does not match the study-day algorithm (expected 1) -> violation"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-02 | 999
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-05 | 4
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+---

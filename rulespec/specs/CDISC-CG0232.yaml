@@ -1,0 +1,32 @@
+name: CDISC-CG0232
+kind: rule
+description: |
+  Wave 11 port - --STTPT = --DTC but --STRTPT not in [BEFORE,COINCIDENT,ONGOING,UNKNOWN]. Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000763)
+rule:
+  coreId: CDISC-CG0232
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBSTTPT: '2026-01-01', LBSTRTPT: COINCIDENT, LBDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 2, LBSTTPT: '2026-01-01', LBSTRTPT: ONGOING, LBDTC: '2026-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0232
+    dataset: LB
+    row_key: {LBSEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      LBDTC: '2026-01-01'
+      LBSTRTPT: ONGOING
+      LBSTTPT: '2026-01-01'
+expected_errors: []

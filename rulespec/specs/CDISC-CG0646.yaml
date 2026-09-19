@@ -1,0 +1,30 @@
+name: CDISC-CG0646
+kind: rule
+description: |
+  Side-batch port (Fix #15 bucket) - SJ dataset present (trial-design dataset that shouldn't ship). Domain
+  Presence Check rule with no Outcome.Output_Variables; Fix #15 infers
+  the Check leaf names but extractOutputValues drops dataset-name leaves
+  (no matching column), so the canonical violation has empty
+  output_variables - matching Python's behaviour after the adapter strips
+  "Not in dataset" sentinels (Finding #10).
+python_source: rules-sdtmig-3-4.json (CORE-000044)
+rule:
+  coreId: CDISC-CG0646
+datasets:
+  SJ:
+    row_key: [STUDYID]
+    rows:
+      - {STUDYID: S1, DOMAIN: SJ}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [SJ]
+expected_violations:
+  - rule_id: CDISC-CG0646
+    dataset: SJ
+    row_key: {STUDYID: S1}
+    status: SUCCESS
+    output_variables: {}
+expected_errors: []

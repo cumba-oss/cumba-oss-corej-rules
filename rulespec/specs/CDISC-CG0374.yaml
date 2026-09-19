@@ -1,0 +1,41 @@
+name: CDISC-CG0374
+kind: rule
+description: |
+  Wave 7 port — RELREC.RDOMAIN must reference a dataset present in the study.
+  Uses the `study_domains` Operation which enumerates all available datasets.
+python_source: rules-sdtmig-3-4.json (CORE-000384)
+rule:
+  coreId: CDISC-CG0374
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1}
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1}
+  RELREC:
+    row_key: [__row_number__]
+    rows:
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', RELID: R1}
+      - {STUDYID: S1, RDOMAIN: CM, USUBJID: '001', IDVAR: CMSEQ, IDVARVAL: '1', RELID: R1}
+      # bad: references MH which isn't present in the study
+      - {STUDYID: S1, RDOMAIN: MH, USUBJID: '001', IDVAR: MHSEQ, IDVARVAL: '1', RELID: R2}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    interventions: [CM]
+    relationship: [RELREC]
+expected_violations:
+  - rule_id: CDISC-CG0374
+    dataset: RELREC
+    row_key: {__row_number__: 2}
+    status: SUCCESS
+    output_variables:
+      $study_domains: '[, AE, CM]'
+      RDOMAIN: MH
+expected_errors: []

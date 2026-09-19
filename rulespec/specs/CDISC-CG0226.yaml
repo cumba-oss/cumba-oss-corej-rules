@@ -1,0 +1,35 @@
+name: CDISC-CG0226
+kind: rule
+description: |
+  Wave 9 port - DM.RFSTDTC empty but --STRF non-empty. Match_Datasets joins primary AE
+  to DM on USUBJID; DM.RFSTDTC / RFENDTC / RFPENDTC are emitted with the
+  DM.* prefix preserved in the canonical output_variables.
+python_source: rules-sdtmig-3-4.json (CORE-000262)
+rule:
+  coreId: CDISC-CG0226
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESTRF: AFTER}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AESTRF: AFTER}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFSTDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFSTDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0226
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AESTRF: AFTER
+      DM.RFSTDTC:
+expected_errors: []

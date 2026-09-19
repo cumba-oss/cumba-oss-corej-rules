@@ -1,0 +1,45 @@
+name: CDISC-CG0289
+kind: rule
+description: |
+  Wave 1 port — library-mocks shape.
+  CORE-000761: Trigger error when TSVCDREF names a CDISC terminology and TSVCDVER is not a valid
+  published date. Primary domain TS. Operation `valid_codelist_dates` (with ct_package_types:
+  [SDTM]) yields $valid_dates from the published_ct_packages library mock. Check fires when
+  prefix(TSVCDREF, 5) == "CDISC" (the CG0289 prefix mechanism, adopted by the CL-C twin-alignment
+  ruling 2026-08-18 - it matches every 'CDISC ...' spelling) AND TSVCDVER not in $valid_dates.
+python_source: rules-sdtmig-3-4.json (CORE-000761)
+rule:
+  coreId: CDISC-CG0289
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ, TSPARMCD]
+    rows:
+      # Subject 1 row — TSVCDVER in published list, no violation.
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: DOSE, TSVCDREF: CDISC, TSVCDVER: '2023-12-13'}
+      # Subject 2 row — TSVCDVER not in list → violation.
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 2, TSPARMCD: ROUTE, TSVCDREF: CDISC CT, TSVCDVER: '2099-01-01'}
+      # Subject 3 row — TSVCDREF != CDISC → no violation regardless of TSVCDVER.
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 3, TSPARMCD: AGEU, TSVCDREF: OTHER, TSVCDVER: '2099-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    # Engine helper convert_library_class_name_to_ct_class only special-cases
+    # "special-purpose"; for any other class the engine compares
+    # ``class_name.upper()`` against rule.Scope.Classes.Include — so the mock key
+    # must match the Pascal-with-space form the rule uses, lower-cased.
+    trial design: [TS]
+  published_ct_packages:
+    - sdtmct-2023-10-26
+    - sdtmct-2023-12-13
+expected_violations:
+  - rule_id: CDISC-CG0289
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: ROUTE, TSSEQ: 2}
+    status: SUCCESS
+    output_variables:
+      $valid_dates: '[2023-10-26, 2023-12-13]'
+      TSVCDREF: CDISC CT
+      TSVCDVER: '2099-01-01'
+expected_errors: []

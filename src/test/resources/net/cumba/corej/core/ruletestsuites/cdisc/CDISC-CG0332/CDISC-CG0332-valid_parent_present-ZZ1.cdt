@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0332 expect=noViolation domain=ZZ1
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "Split dataset ZZ1 matches the split-name regex and is not AP/FA-prefixed, but its two-letter parent ZZ IS present in the study, so the prefix_is_not_contained_by conjunct is false"
+dataset ZZ1 label="Split dataset whose parent domain ZZ is present"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | ZZ | 01-701-1015
+CDISCPILOT01 | ZZ | 01-701-1023
+---
+
+dataset ZZ label="Parent domain present in the study"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | ZZ | 01-701-1015
+CDISCPILOT01 | ZZ | 01-701-1023
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

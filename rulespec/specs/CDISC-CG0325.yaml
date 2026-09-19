@@ -1,0 +1,44 @@
+name: CDISC-CG0325
+kind: rule
+description: |
+  Wave 14 port — `is_unique_set` + `is_not_unique_set` composite. Fires
+  branch 1: ETCD is_not_unique_set over (ELEMENT, TESTRL, TEENRL, TEDUR).
+  Two TE rows share the same tuple across all four set columns AND the same
+  ETCD — a genuine duplicate element definition. Both rows violate.
+python_source: rules-sdtmig-3-4.json (CORE-000580)
+rule:
+  coreId: CDISC-CG0325
+datasets:
+  TE:
+    row_key: [STUDYID, __row_number__]
+    rows:
+      - {STUDYID: S1, DOMAIN: TE, ETCD: SCREEN, ELEMENT: Screening, TESTRL: SV1DT, TEENRL: SV2DT, TEDUR: P7D}
+      - {STUDYID: S1, DOMAIN: TE, ETCD: SCREEN, ELEMENT: Screening, TESTRL: SV1DT, TEENRL: SV2DT, TEDUR: P7D}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TE]
+expected_violations:
+  - rule_id: CDISC-CG0325
+    dataset: TE
+    row_key: {STUDYID: S1, __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      ELEMENT: Screening
+      ETCD: SCREEN
+      TEDUR: P7D
+      TEENRL: SV2DT
+      TESTRL: SV1DT
+  - rule_id: CDISC-CG0325
+    dataset: TE
+    row_key: {STUDYID: S1, __row_number__: 1}
+    status: SUCCESS
+    output_variables:
+      ELEMENT: Screening
+      ETCD: SCREEN
+      TEDUR: P7D
+      TEENRL: SV2DT
+      TESTRL: SV1DT
+expected_errors: []

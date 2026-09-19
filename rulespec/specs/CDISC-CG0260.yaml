@@ -1,0 +1,29 @@
+name: CDISC-CG0260
+kind: rule
+description: |
+  Wave 13 port - TSVAL and TSVALNF both populated. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000150)
+rule:
+  coreId: CDISC-CG0260
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: DOSE, TSVAL: 10mg, TSVALNF: ''}
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: ROUTE, TSVAL: ORAL, TSVALNF: 'NULL'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0260
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: ROUTE}
+    status: SUCCESS
+    output_variables:
+      TSVAL: ORAL
+      TSVALNF: 'NULL'
+expected_errors: []

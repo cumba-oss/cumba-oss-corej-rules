@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0311 expect=noViolation domain=DM
+# Rule:Description: Raise an error when a variable label is longer than 40 characters.
+#note "All variable labels are 40 characters or fewer"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

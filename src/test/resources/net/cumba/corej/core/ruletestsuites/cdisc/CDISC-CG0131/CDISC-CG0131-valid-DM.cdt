@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0131 expect=noViolation domain=DM
+# Rule:Description: Raise an error when DTHFL is populated and not equal to 'Y'.
+#note "DTHFL is either 'Y' or empty, so the non-empty-and-not-Y condition is never met"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL type=Char label="Subject Death Flag" format=$Y_BLANK.
+---
+CDISCPILOT01 | DM | 01-701-1015 | Y
+CDISCPILOT01 | DM | 01-701-1023 |
+---

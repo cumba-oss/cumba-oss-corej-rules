@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD9736 expect=noViolation domain=OI
+# Rule:Description: Raise an error when OIPARMCD and OIPARM do not have a one-to-one relationship.
+#note "Each OIPARMCD maps to exactly one OIPARM, preserving the one-to-one relationship"
+#library standard=sdtmig version=3-4
+dataset OI label="Non-host Organism Identifiers"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col OIPARMCD type=Char label="Organism Identifier Parameter Short Name"
+col OIPARM type=Char label="Organism Identifier Parameter"
+---
+CDISCPILOT01 | OI | PARAM1 | Parameter One
+CDISCPILOT01 | OI | PARAM2 | Parameter Two
+---

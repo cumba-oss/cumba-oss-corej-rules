@@ -1,0 +1,43 @@
+name: CDISC-CG0545
+kind: rule
+description: |
+  Wave 21 port — SM primary + TM match (MIDSTYPE) + distinct(TM.MIDSTYPE).
+  Fires when MIDSTYPE is repeated within a subject but TM.TMRPT=N (non-repeatable).
+python_source: rules-sdtmig-3-4.json (CORE-000216)
+rule:
+  coreId: CDISC-CG0545
+datasets:
+  SM:
+    row_key: [STUDYID, USUBJID, __row_number__]
+    rows:
+      # Subject 001 has MIDSTYPE=SCREENING twice — violates (TM says N = non-repeatable).
+      - {STUDYID: S1, DOMAIN: SM, USUBJID: '001', MIDSTYPE: SCREENING, TMRPT: N}
+      - {STUDYID: S1, DOMAIN: SM, USUBJID: '001', MIDSTYPE: SCREENING, TMRPT: N}
+  TM:
+    row_key: [STUDYID, MIDSTYPE]
+    rows:
+      - {STUDYID: S1, DOMAIN: TM, MIDSTYPE: SCREENING, TMRPT: N}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SM, TM]
+expected_violations:
+  - rule_id: CDISC-CG0545
+    dataset: SM
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      $tm_midstype: '[SCREENING]'
+      MIDSTYPE: SCREENING
+      TM.TMRPT: N
+  - rule_id: CDISC-CG0545
+    dataset: SM
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 1}
+    status: SUCCESS
+    output_variables:
+      $tm_midstype: '[SCREENING]'
+      MIDSTYPE: SCREENING
+      TM.TMRPT: N
+expected_errors: []

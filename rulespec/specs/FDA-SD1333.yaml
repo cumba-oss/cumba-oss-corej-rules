@@ -1,0 +1,28 @@
+name: FDA-SD1333
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000659)
+python_source: rules-sdtmig-3-4.json (CORE-000659)
+rule:
+  coreId: FDA-SD1333
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEOUT: RECOVERED/RESOLVED, AEENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEOUT: RECOVERED/RESOLVED, AEENDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD1333
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC:
+      AEOUT: RECOVERED/RESOLVED
+expected_errors: []

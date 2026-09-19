@@ -1,0 +1,29 @@
+name: CDISC-CG0271
+kind: rule
+description: |
+  Record-Data plain. CORE-000373: TSPARMCD='RANDOM' with TSVAL non-empty and
+  not in [N, Y]. TS row sets TSPARMCD=RANDOM, TSVAL='MAYBE' so all three leaves
+  fire.
+python_source: rules-sdtmig-3-3.json (CORE-000373)
+rule:
+  coreId: CDISC-CG0271
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: RANDOM, TSVAL: MAYBE}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0271
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: RANDOM, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: RANDOM
+      TSVAL: MAYBE
+expected_errors: []

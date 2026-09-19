@@ -1,0 +1,37 @@
+name: FDA-SD1087
+kind: rule
+description: |
+  Wave 12b port - --STDTC present but --STDY absent. Variable Metadata Check with
+  Dataset sensitivity; Java evaluates against the original dataset's column
+  metadata (correct), Python swaps to a metadata projection and reports 0
+  violations. Baselined on the Python lane under Finding #9.
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection before evaluating the Check,
+  so `exists(--COLNAME)` checks meta-field column names (variable_name,
+  variable_label, ...) instead of the original dataset columns and yields
+  0 violations. Java evaluates the `exists`/`not_exists` leaves against the
+  actual column metadata and fires correctly. expected_violations matches
+  Java; Python XFAILs on the asymmetric-lane baseline.
+python_source: rules-sdtmig-3-4.json (CORE-000328)
+rule:
+  coreId: FDA-SD1087
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBSTDTC: '2026-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD1087
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBSTDTC: '2026-01-01'
+expected_errors: []

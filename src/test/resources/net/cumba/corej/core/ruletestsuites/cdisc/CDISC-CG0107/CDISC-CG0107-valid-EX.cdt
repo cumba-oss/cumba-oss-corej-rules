@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0107 expect=noViolation domain=EX
+# Rule:Description: Raise an error when the EC domain is present and Treatment Vehicle Amount Units (EXVAMTU) is present in the EX dataset.
+#note "EC dataset is present but EX does not carry the EXVAMTU variable -> no violation"
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | EX | 01-701-1015 | 1
+CDISCPILOT01 | EX | 01-701-1015 | 2
+CDISCPILOT01 | EX | 01-701-1023 | 1
+---
+
+dataset EC label="Exposure as Collected"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ECSEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | EC | 01-701-1015 | 1
+---

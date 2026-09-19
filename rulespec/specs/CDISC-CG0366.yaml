@@ -1,0 +1,29 @@
+name: CDISC-CG0366
+kind: rule
+description: |
+  Record Data. CORE-000234: in an Associated Persons domain (AP--), RSUBJID must be
+  empty when RDEVID is populated. Check is all[ RDEVID non_empty, RSUBJID non_empty ].
+  The APDM row populates both RDEVID and RSUBJID, so it fires.
+python_source: rules-sdtmig-3-4.json (CORE-000234)
+rule:
+  coreId: CDISC-CG0366
+datasets:
+  APDM:
+    row_key: [STUDYID, APID]
+    rows:
+      - {STUDYID: S1, DOMAIN: APDM, APID: AP01, RDEVID: D01, RSUBJID: '001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [APDM]
+expected_violations:
+  - rule_id: CDISC-CG0366
+    dataset: APDM
+    row_key: {APID: AP01, STUDYID: S1}
+    status: SUCCESS
+    output_variables:
+      RDEVID: D01
+      RSUBJID: '001'
+expected_errors: []

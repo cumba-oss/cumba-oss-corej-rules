@@ -1,0 +1,34 @@
+name: CDISC-CG0178
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary IE checked
+  against distinct(TI.IETEST).
+python_source: rules-sdtmig-3-4.json (CORE-000227)
+rule:
+  coreId: CDISC-CG0178
+datasets:
+  IE:
+    row_key: [STUDYID, USUBJID, IESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '001', IESEQ: 1, IETEST: Age >= 18}
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '002', IESEQ: 1, IETEST: Bogus Test}
+  TI:
+    row_key: [STUDYID, IETESTCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TI, IETESTCD: INCL01, IETEST: Age >= 18}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [IE]
+    trial design: [TI]
+expected_violations:
+  - rule_id: CDISC-CG0178
+    dataset: IE
+    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ti_ietest: '[Age >= 18]'
+      IETEST: Bogus Test
+expected_errors: []

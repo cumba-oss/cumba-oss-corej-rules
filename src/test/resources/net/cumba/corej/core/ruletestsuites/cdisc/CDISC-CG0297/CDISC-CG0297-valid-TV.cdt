@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0297 expect=noViolation domain=TV
+# Rule:Description: Raise an error when the length of the Planned Arm Code (ARMCD) value exceeds 20 characters.
+#note "all ARMCD values are 20 characters or fewer"
+dataset TV label="Trial Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col ARMCD type=Char label="Planned Arm Code" format=$ARMCD.
+---
+CDISCPILOT01 | TV | 1 | SCREENING 1 | Pbo
+CDISCPILOT01 | TV | 2 | BASELINE | Xan_Hi
+---

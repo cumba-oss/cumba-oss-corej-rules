@@ -1,0 +1,39 @@
+name: CDISC-CG0657
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary SV checked
+  against distinct(TV.VISIT).
+python_source: rules-sdtmig-3-4.json (CORE-000036)
+rule:
+  coreId: CDISC-CG0657
+datasets:
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, SVPRESP: Y, VISIT: Screening}
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '002', VISITNUM: 1, SVPRESP: Y, VISIT: Bogus Visit}
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: Screening, ARMCD: TRT01}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0657
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '002', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      $tv_visit: '[Screening]'
+      SVPRESP: Y
+      VISIT: Bogus Visit
+expected_errors: []

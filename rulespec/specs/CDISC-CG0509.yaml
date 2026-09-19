@@ -1,0 +1,27 @@
+name: CDISC-CG0509
+kind: rule
+description: |
+  Record-Data port. CORE-000057: FETUSID must not be present in any dataset.
+  Single leaf: FETUSID exists. The AE row includes a FETUSID column so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000057)
+rule:
+  coreId: CDISC-CG0509
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, FETUSID: F1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0509
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      FETUSID: F1
+expected_errors: []

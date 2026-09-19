@@ -1,0 +1,29 @@
+name: CDISC-CG0429
+kind: rule
+description: |
+  Wave 8 port — --SCAT populated but --CAT empty (class=ALL). Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000103)
+rule:
+  coreId: CDISC-CG0429
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESCAT: SEVERE, AECAT: ALLERGIC}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESCAT: SEVERE, AECAT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0429
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AECAT:
+      AESCAT: SEVERE
+expected_errors: []

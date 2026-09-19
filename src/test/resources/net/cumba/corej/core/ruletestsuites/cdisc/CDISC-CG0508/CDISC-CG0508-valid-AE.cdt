@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0508 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --IMPLBL, a variable defined for use in non-clinical (SEND) studies, is present in a dataset submitted as SDTM-based data for a human clinical trial.
+#note "AEIMPLBL column is absent"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2
+---

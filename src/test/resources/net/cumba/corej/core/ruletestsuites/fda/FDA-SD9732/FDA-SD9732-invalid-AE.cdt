@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9732 expect=violation domain=AE
+# Rule:Description: Raise an error when --SOCCD and --SOC do not have a one-to-one relationship.
+#note "AESOC GENERAL DISORDERS... maps to two different AESOCCD values, breaking the one-to-one relationship"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESOC type=Char label="Primary System Organ Class" format="$ADVERSE EVENT DICTIONARY."
+col AESOCCD type=Num label="Primary System Organ Class Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS | 10018065
+CDISCPILOT01 | AE | 01-701-1015 | 2 | GENERAL DISORDERS AND ADMINISTRATION SITE CONDITIONS | 99999999
+---

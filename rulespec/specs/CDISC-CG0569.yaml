@@ -1,0 +1,28 @@
+name: CDISC-CG0569
+kind: rule
+description: |
+  Wave 8 port — --LOBXFL = Y but --STRESC empty. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000105)
+rule:
+  coreId: CDISC-CG0569
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBLOBXFL: N, LBTESTCD: HGB, LBSTRESC: ''}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBLOBXFL: Y, LBTESTCD: HGB, LBSTRESC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0569
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      LBLOBXFL: Y
+expected_errors: []

@@ -1,0 +1,39 @@
+name: CDISC-CG0205
+kind: rule
+description: |
+  Wave 18 port - Dataset-sensitivity rule. SUPP-- dataset name longer than 8 chars.
+
+  ⚠⚠ DO NOT ADD A `DOMAIN` COLUMN TO THIS DATASET. A SUPPQUAL dataset has no DOMAIN
+  variable (SDTMIG 8.4: STUDYID, RDOMAIN, USUBJID/POOLID, IDVAR, IDVARVAL, QNAM,
+  QLABEL, QVAL, QORIG, QEVAL) — `RDOMAIN` is what names the supplemented domain, and
+  it is what keeps this rule in scope. `SUPP--` is strict (SUPP + exactly two
+  characters), so the 10-character NAME never matches it; the dataset is reached
+  through its DATA-DERIVED base, which OperationExecutor.unsplitNameFromData builds
+  as SUPP + RDOMAIN = SUPPAE (6 characters). That function reads `DOMAIN` FIRST and
+  returns it verbatim when present, so a spurious `DOMAIN: SUPPAETOOL` shadows the
+  RDOMAIN branch, makes the base the raw 10-character name, and the rule is silently
+  SKIPPED — which is exactly how this spec went red when the SUPP/AP family wildcard
+  was deleted (2026-08-07). The expectation below is unchanged; only the invalid
+  input data was corrected.
+python_source: rules-sdtmig-3-4.json (CORE-000293)
+rule:
+  coreId: CDISC-CG0205
+datasets:
+  SUPPAETOOL:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, USUBJID: '001', RDOMAIN: AE, IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, QLABEL: X, QVAL: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAETOOL]
+expected_violations:
+- rule_id: CDISC-CG0205
+  dataset: SUPPAETOOL
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    dataset_name: SUPPAETOOL
+expected_errors: []

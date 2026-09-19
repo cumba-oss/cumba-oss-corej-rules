@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0093 expect=violation domain=AE
+# Rule:Description: Raise an error when --ELTM, --TPTNUM, --TPT, --STINT, and --ENINT are not present in the dataset but --TPTREF is present.
+#note "D23 direction 2 -- the rule was narrowed, not disabled. AETPTREF is present while ALL FIVE timing anchors (AEELTM, AETPTNUM, AETPT, AESTINT, AEENINT) are absent, so the rule still fires exactly as before the two conjuncts were added."
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETPTREF type=Char label="Time Point Reference"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | DOSING
+CDISCPILOT01 | AE | 01-701-1015 | 2 | DOSING
+---

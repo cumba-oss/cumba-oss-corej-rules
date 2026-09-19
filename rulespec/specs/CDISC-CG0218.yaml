@@ -1,0 +1,38 @@
+name: CDISC-CG0218
+kind: rule
+description: |
+  Wave 17 port - non-wildcard Match_Datasets rule.
+python_source: rules-sdtmig-3-4.json (CORE-000097)
+rule:
+  coreId: CDISC-CG0218
+datasets:
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, EPOCH: SCREENING, SVSTDTC: '2026-01-03'}
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '002', VISITNUM: 1, EPOCH: TREATMENT, SVSTDTC: '2026-01-03'}
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, SESTDTC: '2026-01-01', SEENDTC: '2026-01-07', EPOCH: SCREENING}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', SESEQ: 1, SESTDTC: '2026-01-01', SEENDTC: '2026-01-07', EPOCH: SCREENING}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+expected_violations:
+  - rule_id: CDISC-CG0218
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '002', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      EPOCH: TREATMENT
+      SE.EPOCH: SCREENING
+      SE.SEENDTC: '2026-01-07'
+      SE.SESTDTC: '2026-01-01'
+      SVSTDTC: '2026-01-03'
+expected_errors: []

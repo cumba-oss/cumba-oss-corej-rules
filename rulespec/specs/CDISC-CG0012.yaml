@@ -1,0 +1,44 @@
+name: CDISC-CG0012
+kind: rule
+description: |
+  Variable-Metadata-Check-against-Library-Metadata port. CORE-001082: a dataset
+  variable's data type must match the library (IG/Model) type. The
+  VariablesMetadataWithLibraryMetadataDatasetBuilder merges the dataset's variable
+  metadata (variable_data_type — the variable's loaded type) against the library variable
+  metadata (library_variable_data_type, derived from the standard's simpleDatatype). The
+  study declares LBORRES numeric (column_types: DOUBLE → Num) whereas the library defines
+  LBORRES as Char, so variable_data_type != library_variable_data_type fires on LBORRES;
+  the other LB columns match their library types and do not fire. Because the rule is
+  Dataset-sensitivity, the engine reports a single finding (the first failing variable).
+python_source: rules-sdtmig-3-4.json (CORE-001082)
+rule:
+  coreId: CDISC-CG0012
+datasets:
+  LB:
+    row_key: [variable_name]
+    # LBORRES is Char in the library; the study declares it numeric — a genuine data-type
+    # mismatch the rule must catch. (Both engines take the variable's loaded type, so the study
+    # variable_data_type is Num here and != the library's Char.)
+    column_types:
+      LBORRES: DOUBLE
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBORRES: 5.0}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+  domain_variables:
+    LB:
+      - {name: LBORRES, ordinal: '1', role: Qualifier, simpleDatatype: Char, label: Result or Finding in Original Units}
+expected_violations:
+  - rule_id: CDISC-CG0012
+    dataset: LB
+    row_key: {variable_name: null}
+    status: SUCCESS
+    output_variables:
+      library_variable_data_type: Char
+      variable_data_type: Num
+      variable_name: LBORRES
+expected_errors: []

@@ -1,0 +1,31 @@
+name: CDISC-CG0285
+kind: rule
+description: |
+  Wave 14 port — `invalid_date`. TS row with TSPARMCD=SSTDTC must have a
+  valid ISO-8601 date in TSVAL. Invalid forms ("2026-13-40", "not-a-date")
+  fire the rule.
+python_source: rules-sdtmig-3-4.json (CORE-000505)
+rule:
+  coreId: CDISC-CG0285
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: SSTDTC, TSVAL: '2026-01-01'}        # ok (valid ISO)
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: AGEMAX, TSVAL: not-a-date}          # ok (not SSTDTC)
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: SSTDTC, TSVAL: not-a-date}          # bad
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0285
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: SSTDTC}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: SSTDTC
+      TSVAL: not-a-date
+expected_errors: []

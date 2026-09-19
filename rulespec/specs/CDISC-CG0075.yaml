@@ -1,0 +1,40 @@
+name: CDISC-CG0075
+kind: rule
+description: |
+  Wave 2 port — cross-dataset shape.
+  CORE-000086: DV.DVSTDTC must not be earlier than DM.RFICDTC for the matching subject.
+  Single-key DV↔DM join on USUBJID.
+python_source: rules-sdtmig-3-4.json (CORE-000086)
+rule:
+  coreId: CDISC-CG0075
+datasets:
+  DV:
+    row_key: [STUDYID, USUBJID, DVSEQ]
+    rows:
+      # Subject 001 — DVSTDTC after RFICDTC                      → no violation
+      - {STUDYID: S1, DOMAIN: DV, USUBJID: '001', DVSEQ: 1, DVSTDTC: '2023-02-01'}
+      # Subject 002 — DVSTDTC before RFICDTC                     → violation
+      - {STUDYID: S1, DOMAIN: DV, USUBJID: '002', DVSEQ: 1, DVSTDTC: '2022-12-31'}
+      # Subject 003 — DVSTDTC equal to RFICDTC                   → no violation (date_less_than is strict)
+      - {STUDYID: S1, DOMAIN: DV, USUBJID: '003', DVSEQ: 1, DVSTDTC: '2023-01-15'}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFICDTC: '2023-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2023-01-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFICDTC: '2023-01-15'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DV]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0075
+    dataset: DV
+    row_key: {DVSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DM.RFICDTC: '2023-01-15'
+      DVSTDTC: '2022-12-31'
+expected_errors: []

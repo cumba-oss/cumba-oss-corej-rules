@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0650 expect=violation domain=APA
+# Rule:Description: Raise an error when an Associated Persons non-supplemental qualifier dataset associated with a split dataset has a dataset name length shorter than or equal to 4 or greater than 6 characters.
+#note "⚠ DOMAIN WAS `AE` AND THE SCENARIO PASSED ONLY BECAUSE OF AN ENGINE DEFECT — see the sibling -invalid-APTOOLONG scenario for the full account. In short: `include_split_datasets: true` used to be applied ADDITIVELY, force-including every split dataset regardless of `Domains.Include: [AP--]`; with DOMAIN=AE the data-derived base was `AE` and nothing else put this dataset in scope. DOMAIN is now `APAE` — 4 characters, as CDISC-CG0309 / CDISC-CG0309 require of any AP-- dataset — so the base `APAE` matches strict `AP--` and APA != APAE makes it a split of APAE. The name APA is deliberately malformed (that is what the scenario tests); the DOMAIN value is what declares the split parent, and it is now well-formed. The expectation is unchanged. Associated Persons split dataset name APA is 3 characters (shorter_than_or_equal 4) -> violation"
+#expectViolationCount 1
+dataset APA label="Associated Persons split dataset with an over-short name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col APID type=Char label="Associated Persons Identifier"
+---
+CDISCPILOT01 | APAE | AP-701-1015
+CDISCPILOT01 | APAE | AP-701-1023
+---

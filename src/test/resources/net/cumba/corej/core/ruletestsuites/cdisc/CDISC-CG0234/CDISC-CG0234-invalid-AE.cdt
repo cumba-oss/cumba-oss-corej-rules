@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0234 expect=violation domain=AE
+# Rule:Description: Raise an error when the end reference time point (--ENTPT) is a complete date equal to the date/time of collection (--DTC) but the end relative to reference time point (--ENRTPT) is not one of 'BEFORE', 'COINCIDENT', 'ONGOING', or 'UNKNOWN'.
+#note "AEENTPT is a complete date equal to AEDTC but AEENRTPT is AFTER"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEENTPT type=Char label="End Reference Time Point"
+col AEENRTPT type=Char label="End Relative to Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-16 | 2014-01-16 | AFTER
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-16 |  | 
+---

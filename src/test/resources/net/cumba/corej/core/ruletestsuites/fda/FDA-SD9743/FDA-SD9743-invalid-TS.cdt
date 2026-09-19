@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD9743 expect=violation domain=TS
+# Rule:Description: Raise an error when both AGE and AGETXT are present in the list of TSPARMCDs with TSVAL populated (only one should be used).
+#note "Both AGE and AGETXT records exist with a populated TSVAL (age_count>=1 AND agetxt_count>=1) -> violation"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 TSSEQ=1
+#expectViolationAt row=2 TSSEQ=2
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSSEQ type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGE | 65
+CDISCPILOT01 | TS | 2 | AGETXT | 18-65
+---

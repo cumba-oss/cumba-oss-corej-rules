@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0018 expect=noViolation domain=SUPPLBHM
+# Rule:Description: Raise an error when a Supplemental Qualifier dataset associated with a split domain has a dataset name longer than 8 characters.
+#note "In-scope no-violation control, added when `include_split_datasets: true` became a CONJUNCTIVE gate (match Include AND be a split) — it replaces the discrimination previously carried by -valid-SUPPDM, which is now legitimately out of scope because SUPPDM is not a split. ⚠ RDOMAIN is REQUIRED here and is what keeps the rule in scope: `SUPP--` is strict (SUPP + exactly two characters), so the 8-character NAME never matches it; the dataset is reached through its DATA-DERIVED base, which OperationExecutor.unsplitNameFromData builds as SUPP + RDOMAIN = SUPPLB (6 characters), and SUPPLBHM != SUPPLB additionally makes it a split. Do NOT add a DOMAIN column: a SUPPQUAL dataset has none (SDTMIG 8.4), and unsplitNameFromData reads DOMAIN first, so a spurious value would shadow the RDOMAIN branch and silently skip the rule. Split-dataset supp name SUPPLBHM is exactly 8 characters, so `longer_than 8` is false -> no violation. Neutering the `longer_than 8` bound to `longer_than 7` must turn this red."
+dataset SUPPLBHM label="Supplemental Qualifiers for the LB split LBHM"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+CDISCPILOT01 | LB | 01-701-1023
+---

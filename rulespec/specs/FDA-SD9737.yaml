@@ -1,0 +1,39 @@
+name: FDA-SD9737
+kind: rule
+description: |
+  Wave 11 port - --CLAS maps to multiple distinct --CLASCD values. Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000792)
+rule:
+  coreId: FDA-SD9737
+datasets:
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMCLAS: ANALGESIC, CMCLASCD: A01}
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '002', CMSEQ: 2, CMCLAS: ANTIBIOTIC, CMCLASCD: B01}
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '003', CMSEQ: 3, CMCLAS: ANTIBIOTIC, CMCLASCD: B99}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [CM]
+expected_violations:
+  - rule_id: FDA-SD9737
+    dataset: CM
+    row_key: {CMSEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      CMCLAS: ANTIBIOTIC
+      CMCLASCD: B01
+  - rule_id: FDA-SD9737
+    dataset: CM
+    row_key: {CMSEQ: 3, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      CMCLAS: ANTIBIOTIC
+      CMCLASCD: B99
+expected_errors: []

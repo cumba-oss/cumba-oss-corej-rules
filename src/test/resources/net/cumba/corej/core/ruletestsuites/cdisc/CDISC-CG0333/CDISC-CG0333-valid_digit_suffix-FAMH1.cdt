@@ -1,0 +1,10 @@
+#!RuleTest
+#test CDISC-CG0333 expect=noViolation domain=FAMH1
+# Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
+#note "CL-C (wave TA-4): the CG0333-shape regex tail admits letters only and is anchored, so the digit-suffix split FAMH1 is no longer treated as a Findings About parent-reference name (its parent question belongs to the split-dataset machinery, not this rule) - under the old unanchored head it fired for the missing MH parent."
+dataset FAMH1 label="Findings About digit-suffix split"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | FA | 01-701-1015

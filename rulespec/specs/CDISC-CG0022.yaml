@@ -1,0 +1,35 @@
+name: CDISC-CG0022
+kind: rule
+description: |
+  Wave 3 port — verifies Fix #1 (variable_count --template preservation) is landed.
+  CORE-000358: When --LNKGRP is present in one domain, it must be present in another
+  (paired link-group scenarios). Exercises the `variable_count` operation over a
+  wildcard name and the `< 2` check.
+
+  Scope.Domains: [ALL] + Variable Metadata Check rule — the engine fires per dataset
+  that has a matching *LNKGRP column. With Fix #1 (pre-2026-04-19), the Java engine
+  collapses `--LNKGRP` to the current domain's literal name before variable_count,
+  producing count=1 every time → over-reports. After Fix #1, both engines count
+  distinct dataset families that expose the variable family.
+python_source: rules-sdtmig-3-4.json (CORE-000358)
+rule:
+  coreId: CDISC-CG0022
+datasets:
+  # Two datasets both expose *LNKGRP — count should be 2 → check fails (no violation).
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AELNKGRP: G1, AETERM: Headache}
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMLNKGRP: G1, CMTRT: Aspirin}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    interventions: [CM]
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-CG0371 expect=noViolation domain=SUPPLBHE
+# Rule:Description: Raise an error when the reference record defined by RDOMAIN, USUBJID, IDVAR and IDVARVAL does not exist in the target domain.
+#note "Fix #358 (PLAN-match-datasets-split-union.md): LB ships SPLIT (lbch/lbhe, DOMAIN=LB, no standalone LB). The RDOMAIN=LB parent resolves to the row-stacked UNION of the members, so a SUPPLBHE row whose LBSEQ lives in LBHE and one whose LBSEQ lives in LBCH both find their parent record -> no violation. Before the union the parent was the lexicographically-first member (LBCH) alone, and the LBHE-pointing row was reported as a phantom orphan."
+dataset SUPPLBHE label="Supplemental Qualifiers for LBHE"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM type=Char label="Qualifier Variable Name"
+col QVAL type=Char label="Data Value"
+---
+CDISCPILOT01 | LB | 01-701-1015 | LBSEQ | 9 | LBTMSHI | HIGH
+CDISCPILOT01 | LB | 01-701-1015 | LBSEQ | 1 | LBTMSHI | LOW
+---
+
+dataset LBCH label="Laboratory Test Results (Chemistry)"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBORRES type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | 4.5
+---
+
+dataset LBHE label="Laboratory Test Results (Hematology)"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBORRES type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 9 | 13.2
+---

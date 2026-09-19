@@ -1,0 +1,28 @@
+name: CDISC-CG0269
+kind: rule
+description: |
+  Record-Data. CORE-000372: in TS, when TSPARMCD='ADDON' the non-empty TSVAL must be
+  'N' or 'Y'. The TS row sets TSPARMCD=ADDON and TSVAL=MAYBE so all three leaves fire.
+python_source: rules-sdtmig-3-3.json (CORE-000372)
+rule:
+  coreId: CDISC-CG0269
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: ADDON, TSVAL: MAYBE}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0269
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: ADDON, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: ADDON
+      TSVAL: MAYBE
+expected_errors: []

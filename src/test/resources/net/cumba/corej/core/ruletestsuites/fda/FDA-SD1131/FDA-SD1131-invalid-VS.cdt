@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1131 expect=violation domain=VS
+#note "R-4 (ruled 2026-08-19): FDA-SD1131 is scoped Classes [FINDINGS, FINDINGS ABOUT] - its retired CORE twin was aligned to this scope - --STRESC exists only in the Findings classes. Row 1 is a baseline record (VSBLFL=Y) without a standardized result -> fires; row 2 carries VSSTRESC."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 VSSEQ=1 USUBJID=01-701-1015
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSBLFL   type=Char label="Baseline Flag"
+col VSSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Y |
+CDISCPILOT01 | VS | 01-701-1015 | 2 | DIABP | Y | 82

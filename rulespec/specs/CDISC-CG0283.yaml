@@ -1,0 +1,29 @@
+name: CDISC-CG0283
+kind: rule
+description: |
+  Record-Data plain. CORE-000504: TSVAL for TSPARMCD='DCUTDTC' is not a valid
+  date/time. TS row sets TSPARMCD=DCUTDTC and an invalid TSVAL date so both
+  leaves fire.
+python_source: rules-sdtmig-3-3.json (CORE-000504)
+rule:
+  coreId: CDISC-CG0283
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: DCUTDTC, TSVAL: '2021-13-45'}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0283
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: DCUTDTC, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: DCUTDTC
+      TSVAL: '2021-13-45'
+expected_errors: []

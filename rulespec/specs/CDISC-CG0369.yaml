@@ -1,0 +1,34 @@
+name: CDISC-CG0369
+kind: rule
+description: |
+  Wave 7 port — CO: RDOMAIN must reference a dataset present in the study.
+  Same `study_domains` Operation as CORE-000384 but scoped to CO primary.
+python_source: rules-sdtmig-3-4.json (CORE-000502)
+rule:
+  coreId: CDISC-CG0369
+datasets:
+  CO:
+    row_key: [STUDYID, USUBJID, COSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '001', COSEQ: 1, RDOMAIN: AE, IDVAR: AESEQ, IDVARVAL: '1', COVAL: ok}
+      - {STUDYID: S1, DOMAIN: CO, USUBJID: '001', COSEQ: 2, RDOMAIN: MH, IDVAR: MHSEQ, IDVARVAL: '1', COVAL: bad — MH absent}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [CO]
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0369
+    dataset: CO
+    row_key: {COSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $study_domains: '[AE, CO]'
+      RDOMAIN: MH
+expected_errors: []

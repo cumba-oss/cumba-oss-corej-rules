@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0336 expect=noViolation domain=DS
+# Rule:Description: Raise an error when --CAT is equal to the domain label, making the category value redundant with the domain name.
+#note "DSCAT is present but no value equals the DS domain label 'Disposition' -> no violation. Fix #371: the library MUST be wired here — before it, this scenario passed VACUOUSLY (no library ⇒ the label was never read ⇒ the not-empty guard silenced the rule), so it proved nothing about the comparison."
+#library standard=sdtmig version=3-4
+#library dataset-metadata DS label=Disposition
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSCAT type=Char label="Category for Disposition Event" format=$DSCAT.
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | OTHER EVENT
+---

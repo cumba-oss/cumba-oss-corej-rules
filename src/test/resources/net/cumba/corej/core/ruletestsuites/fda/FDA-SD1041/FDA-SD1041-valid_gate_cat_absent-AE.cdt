@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1041 expect=skipped domain=AE
+# Rule:Description: Raise an error when --SCAT is populated and equal to --CAT.
+#note "D-TA-5b gate re-capture (aligned to CDISC-CG0027's two-variable gate): the AECAT column is absent, so the Requirements.Variables gate SKIPS the dataset (an auditable skipped dataset instead of silence — the skip is the contract under test). The Check could not fire here either way — the ruling's firing-equivalence reading — but the gate makes the skip reportable."
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESCAT type=Char label="Subcategory for Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | CARDIAC

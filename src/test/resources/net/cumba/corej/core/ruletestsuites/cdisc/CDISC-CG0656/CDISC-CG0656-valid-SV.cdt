@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-CG0656 expect=noViolation domain=SV
+# Rule:Description: Raise an error when a visit is unplanned (SVPRESP is empty) but the Visit Number (VISITNUM) value matches a VISITNUM value in the Trial Visits (TV) dataset.
+#note "VISITNUM rows present in TV.VISITNUM all carry a non-empty SVPRESP, so the rule does not fire"
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SVSEQ type=Num label="Sequence Number"
+col VISITNUM type=Num label="Visit Number" format=VISITNUM.
+col SVPRESP type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 1 | Y
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 2 | Y
+---
+
+dataset TV label="Trial Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col VISITNUM type=Num label="Visit Number" format=VISITNUM.
+---
+CDISCPILOT01 | TV | 1
+CDISCPILOT01 | TV | 2
+---

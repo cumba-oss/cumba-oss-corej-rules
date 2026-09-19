@@ -1,0 +1,28 @@
+name: CDISC-CG0542
+kind: rule
+description: |
+  Record-Data plain. CORE-000072: --BEATNO must only be used in EG. Single
+  leaf --BEATNO exists, scoped to FINDINGS excluding EG. The LB row below
+  includes LBBEATNO, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000072)
+rule:
+  coreId: CDISC-CG0542
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBBEATNO: 60}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0542
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBBEATNO: '60'
+expected_errors: []

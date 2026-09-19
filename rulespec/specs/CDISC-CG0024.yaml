@@ -1,0 +1,36 @@
+name: CDISC-CG0024
+kind: rule
+description: |
+  Record Data + Operation. CORE-000571: --LNKID present in one domain but not in any
+  other. The variable_count operation counts in how many datasets a --LNKID variable
+  appears, into $LNKID_variable_count. Check is all[ --LNKID exists,
+  $LNKID_variable_count < 2 ]. AE carries AELNKID; CM has no LNKID, so the count is 1
+  (< 2) and the AE rows fire.
+python_source: rules-sdtmig-3-4.json (CORE-000571)
+rule:
+  coreId: CDISC-CG0024
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AELNKID: L1}
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMTRT: DRUG}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    interventions: [CM]
+expected_violations:
+  - rule_id: CDISC-CG0024
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $variable_count: '1'
+      AELNKID: L1
+expected_errors: []

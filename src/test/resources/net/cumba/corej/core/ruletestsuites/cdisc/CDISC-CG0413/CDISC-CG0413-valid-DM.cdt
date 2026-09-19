@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0413 expect=noViolation domain=DM
+# Rule:Description: Raise an error when the Domain Abbreviation (DOMAIN) value is not consistent with the name of the dataset (the dataset name does not begin with the DOMAIN value).
+#note "Dataset name DM begins with the DOMAIN value DM, so the rule does not fire"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

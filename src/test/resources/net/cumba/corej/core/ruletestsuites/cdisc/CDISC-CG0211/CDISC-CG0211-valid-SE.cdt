@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0211 expect=noViolation domain=SE
+# Rule:Description: Raise an error when SEUPDES ^= null, ETCD ^= 'UNPLAN'
+#note "SEUPDES is populated only on the ETCD=UNPLAN element; planned elements leave it blank"
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col ETCD type=Char label="Element Code" format=$ETCD.
+col SEUPDES type=Char label="Description of Unplanned Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | PBO    |
+CDISCPILOT01 | SE | 01-701-1015 | 2 | UNPLAN | Extra dosing visit
+---

@@ -1,0 +1,29 @@
+name: CDISC-CG0444
+kind: rule
+description: |
+  Record Data. CORE-000735: when TSPARMCD is COMPTRT / CURTRT / TRT, TSVCDREF should
+  be UNII. Check is all[ any[TSPARMCD==COMPTRT, ==CURTRT, ==TRT], TSVCDREF != UNII ].
+  The TS row sets TSPARMCD=TRT and TSVCDREF=NDC (not UNII), so it fires.
+python_source: rules-sdtmig-3-3.json (CORE-000735)
+rule:
+  coreId: CDISC-CG0444
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: TRT, TSPARM: Investigational Therapy, TSVAL: DRUG, TSVCDREF: NDC}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0444
+    dataset: TS
+    row_key: {STUDYID: S1, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: TRT
+      TSVCDREF: NDC
+expected_errors: []

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0010 expect=noViolation domain=DM
+#note "RULING-8 scenario: encodes the PROPOSED guarded Check (CDISC-CG0010's leading `not empty(var_role(\"LIBRARY\"))` guard). Sponsor item XVAR carries Role=Identifier in the define with NO library variable-metadata entry (library role empty); USUBJID matches. Under the proposed guard this is silent. PREDICTED RED under the CURRENT unguarded rule (D9): the run fires exactly 1 violation -- define_variable_name=XVAR, define_variable_role=Identifier, library_variable_role empty/omitted -- because the current Check compares 'Identifier' != '' and fires. That exact shape is the pass condition until the decision lane rules on the proposed fix."
+#library standard=sdtmig version=3-4
+#library variable-metadata DM USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-dm-sponsor-define.xml
+dataset DM
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+S1 | DM | 001

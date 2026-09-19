@@ -1,0 +1,28 @@
+name: CDISC-CG0633
+kind: rule
+description: |
+  Record-Data plain. CORE-000060: RPPLSTDY must not be present. Single leaf
+  RPPLSTDY exists. Scope is ALL domains; we use AE with an RPPLSTDY value so
+  the column exists and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000060)
+rule:
+  coreId: CDISC-CG0633
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, __row_number__]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', RPPLSTDY: 5}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0633
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      RPPLSTDY: '5'
+expected_errors: []

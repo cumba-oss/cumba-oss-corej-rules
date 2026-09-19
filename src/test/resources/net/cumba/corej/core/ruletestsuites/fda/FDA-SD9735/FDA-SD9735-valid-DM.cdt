@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD9735 expect=noViolation domain=DM
+# Rule:Description: Raise an error when INVID and INVNAM do not have a one-to-one relationship.
+#note "Each INVID maps to exactly one INVNAM and vice versa"
+#library standard=sdtmig version=3-4
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col INVID type=Char label="Investigator Identifier"
+col INVNAM type=Char label="Investigator Name"
+---
+CDISCPILOT01 | DM | 01-701-1015 | INV01 | Investigator A
+CDISCPILOT01 | DM | 01-701-1023 | INV02 | Investigator B
+---

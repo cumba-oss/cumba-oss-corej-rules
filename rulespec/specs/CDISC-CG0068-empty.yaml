@@ -1,0 +1,60 @@
+name: CDISC-CG0068-empty
+kind: rule
+description: |
+  Empty-string parity demo derived from CORE-000363 (EMPTYSTR-equal-to-both-empty,
+  PLAN-empty-string-membership-parity Category B.2).
+
+  CORE-000363's Check.all contains the leaf `$min_ds_dsstdtc equal_to DSSTDTC`,
+  which selects the row whose DSSTDTC equals the per-subject earliest date. When a
+  subject's DSSTDTC is all-empty, the min_date operation yields an empty
+  `$min_ds_dsstdtc`, so that leaf collapses to `'' == ''`. The honest coreJ engine
+  treats two empties as a match and fires; Python's `_check_equality`
+  (dataframe_operators.py) returns not-a-match for two empties and does not fire.
+
+  This is the real-rule manifestation of the EMPTYSTR-equal-to-both-empty corner.
+  Subject 003 (populated DSSTDTC) is a genuine violation both engines agree on;
+  subject 002 (all-empty DSSTDTC) is the divergence: coreJ fires its two rows,
+  Python fires nothing. Baselined on the python lane (expected = honest coreJ).
+python_notes: |
+  Python equal_to (_check_equality) returns not-a-match for two empty/null operands,
+  so the both-empty rows of subject 002 do not fire. coreJ's honest engine fires
+  them. Subject 003 fires identically on both engines.
+python_source: rules-sdtmig-3-4.json (CORE-000363) + PLAN-empty-string-membership-parity.md (B.2)
+rule:
+  coreId: CDISC-CG0068
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      # Subject 002 — all-empty DSSTDTC → min_date empty → leaf `'' == ''`.
+      # coreJ fires both rows; Python fires neither. THE DIVERGENCE.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: ''}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 2, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: ''}
+      # Subject 003 — populated DSSTDTC, earliest (2026-01-05) != DM.RFICDTC.
+      # Both engines fire the earliest row. CONTROL (agreement).
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 1, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-05'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 2, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-07'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFICDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+    special-purpose: [DM]
+expected_violations:
+  # Subject 002 — both all-empty rows. coreJ fires (`'' == ''`); Python does not.
+  - rule_id: CDISC-CG0068
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $min_ds_dsstdtc: '2026-01-05'
+      DM.RFICDTC: '2026-01-10'
+      DSDECOD: INFORMED CONSENT OBTAINED
+      DSSTDTC: '2026-01-05'
+expected_errors: []

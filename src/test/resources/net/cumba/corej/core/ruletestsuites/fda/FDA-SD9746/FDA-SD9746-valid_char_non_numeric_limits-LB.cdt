@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD9746 expect=noViolation domain=LB
+# Rule:Description: Raise an error when the Normal Range Upper Limit (--ORNRHI) is less than or equal to the Normal Range Lower Limit (--ORNRLO).
+#note "Added 2026-09-14 (PLAN-column-type-conformance carried-forward), the other half of the Char pair. --ORNRLO/--ORNRHI are Char precisely because a reference range is not always a number: row 1 is an inequality limit and row 2 a qualitative range. The rule's two is_numeric() guards are what make it 'Partially Executable - Possible Underreporting' — these rows are deliberately NOT checked rather than checked wrongly, and this scenario pins that they are passed over in SILENCE rather than firing or erroring. ⚠⚠ Unlike its -invalid_char_limits sibling this file does NOT discriminate the migrated rule from the unmigrated one, and the distinction is worth knowing rather than assuming: measured 2026-09-14 by reverting the expression to `--ORNRHI <= --ORNRLO` and re-running, the sibling went red with the gate's own message while THIS file stayed green — is_numeric() is false on both rows, so the conjunction short-circuits and the order comparison the gate guards is never reached. What it does pin is that the guard is what produces the silence: delete or weaken either is_numeric() and these rows reach a numeric comparison of non-numeric text, which reds this file."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORNRLO type=Char label="Reference Range Lower Limit in Orig Unit"
+col LBORNRHI type=Char label="Reference Range Upper Limit in Orig Unit"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | <5      | <10
+CDISCPILOT01 | LB | 01-701-1015 | 2 | KETON | NEGATIVE | NEGATIVE
+---

@@ -1,0 +1,81 @@
+Core:
+  Id: "FDA-SD9739"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Start of Assessment Interval (--STINT) is\
+  \ populated but Time Point Reference (--TPTREF) is empty."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    All:
+    - "--STINT"
+    - "--TPTREF"
+Check:
+  expression: >-
+    not empty(--STINT) and empty(--TPTREF)
+Outcome:
+  Message: "--STINT is populated, but --TPTREF is empty."
+  Output_Variables:
+  - "--TPTREF"
+  - "--STINT"
+Source_Proposed:
+  Sheet_Issue: "#261"
+  FDA_Validator_Rule_Message: "--TPTREF is not populated although --STINT is populated"
+  FDA_Validator_Rule_Description: "When the Planned Start of Assessment Interval (--STINT)\
+    \ is populated, the Time Point Reference (--TPTREF) must also be populated."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"

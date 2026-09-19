@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0106 expect=noViolation domain=CM
+# Rule:Description: Raise an error when Treatment Vehicle (--TRTV) is empty but Treatment Vehicle Amount (--VAMT) is populated.
+#note "CMVAMT populated only where CMTRTV is also populated -> '--TRTV empty' is false, no violation"
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num label="Sequence Number"
+col CMTRTV type=Char label="Treatment Vehicle"
+col CMVAMT type=Char label="Treatment Vehicle Amount"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | SALINE | 100
+CDISCPILOT01 | CM | 01-701-1015 | 2 |        |
+---

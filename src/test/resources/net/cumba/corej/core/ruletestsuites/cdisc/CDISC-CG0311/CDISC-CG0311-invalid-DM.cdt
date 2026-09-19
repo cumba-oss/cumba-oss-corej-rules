@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0311 expect=violation domain=DM
+# Rule:Description: Raise an error when a variable label is longer than 40 characters.
+#note "The DOMAIN variable label is longer than 40 characters, so the rule fires"
+#expectViolationCount 1
+#expectViolationAt variable_label="This Domain Abbreviation Label Is Definitely Longer Than Forty Characters" variable_name=DOMAIN
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="This Domain Abbreviation Label Is Definitely Longer Than Forty Characters"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

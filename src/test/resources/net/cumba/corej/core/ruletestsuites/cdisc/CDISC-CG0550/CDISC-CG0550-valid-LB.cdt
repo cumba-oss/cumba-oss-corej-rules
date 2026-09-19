@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0550 expect=noViolation domain=LB
+# Rule:Description: Raise an error when --STREFC is populated but --STREFN is missing.
+#note "LBSTREFC is populated and LBSTREFN is also populated, so the rule does not fire"
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBSTREFC type=Char label="Character Reference Result in Std Format"
+col LBSTREFN type=Num label="Numeric Reference Result in Std Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | NORMAL | 38
+CDISCPILOT01 | LB | 01-701-1015 | 2 | NORMAL | 40
+---

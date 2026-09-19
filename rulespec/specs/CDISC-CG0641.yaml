@@ -1,0 +1,27 @@
+name: CDISC-CG0641
+kind: rule
+description: |
+  Record-Data. CORE-000068: AGETXT present in DM. DM row carries an AGETXT column,
+  so the single exists leaf holds and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000068)
+rule:
+  coreId: CDISC-CG0641
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', AGETXT: 18-65}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0641
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AGETXT: 18-65
+expected_errors: []

@@ -1,0 +1,31 @@
+name: CDISC-CG0535
+kind: rule
+description: |
+  Record-Data plain. CORE-000212: when a subject has more than one record per
+  Epoch with DSCAT='DISPOSITION EVENT', DSSCAT must be present. Two DS rows for
+  the same USUBJID+EPOCH with DSCAT='DISPOSITION EVENT' and no DSSCAT column
+  make is_not_unique_set + equal_to + not_exists all fire.
+python_source: rules-sdtmig-3-4.json (CORE-000212)
+rule:
+  coreId: CDISC-CG0535
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, EPOCH: TREATMENT, DSCAT: DISPOSITION EVENT, DSTERM: COMPLETED, DSDECOD: COMPLETED}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, EPOCH: TREATMENT, DSCAT: DISPOSITION EVENT, DSTERM: ADVERSE EVENT, DSDECOD: ADVERSE EVENT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0535
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DSCAT: DISPOSITION EVENT
+      EPOCH: TREATMENT
+expected_errors: []

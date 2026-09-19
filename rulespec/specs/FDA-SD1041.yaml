@@ -1,0 +1,31 @@
+name: FDA-SD1041
+kind: rule
+description: |
+  Wave 11 port - --SCAT equal to --CAT (redundant sub-category). Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000237)
+rule:
+  coreId: FDA-SD1041
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AECAT: CARDIAC, AESCAT: BRADY}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AECAT: CARDIAC, AESCAT: CARDIAC}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD1041
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AECAT: CARDIAC
+      AESCAT: CARDIAC
+expected_errors: []

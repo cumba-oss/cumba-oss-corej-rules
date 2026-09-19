@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0354 expect=noViolation domain=AE
+# Rule:Description: Raise an error when the --REASEX variable is present in the dataset, since --REASEX is defined for use in non-clinical (SEND) studies and must never be used in the submission of SDTM-based data for human clinical trials.
+#note "AEREASEX column absent from the dataset"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2
+---

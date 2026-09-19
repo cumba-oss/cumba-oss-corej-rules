@@ -1,0 +1,28 @@
+name: CDISC-CG0310
+kind: rule
+description: |
+  Variable Metadata Check (Dataset sensitivity). Fires when a variable name is
+  longer than 8 characters. Column TOOLONGVAR (10 chars) trips the longer_than 8
+  leaf.
+python_source: rules-sdtmig-3-4.json (CORE-000182)
+rule:
+  coreId: CDISC-CG0310
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, TOOLONGVAR: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0310
+    dataset: AE
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      variable_name: TOOLONGVAR
+expected_errors: []

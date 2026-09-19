@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0561 expect=violation domain=PE
+# Rule:Description: Raise an error when Verbatim Examination Finding (PEORRES) is empty but Character Result/Finding in Std Format (PESTRESC) is populated.
+#note "C5 discrimination: row1 PEORRES empty + PESTRESC populated fires; row2 PEORRES populated does not -> per-row discrimination"
+#expectViolationCount 1
+#expectViolationAt row=1 PESEQ=1 USUBJID=01-701-1015
+dataset PE label="Physical Examination"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PESEQ type=Num label="Sequence Number"
+col PEORRES type=Char label="Result or Finding in Original Units"
+col PESTRESC type=Char label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | PE | 01-701-1015 | 1 |        | NORMAL
+CDISCPILOT01 | PE | 01-701-1015 | 2 | NORMAL | NORMAL
+---

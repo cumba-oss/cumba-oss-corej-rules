@@ -1,0 +1,72 @@
+Core:
+  Id: "FDA-SD9749"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when DM.DTHFL equals 'Y' for a subject but the subject\
+  \ has no AE record where AEOUT equals 'FATAL' or AESDTH equals 'Y'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "AE"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "DM"
+- Keys:
+  - "USUBJID"
+  Name: "AE"
+Grouping:
+  Variables:
+  - "USUBJID"
+Operations:
+- id: "$ae_fatal_usubjid"
+  expression: "distinct(USUBJID, domain=\"AE\", filter=filter(AEOUT=\"FATAL\"))"
+- id: "$ae_sdth_usubjid"
+  expression: "distinct(USUBJID, domain=\"AE\", filter=filter(AESDTH=\"Y\"))"
+Check:
+  expression: >-
+    DM.DTHFL == "Y" and USUBJID not in $ae_fatal_usubjid and USUBJID not in $ae_sdth_usubjid
+Outcome:
+  Message: "DTHFL in DM dataset is \"Y\" but a record is missing in AE dataset where\
+    \ AESDTH is equal to \"Y\" and AEOUT is equal to \"FATAL\"."
+  Output_Variables:
+  - "$ae_fatal_usubjid"
+  - "$ae_sdth_usubjid"
+  - "DM.DTHFL"
+Source_Proposed:
+  Sheet_Issue: "#271"
+  FDA_Validator_Rule_Message: "Missing fatal AE record for a subject whose DTHFL is\
+    \ 'Y'"
+  FDA_Validator_Rule_Description: "When the Subject Death Flag (DTHFL) in DM is 'Y',\
+    \ the Adverse Events (AE) dataset must carry a record for that subject with Outcome\
+    \ of Adverse Event (AEOUT) equal to 'FATAL' or Involves Death (AESDTH) equal to\
+    \ 'Y'."
+  Domains: "AE"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,63 @@
+Core:
+  Id: "FDA-SD9745"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the trial is interventional (TS.TSPARMCD equals\
+  \ 'STYPE' and TS.TSVAL equals 'INTERVENTIONAL'), the subject has no record in the\
+  \ EX dataset, and ARMNRS is empty or equals 'UNPLANNED TREATMENT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+Match_Datasets:
+- Keys:
+  - "STUDYID"
+  Name: "TS"
+Operations:
+- id: "$usubjids_in_ex"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+Check:
+  expression: >-
+    empty(ARMNRS) and TS.TSPARMCD == "STYPE" and TS.TSVAL == "INTERVENTIONAL" and USUBJID not in
+    $usubjids_in_ex or ARMNRS == "UNPLANNED TREATMENT" and TS.TSPARMCD == "STYPE" and TS.TSVAL ==
+    "INTERVENTIONAL" and USUBJID not in $usubjids_in_ex
+Outcome:
+  Message: "A subject has a record in DM but not in EX while participating in an interventional\
+    \ study"
+  Output_Variables:
+  - "ARMNRS"
+  - "TS.TSPARMCD"
+  - "TS.TSVAL"
+  - "$usubjids_in_ex"
+Source_Proposed:
+  Sheet_Issue: "#267"
+  FDA_Validator_Rule_Message: "Subject has no EX record in an interventional study"
+  FDA_Validator_Rule_Description: "In an interventional study (Trial Summary Parameter\
+    \ TSPARMCD 'STYPE' with TSVAL 'INTERVENTIONAL') a subject present in DM must have\
+    \ at least one record in Exposure (EX), unless Reason Arm and/or Actual Arm is\
+    \ Null (ARMNRS) is populated with a value other than 'UNPLANNED TREATMENT'."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"

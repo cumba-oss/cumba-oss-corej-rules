@@ -1,0 +1,30 @@
+name: CDISC-CG0501
+kind: rule
+description: |
+  Wave 20 port — `variable_exists` MIDS + TM not_exists.
+python_source: rules-sdtmig-3-4.json (CORE-000297)
+rule:
+  coreId: CDISC-CG0501
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, MIDS: MILESTONE1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0501
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      # D-TA-7b (twin-alignment TA-1, 2026-08-17): the rule now declares the load-bearing
+      # $MIDS_EXISTS operation id in Output_Variables (twin-symmetric with CDISC-CG0501 /
+      # PMDA-SD1355), so the finding reports the materialised $-result too.
+      $MIDS_EXISTS: 'true'
+      MIDS: MILESTONE1
+expected_errors: []

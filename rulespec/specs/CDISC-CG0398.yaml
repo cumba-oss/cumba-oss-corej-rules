@@ -1,0 +1,39 @@
+name: CDISC-CG0398
+kind: rule
+description: |
+  Record-Data plain. CORE-000586: when DSCAT = 'DISPOSITION EVENT', there must
+  be at most one record per subject per EPOCH. Two leaves: DSCAT ==
+  'DISPOSITION EVENT' (literal) AND DSCAT is_not_unique_set [USUBJID, EPOCH].
+  Two DS rows share USUBJID/EPOCH with DSCAT = 'DISPOSITION EVENT', so the rule
+  fires.
+python_source: rules-sdtmig-3-2.json (CORE-000586)
+rule:
+  coreId: CDISC-CG0398
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: DISPOSITION EVENT, EPOCH: TREATMENT, DSTERM: COMPLETED, DSDECOD: COMPLETED}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSCAT: DISPOSITION EVENT, EPOCH: TREATMENT, DSTERM: ADVERSE EVENT, DSDECOD: ADVERSE EVENT}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0398
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DSCAT: DISPOSITION EVENT
+      EPOCH: TREATMENT
+  - rule_id: CDISC-CG0398
+    dataset: DS
+    row_key: {DSSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DSCAT: DISPOSITION EVENT
+      EPOCH: TREATMENT
+expected_errors: []

@@ -1,0 +1,56 @@
+Core:
+  Id: "FDA-SD9735"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when INVID and INVNAM do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "INVID"
+    - "INVNAM"
+Check:
+  expression: >-
+    not is_unique_relationship(INVID, INVNAM)
+Outcome:
+  Message: "INVNAM and INVID do not have a one-to-one relationship."
+  Output_Variables:
+  - "INVID"
+  - "INVNAM"
+Source_Proposed:
+  Sheet_Issue: "#257"
+  FDA_Validator_Rule_Message: "INVID and INVNAM do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of Investigator Identifier (INVID) and\
+    \ Investigator Name (INVNAM) must have a one-to-one relationship."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

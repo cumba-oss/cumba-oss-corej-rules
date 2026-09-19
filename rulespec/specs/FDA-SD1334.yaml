@@ -1,0 +1,31 @@
+name: FDA-SD1334
+kind: rule
+description: |
+  Wave 2 port — date comparison shape.
+  CORE-000713: DM.RFICDTC (informed-consent date) should be on or before RFSTDTC
+  (study-treatment start). Three-leaf check: both fields non-empty AND RFICDTC > RFSTDTC.
+python_source: rules-sdtmig-3-4.json (CORE-000713)
+rule:
+  coreId: FDA-SD1334
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFICDTC: '2023-01-01', RFSTDTC: '2023-01-15'}      # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2023-01-15', RFSTDTC: '2023-01-15'}      # equal — ok (date_greater_than is strict)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFICDTC: '2023-02-01', RFSTDTC: '2023-01-15'}      # bad
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '004', RFICDTC: '', RFSTDTC: '2023-01-15'}                # empty → not flagged
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1334
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      RFICDTC: '2023-02-01'
+      RFSTDTC: '2023-01-15'
+expected_errors: []

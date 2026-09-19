@@ -1,0 +1,22 @@
+name: FDA-SD1071
+kind: rule
+description: |
+  Wave 20 port — dataset_size > 5 GB check. Our fixture dataset is tiny, so
+  the rule does not fire. Verifies both engines correctly compute
+  dataset_size and agree the small fixture is under the threshold.
+python_source: rules-sdtmig-3-4.json (CORE-000765)
+rule:
+  coreId: FDA-SD1071
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations: []
+expected_errors: []

@@ -1,0 +1,36 @@
+name: FDA-SD9736
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000745)
+python_source: rules-sdtmig-3-4.json (CORE-000745)
+rule:
+  coreId: FDA-SD9736
+datasets:
+  OI:
+    row_key: [STUDYID, OIPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: OI, OIPARMCD: P1, OIPARM: Parameter One}
+      - {STUDYID: S1, DOMAIN: OI, OIPARMCD: P2, OIPARM: Parameter Two}
+      - {STUDYID: S1, DOMAIN: OI, OIPARMCD: P3, OIPARM: Parameter Two}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    study reference: [OI]
+expected_violations:
+  - rule_id: FDA-SD9736
+    dataset: OI
+    row_key: {STUDYID: S1, OIPARMCD: P2}
+    status: SUCCESS
+    output_variables:
+      OIPARM: Parameter Two
+      OIPARMCD: P2
+  - rule_id: FDA-SD9736
+    dataset: OI
+    row_key: {STUDYID: S1, OIPARMCD: P3}
+    status: SUCCESS
+    output_variables:
+      OIPARM: Parameter Two
+      OIPARMCD: P3
+expected_errors: []

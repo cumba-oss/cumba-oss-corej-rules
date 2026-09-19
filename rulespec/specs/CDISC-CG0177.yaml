@@ -1,0 +1,29 @@
+name: CDISC-CG0177
+kind: rule
+description: |
+  Wave 6 port — IE.IESTRESC must equal IEORRES. Column-vs-column comparison within
+  the same dataset.
+python_source: rules-sdtmig-3-4.json (CORE-000025)
+rule:
+  coreId: CDISC-CG0177
+datasets:
+  IE:
+    row_key: [STUDYID, USUBJID, IESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '001', IESEQ: 1, IEORRES: Y, IESTRESC: Y}           # ok
+      - {STUDYID: S1, DOMAIN: IE, USUBJID: '002', IESEQ: 1, IEORRES: N, IESTRESC: Y}           # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [IE]
+expected_violations:
+  - rule_id: CDISC-CG0177
+    dataset: IE
+    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      IEORRES: N
+      IESTRESC: Y
+expected_errors: []

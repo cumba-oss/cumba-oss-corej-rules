@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0008 expect=noViolation domain=AE
+# Rule:Description: Raise an error when the planned elapsed time (--ELTM) is populated but its fixed reference point (--TPTREF) is empty; --ELTM must be empty when --TPTREF is empty.
+#note "AEELTM is populated and AETPTREF is also populated"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEELTM type=Char label="Elapsed Time"
+col AETPTREF type=Char label="Time Point Reference"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | PT1H | DOSING
+CDISCPILOT01 | AE | 01-701-1015 | 2 |  | 
+---

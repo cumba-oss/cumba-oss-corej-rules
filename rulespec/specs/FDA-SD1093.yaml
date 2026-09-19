@@ -1,0 +1,46 @@
+name: FDA-SD1093
+kind: rule
+description: |
+  Wave 9 port - --ENDTC or DM.RFSTDTC incomplete while --ENDY is populated. Match_Datasets joins primary AE
+  to DM on USUBJID; DM.RFSTDTC / RFENDTC / RFPENDTC are emitted with the
+  DM.* prefix preserved in the canonical output_variables.
+python_source: rules-sdtmig-3-4.json (CORE-000139)
+rule:
+  coreId: FDA-SD1093
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEENDTC: '2026-01-05', AEENDY: 5}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AEENDTC: '2026', AEENDY: 5}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 3, AEENDTC: '2026-01-05', AEENDY: 5}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFSTDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFSTDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFSTDTC: '2026'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1093
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026'
+      AEENDY: '5'
+      DM.RFSTDTC: '2026-01-01'
+  - rule_id: FDA-SD1093
+    dataset: AE
+    row_key: {AESEQ: 3, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026-01-05'
+      AEENDY: '5'
+      DM.RFSTDTC: '2026'
+expected_errors: []

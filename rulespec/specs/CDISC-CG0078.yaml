@@ -1,0 +1,34 @@
+name: CDISC-CG0078
+kind: rule
+description: |
+  Wave 17 port - non-wildcard Match_Datasets rule.
+python_source: rules-sdtmig-3-4.json (CORE-000250)
+rule:
+  coreId: CDISC-CG0078
+datasets:
+  MH:
+    row_key: [STUDYID, USUBJID, MHSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: MH, USUBJID: '001', MHSEQ: 1, MHENDTC: '2025-12-20'}
+      - {STUDYID: S1, DOMAIN: MH, USUBJID: '002', MHSEQ: 1, MHENDTC: '2026-01-05'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFSTDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFSTDTC: '2026-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [MH]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0078
+    dataset: MH
+    row_key: {MHSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DM.RFSTDTC: '2026-01-01'
+      MHENDTC: '2026-01-05'
+expected_errors: []

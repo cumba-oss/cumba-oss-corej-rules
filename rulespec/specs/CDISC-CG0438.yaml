@@ -1,0 +1,30 @@
+name: CDISC-CG0438
+kind: rule
+description: |
+  Record-Data. When TSPARMCD=AGEMIN and TSVAL is not empty, TSVAL must NOT be
+  an invalid ISO-8601 duration (negative invalid_duration => must be valid).
+  The AGEMIN row carries an invalid duration, so the rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000730)
+rule:
+  coreId: CDISC-CG0438
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: AGEMAX, TSVAL: not-a-duration}    # ok (not AGEMIN)
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: AGEMIN, TSVAL: not-a-duration}    # bad
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0438
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: AGEMIN}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: AGEMIN
+      TSVAL: not-a-duration
+expected_errors: []

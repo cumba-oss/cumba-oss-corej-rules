@@ -1,0 +1,27 @@
+name: CDISC-CG0413
+kind: rule
+description: |
+  Wave 18 port - Dataset-sensitivity rule. dataset_name prefix does not equal DOMAIN column value.
+python_source: rules-sdtmig-3-4.json (CORE-000598)
+rule:
+  coreId: CDISC-CG0413
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, DOMAIN: XY, USUBJID: '001', AESEQ: 1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+- rule_id: CDISC-CG0413
+  dataset: AE
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    DOMAIN: XY
+    dataset_name: AE
+expected_errors: []

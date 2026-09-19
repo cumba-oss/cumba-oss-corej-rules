@@ -1,0 +1,33 @@
+name: CDISC-CG0200
+kind: rule
+description: |
+  Wave 14 port — `not_present_on_multiple_rows_within`. Within a USUBJID, each
+  unique RELID value should appear on at least 2 RELREC rows (since RELREC
+  relates one record to another). A RELID that appears only once within a
+  USUBJID violates — it's an orphaned half-relationship.
+python_source: rules-sdtmig-3-4.json (CORE-000484)
+rule:
+  coreId: CDISC-CG0200
+datasets:
+  RELREC:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL]
+    rows:
+      # Subject 001 RELID=R1 spans 2 rows — ok
+      - {STUDYID: S1, DOMAIN: RELREC, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', RELID: R1, RELTYPE: ONE}
+      - {STUDYID: S1, DOMAIN: RELREC, USUBJID: '001', IDVAR: CMSEQ, IDVARVAL: '1', RELID: R1, RELTYPE: ONE}
+      # Subject 002 RELID=R2 appears only once — bad
+      - {STUDYID: S1, DOMAIN: RELREC, USUBJID: '002', IDVAR: AESEQ, IDVARVAL: '1', RELID: R2, RELTYPE: ONE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [RELREC]
+expected_violations:
+  - rule_id: CDISC-CG0200
+    dataset: RELREC
+    row_key: {IDVAR: AESEQ, IDVARVAL: '1', STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      RELID: R2
+expected_errors: []

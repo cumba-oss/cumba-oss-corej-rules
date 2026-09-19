@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1041 expect=violation domain=AE
+# Rule:Description: Raise an error when --SCAT is populated and equal to --CAT.
+#note "AESCAT non-empty and equal to AECAT"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESCAT type=Char label="Subcategory for Adverse Event"
+col AECAT type=Char label="Category for Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | CARDIAC | CARDIAC
+CDISCPILOT01 | AE | 01-701-1015 | 2 | GI | DERM
+---

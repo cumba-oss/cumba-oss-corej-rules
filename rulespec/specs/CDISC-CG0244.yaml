@@ -1,0 +1,29 @@
+name: CDISC-CG0244
+kind: rule
+description: |
+  Record-Data plain. CORE-000371: ARM in TA must not be a reserved value.
+  Single leaf ARM is_contained_by ['Screen Failure', 'Not Assigned',
+  'Unplanned Treatment', 'Not Treated']. The TA row sets ARM = 'Screen
+  Failure', so the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000371)
+rule:
+  coreId: CDISC-CG0244
+datasets:
+  TA:
+    row_key: [STUDYID, ARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: SCRNFAIL, ARM: Screen Failure, TAETORD: 1, ETCD: E1}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    trial-design: [TA]
+expected_violations:
+  - rule_id: CDISC-CG0244
+    dataset: TA
+    row_key: {ARMCD: SCRNFAIL, STUDYID: S1}
+    status: SUCCESS
+    output_variables:
+      ARM: Screen Failure
+expected_errors: []

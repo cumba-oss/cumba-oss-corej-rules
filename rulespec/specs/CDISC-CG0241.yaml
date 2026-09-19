@@ -1,0 +1,49 @@
+name: CDISC-CG0241
+kind: rule
+description: |
+  Wave 11 port - --ELTM inconsistent across (DOMAIN, VISITNUM, --TPTREF, --TPTNUM) group. Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000142)
+rule:
+  coreId: CDISC-CG0241
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    column_types:
+      VISITNUM: LONG
+      LBTPTNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, VISITNUM: 1, LBTPTREF: SCREENING, LBTPTNUM: 1, LBTPT: HOUR 1, LBELTM: PT1H}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 2, VISITNUM: 1, LBTPTREF: SCREENING, LBTPTNUM: 1, LBTPT: HOUR 1, LBELTM: PT2H}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0241
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DOMAIN: LB
+      LBELTM: PT1H
+      LBTPT: HOUR 1
+      LBTPTNUM: '1'
+      LBTPTREF: SCREENING
+      VISITNUM: '1'
+  - rule_id: CDISC-CG0241
+    dataset: LB
+    row_key: {LBSEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DOMAIN: LB
+      LBELTM: PT2H
+      LBTPT: HOUR 1
+      LBTPTNUM: '1'
+      LBTPTREF: SCREENING
+      VISITNUM: '1'
+expected_errors: []

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD9740 expect=violation domain=LB
+# Rule:Description: Raise an error when Planned End of Assessment Interval (--ENINT) is populated but Time Point Reference (--TPTREF) is empty.
+#note "--ENINT populated while --TPTREF empty -> violation"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1 USUBJID=01-701-1015
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTPTREF type=Char label="Time Point Reference"
+col LBENINT type=Char label="Planned End of Assessment Interval"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 |        | PT1H
+CDISCPILOT01 | LB | 01-701-1015 | 2 | DOSE 1 | PT1H
+---

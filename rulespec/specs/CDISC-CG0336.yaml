@@ -1,0 +1,35 @@
+name: CDISC-CG0336
+kind: rule
+description: |
+  Wave 12a port - --CAT equals the domain dataset label (case-insensitive). Exercises the
+  `ds_label("LIBRARY")` accessor. Fix #371 retired the `domain_label` Operation this used
+  to exercise and converted the rule onto the accessor, which resolves the SAME way (the
+  name first, then cdiscDomainOf -> the DOMAIN cell -> "AE"). The `dataset_metadata` mock
+  supplies that label, so the read resolves to "AE" and the guard
+  `non_empty(ds_label("LIBRARY"))` passes.
+python_source: rules-sdtmig-3-4.json (CORE-000272); PLAN-java-parity-defect-fixes.md (J8/J10)
+rule:
+  coreId: CDISC-CG0336
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AECAT: CARDIAC}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AECAT: AE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+  dataset_metadata:
+    AE: {label: AE}
+expected_violations:
+  - rule_id: CDISC-CG0336
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      library_dataset_label: AE
+      AECAT: AE
+expected_errors: []

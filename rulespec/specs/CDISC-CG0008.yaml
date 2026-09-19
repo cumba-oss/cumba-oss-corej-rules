@@ -1,0 +1,29 @@
+name: CDISC-CG0008
+kind: rule
+description: |
+  Wave 8 port — --TPTREF empty but --ELTM non-empty (class=ALL). Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000028)
+rule:
+  coreId: CDISC-CG0008
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETPTREF: SCREENING, AEELTM: PT1H}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AETPTREF: '', AEELTM: PT1H}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0008
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEELTM: PT1H
+      AETPTREF:
+expected_errors: []

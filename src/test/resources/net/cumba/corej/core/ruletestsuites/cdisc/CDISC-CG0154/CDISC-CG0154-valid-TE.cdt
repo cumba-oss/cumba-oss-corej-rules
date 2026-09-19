@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0154 expect=noViolation domain=TE
+# Rule:Description: Raise an error when Element Code (ETCD) and Description of Element (ELEMENT) do not have a one-to-one relationship within the domain.
+#note "each ETCD maps to exactly one ELEMENT and vice versa -> one-to-one holds"
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col ETCD type=Char label="Element Code" format=$ETCD.
+col ELEMENT type=Char label="Description of Element" format=$ELEMENT.
+---
+CDISCPILOT01 | TE | SCRN | Screen
+CDISCPILOT01 | TE | HIS | High_Start
+---

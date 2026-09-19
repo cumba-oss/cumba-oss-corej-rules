@@ -1,0 +1,83 @@
+Core:
+  Id: "FDA-SD9740"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned End of Assessment Interval (--ENINT) is\
+  \ populated but Time Point Reference (--TPTREF) is empty."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ENINT"
+    - "--TPTREF"
+Check:
+  expression: >-
+    not empty(--ENINT) and empty(--TPTREF)
+Outcome:
+  Message: "--ENINT is populated, but --TPTREF is empty."
+  Output_Variables:
+  - "--TPTREF"
+  - "--ENINT"
+Source_Proposed:
+  Sheet_Issue: "#262"
+  FDA_Validator_Rule_Message: "--TPTREF is not populated although --ENINT is populated"
+  FDA_Validator_Rule_Description: "When the Planned End of Assessment Interval (--ENINT)\
+    \ is populated, the Time Point Reference (--TPTREF) must also be populated."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB044"
+        Version: "1"
+      Version: "1.5"

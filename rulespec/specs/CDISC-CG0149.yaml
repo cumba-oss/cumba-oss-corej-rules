@@ -1,0 +1,28 @@
+name: CDISC-CG0149
+kind: rule
+description: |
+  Wave 7 port — DM/TX SETCD length check. Regex `^(.){9,}$` matches 9-or-more-char
+  strings; the rule fires on those (SETCD must be ≤ 8 chars).
+python_source: rules-sdtmig-3-4.json (CORE-000088)
+rule:
+  coreId: CDISC-CG0149
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', SETCD: SHORT}              # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', SETCD: EXACTLY8}           # ok (8 chars)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', SETCD: TOOLONGCODE}        # bad (11 chars)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0149
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      SETCD: TOOLONGCODE
+expected_errors: []

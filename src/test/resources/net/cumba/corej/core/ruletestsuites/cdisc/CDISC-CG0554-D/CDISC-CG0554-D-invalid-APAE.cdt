@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0554-D expect=violation domain=APAE
+# Rule:Description: Raise an error when, in an Associated Persons dataset (DOMAIN starting with AP), APID is not present.
+#note "AP-domain branch: DOMAIN=APAE (prefix AP) but APID column is absent -> the associated-persons identifier requirement fires"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset APAE label="Associated Persons AE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col APSEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | APAE | 01-701-1015 | 1
+CDISCPILOT01 | APAE | 01-701-1015 | 2
+---

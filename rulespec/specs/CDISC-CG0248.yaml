@@ -1,0 +1,39 @@
+name: CDISC-CG0248
+kind: rule
+description: |
+  Wave 7 port — TA TAETORD must be an integer.
+  Exercises `not_matches_regex` on a numeric pattern.
+python_source: rules-sdtmig-3-4.json (CORE-000534)
+rule:
+  coreId: CDISC-CG0248
+datasets:
+  TA:
+    row_key: [STUDYID, ARMCD, TAETORD]
+    column_types:
+      TAETORD: STRING
+    rows:
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: A, TAETORD: '1', ETCD: SCRN}
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: A, TAETORD: '-5', ETCD: WASH}
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: A, TAETORD: '0', ETCD: DRUG}
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: A, TAETORD: '1.5', ETCD: DOSE}           # bad
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: A, TAETORD: abc, ETCD: FU}               # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TA]
+expected_violations:
+  - rule_id: CDISC-CG0248
+    dataset: TA
+    row_key: {ARMCD: A, STUDYID: S1, TAETORD: '1.5'}
+    status: SUCCESS
+    output_variables:
+      TAETORD: '1.5'
+  - rule_id: CDISC-CG0248
+    dataset: TA
+    row_key: {ARMCD: A, STUDYID: S1, TAETORD: abc}
+    status: SUCCESS
+    output_variables:
+      TAETORD: abc
+expected_errors: []

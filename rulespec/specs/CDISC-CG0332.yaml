@@ -1,0 +1,31 @@
+name: CDISC-CG0332
+kind: rule
+description: |
+  Dataset Metadata Check (Dataset sensitivity). Split dataset present but the
+  two-letter parent domain is missing. Operation $list_dataset_names yields the
+  study's dataset list. With only LBHE present, its 2-char prefix LB is not in
+  [LBHE], the name matches the split regex, and the prefix is not AP/FA, so the
+  rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000539)
+rule:
+  coreId: CDISC-CG0332
+datasets:
+  LBHE:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LBHE]
+expected_violations:
+  - rule_id: CDISC-CG0332
+    dataset: LBHE
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $list_dataset_names: '[LBHE]'
+      dataset_name: LBHE
+expected_errors: []

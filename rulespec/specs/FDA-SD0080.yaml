@@ -1,0 +1,34 @@
+name: FDA-SD0080
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['max']).
+python_source: rules-sdtmig-3-4.json (CORE-000717)
+rule:
+  coreId: FDA-SD0080
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESTDTC: '2026-01-05'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, AESTDTC: '2026-02-01'}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: COMPLETED, DSTERM: X, DSSTDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD0080
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $max_ds_dsstdtc: '2026-01-10'
+      AESTDTC: '2026-02-01'
+expected_errors: []

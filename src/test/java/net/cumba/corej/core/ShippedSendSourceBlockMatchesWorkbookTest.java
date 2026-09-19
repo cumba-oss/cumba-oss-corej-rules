@@ -199,7 +199,20 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
             "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9437", "CDISC-SEND-9438",
-            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441");
+            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441", "CDISC-SEND-9442");
+    // ⭐ Re-derived 2026-09-19, 8 -> 9 (PLAN-retire-core-family phase 4): CDISC-SEND-9442, the
+    // GENETOX arm minted from CORE-009701 (GVMETHOD not populated in GV), behind sheet issue #272.
+    // Measured over the 1 934 rows of the workbook's _GENETOXv1.0_DARTv1.2 sheet: the five GV rows
+    // are SEND407 (domain structure), SEND408/409 (GVCAT), SEND410 (USUBJID) and SEND411 (GVSCAT)
+    // --
+    // none names GVMETHOD, so the rule resolves to no row and carries no Source. ⚠ It is filed as
+    // rowless rather than as a SEND12 generic-row split because ruling I's test for that is
+    // "every variable the rule names is Core = Required", and GVMETHOD's Core status could NOT be
+    // read: no SENDIG-GENETOX v1.0 IG is mounted and the Library cache's genetox rules endpoint is
+    // empty. If it is Required, this entry moves to SourceProposedCase.GENERIC_ROW_SPLITS with
+    // SEND12 as its row, together with the side-car record and issue #272.
+    // ⚑ This pin is exact, so the wave that mints a SEND rule owes it -- and the test is opt-in
+    // (-Dcdisc.docs.dir), so nothing else would have reported the drift.
     // ⭐ Re-derived 2026-09-12, 3 -> 8 (top-level-or wave 2 close, repairing a pin the minting
     // waves owed): the five CDISC-SEND-943x sisters minted by the absent-column board on
     // 2026-09-11 — 9437/9438 (wave C2), 9439 (wave D, sheet issue #210), 9440/9441 (wave E,

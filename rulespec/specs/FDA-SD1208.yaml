@@ -1,0 +1,30 @@
+name: FDA-SD1208
+kind: rule
+description: |
+  Wave 2 port — date comparison shape (mirror of CORE-000713 but for RFXSTDTC/RFXENDTC).
+  CORE-000714: First Study Treatment date (RFXSTDTC) should be on or before
+  Last Study Treatment date (RFXENDTC).
+python_source: rules-sdtmig-3-4.json (CORE-000714)
+rule:
+  coreId: FDA-SD1208
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2023-01-01', RFXENDTC: '2023-06-30'}      # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2023-07-01', RFXENDTC: '2023-06-30'}      # bad
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXSTDTC: '', RFXENDTC: '2023-06-30'}                # empty → not flagged
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1208
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      RFXENDTC: '2023-06-30'
+      RFXSTDTC: '2023-07-01'
+expected_errors: []

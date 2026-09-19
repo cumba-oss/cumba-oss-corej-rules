@@ -1,0 +1,36 @@
+name: CDISC-CG0217
+kind: rule
+description: |
+  Record-Data + Match_Datasets. CORE-000784: SV joined to SE on USUBJID. SV has TAETORD
+  populated, SVSTDTC falls within SE.SESTDTC..SE.SEENDTC, but SV.TAETORD differs from
+  SE.TAETORD. The single SV/SE pair satisfies every leaf so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000784)
+rule:
+  coreId: CDISC-CG0217
+datasets:
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, SVSTDTC: '2020-01-05', TAETORD: 2}
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, SESTDTC: '2020-01-01', SEENDTC: '2020-01-10', TAETORD: 1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SV, SE]
+expected_violations:
+  - rule_id: CDISC-CG0217
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      SE.SEENDTC: '2020-01-10'
+      SE.SESTDTC: '2020-01-01'
+      SE.TAETORD: '1'
+      SVSTDTC: '2020-01-05'
+      TAETORD: '2'
+expected_errors: []

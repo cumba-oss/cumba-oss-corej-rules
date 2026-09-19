@@ -1,0 +1,35 @@
+name: CDISC-CG0133
+kind: rule
+description: |
+  Wave 21 port — DM primary + DD match + distinct(DD.USUBJID). Fires on DM
+  subjects who have a DD record but DTHFL != Y.
+python_source: rules-sdtmig-3-4.json (CORE-000108)
+rule:
+  coreId: CDISC-CG0133
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: Y}      # ok (has DD record + DTHFL=Y)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: N}      # bad (has DD record, DTHFL != Y)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHFL: N}      # ok (no DD record)
+  DD:
+    row_key: [STUDYID, USUBJID, DDSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DD, USUBJID: '001', DDSEQ: 1, DDTERM: MYOCARDIAL INFARCTION}
+      - {STUDYID: S1, DOMAIN: DD, USUBJID: '002', DDSEQ: 1, DDTERM: UNKNOWN}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    findings: [DD]
+expected_violations:
+  - rule_id: CDISC-CG0133
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DTHFL: N
+expected_errors: []

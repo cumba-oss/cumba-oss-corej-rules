@@ -1,0 +1,28 @@
+name: FDA-SD1122
+kind: rule
+description: |
+  Wave 8 port — --STRESC numeric but --STRESN empty. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000863)
+rule:
+  coreId: FDA-SD1122
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBSTRESC: '5.0', LBSTRESN: '5.0'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBSTRESC: '5.0', LBSTRESN: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD1122
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      LBSTRESC: '5.0'
+expected_errors: []

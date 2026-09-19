@@ -1,0 +1,29 @@
+name: CDISC-CG0311
+kind: rule
+description: |
+  Variable Metadata Check (Dataset sensitivity). Fires when a variable label
+  is longer than 40 characters. Column label equals column name in the harness,
+  so a column whose NAME exceeds 40 chars fires the longer_than 40 leaf.
+python_source: rules-sdtmig-3-4.json (CORE-000019)
+rule:
+  coreId: CDISC-CG0311
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, THISVARIABLELABELISWAYLONGERTHANFORTYCHARACTERSXX: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0311
+    dataset: AE
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      variable_label: THISVARIABLELABELISWAYLONGERTHANFORTYCHARACTERSXX
+      variable_name: THISVARIABLELABELISWAYLONGERTHANFORTYCHARACTERSXX
+expected_errors: []

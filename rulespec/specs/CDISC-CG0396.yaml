@@ -1,0 +1,29 @@
+name: CDISC-CG0396
+kind: rule
+description: |
+  Wave 2 port — simple shape (mirror of CORE-000087 but for AECONTRT).
+python_source: rules-sdtmig-3-4.json (CORE-000131)
+rule:
+  coreId: CDISC-CG0396
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AECONTRT: Y}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, AECONTRT: N}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AECONTRT: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AECONTRT: Z}         # bad — clearly not Y/N (avoid YAML 1.1 Yes/No bool ambiguity)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0396
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      AECONTRT: Z
+expected_errors: []

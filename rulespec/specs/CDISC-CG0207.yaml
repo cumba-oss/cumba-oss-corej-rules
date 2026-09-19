@@ -1,0 +1,39 @@
+name: CDISC-CG0207
+kind: rule
+description: |
+  Wave 14 port — `does_not_have_next_corresponding_record`. Within USUBJID
+  ordered by SESEQ, each SEENDTC must equal the next row's SESTDTC (elements
+  must chain without gaps). The last row per subject has no "next" row and
+  is exempt. Subject 001's seq-1 row has SEENDTC=2026-01-07 but seq-2's
+  SESTDTC=2026-01-10 — 3-day gap, seq-1 violates. Subject 002's chain is
+  clean, no violations.
+python_source: rules-sdtmig-3-4.json (CORE-000352)
+rule:
+  coreId: CDISC-CG0207
+datasets:
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    column_types:
+      SESEQ: LONG
+    rows:
+      # Subject 001 with a gap between seq 1 and seq 2
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, ETCD: SCRN, SESTDTC: '2026-01-01', SEENDTC: '2026-01-07'}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 2, ETCD: TRT, SESTDTC: '2026-01-10', SEENDTC: '2026-01-20'}
+      # Subject 002 with clean chain
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', SESEQ: 1, ETCD: SCRN, SESTDTC: '2026-01-01', SEENDTC: '2026-01-07'}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', SESEQ: 2, ETCD: TRT, SESTDTC: '2026-01-07', SEENDTC: '2026-01-20'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SE]
+expected_violations:
+  - rule_id: CDISC-CG0207
+    dataset: SE
+    row_key: {SESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      SEENDTC: '2026-01-07'
+      SESTDTC: '2026-01-01'
+expected_errors: []

@@ -1,0 +1,41 @@
+name: CDISC-CG0171
+kind: rule
+description: |
+  Wave 3 port — cross-dataset date comparison.
+  CORE-000259: When SS.SSSTRESC='DEAD', SS.SSDTC must equal DM.DTHDTC for that subject.
+  Primary SS, join to DM.
+python_source: rules-sdtmig-3-4.json (CORE-000259)
+rule:
+  coreId: CDISC-CG0171
+datasets:
+  SS:
+    row_key: [STUDYID, USUBJID, SSSEQ]
+    rows:
+      # Subject 001 — DEAD, SSDTC equal DM.DTHDTC    → no violation (date_less_than is strict, equal = no)
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '001', SSSEQ: 1, SSSTRESC: DEAD, SSDTC: '2023-03-15'}
+      # Subject 002 — DEAD, SSDTC before DM.DTHDTC   → violation
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '002', SSSEQ: 1, SSSTRESC: DEAD, SSDTC: '2023-03-10'}
+      # Subject 003 — ALIVE                           → no violation regardless
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '003', SSSEQ: 1, SSSTRESC: ALIVE, SSDTC: '2023-05-01'}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHDTC: '2023-03-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHDTC: '2023-03-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [SS]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0171
+    dataset: SS
+    row_key: {SSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DM.DTHDTC: '2023-03-15'
+      SSDTC: '2023-03-10'
+      SSSTRESC: DEAD
+expected_errors: []

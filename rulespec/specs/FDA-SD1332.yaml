@@ -1,0 +1,29 @@
+name: FDA-SD1332
+kind: rule
+description: |
+  Wave 13 port - AEOUT=NOT RECOVERED/NOT RESOLVED but AEENDTC populated. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000657)
+rule:
+  coreId: FDA-SD1332
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEOUT: RECOVERED, AEENDTC: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEOUT: NOT RECOVERED/NOT RESOLVED, AEENDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD1332
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2026-01-10'
+      AEOUT: NOT RECOVERED/NOT RESOLVED
+expected_errors: []

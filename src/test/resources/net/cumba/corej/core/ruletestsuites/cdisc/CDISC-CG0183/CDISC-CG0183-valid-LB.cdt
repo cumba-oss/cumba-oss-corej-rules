@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0183 expect=noViolation domain=LB
+# Rule:Description: Raise an error when LBORRES is populated with a non-quantitative result and the upper end of the reference range in standardized units (LBSTNRHI) is populated. LBSTNRHI should be populated only for continuous measurements; a quantitative (continuous) result is approximated by a numeric LBORRES value, optionally prefixed with a relational operator.
+#note "numeric LBORRES is a continuous measurement -> no violation"
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBORRES type=Char label="Result or Finding in Original Units"
+col LBSTNRHI type=Char label="Reference Range Upper Limit-Std Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | 12.5 | 20
+---

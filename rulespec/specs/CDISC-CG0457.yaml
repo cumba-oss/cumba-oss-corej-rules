@@ -1,0 +1,30 @@
+name: CDISC-CG0457
+kind: rule
+description: |
+  Record-Data plain. CORE-000338: when TSPARMCD = 'ACTSUB', TSVAL must be an
+  integer greater than 0. Two leaves: TSPARMCD == 'ACTSUB' (literal) AND TSVAL
+  not_matches_regex ^[1-9]\d*$. The TS row sets TSVAL to a non-integer, so the
+  rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000338)
+rule:
+  coreId: CDISC-CG0457
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: ACTSUB, TSPARM: Actual Number of Subjects, TSVAL: ABC}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0457
+    dataset: TS
+    row_key: {STUDYID: S1, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: ACTSUB
+      TSVAL: ABC
+expected_errors: []

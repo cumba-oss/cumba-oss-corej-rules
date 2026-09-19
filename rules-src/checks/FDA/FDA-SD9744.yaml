@@ -1,0 +1,62 @@
+Core:
+  Id: "FDA-SD9744"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the TS dataset contains a record with TSPARMCD='HLTSUBJI'\
+  \ and TSVAL='Y' (indicating a healthy-subjects study) but does not contain a record\
+  \ with TSPARMCD='INDIC' and TSVALNF='NA'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TS"
+Operations:
+- id: "$INDIC"
+  expression: "record_count(filter=filter(TSPARMCD=\"INDIC\", TSVALNF=\"NA\"))"
+- id: "$HLTSUBJI"
+  expression: "record_count(filter=filter(TSPARMCD=\"HLTSUBJI\", TSVAL=\"Y\"))"
+Check:
+  expression: >-
+    $HLTSUBJI > 0 and $INDIC == 0
+Outcome:
+  Message: "For a healthy-subjects study, TS is missing a record with TSPARMCD='INDIC'\
+    \ and TSVALNF='NA'."
+  Output_Variables:
+  - "$INDIC"
+  - "$HLTSUBJI"
+Source_Proposed:
+  Sheet_Issue: "#266"
+  FDA_Validator_Rule_Message: "Missing TS record with TSPARMCD = 'INDIC' for a healthy-subjects\
+    \ study"
+  FDA_Validator_Rule_Description: "When the Trial Summary (TS) dataset carries a record\
+    \ with Trial Summary Parameter Short Name (TSPARMCD) equal to 'HLTSUBJI' and Parameter\
+    \ Value (TSVAL) equal to 'Y', it must also carry a record with TSPARMCD equal\
+    \ to 'INDIC' and Parameter Value Not Found (TSVALNF) equal to 'NA'."
+  Domains: "TS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB011"
+        Version: "1"
+      Version: "1.5"

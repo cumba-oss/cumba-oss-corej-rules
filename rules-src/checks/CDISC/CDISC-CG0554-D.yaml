@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0554-D"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when, in an Associated Persons dataset (DOMAIN starting\
+  \ with AP), APID is not present."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+    - "INTERVENTIONS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Check:
+  expression: >-
+    prefix(DOMAIN, 2) =~ /^(AP|ap)$/ and not var_exists("APID")
+Outcome:
+  Message: "APID is not present in an Associated Persons dataset."
+  Output_Variables:
+  - "DOMAIN"
+Source_Proposed:
+  Sheet_Issue: "#248"
+  Class: "ALL"
+  Domain: "AP--"
+  Variable: "APID"
+  Rule: "APID exists in an Associated Persons dataset"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "STUDYID, DOMAIN, and --SEQ exist and at least one of USUBJID, APID, SPDEVID,\
+    \ or POOLID"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0554"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0554"
+        Version: "1"
+      Version: "2.0"

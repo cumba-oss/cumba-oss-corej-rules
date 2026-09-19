@@ -1,0 +1,42 @@
+name: FDA-SD1347
+kind: rule
+description: |
+  Wave 3 port — cross-dataset with literal string comparator.
+  CORE-000841: When AEOUT = 'FATAL' in AE, AEENDTC must equal DM.DTHDTC for that subject.
+  Uses `value_is_literal: true` to anchor AEOUT="FATAL", then cross-dataset AEENDTC vs
+  DM.DTHDTC.
+python_source: rules-sdtmig-3-4.json (CORE-000841)
+rule:
+  coreId: FDA-SD1347
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      # Subject 001 — FATAL, AEENDTC matches DM.DTHDTC        → no violation
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEOUT: FATAL, AEENDTC: '2023-03-15'}
+      # Subject 002 — FATAL, AEENDTC differs                  → violation
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEOUT: FATAL, AEENDTC: '2023-04-01'}
+      # Subject 003 — non-FATAL, no constraint                → no violation
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEOUT: RECOVERED, AEENDTC: '2023-05-01'}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHDTC: '2023-03-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHDTC: '2023-03-20'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHDTC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1347
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDTC: '2023-04-01'
+      AEOUT: FATAL
+      DM.DTHDTC: '2023-03-20'
+expected_errors: []

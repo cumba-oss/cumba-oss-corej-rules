@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0116 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --LOC is not present but --DIR is present.
+#note "AEDIR is present (exists true) but AELOC is also present, so the not_exists(--LOC) conjunct is false and the rule does not fire"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELOC type=Char label="Location of the Reaction"
+col AEDIR type=Char label="Directionality"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | ARM | UPPER
+CDISCPILOT01 | AE | 01-701-1015 | 2 | LEG | LOWER
+---

@@ -1,0 +1,33 @@
+name: CDISC-CG0281
+kind: rule
+description: |
+  Record-Data + Operation port. CORE-000733: exactly one TSPARMCD=TRT record
+  (single investigational treatment) requires a TSPARMCD=RANDQT record. Two
+  `record_count` operations build $trt_count (filter TSPARMCD=TRT) and
+  $randqt_count (filter TSPARMCD=RANDQT). Check leaves: $trt_count == 1 AND
+  $randqt_count < 1. The TS dataset has a single TRT record and no RANDQT record,
+  so the rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000733)
+rule:
+  coreId: CDISC-CG0281
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: TRT, TSSEQ: 1, TSVAL: Drug A}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial-design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0281
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: TRT, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $randqt_count: '0'
+      $trt_count: '1'
+      TSPARMCD: TRT
+expected_errors: []

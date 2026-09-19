@@ -1,0 +1,27 @@
+name: CDISC-CG0568
+kind: rule
+description: |
+  Record-Data. CORE-000326: raise an error when EXMETHOD exists in the EX dataset.
+  The single EX row populates EXMETHOD so the exists leaf fires.
+python_source: rules-sdtmig-3-3.json (CORE-000326)
+rule:
+  coreId: CDISC-CG0568
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXMETHOD: INJECTION}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0568
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      EXMETHOD: INJECTION
+expected_errors: []

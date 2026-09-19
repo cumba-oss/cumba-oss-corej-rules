@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0350 expect=violation domain=DM
+# Rule:Description: Raise an error when --SCAT is equal to the domain name.
+#note "DMSCAT equals the DM dataset label 'Demographics'; Fix #371: the ds_label LIBRARY accessor reads it from the Library, so the DM label is supplied via dataset-metadata."
+#library standard=sdtmig version=3-4
+#library dataset-metadata DM label=Demographics
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DMSCAT type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | Demographics
+CDISCPILOT01 | DM | 01-701-1023 |
+---

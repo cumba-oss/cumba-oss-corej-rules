@@ -1,0 +1,28 @@
+name: CDISC-CG0088
+kind: rule
+description: |
+  Record-Data. CORE-000015: --PRESP not present in dataset and --OCCUR present.
+  Domain CM (interventions, not in the AE/DS/DV/EX exclusion): row has CMOCCUR
+  populated and no CMPRESP column, so both leaves hold and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000015)
+rule:
+  coreId: CDISC-CG0088
+datasets:
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMTRT: ASPIRIN, CMOCCUR: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [CM]
+expected_violations:
+  - rule_id: CDISC-CG0088
+    dataset: CM
+    row_key: {CMSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      CMOCCUR: Y
+expected_errors: []

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0352 expect=violation domain=AE
+# Rule:Description: Raise an error when --DTHREL is present in a dataset submitted for human clinical trials.
+#note "AEDTHREL column present in the dataset"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTHREL type=Char label="Relationship of AE to Death"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 
+---

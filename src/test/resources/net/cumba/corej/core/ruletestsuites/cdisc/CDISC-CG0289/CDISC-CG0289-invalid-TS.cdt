@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0289 expect=violation domain=TS
+# Rule:Description: Raise an error when TSVCDREF begins with 'CDISC' (e.g. 'CDISC CT') and TSVCDVER is not a valid published CDISC Controlled Terminology version (date).
+#note "CL-C (wave TA-4): the dead equal_to 'CDISC' literal became CG0289's 5-character prefix test, which matches every real-world 'CDISC ...' spelling. TSVCDREF='CDISC CT' names a CDISC terminology but TSVCDVER 2099-01-01 is not a published CT package date -> fires (under the old literal the rule was silent on every real submission)."
+#expectViolationCount 1
+#expectViolationAt row=1
+#library standard=sdtmig version=3-4
+#library published-ct-packages sdtmct-2023-10-26 sdtmct-2023-12-13
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Parameter Value Code Version"
+---
+CDISCPILOT01 | TS | CDISC CT | 2099-01-01
+---

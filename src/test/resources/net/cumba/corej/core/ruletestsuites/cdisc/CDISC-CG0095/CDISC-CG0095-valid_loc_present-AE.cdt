@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0095 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --LOC is not present but --LAT is present.
+#note "AELOC present alongside AELAT -> 'not var_exists(--LOC)' is false, rule silent"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELOC type=Char label="Location of the Reaction"
+col AELAT type=Char label="Laterality"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | ARM | LEFT
+CDISCPILOT01 | AE | 01-701-1015 | 2 | LEG | RIGHT
+---

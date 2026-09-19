@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0467 expect=violation domain=APLB
+# Rule:Description: Raise an error when --STDTC is present in a Findings general observation class dataset, where its use is not recommended.
+#note "EC-36 AP pin: an Associated Persons dataset carries PARENT-prefixed variables, so APLB holds LBSTDTC (not APLBSTDTC) and --STDTC must resolve to LBSTDTC. Before EC-36 the prefix was the full domain code APLB, the engine looked for APLBSTDTC, found nothing and this rule silently did not fire."
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset APLB label="Associated Persons Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col APID type=Char label="Associated Persons Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBSTDTC type=Char label="Start Date/Time of Observation"
+---
+CDISCPILOT01 | APLB | AP-701-1015 | 1 | 2014-01-03
+CDISCPILOT01 | APLB | AP-701-1015 | 2 | 2014-01-09
+---

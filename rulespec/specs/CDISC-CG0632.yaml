@@ -1,0 +1,27 @@
+name: CDISC-CG0632
+kind: rule
+description: |
+  Record-Data. CORE-000059: raise an error when RPPLDY is present in any dataset.
+  The single row populates RPPLDY so the exists leaf fires.
+python_source: rules-sdtmig-3-4.json (CORE-000059)
+rule:
+  coreId: CDISC-CG0632
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, RPPLDY: 5}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0632
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      RPPLDY: '5'
+expected_errors: []

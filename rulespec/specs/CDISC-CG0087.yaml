@@ -1,0 +1,29 @@
+name: CDISC-CG0087
+kind: rule
+description: |
+  Wave 16 port - Fix17 leftover edge case. Unplanned (--PRESP != Y) intervention occurred or --STAT=NOT DONE.
+python_source: rules-sdtmig-3-4.json (CORE-000014)
+rule:
+  coreId: CDISC-CG0087
+datasets:
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMPRESP: Y, CMOCCUR: '', CMSTAT: ''}
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '002', CMSEQ: 1, CMPRESP: N, CMOCCUR: Y, CMSTAT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [CM]
+expected_violations:
+  - rule_id: CDISC-CG0087
+    dataset: CM
+    row_key: {CMSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      CMOCCUR: Y
+      CMPRESP: N
+      CMSTAT:
+expected_errors: []

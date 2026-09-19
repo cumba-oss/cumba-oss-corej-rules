@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0289 expect=noViolation domain=TS
+# Rule:Description: Raise an error when TSVCDREF begins with 'CDISC' (e.g. 'CDISC CT') and TSVCDVER is not a valid published CDISC Controlled Terminology version (date).
+#note "TSVCDREF is 'ISO 8601' (not CDISC) so the leading prefix conjunct is false; TSVCDVER 2099-01-01 is still not a published CT package date so the second conjunct stays true, isolating the guard-false silent path"
+#library standard=sdtmig version=3-4
+#library published-ct-packages sdtmct-2023-10-26 sdtmct-2023-12-13
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Parameter Value Code Version"
+---
+CDISCPILOT01 | TS | ISO 8601 | 2099-01-01
+---

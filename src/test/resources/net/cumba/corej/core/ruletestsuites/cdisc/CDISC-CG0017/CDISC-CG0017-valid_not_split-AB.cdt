@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0017 expect=skipped domain=AB
+# Rule:Description: Raise an error when a split dataset (excluding Supplemental Qualifier, Related Records, and Associated Persons datasets) has a name whose length is not 3 or 4 characters.
+#note "A 2-character dataset name equals its DOMAIN, so AB is not a split dataset -> out of the rule's split-only scope -> no violation (a real split name is >= 3 characters by construction, so the shorter_than-3 branch is unreachable)."
+dataset AB label="Split dataset with an over-short name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AB | 01-701-1015
+CDISCPILOT01 | AB | 01-701-1023
+---

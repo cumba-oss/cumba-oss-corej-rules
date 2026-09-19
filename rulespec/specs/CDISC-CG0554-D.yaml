@@ -1,0 +1,31 @@
+name: CDISC-CG0554-D
+kind: rule
+description: |
+  Wave 14 port — `prefix_matches_regex` with `prefix: 2`. DOMAIN starts with
+  "AP" AND the APID column is absent. AP-- (associated persons) dataset missing
+  the APID qualifier. Narrowed to the AP half by the R-5.25 wave-3 split (the
+  non-AP identifier half is CORE-000107-A); Output_Variables is now [DOMAIN]
+  alone - STUDYID plays no part in the AP branch.
+python_source: rules-sdtmig-3-4.json (CORE-000107)
+rule:
+  coreId: CDISC-CG0554-D
+datasets:
+  APAE:
+    row_key: [STUDYID, USUBJID, APAESEQ]
+    rows:
+      # APAE dataset with no APID column → branch 1 fires.
+      - {STUDYID: S1, DOMAIN: APAE, USUBJID: '001', APAESEQ: 1, APTERM: HEADACHE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [APAE]
+expected_violations:
+  - rule_id: CDISC-CG0554-D
+    dataset: APAE
+    row_key: {APAESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      DOMAIN: APAE
+expected_errors: []

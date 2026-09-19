@@ -1,0 +1,46 @@
+name: CDISC-CG0033
+kind: rule
+description: |
+  Wave 22 port — AE primary (non-TV) + SV match (USUBJID,VISITNUM) + TV distinct VISITNUM.
+python_source: rules-sdtmig-3-4.json (CORE-000270)
+rule:
+  coreId: CDISC-CG0033
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, VISITNUM: 1}   # ok (in TV)
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, VISITNUM: 99}  # bad (not in TV, SV has SVPRESP=Y)
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, SVPRESP: Y, SVSTDTC: '2026-01-01'}
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 99, SVPRESP: Y, SVSTDTC: '2026-01-99'}
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: Screening, ARMCD: TRT01}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [SV]
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0033
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $tv_visitnum: '[1]'
+      SV.SVPRESP: Y
+      VISITNUM: '99'
+expected_errors: []

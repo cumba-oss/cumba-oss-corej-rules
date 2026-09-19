@@ -1,0 +1,52 @@
+name: CDISC-CG0043
+kind: rule
+description: |
+  T11 re-home (FDA run-2 ERROR lane): CORE-000597 is now SUPPAE-primary with a
+  Child-joined AE parent; the Check fires a SUPPAE QNAM=AESOSP record whose parent
+  AESMIE is not 'Y'. This fixture's SUPPAE rows carry blank IDVAR/IDVARVAL (a
+  non-conformant AE-parent reference per SD1072 semantics), so the record-level
+  parent join resolves no AESMIE (null) and rows 001 AND 002 both fire - expected
+  is Java-canonical. The Python reference engine's merge_pivot_supp_dataset pivots
+  SUPPAE and KeyErrors on the post-merge Check (lane: python baseline entry;
+  see EC-32 neighbourhood in plans/PLAN-rule-review-engine-changes.md).
+
+  Fixture: 001 AESMIE=N, 002 AESMIE=Y, 003 SUPP QNAM=AESPID (leaf 1 false).
+python_source: rules-sdtmig-3-4.json (CORE-000597)
+rule:
+  coreId: CDISC-CG0043
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, AESMIE: N}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AETERM: Nausea, AESMIE: Y}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AETERM: Fatigue, AESMIE: N}
+  SUPPAE:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '001', IDVAR: '', IDVARVAL: '', QNAM: AESOSP, QLABEL: Description of Other Sponsor-Provided, QVAL: detail-001}
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '002', IDVAR: '', IDVARVAL: '', QNAM: AESOSP, QLABEL: Description of Other Sponsor-Provided, QVAL: detail-002}
+      - {STUDYID: S1, RDOMAIN: AE, USUBJID: '003', IDVAR: '', IDVARVAL: '', QNAM: AESPID, QLABEL: Sponsor ID, QVAL: SP003}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    relationship: [SUPPAE]
+expected_violations:
+  - rule_id: CDISC-CG0043
+    dataset: SUPPAE
+    row_key: {IDVAR: '', IDVARVAL: '', QNAM: AESOSP, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AESMIE: null
+      QNAM: AESOSP
+  - rule_id: CDISC-CG0043
+    dataset: SUPPAE
+    row_key: {IDVAR: '', IDVARVAL: '', QNAM: AESOSP, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AESMIE: null
+      QNAM: AESOSP
+expected_errors: []

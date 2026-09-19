@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0293 expect=violation domain=TV
+# Rule:Description: Raise an error when ARMCD is populated in the Trial Visits (TV) dataset and the value is not found in TA.ARMCD.
+#note "TV.ARMCD=Scrn is populated but is not one of the TA.ARMCD values"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset TV label="Trial Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col ARMCD type=Char label="Planned Arm Code" format=$ARMCD.
+---
+CDISCPILOT01 | TV | 1 | SCREENING 1 | Scrn
+CDISCPILOT01 | TV | 2 | BASELINE | Pbo
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col ARMCD type=Char label="Planned Arm Code" format=$ARMCD.
+---
+CDISCPILOT01 | TA | Pbo
+CDISCPILOT01 | TA | Xan_Hi
+---

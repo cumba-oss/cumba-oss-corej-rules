@@ -1,0 +1,33 @@
+name: CDISC-CG0409
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary AE checked
+  against distinct(DM.STUDYID).
+python_source: rules-sdtmig-3-4.json (CORE-000172)
+rule:
+  coreId: CDISC-CG0409
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {DOMAIN: AE, STUDYID: S1, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S2, DOMAIN: DM, USUBJID: '001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0409
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $dm_studyid: '[S2]'
+      STUDYID: S1
+expected_errors: []

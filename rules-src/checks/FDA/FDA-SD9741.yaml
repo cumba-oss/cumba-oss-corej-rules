@@ -1,0 +1,63 @@
+Core:
+  Id: "FDA-SD9741"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Death Flag (DTHFL) in the DM dataset equals 'Y'\
+  \ but no record is present in the DS dataset with DSDECOD equal to 'DEATH' for the\
+  \ corresponding subject."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Operations:
+- id: "$ds_death_usubjid"
+  expression: "distinct(USUBJID, domain=\"DS\", filter=filter(DSDECOD=\"DEATH\"))"
+Check:
+  expression: >-
+    DTHFL == "Y" and USUBJID not in $ds_death_usubjid
+Outcome:
+  Message: "DTHFL in DM dataset is \"Y\" but a record is missing in DS dataset where\
+    \ DSDECOD is equal to \"DEATH\"."
+  Output_Variables:
+  - "DTHFL"
+  - "$ds_death_usubjid"
+Source_Proposed:
+  Sheet_Issue: "#263"
+  FDA_Validator_Rule_Message: "Missing DS record with DSDECOD = 'DEATH' for a subject\
+    \ whose DTHFL is 'Y'"
+  FDA_Validator_Rule_Description: "When the Subject Death Flag (DTHFL) in DM is 'Y',\
+    \ the Disposition (DS) dataset must carry a record for that subject with Standardized\
+    \ Disposition Term (DSDECOD) equal to 'DEATH'."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"

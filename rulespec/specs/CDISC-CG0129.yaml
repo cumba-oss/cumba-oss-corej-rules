@@ -1,0 +1,29 @@
+name: CDISC-CG0129
+kind: rule
+description: |
+  Record-Data. CORE-000377: DM record where ARMCD is in [SCRNFAIL, NOTASSGN] but ARMCD
+  does not equal ACTARMCD (column comparison). The DM row sets ARMCD=SCRNFAIL and
+  ACTARMCD=ARM1, so both leaves hold and the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000377)
+rule:
+  coreId: CDISC-CG0129
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMCD: SCRNFAIL, ACTARMCD: ARM1}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0129
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ACTARMCD: ARM1
+      ARMCD: SCRNFAIL
+expected_errors: []

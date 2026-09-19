@@ -1,0 +1,30 @@
+name: CDISC-CG0520
+kind: rule
+description: |
+  Wave 6 port — DM: when ARMCD and ACTARMCD are both populated, ARMNRS must not
+  be populated. Three-leaf `non_empty` check.
+python_source: rules-sdtmig-3-4.json (CORE-000121)
+rule:
+  coreId: CDISC-CG0520
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMCD: A, ACTARMCD: A, ARMNRS: ''}                  # ok
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMCD: A, ACTARMCD: A, ARMNRS: NOT ASSIGNED}            # bad
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', ARMCD: '', ACTARMCD: A, ARMNRS: NOT ASSIGNED}           # ok (ARMCD blank → no fire)
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0520
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ACTARMCD: A
+      ARMCD: A
+      ARMNRS: NOT ASSIGNED
+expected_errors: []

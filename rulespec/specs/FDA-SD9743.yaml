@@ -1,0 +1,42 @@
+name: FDA-SD9743
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['record_count', 'record_count']).
+python_source: rules-sdtmig-3-4.json (CORE-000736)
+rule:
+  coreId: FDA-SD9743
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    column_types:
+      TSSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: DOSE, TSSEQ: 1, TSVAL: 10mg}
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: AGE, TSSEQ: 1, TSVAL: '18'}
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: AGETXT, TSSEQ: 1, TSVAL: Adult}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: FDA-SD9743
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: AGE, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $age_count: '1'
+      $agetxt_count: '1'
+      TSPARMCD: AGE
+      TSVAL: '18'
+  - rule_id: FDA-SD9743
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: AGETXT, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $age_count: '1'
+      $agetxt_count: '1'
+      TSPARMCD: AGETXT
+      TSVAL: Adult
+expected_errors: []

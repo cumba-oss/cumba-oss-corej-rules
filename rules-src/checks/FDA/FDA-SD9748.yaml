@@ -1,0 +1,63 @@
+Core:
+  Id: "FDA-SD9748"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the trial is interventional (TS.TSPARMCD equals\
+  \ 'STYPE' and TS.TSVAL equals 'INTERVENTIONAL'), the subject has a record in the\
+  \ EX dataset, and ARMNRS is populated with a value other than 'UNPLANNED TREATMENT'."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMNRS"
+    - "USUBJID"
+Match_Datasets:
+- Keys:
+  - "STUDYID"
+  Name: "TS"
+Operations:
+- id: "$usubjids_in_ex"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+Check:
+  expression: >-
+    not empty(ARMNRS) and ARMNRS != "UNPLANNED TREATMENT" and TS.TSPARMCD == "STYPE" and TS.TSVAL ==
+    "INTERVENTIONAL" and USUBJID in $usubjids_in_ex
+Outcome:
+  Message: "A subject has a record in EX but is not assigned to a treatment while\
+    \ participating in an interventional study"
+  Output_Variables:
+  - "ARMNRS"
+  - "TS.TSPARMCD"
+  - "TS.TSVAL"
+  - "$usubjids_in_ex"
+Source_Proposed:
+  Sheet_Issue: "#270"
+  FDA_Validator_Rule_Message: "Subject has an EX record although ARMNRS is populated"
+  FDA_Validator_Rule_Description: "In an interventional study (Trial Summary Parameter\
+    \ TSPARMCD 'STYPE' with TSVAL 'INTERVENTIONAL') a subject with a record in Exposure\
+    \ (EX) must not carry a Reason Arm and/or Actual Arm is Null (ARMNRS) value other\
+    \ than 'UNPLANNED TREATMENT'."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB023"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,42 @@
+name: FDA-SD9748
+kind: rule
+description: |
+  Wave 21 port — DM primary + TS match + EX distinct. Inverse of 885/886 —
+  fires when ARMNRS populated (not UNPLANNED TREATMENT) yet subject is in EX.
+python_source: rules-sdtmig-3-4.json (CORE-000927)
+rule:
+  coreId: FDA-SD9748
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMNRS: ''}                   # ok (ARMNRS empty)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMNRS: SCREEN FAILURE}        # bad (ARMNRS populated, in EX)
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: STYPE, TSVAL: INTERVENTIONAL}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    trial design: [TS]
+    interventions: [EX]
+expected_violations:
+  - rule_id: FDA-SD9748
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $usubjids_in_ex: '[001, 002]'
+      ARMNRS: SCREEN FAILURE
+      TS.TSPARMCD: STYPE
+      TS.TSVAL: INTERVENTIONAL
+expected_errors: []

@@ -1,0 +1,31 @@
+name: FDA-SD0025
+kind: rule
+description: |
+  Wave 10 port - --DTC after --ENDTC (collection after event end). Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000866)
+rule:
+  coreId: FDA-SD0025
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBDTC: '2026-01-10', LBENDTC: '2026-01-20'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBDTC: '2026-01-20', LBENDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD0025
+    dataset: LB
+    row_key: {STUDYID: S1, USUBJID: '002', LBSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      LBDTC: '2026-01-20'
+      LBENDTC: '2026-01-10'
+expected_errors: []

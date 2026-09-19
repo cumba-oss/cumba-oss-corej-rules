@@ -1,0 +1,30 @@
+name: CDISC-CG0086
+kind: rule
+description: |
+  Wave 10 port - --PRESP=Y, --STAT empty, --OCCUR exists but is empty. Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000018)
+rule:
+  coreId: CDISC-CG0086
+datasets:
+  CM:
+    row_key: [STUDYID, USUBJID, CMSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '001', CMSEQ: 1, CMPRESP: Y, CMSTAT: '', CMOCCUR: Y}
+      - {STUDYID: S1, DOMAIN: CM, USUBJID: '002', CMSEQ: 1, CMPRESP: Y, CMSTAT: '', CMOCCUR: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [CM]
+expected_violations:
+  - rule_id: CDISC-CG0086
+    dataset: CM
+    row_key: {CMSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      CMPRESP: Y
+expected_errors: []

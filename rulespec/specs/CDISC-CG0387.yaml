@@ -1,0 +1,31 @@
+name: CDISC-CG0387
+kind: rule
+description: |
+  Wave 2 port — simple shape.
+  CORE-000087: AESER must be 'Y' or 'N' when populated. Single-domain AE rule with
+  a non_empty + is_not_contained_by pair.
+python_source: rules-sdtmig-3-4.json (CORE-000087)
+rule:
+  coreId: CDISC-CG0387
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESER: Y}           # ok
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, AESER: N}           # ok
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESER: ''}          # empty → not flagged (non_empty fails)
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AESER: Maybe}       # invalid → flagged
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0387
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      AESER: Maybe
+expected_errors: []

@@ -1,0 +1,39 @@
+name: FDA-SD9733
+kind: rule
+description: |
+  Wave 11 port - --HLGT maps to multiple distinct --HLGTCD values. Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000719)
+rule:
+  coreId: FDA-SD9733
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEHLGT: HEPATIC, AEHLGTCD: '10001'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AEHLGT: NEUROLOGIC, AEHLGTCD: '10002'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 3, AEHLGT: NEUROLOGIC, AEHLGTCD: '10099'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD9733
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 2}
+    status: SUCCESS
+    output_variables:
+      AEHLGT: NEUROLOGIC
+      AEHLGTCD: '10002'
+  - rule_id: FDA-SD9733
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 3}
+    status: SUCCESS
+    output_variables:
+      AEHLGT: NEUROLOGIC
+      AEHLGTCD: '10099'
+expected_errors: []

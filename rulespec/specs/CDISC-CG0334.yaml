@@ -1,0 +1,32 @@
+name: CDISC-CG0334
+kind: rule
+description: |
+  Wave 22 port — extract_metadata(dataset_name). SUPP--.RDOMAIN must match
+  the last 2 chars of the dataset_name via regex `.{4}(..).*`.
+python_source: rules-sdtmig-3-4.json (CORE-000538)
+rule:
+  coreId: CDISC-CG0334
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      # Dataset SUPPAE → characters 5-6 = "AE". RDOMAIN=AE → ok.
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, QLABEL: X, QVAL: x}
+      # RDOMAIN=CM does not match "AE" → violation.
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: CM, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, QLABEL: X, QVAL: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+expected_violations:
+  - rule_id: CDISC-CG0334
+    dataset: SUPPAE
+    row_key: {IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $dataset_name: 'SUPPAE'
+      RDOMAIN: CM
+      dataset_name: 'SUPPAE'
+expected_errors: []

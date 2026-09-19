@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0359 expect=violation domain=DM
+# Rule:Description: Raise an error when a variable label is not in title case, i.e. the first letter of every word is not capitalized except for articles, prepositions, and conjunctions (per SDTMIG Section 2.6, item 3h), which may remain lowercase.
+#note "DOMAIN variable label is not in title case"
+#expectViolationCount 1
+#expectViolationAt variable_label="all lowercase label" variable_name=DOMAIN
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="all lowercase label"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

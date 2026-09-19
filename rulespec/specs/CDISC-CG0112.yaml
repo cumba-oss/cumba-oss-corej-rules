@@ -1,0 +1,28 @@
+name: CDISC-CG0112
+kind: rule
+description: |
+  Wave 8 port — --DOSTXT value is purely numeric (should be text-only). Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000094)
+rule:
+  coreId: CDISC-CG0112
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXDOSTXT: 10 mg}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXDOSTXT: '10.5'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0112
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      EXDOSTXT: '10.5'
+expected_errors: []

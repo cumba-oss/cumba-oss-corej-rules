@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0533 expect=violation domain=DM
+# Rule:Description: Raise an error when the Planned Repro Path Code (RPATHCD) variable is present in the Demographics (DM) dataset; RPATHCD is not used in human clinical trials.
+#note "The RPATHCD column is present in DM, so the rule fires"
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Reproductive Path Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 |
+---

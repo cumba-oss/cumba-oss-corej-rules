@@ -1,0 +1,37 @@
+name: CDISC-CG0293
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary TV checked
+  against distinct(TA.ARMCD).
+python_source: rules-sdtmig-3-4.json (CORE-000155)
+rule:
+  coreId: CDISC-CG0293
+datasets:
+  TV:
+    row_key: [STUDYID, ARMCD, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, ARMCD: TRT01, VISITNUM: 1, ARM: Treatment 1}
+      - {STUDYID: S1, DOMAIN: TV, ARMCD: BOGUS, VISITNUM: 1, ARM: Bogus}
+  TA:
+    row_key: [STUDYID, ARMCD, TAETORD]
+    column_types:
+      TAETORD: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: TRT01, TAETORD: 1, ARM: Treatment 1, ETCD: SCRN}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0293
+    dataset: TV
+    row_key: {ARMCD: BOGUS, STUDYID: S1, VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      $ta_armcd: '[TRT01]'
+      ARMCD: BOGUS
+expected_errors: []

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0060 expect=noViolation domain=AE
+# Rule:Description: Raise an error when Start Reference Time Point (--STTPT) is present in the dataset but Start Relative to Reference Time Point (--STRTPT) is not present in the dataset.
+#note "AESTTPT present and its companion AESTRTPT also present"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESTTPT type=Char label="Start Reference Time Point"
+col AESTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-01 | COINCIDENT
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-01 | BEFORE
+---

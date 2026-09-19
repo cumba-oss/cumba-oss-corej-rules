@@ -1,0 +1,34 @@
+name: CDISC-CG0029
+kind: rule
+description: |
+  Wave 22 port — AE primary (non-AP-- scope) + DM distinct USUBJID. Fires when
+  AE.USUBJID isn't in DM.USUBJID.
+python_source: rules-sdtmig-3-4.json (CORE-000201)
+rule:
+  coreId: CDISC-CG0029
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '999', AESEQ: 1, AETERM: Orphan}     # bad
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0029
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '999'}
+    status: SUCCESS
+    output_variables:
+      $dm_usubjid: '[001, 002]'
+expected_errors: []

@@ -1,0 +1,26 @@
+name: CDISC-CG0408
+kind: rule
+description: |
+  Wave 20 port — empty-dataset check. Dataset-sensitivity rule fires once per
+  dataset when record_count == 0.
+python_source: rules-sdtmig-3-4.json (CORE-000579)
+rule:
+  coreId: CDISC-CG0408
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows: []
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0408
+    dataset: AE
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      $records_in_dataset: '0'
+expected_errors: []

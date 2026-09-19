@@ -1,0 +1,30 @@
+name: FDA-SD9746
+kind: rule
+description: |
+  Record-Data over FINDINGS (ALL domains). --ORNRHI and --ORNRLO both exist,
+  are non-empty and numeric, and --ORNRHI <= --ORNRLO (inverted range). The LB
+  row sets LBORNRHI=1 and LBORNRLO=5, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000889)
+rule:
+  coreId: FDA-SD9746
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: ALT, LBORNRLO: '5', LBORNRHI: '1'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD9746
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBORNRHI: '1'
+      LBORNRLO: '5'
+      LBTESTCD: ALT
+expected_errors: []

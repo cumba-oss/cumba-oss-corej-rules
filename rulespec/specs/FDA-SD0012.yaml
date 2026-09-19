@@ -1,0 +1,34 @@
+name: FDA-SD0012
+kind: rule
+description: |
+  Wave 11 port - Study day start (--STDY) greater than end (--ENDY). Covers harder plain bucket:
+  complex operators (is_inconsistent_across_dataset, is_not_unique_set,
+  target_is_not_sorted_by, inconsistent_enumerated_columns) or multi-leaf
+  composite checks that Waves 8-10 did not reach.
+python_source: rules-sdtmig-3-4.json (CORE-000708)
+rule:
+  coreId: FDA-SD0012
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESTDY: LONG
+      AEENDY: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESTDY: 5, AEENDY: 10}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AESTDY: 15, AEENDY: 10}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD0012
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEENDY: '10'
+      AESTDY: '15'
+expected_errors: []

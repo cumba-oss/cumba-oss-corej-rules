@@ -1,0 +1,30 @@
+name: FDA-SD1365
+kind: rule
+description: |
+  Record-Data port (pilot). CORE-000211: SUPPDM must not include population flags.
+  Record-level check, two leaves: RDOMAIN == "DM" (case-insensitive literal) AND
+  QNAM is_contained_by the population-flag list. The SUPPDM row below sets RDOMAIN=DM
+  and QNAM=SAFFL, so the record fires.
+python_source: rules-sdtmig-3-4.json (CORE-000211)
+rule:
+  coreId: FDA-SD1365
+datasets:
+  SUPPDM:
+    row_key: [STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: DM, USUBJID: '001', IDVAR: '', IDVARVAL: '', QNAM: SAFFL, QLABEL: Safety Population Flag, QVAL: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPDM]
+expected_violations:
+  - rule_id: FDA-SD1365
+    dataset: SUPPDM
+    row_key: {IDVAR: '', IDVARVAL: '', QNAM: SAFFL, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      QNAM: SAFFL
+      RDOMAIN: DM
+expected_errors: []

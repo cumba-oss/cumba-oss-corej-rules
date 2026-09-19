@@ -1,0 +1,30 @@
+name: FDA-SD0056
+kind: rule
+description: |
+  Wave 22 port — required_variables Operation. Fires when the dataset is
+  missing any variable marked Required in the CDISC library.
+python_source: rules-sdtmig-3-4.json (CORE-000355)
+rule:
+  coreId: FDA-SD0056
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      # Dataset has STUDYID, USUBJID, AESEQ, AETERM but NOT AEDECOD (required).
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+  required_variables:
+    AE: [STUDYID, DOMAIN, USUBJID, AESEQ, AETERM, AEDECOD]
+expected_violations:
+  - rule_id: FDA-SD0056
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $missing_required_variables: '[AEDECOD]'
+expected_errors: []

@@ -1,0 +1,29 @@
+name: CDISC-CG0433
+kind: rule
+description: |
+  Record-Data. CORE-000453: in DM, AGEU is non-empty while AGE and AGETXT are empty.
+  The DM row populates AGEU only so all leaves fire.
+python_source: rules-sdtmig-3-3.json (CORE-000453)
+rule:
+  coreId: CDISC-CG0433
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', AGE: '', AGEU: YEARS, AGETXT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0433
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AGE:
+      AGETXT:
+      AGEU: YEARS
+expected_errors: []

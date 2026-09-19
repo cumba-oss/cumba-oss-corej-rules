@@ -1,0 +1,28 @@
+name: FDA-SD1035
+kind: rule
+description: |
+  Wave 13 port - DSCAT empty. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000522)
+rule:
+  coreId: FDA-SD1035
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: PROTOCOL MILESTONE}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSCAT: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: FDA-SD1035
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DSCAT:
+expected_errors: []

@@ -1,0 +1,57 @@
+name: CDISC-CG0068-guarded
+kind: rule
+description: |
+  Guarded counterpart to CORE-000363-empty — proves the EMPTYSTR-equal-to-both-empty
+  divergence disappears once a non_empty guard is added to the variable.
+
+  Identical data to CORE-000363-empty, but the rule prepends
+  `{ name: DSSTDTC, operator: non_empty }` to Check.all. With the guard, subject
+  002's all-empty rows fail the non_empty leaf, so the honest coreJ engine no longer
+  reaches the `'' == ''` corner and does NOT fire them — matching Python. Subject 003
+  (populated DSSTDTC) still fires on both engines. Result: zero divergence, so this
+  spec is NOT baselined and passes both lanes.
+
+  This mirrors the gate the production CORE->native converter (RulePackageConverter)
+  already wraps around equal_to; the spec-runner does not apply that gate
+  automatically, so we add it explicitly in the fixture rule.
+python_notes: |
+  With the non_empty(DSSTDTC) guard both engines emit exactly one violation
+  (subject 003). The empty-string corner is gated out before equal_to runs, so the
+  Java/Python equal_to-both-empty disagreement can no longer manifest.
+python_source: rules-sdtmig-3-4.json (CORE-000363) + PLAN-empty-string-membership-parity.md (B.2)
+rule:
+  coreId: CDISC-CG0068
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      # Subject 002 — all-empty DSSTDTC. Guarded out by non_empty → no fire (both engines).
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: ''}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 2, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: ''}
+      # Subject 003 — populated DSSTDTC, earliest (2026-01-05) != DM.RFICDTC → fires (both engines).
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 1, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-05'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 2, DSTERM: IC, DSDECOD: INFORMED CONSENT OBTAINED, DSSTDTC: '2026-01-07'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFICDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFICDTC: '2026-01-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+    special-purpose: [DM]
+expected_violations:
+  # Only the populated control fires — both engines agree, no divergence.
+  - rule_id: CDISC-CG0068
+    dataset: DS
+    row_key: {STUDYID: S1, USUBJID: '003', DSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $min_ds_dsstdtc: '2026-01-05'
+      DM.RFICDTC: '2026-01-10'
+      DSDECOD: INFORMED CONSENT OBTAINED
+      DSSTDTC: '2026-01-05'
+expected_errors: []

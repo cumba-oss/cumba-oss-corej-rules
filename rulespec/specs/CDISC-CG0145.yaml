@@ -1,0 +1,30 @@
+name: CDISC-CG0145
+kind: rule
+description: |
+  Record Data. CORE-000379: RFSTDTC populated while ACTARM indicates the subject was
+  not treated. Check is all[ ACTARM is_contained_by [Screen Failure, Not Assigned,
+  Not Treated, ...], RFSTDTC non_empty ]. The DM row sets ACTARM=Not Treated and a
+  populated RFSTDTC, so both leaves are satisfied and it fires.
+python_source: rules-sdtmig-3-2.json (CORE-000379)
+rule:
+  coreId: CDISC-CG0145
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ACTARM: Not Treated, RFSTDTC: '2020-01-01'}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0145
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      ACTARM: Not Treated
+      RFSTDTC: '2020-01-01'
+expected_errors: []

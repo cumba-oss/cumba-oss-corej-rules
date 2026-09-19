@@ -1,0 +1,30 @@
+name: CDISC-CG0359
+kind: rule
+description: |
+  Variable Metadata Check (Dataset sensitivity). Fires when a variable label is
+  not title case (not_matches_regex). Column label equals column name; a
+  lowercase-leading name 'lowercasevar' does not match the title-case regex and
+  fires.
+python_source: rules-sdtmig-3-4.json (CORE-000594)
+rule:
+  coreId: CDISC-CG0359
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, lowercasevar: x}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0359
+    dataset: AE
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      variable_label: lowercasevar
+      variable_name: lowercasevar
+expected_errors: []

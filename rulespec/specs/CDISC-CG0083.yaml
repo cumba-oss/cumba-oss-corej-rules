@@ -1,0 +1,39 @@
+name: CDISC-CG0083
+kind: rule
+description: |
+  Wave 10 port - --BDSYCD has multiple distinct --BODSYS mappings. Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000184)
+rule:
+  coreId: CDISC-CG0083
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBDSYCD: '10001', AEBODSYS: HEPATIC}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBDSYCD: '10002', AEBODSYS: NERVOUS}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEBDSYCD: '10002', AEBODSYS: OTHER}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0083
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEBDSYCD: '10002'
+      AEBODSYS: NERVOUS
+  - rule_id: CDISC-CG0083
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      AEBDSYCD: '10002'
+      AEBODSYS: OTHER
+expected_errors: []

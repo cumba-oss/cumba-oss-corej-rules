@@ -1,0 +1,29 @@
+name: CDISC-CG0204
+kind: rule
+description: |
+  Record-Data plain (RELATIONSHIP class). CORE-000135: IDVAR populated but
+  IDVARVAL empty. Scope SUPP-- -> SUPPDM. Row sets IDVAR=AESEQ with empty
+  IDVARVAL so both leaves are satisfied and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000135)
+rule:
+  coreId: CDISC-CG0204
+datasets:
+  SUPPDM:
+    row_key: [STUDYID, USUBJID, IDVAR, QNAM]
+    rows:
+      - {STUDYID: S1, RDOMAIN: DM, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '', QNAM: RACE1, QVAL: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPDM]
+expected_violations:
+  - rule_id: CDISC-CG0204
+    dataset: SUPPDM
+    row_key: {IDVAR: AESEQ, QNAM: RACE1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVAR: AESEQ
+      IDVARVAL:
+expected_errors: []

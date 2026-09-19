@@ -1,0 +1,56 @@
+Core:
+  Id: "FDA-SD9732"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --SOCCD and --SOC do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--SOC"
+    - "--SOCCD"
+Check:
+  expression: >-
+    not is_unique_relationship(--SOC, --SOCCD)
+Outcome:
+  Message: "--SOCCD and --SOC do not have a one-to-one relationship."
+  Output_Variables:
+  - "--SOC"
+  - "--SOCCD"
+Source_Proposed:
+  Sheet_Issue: "#254"
+  FDA_Validator_Rule_Message: "--SOCCD and --SOC do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of Primary System Organ Class Code (--SOCCD)\
+    \ and Primary System Organ Class (--SOC) must have a one-to-one relationship."
+  Domains: "EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

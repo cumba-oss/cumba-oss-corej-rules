@@ -1,0 +1,30 @@
+name: CDISC-CG0439
+kind: rule
+description: |
+  Record-Data. CORE-000731: TS record where TSPARMCD=LENGTH, TSVAL non-empty, and
+  TSVAL is not a valid ISO 8601 duration (negative invalid_duration). The TS row
+  sets TSPARMCD=LENGTH and TSVAL to a non-duration string, so all leaves hold and
+  the rule fires.
+python_source: rules-sdtmig-3-3.json (CORE-000731)
+rule:
+  coreId: CDISC-CG0439
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: LENGTH, TSVAL: not-a-duration}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0439
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: LENGTH, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: LENGTH
+      TSVAL: not-a-duration
+expected_errors: []

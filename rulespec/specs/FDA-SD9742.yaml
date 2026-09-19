@@ -1,0 +1,35 @@
+name: FDA-SD9742
+kind: rule
+description: |
+  Wave 17 port - non-wildcard Match_Datasets rule.
+python_source: rules-sdtmig-3-4.json (CORE-000709)
+rule:
+  coreId: FDA-SD9742
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: Y}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: ''}
+  CE:
+    row_key: [STUDYID, USUBJID, CESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: CE, USUBJID: '001', CESEQ: 1, CETERM: DEATH, CEDECOD: DEATH}
+      - {STUDYID: S1, DOMAIN: CE, USUBJID: '002', CESEQ: 1, CETERM: DEATH, CEDECOD: DEATH}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    events: [CE]
+expected_violations:
+  - rule_id: FDA-SD9742
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      CE.CEDECOD: DEATH
+      CE.CETERM: DEATH
+      DTHFL:
+expected_errors: []

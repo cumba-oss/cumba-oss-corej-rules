@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SD1203 expect=violation domain=AE
+# Rule:Description: Raise an error when --DTC is populated and is after DM.RFPENDTC (Date/Time of End of Participation).
+#note "AESEQ=1 AEDTC is later than the subject's DM.RFPENDTC"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2099-12-31
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-16
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFPENDTC type=Char label="Date/Time of End of Participation"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-07-02T11:45
+---

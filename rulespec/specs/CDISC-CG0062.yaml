@@ -1,0 +1,33 @@
+name: CDISC-CG0062
+kind: rule
+description: |
+  Wave 23 port - Variable Metadata Check with `exists`/`not_exists` on
+  `--`-resolved column names. Baselined on Python lane under Finding #9
+  (VMC dataset projection divergence).
+python_notes: |
+  Known divergence (Finding #9): Python swaps the dataset for a
+  VariablesMetadataDatasetBuilder projection, so `exists(--COLNAME)`
+  checks meta-field column names instead of dataset columns and yields
+  0 violations. Java fires correctly; expected matches Java.
+python_source: rules-sdtmig-3-4.json (CORE-000258)
+rule:
+  coreId: CDISC-CG0062
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBSTRTPT: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0062
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBSTRTPT: X
+expected_errors: []

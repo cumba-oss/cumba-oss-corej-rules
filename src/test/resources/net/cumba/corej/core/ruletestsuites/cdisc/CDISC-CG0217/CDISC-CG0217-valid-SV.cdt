@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0217 expect=noViolation domain=SV
+# Rule:Description: Raise an error when the Planned Order of Element within Arm (TAETORD) in the Subject Visits (SV) domain does not match the TAETORD value of the corresponding Subject Elements (SE) element whose date range (SESTDTC to SEENDTC) contains the visit start date (SVSTDTC).
+#note "SV.TAETORD matches SE.TAETORD for the element covering SVSTDTC, so the rule executes and does not fire"
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SVSEQ type=Num label="Sequence Number"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col TAETORD type=Char label="Planned Order of Element within Arm"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2013-12-31 | 1
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col TAETORD type=Char label="Planned Order of Element within Arm"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-02 | 1
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0619 expect=violation domain=LB
+# Rule:Description: Raise an error when --SPCUFL is populated with a value other than 'N'.
+#note "LBSPCUFL is present and populated with Y (not N), so the rule fires"
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1 USUBJID=01-701-1015
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBSPCUFL type=Char label="Specimen Usability for the Test"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | Y
+CDISCPILOT01 | LB | 01-701-1015 | 2 | N
+---

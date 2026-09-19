@@ -1,0 +1,35 @@
+name: CDISC-CG0044
+kind: rule
+description: |
+  Record-Data port of an affected "exists" rule (parity regression coverage).
+  CORE-000013: raise an error when AESTAT is present in the AE dataset.
+  Single domain (AE), single check leaf `AESTAT exists`, Sensitivity: Dataset.
+
+  This rule is one of the set that was briefly mis-typed as "Variable Metadata Check"
+  in rules-legacy; under that type the `exists`-against-a-real-variable check diverges
+  between the engines (Java fires row-level, Python's VariablesMetadataDatasetBuilder
+  fires nothing). With the rule restored to its legacy "Record Data" type, both engines
+  agree: AESTAT is present, so the dataset-level check fires once. Kept un-baselined so a
+  future re-introduction of the bad rule type surfaces as a parity failure here.
+python_source: rules-sdtmig-3-4.json (CORE-000013)
+rule:
+  coreId: CDISC-CG0044
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, AESTAT: NOT DONE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0044
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AESTAT: NOT DONE
+expected_errors: []

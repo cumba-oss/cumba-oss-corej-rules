@@ -1,0 +1,35 @@
+name: CDISC-CG0268
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000154)
+python_source: rules-sdtmig-3-4.json (CORE-000154)
+rule:
+  coreId: CDISC-CG0268
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    column_types:
+      TSSEQ: LONG
+    rows:
+    - {STUDYID: S1, DOMAIN: TS, TSPARMCD: DOSE, TSSEQ: 1, TSVAL: 10mg}
+    - {STUDYID: S1, DOMAIN: TS, TSPARMCD: DOSE, TSSEQ: 1, TSVAL: 20mg}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+- rule_id: CDISC-CG0268
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: DOSE, TSSEQ: 1}
+  status: SUCCESS
+  output_variables:
+    TSPARMCD: DOSE
+- rule_id: CDISC-CG0268
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: DOSE, TSSEQ: 1}
+  status: SUCCESS
+  output_variables:
+    TSPARMCD: DOSE
+expected_errors: []

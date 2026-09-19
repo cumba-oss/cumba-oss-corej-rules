@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-9442 expect=skipped domain=GV
+# Rule:Description: Raise an error when --METHOD is not populated.
+#note "GVMETHOD is absent from GV, so Requirements.Variables.All gates the rule to SKIPPED rather than firing on every row. This is the absent-column guard the standing 'absent column = all-missing column' policy makes necessary: without it empty(GVMETHOD) would be true on every row of every dataset that simply lacks the column. Asserts the SKIP, not merely the absence of a finding."
+#library standard=sendig-genetox version=1-0
+dataset GV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col GVSEQ type=Char
+col GVTESTCD type=Char
+col GVTEST type=Char
+---
+S1      | GV     | S1-001  | 1     | MNCELL   | Micronucleated Cells
+---

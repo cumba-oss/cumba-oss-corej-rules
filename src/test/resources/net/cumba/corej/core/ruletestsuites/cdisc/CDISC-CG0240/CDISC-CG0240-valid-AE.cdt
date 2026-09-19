@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0240 expect=noViolation domain=AE
+# Rule:Description: Raise an error when Planned Time Point Name (--TPT) is not consistent for a given Planned Time Point Number (--TPTNUM), i.e. when VISITNUM and --TPTREF are not present and --TPT and --TPTNUM do not have a one-to-one relationship.
+#note "VISITNUM and AETPTREF absent; AETPT and AETPTNUM keep a clean one-to-one relationship"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETPT type=Char label="Planned Time Point Name"
+col AETPTNUM type=Char label="Planned Time Point Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | BEFORE | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2 | AFTER | 2
+CDISCPILOT01 | AE | 01-701-1023 | 1 | BEFORE | 1
+---

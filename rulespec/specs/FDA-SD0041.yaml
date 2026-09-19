@@ -1,0 +1,30 @@
+name: FDA-SD0041
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000038)
+python_source: rules-sdtmig-3-4.json (CORE-000038)
+rule:
+  coreId: FDA-SD0041
+datasets:
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, SVPRESP: Y, SVOCCUR: Y}
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '002', VISITNUM: 1, SVPRESP: N, SVOCCUR: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+expected_violations:
+  - rule_id: FDA-SD0041
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '002', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      SVOCCUR: Y
+      SVPRESP: N
+expected_errors: []

@@ -1,0 +1,44 @@
+name: CDISC-CG0279
+kind: rule
+description: |
+  Record-Data + Operation. CORE-000497: for an interventional study, the PCLAS
+  parameter must be populated. Operation `record_count` (filtered to
+  TSPARMCD=STYPE, TSVAL=INTERVENTIONAL, ungrouped) builds
+  $STYPE_INTERVENTIONAL for the dataset. Check: TSPARMCD == 'PCLAS' AND
+  $STYPE_INTERVENTIONAL >= 1 AND TSVAL empty. A STYPE/INTERVENTIONAL record exists and
+  the PCLAS record is empty, so the PCLAS row fires.
+  D15 / Fix #158 (2026-08-05) removed the `group: [TSGRPID]` block from this rule: the key
+  related the wrong things (the operation counts one TS parameter while the Check fires on a
+  different one), and with TSGRPID populated the target row's group held no trigger record, so
+  the count was 0 and the rule was SILENTLY DEAD. The count is now dataset-wide. This spec's
+  rows carry a CONSTANT TSGRPID, so the verdict is unchanged either way -- a constant group
+  column and no group column are the same computation. What DID change is the reporting
+  surface: TSGRPID was a derived Output_Variable only because it was a group key, so it no
+  longer decorates the finding. That closed the EC-37 / Fix #127 Java-over-derivation gap for
+  this spec, and its parity-diff-baseline.json entry was retired as HEALED.
+python_source: rules-sdtmig-3-3.json (CORE-000497)
+rule:
+  coreId: CDISC-CG0279
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSGRPID: G1, TSPARMCD: STYPE, TSPARM: Study Type, TSVAL: INTERVENTIONAL}
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 2, TSGRPID: G1, TSPARMCD: PCLAS, TSPARM: Pharmacological Class, TSVAL: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0279
+    dataset: TS
+    row_key: {STUDYID: S1, TSSEQ: 2}
+    status: SUCCESS
+    output_variables:
+      $STYPE_INTERVENTIONAL: '1'
+      STUDYID: S1
+      TSPARMCD: PCLAS
+      TSVAL:
+expected_errors: []

@@ -1,0 +1,28 @@
+name: CDISC-CG0634
+kind: rule
+description: |
+  Record-Data plain `exists` over ALL domains. RPPLENDY must not be present.
+  The AE row (a concrete domain for the ALL wildcard) carries an RPPLENDY
+  column, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000061)
+rule:
+  coreId: CDISC-CG0634
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE, RPPLENDY: '5'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0634
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      RPPLENDY: '5'
+expected_errors: []

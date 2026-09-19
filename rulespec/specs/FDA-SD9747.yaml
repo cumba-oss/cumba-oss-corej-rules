@@ -1,0 +1,42 @@
+name: FDA-SD9747
+kind: rule
+description: |
+  Record-Data + Match_Datasets (RELREC wildcard PC). CORE-000901: PP joined to PC via
+  RELREC. PPCAT is non-empty, RELREC.PCRFTDTC is non-empty, PPRFTDTC equals RELREC.PCRFTDTC
+  (same reference timepoint) but PPCAT differs from RELREC.PCTEST. The PP/PC pair satisfies
+  every leaf, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000901)
+rule:
+  coreId: FDA-SD9747
+datasets:
+  PP:
+    row_key: [STUDYID, USUBJID, PPSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PP, USUBJID: '001', PPSEQ: 1, PPLNKID: '1', PPCAT: ANALYTE_X, PPRFTDTC: '2020-01-05', PPTESTCD: AUC}
+  PC:
+    row_key: [STUDYID, USUBJID, PCSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: PC, USUBJID: '001', PCSEQ: 1, PCLNKID: '1', PCTEST: ANALYTE_Y, PCRFTDTC: '2020-01-05'}
+  RELREC:
+    row_key: [__row_number__]
+    rows:
+      - {STUDYID: S1, RDOMAIN: PP, USUBJID: '', IDVAR: PPLNKID, IDVARVAL: '', RELTYPE: ONE, RELID: PPPC}
+      - {STUDYID: S1, RDOMAIN: PC, USUBJID: '', IDVAR: PCLNKID, IDVARVAL: '', RELTYPE: ONE, RELID: PPPC}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [PP, PC]
+    relationship: [RELREC]
+expected_violations:
+  - rule_id: FDA-SD9747
+    dataset: PP
+    row_key: {PPSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      PPCAT: ANALYTE_X
+      PPRFTDTC: '2020-01-05'
+      RELREC.PCRFTDTC: '2020-01-05'
+      RELREC.PCTEST: ANALYTE_Y
+expected_errors: []

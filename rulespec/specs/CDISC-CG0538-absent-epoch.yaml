@@ -1,0 +1,73 @@
+name: CDISC-CG0538-absent-epoch
+kind: rule
+description: |
+  EC-44 / Fix #133 cross-lane pin — PARTIAL DROP: one of two `group:` columns is absent, and
+  the survivor still partitions.
+
+  `CORE-000214` carries `record_count` with `filter: {DSCAT: DISPOSITION EVENT}` and
+  `group: [USUBJID, EPOCH]`. This fixture is a DS dataset with no `EPOCH` column. Under EC-44
+  the absent column is dropped and the check REGROUPS ON THE SURVIVOR — `USUBJID` — rather
+  than collapsing to one dataset-wide group or dying. The `is_not_unique_set` leaf keys on
+  `[USUBJID]` alone since D16 / Fix #158 (2026-08-05) removed `EPOCH` from it; before that it
+  carried the same `[USUBJID, EPOCH]` pair and dropped the absent `EPOCH` the same way, so the
+  expected violations are identical either side of that change and this spec was untouched by
+  it. The operation's `group:` — which D16 deliberately left alone, because it is the sheet's
+  per-epoch Condition — is what still exercises EC-44 here.
+
+  THE SECOND SUBJECT IS THE POINT. `001` has two DISPOSITION EVENT rows, so its per-USUBJID
+  count is 2 (> 1) and both rows fire. `002` has exactly one, so its count is 1 and it does
+  NOT fire. That asymmetry is what distinguishes the correct EC-44 behaviour — drop `EPOCH`,
+  regroup on `USUBJID` — from the two ways it could be got wrong:
+
+    * dropping ALL group columns and forming one dataset-wide group would make the count 3 for
+      every row, and `002` would fire too;
+    * treating the absent column as killing the operation (the pre-Fix-#133 behaviour) would
+      make NOTHING fire, which is exactly the silent-death defect EC-44 was filed for.
+
+  Only the correct implementation produces "001 twice, 002 never".
+
+  WHY THIS SPEC EXISTS. Measured 2026-07-31, no spec in the suite exercised an absent
+  operation `group:` column, so EC-44's contract was asserted by unit tests on each lane
+  separately and by nothing that compared them — the same blind spot that let the original
+  divergence (Java SUCCESS-with-no-findings vs fork `KeyError` ⇒ SKIPPED) live undetected.
+
+  CONTRAST WITH `CORE-000214.yaml`, the same rule with `EPOCH: SCREENING` present on both
+  rows of a single subject. The two must stay in step for subject `001`.
+python_source: rules-sdtmig-3-4.json (CORE-000214)
+rule:
+  coreId: CDISC-CG0538
+datasets:
+  DS:
+    # EPOCH is deliberately absent from every row -- it is the column under test.
+    row_key: [STUDYID, USUBJID, __row_number__]
+    column_types:
+      DSSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: DISPOSITION EVENT, DSSCAT: STUDY PARTICIPATION}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSCAT: DISPOSITION EVENT, DSSCAT: STUDY PARTICIPATION}
+      # Single-record subject: proves the regroup is on USUBJID, not one dataset-wide group.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSCAT: DISPOSITION EVENT, DSSCAT: STUDY PARTICIPATION}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0538
+    dataset: DS
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      $disposition_event_count: '2'
+      DSCAT: DISPOSITION EVENT
+      DSSCAT: STUDY PARTICIPATION
+  - rule_id: CDISC-CG0538
+    dataset: DS
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 1}
+    status: SUCCESS
+    output_variables:
+      $disposition_event_count: '2'
+      DSCAT: DISPOSITION EVENT
+      DSSCAT: STUDY PARTICIPATION
+expected_errors: []

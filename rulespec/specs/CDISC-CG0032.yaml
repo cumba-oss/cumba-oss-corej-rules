@@ -1,0 +1,42 @@
+name: CDISC-CG0032
+kind: rule
+description: |
+  Wave 22 port — AE primary + TV match (VISITNUM) + TV distinct VISITNUM.
+  Fires when AE.VISITDY != TV.VISITDY for the matched VISITNUM.
+python_source: rules-sdtmig-3-4.json (CORE-000249)
+rule:
+  coreId: CDISC-CG0032
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      VISITNUM: LONG
+      VISITDY: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, VISITNUM: 1, VISITDY: 1}    # ok
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, VISITNUM: 1, VISITDY: 99}    # bad
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+      VISITDY: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: Screening, VISITDY: 1, ARMCD: TRT01}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0032
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $tv_visitnum: '[1]'
+      TV.VISITDY: '1'
+      VISITDY: '99'
+      VISITNUM: '1'
+expected_errors: []

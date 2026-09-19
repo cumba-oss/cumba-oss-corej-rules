@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0035 expect=noViolation domain=SV
+# Rule:Description: Raise an error when VISITNUM is present in TV.VISITNUM but VISIT and VISITNUM do not have a one-to-one relationship.
+#note "VISITNUM 1 and 2 are present in TV and each maps to a single consistent VISIT name, so the one-to-one relationship holds and the rule does not fire"
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SVSEQ type=Num label="Sequence Number"
+col VISITNUM type=Num label="Visit Number" format=VISITNUM.
+col VISIT type=Char label="Visit Name" format=$VISIT.
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 1 | SCREENING 1
+CDISCPILOT01 | SV | 01-701-1023 | 1 | 1 | SCREENING 1
+CDISCPILOT01 | SV | 01-701-1023 | 2 | 2 | SCREENING 2
+---
+
+dataset TV label="Trial Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col VISITNUM type=Num label="Visit Number" format=VISITNUM.
+col VISIT type=Char label="Visit Name" format=$VISIT.
+---
+CDISCPILOT01 | TV | 1 | SCREENING 1
+CDISCPILOT01 | TV | 2 | SCREENING 2
+---

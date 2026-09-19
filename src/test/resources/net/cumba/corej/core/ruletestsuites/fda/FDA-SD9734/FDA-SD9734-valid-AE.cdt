@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD9734 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --HLTCD and --HLT do not have a one-to-one relationship.
+#note "Each AEHLT maps to exactly one AEHLTCD and vice versa (clean 1:1)"
+#library standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLT type=Char label="High Level Term"
+col AEHLTCD type=Num label="High Level Term Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HLT_0617 | 10019211
+CDISCPILOT01 | AE | 01-701-1015 | 2 | HLT_0317 | 10019317
+---

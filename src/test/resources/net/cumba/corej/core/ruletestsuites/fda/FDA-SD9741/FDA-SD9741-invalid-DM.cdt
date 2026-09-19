@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD9741 expect=violation domain=DM
+# Rule:Description: Raise an error when Death Flag (DTHFL) in the DM dataset equals 'Y' but no record is present in the DS dataset with DSDECOD equal to 'DEATH' for the corresponding subject.
+#note "DTHFL is 'Y' but no DS record with DSDECOD='DEATH' exists for the subject"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL type=Char label="Subject Death Flag" format=$Y_BLANK.
+---
+CDISCPILOT01 | DM | 01-701-1015 | Y
+CDISCPILOT01 | DM | 01-701-1023 |
+---
+
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term" format=$DISCCD.
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | COMPLETED
+CDISCPILOT01 | DS | 01-701-1015 | 2 | FINAL LAB VISIT
+CDISCPILOT01 | DS | 01-701-1023 | 1 | COMPLETED
+---

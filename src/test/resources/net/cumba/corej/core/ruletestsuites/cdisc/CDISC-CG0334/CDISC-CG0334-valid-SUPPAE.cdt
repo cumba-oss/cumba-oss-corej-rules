@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0334 expect=noViolation domain=SUPPAE
+# Rule:Description: Raise an error when, in a split Supplemental Qualifier (SUPP--) dataset, the value of RDOMAIN does not equal characters 5 and 6 of the dataset name.
+#note "SUPPAE characters 5-6 are AE and RDOMAIN=AE matches, so no violation"
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015
+CDISCPILOT01 | AE | 01-701-1023
+---

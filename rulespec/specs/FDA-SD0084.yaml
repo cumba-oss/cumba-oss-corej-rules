@@ -1,0 +1,30 @@
+name: FDA-SD0084
+kind: rule
+description: |
+  Wave 13 port - AGE negative. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000310)
+rule:
+  coreId: FDA-SD0084
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    column_types:
+      AGE: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', AGE: 35}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', AGE: -1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD0084
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AGE: '-1'
+expected_errors: []

@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0013 expect=violation domain=DM
+#note "R-7 (ruled 2026-08-19): FDA-SD0013's sheet-backed exclusion set excludes CO but not DM (both twin sheets list DM). A sponsor-invented nonstandard DMSTDTC/DMENDTC pair with start after end fires, matching PMDA-SD0013."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+col DMSTDTC type=Char label="Start Date/Time (nonstandard)"
+col DMENDTC type=Char label="End Date/Time (nonstandard)"
+---
+S1 | DM | 001 | 2026-01-10 | 2026-02-01 | 2026-01-20

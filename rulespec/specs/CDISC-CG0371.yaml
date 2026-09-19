@@ -1,0 +1,43 @@
+name: CDISC-CG0371
+kind: rule
+description: |
+  Wave 3 port — Child:true SUPP pre-merge (validation spec for Finding #12b).
+  CORE-000206: For SUPP--/CO/RELREC rows with populated IDVAR + IDVARVAL, the
+  IDVARVAL must match the value of the parent-domain column named by IDVAR.
+
+  Primary SUPPAE. Row 1 has IDVAR=AESEQ, IDVARVAL=1 — AE row 0 has AESEQ=1 → match,
+  no violation. Row 2 has IDVAR=AESEQ, IDVARVAL=99 — no AE row with AESEQ=99 →
+  violation.
+python_source: rules-sdtmig-3-4.json (CORE-000206)
+rule:
+  coreId: CDISC-CG0371
+datasets:
+  SUPPAE:
+    row_key: [STUDYID, RDOMAIN, USUBJID, IDVAR, IDVARVAL, QNAM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '1', QNAM: AESOSP, QLABEL: Other specify, QVAL: Other}
+      - {STUDYID: S1, DOMAIN: SUPPAE, RDOMAIN: AE, USUBJID: '001', IDVAR: AESEQ, IDVARVAL: '99', QNAM: AESOSP, QLABEL: Other specify, QVAL: BadRef}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 2, AETERM: Nausea}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [SUPPAE]
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0371
+    dataset: SUPPAE
+    row_key: {IDVAR: AESEQ, IDVARVAL: '99', QNAM: AESOSP, RDOMAIN: AE, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      IDVAR: AESEQ
+      IDVARVAL: '99'
+      RDOMAIN: AE
+expected_errors: []

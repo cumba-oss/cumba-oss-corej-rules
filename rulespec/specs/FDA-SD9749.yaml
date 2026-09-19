@@ -1,0 +1,40 @@
+name: FDA-SD9749
+kind: rule
+description: |
+  Wave 22 port — Sensitivity=Group. Grouping_Variables=[USUBJID]. Match_Datasets
+  joins DM+AE on USUBJID; re-shaped by FDA run-2 (T10 exact membership): the
+  Operations compute the USUBJID sets of AEOUT=FATAL / AESDTH=Y records
+  ($ae_fatal_usubjid / $ae_sdth_usubjid). Fires when DM.DTHFL=Y but the subject
+  is in neither set. Java-canonically the grouping variable is not decorated
+  into output_variables (python-lane baseline entry).
+python_source: rules-sdtmig-3-4.json (CORE-001078)
+rule:
+  coreId: FDA-SD9749
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEOUT: RECOVERED, AESDTH: N}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: Y}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD9749
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ae_fatal_usubjid: '[]'
+      $ae_sdth_usubjid: '[]'
+      AEOUT: 'RECOVERED'
+      AESDTH: 'N'
+      DM.DTHFL: Y
+expected_errors: []

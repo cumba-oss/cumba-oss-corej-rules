@@ -1,0 +1,39 @@
+name: CDISC-CG0664
+kind: rule
+description: |
+  Variable-Metadata + Operation port. CORE-000852: variables in a general
+  observation class dataset must follow the SDTM Model order (FDA run-2 W10:
+  the operation switched from get_column_order_from_library to
+  `get_model_column_order`, building $model_column_order; the check fires when
+  $column_order_from_dataset is_not_ordered_subset_of the Model order). The
+  AE dataset below lists AETERM (Topic) before USUBJID (Identifier), which is
+  the reverse of the Model order, so the dataset order is not an ordered subset
+  and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000852)
+rule:
+  coreId: CDISC-CG0664
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, AETERM: Headache, USUBJID: '001', AESEQ: 1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0664
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $column_order_from_dataset: '[AESEQ, AETERM, DOMAIN, STUDYID, USUBJID]'
+      $model_column_order: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBEATNO, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
+        AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEPCHGI, AEEVDTYP, AEEVINTX, AEEVLINT, AEGRPID, AEHLGT, AEHLGTCD, AEHLT, AEHLTCD, AELAT, AELLT, AELLTCD, AELNKGRP, AELNKID, AELOC, AEMODIFY, AENOMDY,
+        AENOMLBL, AEOCCUR, AEOUT, AEPARTY, AEPATT, AEPDUR, AEPORTOT, AEPRESP, AEPRTYID, AEPTCD, AEPTFL, AEREASND, AEREASOC, AERECID, AEREFID, AEREL, AERELNST, AERFTDTC, AERLDEV, AERLPRC, AERLPRT, AERPDY,
+        AERPENDY, AERPSTDY, AESCAN, AESCAT, AESCONG, AESDISAB, AESDTH, AESEQ, AESER, AESEV, AESHOSP, AESINTV, AESLIFE, AESMIE, AESOC, AESOCCD, AESOD, AESPID, AESTAT, AESTDTC, AESTDY, AESTINT, AESTRF, AESTRTPT,
+        AESTTPT, AETERM, AETOX, AETOXGR, AETPT, AETPTNUM, AETPTREF, AEUNANT, AEUSCHFL, AEXDY, AEXENDY, AEXSTDY, DOMAIN, EPOCH, FETUSID, FOCID, MIDS, MIDSDTC, NHOID, POOLID, RELMIDS, RPHASE, RPPLDY, RPPLENDY,
+        RPPLSTDY, SPDEVID, STUDYID, TAETORD, USUBJID, VISIT, VISITDY, VISITNUM]'
+expected_errors: []

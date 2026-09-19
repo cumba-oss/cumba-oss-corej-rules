@@ -1,0 +1,44 @@
+#!RuleTest
+#test FDA-SD9747 expect=violation domain=PP
+# Rule:Description: Raise an error when PPCAT and RELREC.PCRFTDTC are populated, PPRFTDTC equals RELREC.PCRFTDTC, and PPCAT does not equal RELREC.PCTEST.
+#note "Two PP rows joined to PC via RELREC: PPSEQ=1 fires (PPCAT=PHARMACOKINETICS != PCTEST=DRUG_X at same timepoint); PPSEQ=2 stays silent (PPCAT=DRUG_X == PCTEST=DRUG_X)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 PPSEQ=1 USUBJID=01-701-1015
+dataset PP label="Pharmacokinetics Parameters"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PPSEQ type=Num label="Sequence Number"
+col PPCAT type=Char label="Parameter Category"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | PHARMACOKINETICS | 2014-01-15
+CDISCPILOT01 | PP | 01-701-1015 | 2 | DRUG_X | 2014-01-16
+---
+
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ type=Num label="Sequence Number"
+col PCTEST type=Char label="Pharmacokinetic Test Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUG_X | 2014-01-15
+CDISCPILOT01 | PC | 01-701-1015 | 2 | DRUG_X | 2014-01-16
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | PP | 01-701-1015 | PPSEQ | 1 | R1
+CDISCPILOT01 | PC | 01-701-1015 | PCSEQ | 1 | R1
+CDISCPILOT01 | PP | 01-701-1015 | PPSEQ | 2 | R2
+CDISCPILOT01 | PC | 01-701-1015 | PCSEQ | 2 | R2
+---

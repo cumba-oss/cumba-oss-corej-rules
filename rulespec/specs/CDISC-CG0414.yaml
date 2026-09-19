@@ -1,0 +1,36 @@
+name: CDISC-CG0414
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary SE checked
+  against distinct(TE.ETCD).
+python_source: rules-sdtmig-3-4.json (CORE-000173)
+rule:
+  coreId: CDISC-CG0414
+datasets:
+  SE:
+    row_key: [STUDYID, USUBJID, SESEQ]
+    column_types:
+      SESEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '001', SESEQ: 1, ETCD: SCRN}
+      - {STUDYID: S1, DOMAIN: SE, USUBJID: '002', SESEQ: 1, ETCD: BOGUS}
+  TE:
+    row_key: [STUDYID, ETCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TE, ETCD: SCRN, ELEMENT: Screening}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [SE]
+    trial design: [TE]
+expected_violations:
+  - rule_id: CDISC-CG0414
+    dataset: SE
+    row_key: {SESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $te_etcd: '[SCRN]'
+      ETCD: BOGUS
+expected_errors: []

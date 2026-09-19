@@ -1,0 +1,37 @@
+name: CDISC-CG0215
+kind: rule
+description: |
+  Record-Data + Operation port. CORE-000333: SV.VISIT must appear in TV.VISIT
+  when SVUPDES is empty. Operation `distinct VISIT` over the TV domain builds
+  $visits_in_tv. Check leaves: VISIT exists AND (SVUPDES empty/not_exists) AND
+  VISIT is_not_contained_by $visits_in_tv. The SV row sets VISIT=WEEK 99 (absent
+  from TV's [SCREENING, WEEK 1]) with empty SVUPDES, so it fires.
+python_source: rules-sdtmig-3-3.json (CORE-000333)
+rule:
+  coreId: CDISC-CG0215
+datasets:
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: SCREENING}
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 2, VISIT: WEEK 1}
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 99, VISIT: WEEK 99, SVUPDES: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+    trial-design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0215
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 99}
+    status: SUCCESS
+    output_variables:
+      $tv_visit: '[SCREENING, WEEK 1]'
+      VISIT: WEEK 99
+expected_errors: []

@@ -1,0 +1,39 @@
+name: CDISC-CG0539
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['record_count']).
+python_source: rules-sdtmig-3-4.json (CORE-000215)
+rule:
+  coreId: CDISC-CG0539
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, __row_number__]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: DISPOSITION EVENT, DSSCAT: STUDY TREATMENT, EPOCH: TREATMENT}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSCAT: DISPOSITION EVENT, DSSCAT: STUDY TREATMENT, EPOCH: TREATMENT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0539
+    dataset: DS
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 0}
+    status: SUCCESS
+    output_variables:
+      $disposition_event_count: '2'
+      DSCAT: DISPOSITION EVENT
+      DSSCAT: STUDY TREATMENT
+      EPOCH: TREATMENT
+  - rule_id: CDISC-CG0539
+    dataset: DS
+    row_key: {STUDYID: S1, USUBJID: '001', __row_number__: 1}
+    status: SUCCESS
+    output_variables:
+      $disposition_event_count: '2'
+      DSCAT: DISPOSITION EVENT
+      DSSCAT: STUDY TREATMENT
+      EPOCH: TREATMENT
+expected_errors: []

@@ -1,0 +1,29 @@
+name: CDISC-CG0050
+kind: rule
+description: |
+  Wave 8 port — --PTCD populated but --DECOD empty. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000267)
+rule:
+  coreId: CDISC-CG0050
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEPTCD: '10001', AEDECOD: HEADACHE}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEPTCD: '10001', AEDECOD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0050
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEDECOD:
+      AEPTCD: '10001'
+expected_errors: []

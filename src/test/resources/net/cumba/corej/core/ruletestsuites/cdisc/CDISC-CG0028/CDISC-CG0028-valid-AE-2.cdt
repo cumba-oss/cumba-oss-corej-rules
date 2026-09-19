@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0028 expect=noViolation domain=AE
+# Rule:Description: Raise an error when Sequence Number (--SEQ), excluding Trial Summary Sequence Number (TSSEQ), is not a unique number per USUBJID per domain, nor a unique number per POOLID per domain, including when the domain is split into multiple files.
+#note "POOLID branch negation: USUBJID empty and AESEQ is a unique number within each POOLID per domain"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID type=Char label="Pool Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE |  | P01 | 1
+CDISCPILOT01 | AE |  | P01 | 2
+---

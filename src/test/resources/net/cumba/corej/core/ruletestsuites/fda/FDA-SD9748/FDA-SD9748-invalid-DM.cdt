@@ -1,0 +1,34 @@
+#!RuleTest
+#test FDA-SD9748 expect=violation domain=DM
+# Rule:Description: Raise an error when the trial is interventional (TS.TSPARMCD equals 'STYPE' and TS.TSVAL equals 'INTERVENTIONAL'), the subject has a record in the EX dataset, and ARMNRS is populated with a value other than 'UNPLANNED TREATMENT'.
+#note "Interventional study; subject 01-701-1015 has an EX record but ARMNRS is populated (no arm)"
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMNRS type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1023 |
+---
+
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | STYPE | INTERVENTIONAL
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | EX | 01-701-1015
+CDISCPILOT01 | EX | 01-701-1023
+---

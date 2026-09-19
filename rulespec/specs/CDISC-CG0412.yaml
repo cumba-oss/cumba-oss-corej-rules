@@ -1,0 +1,35 @@
+name: CDISC-CG0412
+kind: rule
+description: |
+  Record-Data + Operation. CORE-000515: DM subject with ACTARMCD not in the reserved
+  set (SCRNFAIL/NOTASSGN/NOTTRT) but with no record in DS. Operation `distinct USUBJID`
+  over DS builds $ds_usubjid = [002]; DM subject 001 has ACTARMCD=ARM1 and is absent
+  from DS, so both leaves hold and the rule fires.
+python_source: rules-sdtmig-3-2.json (CORE-000515)
+rule:
+  coreId: CDISC-CG0412
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMCD: ARM1, ACTARMCD: ARM1}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSTERM: COMPLETED, DSDECOD: COMPLETED}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    events: [DS]
+expected_violations:
+  - rule_id: CDISC-CG0412
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $ds_usubjid: '[002]'
+      ACTARMCD: ARM1
+expected_errors: []

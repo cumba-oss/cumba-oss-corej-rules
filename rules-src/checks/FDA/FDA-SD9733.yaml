@@ -1,0 +1,56 @@
+Core:
+  Id: "FDA-SD9733"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --HLGTCD and --HLGT do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--HLGT"
+    - "--HLGTCD"
+Check:
+  expression: >-
+    not is_unique_relationship(--HLGT, --HLGTCD)
+Outcome:
+  Message: "--HLGTCD and --HLGT do not have a one-to-one relationship."
+  Output_Variables:
+  - "--HLGT"
+  - "--HLGTCD"
+Source_Proposed:
+  Sheet_Issue: "#255"
+  FDA_Validator_Rule_Message: "--HLGTCD and --HLGT do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of High Level Group Term Code (--HLGTCD)\
+    \ and High Level Group Term (--HLGT) must have a one-to-one relationship."
+  Domains: "EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

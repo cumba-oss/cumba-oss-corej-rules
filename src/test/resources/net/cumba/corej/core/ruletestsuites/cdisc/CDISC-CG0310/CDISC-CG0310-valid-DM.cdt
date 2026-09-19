@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0310 expect=noViolation domain=DM
+# Rule:Description: Raise an error when a variable name is longer than 8 characters.
+#note "all variable names <= 8 chars -> no violation"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

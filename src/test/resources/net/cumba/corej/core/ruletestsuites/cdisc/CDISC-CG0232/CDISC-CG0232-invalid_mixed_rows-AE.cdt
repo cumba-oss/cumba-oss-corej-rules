@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0232 expect=violation domain=AE
+# Rule:Description: Raise an error when the start reference time point (--STTPT) is a complete date equal to the date/time of collection (--DTC) but the start relative to reference time point (--STRTPT) is not one of 'BEFORE', 'COINCIDENT', or 'UNKNOWN'.
+#note "Row 1 fires (AESTTPT==AEDTC and AESTRTPT=AFTER); row 2 is silent (AESTRTPT=COINCIDENT, an allowed value)"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AESTTPT type=Char label="Start Reference Time Point"
+col AESTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-15 | 2014-01-15 | AFTER
+CDISCPILOT01 | AE | 01-701-1023 | 2 | 2014-01-15 | 2014-01-15 | COINCIDENT
+---

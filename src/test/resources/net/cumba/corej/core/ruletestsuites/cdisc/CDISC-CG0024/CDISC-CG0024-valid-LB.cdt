@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0024 expect=noViolation domain=LB
+# Rule:Description: Raise an error when Link ID (--LNKID) is present in a domain but is not present in any other domain.
+#note "--LNKID carried by both LB and AE -> present in two domains -> no violation"
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBLNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | LNK1
+CDISCPILOT01 | LB | 01-701-1015 | 2 |
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | LNK1
+CDISCPILOT01 | AE | 01-701-1015 | 2 |
+---

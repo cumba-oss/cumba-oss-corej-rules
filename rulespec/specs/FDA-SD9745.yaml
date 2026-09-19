@@ -1,0 +1,42 @@
+name: FDA-SD9745
+kind: rule
+description: |
+  Wave 21 port — DM primary + TS match + EX distinct. Fires on branch 1 (ARMNRS
+  empty) OR branch 2 (ARMNRS=UNPLANNED TREATMENT), both requiring subject not
+  in EX.USUBJID.
+python_source: rules-sdtmig-3-4.json (CORE-000885)
+rule:
+  coreId: FDA-SD9745
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', ARMNRS: ''}    # ok (in EX)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', ARMNRS: ''}    # bad (branch 1)
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: STYPE, TSVAL: INTERVENTIONAL}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    trial design: [TS]
+    interventions: [EX]
+expected_violations:
+  - rule_id: FDA-SD9745
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $usubjids_in_ex: '[001]'
+      ARMNRS:
+      TS.TSPARMCD: STYPE
+      TS.TSVAL: INTERVENTIONAL
+expected_errors: []

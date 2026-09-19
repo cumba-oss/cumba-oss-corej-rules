@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0501 expect=noViolation domain=DM
+# Rule:Description: Raise an error when the Disease Milestone Instance Name (MIDS) variable is present in a dataset but the Trial Disease Milestones (TM) dataset is not present in the study.
+#note "MIDS variable is present but a TM dataset also exists -> not ds_exists(TM) false -> no violation"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MIDS type=Char label="Milestone Instance Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015 |
+CDISCPILOT01 | DM | 01-701-1023 |
+---
+
+dataset TM label="Trial Disease Milestones"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col MIDS type=Char label="Milestone Instance Identifier"
+---
+CDISCPILOT01 | TM | MILESTONE1
+---

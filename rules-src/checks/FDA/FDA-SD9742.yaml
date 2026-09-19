@@ -1,0 +1,63 @@
+Core:
+  Id: "FDA-SD9742"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a CE record has CETERM or CEDECOD equal to DEATH\
+  \ but DTHFL in DM for the corresponding subject is not Y."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "DTHFL"
+Match_Datasets:
+- Keys:
+  - "USUBJID"
+  Name: "CE"
+Check:
+  expression: >-
+    (CE.CETERM == "DEATH" or CE.CEDECOD == "DEATH") and DTHFL != "Y"
+Outcome:
+  Message: "CETERM or CEDECOD is 'DEATH' in CE dataset, but DTHFL in DM dataset is\
+    \ not \"Y\"."
+  Output_Variables:
+  - "CE.CETERM"
+  - "CE.CEDECOD"
+  - "DTHFL"
+Source_Proposed:
+  Sheet_Issue: "#264"
+  FDA_Validator_Rule_Message: "DTHFL is not 'Y' although a CE record reports death"
+  FDA_Validator_Rule_Description: "When a Clinical Events (CE) record carries Reported\
+    \ Term for the Clinical Event (CETERM) or Dictionary-Derived Term (CEDECOD) equal\
+    \ to 'DEATH', the Subject Death Flag (DTHFL) in DM must be 'Y' for that subject."
+  Domains: "DM"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB006"
+        Version: "1"
+      Version: "1.5"

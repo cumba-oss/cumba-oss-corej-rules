@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0140 expect=noViolation domain=SUPPDM
+# Rule:Description: Raise an error when multiple races are captured in SUPPDM (QNAM values beginning with 'RACE') but RACE in the DM dataset does not equal 'MULTIPLE'.
+#note "suffix(QNAM,1) regex false: QNAM=RACE_ ends in an underscore (not [A-Z0-9]), so the suffix-1 conjunct is false and the rule is silent even though DM.RACE=WHITE != MULTIPLE"
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM type=Char label="Qualifier Variable Name"
+---
+CDISCPILOT01 | 01-701-1015 | RACE_
+CDISCPILOT01 | 01-701-1015 | SAFETY
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE type=Char label=Race
+---
+CDISCPILOT01 | DM | 01-701-1015 | WHITE
+---

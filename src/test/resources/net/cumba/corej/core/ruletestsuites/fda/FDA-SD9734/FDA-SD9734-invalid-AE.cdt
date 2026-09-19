@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9734 expect=violation domain=AE
+# Rule:Description: Raise an error when --HLTCD and --HLT do not have a one-to-one relationship.
+#note "Two distinct AEHLT values share the same AEHLTCD 10019211"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLT type=Char label="High Level Term"
+col AEHLTCD type=Num label="High Level Term Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HLT_0617 | 10019211
+CDISCPILOT01 | AE | 01-701-1015 | 2 | HLT_0317 | 10019211
+---

@@ -1,0 +1,41 @@
+name: CDISC-CG0132
+kind: rule
+description: |
+  Wave 3 port — reverse cross-dataset direction.
+  CORE-000008: When SS.SSSTRESC='DEAD' for a subject, DM.DTHFL must be 'Y'. The primary
+  domain is DM; Match_Datasets pulls SS rows in on USUBJID. Demonstrates the DM-as-primary
+  join to a records-per-subject target.
+python_source: rules-sdtmig-3-4.json (CORE-000008)
+rule:
+  coreId: CDISC-CG0132
+datasets:
+  DM:
+    rows:
+      # Subject 001 — SS says DEAD, DTHFL is Y        → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: Y}
+      # Subject 002 — SS says DEAD, DTHFL blank       → violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: ''}
+      # Subject 003 — SS says ALIVE                   → no violation regardless
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHFL: ''}
+  SS:
+    row_key: [STUDYID, USUBJID, SSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '001', SSSEQ: 1, SSSTRESC: DEAD}
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '002', SSSEQ: 1, SSSTRESC: DEAD}
+      - {STUDYID: S1, DOMAIN: SS, USUBJID: '003', SSSEQ: 1, SSSTRESC: ALIVE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    findings: [SS]
+expected_violations:
+  - rule_id: CDISC-CG0132
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DTHFL:
+      SS.SSSTRESC: DEAD
+expected_errors: []

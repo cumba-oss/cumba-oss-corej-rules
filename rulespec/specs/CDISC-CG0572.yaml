@@ -1,0 +1,39 @@
+name: CDISC-CG0572
+kind: rule
+description: |
+  Wave 16 port - Fix17 leftover edge case. VISITNUM absent + --TPTREF present → --TPT inconsistent across (--TPTREF, --TPTNUM).
+python_source: rules-sdtmig-3-4.json (CORE-000686)
+rule:
+  coreId: CDISC-CG0572
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AETPTNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETPTREF: SCREENING, AETPTNUM: 1, AETPT: HOUR 1}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AETPTREF: SCREENING, AETPTNUM: 1, AETPT: HOUR 2}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0572
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AETPT: HOUR 1
+      AETPTNUM: '1'
+      AETPTREF: SCREENING
+  - rule_id: CDISC-CG0572
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AETPT: HOUR 2
+      AETPTNUM: '1'
+      AETPTREF: SCREENING
+expected_errors: []

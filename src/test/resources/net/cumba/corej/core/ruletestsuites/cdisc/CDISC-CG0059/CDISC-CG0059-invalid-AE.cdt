@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0059 expect=violation domain=AE
+# Rule:Description: Raise an error when Start Reference Time Point (--STTPT) is populated but Start Relative to Reference Time Point (--STRTPT) is not populated.
+#note "AESEQ=1 has AESTTPT populated but AESTRTPT empty"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AESTTPT type=Char label="Start Reference Time Point"
+col AESTRTPT type=Char label="Start Relative to Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | VISIT 1 | 
+CDISCPILOT01 | AE | 01-701-1015 | 2 |  | 
+---

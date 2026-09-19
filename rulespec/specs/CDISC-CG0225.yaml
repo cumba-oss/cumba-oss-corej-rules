@@ -1,0 +1,40 @@
+name: CDISC-CG0225
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary AE checked
+  against distinct(TV.VISITNUM).
+python_source: rules-sdtmig-3-4.json (CORE-000140)
+rule:
+  coreId: CDISC-CG0225
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      VISITNUM: LONG
+      VISITDY: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, VISITNUM: 1, VISITDY: 1}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, VISITNUM: 99, VISITDY: 5}
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    column_types:
+      VISITNUM: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: Screening, ARMCD: TRT01}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    trial design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0225
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $tv_visitnum: '[1]'
+      VISITDY: '5'
+      VISITNUM: '99'
+expected_errors: []

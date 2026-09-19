@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9737 expect=violation domain=CM
+# Rule:Description: Raise an error when --CLASCD and --CLAS do not have a one-to-one relationship.
+#note "One CMCLAS value (NERVOUS SYSTEM) maps to two distinct CMCLASCD codes -> not one-to-one -> violation"
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 CMSEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 CMSEQ=2 USUBJID=01-701-1015
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num label="Sequence Number"
+col CMCLAS type=Char label="Medication Class"
+col CMCLASCD type=Char label="Medication Class Code"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | NERVOUS SYSTEM | CD1
+CDISCPILOT01 | CM | 01-701-1015 | 2 | NERVOUS SYSTEM | CD2
+---

@@ -1,0 +1,33 @@
+name: FDA-SD0002
+kind: rule
+description: |
+  Value Check with Dataset Metadata. CORE-000356: a Required variable must not be
+  empty for any record. The `required_variables` Operation builds $required_variables
+  (variables tagged Req in the library); the Check fires per-record when a variable
+  in that set has an empty value. The AE row below leaves AETERM (Required) empty,
+  so the record fires.
+python_source: rules-sdtmig-3-4.json (CORE-000356)
+rule:
+  coreId: FDA-SD0002
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+  required_variables:
+    AE: [STUDYID, DOMAIN, USUBJID, AESEQ, AETERM]
+expected_violations:
+  - rule_id: FDA-SD0002
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      variable_name: AETERM
+      variable_value:
+expected_errors: []

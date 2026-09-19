@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0309 expect=skipped domain=APTOOLONG
+#note "⚠⚠ THIS SCENARIO RECORDS A LOSS OF COVERAGE, not a passing rule. CDISC-CG0309 asserts that an Associated Persons DOMAIN value is exactly four characters — yet the rule is scoped `Domains.Include: [AP--]`, and `AP--` is strict: AP plus exactly two characters. Once the SUPP/AP family wildcard was deleted (2026-08-07), a dataset whose AP DOMAIN is NOT four characters is out of the rule's scope BY CONSTRUCTION — the very malformation the rule exists to detect now puts the dataset beyond its reach. It was previously caught only because the family wildcard matched any name starting with `AP`, at any length. What still works is the case where the dataset NAME is four characters and the DOMAIN value disagrees: CDISC-CG0309-invalid-APMH.cdt (name APMH, DOMAIN=MH) covers that and stays green. `expect=skipped` is the honest declaration of what the engine now does; it is NOT an endorsement. Escalated with the wave-9 corpus lane. AP-- DOMAIN value APTOOLONG has length 9 (!= 4) -> violation. Sensitivity: Dataset -> one dataset-level finding, not one per row."
+# Rule:Description: Raise an error when the DOMAIN value length of an Associated Persons (AP--) dataset is not equal to 4 characters.
+dataset APTOOLONG label="Associated Persons split dataset with an over-long name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | APTOOLONG | 01-701-1015
+CDISCPILOT01 | APTOOLONG | 01-701-1023
+---

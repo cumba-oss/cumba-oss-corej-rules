@@ -1,0 +1,36 @@
+name: CDISC-CG0134
+kind: rule
+description: |
+  Wave 7 port — DM cross-dataset to AE. When AE.AEOUT='FATAL' for a subject, DM.DTHFL
+  must be 'Y'. Counterpart to CORE-000252 (DEATH in DS).
+python_source: rules-sdtmig-3-4.json (CORE-000254)
+rule:
+  coreId: CDISC-CG0134
+datasets:
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: Y}         # ok (AE FATAL + DTHFL=Y)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: ''}        # bad (AE FATAL + DTHFL blank)
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHFL: ''}        # ok (no AE FATAL)
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEOUT: FATAL}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEOUT: FATAL}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEOUT: RECOVERED}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0134
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AE.AEOUT: FATAL
+      DTHFL:
+expected_errors: []

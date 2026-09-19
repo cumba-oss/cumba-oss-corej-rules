@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0017 expect=violation domain=TOOLONG
+# Rule:Description: Raise an error when a split dataset (excluding Supplemental Qualifier, Related Records, and Associated Persons datasets) has a name whose length is not 3 or 4 characters.
+#note "Split dataset TOOLONG (DOMAIN=TO, so a genuine split) has a 7-character name (longer_than 4) -> violation"
+#expectViolationCount 1
+dataset TOOLONG label="Split dataset with an over-long name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | TO | 01-701-1015
+CDISCPILOT01 | TO | 01-701-1023
+---

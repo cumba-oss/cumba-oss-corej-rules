@@ -1,0 +1,31 @@
+name: CDISC-CG0329
+kind: rule
+description: |
+  Wave 2 port — any-of presence shape.
+  CORE-000027: Either TEDUR or TEENRL must be present for each TE record. Fires when
+  both are empty/missing.
+python_source: rules-sdtmig-3-4.json (CORE-000027)
+rule:
+  coreId: CDISC-CG0329
+datasets:
+  TE:
+    row_key: [STUDYID, ETCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TE, ETCD: SCRN, TEDUR: P14D, TEENRL: ''}             # ok (TEDUR present)
+      - {STUDYID: S1, DOMAIN: TE, ETCD: TRT, TEDUR: '', TEENRL: ENROL}             # ok (TEENRL present)
+      - {STUDYID: S1, DOMAIN: TE, ETCD: FU, TEDUR: '', TEENRL: ''}                 # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TE]
+expected_violations:
+  - rule_id: CDISC-CG0329
+    dataset: TE
+    row_key: {ETCD: FU, STUDYID: S1}
+    status: SUCCESS
+    output_variables:
+      TEDUR:
+      TEENRL:
+expected_errors: []

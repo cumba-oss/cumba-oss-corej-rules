@@ -1,0 +1,57 @@
+Core:
+  Id: "FDA-SD9736"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when OIPARMCD and OIPARM do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "OI"
+Requirements:
+  Variables:
+    All:
+    - "OIPARM"
+    - "OIPARMCD"
+Check:
+  expression: >-
+    not is_unique_relationship(OIPARM, OIPARMCD)
+Outcome:
+  Message: "OIPARMCD and OIPARM do not have a one-to-one relationship."
+  Output_Variables:
+  - "OIPARMCD"
+  - "OIPARM"
+Source_Proposed:
+  Sheet_Issue: "#258"
+  FDA_Validator_Rule_Message: "OIPARMCD and OIPARM do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of Object Identification Short Name\
+    \ of Parameter (OIPARMCD) and Object Identification Parameter (OIPARM) must have\
+    \ a one-to-one relationship."
+  Domains: "OI"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

@@ -1,0 +1,29 @@
+name: CDISC-CG0388
+kind: rule
+description: |
+  Wave 7 port — AESCAN must be Y or N when populated. Same pattern as CORE-000127/128.
+python_source: rules-sdtmig-3-4.json (CORE-000123)
+rule:
+  coreId: CDISC-CG0388
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESCAN: Y}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESCAN: N}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AESCAN: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '004', AESEQ: 1, AESCAN: Z}        # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0388
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '004'}
+    status: SUCCESS
+    output_variables:
+      AESCAN: Z
+expected_errors: []

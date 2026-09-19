@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-CG0174 expect=noViolation domain=FA
+# Rule:Description: Raise an error when a related record is present in the parent domain dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent record.
+#note "DATASET 1-to-many join: FAOBJ equals AETERM of every related AE record"
+dataset FA label="Findings About"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Char label="Sequence Number"
+col FAOBJ type=Char label="Object of the Observation"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | HEADACHE
+CDISCPILOT01 | AE | 01-701-1015 | 2 | HEADACHE | HEADACHE
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015 | USUBJID |  | R1
+CDISCPILOT01 | FA | 01-701-1015 | USUBJID |  | R1
+---

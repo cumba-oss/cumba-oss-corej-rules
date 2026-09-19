@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0309 expect=noViolation domain=APAE
+#note "EMPTY-DATASET PIN (PLAN-zero-row-routing-rekey.md, owner ruling 6c-1, Fix #349 / EC-89). APAE is DECLARED with its columns (DOMAIN present) and carries ZERO rows. Before the fix this rule fired spuriously here: the engine substituted a synthetic 1-row ZERO-COLUMN table for a non-row-based rule on an empty dataset, DOMAIN folded absent on it (EC-43 / R14) and len(DOMAIN) != 4 was true with nothing real behind it. The synthetic table is retired: a rule that must read a row to decide has nothing to check on an empty dataset and returns EXECUTED with zero findings (ruling Q5: never SKIPPED). The empty dataset itself is reported once, by the package's own no-records rule (CDISC-CG0408), not here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset APAE label="Associated Persons Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col APID     type=Char label="Associated Persons Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+---

@@ -1,0 +1,29 @@
+name: CDISC-CG0549
+kind: rule
+description: |
+  Wave 8 port — --STREFC empty when --ORREF populated or --DRVFL = Y. Fix #17 resolves `--`-prefixed
+  Output_Variables against the primary domain prefix.
+python_source: rules-sdtmig-3-4.json (CORE-000110)
+rule:
+  coreId: CDISC-CG0549
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBORREF: 5-10, LBDRVFL: '', LBSTREFC: 5-10}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBORREF: 5-10, LBDRVFL: '', LBSTREFC: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0549
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      LBDRVFL:
+      LBORREF: 5-10
+expected_errors: []

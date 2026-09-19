@@ -1,0 +1,34 @@
+name: FDA-SD1330
+kind: rule
+description: |
+  Wave 10 port - --DY greater than --ENDY (collection after end day). Exercises the broader Fix #17
+  bucket: Check leaves with column-as-reference values, exists/not_exists
+  column-presence safeguards, or Domains.Exclude scope shapes not covered
+  by Waves 8-9.
+python_source: rules-sdtmig-3-4.json (CORE-000707)
+rule:
+  coreId: FDA-SD1330
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    column_types:
+      LBDY: LONG
+      LBENDY: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBDY: 5, LBENDY: 10}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBDY: 15, LBENDY: 10}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: FDA-SD1330
+    dataset: LB
+    row_key: {STUDYID: S1, USUBJID: '002', LBSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      LBDY: '15'
+      LBENDY: '10'
+expected_errors: []

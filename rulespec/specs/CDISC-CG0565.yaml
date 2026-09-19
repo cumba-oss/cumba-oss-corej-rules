@@ -1,0 +1,27 @@
+name: CDISC-CG0565
+kind: rule
+description: |
+  Record-Data port. CORE-000112: --CONC must not be present in a Findings dataset
+  other than MS. Single leaf: --CONC exists. The LB row includes LBCONC so it fires.
+python_source: rules-sdtmig-3-4.json (CORE-000112)
+rule:
+  coreId: CDISC-CG0565
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBCONC: '5'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+expected_violations:
+  - rule_id: CDISC-CG0565
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      LBCONC: '5'
+expected_errors: []

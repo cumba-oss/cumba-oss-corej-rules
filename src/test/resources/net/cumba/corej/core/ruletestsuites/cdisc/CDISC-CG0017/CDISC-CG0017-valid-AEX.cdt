@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0017 expect=noViolation domain=AEX
+# Rule:Description: Raise an error when a split dataset (excluding Supplemental Qualifier, Related Records, and Associated Persons datasets) has a name whose length is not 3 or 4 characters.
+#note "Split dataset name AEX is 3 characters (within 3-4) -> no violation"
+dataset AEX label="Adverse Events (split)"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015
+CDISCPILOT01 | AE | 01-701-1023
+---

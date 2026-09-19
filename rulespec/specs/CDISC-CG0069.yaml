@@ -1,0 +1,35 @@
+name: CDISC-CG0069
+kind: rule
+description: |
+  Wave 17 port - non-wildcard Match_Datasets rule.
+python_source: rules-sdtmig-3-4.json (CORE-000034)
+rule:
+  coreId: CDISC-CG0069
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: '2026-01-15'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: DEATH, DSSTDTC: '2026-02-01'}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHDTC: '2026-01-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHDTC: '2026-01-15'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0069
+    dataset: DS
+    row_key: {DSSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      DM.DTHDTC: '2026-01-15'
+      DSDECOD: DEATH
+      DSSTDTC: '2026-02-01'
+expected_errors: []

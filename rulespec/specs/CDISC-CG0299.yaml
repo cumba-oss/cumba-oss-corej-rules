@@ -1,0 +1,27 @@
+name: CDISC-CG0299
+kind: rule
+description: |
+  Record-Data plain `exists`. TRLOC must not be present in the TR dataset.
+  The TR row carries a TRLOC column, so the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000003)
+rule:
+  coreId: CDISC-CG0299
+datasets:
+  TR:
+    row_key: [STUDYID, USUBJID, TRSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TR, USUBJID: '001', TRSEQ: 1, TRLOC: ARM}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [TR]
+expected_violations:
+  - rule_id: CDISC-CG0299
+    dataset: TR
+    row_key: {STUDYID: S1, TRSEQ: 1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      TRLOC: ARM
+expected_errors: []

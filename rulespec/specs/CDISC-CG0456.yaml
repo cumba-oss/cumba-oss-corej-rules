@@ -1,0 +1,28 @@
+name: CDISC-CG0456
+kind: rule
+description: |
+  Record-Data. CORE-000339: in TS, when TSPARMCD='FCNTRY' the TSVCDREF must equal
+  'ISO 3166-1 alpha-3'. The TS row sets TSPARMCD=FCNTRY and a bad TSVCDREF so it fires.
+python_source: rules-sdtmig-3-3.json (CORE-000339)
+rule:
+  coreId: CDISC-CG0456
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD, TSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: FCNTRY, TSVAL: USA, TSVCDREF: BOGUS}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0456
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: FCNTRY, TSSEQ: 1}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: FCNTRY
+      TSVCDREF: BOGUS
+expected_errors: []

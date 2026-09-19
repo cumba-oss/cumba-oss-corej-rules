@@ -1,0 +1,28 @@
+name: CDISC-CG0364
+kind: rule
+description: |
+  Wave 15 port - non-wildcard plain Record-Data rule. (CORE-000232)
+python_source: rules-sdtmig-3-4.json (CORE-000232)
+rule:
+  coreId: CDISC-CG0364
+datasets:
+  RELSUB:
+    row_key: [STUDYID, USUBJID, RSUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: RELSUB, USUBJID: '001', POOLID: P1, RSUBJID: '002'}
+      - {STUDYID: S1, DOMAIN: RELSUB, USUBJID: '002', POOLID: P1, RSUBJID: P1}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    relationship: [RELSUB]
+expected_violations:
+  - rule_id: CDISC-CG0364
+    dataset: RELSUB
+    row_key: {RSUBJID: P1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      POOLID: P1
+      RSUBJID: P1
+expected_errors: []

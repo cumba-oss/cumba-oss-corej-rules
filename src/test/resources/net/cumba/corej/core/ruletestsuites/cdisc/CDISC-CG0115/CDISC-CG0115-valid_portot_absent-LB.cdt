@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0115 expect=noViolation domain=LB
+# Rule:Description: Raise an error when --LOC is not present but --PORTOT is present.
+#note "LBLOC is absent (not_exists true) but LBPORTOT is also absent, so the exists(--PORTOT) conjunct is false and the rule does not fire"
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1
+CDISCPILOT01 | LB | 01-701-1015 | 2
+---

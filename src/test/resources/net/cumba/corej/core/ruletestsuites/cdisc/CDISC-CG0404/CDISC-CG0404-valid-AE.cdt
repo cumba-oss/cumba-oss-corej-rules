@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0404 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --PRESP is equal to 'Y' and --OCCUR is empty and --STAT is not present in dataset.
+#note "AEPRESP=Y with empty AEOCCUR, but AESTAT is present so the rule does not fire"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEPRESP type=Char label="Pre-Specified"
+col AEOCCUR type=Char label="Occurrence"
+col AESTAT type=Char label="Completion Status"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Y |  | NOT DONE
+CDISCPILOT01 | AE | 01-701-1023 | 1 |  | Y |
+---

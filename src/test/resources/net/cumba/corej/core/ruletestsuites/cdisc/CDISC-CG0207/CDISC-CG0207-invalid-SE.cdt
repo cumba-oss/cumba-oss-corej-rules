@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0207 expect=violation domain=SE
+# Rule:Description: Raise an error when End Date/Time of Element (SEENDTC) is not equal to the Start Date/Time of Element (SESTDTC) of the next Element within the subject.
+#note "ordered by SESEQ, element 1's SEENDTC does not match element 2's SESTDTC (gap)"
+#expectViolationCount 1
+#expectViolationAt row=1 SESEQ=1 USUBJID=01-701-1015
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-02
+CDISCPILOT01 | SE | 01-701-1015 | 2 | 2014-01-05 | 2014-07-02
+---

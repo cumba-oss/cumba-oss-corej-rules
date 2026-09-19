@@ -1,0 +1,38 @@
+name: CDISC-CG0107
+kind: rule
+description: |
+  Wave 20 port — `variable_exists` Operation + Domain Presence Check. Fires
+  when EX has EXVAMTU column AND EC dataset also exists.
+python_source: rules-sdtmig-3-4.json (CORE-000292)
+rule:
+  coreId: CDISC-CG0107
+datasets:
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXVAMTU: mL}
+  EC:
+    row_key: [STUDYID, USUBJID, ECSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: EC, USUBJID: '001', ECSEQ: 1, ECTRT: DRUG}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EX, EC]
+expected_violations:
+  - rule_id: CDISC-CG0107
+    dataset: EX
+    row_key: {EXSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    # Wave 20 (PLAN-retired-operators-as-operations.md Phase 4): the retained
+    # `variable_exists` operation restores the AUTHORED `$EXVAMTU_EXISTS`, and because that
+    # operation is `local` (its `domain: EX` matches the rule's Scope)
+    # OutputVariableDeriver.contributeOperations also contributes the DERIVED bare `EXVAMTU`
+    # — the Check only contributes the dotted `EX.EXVAMTU`. Both halves are required; this is
+    # the one rule of the ten where the derived half differs.
+    output_variables:
+      $exvamtu_exists: 'true'
+      EXVAMTU: 'mL'
+expected_errors: []

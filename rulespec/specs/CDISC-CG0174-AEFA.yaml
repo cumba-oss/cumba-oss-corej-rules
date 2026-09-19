@@ -1,0 +1,69 @@
+name: CDISC-CG0174-AEFA
+kind: rule
+description: |
+  RELREC dataset-level join on real CDISCPILOT01 data (FA <-> AE via AELNKID/FALNKGRP,
+  blank IDVARVAL, RELTYPE populated). Bundled rule CORE-000744, primary = FA: for each FA
+  finding-about record, FAOBJ must equal the parent AE's --TERM / --TRT / --DECOD.
+
+  Exercises the new forward-RELREC row-expansion engine's DATASET-LEVEL branch (join on the
+  IDVAR column VALUE, not IDVARVAL). Each FA record links to its one parent AE record
+  (FALNKGRP == AELNKID). Data is a shortened slice of testdata/study3/sdtm (subject CDISC001,
+  RELID AEFA). RELTYPE is present but unused by both engines.
+python_source: rules-sdtmig-3-4.json (CORE-000744) on CDISCPILOT01 RELREC AEFA
+rule:
+  coreId: CDISC-CG0174
+datasets:
+  FA:
+    row_key: [STUDYID, USUBJID, FASEQ]
+    column_types:
+      FASEQ: LONG
+    rows:
+      - {STUDYID: CDISCPILOT01, DOMAIN: FA, USUBJID: CDISC001, FASEQ: 1, FALNKGRP: '1', FATESTCD: OCCUR, FAOBJ: ERYTHEMA, FAORRES: Y}
+      - {STUDYID: CDISCPILOT01, DOMAIN: FA, USUBJID: CDISC001, FASEQ: 2, FALNKGRP: '1', FATESTCD: SEV, FAOBJ: ERYTHEMA, FAORRES: MODERATE}
+      - {STUDYID: CDISCPILOT01, DOMAIN: FA, USUBJID: CDISC001, FASEQ: 3, FALNKGRP: '1', FATESTCD: OCCUR, FAOBJ: PAIN, FAORRES: N}
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: CDISCPILOT01, DOMAIN: AE, USUBJID: CDISC001, AESEQ: 1, AELNKID: '1', AETERM: INJECTION SITE REACTION, AEDECOD: ''}
+      - {STUDYID: CDISCPILOT01, DOMAIN: AE, USUBJID: CDISC001, AESEQ: 2, AELNKID: '2', AETERM: FATIGUE, AEDECOD: ''}
+  RELREC:
+    row_key: [__row_number__]
+    rows:
+      - {STUDYID: CDISCPILOT01, RDOMAIN: AE, USUBJID: '', IDVAR: AELNKID, IDVARVAL: '', RELTYPE: ONE, RELID: AEFA}
+      - {STUDYID: CDISCPILOT01, RDOMAIN: FA, USUBJID: '', IDVAR: FALNKGRP, IDVARVAL: '', RELTYPE: MANY, RELID: AEFA}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings about: [FA]
+    events: [AE]
+    relationship: [RELREC]
+expected_violations:
+  - rule_id: CDISC-CG0174
+    dataset: FA
+    row_key: {FASEQ: 1, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
+    status: SUCCESS
+    output_variables:
+      FAOBJ: ERYTHEMA
+      RELREC.**DECOD:
+      RELREC.**TERM: INJECTION SITE REACTION
+  - rule_id: CDISC-CG0174
+    dataset: FA
+    row_key: {FASEQ: 2, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
+    status: SUCCESS
+    output_variables:
+      FAOBJ: ERYTHEMA
+      RELREC.**DECOD:
+      RELREC.**TERM: INJECTION SITE REACTION
+  - rule_id: CDISC-CG0174
+    dataset: FA
+    row_key: {FASEQ: 3, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
+    status: SUCCESS
+    output_variables:
+      FAOBJ: PAIN
+      RELREC.**DECOD:
+      RELREC.**TERM: INJECTION SITE REACTION
+expected_errors: []

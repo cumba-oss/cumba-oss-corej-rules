@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0467 expect=noViolation domain=SUPPLB
+# Rule:Description: Raise an error when --STDTC is present in a Findings general observation class dataset, where its use is not recommended.
+#note "EC-36 SUPP pin, negative twin: a conformant SUPPLB carries only the supplemental-qualifier columns, so the bare STDTC that --STDTC now resolves to is absent and the rule stays quiet. Guards the empty prefix against over-firing."
+dataset SUPPLB label="Supplemental Qualifiers for LB"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM type=Char label="Qualifier Variable Name"
+col QVAL type=Char label="Data Value"
+---
+CDISCPILOT01 | LB | 01-701-1015 | LBSEQ | 1 | LBREASND | Not done
+---

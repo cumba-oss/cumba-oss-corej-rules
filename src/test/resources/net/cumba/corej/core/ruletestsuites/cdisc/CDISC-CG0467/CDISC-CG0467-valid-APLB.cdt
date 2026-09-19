@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0467 expect=noViolation domain=APLB
+# Rule:Description: Raise an error when --STDTC is present in a Findings general observation class dataset, where its use is not recommended.
+#note "EC-36 AP guard (NOT a pre-change pin): --STDTC now resolves to LBSTDTC, which is absent here, so the rule must stay quiet even though the look-alike APLBSTDTC is present. This guards against over-firing. It does NOT fail against the pre-EC-36 engine: that engine gated substitution on a 2-character prefix, so on APLB it left --STDTC unresolved and also reported nothing. Measured, not assumed."
+dataset APLB label="Associated Persons Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col APID type=Char label="Associated Persons Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col APLBSTDTC type=Char label="Start Date/Time of Observation (pre-EC-36 mis-resolved name)"
+---
+CDISCPILOT01 | APLB | AP-701-1015 | 1 | 2014-01-03
+---

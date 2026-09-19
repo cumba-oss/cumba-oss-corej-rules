@@ -1,0 +1,32 @@
+name: CDISC-CG0017
+kind: rule
+description: |
+  Wave 18 port - Dataset-sensitivity rule. The rule's own Description says
+  "Split datasets (excluding supplemental qualifiers) is expected to have a
+  length of 3 or 4 characters", and its scope (`Exclude: [SUPP--, AP--]` +
+  `include_split_datasets: true` with no Include list) restricts evaluation
+  to split datasets only. Fixture uses AESEX1 — a 6-char digit-suffix split
+  whose unsplit base is AE — so both lanes recognise it as in-scope and
+  the `longer_than 4` check fires once.
+python_source: rules-sdtmig-3-4.json (CORE-000510)
+rule:
+  coreId: CDISC-CG0017
+datasets:
+  AESEX1:
+    row_key: [STUDYID, USUBJID]
+    rows:
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '001'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AESEX1]
+expected_violations:
+- rule_id: CDISC-CG0017
+  dataset: AESEX1
+  row_key: {STUDYID: S1, USUBJID: '001'}
+  status: SUCCESS
+  output_variables:
+    dataset_name: AESEX1
+expected_errors: []

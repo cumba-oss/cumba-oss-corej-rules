@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0241 expect=violation domain=AE
+# Rule:Description: Raise an error when --ELTM is populated but --ELTM does not have the same value across records that share the same DOMAIN, VISITNUM, --TPTREF, and --TPTNUM.
+#note "Two records share DOMAIN/VISITNUM/AETPTNUM but carry different AEELTM values"
+#expectViolationCount 2
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col VISITNUM type=Num label="Visit Number"
+col AETPT type=Char label="Planned Time Point Name"
+col AETPTNUM type=Char label="Planned Time Point Number"
+col AEELTM type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 1 | 1H POST | 1 | PT1H
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 1 | 1H POST | 1 | PT2H
+CDISCPILOT01 | AE | 01-701-1023 | 1 | 1 | 2H POST | 2 | PT2H
+---

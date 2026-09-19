@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0240 expect=skipped domain=AE
+# Rule:Description: Raise an error when Planned Time Point Name (--TPT) is not consistent for a given Planned Time Point Number (--TPTNUM), i.e. when VISITNUM and --TPTREF are not present and --TPT and --TPTNUM do not have a one-to-one relationship.
+#note "D-TA-1c gate re-capture (r2 W6(e), the shape its twin FDA-SD2239 also carries): the AETPTNUM column is absent, so the two-variable Requirements.Variables gate SKIPS the dataset instead of feeding an absent comparator into is_unique_relationship — the auditable skip is the contract under test."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETPT type=Char label="Planned Time Point Name"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | BEFORE
+CDISCPILOT01 | AE | 01-701-1015 | 2 | BEFORE

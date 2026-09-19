@@ -1,0 +1,27 @@
+name: CDISC-CG0301
+kind: rule
+description: |
+  Record-Data. CORE-000077: TRDIR present in TR. TR row carries a TRDIR column,
+  so the single exists leaf holds and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000077)
+rule:
+  coreId: CDISC-CG0301
+datasets:
+  TR:
+    row_key: [STUDYID, USUBJID, TRSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: TR, USUBJID: '001', TRSEQ: 1, TRTESTCD: LDIAM, TRDIR: '15'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [TR]
+expected_violations:
+  - rule_id: CDISC-CG0301
+    dataset: TR
+    row_key: {STUDYID: S1, TRSEQ: 1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      TRDIR: '15'
+expected_errors: []

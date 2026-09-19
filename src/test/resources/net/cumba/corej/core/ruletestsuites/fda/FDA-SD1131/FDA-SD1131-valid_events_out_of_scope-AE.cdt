@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1131 expect=skipped domain=AE
+#note "R-4 (ruled 2026-08-19): the pre-ruling Domains [ALL] scope admitted Events/Interventions datasets and fired on every baseline-flagged row because --STRESC cannot exist there (the false-positive flood the ruling ends). AE is EVENTS, outside the aligned Classes [FINDINGS, FINDINGS ABOUT] scope -> the rule no longer runs here."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEBLFL  type=Char label="Baseline Flag (nonstandard use)"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HYPERTENSION | Y

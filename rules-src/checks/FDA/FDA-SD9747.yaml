@@ -1,0 +1,104 @@
+Core:
+  Id: "FDA-SD9747"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when PPCAT and RELREC.PCRFTDTC are populated, PPRFTDTC\
+  \ equals RELREC.PCRFTDTC, and PPCAT does not equal RELREC.PCTEST."
+Executability: "Partially Executable"
+Scope:
+  Domains:
+    Include:
+    - "PP"
+Requirements:
+  Variables:
+    All:
+    - "PPRFTDTC"
+Match_Datasets:
+- Name: "RELREC"
+  Wildcard: "PC"
+Check:
+  expression: >-
+    not empty(PPCAT) and not empty(RELREC.PCRFTDTC) and PPRFTDTC == RELREC.PCRFTDTC and PPCAT !=
+    RELREC.PCTEST
+Outcome:
+  Message: "The values of PPCAT and PCTEST do not match at the same reference timepoint"
+  Output_Variables:
+  - "PPCAT"
+  - "PPRFTDTC"
+  - "RELREC.PCRFTDTC"
+  - "RELREC.PCTEST"
+Source_Proposed:
+  Sheet_Issue: "#269"
+  FDA_Validator_Rule_Message: "PPCAT does not match PCTEST at the same reference time\
+    \ point"
+  FDA_Validator_Rule_Description: "For a PP record whose Reference Time Point (PPRFTDTC)\
+    \ equals the RELREC-related PC record's Reference Time Point (PCRFTDTC), the Category\
+    \ of Parameter (PPCAT) must equal that PC record's Name of Test (PCTEST)."
+  Domains: "PP"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB069"
+        Version: "1"
+      Version: "1.5"

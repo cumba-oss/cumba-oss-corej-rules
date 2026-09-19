@@ -1,0 +1,19 @@
+#!RuleTest
+#test FDA-SD9746 expect=violation domain=LB
+# Rule:Description: Raise an error when the Normal Range Upper Limit (--ORNRHI) is less than or equal to the Normal Range Lower Limit (--ORNRLO).
+#note "Added 2026-09-14. ⭐ This file exists because a blast-radius scan after engine ef60470 found that the NUMERIC-CELL half of that change had ZERO corpus coverage: of the 15 rules calling is_numeric, the only ones whose subject column is ever declared Num are FDA-SD9746's two Num fixtures, and every value in them sits in [1e-3, 1e7) — the range Java prints without an exponent — so nothing anywhere exercised the half of the fix the owner ruling was actually about. The defect ef60470 fixed: is_numeric used to ask a string scan that rejected exponents, but a numeric cell's text comes from String.valueOf(double), which PRODUCES exponents outside that range. So is_numeric(NUMCOL) answered FALSE for a genuinely numeric cell holding 0.0001 (rendered '1.0E-4'), and this rule's own guard then skipped the comparison — a reference range silently unchecked. Row 1 is that case: LBORNRHI 0.00005 is below LBORNRLO 0.0001, an inverted range that must fire and, before ef60470, did not. Row 2 is a correctly ordered pair in the same magnitude and must stay silent, so the file cannot pass by firing on everything small. ⚠ Lab results live here routinely (TSH, troponin, most hormone assays), so this is an ordinary case, not a contrived one."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1 LBTESTCD=TSH
+dataset LB label="Laboratory Tests Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORNRLO type=Num label="Reference Range Lower Limit in Orig Unit"
+col LBORNRHI type=Num label="Reference Range Upper Limit in Orig Unit"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | TSH  | 0.0001 | 0.00005
+CDISCPILOT01 | LB | 01-701-1015 | 2 | TROP | 0.0001 | 0.0004
+---

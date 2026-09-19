@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0006 expect=violation domain=AE
+#note "NEW with the M2-P2 ruling (option (a), Fix #303) - the CORE family's pin of the truncated-time class, authored on AE to match this rule's existing fixtures. AEDTC '2014-01-02T09' is 13 characters: a complete date carrying a truncated time, which is_complete_date rejected and is_complete_date_part accepts. RFSTDTC is 2014-01-02, so the study-day algorithm gives 1; AEDY=999 fires. Row 2 is the same truncated-time shape with the correct day (2014-01-05 -> 4) and must stay silent."
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-02T09 | 999
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-05T09 | 4
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+---

@@ -1,0 +1,27 @@
+name: CDISC-CG0357
+kind: rule
+description: |
+  Record-Data. CORE-000175: STRAIN present in DM. DM row carries a STRAIN column,
+  so the single exists leaf holds and the rule fires.
+python_source: rules-sdtmig-3-4.json (CORE-000175)
+rule:
+  coreId: CDISC-CG0357
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', STRAIN: WISTAR}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: CDISC-CG0357
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      STRAIN: WISTAR
+expected_errors: []

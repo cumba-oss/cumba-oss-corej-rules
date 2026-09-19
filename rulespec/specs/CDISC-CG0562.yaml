@@ -1,0 +1,61 @@
+name: CDISC-CG0562
+kind: rule
+description: |
+  Wave 13 port (Finding #21 validation) — REPNUM must be unique when a subject
+  has multiple records for the same test within the same timing window.
+  Exercises `get_dataset_filtered_variables` with role=Timing, `record_count`
+  grouped by (USUBJID, --TESTCD, $TIMING_VARIABLES), and `is_not_unique_set`
+  reuse of the same grouping. The Python adapter's `_build_library_metadata`
+  now threads `library_mocks.domain_variables` into
+  `standard_metadata.classes[*].datasets[*].datasetVariables`, and the static
+  `_SDTM_MODEL_METADATA` exposes FINDINGS / GENERAL OBSERVATIONS classes with
+  proper `role`/`ordinal` tags so Python's `_get_variables_metadata_from_standard`
+  resolves timing vars against the LB dataset.
+python_source: rules-sdtmig-3-4.json (CORE-001034)
+rule:
+  coreId: CDISC-CG0562
+datasets:
+  LB:
+    row_key: [STUDYID, USUBJID, LBSEQ]
+    rows:
+      # Subject 001: 2 HGB records on the same LBDTC with identical LBREPNUM — bad.
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBTESTCD: HGB, LBDTC: '2026-01-01', LBREPNUM: '1'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 2, LBTESTCD: HGB, LBDTC: '2026-01-01', LBREPNUM: '1'}
+      # Subject 002: 2 HGB records on the same LBDTC but LBREPNUM distinguishes them — ok.
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBTESTCD: HGB, LBDTC: '2026-01-01', LBREPNUM: '1'}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 2, LBTESTCD: HGB, LBDTC: '2026-01-01', LBREPNUM: '2'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [LB]
+  domain_variables:
+    LB:
+      - {name: STUDYID, role: Identifier, ordinal: '1'}
+      - {name: DOMAIN, role: Identifier, ordinal: '2'}
+      - {name: USUBJID, role: Identifier, ordinal: '3'}
+      - {name: LBSEQ, role: Identifier, ordinal: '4'}
+      - {name: LBTESTCD, role: Topic, ordinal: '5'}
+      - {name: LBREPNUM, role: Record Qualifier, ordinal: '6'}
+      - {name: LBDTC, role: Timing, ordinal: '7'}
+expected_violations:
+  - rule_id: CDISC-CG0562
+    dataset: LB
+    row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $TIMING_VARIABLES: '[LBDTC]'
+      $record_count_per_subject_test_timing: '2'
+      LBREPNUM: '1'
+      LBTESTCD: HGB
+  - rule_id: CDISC-CG0562
+    dataset: LB
+    row_key: {LBSEQ: 2, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $TIMING_VARIABLES: '[LBDTC]'
+      $record_count_per_subject_test_timing: '2'
+      LBREPNUM: '1'
+      LBTESTCD: HGB
+expected_errors: []

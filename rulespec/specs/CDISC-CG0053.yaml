@@ -1,0 +1,29 @@
+name: CDISC-CG0053
+kind: rule
+description: |
+  Record-Data port. CORE-000030: --REASND present while --PRESP is absent.
+  Two Check leaves: --PRESP not_exists AND --REASND exists. Resolved to the AE
+  (events) domain: the row carries AEREASND but no AEPRESP column, so the rule
+  fires. Domain AE is not in the Exclude list (DS/DV/EX).
+python_source: rules-sdtmig-3-4.json (CORE-000030)
+rule:
+  coreId: CDISC-CG0053
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE, AEREASND: NOT DONE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0053
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      AEREASND: NOT DONE
+expected_errors: []

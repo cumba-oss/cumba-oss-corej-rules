@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0084 expect=noViolation domain=AE
+# Rule:Description: Raise an error when --TOXGR is not present in the dataset but --TOX is present.
+#note "AETOX column is absent, so the rule's --TOX exists precondition is not met"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+CDISCPILOT01 | AE | 01-701-1015 | 2
+---

@@ -1,0 +1,31 @@
+name: CDISC-CG0101
+kind: rule
+description: |
+  Wave 13 port - ECOCCUR=N and ECDOSE <= 0. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000004)
+rule:
+  coreId: CDISC-CG0101
+datasets:
+  EC:
+    row_key: [STUDYID, USUBJID, ECSEQ]
+    column_types:
+      ECDOSE: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: EC, USUBJID: '001', ECSEQ: 1, ECOCCUR: N, ECDOSE: 10}
+      - {STUDYID: S1, DOMAIN: EC, USUBJID: '002', ECSEQ: 1, ECOCCUR: N, ECDOSE: 0}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    interventions: [EC]
+expected_violations:
+  - rule_id: CDISC-CG0101
+    dataset: EC
+    row_key: {ECSEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      ECDOSE: '0'
+      ECOCCUR: N
+expected_errors: []

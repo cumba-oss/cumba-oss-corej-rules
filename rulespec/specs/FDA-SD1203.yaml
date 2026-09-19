@@ -1,0 +1,35 @@
+name: FDA-SD1203
+kind: rule
+description: |
+  Wave 9 port - --DTC after DM.RFPENDTC (collection after end of participation). Match_Datasets joins primary AE
+  to DM on USUBJID; DM.RFSTDTC / RFENDTC / RFPENDTC are emitted with the
+  DM.* prefix preserved in the canonical output_variables.
+python_source: rules-sdtmig-3-4.json (CORE-000720)
+rule:
+  coreId: FDA-SD1203
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEDTC: '2026-01-15'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 2, AEDTC: '2026-02-15'}
+  DM:
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFPENDTC: '2026-01-31'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFPENDTC: '2026-01-31'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    special-purpose: [DM]
+expected_violations:
+  - rule_id: FDA-SD1203
+    dataset: AE
+    row_key: {AESEQ: 2, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      AEDTC: '2026-02-15'
+      DM.RFPENDTC: '2026-01-31'
+expected_errors: []

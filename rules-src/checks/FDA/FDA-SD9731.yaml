@@ -1,0 +1,57 @@
+Core:
+  Id: "FDA-SD9731"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when --LLTCD and --LLT do not have a one-to-one relationship."
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    All:
+    - "--LLT"
+    - "--LLTCD"
+Check:
+  expression: >-
+    not is_unique_relationship(--LLT, --LLTCD)
+Outcome:
+  Message: "This --LLTCD and --LLT pairing violates the required one-to-one relationship\
+    \ between --LLTCD and --LLT."
+  Output_Variables:
+  - "--LLT"
+  - "--LLTCD"
+Source_Proposed:
+  Sheet_Issue: "#253"
+  FDA_Validator_Rule_Message: "--LLTCD and --LLT do not have a one-to-one relationship"
+  FDA_Validator_Rule_Description: "All values of Lowest Level Term Code (--LLTCD)\
+    \ and Lowest Level Term (--LLT) must have a one-to-one relationship."
+  Domains: "EVENTS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Business Rules"
+      Rule_Identifier:
+        Id: "FDAB009"
+        Version: "1"
+      Version: "1.5"

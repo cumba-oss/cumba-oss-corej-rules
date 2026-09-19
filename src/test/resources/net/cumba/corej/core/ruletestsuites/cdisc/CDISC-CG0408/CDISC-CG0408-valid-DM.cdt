@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0408 expect=noViolation domain=DM
+# Rule:Description: Raise an error when a dataset has no records; a dataset should have at least one record.
+#note "DM contains records (record_count > 0), so the rule does not fire"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

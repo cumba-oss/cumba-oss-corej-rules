@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-CG0018 expect=skipped domain=SUPPDM
+# Rule:Description: Raise an error when a Supplemental Qualifier dataset associated with a split domain has a dataset name longer than 8 characters.
+#note "⚠ THIS SCENARIO CHANGED VERDICT (noViolation -> skipped) AND THAT IS THE POINT. CDISC-CG0018 is scoped `Domains.Include: [SUPP--, SQ--, SUPPAPFA--]` + `include_split_datasets: true`. The flag used to be applied ADDITIVELY (mirroring Python `_handle_split_domains`), which had two consequences: every split dataset in the study was force-included regardless of Include (so a long non-SUPP split such as LBCHEMIST drew this rule's 'split Supplemental Qualifier dataset name is longer than 8 characters' message on top of CDISC-CG0017's correct one), and a NON-split that merely matched Include stayed in scope. The flag is now a CONJUNCTIVE gate: in scope iff the dataset matches Include AND is a split. SUPPDM carries no DOMAIN and no RDOMAIN, so its data-derived base falls back to the raw name, it is NOT a split, and it is correctly out of scope — which is what the rule's own Description ('associated with a split dataset') and its Source Condition ('Split dataset names length <= 8') have always said. `expect=skipped` is the honest declaration; the in-scope no-violation control now lives in the sibling -valid-SUPPLBHM scenario. Supp dataset name SUPPDM is 6 characters, within the 8-character limit — but the rule never reaches the check."
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | 01-701-1015
+CDISCPILOT01 | 01-701-1023
+---

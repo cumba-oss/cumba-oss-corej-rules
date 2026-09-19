@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0014 expect=noViolation domain=CM
+# Rule:Description: Raise an error when a non-missing Dose (--DOSE) value is negative (less than 0).
+#note "CMDOSE holds non-negative values (10, 0) -> 'less_than 0' is false, no violation"
+#library standard=sdtmig version=3-4
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num label="Sequence Number"
+col CMDOSE type=Num label="Dose per Administration"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | 10
+CDISCPILOT01 | CM | 01-701-1015 | 2 | 0
+---

@@ -1,0 +1,50 @@
+name: CDISC-CG0536-absent-dsscat
+kind: rule
+description: |
+  Pins the status divergence introduced by PLAN-absent-column-guard-backlog P3b (group 2:
+  "the Requirements.Variables half added to an existing discriminator"). DS carries duplicated
+  DISPOSITION EVENT records but NO DSSCAT column at all.
+
+  Why this rule must not apply here, rather than must not fire. DSSCAT is not a defensive
+  guard on CORE-000213 — it is an APPLICABILITY DISCRIMINATOR. Sheet row CG0536, which this
+  rule implements, is conditioned "DSCAT = 'DISPOSITION EVENT' and DSSCAT is present in
+  dataset", and CDISC-CG0537 / CORE-000374 are its explicit "DSSCAT is NOT present"
+  complement. The pair is deliberate: on a DSSCAT-less study the duplicate IS still reported,
+  by the other half. That is also why absence must not silence a rule by default — if it did,
+  CG0536's condition would be redundant and CG0537 would be dead code.
+
+  The fixture duplicates (USUBJID, EPOCH) on purpose. Rows 1 and 2 share subject 001 and
+  EPOCH SCREENING, so the check would have something to find if it applied; the absence of a
+  finding is therefore attributable to the gate, not to clean data.
+
+  Java is gated out up front: Requirements.Variables.All names DSSCAT and the fixture has no
+  such column, so Java reports SKIPPED. Python has no Requirements.Variables gate — it reaches the
+  Check, evaluates the `DSSCAT exists` leaf to false, and EXECUTES to zero findings.
+  Violations agree; status does not. The DSSCAT Check leaf is retained precisely because Python
+  reads no part of Requirements.Variables, and DSSCAT is additionally an is_not_unique_set GROUPING KEY,
+  the one position R-4.11a's carve-out covers: dropping an absent key coarsens Python's grouping
+  and over-fires, so this leaf must never be hoisted away. ⚠ The rule's other guard, EPOCH, is
+  the operator's TARGET, where the carve-out does not reach — it was hoisted to
+  Requirements.Variables.All by the wave-17 R-4.11 migration. This fixture carries EPOCH, so its
+  SKIPPED remains attributable to DSSCAT alone.
+python_source: rules-sdtmig-3-4.json (CORE-000213)
+rule:
+  coreId: CDISC-CG0536
+datasets:
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      # Subject 001 duplicates on (USUBJID, EPOCH) — the rule would fire if it applied.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSCAT: DISPOSITION EVENT, EPOCH: SCREENING}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSCAT: DISPOSITION EVENT, EPOCH: SCREENING}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSCAT: DISPOSITION EVENT, EPOCH: TREATMENT}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [DS]
+# Java gates the rule out: Requirements.Variables.All DSSCAT is absent from the fixture.
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

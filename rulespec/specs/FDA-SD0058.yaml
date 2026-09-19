@@ -1,0 +1,36 @@
+name: FDA-SD0058
+kind: rule
+description: |
+  Variable-Metadata + Operation port. CORE-000550: every variable in an Observation
+  Class dataset must be an allowed model variable. Operation `get_model_column_order`
+  builds $allowed_variables (the model list for the class); the check fires for any
+  variable_name that is_not_contained_by that list. The AE dataset below adds AEFOO,
+  which is not a model variable for the Events class, so it fires.
+python_source: rules-sdtmig-3-4.json (CORE-000550)
+rule:
+  coreId: FDA-SD0058
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: Headache, AEFOO: X}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: FDA-SD0058
+    dataset: AE
+    row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
+    status: SUCCESS
+    output_variables:
+      $allowed_variables: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBEATNO, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
+        AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEPCHGI, AEEVDTYP, AEEVINTX, AEEVLINT, AEGRPID, AEHLGT, AEHLGTCD, AEHLT, AEHLTCD, AELAT, AELLT, AELLTCD, AELNKGRP, AELNKID, AELOC, AEMODIFY, AENOMDY,
+        AENOMLBL, AEOCCUR, AEOUT, AEPARTY, AEPATT, AEPDUR, AEPORTOT, AEPRESP, AEPRTYID, AEPTCD, AEPTFL, AEREASND, AEREASOC, AERECID, AEREFID, AEREL, AERELNST, AERFTDTC, AERLDEV, AERLPRC, AERLPRT, AERPDY,
+        AERPENDY, AERPSTDY, AESCAN, AESCAT, AESCONG, AESDISAB, AESDTH, AESEQ, AESER, AESEV, AESHOSP, AESINTV, AESLIFE, AESMIE, AESOC, AESOCCD, AESOD, AESPID, AESTAT, AESTDTC, AESTDY, AESTINT, AESTRF, AESTRTPT,
+        AESTTPT, AETERM, AETOX, AETOXGR, AETPT, AETPTNUM, AETPTREF, AEUNANT, AEUSCHFL, AEXDY, AEXENDY, AEXSTDY, DOMAIN, EPOCH, FETUSID, FOCID, MIDS, MIDSDTC, NHOID, POOLID, RELMIDS, RPHASE, RPPLDY, RPPLENDY,
+        RPPLSTDY, SPDEVID, STUDYID, TAETORD, USUBJID, VISIT, VISITDY, VISITNUM]'
+      variable_name: AEFOO
+expected_errors: []

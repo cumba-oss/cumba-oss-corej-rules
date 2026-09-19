@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0088 expect=noViolation domain=CM
+# Rule:Description: Raise an error when the Occurrence (--OCCUR) variable is present in the dataset but the Pre-specified (--PRESP) variable is not present in the dataset.
+#note "neither --OCCUR nor --PRESP present, so the rule cannot fire"
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1
+CDISCPILOT01 | CM | 01-701-1015 | 2
+---

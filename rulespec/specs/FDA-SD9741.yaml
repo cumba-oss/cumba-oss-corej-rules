@@ -1,0 +1,42 @@
+name: FDA-SD9741
+kind: rule
+description: |
+  Wave 2 port — operation shape, re-shaped by FDA run-2 (T10 exact membership).
+  CORE-000679: When DTHFL='Y' on a DM record, a DEATH record must exist in DS for
+  that subject. The operation is `distinct` over DS.USUBJID filtered on
+  DSDECOD=DEATH ($ds_death_usubjid); the check fires when the DM subject's
+  USUBJID is_not_contained_by that set.
+python_source: rules-sdtmig-3-4.json (CORE-000679)
+rule:
+  coreId: FDA-SD9741
+datasets:
+  DM:
+    rows:
+      # Subject 001 — DTHFL=Y, has DEATH record         → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', DTHFL: Y}
+      # Subject 002 — DTHFL=Y, no DEATH record          → violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', DTHFL: Y}
+      # Subject 003 — DTHFL not Y                       → no violation
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', DTHFL: ''}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: DEATH}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: ADVERSE EVENT}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 1, DSDECOD: WITHDRAWAL}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    events: [DS]
+expected_violations:
+  - rule_id: FDA-SD9741
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ds_death_usubjid: '[001]'
+      DTHFL: Y
+expected_errors: []

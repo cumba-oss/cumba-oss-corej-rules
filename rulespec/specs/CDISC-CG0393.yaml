@@ -1,0 +1,29 @@
+name: CDISC-CG0393
+kind: rule
+description: |
+  Wave 6 port — AESLIFE must be Y or N when populated.
+python_source: rules-sdtmig-3-4.json (CORE-000128)
+rule:
+  coreId: CDISC-CG0393
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AESLIFE: Y}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AESLIFE: N}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AESLIFE: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '004', AESEQ: 1, AESLIFE: Z}          # bad
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+expected_violations:
+  - rule_id: CDISC-CG0393
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '004'}
+    status: SUCCESS
+    output_variables:
+      AESLIFE: Z
+expected_errors: []

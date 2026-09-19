@@ -1,0 +1,94 @@
+name: EC-variable-count-split-family-dedup
+kind: rule
+description: |
+  variable_count split-family dedup — letter-suffix split. FAAE and FACM are two
+  Findings About split datasets (both DOMAIN=FA), each exposing FALNKGRP (the
+  --LNKGRP variable for domain FA). Python's variable_count groups study datasets by
+  SDTMDatasetMetadata.unsplit_name (data-driven, from the DOMAIN column), so FAAE and
+  FACM collapse to ONE "FA" family → $VARIABLE_COUNT = 1. Java now dedups by the same
+  data-driven unsplit name (OperationExecutor.unsplitNameFromData) instead of the
+  name-only key, which counted FAAE and FACM as two families ($VARIABLE_COUNT = 2).
+
+  The check is `--LNKGRP exists AND $VARIABLE_COUNT == 2`, so the rule does NOT fire
+  when the count is 1 (the correct, deduped value) — expected_violations is empty on
+  both lanes. It fires (wrongly) only with the pre-fix name-only key that yields 2,
+  so this spec is green only once Java dedups variable_count by the data-driven
+  unsplit name. (A firing variant is avoided on purpose: Python reports split-family
+  findings under the concatenated name "FAAE, FACM", which the parity canonicaliser
+  cannot map back to a single declared dataset.) FAAE is primary; FACM is inventory.
+
+  Companion to CDISC-CG0022 (two distinct domains AE/CM, count=2, no split involved).
+
+  ⚠⚠ THE ORIGINAL FINDING, measured 2026-09-16 and since FIXED (see the ✅ block
+  below) — this spec did NOT discriminate what the text above says it does, and the
+  cause was in THIS HARNESS, not in the engine. The
+  fixture's Check was transliterated from the retired operator-leaf form to
+  `expression:` when D121 (PLAN-typed-expression-engine phase 7d) removed the leaf
+  model. Probed on this very spec: `$VARIABLE_COUNT == 1` alone FIRES (one finding on
+  FAAE, so the data-driven dedup really does yield 1) and `var_exists("FALNKGRP")`
+  alone FIRES, while `var_exists("--LNKGRP")` yielded nothing. Consequence: the spec was
+  green with `== 2` AND with `== 1` — the count half, its entire subject, masked by a
+  permanently-false first conjunct.
+
+  ⭐ CORRECTED — the engine resolves `--` inside a string literal, and this is proven
+  twice over, so do NOT read the above as an engine defect:
+    (1) `ExprPrefixResolver.resolveLit` rewrites STRING literals through the same
+        two-prefix text policy as every other name position; only non-STRING literals
+        and `name_pattern=` are exempt (D92b), and `variable_count`'s own name operand
+        is exempt on purpose (D92a) so it can re-resolve per iterated dataset.
+    (2) CDISC-CG0022 — the same `var_exists("--LNKGRP")` shape — has a passing `.cdt`
+        scenario (`CDISC-CG0022-invalid-LB.cdt`) that EXPECTS a violation on an LB
+        dataset carrying LBLNKGRP. It could not fire unless the literal resolved.
+  ⇒ The 455 `var_exists("--X")` / `var_not_exists("--X")` calls across 273 rules-src
+  files are NOT at risk, and this is not a question for the engine repo.
+
+  ✅ FIXED 2026-09-16 in the HARNESS, not in this spec. SpecRunner passed the DATASET
+  KEY as the `--` substitution prefix ("FAAE"), where production derives the CDISC
+  DOMAIN CODE from the data — `CdiscDomainResolver.cdiscDomainOf(table)`
+  (LibraryValidator.java:1063), row-0 DOMAIN first, `SplitDatasetUtil.unsplitName` of
+  the member name as fallback — and hands THAT to `RuleRunner.execute` as its
+  `domainPrefix` (LibraryValidator.java:1125/:1228). SpecRunner now derives the same
+  value from the primary table and passes it; the dataset key stays the lookup key into
+  `tables`, the row-key source and the violation's `dataset` field, exactly as
+  production keeps the member name on its report rows. `--LNKGRP` therefore resolves to
+  FALNKGRP here, as it always did in production.
+
+  ⭐ Negative control, measured on the full gate: with `$VARIABLE_COUNT == 1` the spec
+  FAILS with one unexpected violation on FAAE carrying
+  `{"$VARIABLE_COUNT": "1", "FALNKGRP": "G1"}` — note the output variable is the
+  RESOLVED name, which is what the old harness got wrong; with `== 2` (the committed
+  form) it passes with no violations. Both halves of the conjunct are therefore live:
+  the `var_exists` half resolves, and the count half decides the verdict.
+  ⛔ Do NOT "fix" a future regression here by dropping the conjunct or hard-coding
+  FALNKGRP — either routes around the gap instead of fixing it.
+
+  ⚠ One production divergence is deliberately NOT mirrored, and it is an ENGINE-side
+  defect rather than a harness one: `DatasetRuleResolver` feeds that same CDISC code
+  into `ScopeMatcher.describeDomainMismatch(rule, domainName, unsplitName)`, whose
+  first parameter means the MEMBER name — it derives `isSplit` as
+  `!domainName.equals(unsplitName)`. Both sides read row-0 DOMAIN first, so for any
+  dataset carrying a DOMAIN column the two are equal by construction and split
+  detection is dead: `Include_Split_Datasets: true` can never match. Mirroring that
+  would turn CDISC-CG0309/-CG0017/-CG0333/-CG0650 into vacuous SKIPs (measured), so the
+  scope gate here keeps the member name and SpecRunner carries the reasoning.
+
+python_source: rules-sdtmig-3-4.json (CDISC-CG0022 shape; split-family variant)
+rule:
+  $ref: fixtures/EC-variable-count-split-family-dedup/rule.json
+datasets:
+  FAAE:
+    row_key: [STUDYID, USUBJID, FASEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: FA, USUBJID: '001', FASEQ: 1, FALNKGRP: G1, FATESTCD: OCCUR}
+  FACM:
+    row_key: [STUDYID, USUBJID, FASEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: FA, USUBJID: '001', FASEQ: 1, FALNKGRP: G1, FATESTCD: OCCUR}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [FAAE, FACM]
+expected_violations: []
+expected_errors: []

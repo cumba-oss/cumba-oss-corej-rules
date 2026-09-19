@@ -1,0 +1,32 @@
+name: CDISC-CG0659
+kind: rule
+description: |
+  Record Data. CORE-000031: --EVAL must not be used to model QRS data. Since S1
+  (2026-09-14) the Check is var_exists("--EVAL"), and the -- prefix resolves to the
+  CURRENT domain, so in QS it asks only about QSEVAL. That replaced the D-15
+  varname() in [QSEVAL, FTEVAL] membership list, which was a hard-coded union across
+  the domains in scope and therefore cross-matched: a stray FTEVAL column in a QS
+  dataset satisfied it. The finding is now anchored to the row and carries the
+  RESOLVED column rather than variable_name.
+python_source: rules-sdtmig-3-4.json (CORE-000031)
+rule:
+  coreId: CDISC-CG0659
+datasets:
+  QS:
+    row_key: [STUDYID, USUBJID, QSSEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: QS, USUBJID: '001', QSSEQ: 1, QSTESTCD: T1, QSEVAL: INVESTIGATOR}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    findings: [QS]
+expected_violations:
+  - rule_id: CDISC-CG0659
+    dataset: QS
+    row_key: {QSSEQ: 1, STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      QSEVAL: INVESTIGATOR
+expected_errors: []

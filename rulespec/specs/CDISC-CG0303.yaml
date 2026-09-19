@@ -1,0 +1,94 @@
+name: CDISC-CG0303
+kind: rule
+description: |
+  Variable Metadata Check against Library Metadata. CORE-000398: for an IG variable the
+  dataset variable label must match the library (IG) variable label. The Check joins each
+  dataset variable to the library variable of the same name, then fires when the library
+  label is non-empty and differs from the dataset label. Every column of the AE
+  dataset (STUDYID, DOMAIN, USUBJID, AESEQ, AETERM) carries an adapter-defaulted
+  label equal to its name, all differing from the mocked library labels, and since
+  the FDA run-2 W1 flip the rule is Sensitivity=Record — one finding per
+  mislabelled variable, hence all five expected violations.
+python_source: rules-sdtmig-3-2.json (CORE-000398)
+rule:
+  coreId: CDISC-CG0303
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+    - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE}
+config:
+  standard: sdtmig
+  standard_version: '3.2'
+library_mocks:
+  classes:
+    events: [AE]
+  domain_variables:
+    AE:
+    - {name: STUDYID, label: Study Identifier, role: Identifier, simpleDatatype: Char, ordinal: '1'}
+    - {name: DOMAIN, label: Domain Abbreviation, role: Identifier, simpleDatatype: Char, ordinal: '2'}
+    - {name: USUBJID, label: Unique Subject Identifier, role: Identifier, simpleDatatype: Char, ordinal: '3'}
+    - {name: AESEQ, label: Sequence Number, role: Identifier, simpleDatatype: Num, ordinal: '4'}
+    - {name: AETERM, label: Reported Term for the Adverse Event, role: Topic, simpleDatatype: Char, ordinal: '5'}
+expected_violations:
+- rule_id: CDISC-CG0303
+  dataset: AE
+  row_key:
+    AESEQ: 1
+    STUDYID: S1
+    USUBJID: '001'
+  status: SUCCESS
+  output_variables:
+    library_variable_label: Study Identifier
+    library_variable_name: STUDYID
+    variable_label: STUDYID
+    variable_name: STUDYID
+- rule_id: CDISC-CG0303
+  dataset: AE
+  row_key:
+    AESEQ:
+    STUDYID:
+    USUBJID:
+  status: SUCCESS
+  output_variables:
+    library_variable_label: Domain Abbreviation
+    library_variable_name: DOMAIN
+    variable_label: DOMAIN
+    variable_name: DOMAIN
+- rule_id: CDISC-CG0303
+  dataset: AE
+  row_key:
+    AESEQ:
+    STUDYID:
+    USUBJID:
+  status: SUCCESS
+  output_variables:
+    library_variable_label: Unique Subject Identifier
+    library_variable_name: USUBJID
+    variable_label: USUBJID
+    variable_name: USUBJID
+- rule_id: CDISC-CG0303
+  dataset: AE
+  row_key:
+    AESEQ:
+    STUDYID:
+    USUBJID:
+  status: SUCCESS
+  output_variables:
+    library_variable_label: Sequence Number
+    library_variable_name: AESEQ
+    variable_label: AESEQ
+    variable_name: AESEQ
+- rule_id: CDISC-CG0303
+  dataset: AE
+  row_key:
+    AESEQ:
+    STUDYID:
+    USUBJID:
+  status: SUCCESS
+  output_variables:
+    library_variable_label: Reported Term for the Adverse Event
+    library_variable_name: AETERM
+    variable_label: AETERM
+    variable_name: AETERM
+expected_errors: []

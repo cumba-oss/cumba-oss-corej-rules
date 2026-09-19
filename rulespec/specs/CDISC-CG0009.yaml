@@ -1,0 +1,36 @@
+name: CDISC-CG0009
+kind: rule
+description: |
+  Wave 19 port - `distinct` Operation. Primary AE checked
+  against distinct(TA.EPOCH).
+python_source: rules-sdtmig-3-4.json (CORE-000271)
+rule:
+  coreId: CDISC-CG0009
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, EPOCH: SCREENING}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, EPOCH: BOGUS_EPOCH}
+  TA:
+    row_key: [STUDYID, ARMCD, TAETORD]
+    column_types:
+      TAETORD: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: TA, ARMCD: TRT01, TAETORD: 1, ARM: T1, ETCD: SCRN, EPOCH: SCREENING}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE]
+    trial design: [TA]
+expected_violations:
+  - rule_id: CDISC-CG0009
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ta_epoch: '[SCREENING]'
+      EPOCH: BOGUS_EPOCH
+expected_errors: []

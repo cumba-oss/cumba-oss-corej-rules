@@ -1,0 +1,44 @@
+name: CDISC-CG0232-empty
+kind: rule
+description: |
+  Empty-string parity demo for CORE-000763's date_equal_to leaf
+  (PLAN-empty-string-membership-parity, date-operator family). Domain AE (the --
+  wildcard resolves to AE: --STTPT→AESTTPT, --STRTPT→AESTRTPT, --DTC→AEDTC).
+
+  Check leaf `--STTPT date_equal_to --DTC`. Same shape as CORE-000324: the divergence
+  is on the COMPARATOR (--DTC). When --DTC is empty and --STTPT is a complete date, the
+  honest coreJ engine fires (compareIso(date,'')==0 → date_equal_to true); Python's
+  compare_dates returns False for the non-comparable operand and does not. The TARGET
+  --STTPT is already guarded (non_empty + is_complete_date); only the comparator --DTC
+  diverges. Closing guard: non_empty(--DTC) (see CORE-000763-guarded).
+python_notes: |
+  Captured-from-Java (lane: python). coreJ fires D1 (empty --DTC comparator) + the
+  populated control C1; Python fires only C1.
+python_source: rules-sdtmig-3-4.json (CORE-000763) + PLAN-empty-string-membership-parity.md
+rule:
+  coreId: CDISC-CG0232
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      # D1 — --STTPT complete date, --DTC (comparator) empty, --STRTPT not in allowed list.
+      #      coreJ fires, Python does not. DIVERGENCE.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: D1, AESEQ: 1, AESTTPT: '2026-01-01', AEDTC: '', AESTRTPT: AFTER}
+      # C1 — --STTPT == --DTC (equal), --STRTPT not in allowed list → both fire. CONTROL.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: C1, AESEQ: 1, AESTTPT: '2026-01-01', AEDTC: '2026-01-01', AESTRTPT: AFTER}
+      # N1 — equal dates but --STRTPT in allowed list → is_not_contained_by false → no fire (both). CONTROL.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: N1, AESEQ: 1, AESTTPT: '2026-01-01', AEDTC: '2026-01-01', AESTRTPT: BEFORE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_violations:
+  # D1 — --DTC (date_equal_to comparator) empty. coreJ fires; Python does not.
+  - rule_id: CDISC-CG0232
+    dataset: AE
+    row_key: {AESEQ: 1, STUDYID: S1, USUBJID: C1}
+    status: SUCCESS
+    output_variables:
+      AEDTC: '2026-01-01'
+      AESTRTPT: AFTER
+      AESTTPT: '2026-01-01'
+expected_errors: []

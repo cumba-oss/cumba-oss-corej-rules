@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0007 expect=violation domain=AE
+# Rule:Description: Raise an error when Collection Study Day (--DY) is populated but the date portion of Collection Study Date/Time (--DTC) or Subject Reference Start Date/Time (RFSTDTC) is not a complete date, i.e. empty, invalid, or only partially specified.
+#note "AEDY populated while AEDTC is an incomplete date (year only); DM.RFSTDTC complete"
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 USUBJID=01-701-1015
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014 | 5
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+---

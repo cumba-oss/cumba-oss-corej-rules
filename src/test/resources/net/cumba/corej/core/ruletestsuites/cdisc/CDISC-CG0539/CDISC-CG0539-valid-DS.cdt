@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0539 expect=noViolation domain=DS
+# Rule:Description: Raise an error when a subject has more than one Disposition Event record (DSCAT equals 'DISPOSITION EVENT') per Epoch (EPOCH) and more than one of those records has Subcategory for Disposition Event (DSSCAT) equal to 'STUDY TREATMENT'.
+#note "Case C, accepted knowingly and escalated as SHEET-ISSUES #38 -- this fixture pins a real data error that the rule deliberately does NOT report. The subject has two DISPOSITION EVENT records with DSSCAT=STUDY TREATMENT, which violates the sheet's Rule ('No more than 1 record per subject has DSSCAT = STUDY TREATMENT'), but they sit in distinct EPOCHs, so no epoch holds more than one disposition record and the gate -- record_count(..., group=[USUBJID, EPOCH]) > 1, which is the sheet's Condition verbatim ('Subject has more than one record per Epoch with DSCAT = DISPOSITION EVENT') -- is false on every row. D16 (Fix #158) coarsened the uniqueness key to (DSSCAT, USUBJID), so BOTH rows are now duplicates by that conjunct; the rule is silent solely because the gate never opens. Dropping EPOCH from the gate too was considered and rejected: it would overrule quoted sheet text and make the gate nearly redundant. So this file must keep expecting no violation for as long as we follow the sheet, and it is the scenario that will flip first if SHEET-ISSUES #38 is ever resolved in our favour."
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSCAT type=Char label="Category for Disposition Event" format=$DSCAT.
+col DSSCAT type=Char label="Subcategory for Disposition Event"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | STUDY TREATMENT | SCREENING
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | STUDY TREATMENT | TREATMENT
+---

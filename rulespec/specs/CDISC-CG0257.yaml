@@ -1,0 +1,28 @@
+name: CDISC-CG0257
+kind: rule
+description: |
+  Wave 13 port - TSPARMCD longer than 8 characters. Non-wildcard Record-Data rule with
+  explicit Output_Variables (no Fix #17 wildcard resolution involved).
+python_source: rules-sdtmig-3-4.json (CORE-000147)
+rule:
+  coreId: CDISC-CG0257
+datasets:
+  TS:
+    row_key: [STUDYID, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: DOSE}
+      - {STUDYID: S1, DOMAIN: TS, TSPARMCD: TOOLONG99}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    trial design: [TS]
+expected_violations:
+  - rule_id: CDISC-CG0257
+    dataset: TS
+    row_key: {STUDYID: S1, TSPARMCD: TOOLONG99}
+    status: SUCCESS
+    output_variables:
+      TSPARMCD: TOOLONG99
+expected_errors: []
