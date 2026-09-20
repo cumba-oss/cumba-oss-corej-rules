@@ -138,11 +138,12 @@ class ExcludedOutputVariableShippedRuleTest
 
     /**
      * {@code Fix #357} — the class-(c) apply: 109 guard-only {@code Output_Variables} entries over
-     * 90 rules, ruling (A) of {@code rule-review-results-r3/PROPOSAL-plan-A-class-c-exclusions.md}
-     * (owner 2026-08-24, Message-usage criterion). The three cases above cover {@code $}-operation
-     * results; these cover the other two token shapes the ruling introduces — <b>plain columns</b>
-     * and <b>{@code --} wildcard columns</b>, plus the two dotted {@code DM.ARM} references — where
-     * the projection key is the <em>resolved</em> name, not the authored token.
+     * 90 rules, ruling (A) of {@code PROPOSAL-plan-A-class-c-exclusions.md} (now
+     * {@code cumba-corej-docs-archive/rule-reviews/rule-review-results-r3/}) (owner 2026-08-24,
+     * Message-usage criterion). The three cases above cover {@code $}-operation results; these
+     * cover the other two token shapes the ruling introduces — <b>plain columns</b> and
+     * <b>{@code --} wildcard columns</b>, plus the two dotted {@code DM.ARM} references — where the
+     * projection key is the <em>resolved</em> name, not the authored token.
      *
      * <p>
      * ⚠ The wildcard half of this ruling was blocked until {@code Fix #356}: the per-domain
