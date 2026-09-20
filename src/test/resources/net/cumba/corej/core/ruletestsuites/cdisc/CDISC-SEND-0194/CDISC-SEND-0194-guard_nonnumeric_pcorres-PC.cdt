@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0194 expect=noViolation domain=PC
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): PCSTRESC is not 'BLQ' anywhere, and PCORRES is BLANK (row 1) or NON-NUMERIC (row 2), so num(PCORRES) is MISSING on both and the is_numeric(PCORRES) guard keeps the below-LLOQ disjunct false - PCSTRESN populated alone is no violation. If this FIRES, the guard was deleted: post-6c totality positions the MISSING num() below every number, so num(PCORRES) < PCLLOQ becomes true and the populated PCSTRESN completes the conjunction."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PCSEQ    type=Num
+col PCTESTCD type=Char
+col PCORRES  type=Char
+col PCLLOQ   type=Num
+col PCSTRESC type=Char
+col PCSTRESN type=Num
+---
+S1 | PC | 001 | 1 | DRUGX |       | 5 | 12    | 12
+S1 | PC | 002 | 1 | DRUGX | TRACE | 5 | TRACE | 7

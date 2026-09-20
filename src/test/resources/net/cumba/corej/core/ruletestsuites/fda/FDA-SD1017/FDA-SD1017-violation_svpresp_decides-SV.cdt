@@ -1,0 +1,29 @@
+#!RuleTest
+#test FDA-SD1017 expect=violation domain=SV
+#note "B1 of PLAN-unplanned-visit-cascade: SVPRESP is present and DECIDES. Row 2 is flagged pre-specified and its VISITNUM is not in TV -> fires. Row 3 carries SVPRESP='' - present and not Y, so tier 1 calls it unplanned and it is exempt DESPITE its blank SVUPDES and neutral name; the pre-cascade SVUPDES form of this rule fired on that row. Row 1 is planned and in TV -> clean. No SVUPDES column on purpose: tier 1 never falls through."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2 | BASELINE | Y
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 99 | WEEK 99 | Y
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 98 | WEEK 98 | 
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

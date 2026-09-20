@@ -25,9 +25,9 @@ import org.junit.jupiter.api.TestFactory;
  * <h2>What it pins</h2>
  *
  * <p>
- * The instrument-holds census — a frozen internal measurement, kept in the monorepo and not carried
- * here — <b>recorded 15</b> rules under {@code instrument = adam-template-suite}: rules that
- * carried {@code Scope.Classes} and could not migrate to the semantically correct
+ * {@code lib/corej-rules/scripts/adam-classes-to-structures-instrument-holds.tsv} <b>used to record
+ * 15</b> rules under {@code instrument = adam-template-suite}: rules that carried
+ * {@code Scope.Classes} and could not migrate to the semantically correct
  * {@code Scope.Data_Structures}, because the migrated form went SKIPPED in the template suites and
  * turned their {@code _invalid} assertion red. The recorded cause was <i>"the template-expanded
  * ADLBC table carries no BDS indicator column"</i> — i.e. the fixture is synthesised from the
@@ -159,14 +159,19 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
      */
     private static final List<String> EXPECTED_CASES = List.of("CDISC-AD0346-R2A1LO@ADLBC",
             "CDISC-AD0349-R2A1HI@ADLBC", "CDISC-AD0352-A1IND@ADLBC", "CDISC-AD0369-ADTF@ADLBC",
-            "CDISC-AD0369-AENDTF@ADAE", "CDISC-AD0369-ASTDTF@ADAE", "CDISC-AD0369-TRTEDTF@ADAE",
-            "CDISC-AD0369-TRTEDTF@ADLBC", "CDISC-AD0369-TRTSDTF@ADAE", "CDISC-AD0369-TRTSDTF@ADLBC",
-            "CDISC-AD0411-ANL01FN@ADLBC", "CDISC-AD0412-ANL01FL@ADLBC",
-            "CDISC-AD0413-ANL01FN@ADLBC", "CDISC-AD0414-ANL01FL@ADLBC",
-            "CDISC-AD0445-PARCAT1@ADLBC", "CDISC-AD0446-PARCAT1N@ADLBC",
-            "CDISC-AD0526-ANL01FN@ADLBC", "CDISC-AD0547-PARCAT1N@ADLBC",
-            "CDISC-AD0730-PARCAT1@ADLBC", "CDISC-AD0731-PARCAT1N@ADLBC",
-            "CDISC-AD0792-TRTSDT@ADLBC");
+            "CDISC-AD0369-AENDTF@ADAE", "CDISC-AD0369-ASTDTF@ADAE",
+            // AXDTF joined when the M4 fixture work (terminal review of
+            // PLAN-typed-expression-engine, 2026-09-17) added the AXDTM/AXTM ISO columns to the
+            // ADLBC fixture for the CDISC-AD0044 *DTM/*TM template pair — AD0369's *DTF family
+            // derives an imputation-flag case from the new *DTM column. A real population
+            // growth, not drift.
+            "CDISC-AD0369-AXDTF@ADLBC", "CDISC-AD0369-TRTEDTF@ADAE", "CDISC-AD0369-TRTEDTF@ADLBC",
+            "CDISC-AD0369-TRTSDTF@ADAE", "CDISC-AD0369-TRTSDTF@ADLBC", "CDISC-AD0411-ANL01FN@ADLBC",
+            "CDISC-AD0412-ANL01FL@ADLBC", "CDISC-AD0413-ANL01FN@ADLBC",
+            "CDISC-AD0414-ANL01FL@ADLBC", "CDISC-AD0445-PARCAT1@ADLBC",
+            "CDISC-AD0446-PARCAT1N@ADLBC", "CDISC-AD0526-ANL01FN@ADLBC",
+            "CDISC-AD0547-PARCAT1N@ADLBC", "CDISC-AD0730-PARCAT1@ADLBC",
+            "CDISC-AD0731-PARCAT1N@ADLBC", "CDISC-AD0792-TRTSDT@ADLBC");
 
     /**
      * Every expanded rule of a held family that the template harness can build an invalid fixture

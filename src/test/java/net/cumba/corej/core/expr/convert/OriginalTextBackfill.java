@@ -44,8 +44,7 @@ import org.jspecify.annotations.Nullable;
  * The {@code Source} block is <strong>verbatim own-sheet text only</strong> — it carries no
  * cross-family linkage keys. Cross-family provenance (FDA→CG, FDA→FDA-Business, PMDA→FDA) is
  * expressed structurally as {@code References[]} under {@code Standards[]} by the sibling
- * {@link StandardsLinkageBackfill} tool (stage 2 of the internal {@code backfill-rules} workflow,
- * an internal developer pipeline that is not distributed with this repository).
+ * {@link StandardsLinkageBackfill} tool (stage 2 of {@code scripts/backfill-rules.sh}).
  * </p>
  *
  * <p>
@@ -88,7 +87,7 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <pre>{@code
- * cd lib/corej-cdisc-core
+ * cd lib/corej-core
  * mvn -P main -q org.codehaus.mojo:exec-maven-plugin:3.6.1:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.OriginalTextBackfill

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0152 expect=noViolation domain=ADLB
+#note "The non-firing counterpart of the invalid scenario, keeping only its quiet shapes: 001/HGB is the filter discriminator (post-baseline AVAL 15.0 > baseline AVAL 13.5, BASE=13.5 everywhere -> a filter-ignoring max() would false-fire here and red this scenario), and 003/HGB has no baseline record but keeps BASE empty, so the non_empty(BASE) guard holds it quiet. If the rule's logic were inverted (firing on BASE == baseline AVAL) rows 1-2 would fire and this scenario would red."
+#library standard=adamig version=1-2
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col BASETYPE type=Char label="Baseline Type"
+col ABLFL    type=Char label="Baseline Record Flag"
+col AVAL     type=Char label="Analysis Value"
+col BASE     type=Char label="Baseline Value"
+---
+S1 | 001 | HGB | 0 | LAST | Y | 13.5 | 13.5
+S1 | 001 | HGB | 1 | LAST |   | 15.0 | 13.5
+S1 | 003 | HGB | 2 | LAST |   | 10.0 |

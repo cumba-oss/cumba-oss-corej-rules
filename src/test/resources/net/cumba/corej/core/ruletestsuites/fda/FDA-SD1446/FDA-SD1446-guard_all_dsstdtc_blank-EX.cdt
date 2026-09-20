@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1446 expect=noViolation domain=EX
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv): subject 001 HAS DS records but every DSSTDTC cell is blank, so max_date over the group yields EmptyResult.MISSING and the not empty($max) guard silences the rule despite a populated EXSTDTC. If this FIRES, the order-flip guard was deleted: post-6c totality makes date(EXSTDTC) > MISSING true on every dated EX row."
+#library standard=sdtmig version=3-4
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 2023-09-01
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED |
+S1 | DS | 001 | 2 | COMPLETED  |

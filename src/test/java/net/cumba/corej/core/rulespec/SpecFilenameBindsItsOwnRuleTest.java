@@ -22,11 +22,10 @@ import org.junit.jupiter.api.Test;
  * and landed one — {@code CORE-000852}'s — as {@code CDISC-CG0330.yaml} while it bound
  * {@code CDISC-CG0664}, because the new filename had been computed before the spec was retargeted.
  * <b>Nothing reddened.</b> {@link RuleExecutionSpecTest} resolves the <em>binding</em> and never
- * looks at the name; the internal twin's {@code SpecCorpusPopulationRatchetTest} roster records
- * <em>both</em> and is satisfied by any pair it is told to expect, so committing the wrong pair
- * makes it green (that roster is internal-only; this guard is not). It was caught by a hand audit,
- * which is not an instrument. Fixed in {@code 13a46906}; this test is what makes the next one
- * impossible.
+ * looks at the name; {@link SpecCorpusPopulationRatchetTest}'s roster records <em>both</em> and is
+ * satisfied by any pair it is told to expect, so committing the wrong pair makes it green. It was
+ * caught by a hand audit, which is not an instrument. Fixed in {@code 13a46906}; this test is what
+ * makes the next one impossible.
  * </p>
  *
  * <p>
@@ -42,40 +41,25 @@ import org.junit.jupiter.api.Test;
  * allowlist.</b> An allowlist keyed on {@code EC*}/{@code rule_*} would let any future spec adopt
  * one of those prefixes and leave the guard silently — a blind allowlist is this tree's dominant
  * defect class. Pinning path → bound id exactly means an added exception, a removed one,
- * <em>and</em> an existing one whose binding moves are all red. Measured 2026-09-19 over THIS
- * repository's 971 specs: <b>16</b> — fifteen deliberate ones plus one that is not.
- * </p>
- *
- * <p>
- * The fifteen are the engine-case fixtures, which are named for the <em>engine behaviour</em> they
- * probe rather than for the corpus rule they happen to drive, and the six {@code rule_*} authoring
- * pilots. ⚑ One of them arrived with the CORE-family retirement:
+ * <em>and</em> an existing one whose binding moves are all red. Measured 2026-09-19: exactly
+ * <b>19</b> deliberate exceptions — the engine-case fixtures, which are named for the <em>engine
+ * behaviour</em> they probe rather than for the corpus rule they happen to drive, and the six
+ * {@code rule_*} authoring pilots. ⚑ The 19th arrived with the CORE-family retirement:
  * {@code EC-variable-count-split-family-dedup.yaml} was renamed off its old {@code CORE-*} stem
  * (its {@code $ref} body probes engine behaviour and its id is in no corpus family), so its name
  * now deliberately says nothing about the id it binds.
  * </p>
  *
  * <p>
- * ⛔⛔ <b>The sixteenth, {@code AD0180-srcdom-companion-domains.yaml} → {@code CDISC-AD0180}, is NOT
- * a deliberate exception — it is the shortfall this guard is FOR, and it is pinned only so that the
- * guard could be armed at all.</b> It is an ordinary rule spec whose stem simply drops the family
- * prefix, and it is <b>OSS-only</b>: its internal counterpart does not exist, while every one of
- * its OSS-only siblings ({@code CDISC-AD0152}, {@code CDISC-AD0165}, {@code CDISC-AD0168},
- * {@code PMDA-AD0165}, {@code PMDA-AD0168}) carries the prefix. ⇒ <b>The repair is to RENAME the
- * file</b> to {@code CDISC-AD0180-srcdom-companion-domains.yaml}, which also needs its
- * {@code oss-only} row in the meta repo's {@code oss-identity-exclusions.tsv} re-pointed — a
- * two-repo edit, and the spec belongs to {@code PLAN-typed-engine-oss-port.md}, so it is SURFACED
- * here rather than done in passing. The exact-set equality makes that self-closing: the day it is
- * renamed this entry reds and must go.
- * </p>
- *
- * <p>
- * ⭐ <b>PORTED from the internal twin 2026-09-19</b>, with its exception set RE-DERIVED against this
- * corpus rather than copied — 16 here against 19 there, and the difference is measured, not nudged:
- * the four {@code EC46-*} specs are internal-only (their OSS port is owed by
- * {@code PLAN-typed-engine-oss-port.md}) and {@code AD0180-srcdom-companion-domains.yaml} is
- * OSS-only, so 19 − 4 + 1 = 16. ⛔ Never copy the internal list: the two corpora are different
- * populations and a set copied rather than measured is an allowlist wearing a set's clothes.
+ * ⭐ <b>CLOSED 2026-09-19: the OSS twin now carries this guard and its {@code .cdt} sibling.</b>
+ * Review round 1 recorded that {@code <meta>/cumba-oss-corej-rules} had NEITHER, while holding 971
+ * rulespecs and 8 563 {@code .cdt} — so a re-key whose filename was computed before the retarget
+ * was undetectable there, and the same migration wave had touched it. Both were ported in the
+ * round-1 OSS port, with their exception sets <b>re-derived against that corpus, not copied</b>:
+ * <b>16</b> there against <b>19</b> here, and the difference is measured — the four {@code EC46-*}
+ * specs are internal-only and {@code AD0180-srcdom-companion-domains.yaml} is OSS-only, so 19
+ * &minus; 4 + 1 = 16. ⛔ The two sets are per-corpus measurements and must not be aligned to each
+ * other; a set copied rather than measured is an allowlist.
  * </p>
  */
 class SpecFilenameBindsItsOwnRuleTest
@@ -86,12 +70,19 @@ class SpecFilenameBindsItsOwnRuleTest
      * deliberately does not start with its bound rule id. Exact set; see the class javadoc.
      */
     private static final Map<String, String> EXPECTED_EXCEPTIONS = Map.ofEntries(
+            // ⭐ Added 2026-09-20 by the OSS alignment round, which ported this spec UP from
+            // cumba-oss-corej-rules. Same shape as the 19 below: the stem names the rule WITHOUT
+            // its standard prefix and then the scenario, so "AD0180-…" binds "CDISC-AD0180".
             Map.entry("AD0180-srcdom-companion-domains.yaml", "CDISC-AD0180"),
             Map.entry("EC-variable-count-split-family-dedup.yaml",
                     "EC-VARIABLE-COUNT-SPLIT-FAMILY-DEDUP"),
             Map.entry("EC18-date-diff-mode3-sided.yaml", "EC18-DATEDIFF-MODE3"),
             Map.entry("EC21-date-diff-target-from-evaluation-domain.yaml", "EC21-DATEDIFF-TARGET"),
             Map.entry("EC43-not-equal-absent.yaml", "AUTO-EC43-not-equal-absent"),
+            Map.entry("EC46-offset-and-masked-selection.yaml", "CDISC-CG0148"),
+            Map.entry("EC46-partial-date-max-indeterminate.yaml", "FDA-SD0080"),
+            Map.entry("EC46-partial-date-min-indeterminate.yaml", "CDISC-CG0148"),
+            Map.entry("EC46-unpositionable-value-wins.yaml", "CDISC-CG0148"),
             Map.entry("EC51-CG0147-indeterminate-extreme.yaml", "CDISC-CG0147"),
             Map.entry("EC51-SE2276-indeterminate-extreme.yaml", "FDA-SE2276"),
             Map.entry("EC51-SEND-0306-indeterminate-extreme.yaml", "CDISC-SEND-0306"),
@@ -106,10 +97,9 @@ class SpecFilenameBindsItsOwnRuleTest
 
     /**
      * Floor on the population this guard actually inspected, so a walk that saw almost nothing
-     * cannot pass vacuously. <b>947 rule-bound specs measured here on 2026-09-19</b>, of 971
-     * walked. It is a floor and not a pin — the exact population is the internal twin's
-     * {@code SpecCorpusPopulationRatchetTest}'s job, and this repository has no roster artifact for
-     * it to read ({@code documentation/} does not exist here).
+     * cannot pass vacuously. It is a floor and not a pin — the exact population is
+     * {@link SpecCorpusPopulationRatchetTest}'s job, and duplicating it here would make every
+     * retirement edit two tests instead of one.
      */
     private static final int MIN_SPECS_NAMING_A_RULE = 800;
 
@@ -122,7 +112,7 @@ class SpecFilenameBindsItsOwnRuleTest
     }
 
 
-    /** Every spec's filename stem starts with the rule id the spec binds — 16 exceptions apart. */
+    /** Every spec's filename stem starts with the rule id the spec binds — 19 exceptions apart. */
     @Test
     void everySpecFilenameStartsWithTheRuleItBinds()
     {
@@ -193,14 +183,13 @@ class SpecFilenameBindsItsOwnRuleTest
      * does the same for the {@code .cdt} half.
      *
      * <p>
-     * ⚠⚠ <b>Why the assertion above is not self-guarding.</b> It is an equality against a 16-entry
-     * expected list, so a BLINDED detector — one that reported nothing — reds today, because 16
+     * ⚠⚠ <b>Why the assertion above is not self-guarding.</b> It is an equality against a 19-entry
+     * expected list, so a BLINDED detector — one that reported nothing — reds today, because 19
      * lines would go missing. That protection is an accident of the exception list being non-empty.
-     * The 16 are engine-case fixtures, authoring pilots and one un-prefixed name; retiring or
-     * renaming any of them is an ordinary, legitimate tidy-up, and the day the list reaches zero a
-     * detector that has silently stopped detecting passes an equality of {@code [] == []} for ever.
-     * The floor does not help either: {@code MIN_SPECS_NAMING_A_RULE} counts what was WALKED, not
-     * what was JUDGED.
+     * The 19 exceptions are engine-case fixtures and authoring pilots; retiring or renaming them is
+     * an ordinary, legitimate tidy-up, and the day the list reaches zero a detector that has
+     * silently stopped detecting passes an equality of {@code [] == []} for ever. The floor does
+     * not help either: {@code MIN_SPECS_NAMING_A_RULE} counts what was WALKED, not what was JUDGED.
      * </p>
      *
      * <p>
@@ -231,10 +220,9 @@ class SpecFilenameBindsItsOwnRuleTest
         assertFalse(stemBindsItsRule("CORE-000852.yaml", "CDISC-CG0664"),
                 "SENSITIVITY FAILED: a retired-family stem over a live binding must be reported");
         // a near-miss that a substring test rather than a prefix test would wave through
-        assertFalse(
-                stemBindsItsRule("EC67-dataset-domain-fork-cannot-resolve.yaml", "CDISC-CG0308"),
+        assertFalse(stemBindsItsRule("EC46-unpositionable-value-wins.yaml", "CDISC-CG0148"),
                 "SENSITIVITY FAILED: the check must be a PREFIX test — this very path is one of the"
-                        + " 16 pinned exceptions and must reach the disagreeing list to be pinned");
+                        + " 19 pinned exceptions and must reach the disagreeing list to be pinned");
         // ⚑ one-directional: the stem may be LONGER than the binding, never shorter
         assertFalse(stemBindsItsRule("CDISC-CG0033.yaml", "CDISC-CG0033-A"),
                 "SENSITIVITY FAILED: a parent-named spec binding a split SIBLING must be reported");

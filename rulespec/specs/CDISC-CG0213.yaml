@@ -1,0 +1,40 @@
+name: CDISC-CG0213
+kind: rule
+description: |
+  Record-Data + Operations port, RE-CUT 2026-09-18 (PLAN-unplanned-visit-cascade): the rule
+  now carries the canonical planned-visit cascade. With no SVPRESP column, planned-ness is
+  decided by SVUPDES and then the VISIT-name literals - so the row NAMED "UNSCHEDULED"
+  (VISITNUM=99) is unplanned and EXEMPT, where the pre-cascade empty(SVUPDES) form fired on
+  it: that suppression is the drift this spec now pins. The neutral-named row (VISITNUM=98,
+  "WEEK 98", empty SVUPDES) is planned, its VISITNUM is absent from TV (=[1]), and it fires.
+python_source: rules-sdtmig-3-3.json (CORE-000842)
+rule:
+  coreId: CDISC-CG0213
+datasets:
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: SCREENING}
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 99, VISIT: UNSCHEDULED, SVUPDES: ''}
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 98, VISIT: WEEK 98, SVUPDES: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+    trial-design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0213
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 98}
+    status: SUCCESS
+    output_variables:
+      $visitnums_in_tv: '[1]'
+      SVUPDES:
+      VISIT: WEEK 98
+      VISITNUM: '98'
+expected_errors: []

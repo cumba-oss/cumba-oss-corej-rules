@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when Planned Study Day of Visit (VISITDY) is populated\
   \ for an unplanned visit (Description of Unplanned Visit (SVUPDES) is populated)\
   \ in the Subject Visits (SV) domain; VISITDY should be missing for unplanned visits."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -13,13 +13,14 @@ Scope:
 Requirements:
   Variables:
     All:
-    - "SVUPDES"
     - "VISITDY"
 Check:
   expression: >-
-    not empty(SVUPDES) and not empty(VISITDY)
+    (var_exists("SVPRESP") and SVPRESP != "Y" or not var_exists("SVPRESP") and (not empty(SVUPDES)
+    or contains(upper(VISIT), "UNSCHEDUL") or contains(upper(VISIT), "UNPLAN"))) and not
+    empty(VISITDY)
 Outcome:
-  Message: "VISITDY is populated for an unplanned visit (SVUPDES is populated)."
+  Message: "VISITDY is populated for an unplanned visit."
   Output_Variables:
   - "VISITDY"
   - "SVUPDES"

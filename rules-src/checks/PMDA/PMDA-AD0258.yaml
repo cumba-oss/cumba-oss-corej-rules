@@ -8,12 +8,13 @@ Executability: "Fully Executable"
 ExecutabilityHint:
   Category: "fully executable"
   Detail: "Cross-standard record-key traceability: requires the SDTM AE domain to\
-    \ be co-loaded as a reference dataset alongside ADAE. The Check is guarded by\
-    \ a exists(AE.AESEQ) presence test (mirroring CDISC-AD0053): when AE is not among\
-    \ the loaded datasets the guard is false and the rule self-skips (no spurious\
-    \ fire), so it is safe to run in an ADaM-only package. When AE is present it left-joins\
-    \ ADAE to AE on STUDYID/USUBJID/AESEQ and fires on the un-matched (AE.AESEQ empty)\
-    \ ADAE records."
+    \ be co-loaded as a reference dataset alongside ADAE. The rule left-joins ADAE\
+    \ to AE on STUDYID/USUBJID/AESEQ and fires on the ADAE records the join did not\
+    \ match, read from the join match flag AE._matched_ rather than from an empty()\
+    \ proxy over a merged column. AE.AESEQ is declared in Requirements.Variables.All,\
+    \ so when AE (or its AESEQ column) is not loaded the rule is SKIPPED with a reason\
+    \ instead of executing clean, which is what makes it safe to run in an ADaM-only\
+    \ package."
 Scope:
   Data_Structures:
     Include:
@@ -21,6 +22,10 @@ Scope:
   Subclasses:
     Include:
     - "ADVERSE EVENT"
+Requirements:
+  Variables:
+    All:
+    - "AE.AESEQ"
 Match_Datasets:
 - Name: "AE"
   Keys:
@@ -30,7 +35,7 @@ Match_Datasets:
   Join_Type: "left"
 Check:
   expression: >-
-    var_exists(AE.AESEQ) and empty(AE.AESEQ)
+    not AE._matched_
 Outcome:
   Message: "The ADAE record has no matching SDTM AE record for STUDYID, USUBJID and\
     \ AESEQ."

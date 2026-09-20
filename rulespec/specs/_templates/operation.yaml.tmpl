@@ -2,13 +2,11 @@ name: "{{name}}"
 kind: operation
 description: "{{description}}"
 operation:
-  id: "$auto_result"
-  operator: "{{operator}}"
-  name: "{{column}}"
-check:
   name: "$auto_result"
-  operator: "{{check_operator}}"
-  value: "{{check_value}}"
+  expression: "{{operator}}({{column}})"
+check:
+  # A boolean check expression over the operation result, e.g.: $auto_result > 5
+  expression: "{{check_expression}}"
 datasets:
   {{domain}}:
     row_key: [STUDYID, USUBJID]

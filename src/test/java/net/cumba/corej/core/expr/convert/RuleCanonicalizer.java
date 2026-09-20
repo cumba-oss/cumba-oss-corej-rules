@@ -24,8 +24,7 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Offline developer tool — stage 3 of the internal {@code backfill-rules} workflow (an internal
- * developer pipeline that is not distributed with this repository): normalises every
+ * Offline developer tool — stage 3 of {@code scripts/backfill-rules.sh}: normalises every
  * {@code rules-src/checks/*.yaml} to a defined top-level field order and a single canonical YAML
  * style (plan {@code plans/done/PLAN-source-block-migration.md}). It is schema-aware of the
  * post-backfill layout: {@code Source} is second-to-last (immediately before {@code Standards}, as
@@ -34,8 +33,10 @@ import org.jspecify.annotations.Nullable;
  * {@link StandardsLinkageBackfill}).
  *
  * <p>
- * Per check file it (1) parses the YAML to a tree — dropping comments, which is the agreed
- * behaviour since the rationale lives in the {@code documentation/} prose; (2) reorders the
+ * Per check file it (1) parses the YAML to a tree — <b>dropping comments, and dropping them
+ * SILENTLY</b>, which is the agreed behaviour since the rationale lives in the
+ * {@code documentation/} prose (⚠ read the comment paragraph below before any corpus-wide run: the
+ * agreement has been broken once, and the tool ate the comment without a word); (2) reorders the
  * <strong>top-level</strong> keys into {@link #TOP_ORDER} (any unknown key is placed just before
  * {@code Source}, sorted among the other unknowns, and a drift warning is printed naming it; a
  * straggler {@code Original_*} key is dropped with a warning); (3) preserves every nested object's
@@ -54,28 +55,53 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * Default mode rewrites in place. {@code -Dcanonicalize.check=true} (or the shared
- * {@code -Dbackfill.dryRun=true}) is report-only and, under {@code canonicalize.check}, fails the
- * build (a Spotless-style CI gate). The rewrite is idempotent — a second run makes no change.
+ * {@code -Dbackfill.dryRun=true}) is report-only and, under {@code canonicalize.check}, throws —
+ * Spotless-<em>shaped</em>, but see the next paragraph: it is not a gate, because nothing runs it.
+ * The rewrite is idempotent — a second run makes no change.
  * </p>
  *
  * <p>
- * ⚠ <b>What check mode reports is a COUNT, not a list.</b> {@link #main} prints
- * {@code non-canonical=N}; the per-file names it does print are the {@code warnings} (an unknown
- * top-level key, a dropped straggler, a stripped {@code Severity: "Error"}) and the round-trip
- * failures, which are a different thing entirely. To find <em>which</em> files are non-canonical,
- * run the rewrite against a copy and diff it — e.g. {@code git archive HEAD | tar -x} into a temp
- * tree, point {@code -Dbackfill.checksRoot} at its {@code rules-src/checks}, and diff.
+ * ⛔⛔ <b>NOTHING IN THE BUILD RUNS THIS.</b> Verified 2026-09-11: the only caller anywhere in the
+ * repository is {@code scripts/backfill-rules.sh} stage 3, an offline developer script.
+ * {@code pom.xml} has no {@code exec-maven-plugin} binding for it, no test invokes {@link #run},
+ * and {@code .gitea/workflows/main.yml} never mentions it — so {@code mvn verify} is green over a
+ * corpus that has drifted arbitrarily far out of canonical form. That is not hypothetical:
+ * <b>twelve</b> of the sixteen files non-canonical at {@code 338a8b52} were introduced by a single
+ * board, against a documented baseline of zero, with every gate green throughout. This javadoc
+ * called check mode "a Spotless-style CI gate" the whole time.
  * </p>
  *
  * <p>
- * &#9888;&#9888; <b>The baseline is now ZERO, and the "98" figure below it is retired.</b> Measured
- * 2026-08-25 at {@code d1d21ab08}: <b>{@code files=3804 non-canonical=0}</b> — the whole corpus was
- * canonicalised on the owner's direction, so an acceptance phrased as <em>"expect 0
- * non-canonical"</em> is now <b>correct</b> rather than wrong. <b>Re-measured 2026-08-26</b> at
- * {@code d1d21ab08} <em>plus Plan C phase 5b's nine uncommitted {@code rules-src} files</em> (the
- * level-keyed {@code Check} rewrites): <b>{@code files=3804 non-canonical=0 comments-stripped=8
- * round-trip-failures=0}</b> — so the baseline survives 5b, and the level-map layout below
- * ({@link #renderLevelCheckBlockOrNull}) is what keeps those nine canonical.
+ * ⚠ <b>What check mode reports for non-canonicality is a COUNT, not a list.</b> {@link #main}
+ * prints {@code non-canonical=N}; the per-file names it does print are the {@code warnings} (an
+ * unknown top-level key, a dropped straggler, a stripped {@code Severity: "Error"}), the comment
+ * candidates (named since 2026-09-11, see below) and the round-trip failures — all of which are
+ * different things entirely. To find <em>which</em> files are non-canonical, run the rewrite
+ * against a copy and diff it — e.g. {@code git archive HEAD | tar -x} into a temp tree, point
+ * {@code -Dbackfill.checksRoot} at its {@code rules-src/checks}, and diff.
+ * </p>
+ *
+ * <p>
+ * &#9888;&#9888; <b>The baseline is ZERO, and it is ZERO only as long as someone re-runs this by
+ * hand.</b> Measured 2026-08-25 at {@code d1d21ab08}: <b>{@code files=3804 non-canonical=0}</b> —
+ * the whole corpus was canonicalised on the owner's direction, so an acceptance phrased as
+ * <em>"expect 0 non-canonical"</em> is <b>correct</b> rather than wrong. Re-measured 2026-08-26 at
+ * {@code d1d21ab08} <em>plus Plan C phase 5b's nine uncommitted {@code rules-src} files</em>:
+ * <b>{@code files=3804 non-canonical=0 comments-stripped=8}</b> — so the baseline survives 5b, and
+ * the level-map layout below ({@link #renderLevelCheckBlockOrNull}) is what keeps those nine
+ * canonical.
+ * </p>
+ *
+ * <p>
+ * &#9873; <b>And then it drifted, because nothing was watching.</b> Measured 2026-09-11 at
+ * {@code 338a8b52}: <b>{@code files=3877 non-canonical=16 comments-stripped=9
+ * round-trip-failures=0}</b>. Twelve of the sixteen came from the absent-column flood-guarding
+ * board's waves B–D; four predate it. The defect was the same every time and purely cosmetic — a
+ * hand-written long {@code Description} or {@code Outcome.Message} left as one unwrapped line, or
+ * folded at the wrong width, where this writer folds it. Re-canonicalised in the same pass;
+ * afterwards <b>{@code files=3877 non-canonical=0 comments-stripped=8}</b>. ⇒ The lesson is the one
+ * stated in the next paragraph — a non-canonical count is a property of <em>a commit</em> — plus a
+ * second: <b>a baseline no gate re-asserts is a memory, not an invariant.</b>
  * </p>
  *
  * <p>
@@ -91,21 +117,50 @@ import org.jspecify.annotations.Nullable;
  * &#9888; <b>Run it from the repository root, or with an absolute root.</b> {@code SRC_CHECKS} is a
  * <b>relative</b> path: invoked from the wrong directory {@link #main} walks nothing and prints
  * {@code files=0 non-canonical=0}, which reads exactly like a clean gate and is a <b>void run</b>.
- * Always pass {@code -Dbackfill.checksRoot=<absolute>/lib/corej-cdisc-rules/rules-src/checks} and
- * <b>assert {@code files=3804}</b> before believing the count.
+ * Always pass {@code -Dbackfill.checksRoot=<absolute>/rules-src/checks} (the
+ * {@code lib/corej-rules/} prefix belonged to the retired monorepo) and <b>assert the file count is
+ * the corpus size</b> before believing the result — 3804 on 2026-08-25, <b>3877</b> on 2026-09-11.
+ * It only ever grows; a small number is a void run, not a clean one.
  * </p>
  *
  * <p>
- * &#9888; <b>{@code comments-stripped=8} is a FALSE-POSITIVE detection counter, not an action.</b>
- * The corpus contains <b>zero</b> YAML comments; all 8 hits are a {@code #} inside a <em>quoted
- * string value</em> (sheet-issue references such as {@code #127}, {@code SDTM IG #4.1.5.3.2},
- * {@code naming conventions #10}). Verified 2026-08-25: 4 of the 8 are re-wrapped and 4 untouched,
- * and <b>all 8 keep their values byte-intact</b>. Nothing is lost — but the counter misreports.
+ * &#9888;&#9888; <b>{@code comments-stripped} is MOSTLY a false-positive counter — but it is not
+ * only that, and the difference has already cost a comment.</b> {@link #hasComment} scans line by
+ * line and does not carry double-quote state across a folded scalar's continuation lines, so a
+ * {@code #} inside a <em>quoted string value</em> reads as a comment: sheet-issue references such
+ * as {@code #127}, {@code SDTM IG #4.1.5.3.2}, {@code naming conventions #10}. Those hits lose
+ * nothing — their files come out byte-identical.
+ * </p>
+ *
+ * <p>
+ * ⛔ <b>The sentence "the corpus contains ZERO YAML comments" stood here until 2026-09-11 and was
+ * FALSE</b>, which is exactly what made the hazard invisible: a real comment hides inside the
+ * count, indistinguishable from the harmless ones. Measured at {@code 338a8b52}, nine files tripped
+ * the detector — {@code CDISC-SEND-0049}, {@code CDISC-SEND-0422}, {@code PMDA-AD0037},
+ * {@code PMDA-AD0037B}, {@code PMDA-AD0038}, {@code PMDA-AD0038B}, {@code PMDA-SD1096},
+ * {@code FDA-SD1096} and {@code CDISC-CG0155}. The first eight are the quoted-{@code #} false
+ * positives. The ninth was real: {@code CDISC-CG0155} carried a five-line rationale block inside
+ * {@code Operations} (added by {@code ca63ebf5}, explaining the {@code returntype}
+ * {@code "code" -> "value"} rewrite), and this tool <b>deleted it, silently</b>. Nothing was lost —
+ * the same reasoning is stated in {@code documentation/CORE-RULES-AUTHORING-GUIDELINES.md}
+ * <b>R-5.15a</b>, in {@code CORE-RULES-SPECIFICATION.md}'s {@code returntype} row, in
+ * {@code rule-review-manual.md}, and in all four of that rule's {@code .cdt} scenario
+ * {@code #note}s — but that was luck, not design. After the 2026-09-11 re-canonicalisation the
+ * count is <b>8</b>, and 8 is the all-false-positive floor: <b>a rise above it means a real comment
+ * is about to be eaten.</b> The per-file names are printed by {@link #run}, so the floor can be
+ * checked rather than assumed.
+ * </p>
+ *
+ * <p>
+ * ⚠ The invocation below needs {@code target/test-classes} populated and must run from this
+ * repository's root; with an empty {@code target/} it dies with a bare
+ * {@code ClassNotFoundException}. There is no {@code -P main} profile in the split repo — the
+ * former {@code cd lib/corej-rules} / {@code -P main} form belonged to the retired monorepo.
  * </p>
  *
  * <pre>{@code
- * cd lib/corej-cdisc-rules
- * mvn -P main -q org.codehaus.mojo:exec-maven-plugin:3.6.1:java \
+ * mvn -q test-compile
+ * mvn -q org.codehaus.mojo:exec-maven-plugin:3.6.1:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.RuleCanonicalizer
  * }</pre>
@@ -138,14 +193,14 @@ public final class RuleCanonicalizer
      * {@code Requirements} what it needs in order to answer at all
      * ({@code plans/done/PLAN-scope-requirements-split.md} §4.1). Omitting it here would not fail
      * any gate: an unlisted key is merely relocated to just before {@code Source} with a warning,
-     * at the next {@code backfill-rules} run and nowhere else — which is why
+     * at the next {@code scripts/backfill-rules.sh} run and nowhere else — which is why
      * {@code CanonicalTopOrderCoverageTest} asserts {@code TOP_ORDER} covers every key the corpus
      * actually carries.
      * </p>
      */
     static final List<String> TOP_ORDER = List.of("Core", "Description", "Severity", "Sensitivity",
             "Executability", "ExecutabilityHint", "Scope", "Requirements", "Match_Datasets",
-            "Grouping_Variables", "Grouping", "Variable_Universe", "Operations", "Check", "Outcome",
+            "Grouping_Variables", "Grouping", "Variable_Universe", "Bindings", "Check", "Outcome",
             // Board finding L4 (filed 2026-08-24, landed 2026-08-25): "Expansion" was modelled
             // (Rule.getExpansion()) and authored by two rules, but absent here — so every run
             // relocated it to the unknown-key slot just before "Source" and warned. It heads the
@@ -351,11 +406,12 @@ public final class RuleCanonicalizer
             warnings.add("stripped redundant Severity: \"Error\" (absent means Error)");
         }
 
-        // Order each Operations item: id, operator, then the remaining keys alphabetically. The
-        // array element order (and any inner array values) are preserved.
-        if (work.get("Operations") instanceof ArrayNode ops)
+        // Order each Bindings item: name, then the remaining keys alphabetically (expression
+        // is the only other authorable key since 7b). The array element order (and any inner
+        // array values) are preserved.
+        if (work.get("Bindings") instanceof ArrayNode ops)
         {
-            work.set("Operations", orderOperations(ops));
+            work.set("Bindings", orderOperations(ops));
         }
 
         List<String> unknown = new ArrayList<>();
@@ -439,9 +495,9 @@ public final class RuleCanonicalizer
 
 
     /**
-     * A copy of the {@code Operations} array with each item object's keys reordered to {@code id},
-     * {@code operator}, then the remaining keys alphabetically. Element order and non-object
-     * elements are preserved; inner values (e.g. {@code codelists} lists) are untouched.
+     * A copy of the {@code Bindings} array with each item object's keys reordered to {@code name},
+     * then the remaining keys alphabetically ({@code expression} is the only other authorable key
+     * since phase 7b). Element order and non-object elements are preserved.
      */
     private static ArrayNode orderOperations(ArrayNode ops)
     {
@@ -454,18 +510,14 @@ public final class RuleCanonicalizer
                 continue;
             }
             ObjectNode ordered = YAML_READ.createObjectNode();
-            if (op.has("id"))
+            if (op.has("name"))
             {
-                ordered.set("id", op.get("id"));
-            }
-            if (op.has("operator"))
-            {
-                ordered.set("operator", op.get("operator"));
+                ordered.set("name", op.get("name"));
             }
             List<String> rest = new ArrayList<>();
             op.fieldNames().forEachRemaining(k ->
             {
-                if (!k.equals("id") && !k.equals("operator"))
+                if (!k.equals("name"))
                 {
                     rest.add(k);
                 }

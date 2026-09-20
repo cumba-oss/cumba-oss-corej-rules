@@ -4,7 +4,7 @@ Core:
   Version: "1"
 Description: "Raise an error when SVUPDES is populated and VISITNUM is equal to a\
   \ VISITNUM present in the TV dataset."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -12,17 +12,17 @@ Scope:
 Requirements:
   Variables:
     All:
-    - "SVUPDES"
     - "VISITNUM"
-Operations:
-- id: "$visitnums_in_tv"
+Bindings:
+- name: "$visitnums_in_tv"
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    not empty(SVUPDES) and VISITNUM in $visitnums_in_tv
+    (var_exists("SVPRESP") and SVPRESP != "Y" or not var_exists("SVPRESP") and (not empty(SVUPDES)
+    or contains(upper(VISIT), "UNSCHEDUL") or contains(upper(VISIT), "UNPLAN"))) and VISITNUM in
+    $visitnums_in_tv
 Outcome:
-  Message: "SVUPDES is populated, but the VISITNUM is equal to a VISITNUM present\
-    \ in the TV dataset."
+  Message: "VISITNUM for an unplanned visit matches a VISITNUM value in the TV dataset."
   Output_Variables:
   - "VISITNUM"
   - "!SVUPDES"

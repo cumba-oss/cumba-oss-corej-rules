@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0658 expect=violation domain=SV
+#note "B2 CONTROL of PLAN-unplanned-visit-cascade: no SVPRESP column. Under the pre-cascade empty(SVPRESP) form rows 1, 3 AND the whole dataset's populated-VISITDY rows FIRED (absent column folds to all-empty - the flood this plan retires); under the cascade row 1 is planned (blank SVUPDES, neutral name) and keeps its VISITDY. Row 2 (populated SVUPDES) and row 3 (UNPLANNED marker) are unplanned with VISITDY populated -> fire. Row 4 has no VISITDY -> clean. This fixture reds under the old form (row 1 in the count)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-1015
+#expectViolationAt row=3 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2 | BASELINE |  | 14
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 99 | WEEK 99 | POST-AE EXTRA VISIT | 1
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 98 | UNPLANNED 2 |  | 2
+CDISCPILOT01 | SV | 01-701-1015 | 4 | 1 | SCREENING |  | 
+---

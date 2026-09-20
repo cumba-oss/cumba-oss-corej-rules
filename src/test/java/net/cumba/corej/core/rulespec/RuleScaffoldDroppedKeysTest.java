@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * ⚠ These are hand-authored gate tests: they prove the net fires, never that a shipped spec carries
  * an offending key. Measured 2026-08-25 over 1 105 files — the module's 1 048 spec YAMLs plus their
  * one {@code $ref}ed rule fixture and the 56 {@code coreId}-resolved
- * {@code ../corej-cdisc-rules/rules/rules-*.json} packages — 14 435 {@code Scope} and 5 736
+ * {@code ../corej-rules/rules/rules-*.json} packages — 14 435 {@code Scope} and 5 736
  * {@code Requirements} blocks (4 734 of them with {@code Variables}) carry <b>0</b> unknown nested
  * keys. The net is preventive, and {@code Scope.Datasets} has no carrier at all yet.
  */
@@ -50,7 +50,7 @@ class RuleScaffoldDroppedKeysTest
               Requirements:
                 Variables:
                   All: [AESTDTC]
-              Check: {all: [{name: AESTDTC, operator: is_not_empty}]}
+              Check: {expression: 'not empty(AESTDTC)'}
               Outcome: {Message: "m", Output_Variables: [AESTDTC]}
             datasets:
               AE:
@@ -72,7 +72,7 @@ class RuleScaffoldDroppedKeysTest
                   Description: ""
                   Sensitivity: Record
                 %s
-                  Check: {all: [{name: AESTDTC, operator: is_not_empty}]}
+                  Check: {expression: 'not empty(AESTDTC)'}
                   Outcome: {Message: "m", Output_Variables: [AESTDTC]}
                 datasets:
                   AE:

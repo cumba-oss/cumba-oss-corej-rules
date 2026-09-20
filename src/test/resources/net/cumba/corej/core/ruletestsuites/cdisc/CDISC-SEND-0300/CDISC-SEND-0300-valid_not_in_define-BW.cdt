@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-SEND-0300 expect=noViolation domain=BW
+#note "The Define half of the discriminator: BW is still empty, but the Define channel describes only DM - ds_name('DEFINE') is empty for BW, so the 'described in the Define-XML' conjunct is false and the rule stays quiet. An empty dataset alone is CDISC-SEND-0278's concern, not this rule's. Together with the invalid scenario this isolates the firing condition to the Define declaration."
+#library standard=sendig version=3-1-1
+#define dataset-metadata DM name=DM
+dataset BW label="Body Weight"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BWSEQ   type=Num  label="Sequence Number"
+---

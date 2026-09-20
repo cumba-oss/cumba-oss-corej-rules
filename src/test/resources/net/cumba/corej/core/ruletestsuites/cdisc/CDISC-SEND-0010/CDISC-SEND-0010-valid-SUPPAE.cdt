@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0010 expect=noViolation domain=SUPPAE
+#note "The same SUPPAE without any timing variable: every variable present (identifiers plus the QNAM/QLABEL/QVAL triplet) is outside the curated timing set, so nothing fires. If the membership test were inverted the non-timing variables here would fire and this scenario would red."
+#library standard=sendig version=3-0
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AEFOO | Foo | X

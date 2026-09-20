@@ -1,0 +1,36 @@
+#!RuleTest
+#test PMDA-SD0075 expect=noViolation domain=CO
+#note "Both CO rows reference a variable that exists in the dataset their own RDOMAIN names (LBSEQ in LB, AESEQ in AE), so nothing fires. An inverted membership test (firing on a resolvable IDVAR) fires on both rows and reds this scenario."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | LB | 001 | 1 | LBSEQ | 1 | legit reference
+S1 | CO | AE | 001 | 2 | AESEQ | 1 | legit reference
+---
+
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | Headache

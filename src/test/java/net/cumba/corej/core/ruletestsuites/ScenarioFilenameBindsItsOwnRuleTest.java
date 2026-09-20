@@ -24,8 +24,8 @@ import org.junit.jupiter.api.io.TempDir;
  * MIS-ATTRIBUTES coverage, and until 2026-09-19 nothing in this repository checked it.</b>
  * {@code rulespec/} has had {@link net.cumba.corej.core.rulespec.SpecFilenameBindsItsOwnRuleTest}
  * since a re-key landed {@code CORE-000852}'s spec as {@code CDISC-CG0330.yaml} while it bound
- * {@code CDISC-CG0664} with nothing reddening. The {@code .cdt} corpus — <b>8 564 files here</b>,
- * an order of magnitude larger — had <em>no analogue</em>. The invariant held tree-wide anyway, but
+ * {@code CDISC-CG0664} with nothing reddening. The {@code .cdt} corpus — <b>8 660 files</b>, an
+ * order of magnitude larger — had <em>no analogue</em>. The invariant held tree-wide anyway, but
  * <b>by convention only</b>, and convention is not a check: this tree's signature defect is a
  * population discovered by a convention rather than asserted.
  * </p>
@@ -79,31 +79,32 @@ import org.junit.jupiter.api.io.TempDir;
  * <h2>⛔ Exceptions are an EXACT SET, and today it is EMPTY</h2>
  *
  * <p>
- * Measured 2026-09-19 over all <b>8 564</b> scenarios in THIS repository: <b>zero</b> violations of
- * any of the five checks. So {@link #EXPECTED_EXCEPTIONS} is empty, and it is a {@code Map} rather
- * than a count so that an added exception, a removed one, <em>and</em> an existing one whose
- * binding moves are all red. ⛔ Never widen this to a prefix allowlist or a tolerated count — a
- * blind allowlist is precisely the defect class this guard was added to close. An empty exact set
- * is the strongest form the pin can take, and {@link #MIN_SCENARIOS} plus
+ * Measured 2026-09-19 over all <b>8 660</b> scenarios: <b>zero</b> violations of any of the five
+ * checks. So {@link #EXPECTED_EXCEPTIONS} is empty, and it is a {@code Map} rather than a count so
+ * that an added exception, a removed one, <em>and</em> an existing one whose binding moves are all
+ * red. ⛔ Never widen this to a prefix allowlist or a tolerated count — a blind allowlist is
+ * precisely the defect class this guard was added to close. An empty exact set is the strongest
+ * form the pin can take, and {@link #MIN_SCENARIOS} plus
  * {@link #theDetectorCatchesEveryShapeItClaimsTo(Path)} are what stop it passing vacuously.
  * </p>
  *
  * <p>
  * ⚑ There is exactly <b>one</b> {@code #test} parser in this package and this guard uses it:
  * {@link AbstractRuleTestSuitesFactory#peekCoreId} itself, made package-visible for the purpose. A
- * local re-implementation is what the H-5 finding on the internal twin's
- * {@code OrderFlipGuardCoverageRatchetTest} cost — two predicates, and the guard used the one the
- * factory did not. (That ratchet is internal-only; the lesson is not.)
+ * local re-implementation is what the H-5 finding on {@link OrderFlipGuardCoverageRatchetTest} cost
+ * — two predicates, and the guard used the one the factory did not.
  * </p>
  *
  * <p>
- * ⭐ <b>PORTED from the internal twin 2026-09-19</b>, with its exception set and its population
- * floor RE-DERIVED against this corpus rather than copied. Review round 1 recorded that this
- * repository had neither this guard nor its {@code rulespec} sibling while holding 8 563
- * {@code .cdt} and 971 rulespecs — so a name/binding disagreement here ran green against the wrong
- * rule with nothing reporting it. Both guards now exist on both sides. ⛔ Do not "align" the
- * constants below to the internal twin's: the two corpora are different populations, and an
- * exception set copied rather than measured is an allowlist.
+ * ⭐ <b>CLOSED 2026-09-19: the OSS twin now carries this guard and its {@code rulespec} sibling.</b>
+ * Review round 1 recorded that {@code <meta>/cumba-oss-corej-rules} had NEITHER, while holding 971
+ * rulespecs and 8 563 {@code .cdt}, so a name/binding disagreement there ran green against the
+ * wrong rule with nothing reporting it. Both were ported in the round-1 OSS port. That copy
+ * measured <b>8 564</b> scenarios and <b>zero</b> violations of all five invariants, on an
+ * exception set and a population floor <b>re-derived there rather than copied</b>; its
+ * {@code peekCoreId} was widened to package-visible for the same one-parser reason as here. ⛔ The
+ * two populations differ by construction (internal-only scenarios on this side, six {@code -A}
+ * siblings on that one) — do not align either floor to the other.
  * </p>
  */
 class ScenarioFilenameBindsItsOwnRuleTest
@@ -131,16 +132,21 @@ class ScenarioFilenameBindsItsOwnRuleTest
             "DRAFT-", "fda", "FDA-", "pmda", "PMDA-");
 
     /**
-     * ⛔ Non-vacuity floor on the population inspected. <b>8 564 scenarios in this repository on
-     * 2026-09-19</b>, against the internal twin's 8 661. A run that inspects fewer has read the
-     * wrong root or a truncated tree and would pass over anything — fix the path, never the floor.
+     * ⛔ Non-vacuity floor on the population inspected. <b>8 661 scenarios on 2026-09-19</b>, down
+     * from 9 513 before the CORE family was retired. A run that inspects fewer has read the wrong
+     * root or a truncated tree and would pass over anything — fix the path, never the floor.
      *
      * <p>
-     * ⚑ The two corpora differ by construction and are expected to: this repository does not
-     * redistribute the CORE rule family, and it lacks the internal-only scenarios other plans
-     * authored (their OSS port is owed by {@code PLAN-typed-engine-oss-port.md}), while carrying
-     * six {@code -A} siblings the internal tree retired. ⛔ So the gap is not drift to be closed by
-     * editing this number towards the internal one.
+     * ⛔ CORRECTED 2026-09-19 (review round 1). This paragraph read <i>"8 660 &hellip; down from 9
+     * 516 before the CORE family's 858 were deleted"</i>, and those three figures cannot all be
+     * true: 9 516 &minus; 858 = 8 658, not 8 660. Measured over {@code cd1f983b^..HEAD}: the tree
+     * held <b>9 513</b> {@code .cdt} before; {@code core/} held <b>1 257</b> of them, of which
+     * <b>862</b> were deleted and <b>395</b> were MIGRATED out (330 into {@code cdisc/}, 65 into
+     * {@code fda/}) rather than deleted; <b>9</b> new scenarios were authored elsewhere in the same
+     * span. 9 513 &minus; 862 + 9 = <b>8 660</b>, and 8 661 once review round 1 restored the
+     * {@code CDISC-CG0554-D} discriminator phase 5 had dropped. ⚠ "858 deleted" conflated the
+     * deletions with the net movement (853) and matched neither; migrations are the term that makes
+     * the arithmetic close, and a count of deleted files is not a count of lost scenarios.
      * </p>
      *
      * <p>

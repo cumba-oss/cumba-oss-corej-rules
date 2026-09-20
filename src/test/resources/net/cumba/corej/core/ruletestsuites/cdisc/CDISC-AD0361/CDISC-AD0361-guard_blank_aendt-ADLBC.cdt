@@ -1,0 +1,9 @@
+#!RuleTest
+#test CDISC-AD0361 expect=noViolation domain=ADLBC
+# Rule:Description: The value of ASTDT is greater than the value of AENDT, considering only those rows on which both variables are populated
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): AENDT - the low operand - is a BLANK cell in a numeric ADaM date column (MissingValue.MIS), and the not empty(AENDT) guard silences the rule despite a populated ASTDT. If this FIRES, the order-flip guard was deleted: post-6c totality positions MIS below every number, so ASTDT > MIS becomes true."
+dataset ADLBC
+col ASTDT type=Num
+col AENDT type=Num
+---
+21915 | .

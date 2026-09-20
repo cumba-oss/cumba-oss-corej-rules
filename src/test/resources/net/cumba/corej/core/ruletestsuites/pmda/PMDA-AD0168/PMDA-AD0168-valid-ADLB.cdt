@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-AD0168 expect=noViolation domain=ADLB
+#note "Non-firing counterpart: 001/HGB/PRE keeps the filter-discriminating pair (post-baseline ANRIND 'NORMAL' above baseline 'LOW', BNRIND='LOW' everywhere - a filter-ignoring max() would false-fire and red this scenario) and 003 keeps only the empty-BNRIND no-baseline row, held quiet by the non_empty guard."
+#library standard=adamig version=1-3
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col BASETYPE type=Char label="Baseline Type"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ANRIND   type=Char label="Analysis Reference Range Indicator"
+col BNRIND   type=Char label="Baseline Reference Range Indicator"
+---
+S1 | 001 | HGB | PRE | 0 | Y | LOW    | LOW
+S1 | 001 | HGB | PRE | 1 |   | NORMAL | LOW
+S1 | 003 | HGB | PRE | 2 |   | LOW    |

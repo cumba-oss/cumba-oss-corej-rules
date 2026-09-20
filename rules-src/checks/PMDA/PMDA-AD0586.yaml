@@ -15,7 +15,8 @@ Scope:
     - "MEDICAL DEVICE BASIC DATA STRUCTURE"
 Check:
   expression: >-
-    not empty(PBCHG) and PBCHG != (((BASE - AVAL) / AVAL) * 100)
+    not empty(PBCHG) and not empty(BASE) and not empty(AVAL) and AVAL != 0 and PBCHG != (((BASE -
+    AVAL) / AVAL) * 100)
 Outcome:
   Message: "PBCHG does not equal (BASE minus AVAL) divided by AVAL, expressed as a\
     \ percentage."

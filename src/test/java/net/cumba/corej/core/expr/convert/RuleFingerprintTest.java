@@ -44,8 +44,8 @@ class RuleFingerprintTest
     void operationIdsAreFreeNamesSoAlphaRenameMakesTheRulesEqual()
     {
         JsonNode fda = rule("""
-                Operations:
-                - id: "$HLTSUBJI_N"
+                Bindings:
+                - name: "$HLTSUBJI_N"
                   operator: "record_count"
                   group: ["STUDYID"]
                 Check:
@@ -55,8 +55,8 @@ class RuleFingerprintTest
                     value: 1
                 """);
         JsonNode pmda = rule("""
-                Operations:
-                - id: "$HLTSUBJI_N_COUNT"
+                Bindings:
+                - name: "$HLTSUBJI_N_COUNT"
                   operator: "record_count"
                   group: ["STUDYID"]
                 Check:
@@ -74,8 +74,8 @@ class RuleFingerprintTest
     void alphaRenameSubstitutesThroughOutputVariables()
     {
         JsonNode fda = rule("""
-                Operations:
-                - id: "$a"
+                Bindings:
+                - name: "$a"
                   operator: "record_count"
                 Check:
                   all:
@@ -87,8 +87,8 @@ class RuleFingerprintTest
                   Output_Variables: ["$a", "TSVAL"]
                 """);
         JsonNode pmda = rule("""
-                Operations:
-                - id: "$a_count"
+                Bindings:
+                - name: "$a_count"
                   operator: "record_count"
                 Check:
                   all:
@@ -108,8 +108,8 @@ class RuleFingerprintTest
     void alphaRenameDoesNotMergeGenuinelyDifferentOperations()
     {
         JsonNode a = rule("""
-                Operations:
-                - id: "$x"
+                Bindings:
+                - name: "$x"
                   operator: "record_count"
                 Check:
                   all:
@@ -118,8 +118,8 @@ class RuleFingerprintTest
                     value: 1
                 """);
         JsonNode b = rule("""
-                Operations:
-                - id: "$x"
+                Bindings:
+                - name: "$x"
                   operator: "distinct"
                 Check:
                   all:
@@ -464,8 +464,8 @@ class RuleFingerprintTest
     void excludedOperationIdIsDroppedDespiteAlphaRename()
     {
         JsonNode reported = rule("""
-                Operations:
-                - id: "$cnt"
+                Bindings:
+                - name: "$cnt"
                   operator: "record_count"
                 Check:
                   expression: "$cnt > 1"
@@ -474,8 +474,8 @@ class RuleFingerprintTest
                   Output_Variables: ["AGE", "$cnt"]
                 """);
         JsonNode excluded = rule("""
-                Operations:
-                - id: "$other_name"
+                Bindings:
+                - name: "$other_name"
                   operator: "record_count"
                 Check:
                   expression: "$other_name > 1"
@@ -484,8 +484,8 @@ class RuleFingerprintTest
                   Output_Variables: ["AGE", "$other_name", "!$other_name"]
                 """);
         JsonNode ageOnly = rule("""
-                Operations:
-                - id: "$third"
+                Bindings:
+                - name: "$third"
                   operator: "record_count"
                 Check:
                   expression: "$third > 1"
@@ -674,7 +674,7 @@ class RuleFingerprintTest
         // authors the block, so every L2 string shifts identically and rule-equivalence.yaml does
         // not move" — EXPIRED when the block shipped in phase 4, and is kept here only as history.
         // Measured 2026-08-25: 5 733 of the 14 416 rule records in the 56 shipped packages under
-        // `lib/corej-cdisc-rules/rules/` carry `Requirements` (1 355 of their 3 799 distinct
+        // `lib/corej-rules/rules/` carry `Requirements` (1 355 of their 3 799 distinct
         // Core.Ids), as do 1 161 of the 3 804 authored files under `rules-src/checks` — the
         // population this fingerprint is actually computed over. The term is load-bearing now: two
         // rules that agreed on L2 before the migration and differ in their required variables fall
@@ -800,8 +800,8 @@ class RuleFingerprintTest
     void alphaRenameSubstitutesThroughEveryLevel()
     {
         JsonNode left = rule("""
-                Operations:
-                - id: "$N"
+                Bindings:
+                - name: "$N"
                   operator: "record_count"
                 Check:
                   ERROR:
@@ -816,8 +816,8 @@ class RuleFingerprintTest
                       value: 0
                 """);
         JsonNode right = rule("""
-                Operations:
-                - id: "$COUNT"
+                Bindings:
+                - name: "$COUNT"
                   operator: "record_count"
                 Check:
                   ERROR:

@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import net.cumba.corej.core.expr.CheckExpressionParser;
-import net.cumba.corej.core.expr.CheckToExpr;
 import net.cumba.corej.core.expr.ExpressionException;
 import net.cumba.corej.core.expr.ExpressionPrinter;
 import net.cumba.corej.core.expr.PresenceSpelling;
@@ -79,7 +78,7 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <pre>{@code
- * cd cumba-corej-rules
+ * cd /abs/path/to/this/repository
  * mvn -q org.codehaus.mojo:exec-maven-plugin:3.6.1:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.RuleSrcExpressionWriter \
@@ -352,7 +351,7 @@ public final class RuleSrcExpressionWriter
                 RuleCanonicalizer.renderExpressionCheckBlock(expression), id);
         verifyRewrittenFile(rewritten, expression, id);
         return new Conversion(id, relativePath, rewritten, expression, List.of(expression), parked,
-                plain != null && !plain.equals(expression));
+                divergesFromPlainRaise(plain, expression));
     }
 
 
@@ -404,7 +403,7 @@ public final class RuleSrcExpressionWriter
                 throw new Unraisable(where + ": Check did not bind: " + e.getMessage());
             }
             String plain = plainRaiseText(bound);
-            divergent |= plain != null && !plain.equals(expression);
+            divergent |= divergesFromPlainRaise(plain, expression);
 
             ObjectNode out = rendered.putObject(level.getKey());
             out.put("expression", expression);
@@ -589,19 +588,96 @@ public final class RuleSrcExpressionWriter
 
 
     /**
-     * The plain (special-free) raise's canonical text, or {@code null} when it throws — so a rule
-     * the raise rejects counts as divergent instead of erroring the sweep.
+     * The plain (special-free) canonical text of the bound Check's expression, or {@code null} when
+     * it has none — so a rule with no expression form counts as divergent instead of erroring the
+     * sweep. (Until D121 this was {@code CheckToExpr}'s raise; with the corpus expression-form
+     * throughout, the bound Check IS the expression.)
      */
     private static @Nullable String plainRaiseText(CheckCondition check)
     {
         try
         {
-            return ExpressionPrinter.print(PresenceSpelling.canonical(CheckToExpr.toExpr(check)));
+            return ExpressionPrinter.print(
+                    PresenceSpelling.canonical(net.cumba.corej.core.CheckExprUnits.toExpr(check)));
         }
-        catch (ExpressionException _)
+        catch (ExpressionException | IllegalStateException _)
         {
             return null;
         }
+    }
+
+
+    /**
+     * Whether the authored canonical text diverges from the plain raise, compared <b>modulo
+     * {@code date()} conversion wrappers</b> (both texts stripped before the compare).
+     *
+     * <p>
+     * Phase 3c's D71b retyping (RUNBOOK-phase3c-corpus-rewrite.md §4/§5) made the two-sided
+     * spelling {@code date(A) op date(B)} the authored canon, and put {@code date()} on the
+     * <em>column</em> operand of a {@code $}-operation comparison. The legacy {@code Check} view
+     * carries date-ness as a single flag on the comparison, not per operand, so
+     * {@code CheckToExpr}'s raise structurally cannot reproduce that placement — it re-emits the
+     * one-sided pre-D71b spelling ({@code date(A) op B}, and {@code date($op) == COLUMN} for an
+     * operation comparison). Comparing verbatim would therefore flag every retyped rule as writer
+     * drift. Stripping the wrappers keeps the gate's real power — any <em>structural</em>
+     * divergence (a lost guard, a reordered conjunct, a changed operand) still reds — while
+     * accepting that {@code date()} placement is authored, not legacy-representable.
+     * </p>
+     */
+    private static boolean divergesFromPlainRaise(@Nullable String plain, String expression)
+    {
+        return plain != null
+                && !stripDateConversions(plain).equals(stripDateConversions(expression));
+    }
+
+
+    /**
+     * Removes every {@code date(...)} conversion wrapper (the bare {@code date} name only — never
+     * {@code date_part(} / {@code min_date(} etc.), keeping the wrapped operand. Applied to both
+     * sides of the plain-raise compare; see {@link #divergesFromPlainRaise}.
+     */
+    private static String stripDateConversions(String text)
+    {
+        StringBuilder sb = new StringBuilder(text);
+        int idx;
+        while ((idx = indexOfDateCall(sb)) >= 0)
+        {
+            int open = idx + "date".length();
+            int depth = 0;
+            int close = open;
+            while (true)
+            {
+                char c = sb.charAt(close);
+                if (c == '(')
+                {
+                    depth++;
+                }
+                else if (c == ')' && --depth == 0)
+                {
+                    break;
+                }
+                close++;
+            }
+            sb.deleteCharAt(close);
+            sb.delete(idx, open + 1);
+        }
+        return sb.toString();
+    }
+
+
+    /** The next {@code date(} call whose name is a whole token, or -1. */
+    private static int indexOfDateCall(CharSequence s)
+    {
+        for (int i = 0; i + 5 <= s.length(); i++)
+        {
+            if (s.charAt(i) == 'd' && s.charAt(i + 1) == 'a' && s.charAt(i + 2) == 't'
+                    && s.charAt(i + 3) == 'e' && s.charAt(i + 4) == '('
+                    && (i == 0 || !Character.isJavaIdentifierPart(s.charAt(i - 1))))
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
 

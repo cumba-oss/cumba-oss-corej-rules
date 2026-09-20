@@ -12,10 +12,10 @@ import java.nio.file.Path;
  * committed under the module directory and reached by three different anchoring styles at once — a
  * bare CWD-relative {@code Path.of("rules")} (which only works because this module overrides
  * surefire's {@code workingDirectory} back to the module basedir), {@code projectBasedir} plus a
- * relative segment, and {@code repoRoot} plus {@code lib/corej-cdisc-rules/…}. Three styles meant
- * three things to update whenever the directory moved, and a partial migration is invisible
- * locally: the tests that were missed keep reading a stale copy still sitting on disk, and only a
- * fresh clone or CI reds.
+ * relative segment, and {@code repoRoot} plus {@code lib/corej-rules/…}. Three styles meant three
+ * things to update whenever the directory moved, and a partial migration is invisible locally: the
+ * tests that were missed keep reading a stale copy still sitting on disk, and only a fresh clone or
+ * CI reds.
  * </p>
  *
  * <p>
@@ -40,8 +40,7 @@ import java.nio.file.Path;
  *
  * <p>
  * ⚠ Resolved through methods, not static finals. A static initialiser would capture the property at
- * class-load time, and surefire supplies it per fork — the same reason
- * {@code ScenarioTrimmer.projectBasedir()} is a method.
+ * class-load time, and surefire supplies it per fork.
  * </p>
  */
 public final class CorpusPaths

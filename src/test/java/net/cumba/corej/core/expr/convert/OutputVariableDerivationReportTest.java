@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * {@link OutputVariableDeriver#derivedOnly} over every rule of the shipped packages in
  * {@code rules/} and writes the authored-vs-derived delta to
  * {@code target/output-variable-derivation-report.md} — the in-repo replacement for the Phase-0b
- * scratch probe, since discarded.
+ * scratch probe ({@code /home/claude/ov-derivation-phase0/OvProbe.java}).
  *
  * <p>
  * <b>Report-only.</b> The corpus legitimately omits derivable entries (that is what the derivation
@@ -51,7 +51,7 @@ class OutputVariableDerivationReportTest
 
     private static final Path REPORT = Path.of("target", "output-variable-derivation-report.md");
 
-    private record FamilyDerivation(String family, List<String> authored, List<String> delta,
+    private record RuleInfo(String family, List<String> authored, List<String> delta,
             List<String> pureDerived)
     {
     }
@@ -59,7 +59,7 @@ class OutputVariableDerivationReportTest
     @Test
     void writeDerivationReport() throws IOException
     {
-        Map<String, FamilyDerivation> byRule = new LinkedHashMap<>();
+        Map<String, RuleInfo> byRule = new LinkedHashMap<>();
         List<Path> packages;
         try (Stream<Path> s = Files.list(RULES_DIR))
         {
@@ -104,7 +104,7 @@ class OutputVariableDerivationReportTest
     }
 
 
-    private static FamilyDerivation analyse(Rule rule, String family)
+    private static RuleInfo analyse(Rule rule, String family)
     {
         List<String> authored = rule.getOutcome() != null
                 && rule.getOutcome().getOutputVariables() != null
@@ -126,13 +126,12 @@ class OutputVariableDerivationReportTest
             pureDerived = OutputVariableDeriver.derive(rule);
             outcome.setOutputVariables(saved);
         }
-        return new FamilyDerivation(family, authored, delta, pureDerived);
+        return new RuleInfo(family, authored, delta, pureDerived);
     }
 
 
     /** Specs whose {@code coreId} names a rule with a non-empty delta — the lane-C cost. */
-    private static List<String> parityCrossCheck(Map<String, FamilyDerivation> byRule)
-        throws IOException
+    private static List<String> parityCrossCheck(Map<String, RuleInfo> byRule) throws IOException
     {
         if (!Files.isDirectory(SPECS_DIR))
         {
@@ -151,7 +150,7 @@ class OutputVariableDerivationReportTest
             JsonNode coreId = root.path("rule").path("coreId");
             if (coreId.isTextual())
             {
-                FamilyDerivation info = byRule.get(coreId.asText());
+                RuleInfo info = byRule.get(coreId.asText());
                 if (info != null && !info.delta().isEmpty())
                 {
                     affected.add(spec.getFileName().toString() + " (" + coreId.asText() + ": "
@@ -187,7 +186,7 @@ class OutputVariableDerivationReportTest
     }
 
 
-    private static String render(Map<String, FamilyDerivation> byRule, List<String> affectedSpecs)
+    private static String render(Map<String, RuleInfo> byRule, List<String> affectedSpecs)
     {
         int total = byRule.size();
         int noDelta = 0;
@@ -198,7 +197,7 @@ class OutputVariableDerivationReportTest
         Map<String, int[]> perFamily = new TreeMap<>(); // family -> [rules, withDelta, entries]
         Map<String, Integer> classCount = new TreeMap<>();
         Map<Integer, Integer> sizeHistogram = new TreeMap<>();
-        for (FamilyDerivation info : byRule.values())
+        for (RuleInfo info : byRule.values())
         {
             int[] fam = perFamily.computeIfAbsent(info.family(), _ -> new int[3]);
             fam[0]++;
@@ -279,7 +278,7 @@ class OutputVariableDerivationReportTest
             sb.append("- ").append(line).append('\n');
         }
         sb.append("\n## 7. Full delta list\n\n| rule | family | delta |\n|---|---|---|\n");
-        for (Map.Entry<String, FamilyDerivation> e : byRule.entrySet())
+        for (Map.Entry<String, RuleInfo> e : byRule.entrySet())
         {
             if (!e.getValue().delta().isEmpty())
             {

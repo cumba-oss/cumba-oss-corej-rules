@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1063 expect=violation domain=AE
+#note "Mirrors rulespec PMDA-SD1063.yaml (the rule's only prior guard; PMDA twin of FDA-SD1063). The study ships AE and VS; the Define-XML sidecar declares VS only, so the submitted AE is not described in the Define and the rule fires once on AE - the PRIMARY dataset, deliberately, because only the primary dataset's bucket is ever reported. Pinned on the projected dataset_name."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1063-define-vs-only.xml
+#expectViolationCount 1
+#expectViolationAt dataset_name=AE
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+---
+S1 | VS | 001 | 1 | SYSBP

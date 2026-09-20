@@ -14,8 +14,14 @@ description: |
   corpus rule that exercises this, so the pin has to build its own data. Same reason as
   EC21-date-diff-target-from-evaluation-domain and EC18-date-diff-mode3-sided.
 
-  The leaf is `AESTDTC date_greater_than_or_equal_to AEENDTC`. `>=` is chosen because it is one
+  The Check is `date(AESTDTC) >= date(AEENDTC)`. `>=` is chosen because it is one
   of the three operators that actually diverge; see python_notes for the measured matrix.
+
+  SPELLING NOTE (phase-7 leaf migration, 2026-09-16): the retired operator leaf
+  (`date_greater_than_or_equal_to`) raised mechanically to `date(AESTDTC) >= AEENDTC` —
+  the v1 leaf could hold only one type tag. Authored here with the tag on BOTH sides per
+  the post-3c convention; D102's six-operator differential proved the spellings
+  verdict-identical.
 
   001 — PARTIAL-vs-COMPLETE. The comparand `2026-03` is a whole month and the target
         `2026-03-15` sits INSIDE its hull, so `>=` does not hold for every candidate
@@ -101,8 +107,7 @@ rule:
   Scope:
     Domains: {Include: [AE]}
   Check:
-    all:
-      - {name: AESTDTC, operator: date_greater_than_or_equal_to, value: AEENDTC}
+    expression: 'date(AESTDTC) >= date(AEENDTC)'
   Outcome:
     Message: AESTDTC is not earlier than AEENDTC.
     Output_Variables: [AESTDTC, AEENDTC]

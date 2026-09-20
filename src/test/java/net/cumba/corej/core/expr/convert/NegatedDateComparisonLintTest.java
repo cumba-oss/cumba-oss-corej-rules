@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,18 +15,14 @@ import java.util.Map;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Stream;
+import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.expr.CheckExpressionParser;
 import net.cumba.corej.core.expr.ExpressionPrinter;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.CheckCondition;
-import net.cumba.corej.core.model.CheckConditionAll;
-import net.cumba.corej.core.model.CheckConditionAny;
-import net.cumba.corej.core.model.CheckConditionConstant;
 import net.cumba.corej.core.model.CheckConditionExpression;
-import net.cumba.corej.core.model.CheckConditionLeaf;
-import net.cumba.corej.core.model.CheckConditionNot;
 import net.cumba.corej.core.model.LevelCheck;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -59,75 +54,49 @@ import org.junit.jupiter.api.Test;
  * exists a completion" writes it down; the lint points at that escape hatch in its failure message.
  * </p>
  *
- * <h2>Scope — which operators, decided from the compiler, not from the enum name</h2>
- * <p>
- * {@code CheckOperator} declares <b>ten</b> date/time comparison operators, all of which
- * {@code CheckToExpr.dateCmp} raises to a tagged binary comparison. They split in
- * {@code ExprCompiler.compileTagged}:
- * </p>
+ * <h2>Scope — which comparisons, decided from the compiler</h2>
  * <ul>
- * <li><b>In scope (six)</b> — {@code date_equal_to}, {@code date_not_equal_to},
- * {@code date_less_than}, {@code date_less_than_or_equal_to}, {@code date_greater_than},
- * {@code date_greater_than_or_equal_to}. These carry the {@code date(…)} tag and compile to
- * {@code Primitives.dateComparison}, which is the &forall;-over-the-hull comparison
- * {@code Fix #193} made uniform. Negating one of these is the &exist; over-report.</li>
- * <li><b>Out of scope (four)</b> — {@code date_part_equal_to}, {@code date_part_not_equal_to},
- * {@code time_part_equal_to}, {@code time_part_not_equal_to}. These carry the {@code date_part(…)}
- * / {@code time_part(…)} tag and compile to {@code Primitives.datePartComparison}, which compares
- * only the date or time portion and has <b>no hull &forall; reading at all</b> — so negating one
- * does not produce the over-report this lint exists to prevent. (This is the same split
- * {@code Fix #193} measured when it reported an affected set of 106 rules rather than 110.)</li>
+ * <li><b>In scope</b> — a binary comparison carrying the {@code date(…)} tag on either side. It
+ * compiles to {@code Primitives.dateComparison}, the &forall;-over-the-hull comparison
+ * {@code Fix #193} made uniform; negating it is the &exist; over-report.</li>
+ * <li><b>Out of scope</b> — {@code date_part(…)} / {@code time_part(…)}-tagged comparisons. They
+ * compile to {@code Primitives.datePartComparison}, which compares only the date or time portion
+ * and has <b>no hull &forall; reading at all</b> — so negating one does not produce the over-report
+ * this lint exists to prevent. (The same split {@code Fix #193} measured when it reported an
+ * affected set of 106 rules rather than 110.)</li>
  * </ul>
  * <p>
- * A <b>bare</b> {@code date_not_equal_to} is deliberately <em>not</em> a finding: it is a
- * first-class &forall; operator ("definitely different"), not {@code not(date_equal_to)}. Rejecting
- * it would reject hundreds of legitimate leaves. It is a finding only when it sits <em>under</em> a
- * negation, where the &forall; is inverted like any other.
+ * A <b>bare</b> {@code date(A) != date(B)} is deliberately <em>not</em> a finding: it is a
+ * first-class &forall; comparison ("definitely different"), not {@code not (date(A) == date(B))}.
+ * Rejecting it would reject hundreds of legitimate sites. It is a finding only when it sits
+ * <em>under</em> a negation, where the &forall; is inverted like any other.
  * </p>
  *
  * <h2>The two negation mechanisms are NOT equivalent — and each gets its own message</h2>
  * <ol>
- * <li><b>A structural {@code not:} node</b> ({@code CheckConditionDeserializer} &rarr;
- * {@link CheckConditionNot}) inverts every leaf beneath it, and {@code CheckToExpr} raises it to
- * {@code Expr.Not}, which the native backend compiles to a genuine bit-flip. <b>This is the live
- * &exist; over-report.</b></li>
- * <li><b>A per-leaf {@code negative:} flag</b> ({@link CheckConditionLeaf#getNegative()}) is
- * <em>not</em> a logical negation in coreJ. Its only evaluator consumer is
- * {@code invalid_duration}, where it means <em>allow a negative ISO-8601 duration</em>
- * ({@code ScalarSemantics.isInvalidDuration(s, allowNegative)}); on the affix operators it is one
- * more affix modifier. On <em>any</em> other operator — including every date comparison —
- * {@code CheckToExpr.rejectAffixFields} throws, so the rule keeps {@code checkExpr == null} and
- * {@code RuleRunner} answers a per-rule {@code ERROR} ("the Check has no native expression form;
- * the legacy evaluator has been retired"). It is therefore a <b>different defect</b> — a dead rule,
- * not an over-firing one — and is reported with a different message.</li>
+ * <li><b>A structural {@code not}</b> inverts every comparison beneath it; the native backend
+ * compiles it to a genuine bit-flip. <b>This is the live &exist; over-report.</b></li>
+ * <li><b>A {@code negative=} kwarg</b> is <em>not</em> a logical negation in coreJ. Its only
+ * evaluator consumer is {@code invalid_duration}, where it means <em>allow a negative ISO-8601
+ * duration</em> ({@code ScalarSemantics.isInvalidDuration(s, allowNegative)}). On <em>any</em>
+ * other function the compiler declines, so the rule keeps {@code checkExpr == null} and
+ * {@code RuleRunner} answers a per-rule {@code ERROR}. It is therefore a <b>different defect</b> —
+ * a dead rule, not an over-firing one — and is reported with a different message. (The leaf-era
+ * {@code negative:} field retired with the v1 model under D121; a binary comparison has no kwarg
+ * carriage, so the on-a-date-comparison variant is unauthorable now.)</li>
  * </ol>
  *
  * <h2>Corpus views scanned — both, each named in its own count</h2>
  * <ul>
  * <li>{@code rules/rules-*.json} — the assembled <b>expression-form</b> packages, the corpus the
- * engine ships. ⚠ A walker keyed on a JSON {@code operator} field returns zero leaves here, because
- * the node shape is {@code {"expression": "date(X) < Y"}} — reporting that zero as a finding would
- * be a wrong-population error. This lint loads the packages instead, so
- * {@code CheckConditionDeserializer} parses the expression and {@code ExprLowering} lowers it back
- * to the operator-leaf AST; anything that has no legacy lowering arrives as a
- * {@link CheckConditionExpression} and is walked on the {@link Expr} IR by {@link #walkExpr}. The
- * view is therefore <b>measured</b>, not excluded.</li>
+ * engine ships: every Check arrives as a {@link CheckConditionExpression} and is walked on the
+ * {@link Expr} IR by {@link #walkExpr}.</li>
  * <li>{@code rules-src/checks/*.yaml} — the authoring view, read exactly as
- * {@code MixedGranularityLintTest} reads it, and the one that still exercises {@link #walk}'s
- * operator-leaf arm end to end. Scanning it catches the mistake at authoring time, before the
- * assembled corpus is regenerated.</li>
+ * {@code MixedGranularityLintTest} reads it. Scanning it catches the mistake at authoring time,
+ * before the assembled corpus is regenerated.</li>
  * </ul>
  * <p>
- * ⚠ <b>A third view — the assembled operator-leaf packages — used to sit between these two, and
- * dropping it removed one comparison.</b> What is lost is the <em>assembled</em> leaf form: a
- * defect introduced by the assembler rather than by the author, and not surviving into the
- * expression form, is no longer observed. What is <em>not</em> lost is coverage of the leaf walker
- * itself — {@code rules-src} is authored in operator-leaf form, so {@link #walkLeaf} is still
- * driven over &gt;3 000 real rules, and its own {@code dateComparisonLeaves} floor of 50 still
- * fails loudly if that stops being true.
- * </p>
- * <p>
- * Every count below is a <b>Check-leaf</b> count within a named view — never a file count: one
+ * Every count below is a <b>comparison</b> count within a named view — never a file count: one
  * {@code rules} file is a whole package holding hundreds of rules, so a file-level intersection is
  * noise.
  * </p>
@@ -154,35 +123,23 @@ import org.junit.jupiter.api.Test;
  * findings";</li>
  * <li>{@link #structuralNotNodeOverDateComparisonIsReported},
  * {@link #negationInheritedThroughSubtreeIsReported},
- * {@link #negativeFlagOnDateComparisonIsReported} and {@link #expressionFormNegationIsReported}
- * build the forbidden shapes in-test and assert they are reported — for both mechanisms and both
- * AST forms;</li>
+ * {@link #negativeKwargOnANonConsumingFunctionIsReported} and
+ * {@link #expressionFormNegationIsReported} build the forbidden shapes in-test and assert they are
+ * reported — for both mechanisms;</li>
  * <li>{@link #nearMissesAreNotReported} and {@link #doubleNegationIsNotReported} assert the
- * detector stays silent on a bare {@code date_less_than}, a negated non-date leaf, a bare
- * {@code date_not_equal_to}, a negated {@code date_part_*} / {@code time_part_*} leaf, and a
- * doubly-negated date comparison — without which a detector that answered "everything is a
- * violation" would also pass.</li>
+ * detector stays silent on a bare date comparison, a negated non-date comparison, a bare
+ * date-inequality, a negated {@code date_part} comparison, and a doubly-negated date comparison —
+ * without which a detector that answered "everything is a violation" would also pass.</li>
  * </ol>
  */
 class NegatedDateComparisonLintTest
 {
 
     /**
-     * The six operators whose comparison is &forall;-over-the-hull: {@code CheckToExpr.dateCmp}
-     * tags them {@code date(…)} and {@code ExprCompiler} compiles that tag to
-     * {@code Primitives.dateComparison}. The four {@code date_part_*} / {@code time_part_*}
-     * operators are deliberately absent — see the class javadoc.
-     */
-    private static final Set<String> HULL_DATE_OPERATORS = Set.of("date_equal_to",
-            "date_not_equal_to", "date_less_than", "date_less_than_or_equal_to",
-            "date_greater_than", "date_greater_than_or_equal_to");
-
-    /**
-     * The one operator that actually consumes {@code negative:} — {@code CheckToExpr:182}, where it
-     * means <em>allow a negative ISO duration</em>. Every other operator falls through to
-     * {@code rejectAffixFields} ({@code CheckToExpr:341}, called at {@code :208}), which throws, so
-     * the rule keeps {@code checkExpr == null} and {@code RuleRunner} answers a per-rule
-     * {@code ERROR}: the rule validates nothing at all.
+     * The one function that actually consumes {@code negative=}, where it means <em>allow a
+     * negative ISO duration</em>. On every other function the compiler declines, so the rule keeps
+     * {@code checkExpr == null} and {@code RuleRunner} answers a per-rule {@code ERROR}: the rule
+     * validates nothing at all.
      * <p>
      * Re-measured 2026-08-11 across both surviving views: <b>every</b> {@code negative:} in the
      * corpus sits on {@code invalid_duration} — {@code rules-src} carries 23 of them (3
@@ -228,19 +185,16 @@ class NegatedDateComparisonLintTest
             assertTrue(view.rules > 3000, "corpus scan looks broken: only " + view.rules
                     + " rules loaded from the " + view.view + " view — expected the full corpus");
             assertTrue(view.dateComparisonLeaves > 50,
-                    "the detector's operator match looks broken: only " + view.dateComparisonLeaves
-                            + " hull date-comparison leaves found in the " + view.view + " view, "
-                            + "out of " + view.leaves + " Check leaves in " + view.rules
-                            + " rules — a lint that matches nothing cannot prove it detects "
-                            + "anything");
+                    "the detector's comparison match looks broken: only "
+                            + view.dateComparisonLeaves + " hull date comparisons found in the "
+                            + view.view + " view across " + view.rules + " rules — a lint that"
+                            + " matches nothing cannot prove it detects anything");
         }
 
         List<String> structural = new ArrayList<>();
-        List<String> negativeFlag = new ArrayList<>();
         for (Scan view : views)
         {
             structural.addAll(view.structuralNegation);
-            negativeFlag.addAll(view.negativeFlag);
         }
 
         assertTrue(structural.isEmpty(),
@@ -254,17 +208,6 @@ class NegatedDateComparisonLintTest
                         + "comparison is numeric-only and never fires on ISO strings).\n"
                         + String.join("\n", structural));
 
-        assertTrue(negativeFlag.isEmpty(),
-                "a hull date_* comparison leaf carries `negative:` (" + negativeFlag.size()
-                        + "). In coreJ `negative:` is not a logical negation — only "
-                        + "invalid_duration consumes it (as \"allow a negative duration\") and the "
-                        + "affix operators treat it as an affix modifier. On a date comparison "
-                        + "CheckToExpr.rejectAffixFields throws, so the rule keeps checkExpr == "
-                        + "null and RuleRunner answers a per-rule ERROR. Drop the flag; if a "
-                        + "loose comparison was meant, compare points under the date() tag: "
-                        + "date(latest_possible(X)) >= earliest_possible(Y).\n"
-                        + String.join("\n", negativeFlag));
-
         List<String> dead = new ArrayList<>();
         for (Scan view : views)
         {
@@ -272,15 +215,14 @@ class NegatedDateComparisonLintTest
         }
 
         assertTrue(dead.isEmpty(),
-                "a `negative:` flag sits on an operator that cannot consume it (" + dead.size()
+                "a `negative=` kwarg sits on a function that cannot consume it (" + dead.size()
                         + "). THIS RULE DOES NOT RUN AT ALL — it is a different defect from the "
                         + "over-report above. Only " + NEGATIVE_CONSUMING_OPERATOR + " consumes "
-                        + "`negative:` (CheckToExpr:182, \"allow a negative duration\"); on every "
-                        + "other operator rejectAffixFields (CheckToExpr:341) throws, so "
-                        + "checkExpr stays null and RuleRunner answers a per-rule ERROR instead of "
-                        + "validating anything. Drop the flag and express the intent with the "
-                        + "operator's own negative twin, or with a not: node.\n"
-                        + String.join("\n", dead));
+                        + "`negative=` (\"allow a negative duration\"); on every other function "
+                        + "the compiler declines, so checkExpr stays null and RuleRunner answers "
+                        + "a per-rule ERROR instead of validating anything. Drop the kwarg and "
+                        + "express the intent with `not`, or with the function's own negative "
+                        + "twin.\n" + String.join("\n", dead));
     }
 
     // ------------------------------------------------------------------
@@ -288,17 +230,17 @@ class NegatedDateComparisonLintTest
     // ------------------------------------------------------------------
 
 
-    /** F1 / mechanism 1 — a {@code not:} node directly over a hull date comparison. */
+    /** F1 / mechanism 1 — a {@code not} directly over a hull date comparison. */
     @Test
     void structuralNotNodeOverDateComparisonIsReported()
     {
-        Scan scan = scanCheck(new CheckConditionNot(dateLeaf("date_less_than")));
+        Scan scan = scanExpr("not (date(MHSTDTC) < date(RFSTDTC))");
 
         assertEquals(1, scan.structuralNegation.size(),
-                "not(date_less_than) must be reported: " + scan.structuralNegation);
-        assertTrue(scan.negativeFlag.isEmpty(),
-                "a structural not: is not a `negative:` finding: " + scan.negativeFlag);
-        assertEquals(1, scan.dateComparisonLeaves, "the date leaf must have been recognised");
+                "not (date(X) < date(Y)) must be reported: " + scan.structuralNegation);
+        assertTrue(scan.deadNegativeFlag.isEmpty(),
+                "a structural not is not a negative= finding: " + scan.deadNegativeFlag);
+        assertEquals(1, scan.dateComparisonLeaves, "the date comparison must be recognised");
     }
 
 
@@ -309,82 +251,48 @@ class NegatedDateComparisonLintTest
     @Test
     void negationInheritedThroughSubtreeIsReported()
     {
-        CheckCondition inner = new CheckConditionAny(
-                List.of(CheckConditionLeaf.builder().name("MHSTDTC").operator("non_empty").build(),
-                        dateLeaf("date_greater_than_or_equal_to")));
-        CheckCondition subtree = new CheckConditionAll(List.of(inner));
-
-        Scan scan = scanCheck(new CheckConditionNot(subtree));
+        Scan scan = scanExpr(
+                "not ((not empty(MHSTDTC) or date(MHSTDTC) >= date(RFSTDTC)) and AESEV == \"Y\")");
 
         assertEquals(1, scan.structuralNegation.size(),
-                "negation inherited through all:/any: must reach the leaf: "
+                "negation inherited through and/or must reach the comparison: "
                         + scan.structuralNegation);
     }
 
 
-    /** F1 / mechanism 2 — the per-leaf {@code negative:} flag, with no {@code not:} anywhere. */
-    @Test
-    void negativeFlagOnDateComparisonIsReported()
-    {
-        CheckConditionLeaf leaf = CheckConditionLeaf.builder().name("MHSTDTC")
-                .operator("date_less_than").value(TextNode.valueOf("RFSTDTC"))
-                .negative(Boolean.TRUE).build();
-
-        Scan scan = scanCheck(new CheckConditionAll(List.of(leaf)));
-
-        assertEquals(1, scan.negativeFlag.size(),
-                "a `negative: true` date leaf must be reported: " + scan.negativeFlag);
-        assertTrue(scan.structuralNegation.isEmpty(),
-                "`negative:` is not a structural-negation finding: " + scan.structuralNegation);
-        assertEquals(1, scan.deadNegativeFlag.size(),
-                "a date leaf is also a non-consuming operator, so job 2 reports it too: "
-                        + scan.deadNegativeFlag);
-    }
-
-
     /**
-     * Job 2, the wider half — a {@code negative:} on an operator with nothing to do with dates is
-     * <b>equally dead</b>, and was invisible until 2026-08-10 because the reporting sat behind the
-     * hull-date filter.
+     * Job 2, in the surviving carriage — a {@code negative=} kwarg on a function that cannot
+     * consume it is dead: the compiler declines, the rule ERRORs, and nothing is validated. (The
+     * leaf-era {@code negative:} field on a comparison operator retired with the leaf model; a
+     * binary comparison has no kwarg carriage at all, so that whole defect shape is unauthorable
+     * now.)
      */
     @Test
-    void negativeFlagOnANonDateOperatorIsReported()
+    void negativeKwargOnANonConsumingFunctionIsReported()
     {
-        CheckConditionLeaf leaf = CheckConditionLeaf.builder().name("AESEV").operator("equal_to")
-                .value(TextNode.valueOf("SEVERE")).negative(Boolean.TRUE).build();
-
-        Scan scan = scanCheck(new CheckConditionAll(List.of(leaf)));
+        Scan scan = scanExpr("empty(AESEV, negative=true)");
 
         assertEquals(1, scan.deadNegativeFlag.size(),
-                "a `negative: true` on equal_to must be reported — rejectAffixFields throws on it, "
-                        + "so the rule answers a per-rule ERROR: " + scan.deadNegativeFlag);
-        assertTrue(scan.negativeFlag.isEmpty(),
-                "equal_to is not a hull date operator, so job 1 must stay silent: "
-                        + scan.negativeFlag);
+                "a negative= kwarg on empty() must be reported — the compiler declines it, so "
+                        + "the rule answers a per-rule ERROR: " + scan.deadNegativeFlag);
         assertTrue(scan.structuralNegation.isEmpty(),
                 "no structural negation is present: " + scan.structuralNegation);
     }
 
 
     /**
-     * ⚑ The load-bearing near-miss: {@code invalid_duration} is the <b>only</b> operator that
-     * consumes {@code negative:} ({@code CheckToExpr:182}), and every one of the corpus's flags
-     * sits on it. If this control ever inverts, the lint reds on the 23 correct {@code rules-src}
-     * leaves that carry one.
+     * ⚑ The load-bearing near-miss: {@code invalid_duration} is the <b>only</b> function that
+     * consumes {@code negative=}, and every one of the corpus's flags sits on it. If this control
+     * ever inverts, the lint reds on the 23 correct {@code rules-src} sites that carry one.
      */
     @Test
-    void negativeFlagOnInvalidDurationIsNotReported()
+    void negativeKwargOnInvalidDurationIsNotReported()
     {
-        CheckConditionLeaf leaf = CheckConditionLeaf.builder().name("AEDUR")
-                .operator(NEGATIVE_CONSUMING_OPERATOR).negative(Boolean.TRUE).build();
-
-        Scan scan = scanCheck(new CheckConditionAll(List.of(leaf)));
+        Scan scan = scanExpr("invalid_duration(AEDUR, negative=true)");
 
         assertTrue(scan.deadNegativeFlag.isEmpty(),
-                "invalid_duration CONSUMES `negative:` — reporting it would red the lint on the "
-                        + "23 correct rules-src leaves that carry it: " + scan.deadNegativeFlag);
-        assertTrue(scan.negativeFlag.isEmpty(),
-                "invalid_duration is not a hull date operator: " + scan.negativeFlag);
+                "invalid_duration CONSUMES negative= — reporting it would red the lint on the "
+                        + "23 correct rules-src sites that carry it: " + scan.deadNegativeFlag);
     }
 
 
@@ -395,10 +303,7 @@ class NegatedDateComparisonLintTest
     @Test
     void expressionFormNegationIsReported()
     {
-        String source = "not (date(MHSTDTC) < RFSTDTC)";
-        Expr expr = CheckExpressionParser.parse(source);
-
-        Scan scan = scanCheck(new CheckConditionExpression(expr, source));
+        Scan scan = scanExpr("not (date(MHSTDTC) < RFSTDTC)");
 
         assertEquals(1, scan.structuralNegation.size(),
                 "not(date(X) < Y) in expression form must be reported: " + scan.structuralNegation);
@@ -417,41 +322,35 @@ class NegatedDateComparisonLintTest
     @Test
     void nearMissesAreNotReported()
     {
-        CheckCondition bareDate = dateLeaf("date_less_than");
-        CheckCondition negatedNonDate = new CheckConditionNot(CheckConditionLeaf.builder()
-                .name("AESTDTC").operator("equal_to").value(TextNode.valueOf("X")).build());
-        CheckCondition bareDateNotEqual = dateLeaf("date_not_equal_to");
-        CheckCondition negatedDatePart = new CheckConditionNot(dateLeaf("date_part_not_equal_to"));
-        CheckCondition negativeOnNonDate = CheckConditionLeaf.builder().name("EXDUR")
-                .operator("invalid_duration").negative(Boolean.TRUE).build();
-
-        Scan scan = scanCheck(new CheckConditionAll(List.of(bareDate, negatedNonDate,
-                bareDateNotEqual, negatedDatePart, negativeOnNonDate)));
+        Scan scan = scanExpr("date(MHSTDTC) < date(RFSTDTC)" + " and not AESTDTC == \"X\""
+                + " and date(MHSTDTC) != date(RFSTDTC)" + " and not date_part(MHSTDTC) != RFSTDTC"
+                + " and invalid_duration(EXDUR, negative=true)");
 
         assertTrue(scan.structuralNegation.isEmpty(),
                 "no near miss may be reported as a structural negation: " + scan.structuralNegation
-                        + " (a bare date_less_than, a negated non-date leaf, a bare "
-                        + "date_not_equal_to, and a negated date_part_* leaf are all legitimate)");
-        assertTrue(scan.negativeFlag.isEmpty(),
-                "`negative:` on invalid_duration is its documented modifier, not a finding: "
-                        + scan.negativeFlag);
+                        + " (a bare date comparison, a negated non-date comparison, a bare"
+                        + " date-inequality, and a negated date_part comparison are all"
+                        + " legitimate)");
+        assertTrue(scan.deadNegativeFlag.isEmpty(),
+                "negative= on invalid_duration is its documented modifier, not a finding: "
+                        + scan.deadNegativeFlag);
         assertEquals(2, scan.dateComparisonLeaves,
-                "exactly the two hull date leaves must be recognised — date_part_not_equal_to is "
-                        + "out of scope because it compiles to datePartComparison, not to the "
-                        + "hull comparison");
+                "exactly the two hull date comparisons must be recognised — date_part is out of"
+                        + " scope because it compiles to datePartComparison, not to the hull"
+                        + " comparison");
     }
 
 
-    /** {@code not(not(date_less_than))} is the original &forall; again, so it is not a finding. */
+    /** {@code not (not (date(X) < date(Y)))} is the original &forall; again — not a finding. */
     @Test
     void doubleNegationIsNotReported()
     {
-        Scan scan = scanCheck(
-                new CheckConditionNot(new CheckConditionNot(dateLeaf("date_less_than"))));
+        Scan scan = scanExpr("not (not (date(MHSTDTC) < date(RFSTDTC)))");
 
         assertTrue(scan.structuralNegation.isEmpty(),
                 "double negation restores the ∀ reading: " + scan.structuralNegation);
-        assertEquals(1, scan.dateComparisonLeaves, "the date leaf must still have been recognised");
+        assertEquals(1, scan.dateComparisonLeaves,
+                "the date comparison must still have been recognised");
     }
 
     // ------------------------------------------------------------------
@@ -459,18 +358,12 @@ class NegatedDateComparisonLintTest
     // ------------------------------------------------------------------
 
 
-    private static CheckConditionLeaf dateLeaf(String operator)
-    {
-        return CheckConditionLeaf.builder().name("MHSTDTC").operator(operator)
-                .value(TextNode.valueOf("RFSTDTC")).build();
-    }
-
-
-    private static Scan scanCheck(CheckCondition check)
+    private static Scan scanExpr(String source)
     {
         Scan scan = new Scan("fixture");
         scan.rules++;
-        walk(check, false, "fixture", scan);
+        walk(new CheckConditionExpression(CheckExpressionParser.parse(source), source), false,
+                "fixture", scan);
         return scan;
     }
 
@@ -565,73 +458,30 @@ class NegatedDateComparisonLintTest
 
 
     /**
-     * Walks the legacy Check AST, carrying the inherited negation state down through every
-     * composite node so a {@code not:} several levels above a leaf still reaches it.
+     * Walks one Check, carrying the inherited negation state down through every node so a
+     * {@code not} several levels above a comparison still reaches it. Since D121 every authored
+     * Check is expression-form; the structural wrappers ({@code all:}/{@code any:}/{@code not:} of
+     * expression nodes — synthetic-harness shapes) are reassembled through
+     * {@link CheckExprUnits#toExpr} and walked identically.
      */
     private static void walk(CheckCondition condition, boolean negated, String origin, Scan scan)
     {
         switch (condition)
         {
         case null -> scan.absentChecks++;
-        case CheckConditionAll all -> walkAll(all.getConditions(), negated, origin, scan);
-        case CheckConditionAny any -> walkAll(any.getConditions(), negated, origin, scan);
-        case CheckConditionNot not -> walk(not.getCondition(), !negated, origin, scan);
-        case CheckConditionExpression expression -> walkExpression(expression, negated, origin,
-                scan);
-        case CheckConditionConstant _ -> scan.foldedConstants++;
-        case CheckConditionLeaf leaf -> walkLeaf(leaf, negated, origin, scan);
-        }
-    }
-
-
-    private static void walkAll(List<CheckCondition> parts, boolean negated, String origin,
-            Scan scan)
-    {
-        for (CheckCondition part : parts)
+        case CheckConditionExpression expression ->
         {
-            walk(part, negated, origin, scan);
+            scan.expressionChecks++;
+            walkExpr(expression.expr(), negated, origin, scan);
         }
-    }
-
-
-    private static void walkExpression(CheckConditionExpression expression, boolean negated,
-            String origin, Scan scan)
-    {
-        scan.expressionChecks++;
-        walkExpr(expression.expr(), negated, origin, scan);
-    }
-
-
-    private static void walkLeaf(CheckConditionLeaf leaf, boolean negated, String origin, Scan scan)
-    {
-        scan.leaves++;
-        boolean flagged = Boolean.TRUE.equals(leaf.getNegative());
-        if (flagged)
+        default ->
         {
-            scan.negativeFlagLeaves++;
+            Expr reassembled = CheckExprUnits.toExpr(condition);
+            if (reassembled != null)
+            {
+                walkExpr(reassembled, negated, origin, scan);
+            }
         }
-        String operator = leaf.getOperator();
-        // Job 2 is reported BEFORE the hull-date filter, deliberately: a stray `negative:` is dead
-        // on every operator that does not consume it, not only on the six. CheckToExpr:182 shows
-        // invalid_duration is the sole consumer; rejectAffixFields (:341, called at :208) throws
-        // for all the rest, leaving checkExpr == null and a per-rule RuleRunner ERROR.
-        if (flagged && operator != null && !NEGATIVE_CONSUMING_OPERATOR.equals(operator))
-        {
-            scan.deadNegativeFlag
-                    .add(origin + "|" + operator + "(" + leaf.getName() + ") negative:");
-        }
-        if (operator == null || !HULL_DATE_OPERATORS.contains(operator))
-        {
-            return;
-        }
-        scan.dateComparisonLeaves++;
-        if (negated)
-        {
-            scan.structuralNegation.add(origin + "|not " + operator + "(" + leaf.getName() + ")");
-        }
-        if (flagged)
-        {
-            scan.negativeFlag.add(origin + "|" + operator + "(" + leaf.getName() + ") negative:");
         }
     }
 
@@ -649,7 +499,18 @@ class NegatedDateComparisonLintTest
         case Expr.And and -> walkExprAll(and.parts(), negated, origin, scan);
         case Expr.Or or -> walkExprAll(or.parts(), negated, origin, scan);
         case Expr.Binary binary -> walkBinary(binary, negated, origin, scan);
-        case Expr.Call call -> walkExprAll(call.args(), negated, origin, scan);
+        case Expr.Call call ->
+        {
+            // Job 2, in the surviving carriage: `negative=` is a kwarg now, and only
+            // invalid_duration consumes it — anywhere else the compiler declines and the rule
+            // ERRORs instead of validating anything, so the lint pre-warns at the corpus gate.
+            if (call.kwargs().containsKey("negative")
+                    && !NEGATIVE_CONSUMING_OPERATOR.equals(call.name()))
+            {
+                scan.deadNegativeFlag.add(origin + "|" + call.name() + "(…) negative=");
+            }
+            walkExprAll(call.args(), negated, origin, scan);
+        }
         case Expr.Ref _ -> scan.operands++;
         case Expr.Lit _ -> scan.operands++;
         }
@@ -702,15 +563,9 @@ class NegatedDateComparisonLintTest
 
         private int rules;
 
-        private int leaves;
-
         private int dateComparisonLeaves;
 
-        private int negativeFlagLeaves;
-
         private int expressionChecks;
-
-        private int foldedConstants;
 
         private int absentChecks;
 
@@ -718,9 +573,7 @@ class NegatedDateComparisonLintTest
 
         private final List<String> structuralNegation = new ArrayList<>();
 
-        private final List<String> negativeFlag = new ArrayList<>();
-
-        /** Job 2, corpus-wide: a {@code negative:} on any operator that cannot consume it. */
+        /** Job 2, corpus-wide: a {@code negative=} kwarg on a function that cannot consume it. */
         private final List<String> deadNegativeFlag = new ArrayList<>();
 
         Scan(String view)
@@ -732,12 +585,10 @@ class NegatedDateComparisonLintTest
         @Override
         public String toString()
         {
-            return view + ": rules=" + rules + " leaves=" + leaves + " hullDateLeaves="
-                    + dateComparisonLeaves + " negativeFlagLeaves=" + negativeFlagLeaves
-                    + " expressionChecks=" + expressionChecks + " foldedConstants="
-                    + foldedConstants + " absentChecks=" + absentChecks + " exprOperands="
-                    + operands + " negatedDate=" + structuralNegation.size() + " negativeFlagDate="
-                    + negativeFlag.size() + " deadNegativeFlag=" + deadNegativeFlag.size();
+            return view + ": rules=" + rules + " hullDateComparisons=" + dateComparisonLeaves
+                    + " expressionChecks=" + expressionChecks + " absentChecks=" + absentChecks
+                    + " exprOperands=" + operands + " negatedDate=" + structuralNegation.size()
+                    + " deadNegativeFlag=" + deadNegativeFlag.size();
         }
 
     }

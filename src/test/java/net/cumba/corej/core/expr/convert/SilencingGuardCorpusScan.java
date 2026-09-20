@@ -40,7 +40,7 @@ import net.cumba.corej.core.model.Rule;
  *
  * <p>
  * ⚠ <b>The shipped {@code rules/} corpus would be the wrong view.</b> It is generator output: its
- * {@code Check} is expression carriage that {@code ExprLowering} lowers back on load, and
+ * {@code Check} is expression carriage (evaluated natively since phase 7), and
  * {@code NonEmptyGuardInliner} had injected {@code var_exists(…)} terms into it that no author
  * wrote. A gate whose failure message tells the author to change their authoring must not be
  * measuring a machine's output — the "new guard authored" verdict would be unactionable, and a

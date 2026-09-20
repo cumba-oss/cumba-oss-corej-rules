@@ -20,13 +20,13 @@ Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "DM"
-Operations:
-- id: "$value_dy_algorithm"
+Bindings:
+- name: "$value_dy_algorithm"
   expression: "dy(--DTC)"
 Check:
   expression: >-
     not empty(--DY) and is_complete_date_part(--DTC) and is_complete_date_part(DM.RFSTDTC) and
-    date(--DTC) >= DM.RFSTDTC and --DY != $value_dy_algorithm
+    date(--DTC) >= date(DM.RFSTDTC) and --DY != $value_dy_algorithm
 Outcome:
   Message: "--DY does not equal the value derived by the SDTM study day algorithm\
     \ even though the date portions of --DTC and RFSTDTC are complete dates, --DTC\

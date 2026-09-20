@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleClassifier;
-import net.cumba.corej.core.expr.CheckToExpr;
 import net.cumba.corej.core.expr.eval.Domain;
 import net.cumba.corej.core.expr.eval.DomainScan;
 import net.cumba.corej.core.expr.eval.OperationKinds;
@@ -105,6 +105,11 @@ class CrossCorpusDerivationTest
      */
     private static final List<String> SENSITIVITY_OVERRIDES = List.of("CDISC-CG0001",
             "CDISC-CG0077", "CDISC-CG0535", "CDISC-SEND-0153", "CDISC-SEND-0249.1",
+            // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
+            // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
+            // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and
+            // the reasoning is recorded. No override is lost: each was the CORE arm of a set
+            // whose other arms are all still listed.
             // 8 -> 12 on 2026-08-19 (wave TA-6, review H2): the SV-scoped conditional TV
             // presence mints author `Dataset` because the derivation's `Study` would trip the
             // loader's unrestricted-scope gate; see DerivedFieldEquivalenceTest.
@@ -157,13 +162,7 @@ class CrossCorpusDerivationTest
             // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
             // are record-level by design and deliberately absent. Kept in step with
             // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-SEND-9439"
-    // ⚠ CORE-family ids removed on extraction (2026-09-16): this repository does not
-    // redistribute the CORE rule family, so no CORE rule reaches the shipped corpus this
-    // scan walks and the entries could never match. Internal keeps them; the override set
-    // is otherwise identical to DerivedFieldEquivalenceTest, which holds the rules-src half.
-    // Removed: CORE-000212, CORE-000365, CORE-000929, CORE-009705, CORE-009707
-    );
+            "CDISC-SEND-9439");
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}
@@ -203,6 +202,9 @@ class CrossCorpusDerivationTest
         Rule src = YAML.readValue(
                 Files.readString(CHECKS_DIR.resolveSibling(srcFile), StandardCharsets.UTF_8),
                 Rule.class);
+        // 7b: an external binder materialises the Bindings itself — without this the classifier
+        // sees no operations at all and a `$`-consuming Check derives RECORD.
+        net.cumba.corej.core.RulePackageLoader.normalizeOperations(src);
         assertDerives(id + " [rules-src]", src, expectedDomain, authoredSensitivity);
 
         // Form 2 — rules/ native expression, single-use operations inlined into the Check. The
@@ -249,11 +251,12 @@ class CrossCorpusDerivationTest
             packages = files.filter(p -> p.getFileName().toString().startsWith("rules-"))
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // 56 -> 45 (PLAN-retire-core-family phase 6): 58 -> 47 packages.
+        assertTrue(packages.size() >= 45, "expected the full native corpus, got " + packages);
 
         List<String> diffs = new ArrayList<>();
         List<String> loadErrors = new ArrayList<>();
+        int entries = 0;
         for (Path pkgFile : packages)
         {
             RulePackage pkg = loadStripped(pkgFile, null);
@@ -261,6 +264,7 @@ class CrossCorpusDerivationTest
             {
                 String id = e.getKey();
                 Rule rule = e.getValue();
+                entries++;
                 if (rule.getLoadError() != null)
                 {
                     loadErrors.add(pkgFile.getFileName() + " " + id + ": " + rule.getLoadError());
@@ -312,8 +316,8 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818.
+        assertTrue(entries > 12700, "expected the whole shipped corpus, got " + entries);
         assertEquals(List.of(), loadErrors,
                 "stripping the derived fields must not break loading, and the shipped corpus"
                         + " must carry zero load warnings");
@@ -368,8 +372,11 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // 3500 -> 3100 (PLAN-retire-core-family phase 6). ⚠ This is the ONLY one of these four
+        // counting DISTINCT shipped ids rather than fan-out entries, and its measured value is
+        // 3132 — lower than the manifest's 3411, because it counts only the ids this derivation
+        // routes.
+        assertTrue(byId.size() > 3100, "expected the whole shipped corpus, got " + byId.size());
 
         long dataset = byId.values().stream().filter(Domain.DATASET::equals).count();
         long variable = byId.values().stream().filter(Domain.VARIABLE::equals).count();
@@ -414,13 +421,13 @@ class CrossCorpusDerivationTest
                     .filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
         List<String> offenders = new ArrayList<>();
-        // ⚠ No `entries` counter: its floor was removed on extraction — do not re-import.
+        int entries = 0;
         for (Path pkgFile : packages)
         {
             JsonNode rules = JSON.readTree(pkgFile.toFile()).get("rules");
             for (Map.Entry<String, JsonNode> e : rules.properties())
             {
-                // ⚠ No `entries++`: the floor that read it went on extraction.
+                entries++;
                 if (e.getValue().has("Rule_Type"))
                 {
                     offenders.add(pkgFile.getFileName() + " " + e.getKey() + ": Rule_Type");
@@ -434,8 +441,8 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818.
+        assertTrue(entries > 12700, "expected the whole shipped corpus, got " + entries);
         assertEquals(List.of(), offenders,
                 "rules/ must ship stripped: Rule_Type never, Sensitivity only on the documented"
                         + " override set");
@@ -450,7 +457,7 @@ class CrossCorpusDerivationTest
             Sensitivity authoredSensitivity)
     {
         assertNotNull(rule.getCheck(), label + " has no Check");
-        Domain domain = DomainScan.infer(CheckToExpr.toExpr(rule.getCheck()),
+        Domain domain = DomainScan.infer(CheckExprUnits.toExpr(rule.getCheck()),
                 OperationKinds.forRule(rule));
         assertEquals(expectedDomain, domain.label(), label + " inferred domain");
         RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier.deriveSensitivity(rule);

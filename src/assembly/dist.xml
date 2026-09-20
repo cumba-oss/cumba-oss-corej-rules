@@ -2,13 +2,15 @@
 <!--
     The DATA rule corpus, on its own.
 
-    The two corpora are on different axes — this one is (family, standard, version), the
-    Define-XML one is (family, version), because for Define-XML the standard is always
-    Define-XML — and a consumer may legitimately want one without the other. See
+    ⚑ SPLIT FROM ONE ARCHIVE INTO TWO on 2026-09-02
+    (plans/done/PLAN-rules-corpus-build-integration.md §7). The two corpora are on different axes —
+    this one is (family, standard, version), the Define-XML one is (family, version), because for
+    Define-XML the standard is always Define-XML — and a consumer may legitimately want one
+    without the other; corej-cli-dist already ships only the Define-XML corpus. See
     rules-define.xml beside this file.
 
-    The release job's glob is `dist/*-dist/target/*.zip`, so both archives are picked up
-    with no workflow change. Each execution sets its own finalName, or they would collide.
+    The release job's glob is `dist/*-dist/target/*.zip`, so both archives are picked up with no
+    workflow change. Each execution sets its own finalName, or they would collide.
 -->
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,26 +18,31 @@
 
     <id>rules</id>
     <formats>
-        <!-- zip: the downloadable release artifact, picked up by the release job's
-             dist/*-dist/target/*.zip glob.
-             dir: exploded, so a container build or a local run can COPY it without
-             unzipping. -->
+        <!-- zip: the downloadable release artifact, picked up by the release
+             job's dist/*-dist/target/*.zip glob.
+             dir: exploded, so a container build or a local run can COPY it
+             without unzipping. -->
         <format>zip</format>
         <format>dir</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>cumba-oss-corej-rules-${project.version}</baseDirectory>
+    <baseDirectory>corej-rules-${project.version}</baseDirectory>
 
     <fileSets>
-        <!-- Only the GENERATED packages ship: rules-src/ is authoring source, not a
-             runtime artifact.
+        <!-- The generated native corpus, cross-module exactly as
+             corej-cli-dist reaches into this module for the Define-XML corpus.
+             Only the generated packages ship: rules-src/ is authoring source,
+             not a runtime artifact. (rules-org/ — the archived upstream CDISC
+             release — was named here too until the 2026-09 CORE-family
+             retirement deleted it; it was that family's fallback statement of
+             intent and had no other consumer.)
 
-             ⚑ target/, NOT the source tree. The corpus is generated during
-             cumba-oss-corej-rules' build and is not committed, so that module MUST have
-             been built in this reactor (or earlier in the same workspace) before this
-             assembly runs. The <dependency> in this module's pom orders it; the enforcer
-             requireFilesExist rule there turns a missing corpus into a hard failure
-             rather than an empty bundle. -->
+             ⚑ target/, NOT the source tree (PLAN-rules-corpus-build-integration §4). The
+             corpus is generated during corej-rules' process-test-classes phase and is
+             no longer committed, so corej-rules MUST have been built in this reactor
+             (or earlier in the same workspace) before this assembly runs. The <dependency>
+             in this module's pom is what orders it; the enforcer requireFilesExist rule
+             there turns a missing corpus into a hard failure rather than an empty bundle. -->
         <fileSet>
             <!-- ⭐ rules-release/, NOT rules/. The generator writes two trees from the same
                  assembled nodes: rules/ carries every family and is what the test suite reads,
@@ -43,8 +50,8 @@
                  ships — the archive-internal name stays `rules/`, so nothing downstream sees a
                  layout change, only the absence of the draft packages. Repointing this at
                  rules/ would release unpublished draft rules; ReleaseCorpusTest asserts the
-                 exclusion holds, and the launcher re-asserts it on the staged copy. -->
-            <directory>${project.build.directory}/rules-release</directory>
+                 exclusion holds. -->
+            <directory>${project.basedir}/target/rules-release</directory>
             <outputDirectory>rules</outputDirectory>
             <includes>
                 <include>packages.json</include>
@@ -52,12 +59,11 @@
             </includes>
         </fileSet>
 
-        <!-- What the constituent standard versions are, and why a release asset's tag is
-             not a reproducibility guarantee: the tag answers "is this reproducible",
-             packages.json answers "which SDTM rules am I running", and users ask the
-             second question. -->
+        <!-- What the constituent standard versions are, and why a release asset's tag is not a
+             reproducibility guarantee. §7: the tag answers "is this reproducible", packages.json
+             answers "which SDTM rules am I running", and users ask the second question. -->
         <fileSet>
-            <directory>${project.basedir}/src/assembly</directory>
+            <directory>${project.basedir}/src/main/resources/dist</directory>
             <outputDirectory></outputDirectory>
             <includes>
                 <include>README.md</include>

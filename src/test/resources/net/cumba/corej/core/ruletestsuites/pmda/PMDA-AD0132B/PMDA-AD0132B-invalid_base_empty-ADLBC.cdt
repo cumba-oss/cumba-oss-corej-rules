@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0132B expect=violation domain=ADLBC
-#note "Row 1: BASE missing (lone .) while CHG populated -> first conjunct true, second true via the bare empty(BASE) leaf -> FIRES. Row 2: everything populated -> silent. Pin AVAL and CHG but NOT BASE (blank on the fired row canonicalises to null)."
+#note "Row 1: BASE missing (lone .) while CHG populated -> first conjunct true, second true via the bare empty(BASE) leaf -> FIRES. Row 2: everything populated -> silent. Pin AVAL and CHG but NOT BASE (blank on the fired row canonicalises to null). The CHG column satisfies Requirements.Variables.Any [CHG, PCHG, R2BASE], so the rule binds; ⛔ AVAL and BASE are deliberately NOT in that facet (M2-D24) -- gating them would skip the rule on exactly this dataset."
 #library standard=adamig version=1-3
 #expectViolationCount 1
 #expectViolationAt row=1 AVAL=10 CHG=5

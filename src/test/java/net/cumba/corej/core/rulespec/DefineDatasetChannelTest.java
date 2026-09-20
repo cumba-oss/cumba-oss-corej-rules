@@ -11,6 +11,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.cumba.corej.core.exec.MetadataProvider;
@@ -507,8 +508,70 @@ class DefineDatasetChannelTest
 
     // --- the shipped corpus is unaffected ---------------------------------------------
 
-    // ⚠ The SHIPPED_DEFINE_SPECS pin was dropped on extraction: it named the specs present
-    // when P1.1 landed internally, which this filtered subset deliberately does not mirror.
+    /**
+     * The specs that carried a {@code define_xml} block when P1.1 landed — all variable level. New
+     * dataset-level specs belong to P2/P3/P5 and do not need to be added here; this list pins the
+     * survivors against a silent shape reinterpretation.
+     *
+     * <p>
+     * ⭐ <b>Seven &rarr; five on 2026-09-19</b>, when {@code PLAN-retire-core-family} phase 3
+     * removed {@code CORE-000929.yaml} and {@code CORE-001081.yaml}. Both pinned their rule
+     * <b>inline</b>, so re-keying either onto its surviving twin ({@code CDISC-CG0001} /
+     * {@code CDISC-CG0010}) would have meant re-deriving the pinned rule body, updating
+     * {@code pinned_from.rules_src_sha256} and re-baselining the violation payload from a run —
+     * authoring, not re-keying, and so "cannot be migrated easily" under the owner's bar.
+     * </p>
+     *
+     * <p>
+     * ⚠ This list is one of the <b>two</b> places that hardcoded those two filenames; the other was
+     * {@code DefineItemMetadataSpecTest}, whose only two tests asserted exactly those two specs and
+     * which went with them. ⭐ That removal is what <b>discharges</b> §7 of the plan, which warned
+     * that both classes would survive the rule's deletion <em>green</em> — there is no longer
+     * anything to survive it. The Group-B non-collapse claim the deleted class pinned
+     * ({@code Record} sensitivity ⇒ one finding per offending ItemDef, never one collapsed finding)
+     * is still pinned by {@code DRAFT-900021..900024} below, each of which carries <b>two</b>
+     * {@code expected_violations} on two distinct ItemDefs and is asserted by
+     * {@code RuleExecutionSpecTest}.
+     * </p>
+     */
+    private static final List<String> SHIPPED_DEFINE_SPECS = List.of("DRAFT-900021.yaml",
+            "DRAFT-900022.yaml", "DRAFT-900023.yaml", "DRAFT-900024.yaml", "FDA-SD0059.yaml");
+
+    @Test
+    void shippedDefineXmlSpecsAreVariableLevelAndCarryOnlyTheD4Name() throws IOException
+    {
+        Path specsRoot = Path.of(System.getProperty("projectBasedir"), "rulespec", "specs");
+        assertTrue(Files.isDirectory(specsRoot), "specs root must exist: " + specsRoot);
+
+        for (String fileName : SHIPPED_DEFINE_SPECS)
+        {
+            Path specFile = specsRoot.resolve(fileName);
+            assertTrue(Files.exists(specFile), () -> "missing spec " + specFile);
+            SpecSchema spec = SpecLoader.load(specFile);
+            assertNotNull(spec.defineXml(), fileName);
+
+            MetadataProvider p = SpecRunner.defineProviderFrom(spec.name(), spec.defineXml());
+            assertNotNull(p, fileName);
+            List<String> keys = new ArrayList<>();
+            spec.defineXml().properties().forEach(e ->
+            {
+                keys.add(e.getKey());
+                assertTrue(e.getValue().isArray(),
+                        () -> fileName + '/' + e.getKey() + ": shipped define specs are variable"
+                                + " level; re-deriving this one as dataset level would change its"
+                                + " verdict silently");
+            });
+            // D3 — the keys register as Define dataset names even though they carry only variables.
+            assertEquals(keys, p.getDatasetNames(), fileName);
+            for (String key : keys)
+            {
+                // D4 on shape A — the name default and NOTHING else. A shipped variable-level spec
+                // that started carrying a label or a class would mean its shape was reinterpreted.
+                assertEquals(Map.of("name", key), p.getDatasetMetadata(key),
+                        () -> fileName + '/' + key + ": only D4's name default expected");
+            }
+        }
+    }
 
     // --- helpers ----------------------------------------------------------------------
 
@@ -560,8 +623,7 @@ class DefineDatasetChannelTest
                     Domains:
                       Include: ["%1$s"]
                   Check:
-                    all:
-                      - {name: define_dataset_class, operator: non_empty}
+                    expression: 'not empty(define_dataset_class)'
                   Outcome:
                     Message: "define class present"
                     Output_Variables: [define_dataset_class]

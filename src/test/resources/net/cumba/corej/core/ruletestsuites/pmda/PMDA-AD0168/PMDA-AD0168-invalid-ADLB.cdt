@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-AD0168 expect=violation domain=ADLB
+#note "Mirrors rulespec PMDA-AD0168.yaml (the rule's only prior guard). 001/HGB/PRE is the FILTER discriminator: post-baseline ANRIND 'NORMAL' sorts above the baseline 'LOW' while BNRIND='LOW' everywhere, so a max() ignoring filter(ABLFL='Y') computes 'NORMAL' and false-fires on rows 1-2 (exact-set match reds). 002 row 4 is the genuine violation (BNRIND 'LOW' != baseline ANRIND 'NORMAL'). 003 has no ABLFL=Y row -> missing $-value, populated-BNRIND row 5 fires; row 6 keeps BNRIND empty and the non_empty guard keeps it quiet."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=4 PARAMCD=HGB BASETYPE=PRE ANRIND=LOW BNRIND=LOW "$baseline_anrind"=NORMAL
+#expectViolationAt row=5 PARAMCD=HGB BASETYPE=PRE ANRIND=HIGH BNRIND=HIGH
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col BASETYPE type=Char label="Baseline Type"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ANRIND   type=Char label="Analysis Reference Range Indicator"
+col BNRIND   type=Char label="Baseline Reference Range Indicator"
+---
+S1 | 001 | HGB | PRE | 0 | Y | LOW    | LOW
+S1 | 001 | HGB | PRE | 1 |   | NORMAL | LOW
+S1 | 002 | HGB | PRE | 0 | Y | NORMAL | NORMAL
+S1 | 002 | HGB | PRE | 1 |   | LOW    | LOW
+S1 | 003 | HGB | PRE | 1 |   | HIGH   | HIGH
+S1 | 003 | HGB | PRE | 2 |   | LOW    |

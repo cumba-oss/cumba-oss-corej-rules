@@ -471,7 +471,7 @@ final class RuleFingerprint
     static Renamed alphaRename(JsonNode rule)
     {
         List<JsonNode> operations = new ArrayList<>();
-        JsonNode declared = rule.get("Operations");
+        JsonNode declared = rule.get("Bindings");
         if (declared != null && declared.isArray())
         {
             declared.forEach(operations::add);
@@ -482,7 +482,7 @@ final class RuleFingerprint
         Map<String, String> mapping = new HashMap<>();
         for (int i = 0; i < ordered.size(); i++)
         {
-            JsonNode id = ordered.get(i).get("id");
+            JsonNode id = ordered.get(i).get("name");
             if (id != null && id.isTextual())
             {
                 mapping.put(id.asText(), "$__" + i);
@@ -807,7 +807,7 @@ final class RuleFingerprint
             return operation;
         }
         ObjectNode copy = ((ObjectNode) operation).deepCopy();
-        copy.remove("id");
+        copy.remove("name");
         return copy;
     }
 

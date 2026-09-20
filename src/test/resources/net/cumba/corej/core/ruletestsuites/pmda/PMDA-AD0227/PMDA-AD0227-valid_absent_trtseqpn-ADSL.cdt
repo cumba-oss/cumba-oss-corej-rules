@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0227 expect=noViolation domain=ADSL
+#note "Mirrors rulespec PMDA-AD0227-absent.yaml (the rule's only prior guard, EC-25/Fix #116/Fix #134). The Perm TRTSEQPN column is entirely ABSENT while TRTSEQP is mixed (A-B, A-B, B-A). The faithful var_exists('TRTSEQPN') guard is false, so the rule must stay quiet. This is discriminating since Fix #134: an absent comparator folds all rows into ONE consistency class, in which the minority 'B-A' IS inconsistent - so if the guard were dropped (or inverted) the rule would fire on row 3 and red this scenario. It is the guard doing the masking that this file pins, not the operator's own early return."
+#library standard=adamig version=1-0
+dataset ADSL class=ADSL label="Subject-Level Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col TRTSEQP type=Char label="Planned Sequence of Treatments"
+---
+S1 | 001 | A-B
+S1 | 002 | A-B
+S1 | 003 | B-A

@@ -3,6 +3,7 @@ package net.cumba.corej.core.expr.convert;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,14 +59,31 @@ class RuleSrcExpressionWriterCorpusTest
 
     private static final Path RULES_DIR = CorpusPaths.rules();
 
-    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
-    // which this subset deliberately is not. Enforced internally over the whole corpus.
+    /** Floor, not an equality: the corpus grows (3 781 at authoring time). */
+    // 3700 -> 3400 (PLAN-retire-core-family phase 6): rules-src/checks 3932 -> 3435.
+    private static final int MIN_AUTHORED = 3400;
 
     /**
-     * ⚠ CORE-000029 and CORE-000067 are in the internal parked set and are NOT here: this
-     * repository does not redistribute the CORE rule family, so those checks never reach the
-     * writer. Otherwise identical to internal.
+     * The six parked rules (§2): converted in place, still parked. {@code CDISC-SEND-0202} &ndash;
+     * {@code 0205} are parked on EC-47; {@code DRAFT-900027} was authored
+     * {@code Executability: "Not Executable"} with an {@code ExecutabilityHint} (no operator
+     * detects an imputed date) &mdash; added 2026-08-22. {@code CDISC-CG0328} is parked as the
+     * {@code R-5.26} duplicate of {@code CDISC-CG0329} (owner ruling D-8, 2026-09-12): both ship
+     * the identical check into the same three packages, so one is parked and the lower-numbered
+     * sheet row stays documented in {@code rules-src}.
      */
+    // ⚑ 6 -> 26 on 2026-09-14 (F-1, owner rulings D-8 + D-18): twenty R-5.26 duplicates
+    // parked across twenty pairs. ⛔ In NINE of them the survivor is the LOWER number, because
+    // D-18 makes COVERAGE the invariant and the id only a tie-break — parking the higher id
+    // would have cut the standards only it reaches. Six further pairs were deliberately left
+    // BOTH ACTIVE (partial overlap): they double-report in exactly one package each, which is
+    // the accepted cost of keeping every standard covered.
+    // ⛔ 26 -> 24 on 2026-09-19 (PLAN-retire-core-family phase 6): CORE-000029 and CORE-000067
+    // went with the family. ⭐ These two were NOT R-5.26 duplicates like the other twenty-four —
+    // they are the pair that is AUTHORED but in no generated package, and the cause is
+    // `Executability: "Not Executable"`, which parks a rule. That is exactly why §5 of the plan
+    // could say "authored CORE 518, shipped CORE 516". An EXACT set equality, so no headroom
+    // applied.
     private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0120", "CDISC-CG0126",
             "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361", "CDISC-CG0622",
             "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636", "CDISC-CG0640",
@@ -74,35 +92,34 @@ class RuleSrcExpressionWriterCorpusTest
             "PMDA-SD0063");
 
     /**
-     * Ordinary authored-text pins for the three formerly-curated rules. ⚠ These are, and always
-     * were, a hand-copy of the intended texts — never a literal read of the retired
+     * Ordinary authored-text pins for the three formerly-curated expressions. ⚠ These are, and
+     * always were, a hand-copy of the intended texts — never a literal read of the retired
      * {@code RulePackageConverter.SPECIAL_CASE_BY_CORE_ID} registry (only the key set ever flowed
-     * from the converter). The registry was an accidental safety net: reverting one of these three
-     * files to the broken upstream regex used to be silently repaired by the Java constant. Since
+     * from the converter). The registry was an accidental safety net: reverting one of these files
+     * to the broken upstream regex used to be silently repaired by the Java constant. Since
      * {@code PLAN-retire-corpus-transforms.md} phase 1 the registry is gone and this pin is the
      * deliberate replacement — an edit to one of these files that moves the text reds this run and
      * must be accompanied by moving the pin.
      *
      * <p>
-     * ⛔⛔ <b>RE-POINTED 2026-09-19: the map was EMPTY, and the reason it gave was false.</b> It read
-     * <i>"empty here, on purpose — all three formerly-curated rules are CORE-family, and this
-     * repository does not redistribute that family, so a pin keyed on their basenames could never
-     * fire"</i>. Both premises are true and the conclusion is not: the three curated TEXTS never
-     * were CORE-only. Measured 2026-09-19 over this repository's own {@code rules-src/checks} —
-     * {@code CDISC-CG0280}, {@code FDA-SD1269} and {@code PMDA-SD1269} all carry the {@code RANDQT}
-     * text, {@code CDISC-CG0332} the {@code AP}/{@code FA}-exclusion text and {@code CDISC-CG0333}
-     * the {@code FA} one; all five are present here and all five convert. So the pin is re-pointed
-     * rather than left empty, and now covers five rules instead of nought. {@code CDISC-CG0281} is
-     * NOT a carrier: it is the {@code RANDQT} family's count-based split sibling
-     * ({@code $trt_count == 1 and $randqt_count < 1}), a different claim.
+     * ⛔⛔ <b>RE-POINTED 2026-09-19 (review round 1): all three keys had become DEAD IDS.</b> The map
+     * was keyed on {@code CORE-000335} / {@code -000539} / {@code -000540}, and the CORE family was
+     * retired; the lookup {@code CURATED_BY_ID.get(id)} therefore returned {@code null} for every
+     * one of the 3 435 authored files, so <b>the byte-match assertion below fired for no rule at
+     * all</b> while the constant still read as a live pin. Measured: the three texts survive
+     * byte-identically on live twins — {@code CDISC-CG0280}, {@code FDA-SD1269} and
+     * {@code PMDA-SD1269} all carry the {@code RANDQT} text, {@code CDISC-CG0332} the
+     * {@code AP}/{@code FA}-exclusion text and {@code CDISC-CG0333} the {@code FA} one — so the pin
+     * is re-pointed rather than retired, and now covers five rules instead of nought.
+     * {@code CDISC-CG0281} is NOT a carrier: it is the {@code RANDQT} family's count-based split
+     * sibling ({@code $trt_count == 1 and $randqt_count < 1}), a different claim.
      * </p>
      *
      * <p>
-     * ⚠ Ported from the internal twin's review round 1, which found the same map <em>inert</em>
-     * rather than empty — keyed on {@code CORE-000335} / {@code -000539} / {@code -000540}, so
-     * {@code CURATED_BY_ID.get(id)} returned {@code null} for every authored file while the
-     * constant still read as a live pin. An empty map and a dead-keyed map are one defect in two
-     * costumes, and only the {@code curatedHits} counter below can tell either from a pin that ran.
+     * ⚑ The {@code curatedHits} / {@code leafHits} equalities at the end of
+     * {@link #theWriterConvertsTheWholeAuthoredCorpusCleanly} are the guard that makes this
+     * impossible to repeat. A map-keyed pin over a corpus that can rename or retire its keys is
+     * inert-by-default, and nothing in the assertion's own shape says whether it ran.
      * </p>
      */
     private static final Map<String, String> CURATED_BY_ID = Map.of("CDISC-CG0280",
@@ -128,9 +145,9 @@ class RuleSrcExpressionWriterCorpusTest
      * authored texts are pinned below as ordinary authored-text pins.
      *
      * <p>
-     * ⚠ CORE-000538, the second carrier internally, is NOT here: this repository does not
-     * redistribute the CORE rule family, so its authored check never reaches the writer. Otherwise
-     * identical to internal.
+     * ⚑ 2 &rarr; 1 on 2026-09-19 (review round 1): {@code CORE-000538} went with the CORE family.
+     * Unlike {@link #CURATED_BY_ID} this set was never fully inert — {@code CDISC-CG0334} is live
+     * and kept the pin firing — which is precisely why the dead half was invisible.
      * </p>
      */
     private static final Set<String> CURATED_BY_LEAF = Set.of("CDISC-CG0334");
@@ -152,8 +169,7 @@ class RuleSrcExpressionWriterCorpusTest
                 r.filesIn(), r.filesOut(), r.unraisable().size(), r.genericResidue().size(),
                 r.parked(), r.divergentFromPlainRaise());
 
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        assertTrue(r.filesIn() >= MIN_AUTHORED, "found only " + r.filesIn() + " rules-src checks");
         assertEquals(r.filesIn(), r.filesOut(), "every authored file must convert");
         assertEquals(List.of(), r.unraisable(), "an authored Check failed to raise");
         assertEquals(List.of(), r.genericResidue(),

@@ -13,8 +13,9 @@ rule:
   Match_Datasets:
     - Name: RELREC
   Check:
-    all:
-      - {name: "{{primary_column}}", operator: "{{operator}}", value: "RELREC.**{{joined_column_suffix}}"}
+    # A boolean check expression over the RELREC-related row, e.g.:
+    #   AETERM != RELREC.**OBJ
+    expression: "{{expression}}"
   Outcome:
     Message: "{{message}}"
     Output_Variables: [STUDYID, USUBJID, "{{primary_column}}"]

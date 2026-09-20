@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0132B expect=skipped domain=ADLBC
+#note "The gate half of Requirements.Variables.Any [CHG, PCHG, R2BASE] (flat -> ONE group, an OR over the three; PLAN-any-variable-sets phase 6, owner ruling 2026-09-18). Not one of the three derived columns is declared, so the group is unmet and the rule is GATED OFF -> auditable SKIP instead of a vacuous PASS. The row is deliberately DEFECT-SHAPED on the second conjunct -- BASE is missing while AVAL is populated -- so the silence can only come from the gate, never from the data: delete the Requirements block from rules-src/checks/PMDA/PMDA-AD0132B.yaml and this scenario REDS, because the rule then binds and (not empty(CHG) or not empty(PCHG) or not empty(R2BASE)) folds to all-missing over three ABSENT columns (R-5.22 / EC-43), giving noViolation rather than skipped. ⛔ M2-D24: AVAL and BASE are the rule's DEFECT side and are deliberately NOT in the Any -- gating them would skip the rule on exactly the datasets the defect lives in. A BDS dataset carrying neither CHG nor PCHG nor R2BASE is ordinary ADaM (all three are Permissible), so it is nothing to check, which is what SKIPPED says."
+#library standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL    type=Num
+col BASE    type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 10 | .
+CDISCPILOT01 | 01-701-1023 | ALB | 12 | 4

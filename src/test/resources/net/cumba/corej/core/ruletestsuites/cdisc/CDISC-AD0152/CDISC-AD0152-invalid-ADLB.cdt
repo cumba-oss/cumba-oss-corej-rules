@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0152 expect=violation domain=ADLB
+#note "Mirrors rulespec CDISC-AD0152.yaml (the rule's only prior guard). Three groups: 001/HGB is the FILTER discriminator - post-baseline AVAL 15.0 is strictly greater than the baseline AVAL 13.5 while BASE=13.5 everywhere, so an engine that ignores filter(ABLFL='Y') on max() computes $baseline_aval=15.0 and false-fires on rows 1-2 (the exact-set match would then red). 002/HGB row 4 is the genuine violation (BASE 12.0 != baseline AVAL 14.0). 003/HGB has no ABLFL=Y row, so $baseline_aval is missing for the group: populated BASE vs missing is unequal -> row 5 fires; row 6 keeps BASE empty and the non_empty guard keeps it quiet. AVAL/BASE are Char on purpose, as in the spec, so the projected values are exact strings."
+#library standard=adamig version=1-2
+#expectViolationCount 2
+#expectViolationAt row=4 PARAMCD=HGB BASETYPE=LAST AVAL=13.0 BASE=12.0 "$baseline_aval"=14.0
+#expectViolationAt row=5 PARAMCD=HGB BASETYPE=LAST AVAL=11.0 BASE=11.0
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col BASETYPE type=Char label="Baseline Type"
+col ABLFL    type=Char label="Baseline Record Flag"
+col AVAL     type=Char label="Analysis Value"
+col BASE     type=Char label="Baseline Value"
+---
+S1 | 001 | HGB | 0 | LAST | Y | 13.5 | 13.5
+S1 | 001 | HGB | 1 | LAST |   | 15.0 | 13.5
+S1 | 002 | HGB | 0 | LAST | Y | 14.0 | 14.0
+S1 | 002 | HGB | 1 | LAST |   | 13.0 | 12.0
+S1 | 003 | HGB | 1 | LAST |   | 11.0 | 11.0
+S1 | 003 | HGB | 2 | LAST |   | 10.0 |

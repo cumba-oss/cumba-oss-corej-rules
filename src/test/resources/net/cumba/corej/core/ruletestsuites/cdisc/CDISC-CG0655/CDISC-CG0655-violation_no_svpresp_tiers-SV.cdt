@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0655 expect=violation domain=SV
+#note "Tiers 2-3 of PLAN-unplanned-visit-cascade: no SVPRESP column, so SVUPDES and the VISIT-name literals decide. Row 2 is neutral-named with blank SVUPDES -> planned, VISITNUM not in TV -> fires. Row 3's UNSCHEDULED marker and row 4's populated SVUPDES each mark the visit unplanned -> exempt. Row 1 is planned and in TV -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2 | BASELINE | 
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 99 | WEEK 99 | 
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 98 | UNSCHEDULED 4 | 
+CDISCPILOT01 | SV | 01-701-1015 | 4 | 97 | WEEK 97 | EXTRA VISIT DUE TO AE
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

@@ -1,0 +1,28 @@
+#!RuleTest
+#test PMDA-SD1023 expect=violation domain=LB
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+#note "JOINLESS BASELINE. RENAMED 2026-09-18 (review round 3) from 'violation_no_sv_dataset': that name asserted a premise PMDA-SD1023 CANNOT have. The rule has NO Match_Datasets at all - grep -c Match_Datasets rules-src/checks/PMDA/PMDA-SD1023.yaml -> 0 - so there is no absent-joined-dataset path to enter and this fixture cannot guard one. It was originally kept (f0b866d4) as the in-tree record of the measurement that CORRECTED the plan (the engine FOLDS an absent joined dataset rather than SKIPping the rule, against the plan's AbsentDatasetSkip prediction); that premise now lives in documentation/findings-snapshot-rebaselines.md. What this fixture DOES pin: the verdicts the rule has always had with no SV in sight - row 2 (WEEK 99, 99) is neutral-named and not a TV pair -> fires; row 1 (BASELINE, 2) is a TV pair -> clean. Unlike its FDA twin it is NOT redundant with PMDA-SD1023-invalid-LB.cdt, whose LB rows and TV pairs differ (three rows, including an UNSCHEDULED 4.2 exemption)."
+#library standard=sdtmig version=3-4
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

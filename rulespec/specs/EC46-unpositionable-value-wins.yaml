@@ -1,0 +1,96 @@
+name: EC46-unpositionable-value-wins
+kind: rule
+description: |
+  EC-46 (Defect E, OQ6 + OQ7) — a PRESENT but UNPOSITIONABLE value makes the extreme
+  indeterminate, whatever the reason it cannot be positioned.
+
+  > A present value that cannot be positioned wins every extreme. Masked year, unparseable
+  > token, structurally-invalid date — the reason does not matter; the extreme cannot be
+  > determined in its presence.
+
+  Under EC-46 this needs no special case in the engine: an unpositionable value has an
+  UNBOUNDED hull, so no complete candidate can dominate it and the group simply yields nothing.
+
+  CDISC-CG0148 (`RFXSTDTC != min_date(EX.EXSTDTC grouped by USUBJID)`) makes that visible.
+
+  001 — a YEAR-MASKED value (`----06-15`). Nothing anchors it on the calendar.
+  002 — an UNPARSEABLE TOKEN (`UNKNOWN`). Sponsors do write these into Char date columns.
+  003 — a STRUCTURALLY-INVALID date (`2012-13-45`).
+
+  On coreJ all three groups are indeterminate, so `$min_ex_exstdtc` has no value and the negated
+  `not_equal_to` fires for each. The fork orders them lexicographically instead and computes a
+  determinate-looking minimum, so it fires on a DIFFERENT set of rows.
+
+  ⚠ THE CONTROL THAT MUST NOT INVERT — 004 carries an EMPTY cell beside a populated date.
+  An empty cell is "no data", NOT "an unknown date": it stays SKIPPED, the minimum resolves to
+  the populated value, and no violation is reported. If blanks ever started making a group
+  indeterminate, nearly every group would be (most contain a blank date) and all 35 rules in
+  this family would fire almost everywhere. Both lanes agree on 004 (EC-51 / Fix #141 aligned
+  the blank filter), which is exactly why it is a usable control.
+python_notes: |
+  The fork has no `canPosition` notion. `min_date` is pandas `.min()` over raw text, so
+  '----06-15' (leading hyphens sort below every digit) wins subject 001's min outright, and
+  'UNKNOWN' / '2012-13-45' are ordered as plain strings for 002/003. It therefore publishes a
+  value where coreJ publishes none, and the violation set differs. Java-canonical, by the
+  Java-first direction (2026-08-03).
+python_source: rules-sdtmig-3-4.json (CORE-000239)
+rule:
+  coreId: CDISC-CG0148
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2012-06-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2012-07-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXSTDTC: '2012-08-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '004', RFXSTDTC: '2012-09-15'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      # 001 — year-masked: unbounded hull, cannot be positioned.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '----06-15', EXENDTC: '2012-06-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-06-15', EXENDTC: '2012-06-25'}
+      # 002 — unparseable token.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: 'UNKNOWN', EXENDTC: '2012-07-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-07-15', EXENDTC: '2012-07-25'}
+      # 003 — structurally invalid date.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-13-45', EXENDTC: '2012-08-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-08-15', EXENDTC: '2012-08-25'}
+      # 004 — THE CONTROL: an EMPTY cell is still SKIPPED, not indeterminate. Both lanes agree.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '004', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '', EXENDTC: '2012-09-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '004', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-09-15', EXENDTC: '2012-09-25'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '001'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004]'
+      $min_ex_exstdtc:
+      RFXSTDTC: '2012-06-15'
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004]'
+      $min_ex_exstdtc:
+      RFXSTDTC: '2012-07-15'
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004]'
+      $min_ex_exstdtc:
+      RFXSTDTC: '2012-08-15'
+expected_errors: []

@@ -18,12 +18,15 @@ python_notes: |
   genuinely-different date row fires. coreJ honest engine fires the empty row too.
   The production converter gate (Phase 6) reconciles converted CORE rules with
   Python; the spec-runner does not apply that gate.
+
+  SPELLING NOTE (phase-7 leaf migration, 2026-09-16): the retired operator leaf
+  (`date_not_equal_to`, value_is_literal) raised mechanically to
+  `date(AESTDTC) != "2020-01-01"` — the v1 leaf could hold only one type tag.
+  Authored here with the tag on BOTH sides per the post-3c convention; D102's
+  six-operator differential proved the two spellings verdict-identical.
 python_source: PLAN-empty-string-membership-parity.md (C.1)
 check:
-  name: AESTDTC
-  operator: date_not_equal_to
-  value: "2020-01-01"
-  value_is_literal: true
+  expression: 'date(AESTDTC) != date("2020-01-01")'
 datasets:
   AE:
     row_key: [STUDYID, USUBJID, AESEQ]

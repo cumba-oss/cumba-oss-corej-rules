@@ -148,29 +148,49 @@ class OperationExpressionPrinterTest
     }
 
 
+    /**
+     * Phase 6b: each field rides its CONSUMING operator — the descriptor gate
+     * (OperationDescriptors) rejects a field the operation never reads, which is exactly the
+     * silent-drop shape the old any-host round-trip smuggled past the loader.
+     */
     @Test
     void codelistsAndCtFields()
     {
-        Operation op = new Operation();
-        op.setOperator("valid_codelist_dates");
-        op.setCtPackageTypes(List.of("SDTM"));
-        op.setLevel("term");
-        op.setReturntype("code");
-        op.setCtAttribute("Term CCODE");
-        op.setVersion("TSVCDVER");
-        assertRoundTrip(op, "valid_codelist_dates(level=\"term\", returntype=\"code\", "
-                + "ct_attribute=\"Term CCODE\", version=\"TSVCDVER\", ct_package_types=[SDTM])");
+        Operation terms = new Operation();
+        terms.setOperator("codelist_terms");
+        terms.setCodelists(List.of("DOMAIN"));
+        terms.setLevel("term");
+        terms.setReturntype("code");
+        assertRoundTrip(terms,
+                "codelist_terms(codelists=[DOMAIN], level=\"term\", returntype=\"code\")");
+
+        Operation attrs = new Operation();
+        attrs.setOperator("get_codelist_attributes");
+        attrs.setCtAttribute("Term CCODE");
+        attrs.setVersion("TSVCDVER");
+        assertRoundTrip(attrs,
+                "get_codelist_attributes(ct_attribute=\"Term CCODE\", version=\"TSVCDVER\")");
+
+        Operation dates = new Operation();
+        dates.setOperator("valid_codelist_dates");
+        dates.setCtPackageTypes(List.of("SDTM"));
+        assertRoundTrip(dates, "valid_codelist_dates(ct_package_types=[SDTM])");
     }
 
 
+    /** Phase 6b: regex is record_count's parameter; name_pattern variable_count's. */
     @Test
     void regexAndNamePattern()
     {
-        Operation op = new Operation();
-        op.setOperator("variable_count");
-        op.setNamePattern(".+FL$");
-        op.setRegex("^\\d{4}");
-        assertRoundTrip(op, "variable_count(regex=\"^\\\\d{4}\", name_pattern=\".+FL$\")");
+        Operation rc = new Operation();
+        rc.setOperator("record_count");
+        rc.setRegex("^\\d{4}");
+        assertRoundTrip(rc, "record_count(regex=\"^\\\\d{4}\")");
+
+        Operation vc = new Operation();
+        vc.setOperator("variable_count");
+        vc.setNamePattern(".+FL$");
+        assertRoundTrip(vc, "variable_count(name_pattern=\".+FL$\")");
     }
 
 }

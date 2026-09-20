@@ -43,7 +43,7 @@ import net.cumba.corej.core.model.Sensitivity;
  * </p>
  *
  * <pre>{@code
- * cd cumba-corej-rules
+ * cd /abs/path/to/this/repository
  * mvn -q org.codehaus.mojo:exec-maven-plugin:3.6.3:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.DerivedFieldStripper
@@ -90,6 +90,8 @@ public final class DerivedFieldStripper
             String text = Files.readString(file, StandardCharsets.UTF_8);
             JsonNode node = YAML.readTree(text);
             Rule rule = YAML.treeToValue(node, Rule.class);
+            // 7b: materialise the Bindings before deriving (normalizeOperations javadoc).
+            net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
             String coreId = node.path("Core").path("Id").asText("<unknown>");
 
             RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier

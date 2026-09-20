@@ -54,6 +54,14 @@ class ReleasedRuleFieldFidelityTest
 
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory());
 
+    /** Floor on the population, so a run that read nothing cannot pass. */
+    // 3700 -> 3400 (PLAN-retire-core-family phase 6): distinct shipped ids 3906 -> 3411.
+    // ⚠ TWO ARMS, TWO POPULATIONS, one constant: :138 counts DISTINCT shipped ids (3411, the
+    // arm that failed) and :207 counts FAN-OUT entries (14903 -> 12818, which never came close).
+    // Lowering it for the first arm therefore LOOSENS the second by the same amount — said here
+    // because nothing else records it.
+    private static final int MIN_RULES = 3400;
+
     /**
      * Entries whose {@code Outcome.Output_Variables} is absent or empty, measured 2026-09-02:
      * <b>493 absent + 6 empty = 499</b>, across 123 distinct rule ids.
@@ -89,12 +97,18 @@ class ReleasedRuleFieldFidelityTest
     // CDISC-SEND-0400-A/-B x 2. The wave's five OTHER siblings (F1's four and X's
     // CORE-000107-A) each author their own Output_Variables and do not move this bound.
     // Re-measured against target/rules by run, not nudged.
-    // ⭐ 572 -> 523, re-derived 2026-09-19 by PLAN-retire-core-family.md phase 8f, by RUN (the
-    // constant was probed to 0 and the assertion's own message read back), after phase 8b's port
-    // added the 21 mints. ⚑ 523 is EXACTLY the value the internal twin's phase 7 measured for its
-    // own corpus — the two now agree on this figure, which is the strongest available evidence
-    // that the Outcome/Output_Variables surface is fully ported. A ceiling goes SLACK rather than
-    // red, so nothing would have reported the 49 of false headroom.
+    // ⭐ 572 -> 523 on 2026-09-19 (PLAN-retire-core-family phase 7): the CORE family's 11 packages
+    // stopped being generated, taking 49 entries of this population with them — among them the
+    // CORE-009708 x 10 and CORE-000585-A/-B/-C x 1 entries the two comments above record adding.
+    // Measured by run (the ceiling temporarily tightened so the assertion printed the value, then
+    // restored byte-identically): 523. ⚠⚠ THIS PIN IS AN ADDITION TO §13'S "CLOSED LIST", made
+    // under §13's own amendment rule (an addition needs a measurement attached, not a repair in
+    // flight). It was NOT a breach — a ceiling goes SLACK, not red, when its population shrinks,
+    // and §13 classified it "safe" on exactly that ground. Safe is not the same as re-derived: at
+    // 572 it would have carried 49 entries of budget nobody granted, which is the same silent
+    // erosion ScenarioFixtureCoverageRatchetTest.MAX_UNCOVERED was re-derived for in this phase,
+    // and this constant's own history is a record of being re-measured to the achieved value every
+    // time (499 -> 513 -> 519 -> 556 -> 572). ⚑ Its floor sibling needed nothing: 523 >= 400.
     private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 523;
 
     /**
@@ -119,7 +133,7 @@ class ReleasedRuleFieldFidelityTest
     {
         Map<String, String> authored = authoredDescriptions();
         List<String> offenders = new ArrayList<>();
-        // ⚠ No `checked` counter: its floor was removed on extraction — do not re-import.
+        int checked = 0;
 
         for (Map.Entry<String, Rule> e : shippedRules().entrySet())
         {
@@ -129,7 +143,7 @@ class ReleasedRuleFieldFidelityTest
                 offenders.add(coreId + ": shipped but has no rules-src/checks source file");
                 continue;
             }
-            // ⚠ No `checked++`: the floor that read it went on extraction — do not re-import.
+            checked++;
             String want = authored.get(coreId);
             String got = e.getValue().getDescription();
             if (want == null ? got != null : !want.equals(got))
@@ -138,10 +152,8 @@ class ReleasedRuleFieldFidelityTest
             }
         }
 
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not — this repository ships the corpus MINUS the
-        // CORE family, so the internal population can never be reached here. Enforced
-        // internally over the whole corpus. Re-applied 2026-09-15 after a sync restored it.
+        assertTrue(checked >= MIN_RULES, "only " + checked + " descriptions compared (expected at"
+                + " least " + MIN_RULES + "); a comparison over nothing is not a guard");
         assertEquals(List.of(), offenders.size() > 25 ? offenders.subList(0, 25) : offenders,
                 offenders.size() + " shipped rules do not carry their authored Description. It is"
                         + " report content and no scenario fixture asserts on it, so a"
@@ -166,7 +178,7 @@ class ReleasedRuleFieldFidelityTest
     {
         List<String> noMessage = new ArrayList<>();
         List<String> notDerived = new ArrayList<>();
-        // ⚠ No `entries` counter: its floor was removed on extraction — do not re-import.
+        int entries = 0;
         int derivedEntries = 0;
 
         for (Path pkg : shippedPackages())
@@ -178,7 +190,7 @@ class ReleasedRuleFieldFidelityTest
 
             for (Map.Entry<String, Rule> e : rules.entrySet())
             {
-                // ⚠ No `entries++`: the floor that read it went on extraction.
+                entries++;
                 String coreId = e.getKey();
                 Rule rule = e.getValue();
                 String where = pkg.getFileName() + " / " + coreId;
@@ -209,10 +221,7 @@ class ReleasedRuleFieldFidelityTest
             }
         }
 
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not — this repository ships the corpus MINUS the
-        // CORE family, so the internal population can never be reached here. Enforced
-        // internally over the whole corpus. Re-applied 2026-09-15 after a sync restored it.
+        assertTrue(entries >= MIN_RULES, "only " + entries + " rule entries read");
         assertEquals(List.of(), noMessage.size() > 25 ? noMessage.subList(0, 25) : noMessage,
                 noMessage.size() + " shipped rules have no Outcome.Message. Every row of the"
                         + " Rules Report falls back to it, so a rule without one reports blank.");

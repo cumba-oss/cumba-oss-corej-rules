@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
-import net.cumba.corej.core.exec.NativeExecutionRecorder;
 import net.cumba.corej.core.exec.OperationExecutor;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleExecutionStatus;
@@ -21,6 +20,7 @@ import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.exec.StubMetadataProvider;
 import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.corej.core.metadata.AdamSubclassDetector;
+import net.cumba.corej.core.metadata.CdiscDomainResolver;
 import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.datatable.IDataTable;
@@ -65,7 +65,7 @@ public final class SpecRunner
             List<String> observedErrors, List<CanonicalViolation> expected,
             List<String> expectedErrors, Set<String> diffMissingFromObserved,
             Set<String> diffUnexpectedInObserved, RuleExecutionStatus engineStatus,
-            String engineStatusMessage, Map<String, NativeExecutionRecorder.Backend> backends,
+            String engineStatusMessage,
             /* The spec's declared expectation; null ⇒ EXECUTED. */
             @Nullable RuleExecutionStatus expectedStatus,
             /*
@@ -249,6 +249,54 @@ public final class SpecRunner
         // letter-suffix split like FAAE (DOMAIN=FA) is recognised as a split of FA exactly as the
         // production DatasetRuleResolver path now does.
         String primaryUnsplit = OperationExecutor.unsplitNameFromData(primaryTable);
+        // ⭐ The CDISC DOMAIN CODE of the primary dataset — NOT its member name. Production derives
+        // it once per dataset in LibraryValidator.validateDataset
+        // (`CdiscDomainResolver.cdiscDomainOf(table)`, LibraryValidator.java:1063) and then uses
+        // that one value twice: as the resolver's domain name for scope matching
+        // (`generator.setDomainName(cdiscDomain)`, :1080) and as the execution-time `--`
+        // substitution prefix (`String domainPrefix = cdiscDomain;`, :1125 → `RuleRunner.execute(
+        // rule, table, resolver, domainPrefix, …)`, :1228). The resolver reads the row-0 DOMAIN
+        // value first and falls back to `SplitDatasetUtil.unsplitName(memberName)`.
+        //
+        // ⚠ For a SPLIT dataset the member name and the domain code DIFFER — FAAE carrying
+        // DOMAIN=FA has code FA — and this harness used to hand the member name (the spec's
+        // dataset KEY) to `RuleRunner.execute`. Every `--` in the rule then specialised to the
+        // member name, so `var_exists("--LNKGRP")` on FAAE asked for FAAELNKGRP: permanently
+        // false, and any conjunct behind it permanently unreachable. Measured on
+        // EC-variable-count-split-family-dedup,
+        // which was green with `$VARIABLE_COUNT == 2` AND with `== 1`, i.e. green with its entire
+        // subject masked. The dataset KEY remains the lookup key into `tables`, the row-key
+        // source and the canonical violation's `dataset` field (production reports the member
+        // name there too); only the DOMAIN handed to the engine changes.
+        String cdiscDomain = CdiscDomainResolver.cdiscDomainOf(primaryTable);
+        if (cdiscDomain.isEmpty())
+        {
+            // cdiscDomainOf answers "" only for a nameless, DOMAIN-less table. The engine treats a
+            // blank prefix as "substitute nothing", which would silently disarm `--` resolution;
+            // the member name is what this harness passed before, so fall back to it rather than
+            // change behaviour for such a fixture.
+            cdiscDomain = primaryDomain;
+        }
+        // ⭐ The scope gate below takes the MEMBER name, never `cdiscDomain`, and since 2026-09-17
+        // that is exactly what production does too — this axis is a mirror, not a divergence.
+        // `ScopeMatcher.describeDomainMismatch(rule, domainName, unsplitName)` derives
+        // `isSplit = !domainName.equals(unsplitName)`: its `domainName` parameter means the MEMBER
+        // name (its javadoc: "the dataset name (e.g. \"DM\", \"FAAE\")"), while `unsplitName` is
+        // `OperationExecutor.unsplitNameFromData`.
+        //
+        // ⚠ History worth keeping, because the conflation is easy to reintroduce: production USED
+        // to hand `LibraryValidator`'s `cdiscDomain` (via `setDomainName`) to BOTH parameters.
+        // Both derivations read the row-0 DOMAIN value first, so for every dataset carrying a
+        // DOMAIN column they were equal by construction — split detection was dead,
+        // `Include_Split_Datasets: true` could never match, and the member-name leg of the
+        // Include/Exclude test (`AP--` against `APAE`) was gone. Measured 2026-09-16: mirroring
+        // that conflation here turned four live specs (CORE-000181 / -000510 / -000540 / -000778)
+        // into vacuous SKIPs, so this harness kept the member name and the defect was routed to
+        // the engine repo instead. It was fixed there on 2026-09-17 —
+        // `DatasetRuleResolver.describeScopeSkip` now passes (member name, canonical base), guarded
+        // by `net.cumba.corej.core.report.SplitScopeProductionPathTest` (D125–D125e,
+        // PLAN-typed-expression-engine phase 7c). The four specs above are unchanged and green;
+        // they are now evidence that the two lanes agree.
         String scopeSkipReason = spec.kind() == SpecSchema.Kind.RULE
                 ? describeSpecScopeMismatch(rule, primaryDomain, primaryUnsplit, primaryTable,
                         library)
@@ -272,8 +320,7 @@ public final class SpecRunner
                     expectedErrorsSkip, missingSkip, unexpectedSkip, RuleExecutionStatus.SKIPPED,
                     "Rule skipped — " + scopeSkipReason + " (primary dataset '" + primaryDomain
                             + "')",
-                    // Scope-skipped: no Check evaluated, so no engine backend recorded.
-                    Map.of(), spec.expectedStatus(),
+                    spec.expectedStatus(),
                     // ...and no Check evaluated means no failure reason either. A scope skip is
                     // SKIPPED, never ERROR, so the errors channel is empty by construction here.
                     List.of());
@@ -286,12 +333,11 @@ public final class SpecRunner
         // Python's rule processor is permissive here, so specs must declare literals explicitly
         // (value_is_literal: true) to line the two engines up — see
         // documentation/parity-native-verdict-divergences.md.
-        // Native-only harness (PLAN-parity-harness-native): run with nativeEval=true and capture
-        // which backend produced the verdict via the global NativeExecutionRecorder. The parity
-        // test asserts no spec records LEGACY/MIXED — a rule that installed no native checkExpr
-        // routes to legacy at runtime and is caught here rather than silently falling back. The
-        // recorder is global static state; this is safe because the parity suite runs
-        // sequentially (no surefire/JUnit parallelism — see PLAN-parity-harness-native §Phase 0).
+        // ⛔ The NativeExecutionRecorder session that used to wrap this call is GONE (owner,
+        // 2026-09-18): it was the legacy engine's decommissioning instrument, its Backend enum had
+        // exactly one constant left, and the pin it fed (RuleExecutionSpecTest's allMatch(NATIVE))
+        // could not fail. There is no fallback engine to detect any more — a rule with no native
+        // checkExpr surfaces as a loadError ERROR through the normal expected/observed diff.
         // Define-XML mock (PLAN-define-item-metadata-parity-929-1081): a spec may declare a
         // `define_xml` block (per-dataset define_variable_* record arrays, or — since
         // PLAN-parity-define-dataset-channel P1 — a define_dataset_* attribute object) for the
@@ -300,18 +346,8 @@ public final class SpecRunner
         // 9-arg execute; absent ⇒ null (every other spec is unaffected).
         net.cumba.corej.core.exec.MetadataProvider defineProvider = defineProviderFrom(spec.name(),
                 spec.defineXml());
-        NativeExecutionRecorder.enable();
-        RuleExecutionResult result;
-        Map<String, NativeExecutionRecorder.Backend> backends;
-        try
-        {
-            result = RuleRunner.execute(rule, primaryTable, resolver, primaryDomain, library,
-                    /*joinCache=*/null, defineProvider);
-        }
-        finally
-        {
-            backends = NativeExecutionRecorder.disable();
-        }
+        RuleExecutionResult result = RuleRunner.execute(rule, primaryTable, resolver, cdiscDomain,
+                library, /*joinCache=*/null, defineProvider);
 
         List<CanonicalViolation> observed = ViolationNormaliser.normalise(result, primaryTable,
                 primaryDomain, rowKey);
@@ -336,7 +372,7 @@ public final class SpecRunner
         // `observedErrors` (engine prose) — PLAN-parity-expected-errors D1/Option B. The raw
         // messages ride along only so formatDiff can show them.
         return new SpecResult(spec.name(), observed, observedErrors, expected, expectedErrors,
-                missing, unexpected, result.getStatus(), result.getStatusMessage(), backends,
+                missing, unexpected, result.getStatus(), result.getStatusMessage(),
                 spec.expectedStatus(), observedReasons);
     }
 
@@ -385,6 +421,10 @@ public final class SpecRunner
             String primaryUnsplit, IDataTable primaryTable,
             @Nullable MetadataProvider libraryProvider)
     {
+        // ⚠ `primaryDomain` here is the MEMBER name, which is what this three-argument describer's
+        // first parameter means (`isSplit = !domainName.equals(unsplitName)`), NOT the CDISC domain
+        // code the `--` prefix uses. See the note at the call site for why this deliberately does
+        // not follow production's `setDomainName(cdiscDomain)`.
         String mismatch = ScopeMatcher.describeDomainMismatch(rule, primaryDomain, primaryUnsplit);
         if (mismatch != null)
         {

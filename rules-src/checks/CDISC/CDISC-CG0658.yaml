@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when SVPRESP is empty and VISITDY is populated. VISITDY\
   \ is the Planned Study Day of a visit and should not be populated for unplanned\
   \ visits."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -16,9 +16,11 @@ Requirements:
     - "VISITDY"
 Check:
   expression: >-
-    empty(SVPRESP) and not empty(VISITDY)
+    (var_exists("SVPRESP") and SVPRESP != "Y" or not var_exists("SVPRESP") and (not empty(SVUPDES)
+    or contains(upper(VISIT), "UNSCHEDUL") or contains(upper(VISIT), "UNPLAN"))) and not
+    empty(VISITDY)
 Outcome:
-  Message: "VISITDY is populated when SVPRESP is empty. VISITDY is the Planned Study\
+  Message: "VISITDY is populated for an unplanned visit. VISITDY is the Planned Study\
     \ Day of a visit and should not be populated for unplanned visits."
   Output_Variables:
   - "SVPRESP"

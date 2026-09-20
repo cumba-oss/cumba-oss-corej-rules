@@ -108,7 +108,7 @@ class RulePackageConverterTest
                     "r1": {
                       "Core": {"Id": "CORE-1"},
                       "Outcome": {"Message": "bad"},
-                      "Operations": [{"id": "$op", "operator": "distinct"}],
+                      "Bindings": [{"name": "$op", "expression": "distinct(ARM)"}],
                       "Check": {"expression": "DTHFL == \\"Y\\""},
                       "Precondition": {"expression": "AGE > 18"}
                     }
@@ -122,7 +122,7 @@ class RulePackageConverterTest
         JsonNode rule = out.get("rules").get("r1");
         assertEquals("CORE-1", rule.get("Core").get("Id").asText());
         assertEquals("bad", rule.get("Outcome").get("Message").asText());
-        assertEquals("$op", rule.get("Operations").get(0).get("id").asText());
+        assertEquals("$op", rule.get("Bindings").get(0).get("name").asText());
         assertEquals("/x", out.get("_links").get("self").get("href").asText());
 
         // Check and Precondition carried verbatim.

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import net.cumba.corej.core.exec.RuleExecutionStatus;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ class SpecRunnerStatusTest
         // Trailing List.of() = observedReasons: this fixture exercises the STATUS channel, so the
         // errors channel is held empty-vs-empty (matching) and never masks a status assertion.
         return new SpecRunner.SpecResult("unit", List.of(), List.of(), List.of(), List.of(),
-                aMissing, NO_DIFF, aEngineStatus, null, Map.of(), aExpectedStatus, List.of());
+                aMissing, NO_DIFF, aEngineStatus, null, aExpectedStatus, List.of());
     }
 
 

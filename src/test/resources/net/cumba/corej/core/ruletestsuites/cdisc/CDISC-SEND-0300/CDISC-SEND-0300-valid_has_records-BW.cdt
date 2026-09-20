@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0300 expect=noViolation domain=BW
+#note "The record-count half of the discriminator: the SAME Define declaration (name=BW) but the dataset now carries one record, so $dataset_record_count == 0 is false and the rule stays quiet. If the count comparison were inverted (firing on a non-empty described dataset) this scenario would red."
+#library standard=sendig version=3-1-1
+#define dataset-metadata BW name=BW
+dataset BW label="Body Weight"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BWSEQ   type=Num  label="Sequence Number"
+---
+S1 | BW | 001 | 1

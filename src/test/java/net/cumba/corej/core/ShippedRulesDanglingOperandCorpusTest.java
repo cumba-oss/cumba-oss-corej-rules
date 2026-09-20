@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Test;
  * {@code rules/} reaches the <em>expression</em> arm, so a shape-specific hole in one arm showed up
  * as a disagreement between the two folders. That comparison is gone: this ratchet now exercises
  * the expression arm only. The leaf arm is still covered — but by the synthetic fixtures in
- * {@code DanglingOperationReferenceLoadTest} (corej-cdisc-core), not by the corpus. The floors
- * below are what keeps <em>this</em> pass honest.
+ * {@code DanglingOperationReferenceLoadTest} (corej-core), not by the corpus. The floors below are
+ * what keeps <em>this</em> pass honest.
  * </p>
  *
  * <p>
@@ -54,10 +54,10 @@ import org.junit.jupiter.api.Test;
  * such rule injected (see {@code plans/done/PLAN-not-executable-parks-a-rule.md} phase 3). What it
  * cannot do is demonstrate that {@code validateOperationReferences} detects anything at all: with
  * the corpus clean, a fully neutered pass would still satisfy every assertion below. <b>That proof
- * lives exclusively in {@code DanglingOperationReferenceLoadTest}</b> (corej-cdisc-core), whose
- * cases drive synthetic fixtures such as {@code $never_defined} through the error channel and the
- * inliner lockstep, plus {@code NotExecutableParksRuleLoadTest} for the parking itself. <b>Do not
- * delete either sibling on the grounds that this one covers the corpus.</b>
+ * lives exclusively in {@code DanglingOperationReferenceLoadTest}</b> (corej-core), whose cases
+ * drive synthetic fixtures such as {@code $never_defined} through the error channel and the inliner
+ * lockstep, plus {@code NotExecutableParksRuleLoadTest} for the parking itself. <b>Do not delete
+ * either sibling on the grounds that this one covers the corpus.</b>
  * </p>
  */
 class ShippedRulesDanglingOperandCorpusTest
@@ -77,6 +77,7 @@ class ShippedRulesDanglingOperandCorpusTest
     {
         List<String> errors = new ArrayList<>();
         int packages = 0;
+        int rules = 0;
         for (Path file : listRulePackages(folder))
         {
             packages++;
@@ -87,6 +88,7 @@ class ShippedRulesDanglingOperandCorpusTest
                 {
                     continue;
                 }
+                rules++;
                 String loadError = rule.getLoadError();
                 if (loadError != null && loadError.contains(MARKER))
                 {
@@ -94,13 +96,18 @@ class ShippedRulesDanglingOperandCorpusTest
                 }
             }
         }
-        // ⚠ The corpus-SIZE floor that stood here was removed when this repository was
-        // extracted: it asserted the FULL internal corpus (>= 56 packages), which this
-        // subset deliberately is not. The internal repository still enforces the size.
-        // What is kept is the non-vacuity half, which is subset-safe: an empty or
-        // mis-resolved corpus must red rather than report a clean pass over nothing.
-        assertTrue(packages > 0, "no rule packages found in " + folder + "/ —"
-                + " the corpus did not generate; a pass over nothing is not a check");
+        // Guard the guard: without these, an empty or half-read corpus would report a clean
+        // ratchet — the exact failure mode this whole pass exists to prevent.
+        // 56 -> 45 and 13900 -> 12700 (PLAN-retire-core-family phase 6): 58 -> 47 packages and
+        // 14903 -> 12818 fan-out entries. ⚑ The prose at :103 said "14 035 entries today" against
+        // a measured 14 903 even before this change — the stale-javadoc trap, in the same file as
+        // the pin. Corrected below.
+        assertTrue(packages >= 45, "expected the full shipped corpus in " + folder + "/, saw "
+                + packages + " packages");
+        // 14035 entries today; the floor matches CrossCorpusDerivationTest's rather than the
+        // looser >= 3000 of the sibling enum gate, which a 78%-truncated corpus would still clear.
+        assertTrue(rules > 12700,
+                "expected the full shipped corpus in " + folder + "/, saw " + rules + " rules");
         // ⚠ Ratchets at zero, with no expected-set escape hatch. Since Fix #159 there is no
         // Executability that would move a finding off this channel: `Not Executable` parks the
         // rule instead, so a rule reaching here has claimed to be executable and is not. Fix the

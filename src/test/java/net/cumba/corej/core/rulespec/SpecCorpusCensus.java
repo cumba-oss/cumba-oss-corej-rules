@@ -41,13 +41,13 @@ import java.util.stream.Stream;
  *
  * <p>
  * ⛔ A count alone is not enough, and that was <b>measured</b> on a sibling instrument the day
- * before this one was written: {@code cumba-corej}'s {@code TargetInvariantMarkerCensusTest}
- * asserted a total only, so deleting a statement from one file while adding one to another kept the
- * total intact and the census green ({@code 8f7eb53}). The same hole applies here in three shapes a
- * total cannot see — a spec deleted while another is added, a spec renamed, and a spec <b>re-keyed
- * onto a different rule</b>, which is precisely the bulk edit {@code PLAN-retire-core-family} D4
- * performs. So a row is {@code path → (kind, rule)} and the comparison is an exact equality over
- * the whole set.
+ * before this one was written: the engine repo's {@code TargetInvariantMarkerCensusTest} asserted a
+ * total only, so deleting a statement from one file while adding one to another kept the total
+ * intact and the census green ({@code 8f7eb53}). The same hole applies here in three shapes a total
+ * cannot see — a spec deleted while another is added, a spec renamed, and a spec <b>re-keyed onto a
+ * different rule</b>, which is precisely the bulk edit {@code PLAN-retire-core-family} D4 performs.
+ * So a row is {@code path → (kind, rule)} and the comparison is an exact equality over the whole
+ * set.
  * </p>
  *
  * <h2>⚠ How the rule key is derived, and how it is NOT</h2>

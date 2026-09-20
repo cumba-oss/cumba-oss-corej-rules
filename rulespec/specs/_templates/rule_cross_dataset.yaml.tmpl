@@ -14,8 +14,8 @@ rule:
     - Name: {{joined_domain}}
       Keys: [STUDYID, USUBJID]
   Check:
-    all:
-      - {name: "{{primary_column}}", operator: "{{operator}}", value: "{{joined_domain}}.{{joined_column}}"}
+    # A boolean check expression over the joined row, e.g.: AETERM != FA.FAOBJ
+    expression: "{{expression}}"
   Outcome:
     Message: "{{message}}"
     Output_Variables: [STUDYID, USUBJID, "{{primary_column}}"]

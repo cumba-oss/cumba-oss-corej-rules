@@ -20,12 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Drift guard for the <b>native</b> corpus: re-running the {@code rules/}-producing stages over the
- * {@code rules-src/} YAML must reproduce the generated {@code rules/} JSON (and its
- * {@code packages.json} manifest) exactly. The generated corpus this compares against is the one
- * the build itself writes — {@link RuleCorpusGenerator}, bound to {@code process-test-classes} — so
- * the guard fails the moment someone hand-edits it, or edits {@code rules-src/} against a
- * {@code target/} left over from an earlier build.
+ * Drift guard for the <b>native</b> corpus: re-running the {@code rules/}-producing stages of
+ * {@code scripts/regen-rules-corpus.sh} over the {@code rules-src/} YAML must reproduce the
+ * committed {@code rules/} JSON (and its {@code packages.json} manifest) exactly. It fails the
+ * moment someone hand-edits the generated corpus, or edits {@code rules-src/} without regenerating.
  *
  * <p>
  * ⚑ <b>Why this exists.</b> {@code RuleStorageRoundTripTest} (deleted in wave 33) has asserted this
@@ -109,14 +107,10 @@ class NativeCorpusRoundTripTest
         {
             line++;
         }
-        fail(aCommitted + ": regenerating rules/ from rules-src drifted from the corpus on disk."
-                + " That corpus is written by this build's RuleCorpusGenerator binding"
-                + " (exec-maven-plugin, process-test-classes), so a target/ left over from an"
-                + " earlier build is the usual cause — re-run `mvn clean test` to regenerate it. If"
-                + " it still differs, rules-src/ and the generator genuinely disagree; authoring"
-                + " changes belong upstream, in the monorepo. First difference at line "
-                + (line + 1) + " of " + want.length + " (regenerated has " + got.length + "):\n"
-                + "  on disk    : " + at(want, line) + "\n  regenerated: " + at(got, line));
+        fail(aCommitted + ": regenerating rules/ from rules-src drifted from the committed corpus"
+                + " — re-run scripts/regen-rules-corpus.sh. First difference at line " + (line + 1)
+                + " of " + want.length + " (regenerated has " + got.length + "):\n"
+                + "  committed  : " + at(want, line) + "\n  regenerated: " + at(got, line));
     }
 
 

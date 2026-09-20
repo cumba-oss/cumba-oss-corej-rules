@@ -219,17 +219,16 @@ class OperationExpressionRoundTripTest
 
     /**
      * <b>The printer half of the reflective registration guard</b> (its parser, copy-routine and
-     * Jackson halves live in {@code OperationFieldRegistrationTest}, in {@code corej-cdisc-core},
-     * which cannot see this printer).
+     * Jackson halves live in {@code OperationFieldRegistrationTest}, in {@code corej-core}, which
+     * cannot see this printer).
      *
      * <p>
      * {@link OperationExpressionPrinter#print} is a hand-written field-by-field emitter, and the
      * corpus in {@code rules/} is stored <em>entirely</em> in the form it produces — so a field it
-     * forgets is erased from every rule the next corpus regeneration touches — the build's
-     * {@link RuleCorpusGenerator} binding here, the internal {@code regen-rules-corpus} workflow
-     * upstream — with no error anywhere. This enumerates {@link Operation}'s declared fields
-     * reflectively and asserts each one reaches the printed string, so the next field cannot be
-     * lost the way {@code offset} was.
+     * forgets is erased from every rule the next {@code regen-rules-corpus.sh} run touches, with no
+     * error anywhere. This enumerates {@link Operation}'s declared fields reflectively and asserts
+     * each one reaches the printed string, so the next field cannot be lost the way {@code offset}
+     * was.
      * </p>
      */
     @Test
@@ -335,14 +334,20 @@ class OperationExpressionRoundTripTest
         }
         for (java.util.Map.Entry<String, JsonNode> entry : rules.properties())
         {
-            JsonNode ops = entry.getValue().get("Operations");
+            JsonNode ops = entry.getValue().get("Bindings");
             if (ops == null || !ops.isArray())
             {
                 continue;
             }
             for (JsonNode opNode : ops)
             {
-                out.add(MAPPER.treeToValue(opNode, Operation.class));
+                // 7b: a shipped Bindings entry is {name, expression} — `name` is the binding's
+                // $-variable (Operation.id, the internal carrier's historical field name), NOT
+                // the Operation.name target parameter, so it must not bind via treeToValue.
+                Operation op = new Operation();
+                op.setId(opNode.path("name").asText(null));
+                op.setExpression(opNode.path("expression").asText(null));
+                out.add(op);
             }
         }
     }

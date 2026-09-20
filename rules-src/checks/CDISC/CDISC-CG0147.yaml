@@ -15,17 +15,18 @@ Requirements:
   Variables:
     All:
     - "USUBJID"
-Operations:
-- id: "$ex_usubjid"
+Bindings:
+- name: "$ex_usubjid"
   expression: "distinct(USUBJID, domain=\"EX\")"
-- id: "$max_ex_exstdtc"
+- name: "$max_ex_exstdtc"
   expression: "max_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
-- id: "$max_ex_exendtc"
+- name: "$max_ex_exendtc"
   expression: "max_date(EXENDTC, domain=\"EX\", missing_values=\"indeterminate\",\
     \ group=[USUBJID])"
 Check:
   expression: >-
-    USUBJID in $ex_usubjid and RFXENDTC != $max_ex_exstdtc and RFXENDTC != $max_ex_exendtc
+    USUBJID in $ex_usubjid and date(RFXENDTC) != $max_ex_exstdtc and date(RFXENDTC) !=
+    $max_ex_exendtc
 Outcome:
   Message: "RFXENDTC does not equal the latest value of EXSTDTC or EXENDTC in the\
     \ EX dataset for the subject."

@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0053 expect=violation domain=ADSL
-#note "JOIN: Match_Datasets DM on Keys=[STUDYID, USUBJID], Join_Type=left (authored) -- unmatched primary rows KEPT with null-filled merged columns; DM unique per key -> 1:0/1. Row 2 has no DM match -> DM.DOMAIN null -> var_exists(DM.USUBJID) true (DM present, has the column -- resolved against DM's schema) and empty(DM.DOMAIN) true -> fires."
+#note "JOIN: Match_Datasets DM on Keys=[STUDYID, USUBJID], Join_Type=left (authored) -- unmatched primary rows KEPT with null-filled merged columns; DM unique per key -> 1:0/1. Row 2 has no DM match -> DM._matched_ false -> `not DM._matched_` fires. DM.USUBJID is declared in Requirements.Variables.All, so an absent DM skips the rule rather than flooding it."
 #library standard=adamig version=1-3
 #expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-701-9999

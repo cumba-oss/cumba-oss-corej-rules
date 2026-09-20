@@ -1,0 +1,89 @@
+name: EC46-partial-date-max-indeterminate
+kind: rule
+description: |
+  EC-46 Defect A, MAX side — the direction where selection is provably UNSOUND, and the larger
+  half of the exposure (22 of the 35 affected rules are max-side).
+
+  A right-truncated partial sorts BEFORE every completion of itself, so a lexicographic max
+  always prefers the complete date — even when the partial could be later. Verified over an
+  exhaustive 1 288 225-pair check: MAX is wrong on every PREFIX PAIR, which is the common data
+  shape (one record in the month left at month precision).
+
+  FDA-SD0080 is `AESTDTC > max_date(DS.DSSTDTC grouped by USUBJID)`.
+
+  ⚠ THIS SPEC ALSO COVERS EC-46's ONE RULE CHANGE (OQ4). FDA-SD0080 used to author the GENERIC
+  `max` operator over a date column; it now authors `max_date`, matching the since-retired
+  DRAFT-110006 (duplicate of FDA/PMDA-SD1446), which was the same operation block already
+  written that way. The generic operator's string fallback is
+  not date-only — ANRIND (5 rules) and ATOXGR (4) reach it with Char category codes — so the
+  rule, not the operator, is where the date intent belongs.
+
+  001 — {2012-06, 2012-06-15}: the partial's latest completion is 2012-06-30, LATER than the
+        complete date, so the max is INDETERMINATE on coreJ. AESTDTC 2012-06-20 is then compared
+        against a missing $-ref, and `date_greater_than` is a POSITIVE-polarity operator, so it
+        does NOT fire (Primitives.dateComparison returns `negate`, which is false here).
+        ⚠ The fork picks 2012-06-15 and fires, because 2012-06-20 > 2012-06-15. THE DIVERGENCE,
+        and it is the 21-rule silencing described in the plan's §4.3 made concrete.
+
+  002 — the BENIGN TIE {2012-06, 2012-06-30}: the partial CANNOT end after the last day of its
+        own month, so 2012-06-30 is the determinate max. Both lanes agree and both fire on
+        AESTDTC 2012-07-05. This is the control proving the rule still runs.
+
+  003 — all-complete: a genuine violation, unchanged.
+python_notes: |
+  The fork's `max_date` is pandas `.max()` on raw text, so a partial never wins a max: subject
+  001 yields '2012-06-15' there and the rule fires on AESTDTC 2012-06-20. coreJ finds the group
+  indeterminate, publishes no value, and `date_greater_than` no-fires against the missing ref.
+  The fork therefore reports one violation coreJ does not. Java-canonical, by the Java-first
+  direction (2026-08-03).
+python_source: rules-sdtmig-3-4.json (CORE-000717)
+rule:
+  coreId: FDA-SD0080
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      # 001 — after the complete date but inside the partial's hull: coreJ no-fires, fork fires.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AETERM: HEADACHE, AESTDTC: '2012-06-20'}
+      # 002 — after the determinate max (2012-06-30): both lanes fire.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AETERM: NAUSEA, AESTDTC: '2012-07-05'}
+      # 003 — all-complete control: after the max, both lanes fire.
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AETERM: RASH, AESTDTC: '2012-09-09'}
+  DS:
+    row_key: [STUDYID, USUBJID, DSSEQ]
+    column_types:
+      DSSEQ: LONG
+    rows:
+      # 001 — PREFIX PAIR: 2012-06 could be the 30th, later than 2012-06-15.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 1, DSDECOD: COMPLETED, DSSTDTC: '2012-06'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '001', DSSEQ: 2, DSDECOD: COMPLETED, DSSTDTC: '2012-06-15'}
+      # 002 — BENIGN TIE: the partial cannot reach past 2012-06-30.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 1, DSDECOD: COMPLETED, DSSTDTC: '2012-06'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '002', DSSEQ: 2, DSDECOD: COMPLETED, DSSTDTC: '2012-06-30'}
+      # 003 — all complete.
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 1, DSDECOD: COMPLETED, DSSTDTC: '2012-08-01'}
+      - {STUDYID: S1, DOMAIN: DS, USUBJID: '003', DSSEQ: 2, DSDECOD: COMPLETED, DSSTDTC: '2012-08-20'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    events: [AE, DS]
+expected_violations:
+  - rule_id: FDA-SD0080
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $max_ds_dsstdtc: '2012-06-30'
+      AESTDTC: '2012-07-05'
+  - rule_id: FDA-SD0080
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $max_ds_dsstdtc: '2012-08-20'
+      AESTDTC: '2012-09-09'
+expected_errors: []

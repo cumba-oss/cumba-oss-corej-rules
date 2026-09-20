@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0165 expect=noViolation domain=ADLB
+#note "Non-firing counterpart: 101/ALT keeps the filter-discriminating pair (post-baseline ATOXGR '3' above baseline '1', BTOXGR='1' everywhere - a filter-ignoring max() would false-fire and red this scenario) and 103/ALT keeps only the empty-BTOXGR no-baseline row, held quiet by the non_empty guard."
+#library standard=adamig version=1-2
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col BASETYPE type=Char label="Baseline Type"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ATOXGR   type=Char label="Analysis Toxicity Grade"
+col BTOXGR   type=Char label="Baseline Toxicity Grade"
+---
+S1 | 101 | ALT | 0 | LAST | Y | 1 | 1
+S1 | 101 | ALT | 1 | LAST |   | 3 | 1
+S1 | 103 | ALT | 2 | LAST |   | 1 |

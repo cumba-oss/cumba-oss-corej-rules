@@ -33,7 +33,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * Offline developer tool — the <em>assemble</em> half of the split-storage migration
  * ({@code plans/done/PLAN-rule-storage-split.md}): reads the per-rule YAML under {@code rules-src/}
- * and rebuilds the combined operator-leaf JSON packages.
+ * and rebuilds the combined JSON packages. ⚠ This line said "operator-leaf JSON packages" until
+ * 2026-09-17: phase 7d of {@code PLAN-typed-expression-engine} deleted the v1 operator-leaf model,
+ * and what is assembled is — and for some time already was — expression form.
  *
  * <p>
  * ⚑ <b>It writes nothing.</b> {@link #assemblePackage} returns the <em>canonical</em> node — the
@@ -59,13 +61,9 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * Run it through {@link RuleCorpusGenerator} and never directly: in this repository the build's
- * {@code exec-maven-plugin} binding at {@code process-test-classes} drives that generator on the
- * reactor classpath, and upstream the internal {@code regen-rules-corpus} workflow (not distributed
- * with this repository) drives it on a classpath resolved from that tree. There is deliberately no
- * standalone entry point here. ⚑ That upstream workflow's stale-engine guard was RETIRED
- * 2026-09-08: the shipped corpus no longer carries anything the engine derived, so a stale engine
- * can only crash a generator rather than silently write a different corpus.
+ * Run it through {@code scripts/regen-rules-corpus.sh}, which drives {@link RuleCorpusGenerator} on
+ * a classpath guarded against a stale, installed engine ({@code scripts/lib/corpus-gen-env.sh}).
+ * There is deliberately no standalone entry point here.
  * </p>
  */
 public final class RuleStorageAssembler
@@ -422,6 +420,10 @@ public final class RuleStorageAssembler
             throw new IllegalStateException("cannot bind rule for derivation: " + check.get("Core"),
                     e);
         }
+        // 7b: materialise the Bindings before deriving — an external binder must run this itself
+        // (RulePackageLoader.normalizeOperations javadoc); without it the classifier derives over
+        // a rule with no operations and the gate would judge a different rule than ships.
+        net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
         String coreId = check.path("Core").path("Id").asText("<unknown>");
         RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier.deriveSensitivity(rule);
         if (sensitivity.confidence() == RuleClassifier.Confidence.NONE)

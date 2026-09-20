@@ -257,9 +257,9 @@ class QualifiedScopeVariableLintTest
         {
             lists.add(variables.getAll());
         }
-        if (variables.getAny() != null)
+        if (!variables.anyUnion().isEmpty())
         {
-            lists.add(variables.getAny());
+            lists.add(variables.anyUnion());
         }
         if (variables.getNone() != null)
         {

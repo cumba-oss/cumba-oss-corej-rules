@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD9999 expect=violation domain=XX
+#note "Mirrors rulespec PMDA-SD9999.yaml (the rule's only prior guard; PMDA twin of FDA-SD9999, a DIFFERENT corpus entry resolved from the PMDA package). XX is a custom (non-standard) dataset - '#library custom-domain XX' plus the deliberately non-standard name keep both routes of the custom-ness answer aligned - and its Define-XML class 'TRIAL DESIGN' is not one of the SDTM general observation classes (EVENTS, FINDINGS, INTERVENTIONS) -> one finding. Pinned on both projected output variables, including the $domain_is_custom Operation the Check's first leaf consumes."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+#define dataset-class XX "TRIAL DESIGN"
+#expectViolationCount 1
+#expectViolationAt "$domain_is_custom"=true define_dataset_class="TRIAL DESIGN"
+dataset XX label="Custom Dataset"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XXSEQ   type=Num  label="Sequence Number"
+col XXTERM  type=Char label="Reported Term"
+---
+S1 | XX | 001 | 1 | FOO

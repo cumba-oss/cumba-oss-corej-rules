@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SD1018 expect=violation domain=SV
+#note "B1 of PLAN-unplanned-visit-cascade: SVPRESP is present and DECIDES. The rule left-joins TV on VISITNUM+VISIT+VISITDY (declared Match_Datasets), so a row needs all three to match a TV entry. Row 1 is flagged pre-specified and its (99, WEEK 99, 99) triple matches no TV entry -> fires. Row 2 carries SVPRESP='' - present and not Y -> unplanned -> exempt despite the same TV gap; the pre-cascade SVUPDES form fired on it. Row 3's (2, BASELINE, 1) is a TV entry -> clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 99 | WEEK 99 | 99 | Y
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 98 | WEEK 98 | 98 |
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 2  | BASELINE | 1 | Y
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+---
+CDISCPILOT01 | TV | 1 | SCREENING | -7
+CDISCPILOT01 | TV | 2 | BASELINE  | 1
+---

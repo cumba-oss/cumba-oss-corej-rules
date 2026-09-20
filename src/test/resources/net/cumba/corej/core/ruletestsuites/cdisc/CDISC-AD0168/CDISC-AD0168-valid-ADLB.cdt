@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0168 expect=noViolation domain=ADLB
+#note "Non-firing counterpart: 201/GLUC keeps the filter-discriminating pair (post-baseline ANRIND 'NORMAL' sorts above baseline 'HIGH', BNRIND='HIGH' everywhere - a filter-ignoring max() would false-fire and red this scenario) and 203/GLUC keeps only the empty-BNRIND no-baseline row, held quiet by the non_empty guard."
+#library standard=adamig version=1-2
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col BASETYPE type=Char label="Baseline Type"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ANRIND   type=Char label="Analysis Reference Range Indicator"
+col BNRIND   type=Char label="Baseline Reference Range Indicator"
+---
+S1 | 201 | GLUC | 0 | LAST | Y | HIGH   | HIGH
+S1 | 201 | GLUC | 1 | LAST |   | NORMAL | HIGH
+S1 | 203 | GLUC | 2 | LAST |   | LOW    |

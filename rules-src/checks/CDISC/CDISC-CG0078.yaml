@@ -20,10 +20,11 @@ Match_Datasets:
 Check:
   ERROR:
     expression: >-
-      not empty(MHENDTC) and date(MHENDTC) >= DM.RFSTDTC
+      not empty(MHENDTC) and date(MHENDTC) >= date(DM.RFSTDTC)
   INFO:
     expression: >-
-      not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= earliest_possible(DM.RFSTDTC)
+      not empty(MHENDTC) and not empty(earliest_possible(DM.RFSTDTC)) and
+      date(latest_possible(MHENDTC)) >= earliest_possible(DM.RFSTDTC)
     Message: "MHENDTC is populated and may be the same as or later than RFSTDTC in the\
       \ DM dataset (partial date/time precision leaves the order undetermined)."
 Outcome:

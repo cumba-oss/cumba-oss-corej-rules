@@ -13,13 +13,13 @@ Requirements:
   Variables:
     All:
     - "EXENDTC"
-Operations:
-- id: "$exp_end"
+Bindings:
+- name: "$exp_end"
   expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
     EXPENDTC\")"
 Check:
   expression: >-
-    not empty(EXENDTC) and date(EXENDTC) > $exp_end
+    not empty(EXENDTC) and not empty($exp_end) and date(EXENDTC) > date($exp_end)
 Outcome:
   Message: "EXENDTC is populated and is later than the Experimental End Date (TS EXPENDTC)."
   Output_Variables:

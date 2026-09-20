@@ -1,0 +1,31 @@
+#!RuleTest
+#test CDISC-SEND-0306 expect=violation domain=DM
+#note "Four probes for the D100/SPEC 5.2 retyping (phase 3c, RUNBOOK-phase3c-corpus-rewrite.md 6.2). Subject P1 is the positive: a genuine day-precision mismatch against both EX extremes. P2 and P3 FIRE under plain string equality and are SILENT under typed date equality, each for a different reason -- P2 precision (day vs datetime of the same day), P3 UTC offset (same instant spelled with and without an offset). P4 is the UNPOSITIONABLE probe (calendar-impossible day 99 in RFXENDTC): it was silent from the phase-3c rewrite until H1b and FIRES AGAIN since -- owner ruling 2026-09-17, SPEC 5.2(4) amended (<meta>/plans/SPEC-typed-expression-engine.md): an unbounded hull answers `negate`, so date_not_equal_to fires on an unpositionable operand in EITHER position. That is the right answer here: 2026-02-99 is not a date at all, so it is certainly not the same day as either EX extreme, and the rule now says so. So this scenario expects TWO violations, P1 and P4. This scenario is red on the pre-rewrite corpus by construction."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=P1
+#expectViolationAt row=4 USUBJID=P4
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+S1 | DM | P1 | 2026-03-15
+S1 | DM | P2 | 2026-01-10
+S1 | DM | P3 | 2026-01-10T10:00+02:00
+S1 | DM | P4 | 2026-02-99
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | P1 | 2026-01-01 | 2026-01-10
+S1 | EX | P2 | 2026-01-01 | 2026-01-10T09:00
+S1 | EX | P3 | 2026-01-01 | 2026-01-10T08:00
+S1 | EX | P4 | 2026-01-01 | 2026-01-10
+---

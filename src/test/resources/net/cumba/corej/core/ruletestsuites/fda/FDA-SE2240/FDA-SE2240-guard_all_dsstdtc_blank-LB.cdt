@@ -1,0 +1,27 @@
+#!RuleTest
+#test FDA-SE2240 expect=noViolation domain=LB
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv): subject 001 HAS DS records but every DSSTDTC cell is blank, so max_date over the group yields EmptyResult.MISSING and the not empty($max_ds_dsstdtc) guard silences the rule despite a populated LBENDTC. If this FIRES, the order-flip guard was deleted: post-6c totality makes date(--ENDTC) > MISSING true on every dated row."
+#library standard=sendig version=3-1-1
+#library dataset-class LB FINDINGS
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALT | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | MOVED TO RECOVERY   | RECOVERY            |
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE  | TERMINAL SACRIFICE  |

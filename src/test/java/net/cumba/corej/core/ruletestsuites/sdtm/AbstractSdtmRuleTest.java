@@ -38,12 +38,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * per test suite and provides helper methods for rule lookup, data modification via
  * {@link OverlayDataTable}, and rule execution with assertions. The fixture carries only the
  * domains consumed by the Java-resident test methods (AE, DM, DS, LB, RELREC, TA) — scenarios for
- * every other domain run from self-contained {@code .cdt} files via
- * {@code RuleTestSuitesCoreFactoryTest}.
+ * every other domain run from self-contained {@code .cdt} files via the per-family
+ * {@code RuleTestSuites*FactoryTest} factories.
  * <p>
  * The {@link CdtResourceExtension} is registered so subclasses can use
- * {@code @CdtResource("...", base = "core")} on test parameters to declaratively load {@code .cdt}
+ * {@code @CdtResource("...", base = "cdisc")} on test parameters to declaratively load {@code .cdt}
  * files.
+ * <p>
+ * ⚠⚠ <b>This suite is NOT CORE-scoped and it survived the 2026-09 CORE-family retirement.</b>
+ * {@code RULES_PATH} names {@code rules-sdtmig-3-4.json}, a file that does not exist:
+ * {@link RulePackageLoader#loadCombined} parses the name and delegates to
+ * {@code loadFamilyUnion(dir, "sdtmig", "3-4")}, i.e. the union of every family publishing an
+ * SDTMIG 3.4 package. All 23 of this suite's assertions named a {@code CORE-} rule until phase 6 of
+ * {@code PLAN-retire-core-family} re-pointed 22 of them at surviving twins in that same union and
+ * deleted one (see {@code SdtmAllRuleTest}).
  */
 @ExtendWith(CdtResourceExtension.class)
 abstract class AbstractSdtmRuleTest
@@ -64,7 +72,7 @@ abstract class AbstractSdtmRuleTest
     private static final String SDTM_DEFINE_PATH = System.getProperty("projectBasedir")
             + "/src/test/resources/testdata_study/sdtm/define.xml";
 
-    /** All 430 SDTM-IG 3.4 rules, keyed by Core.Id. */
+    /** Every rule of the SDTMIG 3.4 family union, keyed by Core.Id. */
     static Map<String, Rule> rulesByCoreId;
 
     /** All available SDTM domain tables, keyed by domain name (uppercase). */
@@ -178,16 +186,22 @@ abstract class AbstractSdtmRuleTest
 
     /**
      * Loads a {@code .cdt} test data file from the classpath under
-     * {@code src/test/resources/net/cumba/corej/core/ruletestsuites/core/}.
+     * {@code src/test/resources/net/cumba/corej/core/ruletestsuites/}.
+     *
+     * <p>
+     * ⛔ The path is <b>family-qualified</b>: the {@code core/} root this method used to hard-code
+     * was deleted with the CORE family in 2026-09, so every caller now names the family subtree
+     * itself. A path without one resolves against no directory and fails at load, loudly.
+     * </p>
      *
      * @param relativePath
-     *            path relative to the sdtm resource root (e.g.
-     *            {@code "SDTMIG001/SDTMIG001-valid-DM.cdt"})
+     *            path relative to the scenario-corpus root, family segment first (e.g.
+     *            {@code "cdisc/CDISC-CG0370/CDISC-CG0370-valid-CO.cdt"})
      * @return the loaded {@link OverlayDataTable}
      */
     OverlayDataTable loadCdt(String relativePath)
     {
-        String fullPath = "net/cumba/corej/core/ruletestsuites/core/" + relativePath;
+        String fullPath = "net/cumba/corej/core/ruletestsuites/" + relativePath;
         try
         {
             return CdtLoader.loadResource(fullPath);

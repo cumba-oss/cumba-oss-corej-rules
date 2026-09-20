@@ -22,9 +22,10 @@ Match_Datasets:
 Check:
   ERROR:
     expression: >-
-      date(SE.SESTDTC) <= SVSTDTC and date(SVSTDTC) <= SE.SEENDTC and EPOCH != SE.EPOCH
+      date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) <= date(SE.SEENDTC) and EPOCH != SE.EPOCH
   INFO:
     expression: >-
+      not empty(earliest_possible(SE.SESTDTC)) and not empty(earliest_possible(SVSTDTC)) and
       date(earliest_possible(SE.SESTDTC)) <= latest_possible(SVSTDTC) and
       date(earliest_possible(SVSTDTC)) <= latest_possible(SE.SEENDTC) and EPOCH != SE.EPOCH
     Message: "EPOCH in SV does not match EPOCH of an SE element whose date range may contain\

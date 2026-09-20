@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0078 expect=noViolation domain=MH
+#runLevel Info
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv): DM.RFSTDTC is BLANK, so earliest_possible(DM.RFSTDTC) yields MISSING (BuiltinFunctions.hullBound) and the not empty(earliest_possible(...)) guard silences the INFO leg despite a populated partial MHENDTC. The verbatim ERROR leg cannot fire either: a blank read AS A DATE has an unbounded hull, so all six operators answer false. Runs at #runLevel Info because the engine default never evaluates an INFO level. If this FIRES, the order-flip guard was deleted: D34 #5 positions the MISSING below every date and latest_possible(MHENDTC) >= MISSING becomes true."
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHTERM type=Char label="Reported Term for the Medical History"
+col MHENDTC type=Char label="End Date/Time of Medical History Event"
+---
+CDISCPILOT01 | MH | 01-701-0001 | 1 | HEADACHE | 2012-07
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-0001 |

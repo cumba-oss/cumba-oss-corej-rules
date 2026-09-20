@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
+import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
-import net.cumba.corej.core.expr.CheckToExpr;
 import net.cumba.corej.core.expr.ExpressionException;
 import net.cumba.corej.core.expr.OperandKind;
 import net.cumba.corej.core.expr.ast.Expr;
@@ -194,7 +194,7 @@ class NativeCoverageCensusTest
         Expr expr;
         try
         {
-            expr = CheckToExpr.toExpr(check);
+            expr = CheckExprUnits.toExpr(check);
         }
         catch (ExpressionException _)
         {
@@ -235,7 +235,7 @@ class NativeCoverageCensusTest
         }
         try
         {
-            return String.valueOf(CheckToExpr.toExpr(check));
+            return String.valueOf(CheckExprUnits.toExpr(check));
         }
         catch (ExpressionException _)
         {

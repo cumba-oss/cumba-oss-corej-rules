@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SE2351 expect=noViolation domain=SE
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv): subject 001 IS in DS (so the USUBJID containment gate passes) but every DSSTDTC cell is blank, so max_date over the group yields EmptyResult.MISSING and the not empty($max_ds_dsstdtc) guard silences the rule despite a populated SEENDTC. If this FIRES, the order-flip guard was deleted: post-6c totality makes date(SEENDTC) > MISSING true."
+#library standard=sendig version=3-1-1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | TRT | 2020-02-01
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE |

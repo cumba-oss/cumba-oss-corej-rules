@@ -25,9 +25,12 @@ description: |
 
   ⚠ EC-43's OPERATOR claim does NOT live here any more. Converting this spec to `kind: rule` moved
   it to the rule layer; the claim itself — an absent column folds to all-missing, so the negative is
-  true on every row — is pinned by the sibling `EC43-not-equal-absent-operator`, added in the same
-  change. Nothing about EC-43 is retracted: what the operator computes is EC-43's business, whether
-  the enclosing rule reports is the author's, and both statements hold.
+  true — is pinned by the sibling `EC43-not-equal-absent-operator`, added in the same change.
+  Nothing about EC-43's EVALUATION is retracted: what the operator computes is EC-43's business,
+  whether the enclosing rule reports is the author's, and both statements hold. (Since D111,
+  2026-09-17, the sibling's firing check REPORTS once at dataset level rather than per row — see
+  its description; this spec's authored guard makes the rule silent either way, so nothing here
+  changed.)
 
   ⚠ The two lanes reach the same verdict by different routes, and that asymmetry is
   production-faithful. Java: `RulePackageLoader.installNativeExpr` lowers the `variable_exists`
@@ -59,14 +62,13 @@ rule:
     Domains:
       Include: [TS]
   Check:
-    all:
-    - {name: "$guard_var_exists_TSVAL", operator: equal_to, value: true}
-    - {name: TSVAL, operator: not_equal_to, value: "PLANNED", value_is_literal: true}
+    expression: '$guard_var_exists_TSVAL == true and TSVAL != "PLANNED"'
   Outcome:
     Message: auto
     Output_Variables: [STUDYID, TSPARMCD, TSSEQ]
-  Operations:
-  - {id: "$guard_var_exists_TSVAL", operator: variable_exists, name: TSVAL}
+  Bindings:
+  - name: "$guard_var_exists_TSVAL"
+    expression: 'variable_exists(TSVAL)'
 datasets:
   TS:
     row_key: [STUDYID, TSPARMCD, TSSEQ]

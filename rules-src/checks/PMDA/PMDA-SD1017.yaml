@@ -6,7 +6,7 @@ Description: "Raise a warning when, for a planned visit (SVUPDES is empty) in th
   \ Subject Visits (SV) domain, the Visit Number (VISITNUM) value does not match any\
   \ VISITNUM value in the Trial Visits (TV) dataset."
 Severity: "Warning"
-Executability: "Partially Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -16,13 +16,14 @@ Requirements:
     All:
     - "VISITNUM"
     - "TV.VISITNUM"
-    - "SVUPDES"
-Operations:
-- id: "$tv_visitnum"
+Bindings:
+- name: "$tv_visitnum"
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    not empty(VISITNUM) and empty(SVUPDES) and VISITNUM not in $tv_visitnum
+    not empty(VISITNUM) and (var_exists("SVPRESP") and SVPRESP == "Y" or not var_exists("SVPRESP")
+    and empty(SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT),
+    "UNPLAN")) and VISITNUM not in $tv_visitnum
 Outcome:
   Message: "VISITNUM for a planned visit does not match any VISITNUM value in the\
     \ TV dataset."

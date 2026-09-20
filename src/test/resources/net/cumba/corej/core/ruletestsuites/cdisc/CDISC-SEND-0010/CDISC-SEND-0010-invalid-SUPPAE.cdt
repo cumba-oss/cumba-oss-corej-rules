@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0010 expect=violation domain=SUPPAE
+#note "Mirrors rulespec CDISC-SEND-0010-fire.yaml (the rule's only prior guard). SUPPAE carries VISITNUM, a member of the rule's curated timing set (VISIT, VISITNUM, VISITDY, TAETORD, EPOCH, MIDS, RELMIDS, MIDSDTC) -> one variable-level finding with variable_name=VISITNUM. Per-domain rule, so the location is pinned by the projected variable_name, never by row=."
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt variable_name=VISITNUM
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col VISITNUM type=Num  label="Visit Number"
+---
+S1 | AE | 001 | AESEQ | 1 | AEFOO | Foo | X | 1

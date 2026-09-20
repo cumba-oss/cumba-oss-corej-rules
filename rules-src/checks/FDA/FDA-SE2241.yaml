@@ -22,12 +22,12 @@ Requirements:
   Variables:
     All:
     - "--DTC"
-Operations:
-- id: "$max_ds_dsstdtc"
+Bindings:
+- name: "$max_ds_dsstdtc"
   expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    not empty(--DTC) and date(--DTC) > $max_ds_dsstdtc
+    not empty(--DTC) and not empty($max_ds_dsstdtc) and date(--DTC) > $max_ds_dsstdtc
 Outcome:
   Message: "--DTC is after the latest Disposition (DS) start date (DSSTDTC) for the\
     \ subject."

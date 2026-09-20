@@ -74,11 +74,13 @@ class ShippedNumTagAbsentRatchetTest
      * arithmetic, before moving it.
      * <p>
      * &#11088; <b>63 &rarr; 83, re-derived 2026-09-19</b> by {@code PLAN-retire-core-family.md}
-     * phase 8f, by RUN. The 63 was sized as <i>"the internal corpus minus the CORE packages"</i> at
-     * a time when the internal corpus still had them; the CORE family has since been retired there,
-     * so both trees now measure the same <b>83</b> (verified with the documented command against
-     * each repo's {@code target/rules}). The floor had 20 of dead slack in <i>both</i> repos and
-     * neither could see it &mdash; a floor only reports a loss below itself.
+     * phase 8f, which found it from the OSS side. The 63 was <i>"the corpus without the CORE
+     * family"</i> sized while this corpus still HAD that family; retiring it makes the exclusion
+     * vacuous, so the floor should have moved with the deletion and did not &mdash; &#167;13's five
+     * greps do see this constant, but a floor that is merely SLACK reds nothing, so nothing asked.
+     * Measured 83 here and 83 in {@code cumba-oss-corej-rules}, with the documented command against
+     * each {@code target/rules}; the OSS side read the same 83 back out of this assertion's own
+     * failure message under a deliberately impossible floor.
      * </p>
      */
     private static final int CONVERSION_FLOOR = 83;

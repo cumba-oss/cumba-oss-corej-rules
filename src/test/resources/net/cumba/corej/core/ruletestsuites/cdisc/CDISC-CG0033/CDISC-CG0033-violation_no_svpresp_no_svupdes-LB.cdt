@@ -1,0 +1,40 @@
+#!RuleTest
+#test CDISC-CG0033 expect=violation domain=LB
+#note "RE-CUT 2026-09-18 (PLAN-unplanned-visit-cascade): expect moved skipped -> violation, and the finding this dataset used to owe to the retired CDISC-CG0033-A now comes from the merged parent. SV carries neither SVPRESP nor SVUPDES, so Requirements no longer gate the rule out (SV.SVPRESP left the All list - it would kill the cascade's not-var_exists arm) and the tier-2/3 arm decides: row 2's WEEK 99 carries no unscheduled/unplanned marker and VISITNUM=99 is not in TV -> fires, exactly as the -A sibling did on this same data. The prior pin ('if this EXECUTES again the entry was dropped - escalate') is retired WITH the split: executing here is now the designed behaviour, not a dropped gate."
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 2  | BASELINE
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+

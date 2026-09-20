@@ -12,13 +12,11 @@ rule:
   Executability: Fully Executable
   Scope:
     Domains: {Include: [AE]}
-  Operations:
-  - id: $ae_record_count
-    operator: record_count
-    domain: AE
+  Bindings:
+  - name: "$ae_record_count"
+    expression: 'record_count(domain="AE")'
   Check:
-    all:
-    - {name: $ae_record_count, operator: greater_than, value: 5}
+    expression: '$ae_record_count > 5'
   Outcome:
     Message: AE has more than 5 records.
     Output_Variables: [STUDYID, USUBJID, AESEQ]

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD9999 expect=violation domain=ADXX
+#note "Mirrors rulespec PMDA-AD9999.yaml (the rule's only prior guard). The Define-XML declares class 'ADAM OTHER' for ADXX - the Define-XML v2.1 ADaM class for a dataset that is none of ADSL/BDS/OCCDS - so upper(ds_class('DEFINE')) is outside the three supported structures and the rule fires once. ADXX is deliberately a non-standard ADaM name so the Define channel is the fixture's only moving part; the rule has no Operations and no structure scope (Domains: ALL), so no library mock beyond the mandatory standard declaration is involved. Killing the Define channel yields EXECUTED with zero findings, which is exactly what the violation expectation here would catch."
+#library standard=adamig version=1-3
+#define dataset-class ADXX "ADAM OTHER"
+#expectViolationCount 1
+#expectViolationAt define_dataset_class="ADAM OTHER"
+dataset ADXX label="Unsupported Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | 001

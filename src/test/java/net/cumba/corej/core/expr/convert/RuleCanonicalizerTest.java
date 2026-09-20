@@ -146,8 +146,7 @@ class RuleCanonicalizerTest
      * ordering of a rule carrying <em>no</em> {@code Requirements}, which stays true and is the
      * shape of every corpus file until phase 4. The failure this guards against is silent — no
      * Maven gate runs the canonicalizer over the real corpus, so a missing key would surface only
-     * as a warning at the next run of the internal {@code backfill-rules} workflow, which is not
-     * distributed with this repository.
+     * as a warning at the next {@code scripts/backfill-rules.sh} run.
      * </p>
      */
     @Test
@@ -328,31 +327,24 @@ class RuleCanonicalizerTest
         String in = """
                 Core:
                   Id: "CORE-1"
-                Operations:
-                - domain: "TA"
-                  id: "$ta_arm"
-                  name: "ARM"
-                  operator: "distinct"
-                - codelist: "C66742"
-                  codelists:
-                  - "B"
-                  - "A"
-                  id: "$ct"
-                  operator: "codelist_terms"
+                Bindings:
+                - expression: 'distinct(ARM, domain="TA")'
+                  name: "$ta_arm"
+                - expression: 'codelist_terms(codelists=[B, A])'
+                  name: "$ct"
                 Standards: []
                 """;
         String out = canon(in, new ArrayList<>());
-        JsonNode ops = YAML.readTree(out).get("Operations");
+        JsonNode ops = YAML.readTree(out).get("Bindings");
         List<String> first = new ArrayList<>();
         ops.get(0).fieldNames().forEachRemaining(first::add);
-        assertEquals(List.of("id", "operator", "domain", "name"), first);
+        assertEquals(List.of("name", "expression"), first);
         List<String> second = new ArrayList<>();
         ops.get(1).fieldNames().forEachRemaining(second::add);
-        assertEquals(List.of("id", "operator", "codelist", "codelists"), second);
-        // Array element order preserved (item 0 then item 1) and inner codelists order preserved.
-        assertEquals("$ta_arm", ops.get(0).get("id").asText());
-        assertEquals(List.of("B", "A"), List.of(ops.get(1).get("codelists").get(0).asText(),
-                ops.get(1).get("codelists").get(1).asText()));
+        assertEquals(List.of("name", "expression"), second);
+        // Array element order preserved (item 0 then item 1).
+        assertEquals("$ta_arm", ops.get(0).get("name").asText());
+        assertEquals("$ct", ops.get(1).get("name").asText());
     }
 
     // ---- style normalization ----------------------------------------------

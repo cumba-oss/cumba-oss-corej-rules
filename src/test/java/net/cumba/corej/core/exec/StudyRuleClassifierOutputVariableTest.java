@@ -28,14 +28,14 @@ import org.junit.jupiter.api.Test;
  * and writes the shift to {@code target/study-anchor-ov-shift.md}.
  *
  * <p>
- * ⚠ <b>It lives in {@code corej-cdisc-rules}, not beside {@link StudyRuleClassifier}.</b> It is
- * corpus-driven, and the corpus is generated into {@code corej-cdisc-rules/target/} during that
- * module's build ({@code plans/done/PLAN-rules-corpus-build-integration.md});
- * {@code corej-cdisc-core} builds <em>before</em> it, so a copy left there would assert on a
- * directory that does not exist yet. The reverse dependency cannot fix that — it would be a reactor
- * cycle, which is the same reason the corpus-driven Define-XML tests live here
- * (PLAN-rules-module-consolidation D12/D13). The engine-side unit test of the classifier,
- * {@code StudyRuleClassifierTest}, stays in {@code corej-cdisc-core}.
+ * ⚠ <b>It lives in {@code corej-rules}, not beside {@link StudyRuleClassifier}.</b> It is
+ * corpus-driven, and the corpus is generated into {@code corej-rules/target/} during that module's
+ * build ({@code plans/done/PLAN-rules-corpus-build-integration.md}); {@code corej-core} builds
+ * <em>before</em> it, so a copy left there would assert on a directory that does not exist yet. The
+ * reverse dependency cannot fix that — it would be a reactor cycle, which is the same reason the
+ * corpus-driven Define-XML tests live here (PLAN-rules-module-consolidation D12/D13). The
+ * engine-side unit test of the classifier, {@code StudyRuleClassifierTest}, stays in
+ * {@code corej-core}.
  * </p>
  */
 class StudyRuleClassifierOutputVariableTest

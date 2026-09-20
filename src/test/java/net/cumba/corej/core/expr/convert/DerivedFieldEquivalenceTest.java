@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
+import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleClassifier;
-import net.cumba.corej.core.expr.CheckToExpr;
 import net.cumba.corej.core.expr.eval.DomainScan;
 import net.cumba.corej.core.expr.eval.OperationKinds;
 import net.cumba.corej.core.model.Rule;
@@ -82,6 +82,13 @@ class DerivedFieldEquivalenceTest
      * neither {@code Sensitivity} was correct. Both halves now derive their value with no override.
      * </p>
      */
+    // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): FIVE CORE entries removed with the family
+    // — "CORE-000212", "CORE-000365", "CORE-000929" from the original eight, "CORE-009705" from
+    // the TA-6 four and "CORE-009707" from the wave-B six. ⭐ NO OVERRIDE IS LOST: every one was
+    // the CORE arm of a set whose CDISC/FDA/PMDA arms are all still listed — CDISC-CG0535 /
+    // CDISC-CG0077 / CDISC-CG0001 carry the first three's shapes, CDISC-CG9671 + FDA/PMDA-SD9713
+    // the fourth's, and FDA-SD9720 + FDA-SD9721 the fifth's. The rationale comments are left
+    // exactly as they were, minus the retired ids: they argue about a SHAPE, not about a family.
     private static final List<String> SENSITIVITY_OVERRIDES = List.of("CDISC-CG0001",
             "CDISC-CG0077", "CDISC-CG0535", "CDISC-SEND-0153", "CDISC-SEND-0249.1",
             // 8 -> 12 on 2026-08-19 (twin-alignment wave TA-6, review H2): the four minted
@@ -114,7 +121,7 @@ class DerivedFieldEquivalenceTest
             // 19 -> 25 on 2026-09-11 (R-4.11c wave B, the M3/M11/M11b/M8 presence sisters): same
             // rationale again — the finding is that the end-timepoint set (--ENDTC/--ENRF/
             // --ENRTPT/--DUR, SD9719) or the start-timepoint set (--STDTC/--STRF/--STRTPT,
-            // SD9720/SD9721/CORE-009707) is ABSENT from the dataset, one dataset-level fact,
+            // SD9720/SD9721) is ABSENT from the dataset, one dataset-level fact,
             // while every trigger leaf is per-row (--OCCUR != "N", empty(--STAT),
             // not empty(--ENDTC) …), so the derivation reads `Record` and would multiply one
             // column-absence finding by the number of qualifying rows — the flood these rules
@@ -146,8 +153,9 @@ class DerivedFieldEquivalenceTest
             // DSCAT == "DISPOSITION EVENT"), so the derivation reads `Record` and would multiply
             // one column-absence finding by the number of qualifying rows — the flood these rules
             // replace. DRAFT-900045 is the corpus's first DRAFT-family member of this list; its
-            // models CDISC-CG0535 and CORE-000212 have sat in the base eight since the list was
-            // written, so the shape is proven. ⚠ The M15 pair FDA/PMDA-SD9727 is deliberately NOT
+            // model CDISC-CG0535 has sat in the base eight since the list was written, so the
+            // shape is proven (its CORE twin CORE-000212 sat beside it until the 2026-09 family
+            // retirement). ⚠ The M15 pair FDA/PMDA-SD9727 is deliberately NOT
             // here: like FDA/PMDA-SD9718 its Check is nothing but var_exists leaves, so the
             // derivation itself returns `Dataset` and an authored value would fail the disagree
             // clause below. Kept in step with CrossCorpusDerivationTest, the shipped-corpus half.
@@ -162,13 +170,7 @@ class DerivedFieldEquivalenceTest
             // reporting the absence once — so authored == derived would red the disagree
             // clause below (CDISC-CG0031-A/CG0033-A precedent, routing Record/{ROW}). Kept
             // in step with CrossCorpusDerivationTest, the shipped-corpus half.
-            "CDISC-SEND-9439"
-    // ⚠ CORE-family ids removed on extraction (2026-09-15): this repository does not
-    // redistribute the CORE rule family, so their rules-src checks do not exist here
-    // and the "override must exist in rules-src" clause below can never be satisfied
-    // for them. Internal keeps them; the override set is otherwise identical.
-    // Removed: CORE-000212, CORE-000365, CORE-000929, CORE-009705, CORE-009707
-    );
+            "CDISC-SEND-9439");
 
     /**
      * One {@code rules-src} fixture per evaluation domain ({@code {}}, {@code {VAR}},
@@ -193,6 +195,8 @@ class DerivedFieldEquivalenceTest
         for (Path file : files)
         {
             Rule rule = YAML.readValue(Files.readString(file, StandardCharsets.UTF_8), Rule.class);
+            // 7b: materialise the Bindings before deriving (normalizeOperations javadoc).
+            net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
             if (rule.getSensitivity() != null || rule.getCheck() == null)
             {
                 // The documented override set: not a clause-1 fixture, it is clause 2's.
@@ -202,7 +206,7 @@ class DerivedFieldEquivalenceTest
             try
             {
                 domain = DomainScan
-                        .infer(CheckToExpr.toExpr(rule.getCheck()), OperationKinds.forRule(rule))
+                        .infer(CheckExprUnits.toExpr(rule.getCheck()), OperationKinds.forRule(rule))
                         .label();
             }
             catch (net.cumba.corej.core.expr.ExpressionException _)
@@ -226,9 +230,8 @@ class DerivedFieldEquivalenceTest
      *
      * <ol>
      * <li>a rule carrying no {@code Sensitivity} gets it derived;</li>
-     * <li><i>(clause 2 — an authored value wins — is {@code anAuthoredValueSurvivesTheDerivation},
-     * which is internal-only: the test was dropped by the OSS extraction, so this cannot be a
-     * resolvable link here)</i>;</li>
+     * <li><i>(clause 2 — an authored value wins — is
+     * {@link #anAuthoredValueSurvivesTheDerivation})</i>;</li>
      * <li><i>(clause 3 — the seeding order — is
      * {@link #theSensitivityDerivationIsTypeFreeBecauseTheGenericPresenceOperatorIsRetired})</i>;</li>
      * <li>an applied derivation records a <b>rationale</b>;</li>
@@ -253,8 +256,10 @@ class DerivedFieldEquivalenceTest
         Rule rule = YAML.readValue(yaml, Rule.class);
         assertNull(rule.getSensitivity(), "fixture must start with no authored Sensitivity");
         assertNotNull(rule.getCheck(), "fixture must carry a Check");
-        assertEquals(domain, DomainScan
-                .infer(CheckToExpr.toExpr(rule.getCheck()), OperationKinds.forRule(rule)).label(),
+        assertEquals(domain,
+                DomainScan
+                        .infer(CheckExprUnits.toExpr(rule.getCheck()), OperationKinds.forRule(rule))
+                        .label(),
                 "the fixture really is the routing class it was selected for");
         RulePackageLoader.deriveOmittedFields(rule);
         assertNotNull(rule.getSensitivity(),
@@ -329,9 +334,19 @@ class DerivedFieldEquivalenceTest
      * The generic operator is retired (owner ruling 1), so the parameter was a <em>dead</em>
      * parameter and was removed rather than re-justified. This pins the removal as a fact, not an
      * assumption: the witness now fails to load with the migration message, and the two explicit
-     * spellings of the same leaf carry the information the type used to — {@code ds_not_exists}
+     * spellings of the same conjunct carry the information the type used to — {@code ds_not_exists}
      * derives {@code Study} (nothing reads the dataset under evaluation), {@code var_not_exists}
      * derives {@code Dataset} — with no type in sight.
+     * </p>
+     *
+     * <p>
+     * ⚠ The witness is written as an {@code expression:} since phase 7d of
+     * {@code PLAN-typed-expression-engine.md} (D121) retired the operator-leaf {@code Check} form
+     * outright: an {@code operator:} node is now refused by {@code CheckConditionDeserializer}
+     * before any rule-level validation runs, which would have masked the load error this test is
+     * about behind a Jackson {@code MismatchedInputException}. Both subjects are unchanged —
+     * {@code genericPresenceCall} walks the {@code Expr}, and {@code deriveSensitivity} classifies
+     * the raised conjuncts.
      * </p>
      */
     @Test
@@ -343,11 +358,7 @@ class DerivedFieldEquivalenceTest
                   Id: "LANE-B-CLAUSE3-SYNTHETIC"
                 Description: "Synthetic clause-3 witness: no corpus rule has this shape."
                 Check:
-                  all:
-                  - name: "AE"
-                    operator: "ds_not_exists"
-                  - name: "SUPPAE"
-                    operator: "not_exists"
+                  expression: 'ds_not_exists("AE") and not_exists("SUPPAE")'
                 Outcome:
                   Message: "synthetic"
                 """;
@@ -361,13 +372,11 @@ class DerivedFieldEquivalenceTest
                 loaded.getLoadError());
         assertTrue(loaded.getLoadError().contains("ds_not_exists(X)"), loaded.getLoadError());
 
-        Rule dataset = YAML.readValue(
-                witness.replace("operator: \"not_exists\"", "operator: \"ds_not_exists\""),
+        Rule dataset = YAML.readValue(witness.replace("and not_exists(", "and ds_not_exists("),
                 Rule.class);
         assertEquals(Sensitivity.STUDY, RuleClassifier.deriveSensitivity(dataset).value(),
                 "two dataset-presence leaves read nothing from the dataset under evaluation");
-        Rule column = YAML.readValue(
-                witness.replace("operator: \"not_exists\"", "operator: \"var_not_exists\""),
+        Rule column = YAML.readValue(witness.replace("and not_exists(", "and var_not_exists("),
                 Rule.class);
         assertEquals(Sensitivity.DATASET, RuleClassifier.deriveSensitivity(column).value(),
                 "a column-presence leaf reads the dataset under evaluation");
@@ -417,6 +426,7 @@ class DerivedFieldEquivalenceTest
             }
             Rule authoredRule = YAML
                     .readValue(Files.readString(found.get(0), StandardCharsets.UTF_8), Rule.class);
+            net.cumba.corej.core.RulePackageLoader.normalizeOperations(authoredRule);
             Sensitivity authored = authoredRule.getSensitivity();
             if (authored == null)
             {

@@ -154,15 +154,20 @@ class ExcludedOutputVariableShippedRuleTest
      * </p>
      *
      * <p>
-     * A sample of 11 rules spanning the three families shipped here (CDISC, FDA, PMDA) and all
-     * three {@code kind}s of the proposal's TSV, each run on the rule's own
-     * {@code expect=violation} fixture. Of the 90 edited rules, 72 have such a fixture; the other
-     * 18 have none and are not assertable this way.
+     * A sample of <b>11</b> rules / <b>17</b> excluded entries spanning all three surviving
+     * families (CDISC, FDA, PMDA), <b>9</b> domains and all three {@code kind}s of the proposal's
+     * TSV, each run on the rule's own {@code expect=violation} fixture. Of the 90 edited rules, 72
+     * have such a fixture; the other 18 have none and are not assertable this way.
+     * </p>
      *
      * <p>
-     * ⚠ Four CORE-family rows (CORE-000018 / -000040 / -000095 / -001043) were dropped when this
-     * repository was extracted: the CORE rule family is not redistributed here, so neither their
-     * packages nor their {@code .cdt} fixtures exist. The internal corpus still covers them.
+     * ⚠ Every figure above was re-derived 2026-09-19 after the CORE-family retirement took the
+     * sample from 12 rules to 11 (the row-by-row reasoning is inline below). ⚑ The <b>17</b> is
+     * unchanged, and not by luck: the CORE row that went carried one excluded entry, and the two
+     * that were re-pointed carry the same entries their twins do. ⚠⚠ The pre-retirement javadoc's
+     * own numbers were BOTH wrong, so do not read this as a retirement loss: its "17" was one short
+     * (the 12 rows carried <b>18</b> entries) and its "11 domains" counted a population of <b>9</b>
+     * — 9 before and 9 after, CM and DM leaving as CE arrived. Re-derive them; do not quote them.
      * </p>
      */
     static Stream<Arguments> columnExclusions()
@@ -171,6 +176,47 @@ class ExcludedOutputVariableShippedRuleTest
                 Arguments.of("CDISC-SEND-0085.1", "rules-cdisc-sendig-3-1-1.json",
                         "cdisc/CDISC-SEND-0085.1/CDISC-SEND-0085.1-invalid_blank_stat-BW.cdt",
                         "BWSTAT", Set.of("--ORRES"), Set.of("BWORRES")),
+                // Re-pointed 2026-09-19 (PLAN-retire-core-family.md phase 6, §12.2): CORE-000018
+                // -> its expression-identical twin CDISC-CG0086. Verified, not assumed: the Checks
+                // are byte-identical and CG0086's Output_Variables carry the same two exclusions
+                // ["--PRESP", "!--OCCUR", "!--STAT"]. The DOMAIN moves CM -> CE because the twin's
+                // own expect=violation fixture is on CE (its Domains.Exclude is AE/DS/DV/EX, so CE
+                // is in scope); the exclusion contract under test is the wildcard pair, and this
+                // exercises its resolution against a different domain, which is if anything the
+                // stronger case.
+                Arguments.of("CDISC-CG0086", "rules-cdisc-sdtmig-3-4.json",
+                        "cdisc/CDISC-CG0086/CDISC-CG0086-violation-CE.cdt", "CEPRESP",
+                        Set.of("--OCCUR", "--STAT"), Set.of("CEOCCUR", "CESTAT")),
+                // Re-pointed 2026-09-19 (PLAN-retire-core-family.md phase 5): CORE-000040's
+                // fixtures migrated to its expression-identical twin CDISC-CG0656, which carries
+                // the same Output_Variables ["VISITNUM", "!SVPRESP", "$tv_visitnum"] and the same
+                // Scope but for the INERT Use_Case axis (§9.3 item 6), so the exclusion contract
+                // is unchanged. The CORE row could not stay: its fixture no longer exists.
+                Arguments.of("CDISC-CG0656", "rules-cdisc-sdtmig-3-4.json",
+                        "cdisc/CDISC-CG0656/CDISC-CG0656-invalid-SV.cdt", "VISITNUM",
+                        Set.of("SVPRESP"), Set.of("SVPRESP")),
+                // Re-pointed 2026-09-19 (phase 6, §12.2): CORE-000095 -> CDISC-CG0211, whose
+                // Check is byte-identical and whose Output_Variables are the same ["ETCD",
+                // "!SEUPDES"] pair. ⚠ CG0211 had NO .cdt scenario at all, so phase 6 migrated
+                // CORE-000095's own two onto it rather than leaving this case with no fixture to
+                // load. ⛔ The other twin, FDA-SD0092, would have been the wrong choice twice
+                // over: it has a violation fixture but its Output_Variables are ["ETCD",
+                // "SEUPDES"] with NO exclusion, and its Check is the COMPLEMENT
+                // (ETCD == "UNPLAN" and empty(SEUPDES)) rather than a restatement — so it carries
+                // neither the contract under test nor the same data shape.
+                Arguments.of("CDISC-CG0211", "rules-cdisc-sdtmig-3-4.json",
+                        "cdisc/CDISC-CG0211/CDISC-CG0211-invalid-SE.cdt", "ETCD", Set.of("SEUPDES"),
+                        Set.of("SEUPDES")),
+                // ⛔ CORE-001043's case was DELETED by phase 6 (§12.2 case (c)), not re-pointed,
+                // and the reason is recorded because the coverage really is lost.
+                // ⚠⚠ §12.2 said "CORE-001043 has no twin; it is a §10 mint, so that case is
+                // blocked on phase 4". BOTH halves are wrong: review lane 2 overturned it to
+                // COVERED (§9, row CORE-001043) — FDA-SD1121 *is* this rule, over the same SDTMIG
+                // 3.1.3-3.4 versions — so it was never minted and phase 4 authored nothing for
+                // it. The case still cannot move: FDA-SD1121's Output_Variables are
+                // ["AGE", "AGETXT", "ARMCD"] with NO "!" entry, so it does not carry the exclusion
+                // contract this test exists to pin, and authoring one onto a shipped rule is a
+                // semantic change outside this plan. Failed test: not-CLEAR.
                 Arguments.of("FDA-SD0021", "rules-fda-sdtmig-3-4.json",
                         "fda/FDA-SD0021/FDA-SD0021-invalid-occur-CM.cdt", "CMOCCUR",
                         Set.of("--ENDTC", "--ENRF", "--ENRTPT", "--STAT", "--DUR"),

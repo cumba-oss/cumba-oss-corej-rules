@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0328 expect=violation domain=PC
+#note "Mirrors rulespec CDISC-SEND-0328-fire.yaml. Rows 1 and 2 are both PCELTM=PT0H within one time-concentration profile (USUBJID/PCTESTCD/PCTPTREF/PCSPEC) -> both fire. Row 3 is PT1H in the SAME profile and must NOT fire: PCELTM is part of the uniqueness key and the PCELTM=='PT0H' conjunct excludes it - the exact-set match on rows 1-2 is what distinguishes the re-modelled Check from the old precondition form, which would have flagged the whole profile. POOLID is deliberately absent, as in the spec: an absent key member folds to a constant and does not partition."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 PCTESTCD=DRUGX PCSPEC=PLASMA PCELTM=PT0H PCTPTREF=DOSE1
+#expectViolationAt row=2 PCTESTCD=DRUGX PCSPEC=PLASMA PCELTM=PT0H PCTPTREF=DOSE1
+dataset PC label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCTPTREF type=Char label="Time Point Reference"
+col PCSPEC   type=Char label="Specimen Material Type"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | PC | 001 | 1 | DRUGX | DOSE1 | PLASMA | PT0H
+S1 | PC | 001 | 2 | DRUGX | DOSE1 | PLASMA | PT0H
+S1 | PC | 001 | 3 | DRUGX | DOSE1 | PLASMA | PT1H

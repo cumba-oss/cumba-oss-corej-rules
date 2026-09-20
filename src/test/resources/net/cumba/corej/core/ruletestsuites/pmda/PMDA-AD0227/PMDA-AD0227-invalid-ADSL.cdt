@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0227 expect=violation domain=ADSL
+#note "The firing counterpart that makes the absent-column scenario discriminating: TRTSEQPN is present and the TRTSEQPN=1 group maps to two TRTSEQP values {A-B x2, B-A x1} -> the minority row 3 is inconsistent and fires. Same fixture values as the valid twin plus the comparator column, so the pair isolates the var_exists('TRTSEQPN') guard."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=3 TRTSEQP=B-A TRTSEQPN=1
+dataset ADSL class=ADSL label="Subject-Level Analysis Dataset"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRTSEQP  type=Char label="Planned Sequence of Treatments"
+col TRTSEQPN type=Num  label="Planned Sequence of Treatments (N)"
+---
+S1 | 001 | A-B | 1
+S1 | 002 | A-B | 1
+S1 | 003 | B-A | 1

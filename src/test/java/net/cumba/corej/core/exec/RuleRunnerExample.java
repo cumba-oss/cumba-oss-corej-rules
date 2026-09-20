@@ -102,7 +102,11 @@ public final class RuleRunnerExample
                 continue; // skip rules not applicable to this domain
             }
 
-            RuleExecutionResult result = Objects.requireNonNull(RuleRunner.execute(rule, table),
+            // D77: pass the domain so the bind-time specialisation stage can resolve `--`
+            // templates — a `--` rule executed with NO domain context now errors loudly instead
+            // of silently reading nothing.
+            RuleExecutionResult result = Objects.requireNonNull(
+                    RuleRunner.execute(rule, table, _ -> null, domainName),
                     "single-table execute returned no result");
 
             if (result.hasViolations())
@@ -150,7 +154,8 @@ public final class RuleRunnerExample
                 continue;
             }
 
-            RuleExecutionResult result = RuleRunner.execute(rule, aeTable, resolver);
+            // D77: the primary is AE — hand the domain to the specialisation stage.
+            RuleExecutionResult result = RuleRunner.execute(rule, aeTable, resolver, "AE");
 
             if (result.hasViolations())
             {

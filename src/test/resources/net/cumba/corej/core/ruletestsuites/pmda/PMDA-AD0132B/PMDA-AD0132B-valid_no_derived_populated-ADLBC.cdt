@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0132B expect=noViolation domain=ADLBC
-#note "Proves the gate ORDER: the absent BASE column alone is not enough. CHG missing on BOTH rows -> first conjunct false everywhere despite the second being broadcast TRUE (BASE absent). Rule is about a POPULATED derived value with incomplete inputs, never about a merely incomplete dataset."
+#note "Proves the gate ORDER: the absent BASE column alone is not enough. CHG missing on BOTH rows -> first conjunct false everywhere despite the second being broadcast TRUE (BASE absent). Rule is about a POPULATED derived value with incomplete inputs, never about a merely incomplete dataset. ⚠ The CHG COLUMN is declared here on purpose even though no cell carries a value: Requirements.Variables.Any [CHG, PCHG, R2BASE] gates on column PRESENCE, so the rule EXECUTES and reaches the noViolation this file pins. Drop the column and the verdict becomes skipped, which is a different claim -- see PMDA-AD0132B-skipped_no_derived_columns-ADLBC.cdt."
 #library standard=adamig version=1-3
 #expectViolationCount 0
 dataset ADLBC structure=BDS

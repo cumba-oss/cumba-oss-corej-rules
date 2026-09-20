@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0165 expect=violation domain=ADLB
+#note "Mirrors rulespec CDISC-AD0165.yaml (the rule's only prior guard). 101/ALT is the FILTER discriminator: post-baseline ATOXGR '3' sorts above the baseline '1' while BTOXGR='1' everywhere, so an engine ignoring filter(ABLFL='Y') on max() computes $baseline_atoxgr='3' and false-fires on rows 1-2 (exact-set match reds). 102/ALT row 4 is the genuine violation (BTOXGR '3' != baseline ATOXGR '2'). 103/ALT has no ABLFL=Y row -> missing $-value, populated BTOXGR fires on row 5; row 6 keeps BTOXGR empty and the non_empty guard keeps it quiet."
+#library standard=adamig version=1-2
+#expectViolationCount 2
+#expectViolationAt row=4 PARAMCD=ALT BASETYPE=LAST ATOXGR=1 BTOXGR=3 "$baseline_atoxgr"=2
+#expectViolationAt row=5 PARAMCD=ALT BASETYPE=LAST ATOXGR=2 BTOXGR=2
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col BASETYPE type=Char label="Baseline Type"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ATOXGR   type=Char label="Analysis Toxicity Grade"
+col BTOXGR   type=Char label="Baseline Toxicity Grade"
+---
+S1 | 101 | ALT | 0 | LAST | Y | 1 | 1
+S1 | 101 | ALT | 1 | LAST |   | 3 | 1
+S1 | 102 | ALT | 0 | LAST | Y | 2 | 2
+S1 | 102 | ALT | 1 | LAST |   | 1 | 3
+S1 | 103 | ALT | 1 | LAST |   | 2 | 2
+S1 | 103 | ALT | 2 | LAST |   | 1 |

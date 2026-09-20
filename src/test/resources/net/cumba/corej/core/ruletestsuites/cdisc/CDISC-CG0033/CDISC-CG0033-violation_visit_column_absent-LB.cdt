@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-CG0033 expect=violation domain=LB
+#note "B3 of PLAN-unplanned-visit-cascade, REPLACING the retired CDISC-CG0033-A's R-4.11b pin. The -A arm required `not empty(VISIT)` because a name is all it could read; the merged cascade does not, so a row with a populated VISITNUM, no VISIT column anywhere, no SVPRESP column and no SVUPDES is now checked against TV.VISITNUM: VISITNUM is Req and VISIT only Perm, so a Perm column's absence no longer exempts the Req one. Row 2 (VISITNUM=99) is not in TV -> fires; row 1 (2) is in TV -> clean. The old fixture expected silence here - that silence is exactly what B3 retires."
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 2
+CDISCPILOT01 | SV | 01-701-1015 | 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

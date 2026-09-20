@@ -1,12 +1,17 @@
 name: CDISC-AD0361
 kind: rule
 description: |
-  Wave A3 port — T1a PlainSimple.
-  CDISC-AD0361: ASTDT must not be greater than AENDT.
+  Wave A3 port — T1a PlainSimple. Re-authored 2026-09-17 (terminal review H2 of
+  PLAN-typed-expression-engine): CDISC-AD0361: ASTDT must not be greater than AENDT.
   Record-data rule scoped to ALL classes; single bare-leaf Check (no outer all/any wrapper).
-  Rule-body quirk: uses 'greater_than' (numeric compare) on date strings; Java's numeric
-  operator rejects unparseable strings, Python's business_rules bare-leaf path raises
-  KeyError: 'name'. Both engines emit zero violations, so expected_violations = [].
+  History: until 2026-09-17 this fixture shipped ASTDT/AENDT as Char ISO date strings to
+  document the legacy bare-leaf 'greater_than on date strings' quirk (both engines emitted
+  zero violations; later a catalogued STATUS+ERRORS divergence when the column-type gate made
+  the Char/numeric mismatch an ERROR). That record could not discriminate the rule at all —
+  inverting the comparison left it green. Production types ASTDT/AENDT as Num in every ADaMIG,
+  so the fixture now ships numeric ADaM day values and the bad row FIRES, per the divergence
+  entry's own resolution note ('re-authored with Num *DT columns ... expected_violations
+  re-derived').
 python_source: rules-adamig-1-3.json (CDISC-AD0361)
 rule:
   coreId: CDISC-AD0361
@@ -14,13 +19,20 @@ datasets:
   ADLB:
     row_key: [STUDYID, USUBJID, PARAMCD]
     rows:
-      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ASTDT: '2026-01-01', AENDT: '2026-01-02'}   # ok
-      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ASTDT: '2026-02-02', AENDT: '2026-02-01'}   # bad
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: 'HGB', ASTDT: 21914, AENDT: 21915}   # ok
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB', ASTDT: 21916, AENDT: 21915}   # bad: start after end
 config:
   standard: adamig
   standard_version: '1.3'
 library_mocks:
   classes:
     basic data structure: [ADLB]
-expected_violations: []
+expected_violations:
+  - rule_id: CDISC-AD0361
+    dataset: ADLB
+    row_key: {STUDYID: S1, USUBJID: '002', PARAMCD: 'HGB'}
+    status: SUCCESS
+    output_variables:
+      ASTDT: '21916'
+      AENDT: '21915'
 expected_errors: []

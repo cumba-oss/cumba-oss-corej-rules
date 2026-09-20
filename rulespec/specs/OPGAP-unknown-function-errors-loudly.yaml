@@ -1,0 +1,47 @@
+name: OPGAP-unknown-function-errors-loudly
+kind: check_operator
+description: |
+  The corpus's `expected_status: ERROR` pin, and its only non-empty `expected_errors`.
+
+  Successor (2026-09-16, D121b) to OPGAP-shares-at-least-one-element-with, which pinned the
+  same contract through the retired v1 operator-leaf model: a Check the engine cannot compile
+  must produce a loud per-rule ERROR, never zero findings that read as "your data is clean".
+  Under D121 an operator-leaf Check is simply an incorrect rule — it fails loudly at load, one
+  stage earlier — so the old spec became unauthorable, and the contract it guarded moved here.
+
+  WHAT IT PINS — a real capability gap, not malformed input. The expression parses cleanly
+  (`shares_at_least_one_element_with` lexes as an ordinary function call), so it passes load
+  and parse; the engine has no such builtin, so `ExprCompiler` declines at compile with an
+  ExpressionException, `RulePackageLoader.installNativeExpr` installs no checkExpr, and
+  `RuleRunner` reports a rule-level ERROR. This is externally-supplied-rule territory — a
+  `--rules-dir` user authoring a function this engine version lacks must get a loud per-rule
+  ERROR carrying a reason.
+
+  WHY THE `errors` CHANNEL IS WHAT MAKES IT MEANINGFUL. `expected_status: ERROR` alone would
+  still be satisfied if the rule started erroring for an entirely different cause — a load
+  error, or the RELREC/key-expansion conflict. `expected_errors: [NO_NATIVE_CHECK_EXPR]` says
+  *which*, so an engine change that alters the cause is a red rather than a silent pass. That
+  is the claim of PLAN-parity-expected-errors, and this is the spec that exercises it.
+
+  The function name is kept from the predecessor deliberately: the fork implements
+  `shares_at_least_one_element_with` (dataframe_operators.py), this engine does not, so the
+  spec keeps documenting a genuine cross-engine capability gap rather than a made-up name.
+  AETERM and AEDECOD share no element on any row, so an engine that GAINED the function would
+  execute to zero violations — status EXECUTED, observedReasons empty — and both this spec and
+  ExpectedErrorsTest's anti-rot check would go red, which is the intended signal to re-derive
+  the pin rather than delete it.
+check:
+  expression: 'shares_at_least_one_element_with(AETERM, AEDECOD)'
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: "S1", USUBJID: "001", AESEQ: 1, AETERM: "HEADACHE", AEDECOD: "NAUSEA"}
+      - {STUDYID: "S1", USUBJID: "002", AESEQ: 1, AETERM: "RASH", AEDECOD: "PYREXIA"}
+config:
+  standard: sdtmig
+  standard_version: "3.4"
+expected_status: ERROR
+expected_violations: []
+expected_errors:
+  - NO_NATIVE_CHECK_EXPR

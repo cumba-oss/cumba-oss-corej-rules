@@ -234,6 +234,28 @@ public final class ViolationNormaliser
          */
         COLUMN_TYPE_MISMATCH,
         /**
+         * An armed stage-B bind-gate finding — {@code PLAN-typed-expression-engine} phase 4,
+         * D41/D104e. The typed engine decides each (rule × dataset) binding knowing the dataset's
+         * columns, and an armed {@code StageBErrorKind} ({@code UNRESOLVED_WILDCARD},
+         * {@code FILTER_UNRESOLVABLE}, {@code MATCHED_FLAG_UNRESOLVABLE}) is mapped by
+         * {@code RuleRunner.mapStageBReport} to one {@code ERROR} per (rule, dataset) whose message
+         * is the accumulated per-binding text behind the fixed prefix
+         * {@link #STAGE_B_MESSAGE_PREFIX}.
+         *
+         * <p>
+         * ⚑ <b>The population is ZERO, and this branch exists anyway.</b> Every armed kind is
+         * measured at zero over both of D102c's populations, and the three corpus rules that could
+         * reach {@code MATCHED_FLAG_UNRESOLVABLE} — the D118 join-flag consumers — each declare
+         * their joined dataset in {@code Requirements.Variables}, which makes the absence a SKIP
+         * rather than a bind error. So this is a latent channel, exactly as
+         * {@link #COLUMN_TYPE_MISMATCH} was when it was added. What makes it more than dead code is
+         * {@code StageBErrorReasonReachabilityTest}, which drives the real gate and classifies the
+         * message the <em>engine</em> built — no literal is typed on the test side, so a reworded
+         * prefix reds there instead of degrading every stage-B ERROR to {@link #OTHER} in silence.
+         * </p>
+         */
+        STAGE_B,
+        /**
          * An {@code ERROR} this classifier does not recognise — including a null status message.
          */
         OTHER
@@ -273,6 +295,19 @@ public final class ViolationNormaliser
      * misclassification.
      */
     static final String COLUMN_TYPE_MISMATCH_MESSAGE_PREFIX = "column-type mismatch: ";
+
+    /**
+     * Verbatim copy of the fixed prefix {@code RuleRunner.mapStageBReport} builds every armed
+     * stage-B message with (one builder site, pinned there by {@code EngineErrorMessageContractTest
+     * .theStageBPrefixIsStillTheEngineSWording}).
+     * <p>
+     * ⚠ Matched by <b>prefix</b> for the same forced reason as
+     * {@link #COLUMN_TYPE_MISMATCH_MESSAGE_PREFIX}: the tail is the joined {@code toString()} of
+     * the armed findings, which name the kind, the binding and the rule-specific text, so there is
+     * no fixed string to compare. A reworded prefix degrades to {@link ErrorReason#OTHER} — a
+     * visible divergence — rather than a silent misclassification.
+     */
+    static final String STAGE_B_MESSAGE_PREFIX = "stage B: ";
 
     /**
      * Classifies an execution result into the closed {@link ErrorReason} vocabulary and returns the
@@ -333,6 +368,10 @@ public final class ViolationNormaliser
         if (statusMessage.startsWith(COLUMN_TYPE_MISMATCH_MESSAGE_PREFIX))
         {
             return ErrorReason.COLUMN_TYPE_MISMATCH;
+        }
+        if (statusMessage.startsWith(STAGE_B_MESSAGE_PREFIX))
+        {
+            return ErrorReason.STAGE_B;
         }
         // Checked last: a load error's text is authored, so it could in principle collide with a
         // fixed engine message. Preferring the fixed messages keeps the classification stable.

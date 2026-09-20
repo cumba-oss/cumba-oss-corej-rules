@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0258 expect=violation domain=ADAE
-#note "dataset ADAE (AEDECOD detects OCCDS + ADVERSE EVENT subclass). Row 1 matched in AE -> no. Row 2: no AE row with AESEQ=2 -> FIRES. Row 3: no AE row with STUDYID=S2 -> FIRES (pins the 3-key join: STUDYID participates). JOIN: Match_Datasets AE on Keys=[STUDYID, USUBJID, AESEQ], Join_Type=left; AE unique per key -> 1:0/1; unmatched ADAE rows keep null AE.AESEQ. Record sensitivity: 2 findings."
+#note "dataset ADAE (AEDECOD detects OCCDS + ADVERSE EVENT subclass). Row 1 matched in AE -> no. Row 2: no AE row with AESEQ=2 -> FIRES. Row 3: no AE row with STUDYID=S2 -> FIRES (pins the 3-key join: STUDYID participates). JOIN: Match_Datasets AE on Keys=[STUDYID, USUBJID, AESEQ], Join_Type=left; AE unique per key -> 1:0/1; AE._matched_ is false on the unmatched ADAE rows. Record sensitivity: 2 findings."
 #library standard=adamig version=1-1
 #expectViolationCount 2
 #expectViolationAt row=2 AESEQ=2

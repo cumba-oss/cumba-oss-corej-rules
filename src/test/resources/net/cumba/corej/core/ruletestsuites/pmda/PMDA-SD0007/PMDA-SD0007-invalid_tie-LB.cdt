@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD0007 expect=violation domain=LB
+#note "Mirrors rulespec PMDA-SD0007.yaml (the rule's only prior guard; EC-29 par.7.3, Sensitivity Record). Two records share the PMDA identity keys that are present (LBTESTCD/LBCAT/LBSPEC/LBMETHOD; --OBJ, --TSTDTL and --MRKSTR are absent and do not participate) but disagree on LBSTRESU (g/dL vs mg/dL). A 1-1 tie has no majority, so BOTH records are minority rows and both fire - the 2-row tie case of the minority-row contract (see fda/FDA-SD0007 for the 2-vs-1 majority shape)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBTESTCD=HGB LBCAT=HEM LBSPEC=BLOOD LBMETHOD=AUTO LBSTRESU=g/dL
+#expectViolationAt row=2 LBTESTCD=HGB LBCAT=HEM LBSPEC=BLOOD LBMETHOD=AUTO LBSTRESU=mg/dL
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBSPEC   type=Char label="Specimen Type"
+col LBMETHOD type=Char label="Method of Test or Examination"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | HGB | HEM | BLOOD | AUTO | g/dL
+S1 | LB | 002 | 2 | HGB | HEM | BLOOD | AUTO | mg/dL

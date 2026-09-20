@@ -16,35 +16,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
-import net.cumba.corej.core.expr.CheckExpressionParser;
-import net.cumba.corej.core.expr.ExprLowering;
-import net.cumba.corej.core.expr.ExpressionException;
-import net.cumba.corej.core.expr.ast.Expr;
-import net.cumba.corej.core.model.CheckCondition;
 
 /**
- * Shared scan for the <b>back-conversion</b> direction — {@code rules/}'s shipped
- * {@code Check.expression} parsed by {@link CheckExpressionParser} and lowered by
- * {@link ExprLowering} back to the operator-leaf {@link CheckCondition} AST.
+ * Shared corpus census for the expression instruments: the distinct {@code Core.Id} &rarr; shipped
+ * {@code Check.expression} map over {@code rules/}, plus the newline-separated baseline reader.
  *
  * <p>
- * ⚑ <b>Direction matters.</b> The <em>forward</em> direction (leaf &rarr; expression) was scored by
- * {@code ConverterCoverageTest} over the assembler's canonical packages until the flip retired the
- * authored leaf corpus (wave 43); its synthetic re-base is {@link CheckToExprForwardTableTest}.
- * This scan scores the opposite direction.
- * </p>
- *
- * <p>
- * ⚠ <b>Wave 33 removed this scan's original purpose but not the class.</b> The inverse existed to
- * keep {@code rules-legacy/} — the Python fork's operator-leaf corpus — reachable from the
- * expression form, and {@code BackConversionCoverageTest} ratcheted its residual against a park
- * list. Corpus, fork, coverage gate and park list are all gone
- * ({@code plans/done/PLAN-cut-rules-legacy.md}), so nothing needs an inverse for its own sake any
- * more. The class survives because {@code ExpressionTextIdempotenceTest} builds on
- * {@link #shippedExpressions()} and {@link #loadBaseline(String)}, and because
- * {@link #lower(String, String, boolean)} still expresses a property of {@code rules/} alone: a
- * shipped expression must parse and lower without throwing. ⛔ Do not delete it on the strength of
- * its name — grep the callers first.
+ * ⚑ <b>History.</b> This class began as the <em>back-conversion</em> scan — {@code rules/}'s
+ * shipped expressions lowered by {@code ExprLowering} back to the operator-leaf AST, guarding the
+ * inverse that kept {@code rules-legacy/} reachable. Wave 33 removed that purpose (corpus, fork,
+ * coverage gate and park list all gone — {@code plans/done/PLAN-cut-rules-legacy.md}); phase 7 /
+ * D121 then retired {@code ExprLowering} itself, and the lowering half of this class
+ * ({@code scan}/{@code lower}/{@code Outcome}) went with it. What survives is the census plumbing
+ * {@code ExpressionTextIdempotenceTest} builds on: {@link #shippedExpressions()} and
+ * {@link #loadBaseline(String)}.
  * </p>
  *
  * <p>
@@ -66,15 +51,6 @@ final class BackConversionScan
     {
     }
 
-    /** One rule's back-conversion outcome. */
-    record Outcome(String id, String expression, @org.jspecify.annotations.Nullable String failure)
-    {
-
-        boolean lowered()
-        {
-            return failure == null;
-        }
-    }
 
     /**
      * The distinct {@code Core.Id} &rarr; shipped {@code Check.expression} map over {@code rules/}.
@@ -110,50 +86,6 @@ final class BackConversionScan
             }
         }
         return byId;
-    }
-
-
-    /** Parses and lowers every shipped expression, in id order. */
-    static Map<String, Outcome> scan(boolean aConversionMode)
-    {
-        Map<String, Outcome> out = new LinkedHashMap<>();
-        shippedExpressions()
-                .forEach((id, expression) -> out.put(id, lower(id, expression, aConversionMode)));
-        return out;
-    }
-
-
-    /** Parses and lowers one expression, capturing the rejection message on failure. */
-    static Outcome lower(String aId, String aExpression, boolean aConversionMode)
-    {
-        try
-        {
-            Expr parsed = CheckExpressionParser.parse(aExpression);
-            CheckCondition lowered = aConversionMode
-                    ? ExprLowering.toCheckConditionForConversion(parsed)
-                    : ExprLowering.toCheckCondition(parsed);
-            if (lowered == null)
-            {
-                return new Outcome(aId, aExpression, "lowering returned null");
-            }
-            return new Outcome(aId, aExpression, null);
-        }
-        catch (ExpressionException ex)
-        {
-            return new Outcome(aId, aExpression, message(ex));
-        }
-        catch (RuntimeException ex)
-        {
-            return new Outcome(aId, aExpression,
-                    ex.getClass().getSimpleName() + ": " + message(ex));
-        }
-    }
-
-
-    private static String message(RuntimeException aEx)
-    {
-        String m = aEx.getMessage();
-        return m == null ? aEx.getClass().getSimpleName() : m;
     }
 
 

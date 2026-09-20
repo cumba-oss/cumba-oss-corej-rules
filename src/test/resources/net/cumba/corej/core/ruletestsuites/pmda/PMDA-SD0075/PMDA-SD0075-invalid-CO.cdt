@@ -1,0 +1,38 @@
+#!RuleTest
+#test PMDA-SD0075 expect=violation domain=CO
+#note "Mirrors rulespec PMDA-SD0075.yaml (the rule's only prior guard; EC-34/Fix #126 twin of FDA-SD0075, here on the CO branch of the scope). IDVAR must name a variable of the dataset the row's OWN RDOMAIN references: row 1 (RDOMAIN=LB, IDVAR=LBSEQ) is a legal reference, row 2 (RDOMAIN=AE, IDVAR=LBSEQ) fires because AE has no LBSEQ column. The mixed fixture pins the per-row reference resolution - a study-flat reference set (the pre-fix defect) would see LBSEQ somewhere in the study and suppress the row-2 finding, redding the exact-set match. The pinned $rdomain_variables list is the engine's raw projection - the referenced AE dataset's variables in COLUMN order (the rulespec pins the same set canonical-sorted; the .cdt harness does not sort)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 RDOMAIN=AE IDVAR=LBSEQ "$rdomain_variables"="[STUDYID, DOMAIN, USUBJID, AESEQ, AETERM]"
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | LB | 001 | 1 | LBSEQ | 1 | legit reference
+S1 | CO | AE | 001 | 2 | LBSEQ | 1 | bogus reference
+---
+
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | Headache

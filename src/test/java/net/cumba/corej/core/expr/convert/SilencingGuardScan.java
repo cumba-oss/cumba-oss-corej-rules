@@ -1,17 +1,12 @@
 package net.cumba.corej.core.expr.convert;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import net.cumba.corej.core.expr.ExprLowering;
+import net.cumba.corej.core.CheckExprUnits;
+import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.CheckCondition;
-import net.cumba.corej.core.model.CheckConditionAll;
-import net.cumba.corej.core.model.CheckConditionAny;
-import net.cumba.corej.core.model.CheckConditionExpression;
-import net.cumba.corej.core.model.CheckConditionLeaf;
-import net.cumba.corej.core.model.CheckConditionNot;
 
 /**
  * Detector for <em>silencing {@code exists} guards</em> in an authored {@code Check} — the
@@ -69,11 +64,11 @@ public final class SilencingGuardScan
      * all-True, so a target-position operand below a {@code not} is treated as required too. The
      * branch is defensive — no rule has that shape today (measured 2026-08-07: 0 of 1418 carve-out
      * leaves in {@code rules-legacy/}) and none can arrive through the expression corpus either,
-     * because {@code ExprLowering:113-116} rewrites {@code not is_unique_set(…)} to a plain
-     * {@code is_not_unique_set} leaf rather than a structural {@code CheckConditionNot} (all 708
-     * occurrences in {@code rules/} + the since-retired {@code rules-drafted/} sketches took that
-     * path). It exists so that a hand-authored {@code not} — the one shape that would silently
-     * invert the reasoning above — cannot strip the guard.
+     * because the unit walk ({@code CheckExprUnits}) folds {@code not is_unique_set(…)} to the
+     * {@code is_not_unique_set} unit rather than a structural {@code not} (all 708 occurrences in
+     * {@code rules/} + the since-retired {@code rules-drafted/} sketches took that path). It exists
+     * so that a hand-authored {@code not} — the one shape that would silently invert the reasoning
+     * above — cannot strip the guard.
      * </p>
      *
      * <p>
@@ -90,11 +85,11 @@ public final class SilencingGuardScan
      * ⚠ <b>OPEN (S4 Q2, owner call):</b> whether {@code is_unique_set} should stay in this set. It
      * has <b>0</b> leaves in {@code rules-legacy/} and 0 occurrences in {@code rules-src/checks} —
      * but that measures the <em>legacy operator spelling</em>, not the operator: the expression
-     * corpus carries 708 {@code not is_unique_set(…)} calls, which {@code ExprLowering:113-116}
-     * rewrites to an {@code is_not_unique_set} leaf, and {@code is_not_unique_set} is itself
+     * corpus carries 708 {@code not is_unique_set(…)} calls, which the unit walk folds to an
+     * {@code is_not_unique_set} unit, and {@code is_not_unique_set} is itself
      * {@code ~is_unique_set(…)} in the fork ({@code dataframe_operators.py:1549}) over the same key
-     * filter. A bare {@code is_unique_set(…)} <em>is</em> authorable
-     * ({@code ExprLowering.FUNCTION_OPERATORS}) and would then need this entry.
+     * filter. A bare {@code is_unique_set(…)} <em>is</em> authorable and would then need this
+     * entry.
      * </p>
      */
     static final Set<String> PYTHON_GUARD_REQUIRED_OPERATORS = Set.of("is_unique_set",
@@ -140,220 +135,169 @@ public final class SilencingGuardScan
     }
 
 
-    /**
-     * The operator-leaf view of an {@code {expression}} Check — {@code Fix #256}, the pre-flip
-     * re-point of {@code plans/done/PLAN-rules-src-expression-flip.md} §7b. A Check reaches the
-     * scan as a {@link CheckConditionExpression} only when the strict load-path lowering declined
-     * it ({@code CheckConditionDeserializer} keeps it native), so the raised {@code Expr} is
-     * lowered here through the engine's own <b>conversion-mode</b> machinery
-     * ({@link ExprLowering#toCheckConditionForConversion}) — the offline direction that restores
-     * the raise-side rewrites — and the scan then walks exactly the operator-leaf tree the
-     * expression is equivalent to. Both authoring forms therefore scan with identical semantics by
-     * construction.
-     *
-     * <p>
-     * A native-only expression (no operator-leaf surface even in conversion mode) fails LOUDLY
-     * rather than being skipped: a silent skip is exactly the flip-day vacuity the pre-migration
-     * lane exists to prevent — give the scan a native arm before such a rule is authored.
-     * </p>
-     */
-    private static @org.jspecify.annotations.Nullable CheckCondition loweredOrNull(
-            CheckConditionExpression expression)
-    {
-        CheckCondition condition = DualFormCheckNode.lowerConditionOrNull(expression.expr());
-        if (condition == null)
-        {
-            // Retry with num() conversions erased — a num(X) read is transparent to this
-            // instrument's classification; see DualFormCheckNode.stripNumConversions.
-            condition = DualFormCheckNode
-                    .lowerConditionOrNull(DualFormCheckNode.stripNumConversions(expression.expr()));
-        }
-        if (condition != null)
-        {
-            return condition;
-        }
-        // A native-only expression (no operator-leaf surface even with the dual-form inverses).
-        // When it provably carries no exists-family call it can hide no guard, and the caller
-        // decides what its non-guard content contributes (the substantive walk still reads its
-        // Ref names). One that DOES carry a presence call fails loudly — a silent skip there is
-        // exactly the flip-day vacuity the pre-migration lane exists to prevent
-        // (plans/done/PLAN-rules-src-expression-flip.md §7b).
-        if (!DualFormCheckNode.carriesPresenceCall(expression.expr()))
-        {
-            return null;
-        }
-        throw new IllegalStateException("SilencingGuardScan cannot scan the expression-form"
-                + " Check \"" + expression.source() + "\": it has no operator-leaf equivalent"
-                + " even in conversion mode, and it carries a presence call. Add a native Expr"
-                + " arm to the scan instead of skipping the Check"
-                + " (plans/done/PLAN-rules-src-expression-flip.md §7b).");
-    }
-
-
     private static List<String> hoistable(CheckCondition root, boolean applyCarveOut)
     {
+        Expr check = CheckExprUnits.toExpr(root);
+        if (check == null)
+        {
+            return List.of();
+        }
+        List<CheckExprUnits.Unit> units = CheckExprUnits.units(check);
         Set<String> substantive = new LinkedHashSet<>();
         Set<String> pythonRequired = new LinkedHashSet<>();
-        collectSubstantive(root, substantive, pythonRequired, applyCarveOut, false);
+        for (CheckExprUnits.Unit unit : units)
+        {
+            collectSubstantive(unit, substantive, pythonRequired, applyCarveOut);
+        }
         substantive.removeAll(pythonRequired);
         Set<String> out = new LinkedHashSet<>();
-        collectTopLevelSilencing(root, substantive, out);
-        return new ArrayList<>(out);
-    }
-
-
-    /** DFS following only {@code all} edges — a leaf qualifies iff no any/not ancestor. */
-    private static void collectTopLevelSilencing(CheckCondition node, Set<String> substantive,
-            Set<String> out)
-    {
-        switch (node)
+        for (CheckExprUnits.Unit unit : units)
         {
-        case CheckConditionAll all ->
-        {
-            for (CheckCondition c : all.getConditions())
-            {
-                collectTopLevelSilencing(c, substantive, out);
-            }
-        }
-        case CheckConditionLeaf leaf ->
-        {
-            String name = leaf.getName();
-            // A '*'-wildcard guard (e.g. the ADaM *FL/*FN pair templates) binds PER EXPANSION
-            // PAIR (WildcardExpander): a dataset may carry some pairs complete and others
-            // without the guarded twin, and only the incomplete pairs are silenced.
-            // A variable requirement gates the whole rule per dataset and cannot express that,
-            // so such
-            // guards are required in the Check and never flagged. ('--' domain-prefix names
-            // resolve to ONE column per dataset and remain hoistable.)
-            // `var_exists` joined at the flip: the writer disambiguates every generic `exists`,
-            // so the model view spells a column-presence guard concretely.
-            String operator = leaf.getOperator();
-            if ("var_exists".equals(operator) && name != null && name.indexOf('.') < 0
-                    && name.indexOf('*') < 0 && substantive.contains(name))
+            // A silencing guard is a top-level-conjunction `var_exists` whose variable is used
+            // substantively elsewhere. A '*'-wildcard guard (e.g. the ADaM *FL/*FN pair
+            // templates) binds PER EXPANSION PAIR (WildcardExpander): a dataset may carry some
+            // pairs complete and others without the guarded twin, and only the incomplete pairs
+            // are silenced. A variable requirement gates the whole rule per dataset and cannot
+            // express that, so such guards are required in the Check and never flagged.
+            // ('--' domain-prefix names resolve to ONE column per dataset and stay hoistable.)
+            String name = unit.name();
+            if (unit.topLevel() && "var_exists".equals(unit.operator()) && name != null
+                    && name.indexOf('.') < 0 && name.indexOf('*') < 0 && substantive.contains(name))
             {
                 out.add(name);
             }
         }
-        case CheckConditionExpression expression ->
-        {
-            CheckCondition loweredView = loweredOrNull(expression);
-            if (loweredView != null)
-            {
-                collectTopLevelSilencing(loweredView, substantive, out);
-            }
-            // A presence-free native-only expression can carry no exists guard — nothing to add.
-        }
-        default ->
-        {
-            // any / not / constant subtrees never contribute top-level guards.
-        }
-        }
+        return new ArrayList<>(out);
     }
 
 
     /**
-     * Collects every substantive variable use in the whole tree — the name(s) of each
-     * non-{@code exists}-family leaf plus its value tokens when {@code value_is_literal} is not set
-     * (a literal {@code "SNOMED"}-style value is not a variable use) — and, separately, the
-     * variables used by a Python-guard-required operator (R-4.11a) in the position its warrant
-     * covers.
+     * Collects one unit's substantive variable uses — the target name(s) of each
+     * non-{@code exists}-family unit plus its non-literal value tokens (a literal
+     * {@code "SNOMED"}-style value is not a variable use) — and, separately, the variables used by
+     * a Python-guard-required operator (R-4.11a) in the position its warrant covers.
      *
      * <p>
      * {@code name}/{@code names} is the operator's <b>target</b> and {@code value} its
-     * <b>comparator</b> — that is the fork's own mapping ({@code models/rule.py:160-172}:
-     * {@code value["target"] = condition["name"]},
-     * {@code value["comparator"] = condition["value"]}). Only the comparator side of a carve-out
-     * operator is Python-guard-required; see {@link #PYTHON_GUARD_REQUIRED_OPERATORS}.
+     * <b>comparator</b> — the fork's own mapping ({@code models/rule.py:160-172}). Only the
+     * comparator side of a carve-out operator is Python-guard-required; see
+     * {@link #PYTHON_GUARD_REQUIRED_OPERATORS}. {@link CheckExprUnits.Unit#negated()} carries the
+     * structural-{@code not} parity: a target-position all-False becomes an all-True over-fire
+     * there, so the target is required too.
      * </p>
      *
-     * @param negated
-     *            whether an odd number of {@code not} ancestors sits above this node — a
-     *            target-position all-False becomes an all-True over-fire there, so the target is
-     *            required too
+     * <p>
+     * ⭐ An <b>opaque</b> unit (no v1 classification — a native-only construct) still contributes
+     * every reference it reads, collected from its underlying node: a sibling guard in a mixed
+     * Check must never silently read as non-silencing (wave-43 review finding; over-approximation
+     * is safe — it can only surface more guards, never hide one).
+     * </p>
      */
-    private static void collectSubstantive(CheckCondition node, Set<String> out,
-            Set<String> pythonRequired, boolean applyCarveOut, boolean negated)
+    private static void collectSubstantive(CheckExprUnits.Unit unit, Set<String> out,
+            Set<String> pythonRequired, boolean applyCarveOut)
     {
-        switch (node)
+        String op = unit.operator();
+        if ("var_exists".equals(op) || "var_not_exists".equals(op))
         {
-        case CheckConditionAll all -> all.getConditions()
-                .forEach(c -> collectSubstantive(c, out, pythonRequired, applyCarveOut, negated));
-        case CheckConditionAny any -> any.getConditions()
-                .forEach(c -> collectSubstantive(c, out, pythonRequired, applyCarveOut, negated));
-        case CheckConditionNot not -> collectSubstantive(not.getCondition(), out, pythonRequired,
-                applyCarveOut, !negated);
-        case CheckConditionLeaf leaf ->
-        {
-            String op = leaf.getOperator();
-            if ("var_exists".equals(op) || "var_not_exists".equals(op))
-            {
-                return;
-            }
-            boolean carved = applyCarveOut && PYTHON_GUARD_REQUIRED_OPERATORS.contains(op);
-            // D-8: for the uniqueness pair the `name` is member 0 of one undifferentiated key
-            // tuple, so it takes the comparator verdict in every polarity; only
-            // is_inconsistent_across_dataset still distinguishes its target.
-            boolean positionBlind = carved && POSITION_BLIND_OPERATORS.contains(op);
-            Set<String> targetPosition = carved && (negated || positionBlind) ? pythonRequired
-                    : out;
-            Set<String> comparatorPosition = carved ? pythonRequired : out;
-            if (leaf.getName() != null)
-            {
-                targetPosition.add(leaf.getName());
-            }
-            if (leaf.getNames() != null)
-            {
-                targetPosition.addAll(leaf.getNames());
-            }
-            if (!Boolean.TRUE.equals(leaf.getValueIsLiteral()))
-            {
-                collectValueTokens(leaf.getValue(), comparatorPosition);
-            }
+            return;
         }
-        case CheckConditionExpression expression ->
+        if (op == null)
         {
-            CheckCondition loweredView = loweredOrNull(expression);
-            if (loweredView != null)
+            collectRefNames(unit.node(), out);
+            return;
+        }
+        boolean carved = applyCarveOut && PYTHON_GUARD_REQUIRED_OPERATORS.contains(op);
+        // D-8: for the uniqueness pair the `name` is member 0 of one undifferentiated key
+        // tuple, so it takes the comparator verdict in every polarity; only
+        // is_inconsistent_across_dataset still distinguishes its target.
+        boolean positionBlind = carved && POSITION_BLIND_OPERATORS.contains(op);
+        Set<String> targetPosition = carved && (unit.negated() || positionBlind) ? pythonRequired
+                : out;
+        Set<String> comparatorPosition = carved ? pythonRequired : out;
+        if (unit.name() != null)
+        {
+            targetPosition.add(unit.name());
+        }
+        targetPosition.addAll(unit.names());
+        collectValueTokens(unit.value(), comparatorPosition);
+    }
+
+
+    /**
+     * The non-literal value tokens of a unit's comparator side: a reference's name, or the members
+     * of a list operand (the v1 array form collected its textual members; the expression form
+     * spells references as {@code Ref}s and keeps quoted members as string literals — both are
+     * collected, matching the leaf-era over-approximation).
+     */
+    private static void collectValueTokens(@org.jspecify.annotations.Nullable Expr value,
+            Set<String> out)
+    {
+        switch (value)
+        {
+        case null ->
+        {
+            // No comparator side.
+        }
+        case Expr.Ref r -> out.add(r.name());
+        case Expr.Lit lit ->
+        {
+            if (lit.kind() == Expr.LitKind.LIST && lit.value() instanceof List<?> items)
             {
-                collectSubstantive(loweredView, out, pythonRequired, applyCarveOut, negated);
-            }
-            else
-            {
-                // Native-only, presence-free — but its variable reads are still SUBSTANTIVE
-                // uses: collect the Ref names from the raised Expr directly, so a sibling
-                // guard in a mixed Check can never silently read as non-silencing (wave-43
-                // review finding; over-approximation is safe — it can only surface more
-                // guards, never hide one).
-                DualFormCheckNode.collectRefNames(expression.expr(), out);
+                for (Object item : items)
+                {
+                    switch (item)
+                    {
+                    case Expr.Ref r -> out.add(r.name());
+                    case Expr.Lit il when il.kind() == Expr.LitKind.STRING -> out
+                            .add((String) il.value());
+                    default ->
+                    {
+                        // Non-textual members carry no variable use.
+                    }
+                    }
+                }
             }
         }
         default ->
         {
-            // A constant carries no leaf operands to scan.
+            // Calls (accessors) in value position carry no plain variable token.
         }
         }
     }
 
 
-    private static void collectValueTokens(JsonNode value, Set<String> out)
+    /** Every reference name in a subtree — the opaque-unit over-approximation. */
+    private static void collectRefNames(Expr e, Set<String> out)
     {
-        if (value == null)
+        switch (e)
         {
-            return;
+        case Expr.Ref r -> out.add(r.name());
+        case Expr.Call c ->
+        {
+            c.args().forEach(a -> collectRefNames(a, out));
+            c.kwargs().values().forEach(v -> collectRefNames(v, out));
         }
-        if (value.isTextual())
+        case Expr.And a -> a.parts().forEach(p -> collectRefNames(p, out));
+        case Expr.Or o -> o.parts().forEach(p -> collectRefNames(p, out));
+        case Expr.Not n -> collectRefNames(n.inner(), out);
+        case Expr.Binary b ->
         {
-            out.add(value.asText());
+            collectRefNames(b.left(), out);
+            collectRefNames(b.right(), out);
         }
-        else if (value.isArray())
+        case Expr.Lit lit ->
         {
-            for (JsonNode item : value)
+            if (lit.kind() == Expr.LitKind.LIST && lit.value() instanceof List<?> items)
             {
-                if (item.isTextual())
+                for (Object item : items)
                 {
-                    out.add(item.asText());
+                    if (item instanceof Expr ie)
+                    {
+                        collectRefNames(ie, out);
+                    }
                 }
             }
+        }
         }
     }
 }

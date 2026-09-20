@@ -1,6 +1,7 @@
 package net.cumba.corej.core.expr.convert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,20 +38,23 @@ class SplitByOperationCorpusGateTest
 
     private static final Path SRC_CHECKS = Path.of("rules-src", "checks");
 
-    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
-    // which this subset deliberately is not. Enforced internally over the whole corpus.
+    /** Floor against a vacuously-green scan over an empty or mis-pointed corpus. */
+    // 3700 -> 3400 (PLAN-retire-core-family phase 6): rules-src/checks 3932 -> 3435.
+    private static final int MIN_SCANNED = 3400;
 
     @Test
     void noRuleDeclaresASplitByOperation() throws IOException
     {
         List<String> offenders = new ArrayList<>();
+        int scanned = 0;
         try (Stream<Path> files = Files.walk(SRC_CHECKS))
         {
             for (Path file : files.filter(p -> p.getFileName().toString().endsWith(".yaml"))
                     .sorted().toList())
             {
+                scanned++;
                 JsonNode rule = YAML.readTree(Files.readString(file));
-                JsonNode ops = rule.get("Operations");
+                JsonNode ops = rule.get("Bindings");
                 if (ops == null || !ops.isArray())
                 {
                     continue;
@@ -66,8 +70,10 @@ class SplitByOperationCorpusGateTest
                 }
             }
         }
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        assertTrue(scanned >= MIN_SCANNED,
+                "scanned only " + scanned + " rules-src checks (floor " + MIN_SCANNED
+                        + ") — the gate ran over the wrong directory, which would make an empty"
+                        + " offender list vacuous");
         assertEquals(List.of(), offenders,
                 "`split_by` is not an operation (it is a per-row value function with no"
                         + " OperationType by architecture — a declaration cannot load). Author"

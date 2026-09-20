@@ -204,7 +204,7 @@ class MetadataProviderDecoratorDelegationGuardTest
             "MockLibraryProvider.java", Role.LEAF, //
             // the .cdt scenario harness
             "ScenarioDeclaredScopeProvider.java", Role.DECORATOR, //
-            // test double; a second copy of the same class also lives in cumba-corej
+            // test double; a second copy of the same class also lives in the engine repo
             "StubMetadataProvider.java", Role.LEAF);
 
     /**
@@ -213,8 +213,8 @@ class MetadataProviderDecoratorDelegationGuardTest
      * <p>
      * ⚠⚠ <b>This is the SIBLING half of the guard, and it exists because the split cut the
      * population in two.</b> In the coreJ monorepo one copy of this test covered all eight
-     * {@code MetadataProvider} implementations. Five live in cumba-corej and are policed by that
-     * repo's copy; <b>four</b> are pinned above and live here, under {@code src/test} — the
+     * {@code MetadataProvider} implementations. Five live in the engine repo and are policed by
+     * that repo's copy; <b>four</b> are pinned above and live here, under {@code src/test} — the
      * monorepo's three harness classes plus {@code StubMetadataProvider}, of which each repo keeps
      * its own copy, which is why 5 + 4 still reconciles with eight distinct classes. No build ever
      * checks out both repos at once, so neither copy can see the other's.
@@ -222,8 +222,8 @@ class MetadataProviderDecoratorDelegationGuardTest
      *
      * <p>
      * ⚠ <b>The two copies must be kept in step by hand.</b> A delegation rule added to one and not
-     * the other silently stops applying to half the population. The counterpart is
-     * {@code cumba-corej/lib/cumba-corej-core/src/test/java/net/cumba/corej/core/exec/
+     * the other silently stops applying to half the population. The counterpart is the engine
+     * repository's {@code corej-core/src/test/java/net/cumba/corej/core/exec/
      * MetadataProviderDecoratorDelegationGuardTest.java}, whose floors are 5 / 2.
      * </p>
      *
@@ -378,7 +378,7 @@ class MetadataProviderDecoratorDelegationGuardTest
             // exactly that: it sits on the LIBRARY slot for every ADaM structure=/subclass=
             // scenario without a define block.
             //
-            // ⚠⚠ The cumba-corej copy of this guard must NOT copy this promotion. Its population
+            // ⚠⚠ The engine-side copy of this guard must NOT copy this promotion. Its population
             // contains DefineXmlMetadataProvider, which does not delegate getCodelist, so the row
             // stays NOT_YET_ENFORCED there — that class is not in THIS repo's scan roots, and
             // neither is CompanionDomainsProvider. This is a real, measured divergence between
@@ -392,7 +392,7 @@ class MetadataProviderDecoratorDelegationGuardTest
                             + "\\s+%s\\s*\\(\\s*String\\s+(\\w+)\\s*\\)"),
             // ⭐⭐ Re-derived 2026-09-08 — the eleven entries below were NOT_YET_ENFORCED rows
             // whose excuse read "not delegated by DefineXmlMetadataProvider", copied verbatim
-            // from the cumba-corej ledger. That class is not in this repo's scanned population
+            // from the engine-side ledger. That class is not in this repo's scanned population
             // and never has been, so each row excused a non-delegation that nothing here
             // performs: the guard had stopped guarding eleven methods, silently. Measured against
             // the source instead of the excuse, CompositeMetadataProvider and
@@ -404,7 +404,7 @@ class MetadataProviderDecoratorDelegationGuardTest
             // names the class, while keeping a wrong excuse is silent. Prefer promotion; the build
             // corrects you.
             //
-            // ⛔ The cumba-corej copy must NOT copy these promotions. Its population really does
+            // ⛔ The engine-side copy must NOT copy these promotions. Its population really does
             // contain DefineXmlMetadataProvider, so its rows are correct as they stand and the two
             // ledgers are meant to differ — see INHERITABLE_DEFAULTS.
             //
@@ -442,7 +442,7 @@ class MetadataProviderDecoratorDelegationGuardTest
             // concept ids on the rulespec path, silently. Delegated 2026-09-08; both decorators
             // here now declare it, so the excuse had nothing left to excuse.
             //
-            // ⛔ The cumba-corej copy must NOT copy this promotion: its population contains
+            // ⛔ The engine-side copy must NOT copy this promotion: its population contains
             // DefineXmlMetadataProvider, which does not delegate this method, and that class is
             // not under THIS repo's SCAN_ROOTS. The ledgers differ because the populations do.
             capability("getCodelistCodeMap(String, String)", MAP_OF_TWO_STRINGS));
@@ -505,7 +505,7 @@ class MetadataProviderDecoratorDelegationGuardTest
      * <p>
      * ⚠⚠ <b>Every note here was re-derived over THIS repo's population on 2026-09-08</b> — the two
      * decorators {@link #PINNED} names, found under {@link #SCAN_ROOTS}. Until then the block was a
-     * verbatim copy of the cumba-corej ledger: of its fourteen {@link Why#NOT_YET_ENFORCED} rows,
+     * verbatim copy of the engine-side ledger: of its fourteen {@link Why#NOT_YET_ENFORCED} rows,
      * twelve named {@code DefineXmlMetadataProvider} — a class that has never existed in this repo
      * and that no scan here can reach — and eleven named nothing else. The excuses were true THERE
      * and vacuous HERE, so eleven capability-shaped defaults that both decorators <em>do</em>
@@ -529,7 +529,7 @@ class MetadataProviderDecoratorDelegationGuardTest
      * </p>
      *
      * <p>
-     * ⛔ <b>Do not re-sync this block with the cumba-corej copy in either direction.</b> The two
+     * ⛔ <b>Do not re-sync this block with the engine-side copy in either direction.</b> The two
      * ledgers differ because the two populations differ; that is the fixed state, not drift.
      * </p>
      */
@@ -991,15 +991,15 @@ class MetadataProviderDecoratorDelegationGuardTest
      * Where the required set is derived FROM, named for the assertion messages.
      *
      * <p>
-     * ⚠ In cumba-corej this is a {@code Path} to {@code MetadataProvider.java}. Here it cannot be:
-     * the interface belongs to {@code cumba-corej-core}, a different repository, and this repo's
-     * build never checks that one out. The derivation reads the compiled interface off the test
-     * classpath instead — see {@link #declaredDefaultSignatures()}.
+     * ⚠ Engine-side this is a {@code Path} to {@code MetadataProvider.java}. Here it cannot be: the
+     * interface belongs to {@code corej-core}, a different repository, and this repo's build never
+     * checks that one out. The derivation reads the compiled interface off the test classpath
+     * instead — see {@link #declaredDefaultSignatures()}.
      * </p>
      */
     private static String metadataProviderSource()
     {
-        return MetadataProvider.class.getName() + " (compiled, from cumba-corej-core on the "
+        return MetadataProvider.class.getName() + " (compiled, from corej-core on the "
                 + "test classpath)";
     }
 
@@ -1007,7 +1007,7 @@ class MetadataProviderDecoratorDelegationGuardTest
      * Every {@code default} declared on {@link MetadataProvider}, as {@code name(Type, Type)}.
      *
      * <p>
-     * ⚠ <b>Derived by REFLECTION here, where cumba-corej's copy parses the source file.</b> The
+     * ⚠ <b>Derived by REFLECTION here, where the engine-side copy parses the source file.</b> The
      * interface lives in another repository that this build never checks out, so there is no source
      * to read. {@code Method.isDefault()} answers the same question the source parse asks and
      * cannot be broken by a formatting change — but it sees only what the compiler kept, so the two

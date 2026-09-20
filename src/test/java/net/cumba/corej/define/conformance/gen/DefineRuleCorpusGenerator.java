@@ -63,11 +63,10 @@ import net.cumba.corej.define.conformance.rule.RuleSet;
  *
  * <p>
  * The <em>source</em> path resolves against the module base directory, so the working directory
- * must be the module root — the build's exec binding sets it, and the internal
- * {@code regen-rules-define-corpus} workflow, which is not distributed with this repository,
- * {@code cd}s there. The <em>output</em> directory is {@link #target()}; it is
- * {@code target/rules-define/} under the build, and nothing generated is committed any more
- * ({@code plans/done/PLAN-rules-corpus-build-integration.md}).
+ * must be the module root — the build's exec binding sets it, and
+ * {@code scripts/regen-rules-define-corpus.sh} {@code cd}s there. The <em>output</em> directory is
+ * {@link #target()}; it is {@code target/rules-define/} under the build, and nothing generated is
+ * committed any more ({@code plans/done/PLAN-rules-corpus-build-integration.md}).
  * </p>
  */
 public final class DefineRuleCorpusGenerator
@@ -148,7 +147,8 @@ public final class DefineRuleCorpusGenerator
         // and the packaged rule a close mirror of its authored YAML.
         // Built through JsonMapper.builder() rather than the setters: both
         // ObjectMapper.setSerializationInclusion and the builder's serializationInclusion
-        // shorthand are deprecated in Jackson 2.22, and this module compiles with -Werror.
+        // shorthand are deprecated in Jackson 2.22, and this project builds with -Xlint:all
+        // under maven.compiler.failOnWarning=true.
         // defaultPropertyInclusion(Value) is what the shorthand delegates to; Value.construct
         // (NON_NULL, NON_NULL) reproduces its value/content pair exactly.
         ObjectMapper mapper = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT)

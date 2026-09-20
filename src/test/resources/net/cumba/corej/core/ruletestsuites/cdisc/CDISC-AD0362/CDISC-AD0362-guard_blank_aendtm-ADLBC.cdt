@@ -1,0 +1,9 @@
+#!RuleTest
+#test CDISC-AD0362 expect=noViolation domain=ADLBC
+# Rule:Description: The value of ASTDTM is greater than the value of AENDTM, considering only those rows on which both variables are populated
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): AENDTM - the low operand - is a BLANK cell in a numeric ADaM datetime column (MissingValue.MIS), and the not empty(AENDTM) guard silences the rule despite a populated ASTDTM. If this FIRES, the order-flip guard was deleted: post-6c totality positions MIS below every number, so ASTDTM > MIS becomes true."
+dataset ADLBC
+col ASTDTM type=Num
+col AENDTM type=Num
+---
+1893456000 | .

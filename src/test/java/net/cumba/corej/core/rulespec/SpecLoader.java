@@ -57,7 +57,7 @@ public final class SpecLoader
     private static final List<String> DM_DEFAULT_ROW_KEY = List.of("STUDYID", "USUBJID");
 
     /** Shared rule source, resolved against the module basedir (Surefire working directory). */
-    // The shipped native corpus lives in the sibling corej-cdisc-rules module
+    // The shipped native corpus lives in the sibling corej-rules module
     // (PLAN-engine-rules-decoupling); ../ resolves from this module's basedir (surefire cwd).
     private static final Path RULES_NATIVE = CorpusPaths.rules();
 

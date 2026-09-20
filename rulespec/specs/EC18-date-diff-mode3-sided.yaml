@@ -26,20 +26,11 @@ rule:
   Match_Datasets:
     - Name: EX
       Keys: [USUBJID]
-  Operations:
-    - id: $days
-      operator: date_diff_days
-      name: PMDTC
-      minuend_domain: PM
-      minuend_match: [USUBJID, "--SPID"]
-      domain: EX
-      group: [USUBJID]
-      reference: EXSTDTC
-      offset: "1"
+  Bindings:
+  - name: "$days"
+    expression: 'date_diff_days(PMDTC, domain="EX", reference="EXSTDTC", offset="1", minuend_domain="PM", minuend_match=[USUBJID, "--SPID"], group=[USUBJID])'
   Check:
-    all:
-      - {name: TFDETECT, operator: non_empty}
-      - {name: TFDETECT, operator: not_equal_to, value: $days}
+    expression: 'not empty(TFDETECT) and TFDETECT != $days'
   Outcome:
     Message: TFDETECT does not equal (SPID-matched PMDTC - earliest EXSTDTC) + 1.
     Output_Variables: [$days, TFDETECT]

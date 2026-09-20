@@ -21,12 +21,11 @@ rule:
     Domains: {Include: [SUPP--]}
   Requirements:
     Variables: {All: [QNAM]}
-  Operations:
-    - id: $variable_names
-      operator: variable_names
+  Bindings:
+  - name: "$variable_names"
+    expression: 'variable_names()'
   Check:
-    all:
-      - {name: QNAM, operator: is_contained_by, value: $variable_names}
+    expression: 'QNAM in $variable_names'
   Outcome:
     Message: QNAM equals a variable name defined in another domain or the SDTM.
     Output_Variables: [QNAM]

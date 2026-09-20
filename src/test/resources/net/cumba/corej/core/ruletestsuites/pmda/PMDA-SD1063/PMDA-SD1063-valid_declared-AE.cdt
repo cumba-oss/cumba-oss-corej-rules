@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-SD1063 expect=noViolation domain=AE
+#note "Mirrors rulespec PMDA-SD1063-declared.yaml - the NON-FIRING arm of the A/B pair. The Define-XML declares BOTH submitted datasets, so nothing is missing and the correct answer is zero violations. This is the guard against the one input shape that produces a silently WRONG verdict rather than a skip: a define_dataset_names() that degraded to an EMPTY list would make 'ds_name(DATA) not in $define_datasets' true for every dataset - the firing sibling would stay green (it expects a violation anyway) while THIS scenario goes 0 -> 1 and turns red."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD1063-define-both.xml
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+---
+S1 | VS | 001 | 1 | SYSBP

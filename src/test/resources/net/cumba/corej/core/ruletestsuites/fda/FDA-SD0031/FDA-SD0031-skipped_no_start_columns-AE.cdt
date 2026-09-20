@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD0031 expect=skipped domain=AE
-#note "None of the three start-point columns (AESTDTC/AESTRF/AESTRTPT) exists, so Requirements.Variables.Any [--STDTC, --STRF, --STRTPT] gates the rule out -> auditable skip. Row 1 is violating-shaped (AEENDTC populated, no start column) to prove ONLY the gate silences. Verdict 2-1 (T1-14/19/22): the absence is itself reportable; FDA-SD9720 reports it in the six packages shared with FDA-SD0022, FDA-SD9721 in the four SENDIG-only ones."
+#note "None of the three start-point columns (AESTDTC/AESTRF/AESTRTPT) exists, so GROUP 1 of Requirements.Variables.Any [[--STDTC, --STRF, --STRTPT], [--ENDTC, --ENRF, --ENRTPT]] is unmet and the rule gates out -> auditable skip. Group 2 IS met here -- AEENDTC is declared -- so this file pins the GROUP-1 half of the gate only; its counterpart FDA-SD0031-skipped_no_end_columns-AE.cdt pins group 2. Row 1 is violating-shaped (AEENDTC populated, no start column) to prove ONLY the gate silences. Verdict 2-1 (T1-14/19/22): the absence is itself reportable; FDA-SD9720 reports it in the six packages shared with FDA-SD0022, FDA-SD9721 in the four SENDIG-only ones."
 #library standard=sdtmig version=3-4
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"

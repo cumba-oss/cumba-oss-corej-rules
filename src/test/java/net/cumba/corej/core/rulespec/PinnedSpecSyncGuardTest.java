@@ -30,7 +30,7 @@ class PinnedSpecSyncGuardTest
 
     private static final Path SPECS = Path.of("rulespec", "specs");
 
-    // The authoring corpus lives in the sibling corej-cdisc-rules module; ../ resolves from this
+    // The authoring corpus lives in the sibling corej-rules module; ../ resolves from this
     // module's basedir (surefire cwd), same as SpecLoader / NoStaleFixtureGuardTest.
     private static final Path CHECKS = Path.of("rules-src", "checks");
 

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1119 expect=skipped domain=CO
+#note "COUNTERPART of PMDA-SD1119-valid_no_permissible_columns-CO.cdt, which discriminates GROUP 1; this one discriminates GROUP 2 of Requirements.Variables.Any (review round 2, 2026-09-18 -- group 2 had no scenario in EITHER twin, because all nine .cdt files under the two SD1119 directories declared both RDOMAIN and IDVAR, so deleting group 2 from the YAML changed no verdict anywhere). Neither RDOMAIN nor IDVAR is declared here, so group 2 [RDOMAIN, IDVAR] is unmet and the rule is GATED OFF: SKIPPED, not a silent vacuous pass. Group 1 IS met AND POPULATED -- COGRPID is declared and carries GRP-1 -- so the group-1 gate cannot account for the silence and only group 2 can. Delete group 2 from rules-src/checks/PMDA/PMDA-SD1119.yaml and this scenario REDS: the rule binds, and (not empty(RDOMAIN) or not empty(IDVAR)) is a POSITIVE disjunction over two ABSENT columns which EC-43 folds to all-missing, so the verdict becomes noViolation, not skipped. Both RDOMAIN and IDVAR are Permissible in CO (SDTMIG 3.4 library metadata, core=Perm), so a CO dataset carrying neither is legal SDTM and still must not be reported against. ADAPTED-FROM fda/FDA-SD1119/FDA-SD1119-skipped_no_related_record_columns-CO.cdt (verbatim, pin included)."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col COGRPID  type=Char label="Group ID"
+col COVAL    type=Char label="Comment"
+---
+S1 | CO | 001 | 1 | GRP-1 | General comment

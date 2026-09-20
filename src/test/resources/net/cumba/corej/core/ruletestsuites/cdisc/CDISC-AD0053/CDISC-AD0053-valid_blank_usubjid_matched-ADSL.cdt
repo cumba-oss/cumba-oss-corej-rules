@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0053 expect=noViolation domain=ADSL
+# Rule:Description: The value of USUBJID is not present in SDTM.DM
+#note "THE D110f(ii) DELTA, PINNED. Row 1 carries a BLANK USUBJID and DM carries a row with a blank USUBJID too, so the left join MATCHES on the blank key and DM._matched_ is true -> no fire. Under the retired empty(DM.USUBJID) proxy this same data FIRED, because the merged DM.USUBJID cell is itself blank and the proxy cannot tell 'no partner' from 'a partner whose key is blank'. Row 2 is an ordinary matched subject and pins that the scenario is not vacuous on the normal path."
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 |
+CDISCPILOT01 | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM |
+CDISCPILOT01 | DM | 01-701-1015
+---

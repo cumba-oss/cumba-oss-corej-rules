@@ -1,0 +1,26 @@
+#!RuleTest
+#test FDA-SE0083 expect=noViolation domain=TF
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv, D95f(iii)): subject 001 HAS DS records (so the USUBJID containment gate passes) but every DSSTDY cell is blank, so max() over the group yields EmptyResult.MISSING and the not empty($max_dsstdy) guard - the guard on the operand that actually goes missing, not the TFDETECT gate - silences the rule despite a populated TFDETECT. If this FIRES, the order-flip guard was deleted: post-6c totality makes TFDETECT > MISSING true."
+#library standard=sendig version=3-1-1
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | TUMEXAM | 200
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDY  type=Num  label="Study Day of Disposition"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | .
+S1 | DS | 001 | 2 | MOVED TO RECOVERY  | RECOVERY           | .

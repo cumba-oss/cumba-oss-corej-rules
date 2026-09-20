@@ -21,13 +21,11 @@ rule:
     Domains: {Include: [ADAE]}
   Requirements:
     Variables: {All: [SRCDOM]}
-  Operations:
-    - id: $sdtm_domains
-      operator: standard_domains
+  Bindings:
+  - name: "$sdtm_domains"
+    expression: 'standard_domains()'
   Check:
-    all:
-      - {name: SRCDOM, operator: non_empty}
-      - {name: SRCDOM, operator: is_not_contained_by, value: $sdtm_domains}
+    expression: 'not empty(SRCDOM) and SRCDOM not in $sdtm_domains'
   Outcome:
     Message: SRCDOM has a value that is not an SDTM domain name or null.
     Output_Variables: [SRCDOM]

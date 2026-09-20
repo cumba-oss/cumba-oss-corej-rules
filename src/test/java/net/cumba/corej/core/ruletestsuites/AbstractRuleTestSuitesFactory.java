@@ -54,8 +54,8 @@ import org.junit.jupiter.api.TestFactory;
 /**
  * Base for the per-family {@code @TestFactory} classes that replay the {@code .cdt} rule-test
  * scenarios shipped in this suites module. The scenario tree is <em>family-based</em>: each rule
- * family (cdisc / core / draft / fda / pmda) owns one resource subtree named after it, and its
- * factory resolves rules from that family's assembled packages
+ * family (cdisc / draft / fda / pmda) owns one resource subtree named after it, and its factory
+ * resolves rules from that family's assembled packages
  * ({@code target/rules/rules-<family>-*.json}), loaded per standard+version: the executed view is
  * the declared standard's package when the scenario declares one, else a deterministic canonical
  * fallback (see {@code resolveRule}).
@@ -98,8 +98,8 @@ abstract class AbstractRuleTestSuitesFactory
      * <p>
      * ⚠ In the coreJ monorepo this resolved a SIBLING MODULE's directory,
      * {@code <repoRoot>/lib/corej-core/dictionaries}. The split put corej-core in the separate
-     * cumba-corej repository, which this repo's build never checks out, so the bundle is carried
-     * here as a test resource instead — byte-identical, 7 files, 60 KB.
+     * engine repository, which this repo's build never checks out, so the bundle is carried here as
+     * a test resource instead — byte-identical, 7 files, 60 KB.
      * </p>
      *
      * <p>
@@ -142,7 +142,7 @@ abstract class AbstractRuleTestSuitesFactory
     /**
      * The family key — simultaneously the resource-subtree name under the suites scenario root and
      * the assembled-package prefix ({@code rules-<family>-*.json}): {@code "cdisc"},
-     * {@code "core"}, {@code "draft"}, {@code "fda"} or {@code "pmda"}.
+     * {@code "draft"}, {@code "fda"} or {@code "pmda"}.
      *
      * <p>
      * ⚠ The rule-id prefix does <b>not</b> name the family: the CDISC-SEND rules are
@@ -231,7 +231,7 @@ abstract class AbstractRuleTestSuitesFactory
     /** Cheap prelude scan for the {@code #test <coreId> …} directive; null if absent. */
     // ⛔ Package-visible, NOT private, since 2026-09-19: ScenarioFilenameBindsItsOwnRuleTest
     // asserts the filename/directory/family invariant against the id THIS method reads, so that
-    // there is ONE `#test` parser and not two. The H-5 finding on the internal twin's
+    // there is ONE `#test` parser and not two. The H-5 finding on
     // OrderFlipGuardCoverageRatchetTest is exactly what a second copy costs: that ratchet called
     // RuleTestCdt#hasShebang while this class filtered with a private re-implementation of its
     // own, so the guard used the predicate the factory did not.
@@ -271,22 +271,45 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
 
-    /** Streams the first non-empty line (BOM-tolerant) and checks for the shebang. */
+    /**
+     * Whether the file is a {@code #!RuleTest} scenario — <b>the format's own predicate</b>.
+     *
+     * <p>
+     * ⚠ This DELEGATES to {@link RuleTestCdt#hasShebang(String)} on purpose (review round 3, H-5).
+     * It used to re-implement it over a {@link BufferedReader}, which left TWO predicates deciding
+     * the same question: {@code OrderFlipGuardCoverageRatchetTest} gated its guard fixtures through
+     * {@code RuleTestCdt#hasShebang} — and said so in its javadoc — while the suite this factory
+     * builds admitted files through the local copy. The two disagreed on BOM placement and on
+     * U+2028 / U+0085, which {@code String.split("\\R")} honours and {@code readLine()} does not;
+     * every known divergence happened to land in the safe direction (ratchet red, factory running),
+     * but "happens to be safe" is not a property anyone can rely on. The DECISION is now made in
+     * exactly one place.
+     * </p>
+     *
+     * <p>
+     * ⚠ Only the leading blank lines plus the first non-empty one are read, rather than
+     * {@code Files.readString}. Whole-file reading would have been shorter, but it widens the I/O
+     * failure surface: a malformed UTF-8 byte ANYWHERE in a scenario would then throw, be caught
+     * here, and SILENTLY drop that scenario from the suite — the very "counted a file the suite
+     * never executes" hazard the ratchet exists to catch, inverted. Reading only the head keeps the
+     * failure surface exactly where it was before the delegation.
+     * </p>
+     */
     private static boolean hasShebang(Path aPath)
     {
         try (BufferedReader r = Files.newBufferedReader(aPath, UTF_8))
         {
+            StringBuilder head = new StringBuilder();
             String line;
             while ((line = r.readLine()) != null)
             {
-                String t = line.replace("﻿", "").trim();
-                if (t.isEmpty())
+                head.append(line).append('\n');
+                if (!line.isBlank())
                 {
-                    continue;
+                    break; // the first non-empty line is all the predicate can need
                 }
-                return RuleTestCdt.SHEBANG.equals(t);
             }
-            return false;
+            return RuleTestCdt.hasShebang(head.toString());
         }
         catch (IOException _)
         {
@@ -400,7 +423,7 @@ abstract class AbstractRuleTestSuitesFactory
         // keeps passing while testing nothing. `expect=skipped` is the positive form: the
         // deliberate absent-optional-variable scenarios assert the skip instead of borrowing
         // `noViolation`.
-        // Phase 4b: the verdict judgement moved to ExecutionVerdictCheck (cumba-corej-ruletest),
+        // Phase 4b: the verdict judgement moved to ExecutionVerdictCheck (the ruletest module),
         // so the parse side and the assert side can no longer disagree — they used to live in two
         // repos, and an `expect=` constant added on one side fell through this switch SILENTLY.
         // ⚠ Java does NOT require an arrow switch STATEMENT over an enum to be exhaustive, so

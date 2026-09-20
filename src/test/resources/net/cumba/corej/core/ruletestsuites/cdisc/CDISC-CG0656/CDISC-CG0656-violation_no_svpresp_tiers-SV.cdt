@@ -1,0 +1,31 @@
+#!RuleTest
+#test CDISC-CG0656 expect=violation domain=SV
+#note "B2 CONTROL of PLAN-unplanned-visit-cascade: no SVPRESP column. Under the pre-cascade empty(SVPRESP) form row 1 FIRED - an absent column folds to all-empty and every TV-matched visit counted as unplanned, the flood this plan retires; under the cascade row 1 is planned (blank SVUPDES, neutral name) and SILENT. Row 2 (UNSCHEDULED marker) and row 3 (populated SVUPDES) are genuinely unplanned with a TV-matched VISITNUM -> fire. Row 4 is unplanned but not in TV -> clean. This fixture reds under the old form (count 3, not 2)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-1015
+#expectViolationAt row=3 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2 | BASELINE | 
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 2 | UNSCHEDULED 1 | 
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 2 | BASELINE | AD HOC EXTRA VISIT
+CDISCPILOT01 | SV | 01-701-1015 | 4 | 99 | UNPLANNED 9 | 
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

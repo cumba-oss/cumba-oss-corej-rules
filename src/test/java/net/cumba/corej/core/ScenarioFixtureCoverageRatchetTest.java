@@ -23,9 +23,11 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * Moving corpus generation into the build makes the {@code .cdt} scenario suites the thing that
- * catches a packaging change: a rule whose released form drifts fails its scenario. That net covers
- * <b>3,020 of 3,808 rules — 79.3%</b>. For the other <b>788</b> a packaging change ships with
- * nothing firing at all.
+ * catches a packaging change: a rule whose released form drifts fails its scenario. That net
+ * covered <b>3,020 of 3,808 rules — 79.3%</b> when this test was written. ⚠ <b>Re-measured
+ * 2026-09-19: 2,867 of 3,411 — 84.1%</b>, leaving <b>544</b> for which a packaging change ships
+ * with nothing firing at all. The prose is dated on purpose; {@link #MAX_UNCOVERED} is the pin, and
+ * it is the one to read.
  * </p>
  *
  * <p>
@@ -57,9 +59,11 @@ class ScenarioFixtureCoverageRatchetTest
     /**
      * The 788 measured on 2026-09-02 against 3,808 shipped ids; 787 since 2026-09-08, when
      * CDISC-CG0155 gained its four scenarios (PLAN-codelist-terms-returntype.md P1, folded into
-     * P4); 764 since 2026-09-14, re-derived against 3,930 shipped and 3,166 covered; <b>761 since
-     * later that day</b>, when CDISC-SEND-0221, -0318 and -0388 gained their first scenarios
-     * (PLAN-column-type-conformance carried-forward) — 3,930 shipped, 3,169 covered. <b>Shrink
+     * P4); 764 since 2026-09-14, re-derived against 3,930 shipped and 3,166 covered; 761 since
+     * later that day, when CDISC-SEND-0221, -0318 and -0388 gained their first scenarios
+     * (PLAN-column-type-conformance carried-forward) — 3,930 shipped, 3,169 covered; <b>758 since
+     * 2026-09-16</b>, when CDISC-CG0068, CDISC-CG0148 and CDISC-SEND-0305 gained their first
+     * scenarios (the typed-equality probes of RUNBOOK-phase3c-corpus-rewrite.md §6.2). <b>Shrink
      * only.</b> If a change genuinely retires rules, lower this; never raise it.
      *
      * <p>
@@ -70,53 +74,110 @@ class ScenarioFixtureCoverageRatchetTest
      * granted. <b>Re-derive it after any wave that adds scenarios</b>, the way the other ratchets
      * are re-derived; it does not maintain itself.
      * </p>
-     *
-     * <p>
-     * &#9888;&#9888; <b>683 since 2026-09-16, re-derived for THIS repository.</b> Every figure
-     * above was measured against the <i>internal</i> corpus, which ships the CORE family; this
-     * repository does not redistribute it. Carrying 761 across the extraction therefore handed the
-     * subset <b>78 rules of ceiling nobody granted</b> &mdash; the very erosion the paragraph above
-     * calls a defect, arriving in one step instead of drifting there. Measured here through the
-     * generated manifest, exactly as {@link #shippedRuleIds()} reads it: 3,396 shipped, 2,713
-     * covered, <b>683 uncovered</b>, 0 fixture-only.
-     * </p>
-     *
-     * <p>
-     * &#9888; The asymmetry that hid it: the extraction correctly <i>relaxed</i> every corpus-size
-     * <b>floor</b> for the subset (see the comment in the test body, and the sibling ratchets),
-     * because a smaller corpus can never reach the internal population. This is a <b>ceiling</b>,
-     * so the subset needed it moved in the opposite direction &mdash; <i>down</i> &mdash; and
-     * nothing in a "relax the floors" sweep prompts that.
-     * </p>
-     *
-     * <p>
-     * &#11088; <b>683 &rarr; 566, re-derived 2026-09-19</b> by {@code PLAN-retire-core-family.md}
-     * phase 8f, which is deliberately run <i>after</i> phase 8b's port and never before it: 8b
-     * <i>adds</i> rules and scenarios, so measuring first would have pinned a number the same
-     * commit invalidated. The <b>566 is this assertion's own output</b>, read back after probing
-     * the constant to 0; the surrounding triple reconciles with it exactly &mdash; 47 packages,
-     * 3,417 shipped, 2,851 covered, 566 uncovered, 0 fixture-only. The movement decomposes exactly:
-     * 683 uncovered before the port, the 21 mints all arrived <i>with</i> scenarios so they added
-     * none, and 8b's 407 ported scenarios gave <b>117</b> already-shipped rules their first fixture
-     * &mdash; 683 &minus; 117 = 566.
-     * </p>
-     *
-     * <p>
-     * &#9888; Zero headroom, and that is the point: before the port the actual was <b>exactly
-     * 683</b> against a ceiling of 683. The mints-only intermediate step reddened this test at 704,
-     * which is what proved the ceiling was live rather than slack.
-     * </p>
-     *
-     * <p>
-     * &#9873; The internal twin's value is <b>544</b>, not 566, and the 22 are accounted for: this
-     * tree ships 6 rules the internal one deleted (the {@code -A} siblings retired by
-     * {@code PLAN-unplanned-visit-cascade.md} phase 2, all covered here) and lacks the 126
-     * internal-only scenarios other plans authored, whose OSS port is owed by
-     * {@code PLAN-typed-engine-oss-port.md}. &#8658; Expect the two to converge on the same number
-     * only once that plan lands; do not "align" this constant to 544 by hand.
-     * </p>
      */
-    private static final int MAX_UNCOVERED = 566;
+    // 758 -> 749 on 2026-09-18 (PLAN-unplanned-visit-cascade phase 4): nine edited rules gained
+    // their first scenarios (CDISC-CG0214, CG0215, CG0655, CG0656, CG0657, CG0658, CORE-000333,
+    // CORE-000501, CORE-000843). The eight retired -A siblings left shipped and covered together,
+    // so they move nothing here. Re-derived, not adjusted by arithmetic.
+    //
+    // ⭐ 749 -> 544 on 2026-09-19 (PLAN-retire-core-family §13, phase 7 — the plan's LAST phase,
+    // deliberately: re-deriving a shrink-only ceiling against a partly-migrated tree locks the loss
+    // in permanently). Measured by replicating this test's own two predicates over target/rules:
+    // 3 411 shipped · 2 867 covered · 544 uncovered · 0 fixture-only. The 544 are CDISC 294 +
+    // CDISC-SEND 227 + DRAFT 23 — no FDA and no PMDA rule is uncovered. Set ON the achieved value,
+    // with no headroom, because that is what this constant is for.
+    //
+    // ⚠⚠ THE RETIREMENT MADE THIS CEILING PASS MORE EASILY, WHICH IS WHY NOTHING WOULD HAVE ASKED.
+    // The CORE family was BETTER covered than the corpus it left, so deleting it took more covered
+    // rules out than uncovered ones and the count fell 718 -> 544 with not one fixture added. The
+    // decomposition, measured rather than asserted (the 516 shipped CORE ids had 455 scenario-
+    // covered between them — 88.2%, against the corpus's own 79-84%):
+    // 718 - 61 (uncovered CORE ids leaving: 516 shipped - 455 covered)
+    // - 113 (surviving rules that gained their FIRST fixture from phase 5's 399 migrations)
+    // + 0 (the 21 phase-4 mints, every one of which landed with a fixture) = 544.
+    // ⚑ It closes on the other axis too: shipped 3 906 - 516 + 21 = 3 411, covered 3 188 - 455 + 21
+    // + 113 = 2 867. The 455 was counted from cd1f983b^ by the same #test-directive rule this class
+    // uses — never from file names, see the class javadoc; independently, cd1f983b^ holds exactly
+    // 455 core/<id>/ scenario directories. ⚠ The 3 906 / 718 baseline is PRE-phase-4, which is what
+    // makes the mint term +0 rather than -21: at cd1f983b^ itself the 21 were already authored and
+    // shipped but still fixture-less, so that baseline reads 3 927 / 739 and the same move
+    // decomposes 739 - 61 - 113 - 21 = 544. Either baseline closes; do not mix them.
+    //
+    // ⛔ CORRECTED 2026-09-19 (review round 1). This block previously recorded the decomposition as
+    // 718 - 78 - 96 + 0, from "438 CORE ids covered", and closed the sum anyway — the two wrong
+    // terms are wrong by +17 and -17 and CANCEL, so nothing here asked. Measured now, three ways
+    // over cd1f983b^ (git grep of the #test directive; the core/<id>/ directory count; and this
+    // class's own two predicates replayed over target/rules): 455, not 438. The emphatic sentence
+    // this replaces — "the plan's own 87% and a brief's ~88% do not reproduce; 438/516 is 84.9%" —
+    // was itself THE error: 455/516 is 88.2%, so the plan and the brief were right and the
+    // correction was not. ⚠ What 438 counted could not be identified from anything in the tree;
+    // treat it as unsourced. The pin 544 was never affected and re-derives exact: shipped 3 411,
+    // covered 2 867, uncovered 544, fixture-only 0, families CDISC 294 + CDISC-SEND 227 + DRAFT 23.
+    // ⇒ Carried across at 749 the constant would have stayed green holding 205 rules of slack
+    // nobody granted — an order of magnitude more than the 23 this javadoc records as the erosion
+    // that already happened once.
+    //
+    // ⛔⛔ AND ON THE ACHIEVED VALUE NO INSTRUMENT HERE SEPARATES "uncovered" FROM "uncovered
+    // because the retirement surrendered its fixture". So the surrender is NAMED here rather than
+    // absorbed into a number. The register is the meta repo's
+    // plans/findings/CENSUS-phase5-fixture-disposition.tsv — 546 rows, one per CORE scenario:
+    // 399 MIGRATE, 3 HELD, 143 DROP (137 failed the owner's not-CLEAR test, 6 not-EASY). Of the
+    // dropped scenarios:
+    // · 28 CORE ids had EVERY scenario dropped for the reason "no replacement rule exists".
+    // ⚠⚠ That reason is about the SCENARIO, not the claim, and reading it as "the claim
+    // ceased" overstates the loss by 2.5x. Measured: 17 of the 28 are recorded COVERED with a NAMED
+    // surviving rule in plans/findings/CENSUS-core-read-verdicts.tsv (CORE-000310 ->
+    // FDA/PMDA-SD0084, CORE-000699 -> FDA-SD0007, CORE-001043 -> FDA-SD1121, and 14 more). The two
+    // censuses answer different questions — "is the claim carried?" vs "can this .cdt be
+    // migrated?" — and a twin can carry the claim while its scope leaves it unable to run the
+    // fixture (worked case: CORE-000158 -> FDA-SD1072, expression-identical but domain-disjoint, 5
+    // of its 6 fixtures failing "domain CO not in Scope.Domains.Include"). ⇒ ELEVEN ids have no
+    // surviving rule named by ANY census, and those are the claims that actually ceased:
+    // CORE-000302, -000303, -000318, -000726, -000728, -000743, -000746, -000747, -000791,
+    // -000867, -000890;
+    // · 20 surviving rules were named as a migration target and received NOTHING, every
+    // candidate scenario for them having been dropped. Four of the 20 ship in no package
+    // (CDISC-CG0091, -CG0622, -CG0635, -CG0636) and nine already had fixtures of their own,
+    // which leaves SEVEN shipped rules sitting in the 544 above that a migratable scenario
+    // would have covered: CDISC-CG0037, -CG0143, -CG0262, -CG0374, -CG0601, -CG0602, -CG0603.
+    //
+    // ⛔⛔ THE REGISTER IS NOT A PER-FILE DISPOSITION, AND ITS OWN SHAPE IS WHY. Recorded
+    // 2026-09-19 (review round 1). Measured over cd1f983b^..HEAD: 862 .cdt files were DELETED
+    // (395 more were MIGRATED, i.e. renamed out of core/ into cdisc/ and fda/, and 9 new ones were
+    // authored, so the tree moved 9 513 -> 8 660 for a NET 853). The census above carries 545 data
+    // rows, and of the 862 deletions only 153 have a row (143 DROP + 10 MIGRATE rows whose file
+    // was deleted rather than renamed). ⇒ 709 deleted scenarios have NO per-file disposition at
+    // all. That is not an omission but the census's criterion: it de-duplicated by
+    // (verdict, dataset) SHAPE, not by claim identity, so a family of scenarios sharing a shape
+    // contributed one row and the rest were covered by inference.
+    // ⚠ What that does and does not license. The two largest guard-noted sub-families were checked
+    // and are genuinely duplicated on surviving twins, so the inference held there. About sixty of
+    // the 709 remain UNTRACED — neither confirmed duplicated nor confirmed lost — and no instrument
+    // in this repo can distinguish them, because a scenario that was never migrated leaves no
+    // artefact behind to interrogate. ⇒ "one verified casualty" is a floor on the loss, not a
+    // measurement of it. The one verified casualty is CDISC-CG0554-D's discriminator (CORE-000107's
+    // third fixture, on AE — the only production-reachable scenario on that rule, dropped with no
+    // row in either census); review round 1 recovered it from cd1f983b^ and it is back in the tree.
+    // ⛔ Do not re-file the 709 as "accounted for" on the strength of the two families that were.
+    // Phase 4 surrendered nothing: 21 mints declared, 21 authored, and all 21 landed WITH fixtures
+    // — none of them is in the 544. Two further losses are out of this ratchet's reach and live
+    // only in their own instruments: ShippedExactNameRequirementTest was RETIRED, CORE-000208
+    // having been the corpus's only rule reaching its Requirements.Datasets through an operation
+    // domain alone (AbsentDatasetSkip.resolvesExactOnly now has no corpus carrier); and
+    // OrderFlipGuardCoverageRatchetTest lost 5 guard sites across 4 rules (CORE-000097 ×2,
+    // -000250, -000310, -000717) — 26 entries / 28 sites -> 22 / 23.
+    private static final int MAX_UNCOVERED = 544;
+
+    /**
+     * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus
+     * grows; this is not an equality.
+     */
+    // 3700 -> 3400 on 2026-09-19 (PLAN-retire-core-family §13, licensed row 1): distinct shipped
+    // rule ids fell 3 906 -> 3 411 when the CORE family's 11 packages stopped being generated
+    // (516 shipped CORE ids out, 21 phase-4 mints in). ⚠ A FLOOR, not a pin: set below the
+    // measured 3 411 on purpose, because the corpus grows.
+    // ⛔ MAX_UNCOVERED was NOT touched with it and needs nothing: measured 544 against 749.
+    private static final int MIN_SHIPPED = 3400;
 
     private static final Path SCENARIOS = Path
             .of("src/test/resources/net/cumba/corej/core/ruletestsuites");
@@ -131,9 +192,9 @@ class ScenarioFixtureCoverageRatchetTest
         NavigableSet<String> shipped = shippedRuleIds();
         NavigableSet<String> covered = fixtureRuleIds();
 
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus, which
-        // this subset deliberately is not — the CORE family is not redistributed here, so the
-        // internal population can never be reached. Enforced internally over the whole corpus.
+        assertTrue(shipped.size() >= MIN_SHIPPED, "only " + shipped.size()
+                + " shipped rule ids found (expected at least " + MIN_SHIPPED
+                + "). The corpus did not load — a ratchet over an empty set is not a ratchet.");
 
         // The fixtures are a strict subset today. A fixture naming an id that no package ships is
         // a dead scenario: it runs against nothing and its greenness means nothing.

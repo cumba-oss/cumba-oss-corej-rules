@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0586 expect=noViolation domain=ADLBC
-#note "THE FIXTURE THAT PINS THE SHEET DEFECT'S RESOLUTION. AVAL is ZERO, so the percent change is undefined; ArithmeticSemantics.percentChange returns NaN for a zero denominator and differs treats a NaN on either side as 'no violation', so the row is silent whatever PBCHG holds - 999 is deliberately absurd. The workbook's own guard names the WRONG operand (AD0586-F1, sheet issue owed); the engine's zero-DIVISOR carve-out is the coherent reading."
+#note "THE FIXTURE THAT PINS THE SHEET DEFECT'S RESOLUTION. AVAL is ZERO, so the percent change is undefined and the Description says such records are not evaluated. Since D85 (typed-expression-engine phase 3) the ENGINE no longer delivers that carve-out - a zero divisor is MissingValue.MIS and the not-equal fires - so the guard is now AUTHORED in the Check (AVAL != 0), which this fixture pins. 999 is deliberately absurd. The workbook's own guard names the WRONG operand (AD0586-F1, sheet issue owed); guarding the real divisor is the coherent reading."
 #library standard=adamig version=1-3
 dataset ADLBC structure=BDS
 col STUDYID type=Char

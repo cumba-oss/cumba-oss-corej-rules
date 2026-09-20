@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0324-A expect=noViolation domain=PC
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): subject 001 has NO upper limit recorded - PCULOQ is a BLANK cell in a numeric column (MissingValue.MIS) - and the not empty(PCULOQ) guard silences the rule despite a numeric PCORRES and PCSTRESC not 'ALQ'; the rule's own Description says 'where provided'. If this FIRES, the order-flip guard was deleted: post-6c totality positions MIS below every number, so num(PCORRES) > MIS becomes true."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PCSEQ    type=Num
+col PCTESTCD type=Char
+col PCORRES  type=Char
+col PCULOQ   type=Num
+col PCSTRESC type=Char
+---
+S1 | PC | 001 | 1 | DRUGX | 250 | . | 250

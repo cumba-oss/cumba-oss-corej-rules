@@ -51,7 +51,8 @@ class RulesModuleWiringTest
                     "Core": { "Id": "CORE-WIRING-1" },
                     "Outcome": { "Message": "m" },
                     "Sensitivity": "Record",
-                    "Check": { "all": [ { "name": "AESEV", "operator": "non_empty" } ] }
+                    "Check": { "all": [ { "expression": "not empty(AESEV)" },
+                                        { "expression": "AESEV != \\"MILD\\"" } ] }
                 } } }
                 """;
         RulePackage loaded = RulePackageLoader.loadFromString(pkg);
@@ -60,6 +61,13 @@ class RulesModuleWiringTest
         JsonNode out = MAPPER.readTree(RulePackageExpressionJson.toExpressionJson(rule));
         JsonNode check = out.get("Check");
         assertTrue(check.has("expression"), "expression-notation Check expected, got: " + check);
+        // ⚠ The composite is what makes this a wiring proof rather than a pass-through: an
+        // `all:` of two `expression:` nodes has NO expression text of its own, so the rendering
+        // can only come from CheckToExpr raising the composite and ExpressionPrinter printing
+        // it. A single `expression:` node is carried through verbatim by raiseSubtree and would
+        // have asserted nothing about either collaborator.
+        assertEquals("not empty(AESEV) and AESEV != \"MILD\"", check.get("expression").asText());
+        assertFalse(check.has("all"), "the composite must be folded, got: " + check);
         assertEquals("null", RulePackageExpressionJson.toExpressionJson(null));
     }
 }

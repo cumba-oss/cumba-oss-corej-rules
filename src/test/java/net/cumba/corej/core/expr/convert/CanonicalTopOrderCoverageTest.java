@@ -27,10 +27,9 @@ import org.junit.jupiter.api.Test;
  * canonicaliser — it is silently <em>relocated</em> to just before {@code Source} with a warning
  * nobody reads ({@code RuleCanonicalizer}'s unknown-key scan). And nothing else catches it:
  * {@code RuleCanonicalizerTest} is {@code @TempDir}-fixture only, never reading {@code rules-src/},
- * and the class's sole production caller is the internal {@code backfill-rules} workflow, which is
- * not distributed with this repository. So forgetting a new field here fails <b>silently, at the
- * next backfill run</b>, long after the plan that added the field is closed. That is precisely the
- * shape this test converts into a build failure.
+ * and the class's sole production caller is {@code scripts/backfill-rules.sh}. So forgetting a new
+ * field here fails <b>silently, at the next backfill run</b>, long after the plan that added the
+ * field is closed. That is precisely the shape this test converts into a build failure.
  * </p>
  *
  * <h2>✅ The named exception EXPIRED as designed (2026-08-25)</h2>
@@ -65,8 +64,9 @@ class CanonicalTopOrderCoverageTest
         // key -> the files carrying it, so a failure names something actionable rather than a set.
         TreeMap<String, TreeSet<String>> unlisted = new TreeMap<>();
         List<Path> files = yamlFiles();
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        // 3700 -> 3435: the CORE family's 518 authored rules were deleted (PLAN-retire-core-family
+        // phase 6). Re-derived from the walk, not adjusted by arithmetic.
+        assertTrue(files.size() >= 3435, "expected the full authored corpus, got " + files.size());
         for (Path file : files)
         {
             JsonNode rule = YAML.readTree(file.toFile());

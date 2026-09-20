@@ -1,0 +1,23 @@
+#!RuleTest
+#test PMDA-AD0165 expect=violation domain=ADLB
+#note "Mirrors rulespec PMDA-AD0165.yaml (the rule's only prior guard). 001/HGB/PRE is the FILTER discriminator: post-baseline ATOXGR 'GRADE 3' sorts above the baseline 'GRADE 2' while BTOXGR='GRADE 2' everywhere, so a max() that ignores filter(ABLFL='Y') computes 'GRADE 3' and false-fires on rows 1-2 (the exact-set match then reds). 002 row 4 is the genuine violation (BTOXGR 'GRADE 1' != baseline ATOXGR 'GRADE 3'). 003 has no ABLFL=Y row -> the group's $-value is missing, so the populated-BTOXGR row 5 fires and the empty-BTOXGR row 6 is held quiet by the non_empty guard."
+#library standard=adamig version=1-3
+#expectViolationCount 2
+#expectViolationAt row=4 PARAMCD=HGB BASETYPE=PRE ATOXGR="GRADE 2" BTOXGR="GRADE 1" "$baseline_atoxgr"="GRADE 3"
+#expectViolationAt row=5 PARAMCD=HGB BASETYPE=PRE ATOXGR="GRADE 4" BTOXGR="GRADE 0"
+dataset ADLB label="Analysis Dataset Lab"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PARAMCD  type=Char label="Parameter Code"
+col BASETYPE type=Char label="Baseline Type"
+col AVISITN  type=Num  label="Analysis Visit (N)"
+col ABLFL    type=Char label="Baseline Record Flag"
+col ATOXGR   type=Char label="Analysis Toxicity Grade"
+col BTOXGR   type=Char label="Baseline Toxicity Grade"
+---
+S1 | 001 | HGB | PRE | 0 | Y | GRADE 2 | GRADE 2
+S1 | 001 | HGB | PRE | 1 |   | GRADE 3 | GRADE 2
+S1 | 002 | HGB | PRE | 0 | Y | GRADE 3 | GRADE 3
+S1 | 002 | HGB | PRE | 1 |   | GRADE 2 | GRADE 1
+S1 | 003 | HGB | PRE | 1 |   | GRADE 4 | GRADE 0
+S1 | 003 | HGB | PRE | 2 |   | GRADE 1 |

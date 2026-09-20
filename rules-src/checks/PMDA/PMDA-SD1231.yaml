@@ -12,7 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    not empty(value()) and vlm_value_length(variable_name) > vlm_length(variable_name)
+    not empty(value()) and not empty(vlm_length(variable_name)) and vlm_value_length(variable_name)
+    > vlm_length(variable_name)
 Outcome:
   Message: "The value is longer than the value-level length declared in the Define-XML."
   Output_Variables:

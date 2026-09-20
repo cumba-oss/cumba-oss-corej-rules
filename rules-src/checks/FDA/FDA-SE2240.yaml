@@ -14,12 +14,12 @@ Requirements:
   Variables:
     All:
     - "--ENDTC"
-Operations:
-- id: "$max_ds_dsstdtc"
+Bindings:
+- name: "$max_ds_dsstdtc"
   expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    not empty(--ENDTC) and date(--ENDTC) > $max_ds_dsstdtc
+    not empty(--ENDTC) and not empty($max_ds_dsstdtc) and date(--ENDTC) > $max_ds_dsstdtc
 Outcome:
   Message: "--ENDTC is after the latest Disposition (DS) start date (DSSTDTC) for\
     \ the subject."

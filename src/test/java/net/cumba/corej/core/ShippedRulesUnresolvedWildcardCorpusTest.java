@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
  * The positive control also names the fields that ARE resolved ({@code name}, {@code group},
  * {@code dictionary_parent}, …) and the one deliberately left alone ({@code minuend_match}, whose
  * {@code --SPID} tokens are resolved per side at evaluation time); the unit-level proof for those
- * boundaries lives in {@code UnresolvedOperationWildcardLoadTest} (corej-cdisc-core).
+ * boundaries lives in {@code UnresolvedOperationWildcardLoadTest} (corej-core).
  * </p>
  */
 class ShippedRulesUnresolvedWildcardCorpusTest
@@ -73,9 +73,9 @@ class ShippedRulesUnresolvedWildcardCorpusTest
         RulePackage pkg = RulePackageLoader.loadFromString("""
                 {"rules": {"probe": {
                   "Core": {"Id": "PROBE-UOW"},
-                  "Operations": [{"id": "$last", "operator": "is_last_in_group",
-                                  "group": ["USUBJID"], "ordering": "--SEQ"}],
-                  "Check": {"all": [{"name": "$last", "operator": "equal_to", "value": true}]}
+                  "Bindings": [{"name": "$last",
+                      "expression": "is_last_in_group(group=[USUBJID], ordering=\\"--SEQ\\")"}],
+                  "Check": {"expression": "$last == true"}
                 }}}
                 """);
         Rule probe = pkg.getRules().values().iterator().next();
@@ -89,6 +89,7 @@ class ShippedRulesUnresolvedWildcardCorpusTest
     {
         List<String> findings = new ArrayList<>();
         int packages = 0;
+        int rules = 0;
         for (Path file : listRulePackages(folder))
         {
             packages++;
@@ -99,17 +100,19 @@ class ShippedRulesUnresolvedWildcardCorpusTest
                 {
                     continue;
                 }
+                rules++;
                 collect(findings, file, rule, rule.getLoadError());
                 collect(findings, file, rule, rule.getLoadWarning());
             }
         }
-        // ⚠ The corpus-SIZE floor that stood here was removed when this repository was
-        // extracted: it asserted the FULL internal corpus (>= 56 packages), which this
-        // subset deliberately is not. The internal repository still enforces the size.
-        // What is kept is the non-vacuity half, which is subset-safe: an empty or
-        // mis-resolved corpus must red rather than report a clean pass over nothing.
-        assertTrue(packages > 0, "no rule packages found in " + folder + "/ —"
-                + " the corpus did not generate; a pass over nothing is not a check");
+        // Guard the guard: without these, an empty or half-read corpus would report a clean
+        // ratchet — the exact failure mode this pass exists to prevent.
+        // 56 -> 45 (PLAN-retire-core-family phase 6): 58 -> 47 packages.
+        assertTrue(packages >= 45, "expected the full shipped corpus in " + folder + "/, saw "
+                + packages + " packages");
+        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818.
+        assertTrue(rules > 12700,
+                "expected the full shipped corpus in " + folder + "/, saw " + rules + " rules");
         assertTrue(findings.isEmpty(),
                 "shipped rules whose Operation parks a `--` in reference / ordering / offset —"
                         + " resolvePrefixes copies those verbatim, so the operation reads a"

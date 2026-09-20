@@ -1,0 +1,84 @@
+name: EC46-partial-date-min-indeterminate
+kind: rule
+description: |
+  EC-46 (Defect A, MIN side) — the FIRST parity spec in this operator family to put a PARTIAL
+  date into an extreme-read column. Before EC-46, 10 specs reached
+  min_date/max_date/date_diff_days and every date value in an extreme-read column across all
+  ten was a complete, offset-less, unmasked YYYY-MM-DD.
+
+  CDISC-CG0148 is `RFXSTDTC != min_date(EX.EXSTDTC grouped by USUBJID)`, so the grouped extreme
+  is visible directly as a violation (or its absence).
+
+  Three subjects, each isolating one verdict:
+
+  001 — OQ1: {2012-06, 2012-06-01}. No completion of `2012-06` precedes `2012-06-01`, so the
+        earliest is DETERMINED to be 2012-06-01. RFXSTDTC matches it ⇒ no violation.
+        coreJ (after EC-46) resolves this correctly.
+        ⚠ The fork picks `2012-06` lexicographically (a prefix sorts before its completions),
+        so `'2012-06-01' != '2012-06'` FIRES. THE DIVERGENCE.
+
+  002 — OQ1's exclusion: {2012-06, 2012-06-02}. The partial could be the 1st, which precedes
+        2012-06-02, so the minimum is INDETERMINATE and coreJ publishes no value for the group.
+        Against a missing $-ref, `not_equal_to` (a negated operator) FIRES on coreJ.
+        The fork picks `2012-06` and fires too — for a different reason, but it agrees here, so
+        this subject is NOT part of the divergence claim. It exists to prove the rule still runs.
+
+  003 — the all-complete control that must not move: a genuine violation on both lanes.
+
+  ⚠ This spec is deliberately a NEW file. Four of the ten pre-existing specs in this family are
+  already baselined `lane: python` on the `violations` channel, so adding partial-date data to
+  one of them would have been absorbed with no signal at all.
+python_notes: |
+  Python has no interval semantics: `min_date` is pandas `.min()` on the raw text column, so a
+  right-truncated partial always sorts before every completion of itself. Subject 001 therefore
+  yields `2012-06` on the fork against `2012-06-01` on coreJ, and the fork reports one extra
+  violation. Java-canonical, by the Java-first direction (2026-08-03).
+python_source: rules-sdtmig-3-4.json (CORE-000239)
+rule:
+  coreId: CDISC-CG0148
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXSTDTC: '2012-06-01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXSTDTC: '2012-06-02'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXSTDTC: '2012-09-09'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      # 001 — the partial CANNOT precede 2012-06-01, so the min is determined to be the complete
+      # date. coreJ: no violation. Fork: picks '2012-06' lexicographically and fires.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-06', EXENDTC: '2012-06-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-06-01', EXENDTC: '2012-06-25'}
+      # 002 — the partial COULD be the 1st, so the min is indeterminate; both lanes fire.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-06', EXENDTC: '2012-06-20'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 2, EXTRT: DRUG, EXSTDTC: '2012-06-02', EXENDTC: '2012-06-25'}
+      # 003 — all-complete control: a genuine violation, unchanged by EC-46.
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2012-03-01', EXENDTC: '2012-03-10'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003]'
+      $min_ex_exstdtc:
+      RFXSTDTC: '2012-06-02'
+  - rule_id: CDISC-CG0148
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003]'
+      $min_ex_exstdtc: '2012-03-01'
+      RFXSTDTC: '2012-09-09'
+expected_errors: []

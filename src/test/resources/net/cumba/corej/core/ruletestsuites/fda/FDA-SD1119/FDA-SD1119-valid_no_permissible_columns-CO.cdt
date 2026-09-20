@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD1119 expect=skipped domain=CO
+#note "Mirror of PMDA-SD1119-valid_no_permissible_columns-CO.cdt (review finding 2, 2026-09-18): the FDA twin carries the identical grouped gate and had no scenario for it. None of the thirteen Permissible Identifier/Timing columns (COGRPID, COREFID, COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM, COELTM, COTPTREF, CORFTDTC) is declared, so GROUP 1 of Requirements.Variables.Any is unmet and the rule is GATED OFF: SKIPPED, not a silent vacuous pass. Group 2 [RDOMAIN, IDVAR] IS met -- both are declared and populated -- so only the group-1 gate can account for the silence. Delete group 1 from the YAML and this scenario REDS: the rule binds, each leaf of the first disjunction is a POSITIVE not empty(X) over an absent column which EC-43 folds to all-missing, so the verdict becomes noViolation, not skipped. All thirteen are Permissible in CO, so the dataset shape stays fully conformant and still must not be reported against."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col COSEQ    type=Num
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col COVAL    type=Char
+---
+S1 | CO | AE | 001 | 1 | AESEQ | 1 | Comment on AE record

@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when a visit is planned (SVPRESP is equal to 'Y') but\
   \ the Visit Number (VISITNUM) value does not match any VISITNUM value in the Trial\
   \ Visits (TV) dataset."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -14,13 +14,14 @@ Requirements:
   Variables:
     All:
     - "VISITNUM"
-    - "SVPRESP"
-Operations:
-- id: "$tv_visitnum"
+Bindings:
+- name: "$tv_visitnum"
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    SVPRESP == "Y" and VISITNUM not in $tv_visitnum
+    (var_exists("SVPRESP") and SVPRESP == "Y" or not var_exists("SVPRESP") and empty(SVUPDES) and
+    not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT), "UNPLAN")) and VISITNUM
+    not in $tv_visitnum
 Outcome:
   Message: "VISITNUM value for a planned visit does not match any VISITNUM value in\
     \ the TV dataset."

@@ -18,14 +18,15 @@ Requirements:
 Grouping:
   Variables:
   - "USUBJID"
-Operations:
-- id: "$ds_usubjid"
+Bindings:
+- name: "$ds_usubjid"
   expression: "distinct(USUBJID, domain=\"DS\")"
-- id: "$max_dsstdy"
+- name: "$max_dsstdy"
   expression: "max(DSSTDY, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    USUBJID in $ds_usubjid and not empty(TFDETECT) and TFDETECT > $max_dsstdy
+    USUBJID in $ds_usubjid and not empty(TFDETECT) and not empty($max_dsstdy) and TFDETECT >
+    $max_dsstdy
 Outcome:
   Message: "TFDETECT is greater than the Study Day of the latest Disposition Event\
     \ (maximum DSSTDY in the DS dataset)."

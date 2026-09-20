@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0658 expect=violation domain=SV
+#note "B1 of PLAN-unplanned-visit-cascade: SVPRESP is present and DECIDES. Row 2 carries SVPRESP='' - present and not Y -> unplanned - and VISITDY is populated -> fires. Row 1 is flagged Y -> planned, VISITDY belongs there. Row 3 is unplanned with VISITDY missing -> clean. No SVUPDES column on purpose: the pre-cascade SVUPDES form of this rule was silent on this whole dataset, so this fixture reds under the old form."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SVSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+col VISITDY  type=Num  label="Planned Study Day of Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 2 | BASELINE | Y | 14
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 99 | WEEK 99 |  | 1
+CDISCPILOT01 | SV | 01-701-1015 | 3 | 98 | WEEK 98 |  | 
+---

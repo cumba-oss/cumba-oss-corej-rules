@@ -1,7 +1,6 @@
 #!RuleTest
-#test PMDA-SD1119 expect=noViolation domain=CO
-#note "FRESH, DISCRIMINATING. None of the thirteen Permissible Identifier/Timing columns (COGRPID, COREFID, COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM, COELTM, COTPTREF, CORFTDTC) is declared. The second conjunct is TRUE (RDOMAIN populated) so the whole first parenthesised disjunction must be FALSE. Predicted SILENT: each leaf is a POSITIVE not empty(X) over an absent column, which EC-43 folds to all-missing, and the derivation added no var_exists conjunct anywhere in this rule (the shipped expression is byte-identical to the authored one) precisely because none of those leaves flips on absence. All thirteen are Permissible in CO, so this dataset shape is fully conformant and must not be double-reported. If it fires, thirteen absent columns are being read as populated — escalate, do not rewrite."
-#expectViolationCount 0
+#test PMDA-SD1119 expect=skipped domain=CO
+#note "None of the thirteen Permissible Identifier/Timing columns (COGRPID, COREFID, COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM, COELTM, COTPTREF, CORFTDTC) is declared. Since PLAN-any-variable-sets phase 6 (owner ruling 2026-09-18) the rule carries Requirements.Variables.Any with that thirteen-column set as group 1 (and [RDOMAIN, IDVAR] as group 2), so this dataset shape is GATED OFF: SKIPPED, not a silent vacuous pass. Before the gate this scenario pinned the silence itself (expect=noViolation: each leaf is a POSITIVE not empty(X) over an absent column, which EC-43 folds to all-missing, so the first disjunction could never be true). The gate turns that 'I checked and found nothing' into 'there was nothing to check' -- the honest verdict; all thirteen are Permissible in CO, so the dataset shape stays fully conformant and still must not be reported against."
 #library standard=sdtmig version=3-4
 dataset CO class="SPECIAL PURPOSE" label="Comments"
 col STUDYID  type=Char

@@ -266,8 +266,8 @@ final class MixedGranularityLint
     /**
      * The variable a branch asserts the <em>absence</em> of, or {@code null} when the branch is not
      * a bare absence check. Both spellings are recognised: the negative call
-     * ({@code not_exists(X)}) and the negated positive ({@code Not(var_exists(X))}), because
-     * {@code CheckToExpr} produces either depending on whether the rule type was known.
+     * ({@code not_exists(X)}) and the negated positive ({@code Not(var_exists(X))}), because the
+     * corpus authors either depending on whether the rule type was known when it was written.
      *
      * <p>
      * {@code ds_exists} / {@code ds_not_exists} name a <em>dataset</em>, not a variable, so they

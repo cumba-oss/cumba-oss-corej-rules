@@ -12,14 +12,11 @@ rule:
   Executability: Fully Executable
   Scope:
     Domains: {Include: [DM]}
-  Operations:
-    - id: $ae_subjects
-      operator: distinct
-      name: USUBJID
-      domain: AE
+  Bindings:
+  - name: "$ae_subjects"
+    expression: 'distinct(USUBJID, domain="AE")'
   Check:
-    all:
-      - {name: USUBJID, operator: is_not_contained_by, value: $ae_subjects}
+    expression: 'USUBJID not in $ae_subjects'
   Outcome:
     Message: Subject has no AE records.
     Output_Variables: [STUDYID, USUBJID]

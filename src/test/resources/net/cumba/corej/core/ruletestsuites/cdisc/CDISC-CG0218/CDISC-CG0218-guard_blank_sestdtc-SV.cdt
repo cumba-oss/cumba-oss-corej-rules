@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0218 expect=noViolation domain=SV
+#runLevel Info
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv, site a): SE.SESTDTC is BLANK, so earliest_possible(SE.SESTDTC) yields MISSING and the first not empty(earliest_possible(...)) guard silences the INFO leg despite an EPOCH mismatch. If this FIRES, that guard was deleted: MISSING <= latest_possible(SVSTDTC) is true under D34 #5, and the remaining conjuncts hold (earliest_possible(SVSTDTC) 2012-06-20 <= latest_possible(SEENDTC) 2012-07-31, EPOCH differs). Runs at #runLevel Info because the engine default never evaluates an INFO level. The verbatim ERROR leg cannot fire: a blank read AS A DATE has an unbounded hull, so all six operators answer false."
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 1 | WEEK 1 | 2012-06-20 | TREATMENT
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 |  | 2012-07 | SCREENING

@@ -12,20 +12,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.exec.DatasetRuleResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.expr.eval.Domain;
 import net.cumba.corej.core.gen.GeneratedRuleInfo;
 import net.cumba.corej.core.gen.GeneratedRulePackage;
 import net.cumba.corej.core.gen.RuleCategory;
 import net.cumba.corej.core.model.CheckCondition;
-import net.cumba.corej.core.model.CheckConditionAll;
-import net.cumba.corej.core.model.CheckConditionAny;
-import net.cumba.corej.core.model.CheckConditionLeaf;
-import net.cumba.corej.core.model.CheckConditionNot;
-import net.cumba.corej.core.model.CheckOperator;
 import net.cumba.corej.core.model.MatchDataset;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.ruletestsuites.ScenarioDeclaredScopeProvider;
@@ -385,7 +382,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      */
     Stream<DynamicTest> templateTests_valid(String domainName, String declaredStructure)
     {
-        return expandedRules.stream().map(rule ->
+        return withVacuityGuard(expandedRules.stream().map(rule ->
         {
             String ruleId = rule.getCore().getId();
             return DynamicTest.dynamicTest(ruleId + "_valid", () ->
@@ -408,7 +405,21 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                         ruleId + " should NOT fire on valid data but found "
                                 + result.getViolationCount() + " violation(s)");
             });
-        });
+        }));
+    }
+
+
+    /**
+     * Appends the vacuity ratchet as the stream's last dynamic test, so it runs once every rule
+     * above it has had its fixture built. ⚠ A {@code DynamicTest} stream is consumed lazily and in
+     * order, which is what makes "last in the stream" mean "after the rest" — the guard would
+     * measure nothing if it were an ordinary {@code @Test}.
+     */
+    private static Stream<DynamicTest> withVacuityGuard(Stream<DynamicTest> tests)
+    {
+        return Stream.concat(tests,
+                Stream.of(DynamicTest.dynamicTest("__fixture_builders_are_not_vacuous",
+                        AbstractAdamTemplateTest::assertFixtureBuildersAreNotVacuous)));
     }
 
 
@@ -424,7 +435,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      */
     Stream<DynamicTest> templateTests_invalid(String domainName, String declaredStructure)
     {
-        return expandedRules.stream().map(rule ->
+        return withVacuityGuard(expandedRules.stream().map(rule ->
         {
             String ruleId = rule.getCore().getId();
             return DynamicTest.dynamicTest(ruleId + "_invalid", () ->
@@ -452,7 +463,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 assertTrue(result.hasViolations(),
                         ruleId + " should fire on invalid data but found " + "no violations");
             });
-        });
+        }));
     }
 
     // ---- Table builders ----
@@ -489,7 +500,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                     && isColumnName(leaf.valueText))
             {
                 boolean isVarNameCheck = "variable_name".equals(leaf.name)
-                        && leaf.op == CheckOperator.EQUAL_TO;
+                        && leaf.op == Op.EQUAL_TO;
                 if (isVarNameCheck || !leaf.isLiteral)
                 {
                     allColumns.add(leaf.valueText);
@@ -502,11 +513,10 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             return null;
         }
 
-        boolean hasNonEmpty = leaves.stream().anyMatch(l -> l.op == CheckOperator.NON_EMPTY);
-        boolean hasNotExists = leaves.stream().anyMatch(l -> l.op == CheckOperator.VAR_NOT_EXISTS);
-        boolean hasIsNotUniqueRelationship = leaves.stream()
-                .anyMatch(l -> l.op == CheckOperator.IS_NOT_UNIQUE_RELATIONSHIP
-                        || l.op == CheckOperator.HAS_MULTIPLE_VALUES_FOR);
+        boolean hasNonEmpty = leaves.stream().anyMatch(l -> l.op == Op.NON_EMPTY);
+        boolean hasNotExists = leaves.stream().anyMatch(l -> l.op == Op.VAR_NOT_EXISTS);
+        boolean hasIsNotUniqueRelationship = leaves.stream().anyMatch(
+                l -> l.op == Op.IS_NOT_UNIQUE_RELATIONSHIP || l.op == Op.HAS_MULTIPLE_VALUES_FOR);
 
         // Rules whose Check uses `library_variable_*` leaves (e.g. CDISC-AD0709 —
         // `variable_label not_equal_to library_variable_label`) need a valid case where
@@ -543,8 +553,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
         if (isVariableMetadataCheck(rule))
         {
             // Determine if the rule has not_exists checks
-            boolean ruleHasNotExists = leaves.stream()
-                    .anyMatch(l -> l.op == CheckOperator.VAR_NOT_EXISTS);
+            boolean ruleHasNotExists = leaves.stream().anyMatch(l -> l.op == Op.VAR_NOT_EXISTS);
             if (ruleHasNotExists)
             {
                 // Include ALL referenced columns (including not_exists targets)
@@ -621,10 +630,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             return null;
         }
 
-        boolean hasIsNotUniqueRelationship = leaves.stream()
-                .anyMatch(l -> l.op == CheckOperator.IS_NOT_UNIQUE_RELATIONSHIP
-                        || l.op == CheckOperator.HAS_MULTIPLE_VALUES_FOR);
-        boolean hasNotExists = leaves.stream().anyMatch(l -> l.op == CheckOperator.VAR_NOT_EXISTS);
+        boolean hasIsNotUniqueRelationship = leaves.stream().anyMatch(
+                l -> l.op == Op.IS_NOT_UNIQUE_RELATIONSHIP || l.op == Op.HAS_MULTIPLE_VALUES_FOR);
+        boolean hasNotExists = leaves.stream().anyMatch(l -> l.op == Op.VAR_NOT_EXISTS);
         boolean isVarMetadata = isVariableMetadataCheck(rule);
 
         // Collect columns to include/exclude
@@ -641,8 +649,8 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 // transformation), X is the target column name even though
                 // valueIsLiteral is set. Always add it.
                 boolean isVarNameCheck = "variable_name".equals(leaf.name)
-                        && leaf.op == CheckOperator.EQUAL_TO;
-                if ((isVarNameCheck || !leaf.isLiteral) && leaf.op != CheckOperator.VAR_NOT_EXISTS)
+                        && leaf.op == Op.EQUAL_TO;
+                if ((isVarNameCheck || !leaf.isLiteral) && leaf.op != Op.VAR_NOT_EXISTS)
                 {
                     columnsToAdd.add(leaf.valueText);
                 }
@@ -690,7 +698,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
         {
             for (LeafInfo leaf : leaves)
             {
-                if (leaf.op == CheckOperator.EQUAL_TO && "variable_name".equals(leaf.name)
+                if (leaf.op == Op.EQUAL_TO && "variable_name".equals(leaf.name)
                         && leaf.valueText != null && columnsToOmit.contains(leaf.valueText))
                 {
                     return null; // contradictory rule; skip
@@ -720,8 +728,8 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             // First, ensure all non_empty columns have values
             for (LeafInfo leaf : leaves)
             {
-                if (leaf.op == CheckOperator.NON_EMPTY && leaf.name != null
-                        && !isEngineMetaName(leaf.name) && columnsToAdd.contains(leaf.name))
+                if (leaf.op == Op.NON_EMPTY && leaf.name != null && !isEngineMetaName(leaf.name)
+                        && columnsToAdd.contains(leaf.name))
                 {
                     table.setValue(0, leaf.name, "VALUE");
                     table.setValue(1, leaf.name, "VALUE");
@@ -730,7 +738,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             // Then, set up the relationship-breaking values
             for (LeafInfo leaf : leaves)
             {
-                if (leaf.op == CheckOperator.IS_NOT_UNIQUE_RELATIONSHIP)
+                if (leaf.op == Op.IS_NOT_UNIQUE_RELATIONSHIP)
                 {
                     String keyCol = leaf.name;
                     String valCol = leaf.valueText;
@@ -749,7 +757,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                         table.setValue(1, valCol, "SAME_VAL");
                     }
                 }
-                else if (leaf.op == CheckOperator.HAS_MULTIPLE_VALUES_FOR)
+                else if (leaf.op == Op.HAS_MULTIPLE_VALUES_FOR)
                 {
                     // name is dependent, value is key.
                     // Invalid: same key value with different dependent values.
@@ -803,7 +811,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 // Look for equal_to leaves that reference variable_name
                 for (LeafInfo leaf : leaves)
                 {
-                    if (leaf.op == CheckOperator.EQUAL_TO && "variable_name".equals(leaf.name)
+                    if (leaf.op == Op.EQUAL_TO && "variable_name".equals(leaf.name)
                             && leaf.valueText != null)
                     {
                         columnsToAdd.add(leaf.valueText);
@@ -835,7 +843,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             Set<String> targets = new LinkedHashSet<>();
             for (LeafInfo leaf : leaves)
             {
-                if (leaf.op == CheckOperator.EQUAL_TO && "variable_name".equals(leaf.name)
+                if (leaf.op == Op.EQUAL_TO && "variable_name".equals(leaf.name)
                         && leaf.valueText != null && columnsToAdd.contains(leaf.valueText))
                 {
                     targets.add(leaf.valueText);
@@ -844,7 +852,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             net.cumba.datatable.values.DataValueType requiredType = null;
             for (LeafInfo leaf : leaves)
             {
-                if (leaf.op == CheckOperator.EQUAL_TO && "variable_data_type".equals(leaf.name)
+                if (leaf.op == Op.EQUAL_TO && "variable_data_type".equals(leaf.name)
                         && leaf.isLiteral && leaf.valueText != null)
                 {
                     if ("Num".equalsIgnoreCase(leaf.valueText))
@@ -916,7 +924,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 }
             }
             // not_equal_to with numeric literal (e.g. not_equal_to 0)
-            if (leaf.op == CheckOperator.NOT_EQUAL_TO && leaf.valueText != null && leaf.isLiteral)
+            if (leaf.op == Op.NOT_EQUAL_TO && leaf.valueText != null && leaf.isLiteral)
             {
                 try
                 {
@@ -932,7 +940,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 }
             }
             // not_equal_to_divide: name and both operands in valueArray are numeric
-            if (leaf.op == CheckOperator.NOT_EQUAL_TO_DIVIDE)
+            if (leaf.op == Op.NOT_EQUAL_TO_DIVIDE)
             {
                 if (leaf.name != null && !isEngineMetaName(leaf.name))
                 {
@@ -992,7 +1000,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
         Set<String> columnsWithEmptyLeaf = new LinkedHashSet<>();
         for (LeafInfo leaf : leaves)
         {
-            if (leaf.op == CheckOperator.EMPTY && leaf.name != null)
+            if (leaf.op == Op.EMPTY && leaf.name != null)
             {
                 columnsWithEmptyLeaf.add(leaf.name);
             }
@@ -1006,7 +1014,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             {
                 continue;
             }
-            if (leaf.op == CheckOperator.NON_EMPTY)
+            if (leaf.op == Op.NON_EMPTY)
             {
                 if (datePartCols.contains(leaf.name))
                 {
@@ -1033,7 +1041,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
             {
                 continue;
             }
-            if (leaf.op == CheckOperator.NON_EMPTY)
+            if (leaf.op == Op.NON_EMPTY)
             {
                 continue; // already handled
             }
@@ -1054,7 +1062,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 // Value is a column reference — set both columns appropriately
                 setComparisonValues(table, 0, leaf.name, leaf.valueText, leaf.op);
             }
-            else if (leaf.op == CheckOperator.NOT_EQUAL_TO_DIVIDE && leaf.valueArray != null
+            else if (leaf.op == Op.NOT_EQUAL_TO_DIVIDE && leaf.valueArray != null
                     && leaf.valueArray.size() == 2)
             {
                 // value is [numerator, denominator]; set them and make name
@@ -1072,8 +1080,8 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 // Quotient would be 5.0 — set name to something else
                 table.setValue(0, leaf.name, 999.0);
             }
-            else if (leaf.op == CheckOperator.NOT_EQUAL_TO && leaf.valueText != null
-                    && leaf.isLiteral && numericCols.contains(leaf.name))
+            else if (leaf.op == Op.NOT_EQUAL_TO && leaf.valueText != null && leaf.isLiteral
+                    && numericCols.contains(leaf.name))
             {
                 // numeric literal comparison, e.g. not_equal_to 0
                 try
@@ -1096,7 +1104,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 // null would let an all-null column be pruned, making `exists`
                 // false; a non-empty value would make `empty` false. Either way
                 // the rule could not fire.
-                boolean existsWithEmptySibling = leaf.op == CheckOperator.VAR_EXISTS
+                boolean existsWithEmptySibling = leaf.op == Op.VAR_EXISTS
                         && columnsWithEmptyLeaf.contains(leaf.name);
                 String val = existsWithEmptySibling ? "" : invalidValueForLeaf(leaf);
                 if (val != null)
@@ -1248,7 +1256,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
     {
         for (LeafInfo leaf : leaves)
         {
-            if (leaf.op == CheckOperator.EQUAL_TO && "variable_name".equals(leaf.name)
+            if (leaf.op == Op.EQUAL_TO && "variable_name".equals(leaf.name)
                     && leaf.valueText != null && !leaf.valueText.isEmpty())
             {
                 return leaf.valueText;
@@ -1271,26 +1279,24 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
     }
 
 
-    private static boolean isComparisonOp(CheckOperator op)
+    private static boolean isComparisonOp(Op op)
     {
-        return op == CheckOperator.GREATER_THAN || op == CheckOperator.GREATER_THAN_OR_EQUAL_TO
-                || op == CheckOperator.LESS_THAN || op == CheckOperator.LESS_THAN_OR_EQUAL_TO
-                || op == CheckOperator.EQUAL_TO || op == CheckOperator.NOT_EQUAL_TO;
+        return op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQUAL_TO || op == Op.LESS_THAN
+                || op == Op.LESS_THAN_OR_EQUAL_TO || op == Op.EQUAL_TO || op == Op.NOT_EQUAL_TO;
     }
 
 
-    private static boolean isNumericComparisonOp(CheckOperator op)
+    private static boolean isNumericComparisonOp(Op op)
     {
-        return op == CheckOperator.GREATER_THAN || op == CheckOperator.GREATER_THAN_OR_EQUAL_TO
-                || op == CheckOperator.LESS_THAN || op == CheckOperator.LESS_THAN_OR_EQUAL_TO;
+        return op == Op.GREATER_THAN || op == Op.GREATER_THAN_OR_EQUAL_TO || op == Op.LESS_THAN
+                || op == Op.LESS_THAN_OR_EQUAL_TO;
     }
 
 
-    private static boolean isDatePartOp(CheckOperator op)
+    private static boolean isDatePartOp(Op op)
     {
-        return op == CheckOperator.DATE_PART_EQUAL_TO || op == CheckOperator.DATE_PART_NOT_EQUAL_TO
-                || op == CheckOperator.TIME_PART_EQUAL_TO
-                || op == CheckOperator.TIME_PART_NOT_EQUAL_TO;
+        return op == Op.DATE_PART_EQUAL_TO || op == Op.DATE_PART_NOT_EQUAL_TO
+                || op == Op.TIME_PART_EQUAL_TO || op == Op.TIME_PART_NOT_EQUAL_TO;
     }
 
 
@@ -1300,7 +1306,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * date-only or *TM time-only.
      */
     private static void setDatePartValues(OverlayDataTable table, int row, String dtmCol,
-            String dtCol, CheckOperator op)
+            String dtCol, Op op)
     {
         switch (op)
         {
@@ -1339,7 +1345,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * Sets values in two columns so that the comparison condition is TRUE.
      */
     private static void setComparisonValues(OverlayDataTable table, int row, String nameCol,
-            String valueCol, CheckOperator op)
+            String valueCol, Op op)
     {
         // Use numeric values (Double) for comparison operators
         switch (op)
@@ -1375,32 +1381,80 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
     // ---- Check condition traversal ----
 
 
+    /**
+     * ⚠⚠ <b>An empty result from this walk is what "this suite silently stops testing" looks like —
+     * see {@link #assertFixtureBuildersAreNotVacuous}.</b>
+     *
+     * <p>
+     * History, because this is the suite's second brush with the silent-disarm shape: phase 7a of
+     * {@code PLAN-typed-expression-engine} stopped lowering an {@code expression:} Check into the
+     * v1 leaf AST at load, the then-leaf-keyed walker returned an EMPTY list for every rule, and
+     * {@code buildValidTable} / {@code buildInvalidTable} read that as <i>"cannot build data for
+     * this rule pattern"</i> — 498 calls, 498 empty, 150+ green tests asserting nothing. The
+     * vacuity ratchet below was built from that incident.
+     * </p>
+     *
+     * <p>
+     * D121 then retired the leaf model entirely, so the walk now reads {@link CheckExprUnits}'
+     * v1-vocabulary units — <b>all-or-nothing, exactly like the strict lowering it replaces</b>: a
+     * Check carrying any unit without a strict classification yields no leaves at all, exactly as
+     * such an expression yielded none before phase 7. The builders' ~50 operator comparisons keep
+     * their vocabulary through the local {@link Op} enum.
+     * </p>
+     *
+     * @see #assertFixtureBuildersAreNotVacuous
+     */
     private List<LeafInfo> collectLeaves(CheckCondition condition)
     {
         List<LeafInfo> leaves = new ArrayList<>();
-        collectLeavesRecursive(condition, leaves, false);
+        Expr check = CheckExprUnits.toExpr(condition);
+        if (check != null)
+        {
+            List<CheckExprUnits.Unit> units = CheckExprUnits.units(check);
+            if (!units.isEmpty() && units.stream().allMatch(CheckExprUnits.Unit::strict))
+            {
+                for (CheckExprUnits.Unit unit : units)
+                {
+                    leaves.add(new LeafInfo(unit));
+                }
+            }
+        }
+        LEAF_WALKS.incrementAndGet();
+        if (leaves.isEmpty())
+        {
+            EMPTY_LEAF_WALKS.incrementAndGet();
+        }
         return leaves;
     }
 
+    /** Total {@link #collectLeaves} calls in this JVM — the denominator of the vacuity ratchet. */
+    static final java.util.concurrent.atomic.AtomicLong LEAF_WALKS = new java.util.concurrent.atomic.AtomicLong();
 
-    private void collectLeavesRecursive(CheckCondition condition, List<LeafInfo> leaves,
-            boolean negated)
+    /** Calls that produced NO leaves, i.e. a rule this suite silently declines to test. */
+    static final java.util.concurrent.atomic.AtomicLong EMPTY_LEAF_WALKS = new java.util.concurrent.atomic.AtomicLong();
+
+    /**
+     * ⭐ <b>The ratchet that makes the disarm above impossible to repeat.</b> A fixture generator
+     * whose every builder returns {@code null} is indistinguishable from one that passes, because
+     * "cannot build data for this rule pattern" is a legitimate per-rule outcome and the tests
+     * simply return. This asserts the population-level property instead: most rules must still be
+     * buildable.
+     *
+     * <p>
+     * ⚠ Deliberately a FRACTION and not a count — the expanded rule set grows, and a floor stated
+     * in rules would be met by a suite that had stopped testing two thirds of them.
+     * </p>
+     */
+    static void assertFixtureBuildersAreNotVacuous()
     {
-        switch (condition)
-        {
-        case CheckConditionAll all -> all.getConditions()
-                .forEach(c -> collectLeavesRecursive(c, leaves, negated));
-        case CheckConditionAny any -> any.getConditions()
-                .forEach(c -> collectLeavesRecursive(c, leaves, negated));
-        // A CheckConditionNot flips the polarity of every leaf below it, so the fixture builders
-        // can tell a negated var_exists ("column must be absent") from a positive one.
-        case CheckConditionNot not -> collectLeavesRecursive(not.getCondition(), leaves, !negated);
-        case CheckConditionLeaf leaf -> leaves.add(new LeafInfo(leaf, negated));
-        default ->
-        {
-            // Non-leaf composites: nothing to collect here; sealed hierarchy is exhaustive.
-        }
-        }
+        long walks = LEAF_WALKS.get();
+        long empty = EMPTY_LEAF_WALKS.get();
+        assertTrue(walks > 0, "the fixture builders were never invoked — the suite tested nothing");
+        assertTrue(empty * 2 < walks,
+                "the ADaM template fixture builders have gone VACUOUS: " + empty + " of " + walks
+                        + " rules yielded no leaves, so their dynamic tests returned without"
+                        + " asserting anything. The unit walk no longer classifies the Check"
+                        + " shape the loader produces — see collectLeaves.");
     }
 
 
@@ -1412,12 +1466,11 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      */
     private static boolean requiresColumnAbsent(LeafInfo leaf)
     {
-        if (leaf.op == CheckOperator.VAR_NOT_EXISTS || leaf.op == CheckOperator.DS_NOT_EXISTS)
+        if (leaf.op == Op.VAR_NOT_EXISTS || leaf.op == Op.DS_NOT_EXISTS)
         {
             return true;
         }
-        return leaf.negated
-                && (leaf.op == CheckOperator.VAR_EXISTS || leaf.op == CheckOperator.DS_EXISTS);
+        return leaf.negated && (leaf.op == Op.VAR_EXISTS || leaf.op == Op.DS_EXISTS);
     }
 
 
@@ -1468,7 +1521,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 
         final String name;
 
-        final CheckOperator op;
+        final Op op;
 
         final String valueText;
 
@@ -1476,44 +1529,261 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 
         final boolean isLiteral;
 
-        // True when the leaf sits under an odd number of CheckConditionNot wrappers, so the rule
-        // requires the OPPOSITE verdict. A negated var_exists / exists leaf means "the column must
-        // be ABSENT for the rule to fire" — the fixture builders use this to omit (invalid) /
-        // include (valid) the column, the same way they treat a bare var_not_exists / not_exists.
+        // True when the unit sits under an odd number of structural `not` wrappers, so the rule
+        // requires the OPPOSITE verdict. A negated var_exists means "the column must be ABSENT
+        // for the rule to fire" — the fixture builders use this to omit (invalid) / include
+        // (valid) the column, the same way they treat a flat var_not_exists.
         final boolean negated;
 
-        // Polymorphic post-Fix #25: ``within`` is now either a single column
-        // name on the wire or a list of column names. Stored here as a List
-        // (empty when absent) so downstream fixture-generation iterates over
-        // every partition column rather than only the first.
+        // Polymorphic post-Fix #25: ``within`` is either a single column name or a list of
+        // column names on the wire; read from the unit's underlying call, textual members only,
+        // mirroring the retired CheckConditionLeaf.getWithinColumns.
         final List<String> within;
 
-        LeafInfo(CheckConditionLeaf leaf, boolean negated)
+        LeafInfo(CheckExprUnits.Unit unit)
         {
-            this.name = leaf.getName();
-            this.op = leaf.getCheckOperator();
-            this.negated = negated;
-            this.isLiteral = Boolean.TRUE.equals(leaf.getValueIsLiteral());
-            this.within = leaf.getWithinColumns();
-            if (leaf.getValue() != null && leaf.getValue().isArray())
+            this.name = unit.name();
+            this.op = Op.from(unit.operator());
+            this.negated = unit.negated();
+            this.within = withinOf(unit.node());
+            Expr value = stripValueTag(unit.value());
+            if (value instanceof Expr.Binary arith)
             {
-                this.valueText = null;
+                // The fused arithmetic shapes (X != A / B): the v1 leaf carried [A, B].
                 List<String> arr = new ArrayList<>();
-                leaf.getValue().forEach(n -> arr.add(n.asText()));
+                collectRefNames(arith, arr);
+                this.valueText = null;
                 this.valueArray = arr;
+                this.isLiteral = false;
             }
-            else if (leaf.getValue() != null
-                    && (leaf.getValue().isTextual() || leaf.getValue().isNumber()))
+            else if (value instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.LIST)
             {
-                // Textual and numeric scalars both surface the same way: asText() string
-                // in valueText, no array. Merged per S1871 (duplicate branch bodies).
-                this.valueText = leaf.getValue().asText();
+                List<String> arr = new ArrayList<>();
+                if (lit.value() instanceof List<?> items)
+                {
+                    for (Object item : items)
+                    {
+                        if (item instanceof Expr e)
+                        {
+                            String text = operandText(e);
+                            if (text != null)
+                            {
+                                arr.add(text);
+                            }
+                        }
+                    }
+                }
+                this.valueText = null;
+                this.valueArray = arr;
+                this.isLiteral = false;
+            }
+            else if (value instanceof Expr.Lit lit)
+            {
+                this.valueText = literalText(lit);
                 this.valueArray = null;
+                this.isLiteral = true;
+            }
+            else if (value != null)
+            {
+                this.valueText = operandText(value);
+                this.valueArray = null;
+                this.isLiteral = false;
             }
             else
             {
                 this.valueText = null;
                 this.valueArray = null;
+                this.isLiteral = false;
+            }
+        }
+
+        /**
+         * The transparent type tags / conversions a value operand is read through — the compiler's
+         * own comparison-marker vocabulary, <b>derived</b> from
+         * {@link net.cumba.corej.core.expr.eval.ExprCompiler#comparisonMarkers()} rather than
+         * transcribed (M4, terminal review of {@code PLAN-typed-expression-engine}): the hand list
+         * here omitted {@code time}, which D71b put into the corpus in phase 3c, so
+         * {@code CDISC-AD0044}'s value side ({@code time(*TM)}) never resolved to its column and
+         * {@link #setDatePartValues} never set the discriminating ISO values — the pair
+         * discriminated only through the junk values the {@code non_empty} handler left behind (the
+         * time_part comparator's unconditional mixed-pair FIRE), measured 2026-09-17.
+         *
+         * <p>
+         * ⚠ Deriving widens the set by TWO, not one: the hand list was
+         * {@code date/date_part/time_part/num}, and the compiler's vocabulary also carries
+         * {@code time} and {@code str} (review round 2, R2-13 — the M4 commit message named only
+         * {@code time}). {@code str} is kept, deliberately: the two GATED sites
+         * ({@code CheckExprUnits}, {@code DualFormCheckNode}) exclude it because they translate to
+         * the retired v1 vocabulary, which has no type-insensitive-equality family — an argument
+         * about the LEGACY surface that says nothing about this harness, which only needs to see
+         * through a transparent wrapper to the column beneath it. {@code str(X)} is exactly such a
+         * wrapper. Measured harmless as well as sound: no {@code *-adamig-*} package contains the
+         * token {@code str(}, so no ADaM template scenario reaches it today. ⚠ This sentence used
+         * to enumerate which standards the four {@code str(} rules — CDISC-CG0371, CORE-000206,
+         * FDA-SD0077, PMDA-SD0077 — belong to, and was corrected TWICE for getting that enumeration
+         * wrong ("all SDTM" → "SDTM/SEND" → CORE-000206 is also published into
+         * {@code rules-core-tig-1-0}). The enumeration was never the operative claim; the ADaM
+         * absence is, and it is re-derived above. Do not put a standards list back.
+         * </p>
+         */
+        private static final java.util.Set<String> VALUE_TAGS = net.cumba.corej.core.expr.eval.ExprCompiler
+                .comparisonMarkers();
+
+        /** The value operand with a transparent type tag / conversion removed. */
+        private static Expr stripValueTag(Expr value)
+        {
+            if (value instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 1
+                    && VALUE_TAGS.contains(c.name()))
+            {
+                return stripValueTag(c.args().get(0));
+            }
+            return value;
+        }
+
+
+        private static String operandText(Expr e)
+        {
+            return switch (stripValueTag(e))
+            {
+            case Expr.Ref r -> r.name();
+            case Expr.Lit lit -> literalText(lit);
+            case Expr.Call c when c.args().isEmpty()
+                    && "varname".equals(c.name()) -> "variable_name";
+            case Expr.Call c when c.args().isEmpty()
+                    && "value".equals(c.name()) -> "variable_value";
+            case Expr.Call c when "colref".equals(c.name()) && c.args().size() == 1 -> operandText(
+                    c.args().get(0));
+            default -> null;
+            };
+        }
+
+
+        private static String literalText(Expr.Lit lit)
+        {
+            return switch (lit.kind())
+            {
+            case STRING, REGEX -> String.valueOf(lit.value());
+            case BOOL -> String.valueOf(lit.value());
+            case NUMBER ->
+            {
+                double d = (Double) lit.value();
+                yield (!Double.isInfinite(d) && Double.compare(d, Math.rint(d)) == 0)
+                        ? String.valueOf((long) d)
+                        : String.valueOf(d);
+            }
+            case LIST -> null;
+            };
+        }
+
+
+        private static void collectRefNames(Expr e, List<String> into)
+        {
+            switch (e)
+            {
+            case Expr.Ref r -> into.add(r.name());
+            case Expr.Binary b ->
+            {
+                collectRefNames(b.left(), into);
+                collectRefNames(b.right(), into);
+            }
+            default ->
+            {
+                // Literals (the pctchg 100) carry no name.
+            }
+            }
+        }
+
+
+        private static List<String> withinOf(Expr node)
+        {
+            if (!(node instanceof Expr.Call c))
+            {
+                return List.of();
+            }
+            Expr within = c.kwargs().get("within");
+            return switch (within)
+            {
+            case null -> List.of();
+            case Expr.Ref r -> List.of(r.name());
+            case Expr.Lit lit when lit.kind() == Expr.LitKind.STRING -> List
+                    .of((String) lit.value());
+            case Expr.Lit lit when lit.kind() == Expr.LitKind.LIST ->
+            {
+                List<String> out = new ArrayList<>();
+                if (lit.value() instanceof List<?> items)
+                {
+                    for (Object item : items)
+                    {
+                        // Textual members only — a nested coalesce-group is skipped, mirroring
+                        // the retired getWithinColumns' tolerant read.
+                        if (item instanceof Expr.Ref r)
+                        {
+                            out.add(r.name());
+                        }
+                        else if (item instanceof Expr.Lit il && il.kind() == Expr.LitKind.STRING)
+                        {
+                            out.add((String) il.value());
+                        }
+                    }
+                }
+                yield List.copyOf(out);
+            }
+            default -> List.of();
+            };
+        }
+    }
+
+
+    /**
+     * The v1-vocabulary operators the fixture builders key on — the surviving half of the retired
+     * engine {@code CheckOperator} enum, local to this suite. {@link #from} maps a
+     * {@link CheckExprUnits.Unit#operator()} name; an operator outside this set maps to
+     * {@code null}, and every comparison and switch below treats {@code null} as "no special
+     * handling".
+     */
+    private enum Op
+    {
+
+        EQUAL_TO,
+        NOT_EQUAL_TO,
+        LESS_THAN,
+        LESS_THAN_OR_EQUAL_TO,
+        GREATER_THAN,
+        GREATER_THAN_OR_EQUAL_TO,
+        EMPTY,
+        NON_EMPTY,
+        VAR_EXISTS,
+        VAR_NOT_EXISTS,
+        DS_EXISTS,
+        DS_NOT_EXISTS,
+        HAS_MULTIPLE_VALUES_FOR,
+        IS_NOT_UNIQUE_RELATIONSHIP,
+        NOT_EQUAL_TO_DIVIDE,
+        DATE_PART_EQUAL_TO,
+        DATE_PART_NOT_EQUAL_TO,
+        TIME_PART_EQUAL_TO,
+        TIME_PART_NOT_EQUAL_TO,
+        IS_CONTAINED_BY,
+        IS_NOT_CONTAINED_BY,
+        CONTAINS,
+        DOES_NOT_CONTAIN,
+        STARTS_WITH,
+        ENDS_WITH,
+        NOT_MATCHES_REGEX;
+
+        static Op from(String operator)
+        {
+            if (operator == null)
+            {
+                return null;
+            }
+            try
+            {
+                return valueOf(operator.toUpperCase(Locale.ROOT));
+            }
+            catch (IllegalArgumentException _)
+            {
+                return null;
             }
         }
     }

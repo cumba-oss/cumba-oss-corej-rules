@@ -10,12 +10,12 @@ Scope:
   Domains:
     Include:
     - "EX"
-Operations:
-- id: "$max_ds_dsstdtc"
+Bindings:
+- name: "$max_ds_dsstdtc"
   expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    not empty(EXSTDTC) and date(EXSTDTC) > $max_ds_dsstdtc
+    not empty(EXSTDTC) and not empty($max_ds_dsstdtc) and date(EXSTDTC) > $max_ds_dsstdtc
 Outcome:
   Message: "Exposure start date is after the latest Disposition date"
   Output_Variables:

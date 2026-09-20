@@ -1,20 +1,12 @@
 package net.cumba.corej.core;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import net.cumba.corej.core.expr.ExprLowering;
-import net.cumba.corej.core.expr.convert.DualFormCheckNode;
-import net.cumba.corej.core.model.CheckCondition;
-import net.cumba.corej.core.model.CheckConditionAll;
-import net.cumba.corej.core.model.CheckConditionAny;
-import net.cumba.corej.core.model.CheckConditionExpression;
-import net.cumba.corej.core.model.CheckConditionLeaf;
-import net.cumba.corej.core.model.CheckConditionNot;
+import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.DomainScope;
 import net.cumba.corej.core.model.MatchDataset;
 import net.cumba.corej.core.model.Operation;
@@ -30,26 +22,26 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * {@code STANDING-RULINGS.md} &sect;1, decided 2026-08-07: <em>"A check below an {@code any} is not
- * to be seen as a guard."</em> A presence leaf inside an {@code any} <b>cannot</b> guard, because a
- * sibling disjunct can still satisfy the branch; only a leaf that the whole {@code Check} implies
+ * to be seen as a guard."</em> A presence probe inside an {@code or} <b>cannot</b> guard, because a
+ * sibling disjunct can still satisfy the branch; only a probe that the whole {@code Check} implies
  * &mdash; a conjunct &mdash; guards. Nothing in the engine enforces this, so a guard authored into
- * an {@code any} is silently inert. {@code CORE-000269} / {@code CORE-000270} are the first
- * measured instances, and there the misplaced guard is <b>worse than inert</b>: on an absent
- * {@code SV}, {@code not_exists(SV.SVPRESP)} is TRUE, so the disjunct is satisfied and the rule
- * proceeds into a vacuous {@code $tv_visit} membership test and floods.
+ * a disjunct is silently inert. {@code CORE-000269} / {@code CORE-000270} are the first measured
+ * instances, and there the misplaced guard is <b>worse than inert</b>: on an absent {@code SV},
+ * {@code var_not_exists(SV.SVPRESP)} is TRUE, so the disjunct is satisfied and the rule proceeds
+ * into a vacuous {@code $tv_visit} membership test and floods.
  * </p>
  *
  * <h2>The predicate</h2>
  *
  * <p>
- * A <b>foreign presence leaf</b> is a {@link CheckConditionLeaf} whose operator is one of
+ * A <b>foreign presence unit</b> is a {@link CheckExprUnits.Unit} of the {@code Check} expression
+ * whose operator is one of
  * </p>
  * <ul>
- * <li><b>column presence</b> &mdash; {@code exists}, {@code not_exists}, {@code var_exists},
- * {@code var_not_exists}; the {@code name} is a column, so the dataset comes from a dotted
- * {@code DOMAIN.VAR} prefix or, for a {@code $}-id, from its {@code Operations} entry's
- * {@code domain:}; or</li>
- * <li><b>dataset presence</b> &mdash; {@code ds_exists}, {@code ds_not_exists}; the {@code name}
+ * <li><b>column presence</b> &mdash; {@code var_exists}, {@code var_not_exists}; the target is a
+ * column, so the dataset comes from a dotted {@code DOMAIN.VAR} prefix or, for a {@code $}-id, from
+ * its {@code Operations} entry's {@code domain:}; or</li>
+ * <li><b>dataset presence</b> &mdash; {@code ds_exists}, {@code ds_not_exists}; the target
  * <b>is</b> the dataset.</li>
  * </ul>
  * <p>
@@ -60,33 +52,33 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * Each such leaf is placed in one of two {@linkplain Position positions} by a polarity-aware walk
- * from the {@code Check} root:
+ * Each such unit is placed in one of two {@linkplain Position positions} by {@link CheckExprUnits}'
+ * polarity-aware walk from the {@code Check} root:
  * </p>
  * <ul>
- * <li>{@link Position#GUARD} &mdash; the whole {@code Check} implies the leaf, so it really does
+ * <li>{@link Position#GUARD} &mdash; the whole {@code Check} implies the unit, so it really does
  * gate every other conjunct: <b>(a)</b>.</li>
  * <li>{@link Position#DISJUNCT} &mdash; anywhere else; a sibling branch can satisfy the check
  * without it: <b>(b)</b>, a candidate defect.</li>
  * </ul>
  *
- * <h2>&#9888; Why the walk is polarity-aware rather than a "direct child of the root {@code all}"
+ * <h2>&#9888; Why the walk is polarity-aware rather than a "direct child of the root {@code and}"
  * test</h2>
  *
  * <p>
  * Two shapes a naive positional test gets wrong, in opposite directions:
  * </p>
  * <ul>
- * <li><b>Nested {@code all}.</b> Conjunction is associative, so a leaf in
- * {@code all[ all[ G, X ], Y ]} guards exactly as well as one in {@code all[ G, X, Y ]}. A "direct
- * child of the root" test <b>false-positives</b> on it.</li>
- * <li><b>{@code not} is not {@code any}.</b> De Morgan: under an odd number of {@code not}s an
- * {@code any} becomes a conjunction and an {@code all} becomes a disjunction. So a leaf in
- * {@code all[ not[ any[ G, X ] ], Y ]} <b>is</b> implied by the check (in negated form) and does
- * guard, while a leaf in {@code not[ all[ G, X ] ]} does not. The walk therefore tracks negation
- * parity and reports it via {@link PresenceLeaf#negated()} rather than folding {@code not} into
- * either bucket. &#9888; The authored corpus contains <b>zero</b> {@code not:} nodes today, so this
- * arm is exercised only by the synthetics in {@code GuardPositionLintTest} &mdash; it is kept
+ * <li><b>Nested conjunction.</b> {@code and} is associative, so a probe in {@code (G and X) and Y}
+ * guards exactly as well as one in {@code G and X and Y}. A "direct child of the root" test
+ * <b>false-positives</b> on it.</li>
+ * <li><b>{@code not} is not {@code or}.</b> De Morgan: under an odd number of {@code not}s an
+ * {@code or} becomes a conjunction and an {@code and} becomes a disjunction. So a probe in
+ * {@code not (G or X) and Y} <b>is</b> implied by the check (in negated form) and does guard, while
+ * one in {@code not (G and X)} does not. The walk therefore tracks negation parity and reports it
+ * via {@link PresenceLeaf#negated()} rather than folding {@code not} into either bucket. &#9888;
+ * The authored corpus contains <b>zero</b> structural {@code not}-over-presence shapes today, so
+ * this arm is exercised only by the synthetics in {@code GuardPositionLintTest} &mdash; it is kept
  * because the alternative is an arm that rots silently and then mis-classifies the first rule
  * authored with one.</li>
  * </ul>
@@ -96,19 +88,18 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * A rule can reach a foreign dataset without ever naming one of its columns, through an
  * {@code Operations} entry's {@code domain:} &mdash; {@code $ta_epoch = distinct(EPOCH,
- * domain: "TA")}. {@code exists} / {@code var_exists} take a <b>column</b> name, so no
- * column-presence guard is writable for such a surface. Those rules are enumerated by
- * {@link #operationOnlyDatasets(Rule)} and are <b>never</b> flagged: they carry no presence leaf at
- * all, so they are structurally outside the (a)/(b) population, and flagging them would put ~40
- * false positives on the lint's first run.
+ * domain: "TA")}. {@code var_exists} takes a <b>column</b> name, so no column-presence guard is
+ * writable for such a surface. Those rules are enumerated by {@link #operationOnlyDatasets(Rule)}
+ * and are <b>never</b> flagged: they carry no presence unit at all, so they are structurally
+ * outside the (a)/(b) population, and flagging them would put ~40 false positives on the lint's
+ * first run.
  * </p>
  *
  * <p>
  * &#9888; <b>But "no guard is expressible" is too strong</b>, and this class is the place that
- * records why: {@code ds_exists} / {@code ds_not_exists} take a <b>plain dataset name</b>
- * ({@code OperandSubstitutor} line ~453; {@code RulePackageLoader} Review F2), and the corpus
- * already uses them that way 90 times &mdash; {@code CDISC-CG0107} ships
- * {@code all[ $exvamtu_exists == true, EC ds_exists ]}. A <em>dataset-level</em> guard is therefore
+ * records why: {@code ds_exists} / {@code ds_not_exists} take a <b>plain dataset name</b>, and the
+ * corpus already uses them that way 90 times &mdash; {@code CDISC-CG0107} ships
+ * {@code $exvamtu_exists == true and ds_exists("EC")}. A <em>dataset-level</em> guard is therefore
  * writable for every bucket-(c) surface; what is missing is only a <em>column-level</em> one. The
  * count is reported so the owner can decide, with the number in hand, whether the gap is worth
  * closing.
@@ -118,32 +109,32 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * The five CG0031/CG0033-family defects were closed by the <b>dotted-{@code exists} idiom</b> (plan
- * &sect;9a, re-taken 2026-08-13): a top-level {@code all} conjunct {@code TV.VISIT exists} (resp.
+ * &sect;9a, re-taken 2026-08-13): a top-level conjunct {@code var_exists(TV.VISIT)} (resp.
  * {@code TV.VISITNUM}) &mdash; not {@code ds_exists}, which the corpus assembler rejects under a
  * non-presence {@code Rule_Type} (since {@code Fix #255} the engine itself no longer re-types such
  * a guard &mdash; shape B demotes to Record Data and executes &mdash; but the authoring-side
  * rejection stands, so the dotted idiom remains the authorable form), and not on {@code SV}, whose
  * absence is the Description's documented fallback rather than the flood. The misplaced {@code SV}
- * leaf itself stays where it was authored, so it stays in bucket (b); what changes is that its
+ * probe itself stays where it was authored, so it stays in bucket (b); what changes is that its
  * flood route is now structurally closed. {@link PresenceLeaf#mitigated()} derives exactly that
  * condition, cross-dataset and with <b>no exemption list</b>: every dataset whose vacuous
  * {@code $}-operation the {@code Check} tests with a {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP
- * vacuous-on-empty} membership operator must carry a presence-implying leaf in guard position.
+ * vacuous-on-empty} membership operator must carry a presence-implying unit in guard position.
  * </p>
  */
 public final class GuardPositionAudit
 {
 
-    /** Presence operators whose {@code name} is a <b>column</b>. */
+    /** Presence operators whose target is a <b>column</b>. */
     private static final Set<String> COLUMN_PRESENCE = Set.of("var_exists", "var_not_exists");
 
-    /** Presence operators whose {@code name} is a <b>dataset</b>. */
+    /** Presence operators whose target is a <b>dataset</b>. */
     private static final Set<String> DATASET_PRESENCE = Set.of("ds_exists", "ds_not_exists");
 
     /**
      * Presence operators that assert presence in their authored polarity ({@code var_exists} rather
      * than {@code var_not_exists}). Used by the {@linkplain PresenceLeaf#mitigated() mitigation}
-     * derivation: only a leaf that <em>implies presence</em> when the whole {@code Check} implies
+     * derivation: only a unit that <em>implies presence</em> when the whole {@code Check} implies
      * it can suppress a vacuous-set flood.
      */
     private static final Set<String> POSITIVE_PRESENCE = Set.of("var_exists", "ds_exists");
@@ -152,9 +143,9 @@ public final class GuardPositionAudit
      * Membership operators that are vacuously <b>true</b> against an empty {@code $}-set. This is
      * the flood mechanism of the CG0031/CG0033 family: {@code distinct(VISIT, domain: "TV")} over
      * an absent {@code TV} yields the empty set ({@code OperationExecutor}'s declared
-     * {@code EmptyResult.SET}), and {@code x is_not_contained_by {}} is then true on <b>every</b>
-     * row. An equality against an absent column is false and a {@code contains_all}-shaped
-     * containment passes on an empty required set, so neither can flood this way &mdash; the set is
+     * {@code EmptyResult.SET}), and {@code x not in {}} is then true on <b>every</b> row. An
+     * equality against an absent column is false and a {@code contains_all}-shaped containment
+     * passes on an empty required set, so neither can flood this way &mdash; the set is
      * deliberately this narrow, and widening it is a finding, not a tweak.
      *
      * <p>
@@ -166,11 +157,11 @@ public final class GuardPositionAudit
      * untestable arm. A rule that ever combines a modelled-and-guarded flood with an unmodelled
      * cousin flood would derive {@code mitigated == true} with an open route &mdash; if one of the
      * cousins ever gains a {@code domain:}-carrying {@code $}-ref, add it here in the same change.
-     * The {@code collectDangerous} walk is likewise polarity-blind by choice: a {@code not} above a
-     * <em>modelled</em> leaf only makes this derivation <em>under</em>-mitigate (the safe
+     * The dangerous-dataset collection is likewise polarity-blind by choice: a {@code not} above a
+     * <em>modelled</em> unit only makes this derivation <em>under</em>-mitigate (the safe
      * direction), while the mirror shape &mdash; {@code not} over a positive containment, a real
      * flood &mdash; is unmodelled and behaves exactly like the cousins above. The corpus ships zero
-     * {@code not:} nodes, so both arms are synthetic-only today.
+     * such shapes, so both arms are synthetic-only today.
      */
     private static final Set<String> VACUOUS_ON_EMPTY_MEMBERSHIP = Set.of("is_not_contained_by");
 
@@ -178,10 +169,10 @@ public final class GuardPositionAudit
     {
     }
 
-    /** Where a presence leaf sits in the {@code Check} tree, after De Morgan. */
+    /** Where a presence unit sits in the {@code Check} tree, after De Morgan. */
     public enum Position
     {
-        /** The whole {@code Check} implies the leaf &mdash; it really guards. Bucket (a). */
+        /** The whole {@code Check} implies the unit &mdash; it really guards. Bucket (a). */
         GUARD,
         /**
          * A sibling branch can satisfy the check without it. Bucket (b) &mdash; candidate defect.
@@ -191,29 +182,29 @@ public final class GuardPositionAudit
 
 
     /**
-     * One foreign presence leaf and where it sits.
+     * One foreign presence unit and where it sits.
      *
      * @param ruleId
-     *            {@code Core.Id} of the rule carrying the leaf
+     *            {@code Core.Id} of the rule carrying the unit
      * @param dataset
-     *            the foreign dataset the leaf probes
+     *            the foreign dataset the unit probes
      * @param operator
-     *            the leaf's presence operator, as authored
+     *            the unit's presence operator, in the v1 vocabulary the reports pin
      * @param position
      *            {@link Position#GUARD} (bucket a) or {@link Position#DISJUNCT} (bucket b)
      * @param negated
-     *            whether an odd number of {@code not} nodes sits between the root and the leaf, so
-     *            the leaf's authored polarity is inverted in the check's meaning
+     *            whether an odd number of structural {@code not} nodes sits between the root and
+     *            the unit, so the unit's authored polarity is inverted in the check's meaning
      * @param mitigated
-     *            {@code Fix #246}: for a {@link Position#DISJUNCT} leaf only &mdash; whether the
+     *            {@code Fix #246}: for a {@link Position#DISJUNCT} unit only &mdash; whether the
      *            flood the misplaced guard could enable is <b>structurally suppressed</b>, because
      *            every dataset whose vacuous {@code $}-operation makes the disjunct dangerous (a
      *            {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership test against
      *            a foreign {@code domain:}) carries a presence-<em>implying</em> guard in
      *            {@linkplain Position#GUARD guard position}. &#9888; Cross-dataset by design: on
-     *            the CG0031/CG0033 family the flagged leaf is on {@code SV} while the mitigating
-     *            guard is {@code TV.VISIT exists} &mdash; the guard sits on the dataset that
-     *            floods, not on the dataset the misplaced leaf names. Derived structurally from the
+     *            the CG0031/CG0033 family the flagged unit is on {@code SV} while the mitigating
+     *            guard is {@code var_exists(TV.VISIT)} &mdash; the guard sits on the dataset that
+     *            floods, not on the dataset the misplaced unit names. Derived structurally from the
      *            {@code Check}; there is <b>no exemption list</b>. A rule with no vacuous
      *            {@code $}-membership at all has nothing to mitigate and reports {@code false}.
      * @param path
@@ -226,11 +217,11 @@ public final class GuardPositionAudit
     }
 
     /**
-     * Every foreign presence leaf of one <b>authored</b> rule, in document order.
+     * Every foreign presence unit of one <b>authored</b> rule, in document order.
      *
      * @param rule
      *            a rule deserialised from {@code rules-src/checks/**}
-     * @return the leaves; empty when the rule probes no foreign dataset's presence
+     * @return the units; empty when the rule probes no foreign dataset's presence
      */
     public static List<PresenceLeaf> presenceLeaves(Rule rule)
     {
@@ -249,7 +240,7 @@ public final class GuardPositionAudit
      *
      * @param rule
      *            a rule deserialised from {@code rules-src/checks/**}
-     * @return every foreign presence leaf, guardable or not
+     * @return every foreign presence unit, guardable or not
      */
     public static List<PresenceLeaf> presenceLeavesIgnoringReadsElsewhere(Rule rule)
     {
@@ -257,88 +248,80 @@ public final class GuardPositionAudit
     }
 
 
-    /**
-     * The operator-leaf view of an {@code {expression}} Check subtree — {@code Fix #256}, the
-     * pre-flip re-point of {@code plans/done/PLAN-rules-src-expression-flip.md} §7b. All three of
-     * this audit's walks ({@link #walk}, {@link #collectDangerous}, {@link #collectDottedPrefixes})
-     * are shape-total over the operator-leaf AST; a Check arrives as a
-     * {@link CheckConditionExpression} only when the strict load-path lowering declined it, so the
-     * raised {@code Expr} is lowered through the engine's own conversion-mode machinery
-     * ({@link ExprLowering#toCheckConditionForConversion}) and walked as exactly the operator-leaf
-     * tree it is equivalent to — both authoring forms audit identically by construction.
-     *
-     * <p>
-     * A native-only expression (no operator-leaf surface even in conversion mode) fails LOUDLY
-     * rather than being skipped: a silent skip would let a misplaced guard hide inside an
-     * expression and would let the reads-elsewhere and mitigation derivations under-count.
-     * </p>
-     */
-    private static CheckCondition lowered(CheckConditionExpression expression)
-    {
-        CheckCondition condition = DualFormCheckNode.lowerConditionOrNull(expression.expr());
-        if (condition == null)
-        {
-            // Retry with num() conversions erased — a num(X) read is transparent to this
-            // instrument's classification; see DualFormCheckNode.stripNumConversions.
-            condition = DualFormCheckNode
-                    .lowerConditionOrNull(DualFormCheckNode.stripNumConversions(expression.expr()));
-        }
-        if (condition != null)
-        {
-            return condition;
-        }
-        // A native-only expression (no operator-leaf surface even with the dual-form inverses).
-        // The audit classifies presence leaves; when the expression provably carries no
-        // exists-family call, an empty contribution loses nothing this audit counts. A native-only
-        // expression that DOES carry one still fails loudly — that is the case where a skip would
-        // hide a misplaced guard (plans/done/PLAN-rules-src-expression-flip.md §7b).
-        if (!DualFormCheckNode.carriesPresenceCall(expression.expr()))
-        {
-            return new CheckConditionAll(List.of());
-        }
-        throw new IllegalStateException("GuardPositionAudit cannot audit the expression-form"
-                + " Check \"" + expression.source() + "\": it has no operator-leaf equivalent"
-                + " even in conversion mode, and it carries a presence call. Add a native Expr"
-                + " arm to the audit instead of skipping the Check"
-                + " (plans/done/PLAN-rules-src-expression-flip.md §7b).");
-    }
-
-
     private static List<PresenceLeaf> presenceLeaves(Rule rule, boolean requireRead)
     {
-        CheckCondition check = rule.getCheck();
+        Expr check = CheckExprUnits.checkExpr(rule);
         if (check == null)
         {
             return List.of();
         }
+        List<CheckExprUnits.Unit> units = CheckExprUnits.units(check);
         Map<String, Operation> operations = operationsById(rule);
         Set<String> own = ownDomains(rule);
-        Set<String> guardable = requireRead ? guardable(rule, operations) : null;
+        Set<String> guardable = requireRead ? guardable(rule, operations, units) : null;
         List<PresenceLeaf> out = new ArrayList<>();
-        walk(check, true, true, "", new Context(ruleId(rule), operations, own, guardable), out);
-        return mitigate(check, operations, own, out);
+        String ruleId = ruleId(rule);
+        for (CheckExprUnits.Unit unit : units)
+        {
+            record(unit, ruleId, operations, own, guardable, out);
+        }
+        return mitigate(units, operations, own, out);
+    }
+
+
+    private static void record(CheckExprUnits.Unit unit, String ruleId,
+            Map<String, Operation> operations, Set<String> own, @Nullable Set<String> guardable,
+            List<PresenceLeaf> out)
+    {
+        String operator = unit.operator();
+        String name = unit.name();
+        if (operator == null || name == null)
+        {
+            return;
+        }
+        String dataset;
+        if (DATASET_PRESENCE.contains(operator))
+        {
+            dataset = trimToNull(name);
+        }
+        else if (COLUMN_PRESENCE.contains(operator))
+        {
+            dataset = datasetOf(name, operations);
+        }
+        else
+        {
+            return;
+        }
+        if (dataset == null || own.contains(dataset)
+                || (guardable != null && !guardable.contains(dataset)))
+        {
+            return;
+        }
+        Position position = unit.conjunctive() ? Position.GUARD : Position.DISJUNCT;
+        out.add(new PresenceLeaf(ruleId, dataset, operator, position, unit.negated(), false,
+                unit.path().isEmpty() ? "leaf" : unit.path()));
     }
 
 
     /**
      * The {@code Fix #246} mitigation pass: stamps {@link PresenceLeaf#mitigated()} on the
-     * {@link Position#DISJUNCT} leaves of one rule.
+     * {@link Position#DISJUNCT} units of one rule.
      *
      * <p>
-     * A misplaced guard's danger is not the leaf itself &mdash; it is that the disjunct passes
-     * vacuously (its dataset absent &#8658; {@code not_exists} true) and evaluation then proceeds
-     * into a {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership test whose
-     * {@code $}-operation reads a foreign {@code domain:} that may itself be absent. The flood is
-     * cut by guarding <em>that</em> dataset: when every such dangerous dataset carries a
-     * presence-implying leaf in {@linkplain Position#GUARD guard position}, the whole {@code Check}
+     * A misplaced guard's danger is not the unit itself &mdash; it is that the disjunct passes
+     * vacuously (its dataset absent &#8658; {@code var_not_exists} true) and evaluation then
+     * proceeds into a {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership test
+     * whose {@code $}-operation reads a foreign {@code domain:} that may itself be absent. The
+     * flood is cut by guarding <em>that</em> dataset: when every such dangerous dataset carries a
+     * presence-implying unit in {@linkplain Position#GUARD guard position}, the whole {@code Check}
      * implies the dataset is present and the vacuous-set route is closed &mdash; regardless of the
-     * dataset the misplaced leaf itself names.
+     * dataset the misplaced unit itself names.
      * </p>
      */
-    private static List<PresenceLeaf> mitigate(CheckCondition check,
+    private static List<PresenceLeaf> mitigate(List<CheckExprUnits.Unit> units,
             Map<String, Operation> operations, Set<String> own, List<PresenceLeaf> leaves)
     {
-        Set<String> dangerous = dangerousDatasets(check, operations, own);
+        Set<String> dangerous = dangerousDatasets(units, operations, own);
         if (dangerous.isEmpty())
         {
             return List.copyOf(leaves);
@@ -346,8 +329,8 @@ public final class GuardPositionAudit
         Set<String> guarded = new TreeSet<>();
         for (PresenceLeaf leaf : leaves)
         {
-            // A leaf implies presence when the check implies it (GUARD) and its effective
-            // polarity is positive: an authored `exists`, or a `not_exists` under an odd
+            // A unit implies presence when the check implies it (GUARD) and its effective
+            // polarity is positive: an authored `var_exists`, or a `var_not_exists` under an odd
             // number of `not` nodes (De Morgan turns it back into a presence assertion).
             if (leaf.position() == Position.GUARD
                     && POSITIVE_PRESENCE.contains(leaf.operator()) != leaf.negated())
@@ -373,66 +356,23 @@ public final class GuardPositionAudit
 
     /**
      * The foreign datasets whose absence makes this {@code Check} flood: each is the
-     * {@code domain:} of a {@code $}-operation used as the {@code value} of a
-     * {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership leaf. An absent dataset
+     * {@code domain:} of a {@code $}-operation used as the value of a
+     * {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership unit. An absent dataset
      * there yields an empty set and the membership test fires on every row.
      */
-    private static Set<String> dangerousDatasets(@Nullable CheckCondition node,
+    private static Set<String> dangerousDatasets(List<CheckExprUnits.Unit> units,
             Map<String, Operation> operations, Set<String> own)
     {
         Set<String> dangerous = new TreeSet<>();
-        collectDangerous(node, operations, own, dangerous);
-        return dangerous;
-    }
-
-
-    private static void collectDangerous(@Nullable CheckCondition node,
-            Map<String, Operation> operations, Set<String> own, Set<String> into)
-    {
-        switch (node)
+        for (CheckExprUnits.Unit unit : units)
         {
-        case null ->
-        {
-            // No Check at all.
-        }
-        case CheckConditionAll all -> all.getConditions()
-                .forEach(c -> collectDangerous(c, operations, own, into));
-        case CheckConditionAny any -> any.getConditions()
-                .forEach(c -> collectDangerous(c, operations, own, into));
-        case CheckConditionNot not -> collectDangerous(not.getCondition(), operations, own, into);
-        case CheckConditionLeaf leaf ->
-        {
-            if (!VACUOUS_ON_EMPTY_MEMBERSHIP.contains(leaf.getOperator()))
+            if (unit.operator() == null || !VACUOUS_ON_EMPTY_MEMBERSHIP.contains(unit.operator()))
             {
-                return;
+                continue;
             }
-            // The membership target is a JsonNode: a textual `$`-ref, or an array whose
-            // elements may themselves be `$`-refs (an array value IS a ref — the
-            // dangling-$-operand load check exists because missing that shape silently
-            // over-reports).
-            JsonNode value = leaf.getValue();
-            if (value == null)
+            for (String ref : valueRefs(unit.value()))
             {
-                return;
-            }
-            List<String> refs = new ArrayList<>();
-            if (value.isTextual())
-            {
-                refs.add(value.textValue());
-            }
-            else if (value.isArray())
-            {
-                value.forEach(element ->
-                {
-                    if (element.isTextual())
-                    {
-                        refs.add(element.textValue());
-                    }
-                });
-            }
-            for (String ref : refs)
-            {
-                if (ref == null || !ref.startsWith("$"))
+                if (!ref.startsWith("$"))
                 {
                     continue;
                 }
@@ -440,15 +380,55 @@ public final class GuardPositionAudit
                 String domain = operation == null ? null : trimToNull(operation.getDomain());
                 if (domain != null && !"*".equals(domain) && !own.contains(domain))
                 {
-                    into.add(domain);
+                    dangerous.add(domain);
                 }
             }
         }
-        case CheckConditionExpression expression -> collectDangerous(lowered(expression),
-                operations, own, into);
+        return dangerous;
+    }
+
+
+    /**
+     * The textual references of a membership unit's value side: a single reference, a string
+     * literal (the array-membership encoding keeps {@code $}-refs as strings), or a list of either.
+     */
+    private static List<String> valueRefs(@Nullable Expr value)
+    {
+        List<String> refs = new ArrayList<>();
+        collectValueRefs(value, refs);
+        return refs;
+    }
+
+
+    private static void collectValueRefs(@Nullable Expr value, List<String> into)
+    {
+        switch (value)
+        {
+        case null ->
+        {
+            // No value side at all.
+        }
+        case Expr.Ref r -> into.add(r.name());
+        case Expr.Lit lit ->
+        {
+            if (lit.kind() == Expr.LitKind.STRING)
+            {
+                into.add((String) lit.value());
+            }
+            else if (lit.kind() == Expr.LitKind.LIST && lit.value() instanceof List<?> items)
+            {
+                for (Object item : items)
+                {
+                    if (item instanceof Expr e)
+                    {
+                        collectValueRefs(e, into);
+                    }
+                }
+            }
+        }
         default ->
         {
-            // Constants carry no membership test.
+            // Calls (accessors) carry no textual $-ref.
         }
         }
     }
@@ -456,24 +436,25 @@ public final class GuardPositionAudit
 
     /**
      * The datasets this rule <b>reads</b>, i.e. the ones a guard could have something to protect: a
-     * {@code Match_Datasets} join, a dotted {@code D.COL} reference, or an {@code Operations}
-     * entry's {@code domain:}.
+     * {@code Match_Datasets} join, a dotted {@code D.COL} reference in target position, or an
+     * {@code Operations} entry's {@code domain:}.
      *
      * <h4>&#9888;&#9888; Why the population is narrowed by this, and not only by position</h4>
      *
      * <p>
-     * A presence leaf on a dataset the rule never otherwise touches is not a misplaced guard
+     * A presence unit on a dataset the rule never otherwise touches is not a misplaced guard
      * &mdash; it is <b>the rule's own assertion</b>. {@code CDISC-SEND-0400} was
-     * {@code any[ TT ds_not_exists, TP ds_not_exists, SJ ds_not_exists ]} and its whole purpose is
-     * to report a missing DART domain; every one of its three leaves sat under a top-level
-     * {@code any} and none of them was a guard in any sense (since the 2026-09-12 R-5.25 wave-3
-     * split each leaf is the whole {@code Check} of its own rule, still no guard). Position alone
-     * puts all three in bucket (b) &mdash; <b>3 false positives out of 9</b>, measured 2026-08-12
-     * before this clause existed. A guard protects a <em>read</em>, so requiring the read is what
-     * separates the two.
+     * {@code ds_not_exists("TT") or ds_not_exists("TP") or ds_not_exists("SJ")} and its whole
+     * purpose is to report a missing DART domain; every one of its three probes sat under a
+     * top-level disjunction and none of them was a guard in any sense (since the 2026-09-12 R-5.25
+     * wave-3 split each probe is the whole {@code Check} of its own rule, still no guard). Position
+     * alone puts all three in bucket (b) &mdash; <b>3 false positives out of 9</b>, measured
+     * 2026-08-12 before this clause existed. A guard protects a <em>read</em>, so requiring the
+     * read is what separates the two.
      * </p>
      */
-    private static Set<String> guardable(Rule rule, Map<String, Operation> operations)
+    private static Set<String> guardable(Rule rule, Map<String, Operation> operations,
+            List<CheckExprUnits.Unit> units)
     {
         Set<String> read = new TreeSet<>();
         List<MatchDataset> matches = rule.getMatchDatasets();
@@ -496,7 +477,7 @@ public final class GuardPositionAudit
                 read.add(domain);
             }
         }
-        collectDottedPrefixes(rule.getCheck(), operations, read, true);
+        collectDottedPrefixes(units, read, true);
         return read;
     }
 
@@ -531,7 +512,7 @@ public final class GuardPositionAudit
             return List.of();
         }
 
-        // A dataset whose columns the rule already names — through a dotted Check reference or a
+        // A dataset whose columns the rule already names — through a dotted target reference or a
         // Match_Datasets join — is column-addressable, so a guard IS writable for it and it is not
         // part of the expressiveness gap.
         Set<String> addressable = new TreeSet<>();
@@ -547,170 +528,47 @@ public final class GuardPositionAudit
                 }
             }
         }
-        collectDottedPrefixes(rule.getCheck(), operations, addressable, false);
+        Expr check = CheckExprUnits.checkExpr(rule);
+        if (check != null)
+        {
+            collectDottedPrefixes(CheckExprUnits.units(check), addressable, false);
+        }
 
         viaOperations.removeAll(addressable);
         return List.copyOf(viaOperations);
     }
 
-    // ------------------------------------------------------------------
-    // The walk
-    // ------------------------------------------------------------------
-
-    /** Per-rule facts the walk needs at every leaf. */
-    private record Context(String ruleId, Map<String, Operation> operations, Set<String> own,
-            @Nullable Set<String> guardable)
-    {
-    }
 
     /**
-     * @param positive
-     *            polarity: {@code false} under an odd number of {@code not} nodes
-     * @param conjunctive
-     *            whether every combinator seen so far keeps the leaf implied by the whole check
-     */
-    private static void walk(CheckCondition node, boolean positive, boolean conjunctive,
-            String path, Context ctx, List<PresenceLeaf> out)
-    {
-        switch (node)
-        {
-        case CheckConditionAll all ->
-        {
-            // `all` preserves implication in positive polarity; under a `not` it becomes an
-            // `any` (De Morgan) and stops preserving it.
-            boolean still = conjunctive && positive;
-            for (CheckCondition child : all.getConditions())
-            {
-                walk(child, positive, still, join(path, "all"), ctx, out);
-            }
-        }
-        case CheckConditionAny any ->
-        {
-            // Mirror image: `any` breaks implication in positive polarity and preserves it
-            // under a `not`.
-            boolean still = conjunctive && !positive;
-            for (CheckCondition child : any.getConditions())
-            {
-                walk(child, positive, still, join(path, "any"), ctx, out);
-            }
-        }
-        case CheckConditionNot not ->
-        {
-            CheckCondition child = not.getCondition();
-            if (child != null)
-            {
-                walk(child, !positive, conjunctive, join(path, "not"), ctx, out);
-            }
-        }
-        case CheckConditionLeaf leaf -> record(leaf, positive, conjunctive, path, ctx, out);
-        case CheckConditionExpression expression -> walk(lowered(expression), positive, conjunctive,
-                path, ctx, out);
-        default ->
-        {
-            // A constant carries no structural leaf.
-        }
-        }
-    }
-
-
-    private static void record(CheckConditionLeaf leaf, boolean positive, boolean conjunctive,
-            String path, Context ctx, List<PresenceLeaf> out)
-    {
-        String operator = leaf.getOperator();
-        String name = leaf.getName();
-        if (operator == null || name == null)
-        {
-            return;
-        }
-        String dataset;
-        if (DATASET_PRESENCE.contains(operator))
-        {
-            dataset = trimToNull(name);
-        }
-        else if (COLUMN_PRESENCE.contains(operator))
-        {
-            dataset = datasetOf(name, ctx.operations());
-        }
-        else
-        {
-            return;
-        }
-        Set<String> guardable = ctx.guardable();
-        if (dataset == null || ctx.own().contains(dataset)
-                || (guardable != null && !guardable.contains(dataset)))
-        {
-            return;
-        }
-        Position position = conjunctive ? Position.GUARD : Position.DISJUNCT;
-        out.add(new PresenceLeaf(ctx.ruleId(), dataset, operator, position, !positive, false,
-                path.isEmpty() ? "leaf" : path));
-    }
-
-    // ------------------------------------------------------------------
-    // Resolution helpers
-    // ------------------------------------------------------------------
-
-
-    /** The dataset a <b>column</b> name reads, or {@code null} when it is local. */
-    private static @Nullable String datasetOf(String name, Map<String, Operation> operations)
-    {
-        if (name.startsWith("$"))
-        {
-            Operation operation = operations.get(name);
-            return operation == null ? null : trimToNull(operation.getDomain());
-        }
-        int dot = name.indexOf('.');
-        return dot > 0 ? name.substring(0, dot) : null;
-    }
-
-
-    /**
-     * Every dataset whose <em>columns</em> the {@code Check} names with a dotted {@code D.COL}.
+     * Every dataset whose <em>columns</em> the {@code Check} names with a dotted {@code D.COL} in
+     * target position. ⚠ Target position only, exactly as the v1 leaf's {@code name}/{@code names}
+     * slots were the only ones read: a dotted reference on the <em>value</em> side of a comparison
+     * never counted as a read, and the pinned populations depend on that asymmetry.
      *
      * @param skipPresenceLeaves
-     *            when {@code true}, a presence leaf's own name does not count. &#9888; This is the
-     *            difference between the two callers and it is load-bearing: for {@link #guardable}
-     *            a presence leaf must not make its own dataset "read", or every dotted presence
-     *            leaf would vouch for itself and the clause would be vacuous; for
+     *            when {@code true}, a presence unit's own target does not count. &#9888; This is
+     *            the difference between the two callers and it is load-bearing: for
+     *            {@link #guardable} a presence unit must not make its own dataset "read", or every
+     *            dotted presence probe would vouch for itself and the clause would be vacuous; for
      *            {@link #operationOnlyDatasets} it must count, because naming {@code D.COL} at all
      *            — presence or not — proves {@code D} is column-addressable.
      */
-    private static void collectDottedPrefixes(@Nullable CheckCondition node,
-            Map<String, Operation> operations, Set<String> into, boolean skipPresenceLeaves)
+    private static void collectDottedPrefixes(List<CheckExprUnits.Unit> units, Set<String> into,
+            boolean skipPresenceLeaves)
     {
-        switch (node)
+        for (CheckExprUnits.Unit unit : units)
         {
-        case null ->
-        {
-            // No Check at all.
-        }
-        case CheckConditionAll all -> all.getConditions()
-                .forEach(c -> collectDottedPrefixes(c, operations, into, skipPresenceLeaves));
-        case CheckConditionAny any -> any.getConditions()
-                .forEach(c -> collectDottedPrefixes(c, operations, into, skipPresenceLeaves));
-        case CheckConditionNot not -> collectDottedPrefixes(not.getCondition(), operations, into,
-                skipPresenceLeaves);
-        case CheckConditionLeaf leaf ->
-        {
-            String operator = leaf.getOperator();
+            String operator = unit.operator();
             if (skipPresenceLeaves && operator != null
                     && (COLUMN_PRESENCE.contains(operator) || DATASET_PRESENCE.contains(operator)))
             {
-                return;
+                continue;
             }
-            addDotted(leaf.getName(), into);
-            List<String> names = leaf.getNames();
-            if (names != null)
+            addDotted(unit.name(), into);
+            for (String n : unit.names())
             {
-                names.forEach(n -> addDotted(n, into));
+                addDotted(n, into);
             }
-        }
-        case CheckConditionExpression expression -> collectDottedPrefixes(lowered(expression),
-                operations, into, skipPresenceLeaves);
-        default ->
-        {
-            // Constants carry no name.
-        }
         }
     }
 
@@ -728,10 +586,21 @@ public final class GuardPositionAudit
         }
     }
 
+    // ------------------------------------------------------------------
+    // Resolution helpers
+    // ------------------------------------------------------------------
 
-    private static String join(String path, String node)
+
+    /** The dataset a <b>column</b> name reads, or {@code null} when it is local. */
+    private static @Nullable String datasetOf(String name, Map<String, Operation> operations)
     {
-        return path.isEmpty() ? node : path + '/' + node;
+        if (name.startsWith("$"))
+        {
+            Operation operation = operations.get(name);
+            return operation == null ? null : trimToNull(operation.getDomain());
+        }
+        int dot = name.indexOf('.');
+        return dot > 0 ? name.substring(0, dot) : null;
     }
 
 

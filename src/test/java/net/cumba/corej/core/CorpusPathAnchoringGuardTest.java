@@ -1,11 +1,19 @@
 package net.cumba.corej.core;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,22 +42,18 @@ import org.junit.jupiter.api.Test;
  *
  * <ul>
  * <li>{@link CorpusPaths} itself — it is the definition.
- * <li>The <b>source</b> trees, which did not move: {@code rules-src}, {@code rules-org},
- * {@code rules-define-src}, and the committed engine fixtures under
- * {@code src/test/resources/fixtures/rules}.
+ * <li>The <b>source</b> trees, which did not move: {@code rules-src}, {@code rules-define-src}, and
+ * the committed engine fixtures under {@code src/test/resources/fixtures/rules}. ⚑
+ * {@code rules-org} — the archived upstream CDISC release — was a fourth until the 2026-09
+ * CORE-family retirement deleted it; it was the CORE family's fallback statement of intent and had
+ * no other consumer.
  * <li>Prose: javadoc and comments may name {@code rules/} freely. Only code is checked.
  * </ul>
- *
- * <p>
- * ⚠ The source-tree lint that once lived here — walking {@code src/test/java} and failing any test
- * that named a generated-corpus directory by a hand-built path — is <b>deliberately not carried in
- * this repository</b>. Corpus paths are authored upstream, in the monorepo, which still runs it;
- * here the corpus is build output and there is nothing to anchor. The two checks below are the
- * detector's own self-tests and are kept because they are repo-local.
- * </p>
  */
 class CorpusPathAnchoringGuardTest
 {
+
+    private static final Path SOURCES = Path.of("src", "test", "java");
 
     /** A string literal, with escapes. */
     private static final Pattern LITERAL = Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"");
@@ -67,6 +71,67 @@ class CorpusPathAnchoringGuardTest
      */
     private static final Pattern JSON_ACCESSOR = Pattern.compile(
             "\\.(get|path|has|remove|set|put|putArray|with|findValue|findPath|required)\\s*\\($");
+
+    /** Source directories, which did not move and must not be flagged. */
+    private static final Pattern SOURCE_TREES = Pattern
+            .compile("rules-src|rules-define-src|fixtures/rules|rulespec|\"fixtures\"");
+
+    /**
+     * The one file allowed to name the generated directories in code.
+     *
+     * <p>
+     * ⚠ If you are about to add a name here, you almost certainly want {@link CorpusPaths} instead.
+     * The whole point is that the next move of these directories is a one-line change.
+     * </p>
+     */
+    private static final List<String> ALLOWED = List.of("CorpusPaths.java",
+            "CorpusPathAnchoringGuardTest.java");
+
+    @Test
+    void noTestReachesTheGeneratedCorpusByAHandBuiltPath() throws IOException
+    {
+        List<String> offenders = new ArrayList<>();
+        int scanned = 0;
+
+        try (Stream<Path> files = Files.walk(SOURCES))
+        {
+            for (Path java : files.filter(p -> p.getFileName().toString().endsWith(".java"))
+                    .sorted().toList())
+            {
+                if (ALLOWED.contains(java.getFileName().toString()))
+                {
+                    continue;
+                }
+                scanned++;
+                int lineNumber = 0;
+                for (String line : Files.readAllLines(java, StandardCharsets.UTF_8))
+                {
+                    lineNumber++;
+                    String code = stripComment(line);
+                    if (code.isBlank() || SOURCE_TREES.matcher(code).find()
+                            || code.contains("CorpusPaths."))
+                    {
+                        continue;
+                    }
+                    if (namesAGeneratedCorpusDirectory(code))
+                    {
+                        offenders.add(java + ":" + lineNumber + "  " + code.strip());
+                    }
+                }
+            }
+        }
+
+        assertTrue(scanned > 200,
+                "only " + scanned + " sources scanned; the walk found nothing to guard");
+        assertEquals(List.of(), offenders,
+                offenders.size() + " source line(s) name a generated corpus directory in code"
+                        + " instead of going through CorpusPaths. The corpus is generated into"
+                        + " target/ and is not committed, so a hand-built path resolves to a"
+                        + " directory that does not exist — and does so SILENTLY on any machine"
+                        + " where an old copy is still lying around:\n  "
+                        + String.join("\n  ", offenders));
+    }
+
 
     /**
      * Whether a line of code builds a path to a generated corpus directory.
@@ -108,6 +173,19 @@ class CorpusPathAnchoringGuardTest
     }
 
 
+    /** Drops {@code //} and whole-line {@code *} javadoc/comment text; prose may say anything. */
+    private static String stripComment(String aLine)
+    {
+        String trimmed = aLine.strip();
+        if (trimmed.startsWith("*") || trimmed.startsWith("/*") || trimmed.startsWith("//"))
+        {
+            return "";
+        }
+        int slashes = aLine.indexOf("//");
+        return slashes < 0 ? aLine : aLine.substring(0, slashes);
+    }
+
+
     /**
      * Guards the guard, in both directions.
      *
@@ -130,8 +208,9 @@ class CorpusPathAnchoringGuardTest
                 "the bare Path.of shape");
         assertTrue(namesAGeneratedCorpusDirectory("dir.resolve(\"rules-define\")"),
                 "the define corpus");
-        assertTrue(namesAGeneratedCorpusDirectory(
-                "Path.of(root, \"lib/cumba-oss-corej-rules/rules/rules-cdisc-sdtmig-3-4.json\")"),
+        assertTrue(
+                namesAGeneratedCorpusDirectory(
+                        "Path.of(root, \"lib/corej-rules/rules/rules-cdisc-sdtmig-3-3.json\")"),
                 "the repoRoot-anchored shape");
 
         assertFalse(namesAGeneratedCorpusDirectory("JsonNode rules = root.get(\"rules\");"),

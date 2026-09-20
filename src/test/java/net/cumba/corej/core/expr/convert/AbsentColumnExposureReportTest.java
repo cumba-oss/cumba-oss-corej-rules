@@ -15,7 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
-import net.cumba.corej.core.expr.CheckToExpr;
+import net.cumba.corej.core.expr.CheckExpressionParser;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -107,11 +107,9 @@ class AbsentColumnExposureReportTest
     /** Leaves the scan collects for a single unguarded {@code <op>(TSVAL)} Check. */
     private static int unguardedLeafCount(String operator)
     {
-        Expr expr = CheckToExpr.toExpr(new net.cumba.corej.core.model.CheckConditionAll(
-                List.of(net.cumba.corej.core.model.CheckConditionLeaf.builder().name("TSVAL")
-                        .operator("is_incomplete_date").build())));
-        // Swap the call name in place: CheckToExpr only knows the operators it ships, and the
-        // point here is the SCAN's name-keyed classification, not the converter's.
+        Expr expr = new Expr.And(List.of(CheckExpressionParser.parse("is_incomplete_date(TSVAL)")));
+        // Swap the call name in place: the parser accepts any call spelling, and the point here
+        // is the SCAN's name-keyed classification, not the grammar's.
         Expr probe = renameSingleCall(expr, operator);
         return AbsentColumnExposureScan.scan(probe, List.of(), List.of()).size();
     }
@@ -193,12 +191,12 @@ class AbsentColumnExposureReportTest
                 Expr root;
                 try
                 {
-                    root = CheckToExpr.toExpr(rule.getCheck());
+                    root = net.cumba.corej.core.CheckExprUnits.toExpr(rule.getCheck());
                 }
                 catch (RuntimeException _)
                 {
-                    // Counted and asserted on, never swallowed: a leaf with no faithful expression
-                    // surface would silently shrink the census.
+                    // Counted and asserted on, never swallowed: a Check with no expression form
+                    // would silently shrink the census.
                     unconvertible++;
                     continue;
                 }

@@ -1,0 +1,26 @@
+#!RuleTest
+#test PMDA-SD1017 expect=violation domain=SV
+#note "RE-CUT 2026-09-18 (PLAN-unplanned-visit-cascade): expect moved skipped -> violation, the finding the retired PMDA-SD1017-A owed on this data now coming from the merged parent. SVUPDES left Requirements.Variables.All, so the SVUPDES-less dataset no longer skips: with no SVPRESP and no SVUPDES the name tier decides, WEEK 99 is planned-looking, and VISITNUM=99 not in TV fires."
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=001
+#library standard=sdtmig version=3-4
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | SV | 001 | 1  | SCREENING
+S1 | SV | 001 | 99 | WEEK 99
+---
+
+dataset TV class="TRIAL DESIGN" label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+S1 | TV | 1 | SCREENING
+S1 | TV | 2 | WEEK 2
+---

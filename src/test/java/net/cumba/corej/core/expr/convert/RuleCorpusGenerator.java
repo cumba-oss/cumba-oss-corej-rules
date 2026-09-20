@@ -15,11 +15,8 @@ import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
 
 /**
- * Offline developer tool — <b>stage 0</b> of the internal {@code regen-rules-corpus} workflow, and
- * the single producer of both shipped corpora. That workflow is an internal developer pipeline and
- * is not distributed with this repository, so every {@code regen-rules-corpus} mention below names
- * it rather than a file found here; in <em>this</em> repository the same stage runs unconditionally
- * from the build's {@code exec-maven-plugin} binding at {@code process-test-classes}.
+ * Offline developer tool — <b>stage 0</b> of {@code scripts/regen-rules-corpus.sh}, and the single
+ * producer of both shipped corpora.
  *
  * <h2>Assemble once, emit one corpus</h2>
  *
@@ -61,7 +58,7 @@ import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
  *
  * <p>
  * The <em>source</em> paths resolve against the working directory, which must be the module base
- * directory — the build's exec binding sets it, and the {@code regen-rules-corpus} workflow
+ * directory — the build's exec binding sets it, and {@code scripts/regen-rules-corpus.sh}
  * {@code cd}s there. The <em>output</em> directory is a parameter (see {@link #main}); it is
  * {@code target/rules/} under the build, and nothing generated is committed any more
  * ({@code plans/done/PLAN-rules-corpus-build-integration.md}).
@@ -93,8 +90,8 @@ public final class RuleCorpusGenerator
      *            {@link CorpusPaths#releaseRules()} — the {@code corpusDir} /
      *            {@code releaseCorpusDir} system properties, else {@code <module>/target/rules} and
      *            {@code <module>/target/rules-release}. The build passes both explicitly (see this
-     *            module's pom); the {@code regen-rules-corpus} workflow passes neither, and gets
-     *            the same defaults.
+     *            module's pom); {@code scripts/regen-rules-corpus.sh} passes neither, and gets the
+     *            same defaults.
      * @throws IOException
      *             if the source corpus cannot be read or the output cannot be written
      */

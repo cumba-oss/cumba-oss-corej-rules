@@ -1,24 +1,33 @@
 name: EC43-absent-equals-blank-control
 kind: check_operator
 description: |
-  EC-43 NEGATIVE CONTROL — the same `not_equal_to` leaf over a column that is PRESENT but blank on
-  every row.
+  EC-43 NEGATIVE CONTROL, RE-EXPECTED under D111 (2026-09-17) — the same `not_equal_to` leaf over
+  a column that is PRESENT but blank on every row still fires ON EVERY ROW.
 
-  This is the contract EC-43 implements, stated as a spec: an absent column and a present-but-all-
-  blank column must evaluate IDENTICALLY. Both lanes already agreed on this shape BEFORE the fix
-  (the fork via EC-38, coreJ because a present column reaches the primitive and `Primitives.equality`
-  folds a missing cell to ""), and they must still agree after it.
+  ⚠⚠ WHAT THIS CONTROL NOW PINS. Until D111 (PLAN-typed-expression-engine.md phase 7) it pinned
+  EC-43's REPORTING equivalence: an absent column and a present-but-all-blank column evaluated —
+  and reported — identically, and this spec's expectations were byte-paired with
+  `EC43-not-equal-absent`(-operator)'s. D111 retires that pairing KNOWINGLY, and this file is
+  kept, re-expected rather than deleted, so the pairing's loss stays visible in the corpus
+  instead of vanishing with the file. The ruled split is epistemic, not semantic: an ABSENT
+  column is a schema fact — "can't have a value anywhere", decidable before a row is read — so
+  the check folds to ONE dataset-level finding (see the re-expected sibling
+  `EC43-not-equal-absent-operator`); a PRESENT column "might be all blank, might have some values
+  — we only know when we read the values", so blankness stays a per-row data fact and THIS spec
+  keeps its two row findings. The VERDICTS still agree (both fire; EC-43's evaluation contract —
+  absent folds to all-missing and the operator computes its own polarity — is untouched); only
+  the granularity differs, and that difference is D111's content.
 
-  Paired with EC43-not-equal-absent: identical expectations, only the fixture differs. If these two
-  specs ever diverge from each other, the EC-43 contract has been broken.
+  If this spec ever collapses to one finding, the row path stopped answering for present columns;
+  if the sibling ever returns to two, the D111 fold was lost. Either way exactly one of the pair
+  reddens — that is the pair's job now.
 python_notes: |
-  Both lanes fire every row; identical to EC43-not-equal-absent but with TSVAL present and blank.
+  Both lanes fire every row here (TSVAL present and blank). On the ABSENT sibling the lanes
+  diverge since D111 — the fork fires per row, coreJ once at dataset level — a filed
+  `java-only-accepted` divergence; see the sibling and `documentation/parity-diff-baseline.json`.
 python_source: EC-43 (PLAN-negative-leaf-absent-column.md Phase 2, negative control)
 check:
-  name: TSVAL
-  operator: not_equal_to
-  value: "PLANNED"
-  value_is_literal: true
+  expression: 'TSVAL != "PLANNED"'
 datasets:
   TS:
     row_key: [STUDYID, TSPARMCD, TSSEQ]

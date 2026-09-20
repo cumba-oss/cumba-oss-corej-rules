@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0324 expect=noViolation domain=PC
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): row 1 has a BLANK PCORRES and row 2 a NON-NUMERIC one ('TRACE'), so num(PCORRES) is MISSING on both (D35/D36) and the not empty(PCORRES) and is_numeric(PCORRES) guards silence the rule - an unquantified result is not below anything. If this FIRES, the guards were deleted: post-6c totality positions the MISSING num() below every number, so num(PCORRES) < PCLLOQ becomes true with PCSTRESC not 'BLQ'."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetic Concentrations"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col PCSEQ    type=Num
+col PCTESTCD type=Char
+col PCORRES  type=Char
+col PCLLOQ   type=Num
+col PCSTRESC type=Char
+---
+S1 | PC | 001 | 1 | DRUGX |       | 5 | 12
+S1 | PC | 002 | 1 | DRUGX | TRACE | 5 | TRACE

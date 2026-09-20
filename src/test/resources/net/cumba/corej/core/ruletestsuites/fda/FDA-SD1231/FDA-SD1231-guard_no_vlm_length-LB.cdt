@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1231 expect=noViolation domain=LB
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1-order-flip.tsv): the GLUC where-clause MATCHES but its value-level ItemDef declares NO Length, so vlm_length(variable_name) is MISSING and the not empty(vlm_length(...)) guard silences the rule despite a long value. If this FIRES, the order-flip guard was deleted: post-6c totality positions the MISSING below every number, so vlm_value_length > MISSING becomes true."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD1231-define-nolength.xml
+dataset LB
+col USUBJID  type=Char
+col LBTESTCD type=Char
+col LBSPEC   type=Char
+col LBSTRESC type=Char
+---
+001 | GLUC | SERUM | 123456789012345

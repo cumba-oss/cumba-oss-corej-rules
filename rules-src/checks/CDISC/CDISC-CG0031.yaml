@@ -15,26 +15,30 @@ Requirements:
     All:
     - "VISIT"
     - "TV.VISIT"
-    - "SV.SVPRESP"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
   - "USUBJID"
   - "VISIT"
   Name: "SV"
-Operations:
-- id: "$tv_visit"
+Bindings:
+- name: "$tv_visit"
   expression: "distinct(VISIT, domain=\"TV\")"
 Check:
   expression: >-
-    SV.SVPRESP == "Y" and not empty(VISIT) and VISIT not in $tv_visit
+    (var_exists(SV.SVPRESP) and SV.SVPRESP == "Y" or not var_exists(SV.SVPRESP) and
+    empty(SV.SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT),
+    "UNPLAN")) and not empty(VISIT) and VISIT not in $tv_visit
 Outcome:
-  Message: "VISIT value for a visit flagged pre-specified in SV does not match any\
-    \ VISIT value in the TV dataset."
+  Message: "VISIT value for a visit determined to be planned — SV.SVPRESP is \"Y\"\
+    , or SV carries no SVPRESP column and the visit has no unplanned-visit description\
+    \ and no unscheduled/unplanned name marker — does not match any VISIT value in\
+    \ the TV dataset."
   Output_Variables:
   - "VISITNUM"
   - "VISIT"
   - "SV.SVPRESP"
+  - "SV.SVUPDES"
   - "$tv_visit"
 Source:
   Class: "ALL"

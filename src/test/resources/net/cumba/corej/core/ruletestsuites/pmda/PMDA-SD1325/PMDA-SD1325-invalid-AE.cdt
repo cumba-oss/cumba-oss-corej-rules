@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1325 expect=violation domain=AE
+#note "Mirrors rulespec PMDA-SD1325.yaml (the rule's only prior guard; PMDA twin of FDA-SD1325, byte-identical executable fields but a DIFFERENT corpus entry - a regeneration that dropped or mis-derived the PMDA copy leaves the FDA suite green and only this one red). Submitted dataset label 'AE' vs Define-XML description 'Adverse Events' -> one finding, pinned on both projected labels."
+#library standard=sdtmig version=3-4
+#define dataset-metadata AE name=AE label="Adverse Events"
+#expectViolationCount 1
+#expectViolationAt dataset_label=AE define_dataset_label="Adverse Events"
+dataset AE label="AE"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE

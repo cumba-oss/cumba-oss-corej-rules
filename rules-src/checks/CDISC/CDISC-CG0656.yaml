@@ -5,7 +5,7 @@ Core:
 Description: "Raise an error when a visit is unplanned (SVPRESP is empty) but the\
   \ Visit Number (VISITNUM) value matches a VISITNUM value in the Trial Visits (TV)\
   \ dataset."
-Executability: "Fully Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -14,12 +14,14 @@ Requirements:
   Variables:
     All:
     - "VISITNUM"
-Operations:
-- id: "$tv_visitnum"
+Bindings:
+- name: "$tv_visitnum"
   expression: "distinct(VISITNUM, domain=\"TV\")"
 Check:
   expression: >-
-    empty(SVPRESP) and VISITNUM in $tv_visitnum
+    (var_exists("SVPRESP") and SVPRESP != "Y" or not var_exists("SVPRESP") and (not empty(SVUPDES)
+    or contains(upper(VISIT), "UNSCHEDUL") or contains(upper(VISIT), "UNPLAN"))) and VISITNUM in
+    $tv_visitnum
 Outcome:
   Message: "VISITNUM value for an unplanned visit matches a VISITNUM value in the\
     \ TV dataset."

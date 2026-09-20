@@ -14,12 +14,14 @@ Requirements:
   Variables:
     All:
     - "VISIT"
-Operations:
-- id: "$tv_visit"
+Bindings:
+- name: "$tv_visit"
   expression: "distinct(VISIT, domain=\"TV\")"
 Check:
   expression: >-
-    not empty(VISIT) and empty(SVUPDES) and VISIT not in $tv_visit
+    not empty(VISIT) and (var_exists("SVPRESP") and SVPRESP == "Y" or not var_exists("SVPRESP") and
+    empty(SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT),
+    "UNPLAN")) and VISIT not in $tv_visit
 Outcome:
   Message: "VISIT for a planned visit does not match any VISIT value in the TV dataset."
   Output_Variables:

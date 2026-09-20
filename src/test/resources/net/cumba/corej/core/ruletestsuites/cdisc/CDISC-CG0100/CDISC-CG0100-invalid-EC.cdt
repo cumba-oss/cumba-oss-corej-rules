@@ -1,9 +1,10 @@
 #!RuleTest
 #test CDISC-CG0100 expect=violation domain=EC
-#note "H3 convergence (ruled 2026-08-19): the dose leg is the hole-free bare comparison ECDOSE <= 0, so only a RECORDED non-positive dose fires. The ECOCCUR column is ABSENT (Perm in EC; treat-as-empty applies per D-TA-4c and the guard tolerates it). Row 1 has ECDOSE=0 recorded -> fires; row 2 has ECDOSE > 0 -> silent; row 3 leaves ECDOSE empty -> silent under the converged shape (a missing dose is CDISC-CG0462's subject, and the all-absent dataset shape is CDISC-CG0100-A's)."
+#note "H3 convergence (ruled 2026-08-19) as AMENDED BY PHASE 6c (D117/D95d): the dose leg is the hole-free bare comparison ECDOSE <= 0. The ECOCCUR column is ABSENT (Perm in EC; treat-as-empty applies per D-TA-4c and the guard tolerates it). Row 1 has ECDOSE=0 recorded -> fires; row 2 has ECDOSE > 0 -> silent. ROW 3 LEAVES ECDOSE EMPTY AND NOW FIRES: under D34 #5 every MissingValue sorts BELOW every non-missing value and #5-2 makes the comparison total, so a missing dose IS not-greater-than-0 - which is exactly what this rule's Message asserts. D95d ruled these four ECDOSE <= 0 rules KEEP on that authority: the operand that goes missing is the SUBJECT of the assertion (D96d), so the new firing is a bug fix, not a false positive. The 2026-08-19 note's handover of the missing-dose case to CDISC-CG0462 was written under the pre-flip semantics; CG0462 still reports it under its own aspect (ECDOSTXT empty when ECDOSE is missing), so the row now carries two findings from two rules - ordinary rule overlap, not a defect."
 #library standard=sdtmig version=3-4
-#expectViolationCount 1
+#expectViolationCount 2
 #expectViolationAt row=1 ECSEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=3 ECSEQ=3 USUBJID=01-701-1028
 dataset EC label="Exposure as Collected"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

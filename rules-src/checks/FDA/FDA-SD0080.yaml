@@ -9,12 +9,12 @@ Scope:
   Domains:
     Include:
     - "AE"
-Operations:
-- id: "$max_ds_dsstdtc"
+Bindings:
+- name: "$max_ds_dsstdtc"
   expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    not empty(AESTDTC) and date(AESTDTC) > $max_ds_dsstdtc
+    not empty(AESTDTC) and not empty($max_ds_dsstdtc) and date(AESTDTC) > $max_ds_dsstdtc
 Outcome:
   Message: "AESTDTC is after the latest Disposition (DS) start date (DSSTDTC) for\
     \ the subject."

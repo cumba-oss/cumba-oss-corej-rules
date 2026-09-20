@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD0061 expect=violation domain=AE
+#note "Mirrors rulespec PMDA-SD0061.yaml (the rule's only prior guard; PMDA twin of FDA-SD0061). The Define-XML sidecar declares FOUR datasets (AE, VS, ZZ, YY) but the study submits only AE and VS -> $missing_datasets = [ZZ, YY] and the rule fires once, on the primary dataset's bucket (Sensitivity Study). Pinning the projected $missing_datasets list is what makes this discriminating: leaking the Define's key set into $study_datasets (the D3 inventory hazard the spec guards) un-fires the rule, and a define_dataset_names() that returned [] would change the list and red the pin. The pinned order is the engine's raw projection - Define declaration order minus the study set (the rulespec pins the same set canonical-sorted as [YY, ZZ]; the .cdt harness does not sort)."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD0061-define.xml
+#expectViolationCount 1
+#expectViolationAt "$missing_datasets"="[ZZ, YY]"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+---
+S1 | VS | 001 | 1 | SYSBP

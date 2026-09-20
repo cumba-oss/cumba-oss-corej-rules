@@ -1,9 +1,9 @@
 #!RuleTest
 #test FDA-SE2276 expect=violation domain=MI
-#note "Subject 001's latest disposition starts 2020-01-20. Row 1: collected 2020-01-05 (matches only the earlier, superseded disposition) -> offending. Row 2: collected 2020-01-22, after the disposition -> offending. Row 3: collected on the disposition date -> clean. O-4 (Fix #337, owner 2026-08-22 'the issue is by subject'): the rule carries Grouping: {Variables: [USUBJID]}, so the two offending rows of ONE subject fold into ONE finding, anchored at the subject's first flagged row (row 1). Re-pinned 2 -> 1; a per-record reading would report 2 here."
+#note "Subject 001's latest disposition starts 2020-01-20. Row 1: collected 2020-01-05 (matches only the earlier, superseded disposition) -> offending. Row 2: collected 2020-01-22, after the disposition -> offending. Row 3: collected on the disposition date -> clean. O-4 (Fix #337, owner 2026-08-22 'the issue is by subject'): the rule carries Grouping: {Variables: [USUBJID]}, so the two offending rows of ONE subject fold into ONE finding, anchored at the subject's first flagged row (row 1). Re-pinned 2 -> 1; a per-record reading would report 2 here. Phase 5b (D58/D94b): MIDTC varies across the two flagged rows, so the finding renders the distinct set [2020-01-05, 2020-01-22] instead of the anchor row's arbitrary value."
 #library standard=sendig version=3-1-1
 #expectViolationCount 1
-#expectViolationAt row=1 MIDTC=2020-01-05
+#expectViolationAt row=1 MIDTC="[2020-01-05, 2020-01-22]"
 dataset MI label="Microscopic Findings"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

@@ -292,7 +292,7 @@ src/test/resources/net/cumba/corej/core/ruletestsuites/
 
 The subtree name is simultaneously the **assembled-package prefix**: a
 `<family>/` scenario resolves its rule out of
-the generated `target/rules/rules-<family>-*.json` and nothing else. That is
+`lib/corej-rules/rules/rules-<family>-*.json` and nothing else. That is
 what routes the CDISC-SEND rules — they are `CDISC-*` ids assembled into
 `rules-cdisc-sendig-*.json`, so they live under `cdisc/` and declare
 `#library standard=sendig version=…` (or `sendig-dart` / `sendig-genetox` /
@@ -358,14 +358,14 @@ and the rule is executed against the primary (first) table.
 A `.cdt` file may also be a **self-contained rule-test scenario**: the rule
 under test, the expected outcome, and the input data all live in one file.
 These are discovered and run automatically by the per-family `@TestFactory`
-classes (`RuleTestSuitesCdiscFactoryTest`, `…CoreFactoryTest`,
+classes (`RuleTestSuitesCdiscFactoryTest`,
 `…DraftFactoryTest`, `…FdaFactoryTest`, `…PmdaFactoryTest`) — no Java glue per
 test. A scenario file starts with the `#!RuleTest` shebang followed
 by a short directive prelude, then one or more ordinary `dataset` blocks.
 
 ```
 #!RuleTest
-#test CORE-000575 expect=noViolation domain=LB
+#test CDISC-CG0219 expect=noViolation domain=LB
 #note "at least one timing variable present -> no violation"
 #library standard=sdtmig version=3-4
 #library model-variables LB --DTC:Timing --DY:Timing
@@ -421,27 +421,16 @@ while exercising nothing, exactly as a skip scenario did. `executionError` is th
 
 ```
 #!RuleTest
-#test FDA-SD1212 expect=executionError domain=LB
-#expect-execution-error "LBSTRESN is declared Char"
-#note "LBSTRESN shipped as Char is nonconformant data (SDTMIG declares it Num), so the numeric
-       comparison --STRESN != num(--STRESC) must ERROR rather than compare a number's text"
-#library standard=sdtmig version=3-4
-dataset LB class=FINDINGS label="Laboratory Test Results"
-col STUDYID  type=Char
-col DOMAIN   type=Char
-col USUBJID  type=Char
-col LBSEQ    type=Num
-col LBTESTCD type=Char
-col LBSTRESC type=Char
-col LBSTRESN type=Char
+#test CDISC-CG0040 expect=executionError domain=AE
+#expect-execution-error "use num(AGE)"
+#note "AGE is Char in this submission, so `AGE > 5` is a rule defect (R3) and must ERROR"
+dataset AE
+col STUDYID type=Char
+col AGE    type=Char
 ---
-S1 | LB | 001 | 1 | ALB | 40 | 40
+CDISC01 | 25
 ---
 ```
-
-(The shipped scenario is
-[`fda/FDA-SD1212/FDA-SD1212-executionError_stresn_shipped_char-LB.cdt`](fda/FDA-SD1212/FDA-SD1212-executionError_stresn_shipped_char-LB.cdt);
-its `#note` is a single line — wrapped above only to fit this page.)
 
 - **The rule must have been reached.** A rule that merely *skipped* does not satisfy the verdict —
   the failure names the skip reason and tells you to write `expect=skipped` instead.
@@ -455,9 +444,7 @@ its `#note` is a single line — wrapped above only to fit this page.)
 - The directive is **rejected on any other verdict** — dead text that reads like an assertion is
   worse than no assertion.
 - **Ruling R7** (owner, 2026-09-13): *a rule that can error needs a `.cdt` scenario proving it
-  errors.* The ruling and its column-type-conformance plan are kept in the internal monorepo and
-  are not redistributed here; the twelve `expect=executionError` scenarios in this suite are its
-  product.
+  errors.* See [`plans/done/PLAN-column-type-conformance.md`](../../../../../../../../../plans/done/PLAN-column-type-conformance.md).
 
 ##### ⛔⛔ `executionError` is NOT `severity=ERROR` — the names collide, the meanings are opposite
 
@@ -477,8 +464,7 @@ the word they mean, lands on the wrong concept, and gets a green test asserting 
 `executionError` in the failure, rather than guessing which one was meant.
 
 The requirements a `skipped` scenario can be built on
-(spec `CORE-RULES-SPECIFICATION.md`, "Field: `Requirements`" — kept in the internal
-monorepo and not redistributed here):
+(spec [Field: `Requirements`](../../../../../../../../../corej-rules/documentation/CORE-RULES-SPECIFICATION.md#field-requirements)):
 
 | requirement | the scenario withholds | the rule skips because |
 |---|---|---|
@@ -521,7 +507,7 @@ stored as `1.0`.
 
 ```
 #!RuleTest
-#test CORE-000087 expect=violation domain=AE
+#test CDISC-CG0387 expect=violation domain=AE
 #expectViolationCount 1
 #expectViolationAt row=4 AESER=Maybe
 dataset AE
@@ -587,7 +573,7 @@ engine currently produces; `-Dbackfill.dryRun=true` reports without writing).
 
 A rule may state a different check **per severity level** — a `Check:` whose keys are `REJECT` /
 `ERROR` / `WARNING` / `INFO` rather than a single condition (spec:
-`CORE-RULES-SPECIFICATION.md`, "Level-keyed `Check`" — internal monorepo only).
+[Level-keyed `Check`](../../../../../../../../../corej-rules/documentation/CORE-RULES-SPECIFICATION.md#level-keyed-check)).
 A rule with a plain `Check:` declares exactly one level, at its `Severity`, which is every rule in
 the corpus today. Two directives address that:
 
@@ -609,7 +595,7 @@ not `expect=noViolation`.
 
 ```
 #!RuleTest
-#test CORE-000999 expect=violation domain=DM
+#test CDISC-CG0999 expect=violation domain=DM
 #runLevel Info
 #expectViolationCount 2
 #expectViolationAt row=1 severity=ERROR
@@ -755,7 +741,7 @@ most recent additions.
   NCI concept id ("C-code")** map — the term-conceptId channel of
   `MetadataProvider.getCodelist`, which is what
   `codelist_terms(level="term", returntype="code")` resolves through
-  (`CDISC-CG0001` / `CORE-000929`). Same shape as `codelist-term-mappings`:
+  (`CDISC-CG0001`). Same shape as `codelist-term-mappings`:
   codelist key folds to upper case, term keys are verbatim.
 
   ⚠⚠ **Not `codelist-codes`**, despite the near-identical name: that kind is
@@ -765,7 +751,7 @@ most recent additions.
   ⚠ **Route each representation down its own channel.** `codelist-terms`
   carries real submission values (`AE`, `LB`), `codelist-term-ccodes` carries
   the C-codes. Feeding C-codes through `codelist-terms` is the self-disarming
-  fixture shape that kept CDISC-CG0001/CORE-000929 green while production was
+  fixture shape that kept CDISC-CG0001 green while production was
   wrong (PLAN-codelist-terms-returntype.md §2.3) — the suites now discriminate.
 
   A codelist declared on none of the codelist channels has **no**
@@ -817,7 +803,7 @@ For larger metadata payloads, point at a YAML file in the **same directory**
 as the `.cdt` (resolved as a classpath sibling when loaded from resources):
 
 ```
-#library-include CORE-000575-library.yaml
+#library-include CDISC-CG0219-library.yaml
 ```
 
 The sidecar mirrors the directive grammar one-to-one (every node optional):

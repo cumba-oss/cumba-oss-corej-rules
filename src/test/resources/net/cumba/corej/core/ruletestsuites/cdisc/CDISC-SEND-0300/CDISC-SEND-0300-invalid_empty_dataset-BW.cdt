@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0300 expect=violation domain=BW
+#note "Mirrors rulespec CDISC-SEND-0300.yaml (the rule's only prior guard). BW is submitted with columns but ZERO records, and the synthetic Define channel declares it (name=BW) -> $dataset_record_count == 0 and ds_name('DEFINE') is non-empty -> one dataset-level finding. Dataset-sensitivity rule: the location is pinned by the projected output variables, never by row=. The zero-row block is the fixture shape CDISC-CG0408-invalid-EMPTY.cdt carries."
+#library standard=sendig version=3-1-1
+#define dataset-metadata BW name=BW
+#expectViolationCount 1
+#expectViolationAt define_dataset_name=BW "$dataset_record_count"=0
+dataset BW label="Body Weight"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BWSEQ   type=Num  label="Sequence Number"
+---

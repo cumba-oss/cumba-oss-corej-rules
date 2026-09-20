@@ -12,13 +12,11 @@ rule:
   Executability: Fully Executable
   Scope:
     Domains: {Include: [TS]}
-  Operations:
-    - id: $valid_dates
-      operator: valid_codelist_dates
-      ct_package_types: [SDTM]
+  Bindings:
+  - name: "$valid_dates"
+    expression: 'valid_codelist_dates(ct_package_types=[SDTM])'
   Check:
-    all:
-      - {name: TSVCDVER, operator: is_not_contained_by, value: $valid_dates}
+    expression: 'TSVCDVER not in $valid_dates'
   Outcome:
     Message: TSVCDVER is not a published SDTM CT package date.
     Output_Variables: [STUDYID, TSSEQ, TSPARMCD, TSVCDVER]

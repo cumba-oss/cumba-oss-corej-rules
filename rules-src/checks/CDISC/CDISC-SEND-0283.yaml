@@ -14,16 +14,17 @@ Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "DS"
-Operations:
-- id: "$is_last_se"
+Bindings:
+- name: "$is_last_se"
   expression: "is_last_in_group(ordering=\"SESEQ\", group=[USUBJID], keep_missings=false)"
 Check:
   ERROR:
     expression: >-
-      $is_last_se == true and date(SEENDTC) > DS.DSSTDTC
+      $is_last_se == true and date(SEENDTC) > date(DS.DSSTDTC)
   INFO:
     expression: >-
-      $is_last_se == true and date(latest_possible(SEENDTC)) > earliest_possible(DS.DSSTDTC)
+      $is_last_se == true and not empty(earliest_possible(DS.DSSTDTC)) and
+      date(latest_possible(SEENDTC)) > earliest_possible(DS.DSSTDTC)
     Message: "SEENDTC of the last Subject Element may be later than the subject disposition\
       \ date DS.DSSTDTC (partial date/time precision leaves the order undetermined)."
 Outcome:

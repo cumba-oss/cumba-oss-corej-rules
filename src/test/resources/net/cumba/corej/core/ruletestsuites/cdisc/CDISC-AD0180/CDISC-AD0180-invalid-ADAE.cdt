@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0180 expect=violation domain=ADAE
+#note "Mirrors rulespec AD0180-srcdom-companion-domains.yaml (the rule's only prior guard). The companion SDTM domain set is supplied via '#library standard-domains AE DM LB VS' - the same MetadataProvider.getStandardDatasetNames() channel the spec mocked. SRCDOM=DM passes (a companion domain), SRCDOM=XX fires (not an SDTM domain), SRCDOM='' passes (non_empty guard), SRCDOM=ADSL fires (a submitted ADaM dataset name is not an SDTM domain). structure=BDS declares the scope tier the spec supplied via a class mock; the #library block is its carrier. Without the standard-domains line the operation maps to LIBRARY_NOT_AVAILABLE and the rule SKIPs, so a fire here also proves the enumeration was actually read."
+#library standard=adamig version=1-0
+#library standard-domains AE DM LB VS
+#expectViolationCount 2
+#expectViolationAt row=2 SRCDOM=XX
+#expectViolationAt row=4 SRCDOM=ADSL
+dataset ADAE structure=BDS label="Adverse Events Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col SRCDOM  type=Char label="Source Data"
+---
+S1 | 001 | AEP | DM
+S1 | 002 | AEP | XX
+S1 | 003 | AEP |
+S1 | 004 | AEP | ADSL

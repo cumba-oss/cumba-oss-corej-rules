@@ -16,14 +16,15 @@ Requirements:
 Grouping:
   Variables:
   - "USUBJID"
-Operations:
-- id: "$ds_usubjid"
+Bindings:
+- name: "$ds_usubjid"
   expression: "distinct(USUBJID, domain=\"DS\")"
-- id: "$max_ds_dsstdtc"
+- name: "$max_ds_dsstdtc"
   expression: "max_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    USUBJID in $ds_usubjid and not empty(SEENDTC) and date(SEENDTC) > $max_ds_dsstdtc
+    USUBJID in $ds_usubjid and not empty(SEENDTC) and not empty($max_ds_dsstdtc) and date(SEENDTC) >
+    $max_ds_dsstdtc
 Outcome:
   Message: "SEENDTC is after the latest Disposition Event start date (DSSTDTC) for\
     \ the subject."

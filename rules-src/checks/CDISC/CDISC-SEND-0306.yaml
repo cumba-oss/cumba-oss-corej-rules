@@ -16,18 +16,18 @@ Requirements:
     All:
     - "RFXENDTC"
     - "USUBJID"
-Operations:
-- id: "$ex_subjects"
+Bindings:
+- name: "$ex_subjects"
   expression: "distinct(USUBJID, domain=\"EX\")"
-- id: "$latest_exendtc"
+- name: "$latest_exendtc"
   expression: "max_date(EXENDTC, domain=\"EX\", missing_values=\"indeterminate\",\
     \ group=[USUBJID])"
-- id: "$latest_exstdtc"
+- name: "$latest_exstdtc"
   expression: "max_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
 Check:
   expression: >-
-    not empty(RFXENDTC) and USUBJID in $ex_subjects and RFXENDTC != $latest_exendtc and RFXENDTC !=
-    $latest_exstdtc
+    not empty(RFXENDTC) and USUBJID in $ex_subjects and date(RFXENDTC) != $latest_exendtc and
+    date(RFXENDTC) != $latest_exstdtc
 Outcome:
   Message: "RFXENDTC is populated but does not equal the latest EXENDTC or the latest\
     \ EXSTDTC in the EX dataset for the subject."

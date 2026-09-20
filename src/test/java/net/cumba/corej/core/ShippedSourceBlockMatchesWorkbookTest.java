@@ -307,12 +307,9 @@ class ShippedSourceBlockMatchesWorkbookTest
                 scan.mismatches().size() + " of " + scan.comparisons() + " Source cells no longer"
                         + " match '" + SHEET + "' in " + WORKBOOK + ". The Source block is a"
                         + " verbatim transcription of the workbook row; it is written by the"
-                        + " offline tool OriginalTextBackfill and must never be hand-edited. Nor"
-                        + " re-transcribed here: re-running the backfill is an upstream authoring"
-                        + " step (the internal backfill-rules workflow, over the monorepo's"
-                        + " rules-src/), and this repository only gates the result. If the workbook"
-                        + " itself was upgraded, take the change upstream and re-read"
-                        + " plans/PLAN-adam-sheet-scope-realignment.md before re-pinning"
+                        + " offline tool OriginalTextBackfill and must never be hand-edited. If the"
+                        + " workbook itself was upgraded, re-run scripts/backfill-rules.sh and"
+                        + " re-read plans/PLAN-adam-sheet-scope-realignment.md before re-pinning"
                         + " anything.");
     }
 

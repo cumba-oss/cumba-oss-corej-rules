@@ -1,0 +1,25 @@
+#!RuleTest
+#test FDA-SD1017 expect=noViolation domain=SV
+#note "RE-CUT 2026-09-18 (PLAN-unplanned-visit-cascade): expect moved skipped -> noViolation. SVUPDES left Requirements.Variables.All (the cascade must run on SVUPDES-less data), so the rule executes here instead of skipping. No SVPRESP and no SVUPDES column: the name tier decides. Row 1 SCREENING is planned and in TV -> clean; row 2 UNSCHEDULED carries the marker -> unplanned -> exempt. This is the retired FDA-SD1017-A's silence, now owned by the parent."
+#library standard=sdtmig version=3-4
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Visit"
+---
+CDISCPILOT01 | SV | 001 | 1 | SCREENING | 2020-01-01
+CDISCPILOT01 | SV | 001 | 99 | UNSCHEDULED | 2020-01-15
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

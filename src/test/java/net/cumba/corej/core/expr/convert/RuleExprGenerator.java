@@ -36,10 +36,10 @@ import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
  * Until 2026-08-06 this class had both: it listed {@code rules-legacy/} off disk and re-read
  * {@code rules-src/checks}, which made {@code rules/} a <em>derivative of the Python-facing
  * corpus</em> and made "never run {@code RuleExprGenerator} standalone" a documented trap.
- * {@code RuleCorpusGenerator} — stage 0 of the internal {@code regen-rules-corpus} workflow, which
- * is not distributed with this repository — now assembles once from {@code rules-src/} and hands
- * this class the canonical nodes directly, so {@link #generate} is a pure function of its inputs
- * and the standalone entry point no longer exists to be misused.
+ * {@code RuleCorpusGenerator} — stage 0 of {@code scripts/regen-rules-corpus.sh} — now assembles
+ * once from {@code rules-src/} and hands this class the canonical nodes directly, so
+ * {@link #generate} is a pure function of its inputs and the standalone entry point no longer
+ * exists to be misused.
  * </p>
  *
  * <p>

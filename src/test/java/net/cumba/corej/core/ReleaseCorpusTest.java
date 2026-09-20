@@ -55,11 +55,13 @@ class ReleaseCorpusTest
     private static final ObjectMapper JSON = new ObjectMapper();
 
     /**
-     * Floor on the packages the release tree must carry — 32 at the time of writing (2026-09-07):
-     * 47 generated packages less the 15 of the DRAFT family. A floor, not an equality, so corpus
+     * Floor on the packages the release tree must carry — 43 at the time of writing (2026-09-07):
+     * 58 generated packages less the 15 of the DRAFT family. A floor, not an equality, so corpus
      * growth does not red it; it exists so a mis-resolved or half-written release tree cannot pass
      * as a clean one.
      */
+    // 40 -> 30 (PLAN-retire-core-family phase 6). The release tree is the full 58 less DRAFT's
+    // 15; CORE's 11 were all released, so 43 -> 32. Floor set below the measurement, not on it.
     private static final int MIN_RELEASE_PACKAGES = 30;
 
     private static final String UNRELEASED_PREFIX = CorpusPaths.UNRELEASED_FAMILY + "-";

@@ -1,9 +1,9 @@
 #!RuleTest
 #test FDA-SE2270 expect=violation domain=MA
-#note "Subject 001's latest disposition is study day 20. Row 1: MADY=15 does not equal DSSTDY=20 -> offending. Row 2: MADY=20 equals it -> clean. Row 3: MADY=5 matches only the earlier (superseded) disposition day -> offending. O-4 (Fix #337, owner 2026-08-22 'the issue is by subject'): the rule carries Grouping: {Variables: [USUBJID]}, so the two offending rows of ONE subject fold into ONE finding, anchored at the subject's first flagged row (row 1). Re-pinned 2 -> 1; a per-record reading would report 2 here."
+#note "Subject 001's latest disposition is study day 20. Row 1: MADY=15 does not equal DSSTDY=20 -> offending. Row 2: MADY=20 equals it -> clean. Row 3: MADY=5 matches only the earlier (superseded) disposition day -> offending. O-4 (Fix #337, owner 2026-08-22 'the issue is by subject'): the rule carries Grouping: {Variables: [USUBJID]}, so the two offending rows of ONE subject fold into ONE finding, anchored at the subject's first flagged row (row 1). Re-pinned 2 -> 1; a per-record reading would report 2 here. Phase 5b (D58/D94b): a group finding carries only group-constant values, so MADY - which varies across the two flagged rows - renders as the distinct set [15, 5] over the violating rows instead of the anchor row's arbitrary 15."
 #library standard=sendig version=3-1-1
 #expectViolationCount 1
-#expectViolationAt row=1 MADY=15
+#expectViolationAt row=1 MADY="[15, 5]"
 dataset MA label="Macroscopic Findings"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD0031 expect=skipped domain=AE
+#note "None of the three END-point columns (AEENDTC/AEENRF/AEENRTPT) exists, so GROUP 2 of Requirements.Variables.Any [[--STDTC, --STRF, --STRTPT], [--ENDTC, --ENRF, --ENRTPT]] is unmet and the rule gates out -> auditable skip. Group 1 IS met: AESTDTC is declared AND populated, so nothing in the group-1 gate can account for the silence. Delete group 2 from the YAML and this scenario REDS: the rule then binds, the Check's first disjunction folds the three absent end columns to all-missing (EC-43) and the verdict becomes noViolation, not skipped. It is the exact counterpart of FDA-SD0031-skipped_no_start_columns-AE.cdt, whose fixture declares AEENDTC and therefore satisfies group 2 -- until this file existed, a regression that dropped group 2 outright left every .cdt suite green (review finding 1, 2026-09-18)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2020-01-05

@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-AD0258 expect=skipped domain=ADAE
+#note "AE block WITHOUT the AESEQ column (STUDYID, DOMAIN, USUBJID only). The retired guard var_exists(AE.AESEQ) made this a silent clean EXECUTION; since the D110f/D118 rewrite onto AE._matched_ the same presence test is a DECLARATION -- Requirements.Variables.All [AE.AESEQ] -- so the missing column SKIPS the rule with a reason (D89b: declare => skip). This scenario is the pin on that delta: it is the one case where the flag rewrite changed an outcome, and it changed it from unreportable to reported."
+#library standard=adamig version=1-1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+---
+S1 | 001 | 1 | HEADACHE
+S1 | 001 | 2 | NAUSEA
+S2 | 001 | 1 | RASH
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+S1 | AE | 001

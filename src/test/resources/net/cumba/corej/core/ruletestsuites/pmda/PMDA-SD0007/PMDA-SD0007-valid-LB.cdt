@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD0007 expect=noViolation domain=LB
+#note "The same two records with a CONSISTENT standard unit (g/dL twice) - the identity-key group holds one unit value, so nothing fires. If the consistency test were inverted (firing on agreement) both rows would fire and red this scenario."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBSPEC   type=Char label="Specimen Type"
+col LBMETHOD type=Char label="Method of Test or Examination"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | HGB | HEM | BLOOD | AUTO | g/dL
+S1 | LB | 002 | 2 | HGB | HEM | BLOOD | AUTO | g/dL

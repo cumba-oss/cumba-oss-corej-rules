@@ -1,54 +1,46 @@
 package net.cumba.corej.core.expr.convert;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.cumba.corej.core.expr.CheckExpressionParser;
-import net.cumba.corej.core.expr.ExprLowering;
 import net.cumba.corej.core.expr.ExpressionException;
+import net.cumba.corej.core.expr.MetadataOperandMapping;
 import net.cumba.corej.core.expr.ast.Expr;
-import net.cumba.corej.core.model.CheckCondition;
-import net.cumba.corej.core.model.CheckConditionAll;
-import net.cumba.corej.core.model.CheckConditionAny;
-import net.cumba.corej.core.model.CheckConditionLeaf;
-import net.cumba.corej.core.model.CheckConditionNot;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Dual-form {@code Check} support for the raw-{@link JsonNode} corpus instruments
- * ({@code RuleEquivalenceInventory}, {@code RuleDocCensus}): the Java counterpart of
- * {@code dual_form_check} in {@code check_expr.py}, the Python reference reader for the check
- * corpus. That reader is an internal analysis tool and is not distributed with this repository, so
- * every {@code check_expr.py} mention below names the reference implementation, not a file found
- * here. A legacy Check node passes through unchanged; an {@code {expression}} Check is parsed with
- * the shared parser and lowered back to the legacy {@code all}/{@code any}/{@code not}/leaf shape
- * those instruments' operator tables key on.
+ * ({@code RuleEquivalenceInventory}, {@code RuleDocCensus}, {@code RuleFingerprint}): the Java
+ * counterpart of {@code scripts/lib/check_expr.py}'s {@code dual_form_check}. A legacy Check node
+ * passes through unchanged; an {@code {expression}} Check is parsed with the shared parser and
+ * lowered back to the legacy {@code all}/{@code any}/{@code not}/leaf JSON shape those instruments'
+ * operator tables key on.
  *
  * <p>
- * The lowering targets the image of the flip writer (plan §5, the RuleType-aware raise), so it is
- * {@link ExprLowering#toCheckConditionForConversion} plus the two inverses that forward half keeps
- * in {@code CheckToExpr} rather than in the strict surface (mirroring {@code check_expr.py}):
- * {@code not <exists-family>(X)} is reconstructed as the flat negative leaf ({@code var_not_exists}
- * / {@code ds_not_exists} / {@code not_exists}) — without it every negative presence rule would
- * lower to a structural {@code {not: …}} the pre-flip corpus never authored, shifting the
- * equivalence canonical basis — and {@code tuple(c1, …) [not] in <ref>} is reconstructed as the T3
- * composite {@code names:} membership leaf. A construct with no legacy surface even then (the
- * conversion-unlowerable rules, e.g. {@code char(value()) <= 32}) yields {@code null} — callers
- * keep the expression node and report, or fall back to {@link #carriesPresenceCall} to prove the
- * skip loses nothing they classify.
+ * ⭐ <b>The lowering is self-contained since D121</b> (phase 7 of
+ * {@code PLAN-typed-expression-engine.md}): the engine's {@code ExprLowering} and the v1
+ * {@code CheckConditionLeaf} model are retired, so the conversion-mode table lives HERE, as a
+ * direct {@code Expr → JsonNode} emitter — a faithful port of the retired
+ * {@code ExprLowering.toCheckConditionForConversion} (the legacy-form restoration pre-pass
+ * included) plus the two writer-image inverses this class always added (mirroring
+ * {@code check_expr.py}): {@code not <exists-family>(X)} is reconstructed as the flat negative
+ * leaf, and {@code tuple(c1, …) [not] in <ref>} as the T3 composite {@code names:} membership leaf.
+ * The instruments' canonical basis — and the committed {@code pairs-index.tsv} it feeds — is
+ * therefore unchanged: their own committed-artifact tests are the byte-parity oracle for this port.
+ * A construct with no legacy surface even then (the conversion-unlowerable rules, e.g.
+ * {@code char(value()) <= 32}) yields {@code null} — callers keep the expression node and report,
+ * or fall back to {@link #carriesPresenceCall} to prove the skip loses nothing they classify.
  * </p>
  */
 public final class DualFormCheckNode
 {
 
-    /** Nulls omitted so a lowered leaf carries exactly the fields an authored leaf carries. */
-    private static final ObjectMapper JSON = JsonMapper.builder().defaultPropertyInclusion(
-            JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
-            .build();
+    private static final JsonNodeFactory NODES = JsonNodeFactory.instance;
 
     private static final Map<String, String> NEGATIVE_BY_POSITIVE_EXISTS = Map.of("var_exists",
             "var_not_exists", "ds_exists", "ds_not_exists");
@@ -105,34 +97,10 @@ public final class DualFormCheckNode
         {
             return check;
         }
-        Expr parsed;
         try
         {
-            parsed = CheckExpressionParser.parse(check.path("expression").asText());
-        }
-        catch (ExpressionException _)
-        {
-            return null;
-        }
-        CheckCondition lowered = lowerConditionOrNull(parsed);
-        return lowered == null ? null : JSON.valueToTree(lowered);
-    }
-
-
-    /**
-     * The dual-form lowering over a raised {@code Expr}: {@link ExprLowering}'s conversion mode
-     * plus the two writer-image inverses ({@code check_expr.py}'s extras) — flat negative presence
-     * leaves and the T3 {@code tuple(...) [not] in} composite membership leaf.
-     *
-     * @param parsed
-     *            the raised expression
-     * @return the operator-leaf tree, or {@code null} when a construct has no legacy surface
-     */
-    public static @Nullable CheckCondition lowerConditionOrNull(Expr parsed)
-    {
-        try
-        {
-            return lowerCondition(parsed);
+            Expr parsed = CheckExpressionParser.parse(check.path("expression").asText());
+            return lowerNode(restore(parsed));
         }
         catch (ExpressionException _)
         {
@@ -151,13 +119,11 @@ public final class DualFormCheckNode
      * migration authored {@code num()} in.
      *
      * <p>
-     * ⚠ Deliberately NOT wired into {@link #lowerOrNull} / {@link #lowerConditionOrNull}
-     * themselves: the equivalence and census instruments mirror the dual-form lowering of the
-     * Python-lane corpus tooling (which is not part of this distribution), and a Java-only strip
-     * inside the shared lowering would make the Java and Python fingerprint halves bucket
-     * differently — the exact defect {@code RuleEquivalenceDriftTest}'s diagnosis note warns
-     * regeneration would hide. Callers that only AUDIT (GuardPositionAudit, IntentAbsenceOptOut,
-     * SilencingGuardScan) retry their lowering through this strip; callers that FINGERPRINT do not.
+     * ⚠ Deliberately NOT wired into {@link #lowerOrNull} itself: the equivalence and census
+     * instruments mirror {@code scripts/lib/check_expr.py}'s {@code dual_form_check}, and a
+     * Java-only strip inside the shared lowering would make the Java and Python fingerprint halves
+     * bucket differently — the exact defect {@code RuleEquivalenceDriftTest}'s diagnosis note warns
+     * regeneration would hide.
      * </p>
      *
      * @param e
@@ -172,7 +138,7 @@ public final class DualFormCheckNode
                 && c.args().size() == 1 -> stripNumConversions(c.args().get(0));
         case Expr.Call c -> new Expr.Call(c.name(),
                 c.args().stream().map(DualFormCheckNode::stripNumConversions).toList(),
-                stripKwargs(c.kwargs()));
+                mapKwargs(c.kwargs(), DualFormCheckNode::stripNumConversions));
         case Expr.And a -> new Expr.And(
                 a.parts().stream().map(DualFormCheckNode::stripNumConversions).toList());
         case Expr.Or o -> new Expr.Or(
@@ -189,18 +155,6 @@ public final class DualFormCheckNode
         }
         default -> e;
         };
-    }
-
-
-    private static Map<String, Expr> stripKwargs(Map<String, Expr> kwargs)
-    {
-        if (kwargs.isEmpty())
-        {
-            return kwargs;
-        }
-        java.util.LinkedHashMap<String, Expr> out = new java.util.LinkedHashMap<>();
-        kwargs.forEach((k, v) -> out.put(k, stripNumConversions(v)));
-        return out;
     }
 
 
@@ -270,108 +224,6 @@ public final class DualFormCheckNode
             // scalar literals carry no reference
         }
         }
-    }
-
-
-    private static CheckCondition lowerCondition(Expr e)
-    {
-        return switch (e)
-        {
-        case Expr.And a -> new CheckConditionAll(
-                a.parts().stream().map(DualFormCheckNode::lowerCondition).toList());
-        case Expr.Or o -> new CheckConditionAny(
-                o.parts().stream().map(DualFormCheckNode::lowerCondition).toList());
-        case Expr.Not n ->
-        {
-            if (n.inner() instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 1
-                    && NEGATIVE_BY_POSITIVE_EXISTS.containsKey(c.name()))
-            {
-                yield ExprLowering.toCheckConditionForConversion(new Expr.Call(
-                        NEGATIVE_BY_POSITIVE_EXISTS.get(c.name()), c.args(), Map.of()));
-            }
-            // Inverse of CheckToExpr's case-insensitive-contains fold (mirrors
-            // check_expr.py's _case_insensitive_contains): `not contains(upper(X), upper("v"))`
-            // was raised from a does_not_contain_case_insensitive leaf — ExprLowering's own
-            // contains branch would demand a bare reference subject and throw.
-            CheckConditionLeaf folded = caseInsensitiveContainsLeaf(n.inner());
-            if (folded != null)
-            {
-                yield folded;
-            }
-            // A negated call or comparison must go through ExprLowering as the WHOLE Not node:
-            // lowerNot's inverse table (not empty → non_empty, not contains → does_not_contain,
-            // the POSITIVE_TO_NEGATIVE group operators, …) and the negated regexForm restores
-            // both dispatch on the Not — handing over only the inner would lose every one of
-            // them and reconstruct a structural {not: …} the pre-flip corpus never authored
-            // (found by the wave-43 review: 2 064 rules diverged from check_expr.py's view).
-            if (n.inner() instanceof Expr.Call
-                    || (n.inner() instanceof Expr.Binary b && !isTupleCall(b.left())))
-            {
-                yield ExprLowering.toCheckConditionForConversion(e);
-            }
-            yield new CheckConditionNot(lowerCondition(n.inner()));
-        }
-        case Expr.Binary b when (b.op() == Expr.BinOp.IN || b.op() == Expr.BinOp.NOT_IN)
-                && isTupleCall(b.left()) -> tupleMembershipLeaf(b);
-        default -> ExprLowering.toCheckConditionForConversion(e);
-        };
-    }
-
-
-    /**
-     * The {@code does_not_contain_case_insensitive} leaf for a
-     * {@code contains(upper(X), upper("v"))} inner, or {@code null} when the shape does not match.
-     */
-    private static @Nullable CheckConditionLeaf caseInsensitiveContainsLeaf(Expr inner)
-    {
-        if (!(inner instanceof Expr.Call c && "contains".equals(c.name()) && c.kwargs().isEmpty()
-                && c.args().size() == 2 && isUpperCall(c.args().get(0))
-                && isUpperCall(c.args().get(1))))
-        {
-            return null;
-        }
-        Expr subject = ((Expr.Call) c.args().get(0)).args().get(0);
-        Expr literal = ((Expr.Call) c.args().get(1)).args().get(0);
-        if (!(subject instanceof Expr.Ref ref)
-                || !(literal instanceof Expr.Lit(Expr.LitKind kind, Object value))
-                || kind != Expr.LitKind.STRING)
-        {
-            return null;
-        }
-        return CheckConditionLeaf.builder().name(ref.name())
-                .operator("does_not_contain_case_insensitive")
-                .value(JSON.getNodeFactory().textNode((String) value)).valueIsLiteral(true).build();
-    }
-
-
-    private static boolean isUpperCall(Expr e)
-    {
-        return e instanceof Expr.Call c && "upper".equals(c.name()) && c.kwargs().isEmpty()
-                && c.args().size() == 1;
-    }
-
-
-    /** The T3 composite-key {@code tuple(c1, c2, …)} value function (all-Ref args, no kwargs). */
-    private static boolean isTupleCall(Expr e)
-    {
-        return e instanceof Expr.Call c && "tuple".equals(c.name()) && c.kwargs().isEmpty()
-                && !c.args().isEmpty() && c.args().stream().allMatch(a -> a instanceof Expr.Ref);
-    }
-
-
-    /** Inverse of {@code CheckToExpr.compositeMembershipLeaf}: the {@code names:} leaf. */
-    private static CheckCondition tupleMembershipLeaf(Expr.Binary b)
-    {
-        List<String> names = ((Expr.Call) b.left()).args().stream().map(a -> ((Expr.Ref) a).name())
-                .toList();
-        if (!(b.right() instanceof Expr.Ref ref))
-        {
-            throw new ExpressionException("tuple membership against a non-reference right side"
-                    + " has no legacy surface");
-        }
-        return CheckConditionLeaf.builder().names(names)
-                .operator(b.op() == Expr.BinOp.IN ? "is_contained_by" : "is_not_contained_by")
-                .value(JSON.getNodeFactory().textNode(ref.name())).build();
     }
 
 
@@ -462,4 +314,1247 @@ public final class DualFormCheckNode
         return allLowered;
     }
 
+    // ======================================================================
+    // The conversion-mode lowering, ported from the retired ExprLowering.
+    // ======================================================================
+
+    /** Raise-side regex predicates and the pattern each was raised from. */
+    private static final Map<String, String> PREDICATE_TO_REGEX = Map.of("is_numeric",
+            "^-?(0|[1-9]\\d*)(\\.\\d+)?$", "has_alpha", ".*[a-zA-Z].*", "has_digit", ".*[0-9].*",
+            "is_valid_name", "^[A-Z_][A-Z0-9_]{0,7}$", "is_valid_testcd",
+            "^[a-zA-Z_][a-zA-Z0-9_]{0,7}$");
+
+    /** The first-letter range test the raise emitted {@code ^[A-Z]} for (negated sense). */
+    private static final String FIRST_LETTER_REGEX = "^[A-Z]";
+
+    /** Left-operand wrappers the v1 leaf held as an operator family rather than as a call. */
+    private static final Set<String> UNARY_WRAPPERS = Set.of("date", "len", "date_part",
+            "time_part", "lowcase", "upcase");
+
+    /**
+     * The v1 wrapper roster, exposed for {@code UnaryWrapperRosterDriftTest} (review round 2,
+     * R2-14). The Python mirror carries this set PLUS {@code num}, which the Java side restores in
+     * {@link #stripNumConversions} instead.
+     *
+     * @return the wrapper names
+     */
+    public static Set<String> unaryWrappers()
+    {
+        return UNARY_WRAPPERS;
+    }
+
+
+    /**
+     * Every {@code ExprCompiler.comparisonMarkers()} member, each accounted for by an explicit
+     * decision in this emitter (M4, terminal review of {@code PLAN-typed-expression-engine}).
+     * {@code DualFormMarkerRosterDriftTest} asserts this set EQUALS the compiler's, so a new marker
+     * reds a test here instead of silently becoming unlowerable with no record of the decision:
+     * <ul>
+     * <li>{@code date}/{@code date_part}/{@code time_part} — v1 operator families,
+     * {@link #UNARY_WRAPPERS};</li>
+     * <li>{@code num} — restored by the legacy-form pre-pass ({@link #stripNumConversions} /
+     * {@code check_expr.py}'s {@code num} membership in {@code _UNARY_WRAPPERS});</li>
+     * <li>{@code time}/{@code str} — deliberately WITHOUT a legacy surface: the v1 vocabulary has
+     * no time or type-insensitive-equality operator family, so an expression carrying them (e.g.
+     * {@code CDISC-AD0044}'s {@code time(*TM)} value side) yields {@code null} — unlowerable,
+     * visibly, exactly as {@code scripts/lib/check_expr.py} answers; adding either here without the
+     * Python mirror would fork the committed pairs-index basis.</li>
+     * </ul>
+     */
+    static Set<String> acknowledgedComparisonMarkers()
+    {
+        return Set.of("date", "date_part", "time_part", "num", "time", "str");
+    }
+
+    private static final Set<String> FUNCTION_OPERATORS = Set.of("has_multiple_values_for",
+            "is_not_unique_relationship", "is_not_unique_set", "is_unique_set",
+            "is_inconsistent_across_dataset", "shares_no_elements_with", "not_contains_all",
+            "has_same_values", "is_not_ordered_subset_of", "inconsistent_enumerated_columns",
+            "has_not_equal_length", "has_equal_length", "is_not_unique_value",
+            "present_on_multiple_rows_within", "not_present_on_multiple_rows_within",
+            "empty_within_except_last_row", "does_not_have_next_corresponding_record",
+            "does_not_equal_string_part");
+
+    private static final Set<String> UNIQUE_SET_OPERATORS = Set.of("is_unique_set",
+            "is_not_unique_set");
+
+    private static final Map<String, String> POSITIVE_TO_NEGATIVE = Map.of("is_unique_relationship",
+            "is_not_unique_relationship", "contains_all", "not_contains_all",
+            "shares_elements_with", "shares_no_elements_with", "is_ordered_subset_of",
+            "is_not_ordered_subset_of", "is_unique_value", "is_not_unique_value", "is_unique_set",
+            "is_not_unique_set");
+
+    private static final Set<String> UNARY_PREDICATES = Set.of("ds_exists", "ds_not_exists",
+            "var_exists", "var_not_exists", "var_is_null", "empty", "non_empty", "is_complete_date",
+            "is_incomplete_date", "invalid_date", "invalid_duration", "is_integer",
+            "is_not_integer", "is_complete_date_part", "is_not_complete_date_part");
+
+    private static final Set<String> EXISTS_PREDICATES = Set.of("ds_exists", "ds_not_exists",
+            "var_exists", "var_not_exists");
+
+    private static final Set<String> SUBSTRING_PREDICATES = Set.of("contains", "does_not_contain",
+            "starts_with", "ends_with");
+
+    /**
+     * The legacy-form restoration pre-pass (the retired {@code ExprLowering.restoreLegacyForms}):
+     * raise-side-only constructs are rewritten back to shapes the operator-leaf vocabulary can
+     * express — the regex predicates ({@code is_numeric(X)} et al. and the first-letter
+     * {@code between(char(X), char("A"), char("Z"))}) back to their {@code =~}/{@code !~} form, and
+     * a per-record accessor call only the wide accessor mapping can name back to its bare metadata
+     * operand reference.
+     */
+    private static Expr restore(Expr e)
+    {
+        return switch (e)
+        {
+        case Expr.Not n ->
+        {
+            Expr restored = regexForm(n.inner(), true);
+            yield restored != null ? restored : new Expr.Not(restore(n.inner()));
+        }
+        case Expr.Call c ->
+        {
+            Expr restored = regexForm(c, false);
+            if (restored != null)
+            {
+                yield restored;
+            }
+            String operand = demotedOperand(c);
+            yield operand != null
+                    ? new Expr.Ref(operand, net.cumba.corej.core.expr.OperandKind.BUILTIN)
+                    : new Expr.Call(c.name(),
+                            c.args().stream().map(DualFormCheckNode::restore).toList(),
+                            mapKwargs(c.kwargs(), DualFormCheckNode::restore));
+        }
+        case Expr.Binary b -> new Expr.Binary(b.op(), restore(b.left()), restore(b.right()));
+        case Expr.And a -> new Expr.And(
+                a.parts().stream().map(DualFormCheckNode::restore).toList());
+        case Expr.Or o -> new Expr.Or(o.parts().stream().map(DualFormCheckNode::restore).toList());
+        case Expr.Lit(Expr.LitKind kind, Object value) when kind == Expr.LitKind.LIST ->
+        {
+            @SuppressWarnings("unchecked")
+            List<Expr> items = (List<Expr>) value;
+            yield new Expr.Lit(Expr.LitKind.LIST,
+                    items.stream().map(DualFormCheckNode::restore).toList());
+        }
+        default -> e;
+        };
+    }
+
+
+    private static @Nullable Expr regexForm(Expr e, boolean negated)
+    {
+        if (!(e instanceof Expr.Call c) || !c.kwargs().isEmpty())
+        {
+            return null;
+        }
+        Expr.BinOp op = negated ? Expr.BinOp.NMATCH : Expr.BinOp.MATCH;
+        String pattern = PREDICATE_TO_REGEX.get(c.name());
+        if (pattern != null && c.args().size() == 1)
+        {
+            return new Expr.Binary(op, restore(c.args().get(0)),
+                    new Expr.Lit(Expr.LitKind.REGEX, pattern));
+        }
+        Expr firstLetterOperand = firstLetterRangeOperand(c);
+        if (firstLetterOperand != null)
+        {
+            return new Expr.Binary(op, restore(firstLetterOperand),
+                    new Expr.Lit(Expr.LitKind.REGEX, FIRST_LETTER_REGEX));
+        }
+        return null;
+    }
+
+
+    private static @Nullable Expr firstLetterRangeOperand(Expr.Call c)
+    {
+        if (!"between".equals(c.name()) || c.args().size() != 3)
+        {
+            return null;
+        }
+        Expr subject = charArgument(c.args().get(0));
+        if (subject == null || !isCharLiteral(c.args().get(1), "A")
+                || !isCharLiteral(c.args().get(2), "Z"))
+        {
+            return null;
+        }
+        return subject;
+    }
+
+
+    private static @Nullable Expr charArgument(Expr e)
+    {
+        return e instanceof Expr.Call c && "char".equals(c.name()) && c.args().size() == 1
+                && c.kwargs().isEmpty() ? c.args().get(0) : null;
+    }
+
+
+    private static boolean isCharLiteral(Expr e, String letter)
+    {
+        Expr arg = charArgument(e);
+        return arg instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.STRING
+                && letter.equals(lit.value());
+    }
+
+
+    private static @Nullable String demotedOperand(Expr.Call c)
+    {
+        if (MetadataOperandMapping.reverseToOperand(c) != null)
+        {
+            return null;
+        }
+        return MetadataOperandMapping.reverseAnyAccessor(c);
+    }
+
+
+    private static Map<String, Expr> mapKwargs(Map<String, Expr> kwargs,
+            java.util.function.UnaryOperator<Expr> f)
+    {
+        if (kwargs.isEmpty())
+        {
+            return kwargs;
+        }
+        java.util.LinkedHashMap<String, Expr> out = new java.util.LinkedHashMap<>();
+        kwargs.forEach((k, v) -> out.put(k, f.apply(v)));
+        return out;
+    }
+
+    // ---- boolean lowering ------------------------------------------------
+
+
+    private static JsonNode lowerNode(Expr e)
+    {
+        return switch (e)
+        {
+        case Expr.And a ->
+        {
+            ArrayNode parts = NODES.arrayNode(a.parts().size());
+            a.parts().forEach(p -> parts.add(lowerNode(p)));
+            yield NODES.objectNode().set("all", parts);
+        }
+        case Expr.Or o ->
+        {
+            ArrayNode parts = NODES.arrayNode(o.parts().size());
+            o.parts().forEach(p -> parts.add(lowerNode(p)));
+            yield NODES.objectNode().set("any", parts);
+        }
+        case Expr.Not n -> lowerNot(n.inner());
+        case Expr.Binary b -> lowerBinary(b);
+        case Expr.Call c -> lowerPredicate(c);
+        case Expr.Ref r -> throw unsupported(
+                "bare reference '" + r.name() + "' is not a boolean condition");
+        case Expr.Lit _ -> throw unsupported("a literal is not a boolean condition");
+        };
+    }
+
+
+    private static JsonNode lowerNot(Expr inner)
+    {
+        if (inner instanceof Expr.Call c)
+        {
+            // Writer-image inverse (check_expr.py's extra): not <exists-family>(X) is the flat
+            // negative presence leaf, never a structural {not: …} the pre-flip corpus never
+            // authored.
+            if (c.kwargs().isEmpty() && c.args().size() == 1
+                    && NEGATIVE_BY_POSITIVE_EXISTS.containsKey(c.name()))
+            {
+                return lowerPredicate(new Expr.Call(NEGATIVE_BY_POSITIVE_EXISTS.get(c.name()),
+                        c.args(), Map.of()));
+            }
+            if ("prefix_matches".equals(c.name()) || "suffix_matches".equals(c.name()))
+            {
+                return affixRegexLeaf(c, true);
+            }
+            if ("equalsIgnoreCase".equals(c.name()))
+            {
+                return twoArg(c, "not_equal_to_case_insensitive");
+            }
+            if ("is_sorted_by".equals(c.name()))
+            {
+                return sortedByLeaf(c);
+            }
+            if ("present_on_multiple_rows_within".equals(c.name()))
+            {
+                return functionOperatorLeaf(c, "not_present_on_multiple_rows_within");
+            }
+            if ("has_next_corresponding_record".equals(c.name()))
+            {
+                return functionOperatorLeaf(c, "does_not_have_next_corresponding_record");
+            }
+            String negativeOperator = POSITIVE_TO_NEGATIVE.get(c.name());
+            if (negativeOperator != null)
+            {
+                return functionOperatorLeaf(c, negativeOperator);
+            }
+            if ("empty".equals(c.name()))
+            {
+                return unaryNegationLeaf(c, "non_empty");
+            }
+            if ("is_integer".equals(c.name()))
+            {
+                return unaryNegationLeaf(c, "is_not_integer");
+            }
+            if ("is_complete_date_part".equals(c.name()))
+            {
+                return unaryNegationLeaf(c, "is_not_complete_date_part");
+            }
+            if ("contains".equals(c.name()))
+            {
+                // The case-insensitive-contains fold first (check_expr.py's
+                // _case_insensitive_contains): `not contains(upper(X), upper("v"))` was raised
+                // from a does_not_contain_case_insensitive leaf.
+                JsonNode folded = caseInsensitiveContainsLeaf(c);
+                if (folded != null)
+                {
+                    return folded;
+                }
+                requireArgs(c.name(), c.args().size(), 2);
+                return leaf(nameOf(c.args().get(0)), "does_not_contain",
+                        substringLiteral(c.args().get(1)));
+            }
+        }
+        return NODES.objectNode().set("not", lowerNode(inner));
+    }
+
+
+    private static JsonNode unaryNegationLeaf(Expr.Call c, String negativeOperator)
+    {
+        requireArgs(c.name(), c.args().size(), 1);
+        ObjectNode out = NODES.objectNode();
+        out.put("name", nameOf(c.args().get(0)));
+        out.put("operator", negativeOperator);
+        return out;
+    }
+
+
+    private static JsonNode lowerBinary(Expr.Binary b)
+    {
+        if (b.op() == Expr.BinOp.MATCH || b.op() == Expr.BinOp.NMATCH)
+        {
+            Expr.Call affixOperand = affixCall(b.left());
+            if (affixOperand != null)
+            {
+                return affixRegexMatchLeaf(b, affixOperand);
+            }
+            return regexLeaf(b);
+        }
+        Expr.Call affix = affixCall(b.left());
+        if (affix != null)
+        {
+            return affixCompareLeaf(b, affix);
+        }
+        if (isWrapper(b.left(), "str") && isWrapper(b.right(), "str"))
+        {
+            return typeInsensitiveLeaf(b);
+        }
+        if (b.op() == Expr.BinOp.IN || b.op() == Expr.BinOp.NOT_IN)
+        {
+            // Writer-image inverse (check_expr.py's extra): the T3 composite `names:` leaf.
+            if (isTupleCall(b.left()))
+            {
+                return tupleMembershipLeaf(b);
+            }
+            if (isWrapper(b.left(), "upper"))
+            {
+                return caseInsensitiveMembershipLeaf(b);
+            }
+            String op = b.op() == Expr.BinOp.IN ? "is_contained_by" : "is_not_contained_by";
+            return leaf(nameOf(b.left()), op, b.right());
+        }
+        if (b.right() instanceof Expr.Binary rb && isArith(rb.op()))
+        {
+            return arithmeticLeaf(b, rb);
+        }
+
+        String lw = wrapperOf(b.left());
+        String rw = wrapperOf(b.right());
+        Expr li = unwrap(b.left());
+        Expr ri = unwrap(b.right());
+
+        if ("len".equals(lw) || "len".equals(rw))
+        {
+            return lengthLeaf(b, lw, li, ri, rw);
+        }
+        if (isCaseWrapper(lw) || isCaseWrapper(rw))
+        {
+            if (!isCaseWrapper(lw))
+            {
+                throw unsupported("a case-insensitive comparison needs lowcase/upcase on the left "
+                        + "(column) operand");
+            }
+            boolean rightOk = isCaseWrapper(rw) || b.right() instanceof Expr.Lit;
+            if (!rightOk)
+            {
+                throw unsupported("one-sided lowcase/upcase against a bare reference is ambiguous; "
+                        + "wrap both sides or use equalsIgnoreCase(...)");
+            }
+            String operator = switch (b.op())
+            {
+            case EQ -> "equal_to_case_insensitive";
+            case NEQ -> "not_equal_to_case_insensitive";
+            default -> throw unsupported("lowcase/upcase comparisons support only == and !=");
+            };
+            return leaf(nameOf(li), operator, ri);
+        }
+        String family = comparisonFamily(lw, rw);
+        return leaf(nameOf(li), comparisonOperator(family, b.op()), ri);
+    }
+
+
+    private static String comparisonFamily(@Nullable String lw, @Nullable String rw)
+    {
+        String w = lw != null ? lw : rw;
+        if ("date".equals(w) || "date_part".equals(w) || "time_part".equals(w))
+        {
+            return w;
+        }
+        return "plain";
+    }
+
+
+    private static String comparisonOperator(String family, Expr.BinOp op)
+    {
+        return switch (family)
+        {
+        case "date" -> switch (op)
+        {
+        case EQ -> "date_equal_to";
+        case NEQ -> "date_not_equal_to";
+        case LT -> "date_less_than";
+        case GT -> "date_greater_than";
+        case LE -> "date_less_than_or_equal_to";
+        case GE -> "date_greater_than_or_equal_to";
+        default -> throw unsupported("unsupported date comparison");
+        };
+        case "date_part" -> switch (op)
+        {
+        case EQ -> "date_part_equal_to";
+        case NEQ -> "date_part_not_equal_to";
+        default -> throw unsupported("date_part supports only == and !=");
+        };
+        case "time_part" -> switch (op)
+        {
+        case EQ -> "time_part_equal_to";
+        case NEQ -> "time_part_not_equal_to";
+        default -> throw unsupported("time_part supports only == and !=");
+        };
+        default -> switch (op)
+        {
+        case EQ -> "equal_to";
+        case NEQ -> "not_equal_to";
+        case LT -> "less_than";
+        case GT -> "greater_than";
+        case LE -> "less_than_or_equal_to";
+        case GE -> "greater_than_or_equal_to";
+        default -> throw unsupported("unsupported comparison");
+        };
+        };
+    }
+
+
+    private static JsonNode regexLeaf(Expr.Binary b)
+    {
+        if (!(b.right() instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.REGEX)
+        {
+            throw unsupported("the right-hand side of =~ / !~ must be a /regex/ literal");
+        }
+        String op = b.op() == Expr.BinOp.MATCH ? "matches_regex" : "not_matches_regex";
+        ObjectNode out = NODES.objectNode();
+        out.put("name", nameOf(b.left()));
+        out.put("operator", op);
+        out.set("value", NODES.textNode((String) lit.value()));
+        out.put("value_is_literal", true);
+        return out;
+    }
+
+
+    private static JsonNode lengthLeaf(Expr.Binary b, @Nullable String lw, Expr li, Expr ri,
+            @Nullable String rw)
+    {
+        if (!"len".equals(lw) || "len".equals(rw))
+        {
+            throw unsupported("len(...) must be the left operand of a length comparison");
+        }
+        String op = switch (b.op())
+        {
+        case GT -> "longer_than";
+        case GE -> "longer_than_or_equal_to";
+        case LT -> "shorter_than";
+        case LE -> "shorter_than_or_equal_to";
+        case EQ -> "has_equal_length";
+        case NEQ -> "has_not_equal_length";
+        default -> throw unsupported("unsupported length comparison");
+        };
+        ObjectNode out = NODES.objectNode();
+        out.put("name", nameOf(li));
+        out.put("operator", op);
+        out.set("value", literalNode(ri));
+        out.put("value_is_literal", true);
+        return out;
+    }
+
+
+    private static JsonNode arithmeticLeaf(Expr.Binary b, Expr.Binary rhs)
+    {
+        if (b.op() != Expr.BinOp.NEQ)
+        {
+            throw unsupported("arithmetic comparison supports only != (not_equal_to_*)");
+        }
+        String name = nameOf(b.left());
+        if (rhs.op() == Expr.BinOp.DIV && rhs.left() instanceof Expr.Ref a
+                && rhs.right() instanceof Expr.Ref bb)
+        {
+            return arithLeaf(name, "not_equal_to_divide", a.name(), bb.name());
+        }
+        if (rhs.op() == Expr.BinOp.SUB && rhs.left() instanceof Expr.Ref a
+                && rhs.right() instanceof Expr.Ref bb)
+        {
+            return arithLeaf(name, "not_equal_to_subtract", a.name(), bb.name());
+        }
+        if (rhs.op() == Expr.BinOp.MUL && isHundred(rhs.right())
+                && rhs.left() instanceof Expr.Binary div && div.op() == Expr.BinOp.DIV
+                && div.left() instanceof Expr.Binary sub && sub.op() == Expr.BinOp.SUB
+                && sub.left() instanceof Expr.Ref a && sub.right() instanceof Expr.Ref b1
+                && div.right() instanceof Expr.Ref b2 && b1.name().equals(b2.name()))
+        {
+            return arithLeaf(name, "not_equal_to_pctchg", a.name(), b1.name());
+        }
+        throw unsupported("unrecognised arithmetic shape (native-only, no legacy operator)");
+    }
+
+
+    private static JsonNode arithLeaf(String name, String operator, String a, String b)
+    {
+        ArrayNode arr = NODES.arrayNode(2);
+        arr.add(NODES.textNode(a));
+        arr.add(NODES.textNode(b));
+        ObjectNode out = NODES.objectNode();
+        out.put("name", name);
+        out.put("operator", operator);
+        out.set("value", arr);
+        return out;
+    }
+
+
+    private static boolean isHundred(Expr e)
+    {
+        return e instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.NUMBER
+                && Double.compare((Double) lit.value(), 100.0) == 0;
+    }
+
+
+    private static JsonNode typeInsensitiveLeaf(Expr.Binary b)
+    {
+        String operator = switch (b.op())
+        {
+        case EQ -> "equal_to";
+        case NEQ -> "not_equal_to";
+        default -> throw unsupported("str(...) comparison supports only == and !=");
+        };
+        Expr lhs = ((Expr.Call) b.left()).args().get(0);
+        Expr rhs = ((Expr.Call) b.right()).args().get(0);
+        ObjectNode out = leaf(nameOf(lhs), operator, rhs);
+        out.put("type_insensitive", true);
+        return out;
+    }
+
+
+    private static JsonNode caseInsensitiveMembershipLeaf(Expr.Binary b)
+    {
+        String op = b.op() == Expr.BinOp.IN ? "is_contained_by_case_insensitive"
+                : "is_not_contained_by_case_insensitive";
+        String name = nameOf(((Expr.Call) b.left()).args().get(0));
+        if (b.right() instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.LIST)
+        {
+            @SuppressWarnings("unchecked")
+            List<Expr> items = (List<Expr>) lit.value();
+            ArrayNode arr = NODES.arrayNode(items.size());
+            for (Expr item : items)
+            {
+                arr.add(NODES.textNode(membershipTerm(item)));
+            }
+            ObjectNode out = NODES.objectNode();
+            out.put("name", name);
+            out.put("operator", op);
+            out.set("value", arr);
+            return out;
+        }
+        return leaf(name, op, b.right());
+    }
+
+
+    private static String membershipTerm(Expr item)
+    {
+        Expr lit = isWrapper(item, "upper") ? ((Expr.Call) item).args().get(0) : item;
+        if (lit instanceof Expr.Lit l && l.kind() == Expr.LitKind.STRING)
+        {
+            return (String) l.value();
+        }
+        throw unsupported("case-insensitive membership term must be a string or upper(\"…\")");
+    }
+
+
+    private static @Nullable JsonNode caseInsensitiveContainsLeaf(Expr.Call c)
+    {
+        if (!("contains".equals(c.name()) && c.kwargs().isEmpty() && c.args().size() == 2
+                && isWrapper(c.args().get(0), "upper") && isWrapper(c.args().get(1), "upper")))
+        {
+            return null;
+        }
+        Expr subject = ((Expr.Call) c.args().get(0)).args().get(0);
+        Expr literal = ((Expr.Call) c.args().get(1)).args().get(0);
+        if (!(subject instanceof Expr.Ref ref)
+                || !(literal instanceof Expr.Lit(Expr.LitKind kind, Object value))
+                || kind != Expr.LitKind.STRING)
+        {
+            return null;
+        }
+        ObjectNode out = NODES.objectNode();
+        out.put("name", ref.name());
+        out.put("operator", "does_not_contain_case_insensitive");
+        out.set("value", NODES.textNode((String) value));
+        out.put("value_is_literal", true);
+        return out;
+    }
+
+    // ---- predicates ------------------------------------------------------
+
+
+    private static JsonNode lowerPredicate(Expr.Call c)
+    {
+        String n = c.name();
+        int argc = c.args().size();
+        if (FUNCTION_OPERATORS.contains(n))
+        {
+            return functionOperatorLeaf(c, n);
+        }
+        String negativeOperator = POSITIVE_TO_NEGATIVE.get(n);
+        if (negativeOperator != null)
+        {
+            return NODES.objectNode().set("not", functionOperatorLeaf(c, negativeOperator));
+        }
+        if ("invalid_duration".equals(n) && c.kwargs().containsKey("negative"))
+        {
+            requireArgs(n, argc, 1);
+            Expr neg = c.kwargs().get("negative");
+            if (!(neg instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.BOOL)
+            {
+                throw unsupported("invalid_duration negative= must be a boolean literal");
+            }
+            ObjectNode out = NODES.objectNode();
+            out.put("name", nameOf(c.args().get(0)));
+            out.put("operator", n);
+            out.put("negative", (Boolean) lit.value());
+            return out;
+        }
+        if (UNARY_PREDICATES.contains(n))
+        {
+            requireArgs(n, argc, 1);
+            String name = EXISTS_PREDICATES.contains(n) ? existsArgName(n, c.args().get(0))
+                    : nameOf(c.args().get(0));
+            ObjectNode out = NODES.objectNode();
+            out.put("name", name);
+            out.put("operator", n);
+            return out;
+        }
+        if (SUBSTRING_PREDICATES.contains(n))
+        {
+            requireArgs(n, argc, 2);
+            return leaf(nameOf(c.args().get(0)), n, substringLiteral(c.args().get(1)));
+        }
+        return switch (n)
+        {
+        case "equalsIgnoreCase" -> twoArg(c, "equal_to_case_insensitive");
+        case "prefix_matches", "suffix_matches" -> affixRegexLeaf(c, false);
+        default -> throw unsupported("function '" + n + "' has no v1 lowering");
+        };
+    }
+
+
+    /** A substring predicate's value stays a literal in the leaf, whatever its shape. */
+    private static Expr substringLiteral(Expr value)
+    {
+        return value;
+    }
+
+
+    private static String existsArgName(String predicate, Expr arg)
+    {
+        // The varname() cursor — or its bareword twin `variable_name`, the same cursor read to
+        // the compiler — is the variable-universe discriminator, with no operator-leaf surface.
+        boolean cursor = (arg instanceof Expr.Call c && c.args().isEmpty() && c.kwargs().isEmpty()
+                && "varname".equals(c.name()))
+                || (arg instanceof Expr.Ref r && "variable_name".equals(r.name()));
+        if (cursor)
+        {
+            throw unsupported("function '" + predicate + "' over the varname() cursor has no v1"
+                    + " lowering (needs the native evaluator)");
+        }
+        String name = arg instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.STRING
+                ? (String) lit.value()
+                : nameOf(arg);
+        if (("ds_exists".equals(predicate) || "ds_not_exists".equals(predicate))
+                && (name.indexOf('.') >= 0 || name.indexOf('=') >= 0 || name.contains("${")
+                        || name.contains("--")))
+        {
+            throw unsupported(predicate + " expects a plain dataset name");
+        }
+        return name;
+    }
+
+
+    private static JsonNode twoArg(Expr.Call c, String operator)
+    {
+        requireArgs(c.name(), c.args().size(), 2);
+        return leaf(nameOf(c.args().get(0)), operator, c.args().get(1));
+    }
+
+
+    private static JsonNode affixRegexLeaf(Expr.Call c, boolean negated)
+    {
+        String kind = c.name().startsWith("prefix") ? "prefix" : "suffix";
+        int argc = c.args().size();
+        if (argc != 2 && argc != 3)
+        {
+            throw unsupported(c.name() + "(...) expects 2 or 3 arguments but got " + argc);
+        }
+        Expr pat = c.args().get(1);
+        if (!(pat instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.REGEX)
+        {
+            throw unsupported(c.name() + "(...) requires a /regex/ literal as its second argument");
+        }
+        String operator = (negated ? "not_" : "") + kind + "_matches_regex";
+        ObjectNode out = NODES.objectNode();
+        out.put("name", nameOf(c.args().get(0)));
+        out.put("operator", operator);
+        out.set("value", NODES.textNode((String) lit.value()));
+        out.put("value_is_literal", true);
+        if (argc == 3)
+        {
+            out.put(kind, asInt(c.args().get(2)));
+        }
+        return out;
+    }
+
+
+    private static JsonNode affixRegexMatchLeaf(Expr.Binary b, Expr.Call affix)
+    {
+        String kind = affix.name();
+        if (!(b.right() instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.REGEX)
+        {
+            throw unsupported("the right-hand side of =~ / !~ must be a /regex/ literal");
+        }
+        boolean negated = b.op() == Expr.BinOp.NMATCH;
+        String operator = (negated ? "not_" : "") + kind + "_matches_regex";
+        ObjectNode out = NODES.objectNode();
+        out.put("name", ((Expr.Ref) affix.args().get(0)).name());
+        out.put("operator", operator);
+        out.set("value", NODES.textNode((String) lit.value()));
+        out.put("value_is_literal", true);
+        out.put(kind, asInt(affix.args().get(1)));
+        return out;
+    }
+
+
+    private static JsonNode affixCompareLeaf(Expr.Binary b, Expr.Call affix)
+    {
+        String kind = affix.name();
+        String name = ((Expr.Ref) affix.args().get(0)).name();
+        int len = asInt(affix.args().get(1));
+        String operator = switch (b.op())
+        {
+        case EQ -> kind + "_equal_to";
+        case NEQ -> kind + "_not_equal_to";
+        case IN -> kind + "_is_contained_by";
+        case NOT_IN -> kind + "_is_not_contained_by";
+        default -> throw unsupported(
+                kind + "(...) supports only ==, !=, in and 'not in' comparisons");
+        };
+        ObjectNode out = leaf(name, operator, b.right());
+        out.put(kind, len);
+        return out;
+    }
+
+
+    private static JsonNode sortedByLeaf(Expr.Call c)
+    {
+        if (c.args().isEmpty())
+        {
+            throw unsupported("is_sorted_by(...) requires the column argument");
+        }
+        Expr by = c.kwargs().get("by");
+        if (!(by instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.LIST)
+        {
+            throw unsupported("is_sorted_by requires a by=[…] descriptor list");
+        }
+        @SuppressWarnings("unchecked")
+        List<Expr> descs = (List<Expr>) lit.value();
+        ArrayNode arr = NODES.arrayNode(descs.size());
+        for (Expr d : descs)
+        {
+            if (!(d instanceof Expr.Call dc)
+                    || !("asc".equals(dc.name()) || "desc".equals(dc.name()))
+                    || dc.args().size() != 1 || !(dc.args().get(0) instanceof Expr.Lit col)
+                    || col.kind() != Expr.LitKind.STRING)
+            {
+                throw unsupported("sort descriptor must be asc(\"col\") or desc(\"col\")");
+            }
+            ObjectNode o = NODES.objectNode();
+            o.put("name", (String) col.value());
+            o.put("sort_order", dc.name());
+            Expr nulls = dc.kwargs().get("nulls");
+            o.put("null_position",
+                    nulls instanceof Expr.Lit nl && nl.kind() == Expr.LitKind.STRING
+                            ? (String) nl.value()
+                            : "last");
+            arr.add(o);
+        }
+        ObjectNode out = NODES.objectNode();
+        out.put("name", nameOf(c.args().get(0)));
+        out.put("operator", "target_is_not_sorted_by");
+        out.set("value", arr);
+        Expr within = c.kwargs().get("within");
+        if (within != null)
+        {
+            out.set("within", withinNode(within));
+        }
+        Expr keep = c.kwargs().get("keep_missings");
+        if (keep != null)
+        {
+            if (!(keep instanceof Expr.Lit kl) || kl.kind() != Expr.LitKind.BOOL)
+            {
+                throw unsupported("keep_missings= must be a boolean literal");
+            }
+            out.put("keep_missings", (Boolean) kl.value());
+        }
+        return out;
+    }
+
+
+    private static JsonNode functionOperatorLeaf(Expr.Call c, String operator)
+    {
+        if (c.args().isEmpty())
+        {
+            throw unsupported(c.name() + "(...) requires the column argument");
+        }
+        ObjectNode out = NODES.objectNode();
+        Map<String, Expr> kw = c.kwargs();
+        if (UNIQUE_SET_OPERATORS.contains(operator))
+        {
+            // Owner requirement #1 (2026-08-23): is_(not_)unique_set carries ONE list operand;
+            // the LEAF wire form keeps its name/value split (D-2). The retired keys=/multi-arg
+            // spellings are REFUSED, exactly as the engine's own lowering refused them.
+            if (kw.containsKey("keys"))
+            {
+                throw unsupported(operator + " no longer takes keys= — write " + operator
+                        + "([A, B, …]), one list operand");
+            }
+            if (c.args().size() != 1)
+            {
+                throw unsupported(operator + " takes exactly one list operand");
+            }
+            if (!(c.args().get(0) instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.LIST)
+            {
+                throw unsupported(operator + "'s operand must be a list literal: " + operator
+                        + "([A, B, …])");
+            }
+            @SuppressWarnings("unchecked")
+            List<Expr> items = (List<Expr>) lit.value();
+            if (items.isEmpty())
+            {
+                throw unsupported(operator + "([]) has no members");
+            }
+            out.put("name", referenceName(items.get(0)));
+            out.put("operator", operator);
+            if (items.size() > 1)
+            {
+                out.set("value", operandArray(
+                        new Expr.Lit(Expr.LitKind.LIST, items.subList(1, items.size()))));
+            }
+        }
+        else
+        {
+            out.put("name", nameOf(c.args().get(0)));
+            out.put("operator", operator);
+            if (c.args().size() >= 2)
+            {
+                Expr v = c.args().get(1);
+                if (v instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.NUMBER)
+                {
+                    out.set("value", numberNode((Double) lit.value()));
+                }
+                else
+                {
+                    out.set("value", NODES.textNode(referenceName(v)));
+                }
+            }
+            if (kw.containsKey("keys"))
+            {
+                out.set("value", operandArray(kw.get("keys")));
+            }
+        }
+        if (kw.containsKey("within"))
+        {
+            out.set("within", withinNode(kw.get("within")));
+        }
+        if (kw.containsKey("ordering"))
+        {
+            out.put("ordering", referenceName(kw.get("ordering")));
+        }
+        if (kw.containsKey("regex"))
+        {
+            Expr r = kw.get("regex");
+            if (!(r instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.STRING)
+            {
+                throw unsupported("regex= must be a string literal");
+            }
+            out.put("regex", (String) lit.value());
+        }
+        if (kw.containsKey("include_empty"))
+        {
+            Expr ie = kw.get("include_empty");
+            if (!(ie instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.BOOL)
+            {
+                throw unsupported("include_empty= must be a boolean literal");
+            }
+            out.put("include_empty", (Boolean) lit.value());
+        }
+        if (kw.containsKey("keep_missings"))
+        {
+            Expr km = kw.get("keep_missings");
+            if (!(km instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.BOOL)
+            {
+                throw unsupported("keep_missings= must be a boolean literal");
+            }
+            out.put("keep_missings", (Boolean) lit.value());
+        }
+        if (kw.containsKey("relation"))
+        {
+            Expr rel = kw.get("relation");
+            if (!(rel instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.STRING)
+            {
+                throw unsupported("relation= must be a string literal");
+            }
+            out.put("relation", (String) lit.value());
+        }
+        return out;
+    }
+
+
+    private static boolean isTupleCall(Expr e)
+    {
+        return e instanceof Expr.Call c && "tuple".equals(c.name()) && c.kwargs().isEmpty()
+                && !c.args().isEmpty() && c.args().stream().allMatch(a -> a instanceof Expr.Ref);
+    }
+
+
+    /** Inverse of the raise's composite-membership: the T3 {@code names:} leaf. */
+    private static JsonNode tupleMembershipLeaf(Expr.Binary b)
+    {
+        if (!(b.right() instanceof Expr.Ref ref))
+        {
+            throw unsupported("tuple membership against a non-reference right side"
+                    + " has no legacy surface");
+        }
+        ArrayNode names = NODES.arrayNode();
+        ((Expr.Call) b.left()).args().forEach(a -> names.add(((Expr.Ref) a).name()));
+        ObjectNode out = NODES.objectNode();
+        out.set("names", names);
+        out.put("operator", b.op() == Expr.BinOp.IN ? "is_contained_by" : "is_not_contained_by");
+        out.set("value", NODES.textNode(ref.name()));
+        return out;
+    }
+
+    // ---- operand helpers -------------------------------------------------
+
+
+    private static Expr.@Nullable Call affixCall(Expr e)
+    {
+        if (e instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 2
+                && ("prefix".equals(c.name()) || "suffix".equals(c.name()))
+                && c.args().get(0) instanceof Expr.Ref && c.args().get(1) instanceof Expr.Lit lit
+                && lit.kind() == Expr.LitKind.NUMBER)
+        {
+            return c;
+        }
+        return null;
+    }
+
+
+    private static @Nullable String wrapperOf(Expr e)
+    {
+        if (e instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 1
+                && UNARY_WRAPPERS.contains(c.name()))
+        {
+            return c.name();
+        }
+        return null;
+    }
+
+
+    private static Expr unwrap(Expr e)
+    {
+        return wrapperOf(e) != null ? ((Expr.Call) e).args().get(0) : e;
+    }
+
+
+    private static boolean isCaseWrapper(@Nullable String w)
+    {
+        return "lowcase".equals(w) || "upcase".equals(w);
+    }
+
+
+    private static boolean isWrapper(Expr e, String name)
+    {
+        return e instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 1
+                && name.equals(c.name());
+    }
+
+
+    private static boolean isArith(Expr.BinOp op)
+    {
+        return op == Expr.BinOp.ADD || op == Expr.BinOp.SUB || op == Expr.BinOp.MUL
+                || op == Expr.BinOp.DIV;
+    }
+
+
+    /** The general value leaf: reference values verbatim, literals with the literal flag. */
+    private static ObjectNode leaf(String name, String operator, Expr value)
+    {
+        ObjectNode out = NODES.objectNode();
+        out.put("name", name);
+        out.put("operator", operator);
+        if (isColRef(value))
+        {
+            Expr inner = ((Expr.Call) value).args().get(0);
+            out.set("value", NODES.textNode(referenceName(inner)));
+            out.put("value_is_reference", true);
+        }
+        else if (value instanceof Expr.Lit lit)
+        {
+            out.set("value", literalNode(lit));
+            out.put("value_is_literal", true);
+        }
+        else
+        {
+            out.set("value", NODES.textNode(referenceName(value)));
+        }
+        return out;
+    }
+
+
+    private static boolean isColRef(Expr e)
+    {
+        return e instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 1
+                && "colref".equals(c.name());
+    }
+
+
+    private static void rejectConversion(Expr e)
+    {
+        if (e instanceof Expr.Call c && "num".equals(c.name()) && c.args().size() == 1
+                && c.kwargs().isEmpty())
+        {
+            throw unsupported("num(...) is a value conversion with no v1 operator surface; the "
+                    + "rule is evaluated natively");
+        }
+    }
+
+
+    private static String referenceName(Expr e)
+    {
+        rejectConversion(e);
+        Expr inner = unwrap(e);
+        String current = currentVariableOperand(inner);
+        if (current != null)
+        {
+            return current;
+        }
+        String operand = MetadataOperandMapping.reverseToOperand(inner);
+        if (operand != null)
+        {
+            return operand;
+        }
+        if (inner instanceof Expr.Ref r)
+        {
+            return r.name();
+        }
+        throw unsupported(
+                "expected a column/reference operand but found " + e.getClass().getSimpleName());
+    }
+
+
+    private static String nameOf(Expr e)
+    {
+        rejectConversion(e);
+        Expr inner = unwrap(e);
+        String current = currentVariableOperand(inner);
+        if (current != null)
+        {
+            return current;
+        }
+        String operand = MetadataOperandMapping.reverseToOperand(inner);
+        if (operand != null)
+        {
+            return operand;
+        }
+        if (inner instanceof Expr.Ref r)
+        {
+            if (r.kind() == net.cumba.corej.core.expr.OperandKind.MATCHED_FLAG)
+            {
+                throw unsupported("the _matched_ join flag ('" + r.name()
+                        + "') is a native evaluator construct with no v1 lowering");
+            }
+            return r.name();
+        }
+        throw unsupported("the left side of a comparison must be a column reference, found "
+                + e.getClass().getSimpleName());
+    }
+
+
+    private static @Nullable String currentVariableOperand(Expr e)
+    {
+        if (e instanceof Expr.Call c && c.args().isEmpty() && c.kwargs().isEmpty())
+        {
+            if ("varname".equals(c.name()))
+            {
+                return "variable_name";
+            }
+            if ("value".equals(c.name()))
+            {
+                return "variable_value";
+            }
+        }
+        return null;
+    }
+
+
+    private static JsonNode literalNode(Expr e)
+    {
+        if (!(e instanceof Expr.Lit lit))
+        {
+            throw unsupported("expected a literal but found " + e.getClass().getSimpleName());
+        }
+        return literalNode(lit);
+    }
+
+
+    private static JsonNode literalNode(Expr.Lit lit)
+    {
+        return switch (lit.kind())
+        {
+        case STRING, REGEX -> NODES.textNode((String) lit.value());
+        case BOOL -> NODES.booleanNode((Boolean) lit.value());
+        case NUMBER -> numberNode((Double) lit.value());
+        case LIST ->
+        {
+            @SuppressWarnings("unchecked")
+            List<Expr> items = (List<Expr>) lit.value();
+            ArrayNode arr = NODES.arrayNode(items.size());
+            for (Expr item : items)
+            {
+                if (item instanceof Expr.Lit il)
+                {
+                    arr.add(literalNode(il));
+                }
+                else
+                {
+                    throw unsupported("list elements must be literals");
+                }
+            }
+            yield arr;
+        }
+        };
+    }
+
+
+    private static JsonNode numberNode(Double d)
+    {
+        if (!d.isInfinite() && Double.compare(d, Math.rint(d)) == 0)
+        {
+            return NODES.numberNode(d.longValue());
+        }
+        return NODES.numberNode(d);
+    }
+
+
+    private static ArrayNode operandArray(Expr e)
+    {
+        if (!(e instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.LIST)
+        {
+            throw unsupported(
+                    "expected a [list] operand but found " + e.getClass().getSimpleName());
+        }
+        @SuppressWarnings("unchecked")
+        List<Expr> items = (List<Expr>) lit.value();
+        ArrayNode arr = NODES.arrayNode(items.size());
+        for (Expr item : items)
+        {
+            if (item instanceof Expr.Lit il)
+            {
+                arr.add(literalNode(il));
+            }
+            else
+            {
+                arr.add(NODES.textNode(referenceName(item)));
+            }
+        }
+        return arr;
+    }
+
+
+    private static JsonNode withinNode(Expr within)
+    {
+        if (!(within instanceof Expr.Lit lit) || lit.kind() != Expr.LitKind.LIST)
+        {
+            return NODES.textNode(referenceName(within));
+        }
+        @SuppressWarnings("unchecked")
+        List<Expr> items = (List<Expr>) lit.value();
+        ArrayNode arr = NODES.arrayNode(items.size());
+        for (Expr item : items)
+        {
+            if (item instanceof Expr.Lit il && il.kind() == Expr.LitKind.LIST)
+            {
+                @SuppressWarnings("unchecked")
+                List<Expr> group = (List<Expr>) il.value();
+                ArrayNode inner = NODES.arrayNode(group.size());
+                for (Expr g : group)
+                {
+                    inner.add(NODES.textNode(referenceName(g)));
+                }
+                arr.add(inner);
+            }
+            else
+            {
+                arr.add(NODES.textNode(referenceName(item)));
+            }
+        }
+        return arr;
+    }
+
+
+    private static int asInt(Expr e)
+    {
+        if (e instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.NUMBER)
+        {
+            return (int) Math.rint((Double) lit.value());
+        }
+        throw unsupported("expected a numeric length but found " + e.getClass().getSimpleName());
+    }
+
+
+    private static void requireArgs(String fn, int actual, int expected)
+    {
+        if (actual != expected)
+        {
+            throw unsupported(fn + "(...) expects " + expected + " argument(s) but got " + actual);
+        }
+    }
+
+
+    private static ExpressionException unsupported(String detail)
+    {
+        return new ExpressionException("Expression construct not supported by the v1 lowering "
+                + "(needs the native evaluator): " + detail);
+    }
 }

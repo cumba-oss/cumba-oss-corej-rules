@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-SEND-0283 expect=noViolation domain=SE
+#runLevel Info
+#library standard=sendig version=3-1-1
+#note "H2 guard scenario (WORKORDER-H2-guard-coverage / REVIEW1B-date-order-flip.tsv): the subject's DS row exists but DS.DSSTDTC is BLANK, so earliest_possible(DS.DSSTDTC) yields MISSING and the not empty(earliest_possible(...)) guard silences the INFO leg despite the last element ending on a partial 2020-02 (latest_possible real). The verbatim ERROR leg cannot fire: a blank read AS A DATE has an unbounded hull. Runs at #runLevel Info because the engine default never evaluates an INFO level. If this FIRES, the order-flip guard was deleted: latest_possible(SEENDTC) > MISSING is true under D34 #5."
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | TRT | 2020-01-05 | 2020-02
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE |

@@ -108,9 +108,29 @@ public final class AbsentColumnExposureScan
 
     }
 
-    /** Tag markers and pure unary transforms whose operand is still the column under test. */
-    private static final Set<String> UNWRAPPABLE = Set.of("date", "date_part", "time_part", "num",
-            "str", "len", "length", "upper", "upcase", "lower", "lowcase", "trim");
+    /**
+     * Tag markers and pure unary transforms whose operand is still the column under test. The
+     * marker half is <b>derived</b> from
+     * {@link net.cumba.corej.core.expr.eval.ExprCompiler#comparisonMarkers()} (M4, terminal review
+     * of {@code PLAN-typed-expression-engine}): the transcription here had drifted — {@code time}
+     * joined the compiler's conversions in phase 3b and never reached this list, so a
+     * {@code time(X)}-wrapped read was invisible to this scan. Only the pure string transforms
+     * remain hand-listed; they are not markers and the compiler cannot enumerate them.
+     *
+     * <p>
+     * ⚑ The derivation changed exactly ONE member here — {@code time}. {@code str} was already in
+     * the hand list and stays in, which is the answer to R2-13's question about it: a
+     * {@code str(X)} wrapper leaves the operand the column under test, so the scan must see through
+     * it. The opposite treatment at {@code CheckExprUnits} / {@code DualFormCheckNode} is about the
+     * retired v1 vocabulary having no type-insensitive-equality family, not about what {@code str}
+     * wraps.
+     * </p>
+     */
+    private static final Set<String> UNWRAPPABLE = java.util.stream.Stream
+            .concat(net.cumba.corej.core.expr.eval.ExprCompiler.comparisonMarkers().stream(),
+                    java.util.stream.Stream.of("len", "length", "upper", "upcase", "lower",
+                            "lowcase", "trim"))
+            .collect(java.util.stream.Collectors.toUnmodifiableSet());
 
     /** The presence-test functions that can act as a dominating guard. */
     private static final Set<String> EXISTS_CALLS = Set.of("var_exists");

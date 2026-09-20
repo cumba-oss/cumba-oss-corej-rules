@@ -1,0 +1,67 @@
+name: CDISC-CG0147
+kind: rule
+description: |
+  Wave 19 port - Operation-backed rule (['distinct', 'max_date', 'max_date']).
+  Phase 3c (typed date equality, D100/SPEC 5.2): subject 002 is the positive, a
+  genuine day-precision mismatch against both EX extremes. Subjects 004 (day vs
+  same-day datetime, precision) and 005 (same instant with a UTC offset) fired under
+  plain string equality and are SILENT under typed date equality.
+
+  H1b (owner ruling 2026-09-17; SPEC 5.2(4) AMENDED, <meta>/plans/SPEC-typed-expression-engine.md):
+  subject 003 (RFXENDTC '2026-02-99') is expected to FIRE again. An unpositionable
+  value has an unbounded hull; 5.2(4)'s "false" is the verdict of the six PREDICATES,
+  and `negate` flips it, so `date_not_equal_to` fires on an unpositionable operand in
+  EITHER position. It is the right answer: '2026-02-99' is not a date at all, so it is
+  certainly not the same day as either EX extreme. Between the phase-3c rewrite and
+  H1b this row was expected silent; that expectation was the old behaviour, not a
+  separate decision.
+python_source: rules-sdtmig-3-4.json (CORE-000238)
+rule:
+  coreId: CDISC-CG0147
+datasets:
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '001', RFXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '002', RFXENDTC: '2026-03-15'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '003', RFXENDTC: '2026-02-99'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '004', RFXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '005', RFXENDTC: '2026-01-10T10:00+02:00'}
+  EX:
+    row_key: [STUDYID, USUBJID, EXSEQ]
+    column_types:
+      EXSEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '001', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '002', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '003', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '004', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10T09:00'}
+      - {STUDYID: S1, DOMAIN: EX, USUBJID: '005', EXSEQ: 1, EXTRT: DRUG, EXSTDTC: '2026-01-01', EXENDTC: '2026-01-10T08:00'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+library_mocks:
+  classes:
+    special-purpose: [DM]
+    interventions: [EX]
+expected_violations:
+  - rule_id: CDISC-CG0147
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '002'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004, 005]'
+      $max_ex_exendtc: '2026-01-10'
+      $max_ex_exstdtc: '2026-01-01'
+      RFXENDTC: '2026-03-15'
+  # H1b (2026-09-17): unpositionable RFXENDTC -> date_not_equal_to fires. See description.
+  - rule_id: CDISC-CG0147
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '003'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004, 005]'
+      $max_ex_exendtc: '2026-01-10'
+      $max_ex_exstdtc: '2026-01-01'
+      RFXENDTC: '2026-02-99'
+expected_errors: []

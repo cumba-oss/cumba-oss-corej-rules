@@ -21,7 +21,7 @@ description: |
   what the fork already did, so the two lanes agree on DETECTION. The engine change is pinned
   Java-side by `AbsentColumnFoldTest`; register §45 carries the reasoning (the retired
   CORE-RULES-JAVA-EXTENSIONS.md §22 is indexed in
-  `corej-cdisc-rules/documentation/expression-docs-disposition.md` §A).
+  `corej-rules/documentation/expression-docs-disposition.md` §A).
 
   WHY THE BASELINE ENTRY DID NOT RETIRE. Measured 2026-08-04: both lanes now fire exactly rows
   002 and 003, with identical row keys and status. What still diverges on the `violations`
@@ -44,11 +44,7 @@ python_notes: |
 python_source: EC-49 (filed 2026-08-03 from PLAN-negative-leaf-absent-column.md Phase 0 step 5;
   resolved 2026-08-04 by Fix #148, PLAN-affix-negative-empty-mask-removal.md)
 check:
-  name: AESTDTC
-  operator: prefix_not_equal_to
-  value: "20"
-  value_is_literal: true
-  prefix: 2
+  expression: 'prefix(AESTDTC, 2) != "20"'
 datasets:
   AE:
     row_key: [STUDYID, USUBJID, AESEQ]

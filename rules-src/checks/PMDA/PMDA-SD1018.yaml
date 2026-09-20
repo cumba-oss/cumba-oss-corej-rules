@@ -7,7 +7,7 @@ Description: "Raise a warning when, for a planned visit (SVUPDES is empty) in th
   \ Name (VISIT), and Planned Study Day of Visit (VISITDY) does not match an entry\
   \ in the Trial Visits (TV) dataset."
 Severity: "Warning"
-Executability: "Partially Executable"
+Executability: "Partially Executable - Possible Overreporting"
 Scope:
   Domains:
     Include:
@@ -16,7 +16,6 @@ Requirements:
   Variables:
     All:
     - "VISITNUM"
-    - "SVUPDES"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -26,7 +25,9 @@ Match_Datasets:
   Name: "TV"
 Check:
   expression: >-
-    not empty(VISITNUM) and empty(SVUPDES) and empty(TV.VISITNUM)
+    not empty(VISITNUM) and (var_exists("SVPRESP") and SVPRESP == "Y" or not var_exists("SVPRESP")
+    and empty(SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT),
+    "UNPLAN")) and empty(TV.VISITNUM)
 Outcome:
   Message: "The combination of VISITNUM, VISIT, and VISITDY for a planned visit does\
     \ not match any entry in the Trial Visits (TV) dataset."

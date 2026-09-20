@@ -15,14 +15,14 @@ Requirements:
   Variables:
     All:
     - "USUBJID"
-Operations:
-- id: "$ex_usubjid"
+Bindings:
+- name: "$ex_usubjid"
   expression: "distinct(USUBJID, domain=\"EX\")"
-- id: "$min_ex_exstdtc"
+- name: "$min_ex_exstdtc"
   expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
 Check:
   expression: >-
-    USUBJID in $ex_usubjid and RFXSTDTC != $min_ex_exstdtc
+    USUBJID in $ex_usubjid and date(RFXSTDTC) != $min_ex_exstdtc
 Outcome:
   Message: "RFXSTDTC does not equal the earliest value of EXSTDTC in the EX dataset\
     \ for the subject."

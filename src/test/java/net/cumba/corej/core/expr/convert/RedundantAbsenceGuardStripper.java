@@ -64,7 +64,7 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <pre>{@code
- * cd cumba-corej-rules
+ * cd /abs/path/to/this/repository
  * mvn -q org.codehaus.mojo:exec-maven-plugin:3.6.1:java \
  *     -Dexec.classpathScope=test \
  *     -Dexec.mainClass=net.cumba.corej.core.expr.convert.RedundantAbsenceGuardStripper \

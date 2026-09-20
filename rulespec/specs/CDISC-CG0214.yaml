@@ -1,0 +1,40 @@
+name: CDISC-CG0214
+kind: rule
+description: |
+  Record-Data + Operation. CDISC-CG0214: when SVUPDES is populated, VISITNUM
+  must not equal a planned VISITNUM in TV. Operation `distinct VISITNUM` over
+  TV builds $visitnums_in_tv. Check: SVUPDES exists AND non_empty AND VISITNUM
+  is_contained_by $visitnums_in_tv. The SV row has VISITNUM=1 (present in TV)
+  and a populated SVUPDES, so the rule fires. RE-CUT 2026-09-18
+  (PLAN-unplanned-visit-cascade): the verdict is unchanged - a populated
+  SVUPDES is tier 2 of the cascade - but the Check now also reads VISIT for
+  the name tier, so the derived output_variables gain VISIT.
+python_source: rules-sdtmig-3-3.json (CORE-000843)
+rule:
+  coreId: CDISC-CG0214
+datasets:
+  TV:
+    row_key: [STUDYID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: TV, VISITNUM: 1, VISIT: Visit 1, ARMCD: ARM1}
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '001', VISITNUM: 1, VISIT: Visit 1, SVUPDES: Unplanned follow-up}
+config:
+  standard: sdtmig
+  standard_version: '3.3'
+library_mocks:
+  classes:
+    special-purpose: [SV]
+    trial-design: [TV]
+expected_violations:
+  - rule_id: CDISC-CG0214
+    dataset: SV
+    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 1}
+    status: SUCCESS
+    output_variables:
+      $visitnums_in_tv: '[1]'
+      VISIT: Visit 1
+      VISITNUM: '1'
+expected_errors: []

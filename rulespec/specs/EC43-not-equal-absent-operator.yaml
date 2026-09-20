@@ -2,48 +2,45 @@ name: EC43-not-equal-absent-operator
 kind: check_operator
 description: |
   EC-43's OPERATOR claim, pinned alone: an ABSENT column folds to all-missing, so an intrinsically
-  negative comparison against a populated literal is TRUE on every row and the leaf fires — on both
-  engines.
+  negative comparison against a populated literal is TRUE — the leaf fires. That claim is
+  unchanged. ⚠⚠ WHAT CHANGED 2026-09-17 (D111, PLAN-typed-expression-engine.md phase 7): the
+  REPORT is now ONE dataset-level finding, no longer one per row. An absent-column-only check is
+  dataset-decidable at bind time (D39a: an absent column is a dataset-level constant, D34 #3/#4),
+  so `BroadcastFold` evaluates the leaf once and `RuleRunner` emits a single dataset-level
+  violation (rendered with row 0's key, like every dataset-level finding). The two-row expectation
+  this spec carried from 2026-08-07 until then is retired WITH the ruling, not lost: the
+  present-but-all-blank twin `EC43-absent-equals-blank-control` still expects both rows, and the
+  deliberate difference between the two files is D111's content.
+
+  ⚠ This makes the spec a filed TWO-LANE DIVERGENCE (`java-only-accepted`): the Python fork folds
+  the absent target to all-missing per row (EC-38 / Fix #128) and fires EVERY row, so the lanes
+  now differ on report granularity — detection agrees — on every firing absent-column execution.
+  See the `EC43-not-equal-absent-operator` entry in `documentation/parity-diff-baseline.json`
+  (surfaced through PARITY-DEBT.md).
 
   ⚑ ADDED 2026-08-07 (wave 13 lane F) in the same change that re-authored `EC43-not-equal-absent`
-  from `kind: check_operator` to `kind: rule` to retire EC-63. That conversion moved EC-43's claim to
-  the RULE layer and would otherwise have left the operator contract unpinned — and an unpinned
-  contract is how it gets "corrected" later by somebody who has only read the guard. `Fix #166` /
-  `Fix #169` deliberately did NOT retract it: what the operator computes is EC-43's business,
-  whether the enclosing rule reports is the author's, and the two statements are about different
-  layers.
+  from `kind: check_operator` to `kind: rule` to retire EC-63; it kept the operator contract
+  pinned when that conversion moved EC-43's claim to the RULE layer.
 
-  ⚠⚠ WHY `not_equal_to_case_insensitive` AND NOT `not_equal_to`. X1 / `Fix #166` made
-  `NonEmptyGuardInliner` guard EVERY column-vs-literal negative in `NEGATIVE_BINOPS` (`!=`,
-  `not_matches_regex`, `not in`), and a `kind: check_operator` spec is scaffolded through
-  `RulePackageLoader.installNativeExpr`, which runs that pass — so a bare `not_equal_to` leaf is
-  silenced on the Java lane before the operator's verdict can be observed at all. That is precisely
-  what happened to this spec's sibling, and it is a real loss of expressiveness in the harness, not
-  an accident of this fixture. `not_equal_to_case_insensitive` raises to
-  `Expr.Not(equalsIgnoreCase(...))` (`CheckToExpr:254`) — a `Not` leaf, which
-  `NonEmptyGuardInliner.collectGuardableColumns` leaves unguarded — so the verdict stays observable.
-  Case folding is irrelevant to the claim under test: the target is MISSING, not mis-cased.
-
-  ⚠ Neither engine reaches this through a structural negation. coreJ routes it to
-  `ExprCompiler.compileCaseInsensitiveEquality(negate=true)`, which folds the target (EC-43) and
-  defers to `Primitives.equality`; the fork routes it to `_check_inequality(case_insensitive=True)`.
-  Both implement the same truth table, in which BOTH-missing is "equal" (no fire). Here the value
-  operand is a populated literal and the target is missing, so every row fires on both lanes.
-
-  ⚠ Paired with `EC43-absent-equals-blank-control`, which asserts the same two rows over a column
-  that is PRESENT but blank. Absent and present-all-blank must evaluate identically — that
-  equivalence IS the EC-43 contract. If these two ever disagree, the contract has been broken.
+  ⚠ WHY `not_equal_to_case_insensitive` AND NOT `not_equal_to` — historical: when this spec was
+  authored, `NonEmptyGuardInliner` guarded every column-vs-literal negative at load, and only the
+  `Expr.Not(equalsIgnoreCase(...))` raise escaped it, keeping the verdict observable. The inliner
+  has since been retired (the X1 guard-injection era ended with the expression engine), so the
+  spelling is no longer load-bearing — it is kept because rewriting the fixture would re-pin the
+  same claim under a different surface for no gain. Case folding is irrelevant to the claim: the
+  target is MISSING, not mis-cased. coreJ still routes the shape through
+  `ExprCompiler.compileCaseInsensitiveEquality(negate=true)`; the fold now decides it at dataset
+  level before any row is read.
 python_notes: |
   `not_equal_to_case_insensitive` is not in the fork's `ABSENT_TARGET_AWARE_OPERATORS`, so EC-38 /
   `Fix #128`'s `_absent_target_as_missing` materialises TSVAL as "" and `_check_inequality` returns
   True on both rows (`both_null` is false because the comparator is a populated literal; "" is
-  falsy, so the case-folded target becomes None and `None != "planned"`).
+  falsy, so the case-folded target becomes None and `None != "planned"`). The fork therefore
+  reports TWO row findings where coreJ reports ONE dataset-level finding since D111 — the filed
+  granularity divergence described above.
 python_source: EC-43 (PLAN-negative-leaf-absent-column.md Phase 2); split out of EC43-not-equal-absent 2026-08-07
 check:
-  name: TSVAL
-  operator: not_equal_to_case_insensitive
-  value: "PLANNED"
-  value_is_literal: true
+  expression: 'not equalsIgnoreCase(TSVAL, "PLANNED")'
 datasets:
   TS:
     row_key: [STUDYID, TSPARMCD, TSSEQ]
@@ -56,14 +53,11 @@ config:
   standard_version: '3.4'
 expected_status: EXECUTED
 expected_violations:
+# ONE dataset-level finding (D111): the absent-column fact is decided before a row is read and
+# reported once per (rule, dataset), rendered with row 0's key columns.
 - rule_id: AUTO-EC43-not-equal-absent-operator
   dataset: TS
   row_key: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
   status: SUCCESS
   output_variables: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: '1'}
-- rule_id: AUTO-EC43-not-equal-absent-operator
-  dataset: TS
-  row_key: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
-  status: SUCCESS
-  output_variables: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: '2'}
 expected_errors: []

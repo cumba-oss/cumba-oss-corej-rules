@@ -119,8 +119,11 @@ class RuleTestSuitesFamilyHomeTest
     /**
      * The per-family declaration policy, pinned as one map so it cannot drift silently.
      * {@code fda}, {@code pmda} and {@code draft} are greenfield subtrees whose scenarios must
-     * declare {@code #library standard=… version=…} (or {@code #library-ref}); {@code cdisc} and
-     * {@code core} make it optional <em>only</em> to keep their migrated scenarios working.
+     * declare {@code #library standard=… version=…} (or {@code #library-ref}); {@code cdisc} makes
+     * it optional <em>only</em> to keep its migrated scenarios working. ⚑ {@code core} was the
+     * second such family and went with the 2026-09 CORE-family retirement; the scenarios it had
+     * that survived were migrated into {@code cdisc}, {@code fda} and {@code pmda}, where the
+     * stricter policy of the latter two now applies to them.
      *
      * <p>
      * Flipping a family to optional would switch off its membership assertion for every undeclared
@@ -139,8 +142,6 @@ class RuleTestSuitesFamilyHomeTest
             actual.put(factory.family(), Boolean.valueOf(factory.requireDeclaredStandard()));
         }
         assertEquals(
-                // The CORE family is not redistributed with this repository, so its factory
-                // and scenario home do not exist here.
                 Map.of("cdisc", Boolean.FALSE, DRAFT_FAMILY, Boolean.TRUE, "fda", Boolean.TRUE,
                         "pmda", Boolean.TRUE),
                 actual, "the per-family requireDeclaredStandard() policy changed");

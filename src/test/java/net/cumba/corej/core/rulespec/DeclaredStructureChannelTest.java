@@ -71,8 +71,7 @@ class DeclaredStructureChannelTest
                   Scope:
                     Data_Structures: {Include: ["OCCURRENCE DATA STRUCTURE"]}
                   Check:
-                    all:
-                      - {name: AESEQ, operator: equal_to, value: 1}
+                    expression: 'AESEQ == 1'
                   Outcome:
                     Message: AESEQ probe fired.
                     Output_Variables: [STUDYID, USUBJID, AESEQ]

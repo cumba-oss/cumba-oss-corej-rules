@@ -46,10 +46,10 @@ import org.junit.jupiter.api.Test;
  * ⚠ <b>What it does NOT cover.</b> Idempotence is a property of the <em>text</em>, not of meaning:
  * it says a regeneration is a no-op, not that the expression states the right rule. Semantic checks
  * live in the rulespec suite and the corpus lints. Before the flip this gate additionally raised
- * every authored operator-leaf Check ({@code CheckToExpr}) and ratcheted the nine degenerate
- * singleton-composite files (emptied by {@code Fix #251}); the corpus authors no leaves any more,
- * so that half retired with the flip — the forward raise's remaining synthetic coverage is
- * {@code CheckToExprForwardTableTest}.
+ * every authored operator-leaf Check and ratcheted the nine degenerate singleton-composite files
+ * (emptied by {@code Fix #251}); the corpus authors no leaves any more, so that half retired with
+ * the flip, and the raise itself — with the whole v1 leaf model — retired under D121 (phase 7 of
+ * {@code PLAN-typed-expression-engine.md}).
  * </p>
  */
 class ExpressionTextIdempotenceTest
@@ -60,15 +60,21 @@ class ExpressionTextIdempotenceTest
     private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    // ⚠ Corpus-size floor dropped on extraction: it asserted the FULL internal corpus,
-    // which this subset deliberately is not. Enforced internally over the whole corpus.
+    /** Floors, not equalities: both corpora grow. */
+    // 3700 -> 3403 (PLAN-retire-core-family phase 6): distinct shipped Core.Id, CORE's 516
+    // gone. ⚠ NOT 3411 — this population is BackConversionScan.shippedExpressions(), i.e. the
+    // rules carrying an expression, which is 8 fewer than the 3411 the manifest ships.
+    private static final int MIN_SHIPPED = 3403;
+
+    // 3700 -> 3435 (PLAN-retire-core-family phase 6): rules-src/checks, CORE's 518 gone, the
+    // 21 phase-4 mints added.
+    private static final int MIN_AUTHORED = 3435;
 
     @Test
     void p4aShippedExpressionsAreAFixedPointOfPrintAfterParse()
     {
         Map<String, String> expressions = BackConversionScan.shippedExpressions();
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        assertTrue(expressions.size() >= MIN_SHIPPED, "scanned only " + expressions.size());
         Map<String, String> unstable = new LinkedHashMap<>();
         expressions.forEach((id, text) ->
         {
@@ -95,8 +101,8 @@ class ExpressionTextIdempotenceTest
     void p4bAuthoredExpressionsAreCanonicalFixedPoints() throws IOException
     {
         List<Path> files = authoredCheckFiles();
-        // ⚠ Corpus-size floor removed on extraction: it asserted the FULL internal corpus,
-        // which this subset deliberately is not. Enforced internally over the whole corpus.
+        assertTrue(files.size() >= MIN_AUTHORED,
+                "found only " + files.size() + " rules-src checks");
 
         Map<String, String> notExpressionForm = new LinkedHashMap<>();
         Map<String, String> unstable = new LinkedHashMap<>();

@@ -25,8 +25,7 @@ import java.util.Locale;
  * <p>
  * Corrected 2026-09-01 (PLAN-rules-module-consolidation D15): this paragraph previously named "the
  * {@code RulePackageManifest} readers" as a second deriver and called the agreement "guaranteed".
- * The engine half of that was never true — {@code corej-cdisc-core} contains no reference to this
- * class.
+ * The engine half of that was never true — {@code corej-core} contains no reference to this class.
  * </p>
  */
 public final class RuleFamily

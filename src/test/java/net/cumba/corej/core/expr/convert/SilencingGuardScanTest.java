@@ -1,7 +1,6 @@
 package net.cumba.corej.core.expr.convert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,9 +11,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Classifier branches from {@code plans/done/PLAN-generator-silencing-guard-hoist.md} §5.1: only a
- * top-level-{@code all} {@code exists} guard for a non-dotted variable with a substantive use
- * elsewhere in the Check qualifies; {@code any}/{@code not}-nested, {@code not_exists}, dotted, and
- * literal-value-only cases are left alone.
+ * top-level-conjunction {@code var_exists} guard for a non-dotted variable with a substantive use
+ * elsewhere in the Check qualifies; disjunction-/negation-nested, {@code var_not_exists}, dotted,
+ * and literal-value-only cases are left alone. Fixtures are authored in expression form — since
+ * D121 (phase 7 of {@code PLAN-typed-expression-engine.md}) that is the only authorable form, and
+ * the scan walks the parsed expression through {@code CheckExprUnits}.
  */
 class SilencingGuardScanTest
 {
@@ -30,21 +31,18 @@ class SilencingGuardScanTest
     @Test
     void topLevelSilencingGuard_hoisted() throws Exception
     {
-        assertEquals(List.of("COMPLFL"), scan("""
-                {"all":[
-                  {"name":"COMPLFL","operator":"var_exists"},
-                  {"name":"COMPLFL","operator":"is_not_contained_by","value":["Y","N"]}]}"""));
+        assertEquals(List.of("COMPLFL"),
+                scan("""
+                        {"expression":"var_exists(\\"COMPLFL\\") and COMPLFL not in [\\"Y\\", \\"N\\"]"}"""));
     }
 
 
     @Test
     void anyNestedGuard_kept() throws Exception
     {
-        assertEquals(List.of(), scan("""
-                {"any":[
-                  {"all":[
-                    {"name":"EPOCH","operator":"var_exists"},
-                    {"name":"EPOCH","operator":"non_empty"}]}]}"""));
+        assertEquals(List.of(),
+                scan("""
+                        {"expression":"(var_exists(\\"EPOCH\\") and not empty(EPOCH)) or AESEV == \\"Y\\""}"""));
     }
 
 
@@ -52,31 +50,24 @@ class SilencingGuardScanTest
     void notExistsGuard_kept() throws Exception
     {
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"EPOCH","operator":"var_not_exists"},
-                  {"name":"AESEV","operator":"non_empty"}]}"""));
+                {"expression":"var_not_exists(\\"EPOCH\\") and not empty(AESEV)"}"""));
     }
 
 
     @Test
     void dottedGuard_kept() throws Exception
     {
-        assertEquals(List.of(),
-                scan("""
-                        {"all":[
-                          {"name":"AE.AESDTH","operator":"var_exists"},
-                          {"name":"AE.AESDTH","operator":"equal_to","value":"Y","value_is_literal":true}]}"""));
+        assertEquals(List.of(), scan("""
+                {"expression":"var_exists(AE.AESDTH) and AE.AESDTH == \\"Y\\""}"""));
     }
 
 
     @Test
     void valueOperandUse_isSubstantive() throws Exception
     {
-        // A value-list operand use counts as a substantive use (here via a non-R-4.11a operator).
+        // A value-operand use counts as a substantive use (here via a non-R-4.11a operator).
         assertEquals(List.of("EPOCH"), scan("""
-                {"all":[
-                  {"name":"EPOCH","operator":"var_exists"},
-                  {"name":"USUBJID","operator":"equal_to","value":"EPOCH"}]}"""));
+                {"expression":"var_exists(\\"EPOCH\\") and USUBJID == EPOCH"}"""));
     }
 
 
@@ -85,36 +76,27 @@ class SilencingGuardScanTest
     {
         // CORE-000213 class. Plan A D-8 (ruling 3, 2026-08-23): is_(not_)unique_set builds ONE
         // key tuple from every member and drops an absent one uniformly wherever it sits
-        // (EC-53), so a guard on the `name` (EPOCH) is exactly as load-bearing as one on a
+        // (EC-53), so a guard on member 0 (EPOCH) is exactly as load-bearing as one on a
         // grouping key (DSSCAT) — NEITHER is flagged. (Before the collapse EPOCH was, on the
         // warrant of the wave-33-retired Python fork's _absent_unique_set_target short-circuit.)
-        assertEquals(List.of(),
-                scan("""
-                        {"all":[
-                          {"name":"EPOCH","operator":"var_exists"},
-                          {"name":"DSSCAT","operator":"var_exists"},
-                          {"name":"EPOCH","operator":"is_not_unique_set","value":["USUBJID","DSSCAT"]}]}"""));
+        assertEquals(List.of(), scan("""
+                {"expression":"var_exists(\\"EPOCH\\") and var_exists(\\"DSSCAT\\") and\
+                 not is_unique_set([EPOCH, USUBJID, DSSCAT])"}"""));
         // The keyless shape (CDISC-AD0054): the sole member is the whole tuple — required.
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"USUBJID","operator":"var_exists"},
-                  {"name":"USUBJID","operator":"is_not_unique_set"}]}"""));
+                {"expression":"var_exists(\\"USUBJID\\") and not is_unique_set([USUBJID])"}"""));
     }
 
 
     @Test
     void uniqueSetGuards_carveOutHiddenVars_reportsEveryMemberGuard() throws Exception
     {
-        // The other half of the same Check: what the carve-out hides — since D-8, the `name`
-        // member's guard too.
+        // The other half of the same Check: what the carve-out hides — since D-8, member 0's
+        // guard too.
         assertEquals(List.of("EPOCH", "DSSCAT"),
-                SilencingGuardScan.carveOutHiddenVars(MAPPER.readValue(
-                        """
-                                {"all":[
-                                  {"name":"EPOCH","operator":"var_exists"},
-                                  {"name":"DSSCAT","operator":"var_exists"},
-                                  {"name":"EPOCH","operator":"is_not_unique_set","value":["USUBJID","DSSCAT"]}]}""",
-                        CheckCondition.class)));
+                SilencingGuardScan.carveOutHiddenVars(MAPPER.readValue("""
+                        {"expression":"var_exists(\\"EPOCH\\") and var_exists(\\"DSSCAT\\") and\
+                         not is_unique_set([EPOCH, USUBJID, DSSCAT])"}""", CheckCondition.class)));
     }
 
 
@@ -122,21 +104,15 @@ class SilencingGuardScanTest
     void inconsistentAcrossDatasetGuards_carveOutStaysPositionAware() throws Exception
     {
         // The second arm of D-8 — the one that stops the collapse from being a blanket
-        // disabling: is_inconsistent_across_dataset's `name` is the checked VALUE, not a key
+        // disabling: is_inconsistent_across_dataset's target is the checked VALUE, not a key
         // member (§3.6 D-7), so its target guard (--TPT) is still silencing and IS flagged while
         // its grouping-key guard (VISITNUM) is still hidden.
-        assertEquals(List.of("--TPT"),
-                scan("""
-                        {"all":[
-                          {"name":"--TPT","operator":"var_exists"},
-                          {"name":"VISITNUM","operator":"var_exists"},
-                          {"name":"--TPT","operator":"is_inconsistent_across_dataset","value":["VISITNUM"]}]}"""));
-        assertEquals(List.of("VISITNUM"), SilencingGuardScan.carveOutHiddenVars(MAPPER.readValue(
-                """
-                        {"all":[
-                          {"name":"--TPT","operator":"var_exists"},
-                          {"name":"VISITNUM","operator":"var_exists"},
-                          {"name":"--TPT","operator":"is_inconsistent_across_dataset","value":["VISITNUM"]}]}""",
+        assertEquals(List.of("--TPT"), scan("""
+                {"expression":"var_exists(\\"--TPT\\") and var_exists(\\"VISITNUM\\") and\
+                 is_inconsistent_across_dataset(--TPT, keys=[VISITNUM])"}"""));
+        assertEquals(List.of("VISITNUM"), SilencingGuardScan.carveOutHiddenVars(MAPPER.readValue("""
+                {"expression":"var_exists(\\"--TPT\\") and var_exists(\\"VISITNUM\\") and\
+                 is_inconsistent_across_dataset(--TPT, keys=[VISITNUM])"}""",
                 CheckCondition.class)));
     }
 
@@ -144,14 +120,12 @@ class SilencingGuardScanTest
     @Test
     void negatedTargetPositionGuard_kept() throws Exception
     {
-        // Defensive branch (no corpus instance today): under a `not`, the fork's all-False
+        // Defensive branch (no corpus instance today): under a structural `not`, the all-False
         // not-applicable verdict inverts to an all-True over-fire, so the target guard is
         // load-bearing after all and must not be flagged.
-        assertEquals(List.of(),
-                scan("""
-                        {"all":[
-                          {"name":"EPOCH","operator":"var_exists"},
-                          {"not":{"name":"EPOCH","operator":"is_not_unique_set","value":["USUBJID"]}}]}"""));
+        assertEquals(List.of(), scan("""
+                {"expression":"var_exists(\\"EPOCH\\") and\
+                 not (not is_unique_set([EPOCH, USUBJID]))"}"""));
     }
 
 
@@ -159,11 +133,8 @@ class SilencingGuardScanTest
     void literalValue_isNotSubstantive() throws Exception
     {
         // "SNOMED"-style: the guarded name only reappears as a literal value, not a variable use.
-        assertEquals(List.of(),
-                scan("""
-                        {"all":[
-                          {"name":"TSVCDREF","operator":"var_exists"},
-                          {"name":"OTHER","operator":"equal_to","value":"TSVCDREF","value_is_literal":true}]}"""));
+        assertEquals(List.of(), scan("""
+                {"expression":"var_exists(\\"TSVCDREF\\") and OTHER == \\"TSVCDREF\\""}"""));
     }
 
 
@@ -173,8 +144,7 @@ class SilencingGuardScanTest
         // A pure presence check (no other use of the variable) is the rule's substance, not a
         // silencing guard.
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"AESEV","operator":"var_exists"}]}"""));
+                {"expression":"var_exists(\\"AESEV\\")"}"""));
     }
 
 
@@ -182,10 +152,8 @@ class SilencingGuardScanTest
     void multiVariableGuards_allHoisted() throws Exception
     {
         assertEquals(List.of("EPOCH", "DSSCAT"), scan("""
-                {"all":[
-                  {"name":"EPOCH","operator":"var_exists"},
-                  {"name":"DSSCAT","operator":"var_exists"},
-                  {"name":"EPOCH","operator":"equal_to","value":"DSSCAT"}]}"""));
+                {"expression":"var_exists(\\"EPOCH\\") and var_exists(\\"DSSCAT\\") and\
+                 EPOCH == DSSCAT"}"""));
     }
 
 
@@ -193,21 +161,14 @@ class SilencingGuardScanTest
     void mixedRule_inconsistentAcrossDatasetOperand_kept() throws Exception
     {
         // CORE-000685 shape: VISITNUM's substantive uses are is_inconsistent_across_dataset
-        // grouping operands — Python drops absent comparators there, so the guard is required
-        // (R-4.11a) and the rule is correctly not flagged.
+        // grouping operands — an absent comparator is dropped from the key there, so the guard
+        // is required (R-4.11a) and the rule is correctly not flagged.
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"VISITNUM","operator":"var_exists"},
-                  {"name":"--TPTREF","operator":"var_not_exists"},
-                  {"any":[
-                    {"all":[
-                      {"name":"--TPT","operator":"var_exists"},
-                      {"name":"--TPT","operator":"is_inconsistent_across_dataset",
-                       "value":["--TPTNUM","VISITNUM"]}]},
-                    {"all":[
-                      {"name":"--TPTNUM","operator":"var_exists"},
-                      {"name":"--TPTNUM","operator":"is_inconsistent_across_dataset",
-                       "value":["--TPT","VISITNUM"]}]}]}]}"""));
+                {"expression":"var_exists(\\"VISITNUM\\") and var_not_exists(\\"--TPTREF\\") and\
+                 ((var_exists(\\"--TPT\\") and\
+                 is_inconsistent_across_dataset(--TPT, keys=[--TPTNUM, VISITNUM])) or\
+                 (var_exists(\\"--TPTNUM\\") and\
+                 is_inconsistent_across_dataset(--TPTNUM, keys=[--TPT, VISITNUM])))"}"""));
     }
 
 
@@ -215,25 +176,21 @@ class SilencingGuardScanTest
     void mixedUse_groupingKeyPositionWins() throws Exception
     {
         // Used by BOTH a regular operator and an R-4.11a operator's GROUPING KEY: the guard must
-        // stay (hoisting would still remove the only guard Python's unique-set path sees).
+        // stay (hoisting would still remove the only guard the unique-set key filter sees).
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"EPOCH","operator":"var_exists"},
-                  {"name":"EPOCH","operator":"non_empty"},
-                  {"name":"USUBJID","operator":"is_not_unique_set","value":["EPOCH"]}]}"""));
+                {"expression":"var_exists(\\"EPOCH\\") and not empty(EPOCH) and\
+                 not is_unique_set([USUBJID, EPOCH])"}"""));
     }
 
 
     @Test
     void mixedUse_uniqueSetNamePositionProtectsToo() throws Exception
     {
-        // Same shape with the guard on the uniqueness leaf's `name`: since D-8 that member is a
-        // key like any other, so the guard stays protected despite the ordinary non_empty use.
+        // Same shape with the guard on the uniqueness tuple's member 0: since D-8 that member is
+        // a key like any other, so the guard stays protected despite the ordinary non-empty use.
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"EPOCH","operator":"var_exists"},
-                  {"name":"EPOCH","operator":"non_empty"},
-                  {"name":"EPOCH","operator":"is_not_unique_set","value":["USUBJID"]}]}"""));
+                {"expression":"var_exists(\\"EPOCH\\") and not empty(EPOCH) and\
+                 not is_unique_set([EPOCH, USUBJID])"}"""));
     }
 
 
@@ -241,13 +198,10 @@ class SilencingGuardScanTest
     void mixedUse_inconsistentAcrossDatasetTargetPositionDoesNotProtect() throws Exception
     {
         // The position-aware arm that survives: is_inconsistent_across_dataset's TARGET owes no
-        // protection, and the ordinary non_empty use makes the guard plainly silencing.
-        assertEquals(List.of("EPOCH"),
-                scan("""
-                        {"all":[
-                          {"name":"EPOCH","operator":"var_exists"},
-                          {"name":"EPOCH","operator":"non_empty"},
-                          {"name":"EPOCH","operator":"is_inconsistent_across_dataset","value":["USUBJID"]}]}"""));
+        // protection, and the ordinary non-empty use makes the guard plainly silencing.
+        assertEquals(List.of("EPOCH"), scan("""
+                {"expression":"var_exists(\\"EPOCH\\") and not empty(EPOCH) and\
+                 is_inconsistent_across_dataset(EPOCH, keys=[USUBJID])"}"""));
     }
 
 
@@ -258,10 +212,7 @@ class SilencingGuardScanTest
         // (some pairs complete, others missing the guarded twin) — a variable requirement gates
         // the whole rule and cannot express that, so the guard stays in the Check.
         assertEquals(List.of(), scan("""
-                {"all":[
-                  {"name":"*FL","operator":"equal_to","value":"Y","value_is_literal":true},
-                  {"name":"*FN","operator":"var_exists"},
-                  {"name":"*FN","operator":"not_equal_to","value":1}]}"""));
+                {"expression":"*FL == \\"Y\\" and var_exists(\\"*FN\\") and *FN != 1"}"""));
     }
 
 
@@ -269,62 +220,43 @@ class SilencingGuardScanTest
     void compositeNamesUse_isSubstantive() throws Exception
     {
         assertEquals(List.of("VISIT"), scan("""
-                {"all":[
-                  {"name":"VISIT","operator":"var_exists"},
-                  {"names":["VISIT","VISITNUM"],"operator":"is_not_contained_by",
-                   "value":"$tv_keys"}]}"""));
+                {"expression":"var_exists(\\"VISIT\\") and\
+                 tuple(VISIT, VISITNUM) not in $tv_keys"}"""));
     }
 
 
     /**
-     * {@code Fix #256} (pre-flip re-point, {@code PLAN-rules-src-expression-flip.md} §7b): an
-     * expression-form Check that the strict load-path lowering declines (here through the raised
-     * {@code is_numeric} predicate, which has no v1 lowering) reaches the scan as a
-     * {@code CheckConditionExpression} — and must be SCANNED, identically to its legacy-form
-     * equivalent, not silently skipped. Before the arm this scan returned the empty list.
-     * Unreachable on today's all-legacy corpus; it exists so the flip cannot make the two
-     * silencing-guard ratchets vacuous.
+     * The raise-side regex predicates ({@code is_numeric} et al.) classify as the
+     * {@code matches_regex} they were raised from, so their reads count as substantive. (Successor
+     * of the {@code Fix #256} legacy-vs-expression twin test: the operator-leaf form is
+     * unauthorable since D121, so the expression half IS the contract now.)
      */
     @Test
-    void expressionFormCheck_isScannedIdenticallyToItsLegacyForm() throws Exception
+    void raiseSidePredicateReads_areSubstantive() throws Exception
     {
-        String expressionForm = """
-                {"expression":"var_exists(COMPLFL) and is_numeric(COMPLFL)"}""";
-        // The exact operator-leaf twin: conversion-mode lowering restores is_numeric(X) to the
-        // matches_regex leaf CheckToExpr raised it from, value_is_literal set (ExprLowering
-        // regexLeaf).
-        String legacyForm = """
-                {"all":[
-                  {"name":"COMPLFL","operator":"var_exists"},
-                  {"name":"COMPLFL","operator":"matches_regex",
-                   "value":"^-?(0|[1-9]\\\\d*)(\\\\.\\\\d+)?$","value_is_literal":true}]}""";
-        assertEquals(List.of("COMPLFL"), scan(expressionForm),
-                "the expression-form Check must be scanned at all — an empty result is the"
-                        + " pre-Fix-#256 silent skip");
-        assertEquals(scan(legacyForm), scan(expressionForm),
-                "the two forms of the same Check must scan identically");
+        assertEquals(List.of("COMPLFL"), scan("""
+                {"expression":"var_exists(COMPLFL) and is_numeric(COMPLFL)"}"""));
     }
 
 
     /**
-     * The fail-loud half of the {@code Fix #256} arm: a native-only expression — here a
-     * hand-written {@code between(char(X), char("B"), char("Z"))}, whose non-canonical bounds have
-     * no regex equivalent even in conversion mode ({@code ExprLowering.firstLetterRangeOperand}) —
-     * must throw rather than be skipped, so the first such authored rule reds the ratchets instead
-     * of silently leaving their population.
+     * ⭐ A construct with no v1 classification no longer blinds the scan — the unit walk emits it as
+     * an opaque unit whose references still count as substantive uses. (Successor of the fail-loud
+     * {@code Fix #256} arm: "cannot read this Check" is impossible by construction under a total
+     * walk, and the over-approximation runs in the safe direction — it can only surface more
+     * guards, never hide one.)
      */
     @Test
-    void nativeOnlyExpression_failsLoudRatherThanBeingSkipped() throws Exception
+    void nativeOnlyConstructReads_areStillSubstantive() throws Exception
     {
         CheckCondition check = MAPPER.readValue(
                 """
                         {"expression":"var_exists(COMPLFL) and between(char(COMPLFL), char(\\"B\\"), char(\\"Z\\"))"}""",
                 CheckCondition.class);
         assertTrue(check instanceof CheckConditionExpression,
-                "fixture must stay native through the deserializer, or the throw is untested");
-        IllegalStateException ex = assertThrows(IllegalStateException.class,
-                () -> SilencingGuardScan.hoistableVars(check));
-        assertTrue(ex.getMessage().contains("PLAN-rules-src-expression-flip"),
-                "the failure must name the flip plan: " + ex.getMessage());
+                "fixture must stay native through the deserializer, or the arm is untested");
+        assertEquals(List.of("COMPLFL"), SilencingGuardScan.hoistableVars(check),
+                "an opaque unit's reads must stay substantive — an empty result is the silent"
+                        + " skip this scan's history warns about");
     }
 }
