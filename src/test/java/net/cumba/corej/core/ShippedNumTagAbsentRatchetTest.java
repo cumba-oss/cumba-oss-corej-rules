@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Corpus presence floor for {@code num(} — the INVERSION of the ratchet this class was born as, and
  * the class name is kept because three historical documents cite it by name
- * ({@code expression-docs-disposition.md}, {@code core-engine-update-status.md}, the R3 handover)
- * and history cites history.
+ * ({@code expression-docs-disposition.md}, the archived rule review
+ * {@code core-engine-update-status.md}, the R3 handover) and history cites history.
  *
  * <p>
  * <b>The recorded decision this class used to pin is re-decided.</b> Until 2026-09-13 this test
@@ -91,7 +91,7 @@ class ShippedNumTagAbsentRatchetTest
      * tree that also ships CORE simply exceeds them. Floors keep the control's purpose — a scan
      * that reads nothing, or looks in the wrong directory, still fails — while letting one baseline
      * serve every distribution. (The measurement history of these numbers is in this file's git
-     * history and {@code core-engine-update-status.md}.)
+     * history and the archived rule review {@code core-engine-update-status.md}.)
      */
     private static final Map<String, Integer> PRESENT = Map.of("prefix(", 66, "suffix(", 36,
             "date(", 785, "date_part(", 222, "time_part(", 8);

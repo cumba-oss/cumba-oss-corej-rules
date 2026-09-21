@@ -37,15 +37,15 @@ import org.junit.jupiter.api.Test;
  * test used to also collect a {@code loadWarning} bucket against an {@code EXPECTED_WARNINGS} set,
  * because {@code validateOperationReferences} downgraded its finding to a warning for a rule
  * declaring {@code Executability: "Not Executable"}. That set held {@code CDISC-AD0591} and
- * {@code CDISC-AD0898} (the T3 ADaM engine gaps, {@code engine-gap-consolidation.md} §T3), emptied
- * legitimately when {@code Fix #147} made both {@code Fully Executable}. {@code Fix #159} then made
- * {@code Executability: "Not Executable"} <em>park</em> a rule — it is dropped at load before this
- * gate runs — so the downgrade branch was removed and the pass writes to {@code loadError} only.
- * <b>The warning bucket therefore became unreachable by construction, not merely empty in practice,
- * and collecting into it would have been dead code that no corpus state could ever populate.</b>
- * That is the wave-5 {@code M10} shape (a guard that is both unreachable and untestable), so it was
- * removed rather than left standing at {@code Set.of()}. ⚠ Do not reinstate it without first
- * reinstating a producer.
+ * {@code CDISC-AD0898} (the T3 ADaM engine gaps, the archived rule review
+ * {@code engine-gap-consolidation.md} §T3), emptied legitimately when {@code Fix #147} made both
+ * {@code Fully Executable}. {@code Fix #159} then made {@code Executability: "Not Executable"}
+ * <em>park</em> a rule — it is dropped at load before this gate runs — so the downgrade branch was
+ * removed and the pass writes to {@code loadError} only. <b>The warning bucket therefore became
+ * unreachable by construction, not merely empty in practice, and collecting into it would have been
+ * dead code that no corpus state could ever populate.</b> That is the wave-5 {@code M10} shape (a
+ * guard that is both unreachable and untestable), so it was removed rather than left standing at
+ * {@code Set.of()}. ⚠ Do not reinstate it without first reinstating a producer.
  * </p>
  *
  * <p>

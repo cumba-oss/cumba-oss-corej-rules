@@ -40,8 +40,8 @@ import net.cumba.corej.core.model.VariableUniverse;
  * ratchet has drifted, while every count that <b>is</b> anchored is exact. This class moves the
  * counts onto the anchored side of that line. {@link RuleDocCensusDriftTest} fails the build when
  * the committed region stops matching what this generator produces, exactly as
- * {@code ParityDebtDocDriftTest} did for {@code PARITY-DEBT.md} until that doc was frozen and the
- * test deleted with the Python-parity mechanism (2026-09-17).
+ * {@code ParityDebtDocDriftTest} did for the archived {@code PARITY-DEBT.md} until that doc was
+ * frozen and the test deleted with the Python-parity mechanism (2026-09-17).
  * </p>
  *
  * <h2>⚠ Corpus views — the part that is easy to get wrong</h2>
