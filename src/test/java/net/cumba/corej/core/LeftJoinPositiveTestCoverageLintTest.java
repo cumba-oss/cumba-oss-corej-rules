@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.MatchDataset;
@@ -64,7 +65,25 @@ class LeftJoinPositiveTestCoverageLintTest
      * retired, rather than the pin quietly covering fewer rules than it names.
      * </p>
      */
-    private static final Set<String> CASCADE_CARRIERS = Set.of("CDISC-CG0031", "CDISC-CG0033");
+    private static final Set<String> CASCADE_CARRIERS = Set.of("CDISC-CG0031", "CDISC-CG0033",
+            "FDA-SD1023", "PMDA-SD1023");
+
+    /**
+     * ⭐⭐ <b>R-7.9 AMENDED 2026-09-22 (owner): these four report the unmatched row THEMSELVES.</b>
+     * Each carries an explicit {@code not SV._matched_} tier, which is the amended rule's first
+     * branch — <i>"either carries a {@code not JOINED._matched_} arm, or is accompanied by a rule
+     * that reports the unmatched row"</i>. They therefore stay in {@link #CASCADE_CARRIERS} (the
+     * structural shape is unchanged: a left join plus a positive test on a joined column, which the
+     * derived walk still cannot see inside the parenthesised cascade) but are exempt from needing a
+     * FOREIGN reporter.
+     *
+     * <p>
+     * ⛔ The exemption is not a free pass — {@link #everySelfReportingCascadeCarriesTheUnmatchedArm}
+     * asserts the arm is actually there, against the AUTHORED corpus. Delete the arm from a rule
+     * listed here and that test reds, which is what stops this set becoming a suppression list.
+     * </p>
+     */
+    private static final Set<String> SELF_REPORTING = CASCADE_CARRIERS;
 
     /**
      * Operators a <b>null</b> joined column can SATISFY — so they keep the unmatched row in play
@@ -174,24 +193,21 @@ class LeftJoinPositiveTestCoverageLintTest
                 // longer sees them — but the HAZARD PERSISTS: on a study whose SV carries
                 // SVPRESP, an unmatched primary row has tier 1 false (missing != "Y") and tier 2
                 // false (its not var_exists(SV.SVPRESP) discriminator is a BROADCAST
-                // column-presence fact, invisible to unit-level analysis), so the row is still
-                // silently excluded and still needs its reporter. The carrier set is therefore
-                // PINNED for the cascade family rather than derived. FDA/PMDA-SD1023 are not
-                // members: they briefly carried the cascade (plan phase 3, with an additional
-                // empty(SV.USUBJID) join-miss discriminator) and the phase was REVERTED the same
-                // day for flooding VISIT-less domains, so those two rules have no SV join at all.
-                // ⚠⚠ THE OSS TWIN HAS NOT TAKEN THIS CASCADE, and a passing fixture suite does
-                // not say otherwise. Recorded 2026-09-19 (review round 1) as a record-accuracy
-                // point; the divergence itself is owned by PLAN-typed-engine-oss-port row 8, NOT by
-                // this file. Measured: cumba-oss-corej-rules carries 10 SVPRESP rules, among them
-                // CDISC-CG0031-A and CDISC-CG0033-A — the two -A siblings PLAN-unplanned-visit-
-                // cascade RETIRED here by absorbing them into their parents' cascade — while this
-                // repo carries 18. The 8 ids the two repos share (CDISC-CG0031, -CG0033 and
-                // -CG0653..-CG0658) execute their ported fixtures green on both sides, because no
-                // fixture in that set reaches the branch the two spellings disagree on. ⇒ the OSS
-                // port's "proven by execution, therefore semantics-preserving" argument holds for
-                // the RENAME only; it carries no weight for the cascade.
-                // ⛔ A future cascade adopter with no such discriminator belongs on this list.
+                // column-presence fact, invisible to unit-level analysis). The carrier set is
+                // therefore PINNED for the cascade family rather than derived.
+                // ⭐⭐ REWRITTEN 2026-09-22. Three statements here were falsified and are removed
+                // rather than amended, because each would have misled a re-derivation:
+                // 1. "FDA/PMDA-SD1023 are not members ... those two rules have no SV join at
+                // all" — they gained one (PLAN-unplanned-visit-sv-match-tier), so the set is
+                // four. The instruction one line below ("a future cascade adopter belongs on
+                // this list") was correct and had simply not been followed.
+                // 2. "THE OSS TWIN HAS NOT TAKEN THIS CASCADE ... 10 SVPRESP rules, among them
+                // CDISC-CG0031-A and CG0033-A ... while this repo carries 18" — measured
+                // 2026-09-22, BOTH repos carry 18, neither carries any -A, and the id sets
+                // are identical. The OSS round closed that divergence.
+                // 3. The premise that the unmatched row "is still silently excluded and still
+                // needs its reporter" — R-7.9 was AMENDED, and these four now carry their own
+                // not SV._matched_ arm. See SELF_REPORTING.
                 if (CASCADE_CARRIERS.contains(id))
                 {
                     carriers.put(pkgName + "|" + id + "|SV", id);
@@ -244,7 +260,12 @@ class LeftJoinPositiveTestCoverageLintTest
         // ⚑ The same four leaves are GuardPositionLintTest's EXPECTED_DEFECTS, which went 4 keys
         // -> 2 in the same commit; if that map is ever two again while this floor is not, one of
         // the two instruments has stopped matching.
-        assertTrue(carrierRules.size() >= 2,
+        // ⚑ 2 -> 4 on 2026-09-22: FDA/PMDA-SD1023 joined the cascade. ⛔ The cross-check note
+        // above is now INVERTED and corrected: GuardPositionLintTest.EXPECTED_DEFECTS is FOUR and
+        // so is this floor, which is the agreement the note asks for. It was 4-vs-2 between
+        // 622b215d and this fix — exactly the divergence the note calls diagnostic, and it redded
+        // nothing because the invariant is prose on both sides.
+        assertTrue(carrierRules.size() >= 4,
                 "only " + carrierRules.size() + " left-join-plus-positive-test carrier RULES found"
                         + " (expected at least CDISC-CG0031 and CDISC-CG0033 —"
                         + " PLAN-left-join-silent-exclusion §2, whose CORE-000269 / CORE-000270"
@@ -259,6 +280,13 @@ class LeftJoinPositiveTestCoverageLintTest
         {
             String pkgName = key.substring(0, key.indexOf('|'));
             String dataset = key.substring(key.lastIndexOf('|') + 1);
+            // ⭐ The amended R-7.9's FIRST branch: a rule that states what it concludes when the
+            // join found nothing needs no foreign reporter. Checked, not assumed —
+            // everySelfReportingCascadeCarriesTheUnmatchedArm asserts the arm exists.
+            if (SELF_REPORTING.contains(carriers.get(key)))
+            {
+                continue;
+            }
             if (reportersOf.getOrDefault(pkgName + "|" + dataset, Set.of()).isEmpty())
             {
                 uncovered.add(key);
@@ -313,6 +341,63 @@ class LeftJoinPositiveTestCoverageLintTest
                         + " fewer rules than it claims and nothing says so: " + dead
                         + ". Remove a retired id; if the rule was RENAMED, put the new id in its"
                         + " place — the hazard travelled with it.");
+    }
+
+
+    /**
+     * ⭐⭐ The guard that makes {@link #SELF_REPORTING} an exemption rather than a suppression list.
+     *
+     * <p>
+     * R-7.9 as amended 2026-09-22 lets a rule answer for its own unmatched row instead of relying
+     * on a foreign reporter — but only if it actually does. This asserts the
+     * {@code not SV._matched_} arm is present in the AUTHORED rule (what a human typed), because
+     * that is what the exemption is granted for. Remove the arm and the rule silently returns to
+     * dropping unmatched rows with no reporter, which is precisely what R-7.9 exists to prevent.
+     * </p>
+     *
+     * <p>
+     * ⚠ Authored view, not shipped: the exemption is a property of the authoring decision. And a
+     * population floor, because a path typo would otherwise pass over an empty sweep — the failure
+     * shape this repo has shipped more than once.
+     * </p>
+     */
+    @Test
+    void everySelfReportingCascadeCarriesTheUnmatchedArm() throws Exception
+    {
+        Path checks = Path.of("rules-src", "checks");
+        assertTrue(Files.isDirectory(checks),
+                "authored corpus not found at " + checks.toAbsolutePath());
+        Map<String, String> byId = new TreeMap<>();
+        try (Stream<Path> walk = Files.walk(checks))
+        {
+            for (Path f : walk.filter(x -> x.toString().endsWith(".yaml")).toList())
+            {
+                String id = f.getFileName().toString();
+                id = id.substring(0, id.length() - ".yaml".length());
+                if (SELF_REPORTING.contains(id))
+                {
+                    byId.put(id, Files.readString(f));
+                }
+            }
+        }
+        assertEquals(new TreeSet<>(SELF_REPORTING), new TreeSet<>(byId.keySet()),
+                "SELF_REPORTING names rule id(s) with no authored file, so the exemption below"
+                        + " would be granted over a sweep that found nothing");
+
+        List<String> missing = new ArrayList<>();
+        byId.forEach((id, text) ->
+        {
+            if (!text.contains("not SV._matched_"))
+            {
+                missing.add(id);
+            }
+        });
+        assertEquals(List.of(), missing,
+                "R-7.9 (amended 2026-09-22): these rules are exempt from needing a foreign"
+                        + " unmatched-row reporter ONLY because they carry an explicit"
+                        + " `not SV._matched_` arm of their own. The arm is gone from: " + missing
+                        + " — either restore it, or remove the rule from SELF_REPORTING and give it"
+                        + " a reporter.");
     }
 
 

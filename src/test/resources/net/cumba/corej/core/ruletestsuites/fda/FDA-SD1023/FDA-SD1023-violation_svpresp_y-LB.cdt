@@ -1,0 +1,39 @@
+#!RuleTest
+#test FDA-SD1023 expect=violation domain=LB
+#note "⭐⭐ TRUTH-TABLE CASE 1 — tier 1, which had NO coverage for this rule anywhere. SV MATCHES this row (join USUBJID+VISITNUM) and says SVPRESP = "Y": the visit IS pre-specified, so it is planned and the TV check applies in full — (WEEK 99, 99) is not a TV combination, so the rule FIRES. ⛔ Until this file existed the entire SVPRESP half of this rule was inert under test: every SD1023 fixture shipped an SV that deliberately matched nothing, so deleting tiers 1 AND 2 from the rule left the whole suite green. ⚠ SDTMIG 3.4: SVPRESP exists only from 3.4 / TIG 1.0."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99 | Y
+---

@@ -1,0 +1,38 @@
+#!RuleTest
+#test FDA-SD1023 expect=noViolation domain=LB
+#note "⭐⭐ TRUTH-TABLE CASE 2 — the one case the corpus had NO fixture for anywhere, and the ONLY thing pinning the tier-2 discriminator. SV carries SVPRESP and MATCHES this row (join is USUBJID+VISITNUM), with SVPRESP = "N": the visit is explicitly NOT pre-specified, i.e. unplanned, so the TV check does not apply and the rule must stay SILENT on a visit absent from TV. Tier 1 needs == "Y" (false), tier 2 needs `not var_exists(SV.SVPRESP)` (false, the column exists), tier 3 needs `not SV._matched_` (false, it matched). ⛔ DELETE `not var_exists(SV.SVPRESP)` FROM TIER 2 AND THIS FIXTURE REDS: tier 2 would then read `empty(SV.SVUPDES)` — true, the column is absent — plus a neutral name, making the visit "planned" and firing on WEEK 99. That clause is what makes SVPRESP beat SVUPDES, and until this file existed nothing in either repo asserted it. ⚠ SDTMIG 3.4 on purpose: SVPRESP exists only from 3.4 / TIG 1.0."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99 | N
+---

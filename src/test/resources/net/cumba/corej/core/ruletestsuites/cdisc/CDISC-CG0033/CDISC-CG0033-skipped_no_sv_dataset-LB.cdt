@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0033 expect=skipped domain=LB
+#note "⭐ THE PARENT HALF OF THE PARTITION. No SV dataset at all, so this rule must SKIP — it declares Requirements.Datasets: [SV] because `SV._matched_` is unresolvable without it, and D89b is binary: declare => SKIP, do not declare => hard ERROR. The study is served instead by the CDISC-CG0033-B sibling, which is gated `not ds_exists(\"SV\")`. ⛔ ADDED AT REVIEW 2026-09-22: only CDISC-CG0031 had this pin, so for the other three parents dropping Requirements.Datasets would have turned every SV-less study into a runtime ERROR with nothing in the repo going red — the sibling's own fixtures never exercise the parent, and testdata/study ships an sv.json so the snapshot cannot see it either."
+#library standard=sdtmig version=3-2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+CDISCPILOT01 | LB | 01-701-1015 | 3 | ALB | 3  |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

@@ -1,0 +1,38 @@
+#!RuleTest
+#test PMDA-SD1023 expect=violation domain=LB
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+#note "⭐ THE PRE-JOIN VERDICT BASELINE. ⛔ RENAMED AND RE-NOTED 2026-09-22: this file was called `violation_joinless_baseline` and its note asserted \"the rule has NO Match_Datasets at all — grep -c Match_Datasets ... -> 0\". That grep now returns 1 — the rule gained a left join to SV — so both the name and the note were false, and the file had been renamed ONCE ALREADY (861edd90) on the standard that a filename must not claim otherwise. What it actually pins is unchanged and still worth pinning: with an SV that matches NO row, the cascade's `not SV._matched_` tier decides by the VISIT name and reproduces exactly the verdicts this rule gave before it had any SV surface. ⛔ If this ever moves, the join has started changing answers on data it must not."
+#library standard=sdtmig version=3-4
+dataset LB label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-9999 | 1 | SCREENING
+---
