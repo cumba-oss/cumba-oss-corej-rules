@@ -22,7 +22,7 @@ import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 
 /**
- * Generates {@code documentation/routing-census.tsv} — one row per shipped {@code Core.Id} carrying
+ * Generates {@code generated/routing-census.tsv} — one row per shipped {@code Core.Id} carrying
  * that rule's <b>derived</b> {@code Sensitivity} and the evaluation <b>domain</b>
  * {@link DomainScan} infers from its Check ({@code PLAN-leaf-scope-domain-inference.md} §3.2 —
  * re-grounded 2026-08-22, owner ruling Q11: the census is that plan's phase-3 equivalence gate, so
@@ -132,7 +132,7 @@ public final class RoutingCensus
     /** The committed artifact. */
     public static Path artifactFile()
     {
-        return moduleDir().resolve("documentation").resolve("routing-census.tsv");
+        return moduleDir().resolve("generated").resolve("routing-census.tsv");
     }
 
 

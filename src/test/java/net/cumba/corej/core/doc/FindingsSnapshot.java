@@ -27,10 +27,10 @@ import net.cumba.datatable.report.ValidationReportMember;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Generates {@code documentation/findings-snapshot.tsv} — one row per <b>finding occurrence</b>
- * (and one per rule × dataset execution status) of a full study-level run over
- * {@code testdata/study}, the instrument {@code PLAN-leaf-scope-domain-inference.md} §7a gap 1
- * requires (owner ruling 13, 2026-08-22).
+ * Generates {@code generated/findings-snapshot.tsv} — one row per <b>finding occurrence</b> (and
+ * one per rule × dataset execution status) of a full study-level run over {@code testdata/study},
+ * the instrument {@code PLAN-leaf-scope-domain-inference.md} §7a gap 1 requires (owner ruling 13,
+ * 2026-08-22).
  *
  * <h2>Why this exists — what the other instruments cannot see</h2>
  * <p>
@@ -153,7 +153,7 @@ public final class FindingsSnapshot
     /** The committed artifact. */
     public static Path artifactFile()
     {
-        return moduleDir().resolve("documentation").resolve("findings-snapshot.tsv");
+        return moduleDir().resolve("generated").resolve("findings-snapshot.tsv");
     }
 
 

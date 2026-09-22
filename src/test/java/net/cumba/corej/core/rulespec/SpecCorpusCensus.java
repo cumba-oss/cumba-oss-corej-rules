@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 /**
  * Censuses the <b>rulespec population</b> — every spec file under {@code rulespec/specs}, the kind
  * it declares and the corpus rule it is bound to — and renders it as
- * {@code documentation/rulespec-census.tsv}.
+ * {@code registers/rulespec-census.tsv}.
  *
  * <h2>Why this exists</h2>
  *
@@ -147,7 +147,7 @@ public final class SpecCorpusCensus
     /** The committed artifact. */
     public static Path artifactFile()
     {
-        return moduleDir().resolve("documentation").resolve("rulespec-census.tsv");
+        return moduleDir().resolve("registers").resolve("rulespec-census.tsv");
     }
 
 

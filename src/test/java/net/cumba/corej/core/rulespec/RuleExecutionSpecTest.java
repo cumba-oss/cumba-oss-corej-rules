@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  *
  * <p>
  * ⛔ <b>The baseline XFAIL inversion is GONE (2026-09-17).</b> Specs listed in
- * {@code documentation/parity-diff-baseline.json} used to have their assertion inverted here, and
+ * {@code registers/parity-diff-baseline.json} used to have their assertion inverted here, and
  * {@code BaselineManifest} loaded that file for every spec. Python parity is retired (owner; see
  * the {@code Python parity is RETIRED} section of the meta repo's {@code CLAUDE.md} and
  * {@code PLAN-retire-python-parity.md}), so the manifest is no longer an input to this gate and the

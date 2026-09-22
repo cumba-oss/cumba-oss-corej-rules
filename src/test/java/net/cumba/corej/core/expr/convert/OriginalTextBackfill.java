@@ -107,7 +107,7 @@ import org.jspecify.annotations.Nullable;
  * ⛔ <b>{@code Source_Proposed} is OUT OF THIS TOOL'S SCOPE and must stay that way.</b> {@code
  * Source} is tool-written from a workbook and is verbatim by contract; {@code Source_Proposed} is
  * the row we ask the authority to publish, hand-authored via
- * {@code documentation/rule-review-results/sheet-proposals.yaml} and applied by
+ * {@code registers/rule-review-results/sheet-proposals.yaml} and applied by
  * {@code SourceProposedBackfill} ({@code plans/done/PLAN-source-proposed-block.md} §2.3). This tool
  * neither reads nor writes it — {@link #stripSource} matches {@code "Source:"} at indent 0, which
  * {@code "Source_Proposed:"} does not start with, so the block survives every run untouched. ⚠

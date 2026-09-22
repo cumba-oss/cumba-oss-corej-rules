@@ -323,11 +323,11 @@ final class RuleFingerprint
      * </p>
      *
      * <p>
-     * ⚠⚠ Keep in lockstep with {@code documentation/rule-inventory/generate-inventory.py}'s
-     * {@code l2}. One half moving alone silently re-buckets the corpus. ⚠ That is a standing
-     * obligation, <b>not</b> a statement that the two halves are equivalent today: the list-sorting
-     * step they share is bounded on the Python side and unbounded here, and the exact depths at
-     * which they agree are enumerated in {@link #sortArraysWithin(JsonNode)}.
+     * ⚠⚠ Keep in lockstep with {@code generated/rule-inventory/generate-inventory.py}'s {@code l2}.
+     * One half moving alone silently re-buckets the corpus. ⚠ That is a standing obligation,
+     * <b>not</b> a statement that the two halves are equivalent today: the list-sorting step they
+     * share is bounded on the Python side and unbounded here, and the exact depths at which they
+     * agree are enumerated in {@link #sortArraysWithin(JsonNode)}.
      * </p>
      */
     static String l2(JsonNode rule)
@@ -370,7 +370,7 @@ final class RuleFingerprint
      * after {@code sameL1}, and the registry's divergence flags are computed inside one L1 class —
      * so a derived {@code Rule_Type} can never separate two rules L1 has not already separated.
      * Removing it changes no bucket and no divergence flag; the committed registry is unaffected.
-     * Mirrors {@code documentation/rule-inventory/generate-inventory.py}'s {@code l3}.
+     * Mirrors {@code generated/rule-inventory/generate-inventory.py}'s {@code l3}.
      * </p>
      */
     static String l3(JsonNode rule)
@@ -942,7 +942,7 @@ final class RuleFingerprint
                 // every one of them order-only.
                 //
                 // ⚠⚠ This is NOT lockstep with Python, and must not be described as such. The twin
-                // (`documentation/rule-inventory/generate-inventory.py:470`) is a hard-coded
+                // (`generated/rule-inventory/generate-inventory.py:470`) is a hard-coded
                 // TWO-LEVEL dict comprehension; this is unbounded. Relative to the block root:
                 // • depth 1 (`Requirements.Datasets: [...]`) — both sort;
                 // • depth 2 (`Requirements.Variables.All: [...]`) — both sort. This is the fix;

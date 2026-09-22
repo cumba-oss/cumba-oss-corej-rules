@@ -917,8 +917,8 @@ class RuleFingerprintTest
      * is on a <em>sub</em>-node. A whole-root walk added anywhere above would silently break this.
      * ⚠⚠ And "Java is inert" does not prove "Python is inert" — the two halves already diverge in
      * one known place — so the Python fingerprint
-     * ({@code documentation/rule-inventory/generate-inventory.py}) is asserted separately, by run,
-     * in phase 3, by diffing {@code rule-equivalence.yaml} across the seeding.
+     * ({@code generated/rule-inventory/generate-inventory.py}) is asserted separately, by run, in
+     * phase 3, by diffing {@code rule-equivalence.yaml} across the seeding.
      * </p>
      */
     @Test

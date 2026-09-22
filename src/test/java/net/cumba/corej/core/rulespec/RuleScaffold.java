@@ -36,7 +36,7 @@ import net.cumba.corej.core.model.VariableRequirement;
  *
  * <p>
  * ⚠⚠ <b>Known divergence from a production load</b> — this class is, in the wave-34 census's own
- * words ({@code documentation/derivation/loader-bypassing-tests.tsv}), "a hand-maintained
+ * words ({@code registers/derivation/loader-bypassing-tests.tsv}), "a hand-maintained
  * REIMPLEMENTATION of the load pipeline", and it is deliberately partial. Verified at source
  * 2026-08-13 (wave 41) against {@code RulePackageLoader.finishLoad}
  * ({@code RulePackageLoader.java:160-212}): {@code finishLoad} runs <b>11</b> passes; this scaffold
