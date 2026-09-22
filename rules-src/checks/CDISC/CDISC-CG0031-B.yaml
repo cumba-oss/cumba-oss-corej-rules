@@ -1,0 +1,73 @@
+Core:
+  Id: "CDISC-CG0031-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Visits (SV) dataset is not present in\
+  \ the study and VISIT is populated with a value that does not match any VISIT value\
+  \ defined in the Trial Visits (TV) dataset, for a visit whose name does not mark\
+  \ it unscheduled or unplanned."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+    - "TV.VISIT"
+Bindings:
+- name: "$tv_visit"
+  expression: "distinct(VISIT, domain=\"TV\")"
+Check:
+  expression: >-
+    not ds_exists("SV") and not empty(VISIT) and not contains(upper(VISIT), "UNSCHEDUL") and not
+    contains(upper(VISIT), "UNPLAN") and VISIT not in $tv_visit
+Outcome:
+  Message: "The SV dataset is not present, so planned-ness is decided by the visit\
+    \ name alone, and a VISIT value whose name does not mark the visit unscheduled\
+    \ or unplanned does not match any VISIT value in the TV dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "$tv_visit"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISIT"
+  Condition: "SV dataset is not present and VISIT ^= null and VISIT does not identify\
+    \ the visit as unscheduled or unplanned"
+  Rule: "VISIT in TV.VISIT"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISIT"
+  Condition: "VISIT ^= null and is planned"
+  Rule: "VISIT in TV.VISIT"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"

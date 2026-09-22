@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD1023-B expect=violation domain=LB
+#note "⭐ THE SV-ABSENT ARM. No SV dataset exists, so planned-ness falls to the VISIT name and the rule checks against TV exactly as the family did before the parent gained its SV join. Row 1 BASELINE is in TV -> clean; row 2 WEEK 99 marks nothing so it is treated as planned and is not in TV -> FIRES; row 3 is named UNSCHEDULED so it is exempt -> clean. ⛔ This is the population the parent SKIPs: it declares Requirements.Datasets: [SV] and cannot run here."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+CDISCPILOT01 | LB | 01-701-1015 | 3 | ALB | 3  | UNSCHEDULED 3
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

@@ -1,0 +1,140 @@
+Core:
+  Id: "FDA-SD1023-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Visits (SV) dataset is not present in\
+  \ the study and a (VISIT, VISITNUM) combination does not match any combination defined\
+  \ in the Trial Visits (TV) dataset, excluding unscheduled or unplanned visits."
+Executability: "Partially Executable - Possible Overreporting"
+Scope:
+  Domains:
+    Exclude:
+    - "TV"
+Requirements:
+  Variables:
+    All:
+    - "VISIT"
+    - "VISITNUM"
+    - "TV.VISIT"
+Bindings:
+- name: "$tv_visit_keys"
+  expression: "distinct([VISIT, VISITNUM], domain=\"TV\")"
+Check:
+  expression: >-
+    not ds_exists("SV") and not empty(VISIT) and not empty(VISITNUM) and not contains(upper(VISIT),
+    "UNSCHEDUL") and not contains(upper(VISIT), "UNPLAN") and tuple(VISIT, VISITNUM) not in
+    $tv_visit_keys
+Outcome:
+  Message: "The SV dataset is not present, so planned-ness is decided by the visit\
+    \ name alone, and the (VISIT, VISITNUM) combination does not match any planned\
+    \ visit defined in the Trial Visits (TV) dataset."
+  Output_Variables:
+  - "VISITNUM"
+  - "VISIT"
+  - "$tv_visit_keys"
+Source_Proposed:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "VISIT"
+  Condition: "SV dataset is not present and VISIT ^= null and VISITNUM ^= null and\
+    \ VISIT does not identify the visit as unscheduled or unplanned"
+  Rule: "(VISIT, VISITNUM) in TV"
+Source:
+  FDA_Validator_Rule_Message: "VISIT/VISITNUM values do not match TV domain data"
+  FDA_Validator_Rule_Description: "Combination of Visit Name (VISIT) and Visit Number\
+    \ (VISITNUM) in subject-level domains should match that in the TV domain with\
+    \ the exception of Unscheduled and Unplanned visits."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD1023"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
