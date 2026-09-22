@@ -92,14 +92,15 @@ class UnplannedVisitLiteralInvariantTest
             + " SV.VISIT)), \"UNPLAN\")";
 
     /**
-     * ⛔ Non-vacuity floor for the joined spelling, and it is an EXACT count, not slack. Exactly one
-     * rule carries it today — {@code CDISC-CG0033}, the only joined carrier that does not declare
-     * {@code VISIT} (the other three — {@code CG0031}, {@code FDA}/{@code PMDA-SD1023} — have
-     * {@code VISIT} in their subject, declare it and correctly SKIP when it is absent, per ruling
-     * {@code VA1}). Without this floor the joined branch could stop matching anything and the test
-     * would still be green, which is the failure mode the whole class exists to prevent.
+     * ⛔ Non-vacuity pin for the joined spelling — an EXACT count, asserted with
+     * {@code assertEquals}, not a floor. Exactly one rule carries it today — {@code CDISC-CG0033},
+     * the only joined carrier that does not declare {@code VISIT} (the other three —
+     * {@code CG0031}, {@code FDA}/{@code PMDA-SD1023} — have {@code VISIT} in their subject,
+     * declare it and correctly SKIP when it is absent, per ruling {@code VA1}). Without this floor
+     * the joined branch could stop matching anything and the test would still be green, which is
+     * the failure mode the whole class exists to prevent.
      */
-    private static final int JOINED_FLOOR = 1;
+    private static final int JOINED_COUNT = 1;
 
     /**
      * Measured 2026-09-18 at the cascade's landing: 28 files — the 16 SV-scoped rules, the 4 joined
@@ -115,6 +116,18 @@ class UnplannedVisitLiteralInvariantTest
     // CORE-000269, CORE-000270; the 16 being 8 CDISC + 8 CORE) — that attribution is what was
     // missing, not the number.
     private static final int FILE_FLOOR = 18;
+
+    private static int countOf(String haystack, String needle)
+    {
+        int n = 0;
+        for (int i = haystack.indexOf(needle); i >= 0; i = haystack.indexOf(needle,
+                i + needle.length()))
+        {
+            n++;
+        }
+        return n;
+    }
+
 
     @Test
     void everyVisitNameLiteralIsTheCanonicalCallAndNothingElse() throws IOException
@@ -145,17 +158,46 @@ class UnplannedVisitLiteralInvariantTest
                 // Strip every canonical call; any surviving trace of either literal is a
                 // divergent spelling (case-flip, whitespace, wrong column, inner upper, a
                 // Bindings-bound remnant re-inlined wrong, ...).
-                // ⛔ ORDER MATTERS: strip the JOINED spellings FIRST. They contain the bare
-                // `VISIT` token but not the bare canonical CALL, so stripping is unambiguous —
-                // but stripping in the other order would leave `contains(upper(concat(` debris
-                // that no later replace removes, and the residue test below would red every
-                // joined file. Measured while landing CDISC-CG0033.
+                // ⚑ Strip the JOINED spellings first by convention only — the order is
+                // IRRELEVANT and this comment used to claim otherwise, with a "measured"
+                // rationale that does not survive checking (review, 2026-09-22). The bare call
+                // `contains(upper(VISIT), "` is NOT a substring of the joined one, which spells
+                // `contains(upper(concat(VISIT, " ", SV.VISIT)), "` — so neither replace can
+                // touch the other's occurrences and both orders leave an identical residue.
+                // ⛔ Kept as a worked example: a ⛔-marked claim of having measured something is
+                // exactly what a later reader trusts instead of re-deriving.
                 String residue = e.replace(CANON_UNSCHEDUL_JOINED, "")
                         .replace(CANON_UNPLAN_JOINED, "").replace(CANON_UNSCHEDUL, "")
                         .replace(CANON_UNPLAN, "");
-                if (e.contains(CANON_UNSCHEDUL_JOINED))
+                boolean hasJoined = e.contains(CANON_UNSCHEDUL_JOINED)
+                        || e.contains(CANON_UNPLAN_JOINED);
+                boolean hasBare = e.contains(CANON_UNSCHEDUL) || e.contains(CANON_UNPLAN);
+                if (hasJoined)
                 {
                     joined.add(p.toString());
+                }
+                // ⛔⛔ ONE SPELLING PER FILE (review 2026-09-22, F2). Both checks below are
+                // per-FILE existence tests, so before this a file could carry the joined pair in
+                // one tier and the bare pair in another and be clean on every assertion: the
+                // twin check is satisfied by the joined tier, the residue strips all four
+                // constants, and JOINED_FLOOR only asks that SOME file mentions the joined form.
+                // ⇒ The lint was green over a corpus whose DECIDING tier had lost the fallback.
+                // Reverting only CDISC-CG0033's tier 2 — the branch that decides on SDTMIG
+                // 3.2/3.3, where SVPRESP does not exist — reddened nothing here; only one .cdt
+                // caught it. A per-corpus floor cannot see a per-file inconsistency.
+                if (hasJoined && hasBare)
+                {
+                    offences.add(p + ": MIXES the two canonical spellings. Which one a rule owes"
+                            + " is decided by its PRIMARY (guidelines 5.6): bare where the"
+                            + " primary IS SV, joined where SV is reached through a join. A file"
+                            + " carrying both has one tier reading the visit name from the"
+                            + " primary only, which is the defect the joined form exists to fix.");
+                }
+                if (hasJoined
+                        && countOf(e, CANON_UNSCHEDUL_JOINED) != countOf(e, CANON_UNPLAN_JOINED))
+                {
+                    offences.add(p + ": the joined UNSCHEDUL and UNPLAN calls are not paired"
+                            + " one-for-one — the two literals travel together in every tier");
                 }
                 if (residue.contains("UNSCHEDUL") || residue.contains("\"UNPLAN\""))
                 {
@@ -182,11 +224,17 @@ class UnplannedVisitLiteralInvariantTest
         // stops seeing those calls as canonical and reds — but if the rule ALSO reverted, both
         // go quiet together and the test is green over a corpus that lost the fallback. The
         // floor is what makes the second spelling a checked claim rather than a dead constant.
-        assertTrue(joined.size() >= JOINED_FLOOR,
-                "only " + joined.size() + " authored Check(s) carry the JOINED visit-name spelling"
-                        + " (floor " + JOINED_FLOOR + "); CDISC-CG0033 carries it today. Either the"
-                        + " constant no longer matches what is authored, or the fallback was"
-                        + " reverted — see plans/PLAN-unplanned-visit-name-fallback.md");
+        // ⛔ EXACT, not a floor — corrected at review 2026-09-22 (F4): this was `>=` under a
+        // javadoc promising "an EXACT count, not slack", so a second carrier would have slipped
+        // in silently while the comment claimed it could not. A new joined carrier is a
+        // deliberate, visible decision (guidelines 5.6 decides who owes which spelling), so it
+        // moves this number in the same commit.
+        assertEquals(JOINED_COUNT, joined.size(),
+                joined.size() + " authored Check(s) carry the JOINED visit-name spelling; exactly "
+                        + JOINED_COUNT + " should (CDISC-CG0033). Either the constant no longer"
+                        + " matches what is authored, the fallback was reverted, or a new joined"
+                        + " carrier was added without moving this number —"
+                        + " see plans/PLAN-unplanned-visit-name-fallback.md. Carriers: " + joined);
         assertTrue(population.size() >= FILE_FLOOR,
                 "only " + population.size() + " authored Checks carry the visit-name literals"
                         + " (floor " + FILE_FLOOR + ") — either the walk is broken or the"
