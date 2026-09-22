@@ -3,7 +3,18 @@ kind: rule
 description: |
   Representative fixture for the dy (study-day reference) capability. FDA-SD1381 fires when --XDY is
   populated, both --DTC and DM.RFXSTDTC have complete date portions, and --XDY does not equal the
-  study-day algorithm value relative to RFXSTDTC. Both AE rows carry a genuinely wrong AEXDY (the
+  study-day algorithm value relative to RFXSTDTC.
+  ⭐ 2026-09-21: the expected output_variables no longer carry a BARE `RFXSTDTC`. The binding reads
+  `dy(--DTC, reference="RFXSTDTC")`. ⚠⚠ TWO CHANNELS, and conflating them is easy: the COMPUTATION
+  never went through name resolution at all -- OperationExecutor resolves DM directly
+  (`resolver.resolve("DM")`) and reads `reference` as a bare column name inside it, which is why
+  `$value_xdy_algorithm` is 5 before and after and why the uniformity ruling could not affect it. What
+  the join fallback supplied was only the REPORTED VALUE: the bare `RFXSTDTC` key in
+  output_variables. Under UVC unqualified that key means the PRIMARY (AE), which has no RFXSTDTC, so
+  it is unresolved and correctly omitted. The qualified `DM.RFXSTDTC` the rule declares is unchanged.
+  ⚠ Qualifying the reference to `DM.RFXSTDTC` was tried and REVERTED: `dy`'s `reference` kwarg does not
+  accept a dataset-qualified name, the column lookup inside DM then failed, and the rule's own scenarios
+  broke -- see plans/PLAN-operation-string-column-kwargs.md, which exists because that failure is SILENT. Both AE rows carry a genuinely wrong AEXDY (the
   algorithm day is 5 for AEDTC 2020-01-05 vs RFXSTDTC 2020-01-01), so both fire on both engines.
   (A "correct value" no-fire row is intentionally omitted: the two engines coerce the string --XDY
   against the numeric algorithm day differently, a divergence tracked separately.)
@@ -38,7 +49,6 @@ expected_violations:
       AEDTC: '2020-01-05'
       AEXDY: '3'
       DM.RFXSTDTC: '2020-01-01'
-      RFXSTDTC: '2020-01-01'
   - rule_id: FDA-SD1381
     dataset: AE
     row_key: {AESEQ: 1, STUDYID: S1, USUBJID: '002'}
@@ -48,5 +58,4 @@ expected_violations:
       AEDTC: '2020-01-05'
       AEXDY: '10'
       DM.RFXSTDTC: '2020-01-01'
-      RFXSTDTC: '2020-01-01'
 expected_errors: []

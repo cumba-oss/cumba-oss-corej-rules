@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0899 expect=skipped domain=ADSL
+#note "⭐⭐ THE SHAPE THIS RULE'S OLD SCENARIO USED TO COVER, restored as its own case after review round 2 found it pinned by nothing. ADSL carries NO RFSTDTC while DM does. Until 2026-09-21 the unqualified RFSTDTC resolved to the JOINED DM column, so the check became DM.RFSTDTC != DM.RFSTDTC -- always false, the rule structurally unable to fire. PLAN-unqualified-name-primary-only made an unqualified name mean the PRIMARY always, which turned the same shape into an OVER-FIRE: the absent ADSL column folds to \"\" (D34 #3) and \"\" != DM.RFSTDTC on every row. ⇒ The rule now DECLARES the bare RFSTDTC in Requirements.Variables.All, so an ADSL that does not carry it SKIPS -- 0 findings by an auditable route, the same correction FDA-SE2259 took for the grouping shape (owner ruling, 2026-09-21). ⛔ Do not 'fix' this by giving ADSL the column: CDISC-AD0899-adsl-has-it-and-agrees-ADSL.cdt already covers the conformant case where ADSL HAS it and agrees, and -invalid-ADSL.cdt where it has it and disagrees. This file is the third shape, and it is the one the engine change actually moved."
+#library standard=adamig version=1-3
+dataset ADSL class=ADSL label="Subject Level Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SAFFL   type=Char label="Safety Population Flag"
+---
+CDISCPILOT01 | 01-701-1015 | Y
+CDISCPILOT01 | 01-701-1023 | Y
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2013-01-04
+CDISCPILOT01 | DM | 01-701-1023 | 2012-08-05
+---

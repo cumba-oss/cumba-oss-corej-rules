@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0899 expect=noViolation domain=ADSL
+#note "⭐⭐ REWRITTEN 2026-09-21. This scenario used to pin JOIN SHADOWING -- ADSL carried no RFSTDTC while DM did, the unqualified RFSTDTC resolved to the JOINED DM column, compared equal to DM.RFSTDTC, and nothing was reported. Its own note predicted this change and its blast radius: 'If nameRefPlan ever folds before consulting the join, this scenario goes red and 9 rules turn live.' It did, and it has. PLAN-unqualified-name-primary-only makes an unqualified name mean the PRIMARY dataset always (owner: UVC unqualified + the uniformity ruling), so RFSTDTC != DM.RFSTDTC compared DM against itself and could never fire -- the rule was structurally dead. Owner ruling, 2026-09-21: 'The rule is compare ADSL value against DM value, so ADSL should get RFSTDTC.' => The fixture now carries ADSL.RFSTDTC AGREEING with DM, which is what a conformant study looks like, and the rule correctly reports nothing. Paired with CDISC-AD0899-invalid-ADSL.cdt (ADSL present and DISAGREEING) so neither can pass vacuously."
+#library standard=adamig version=1-3
+dataset ADSL class=ADSL label="Subject Level Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SAFFL   type=Char label="Safety Population Flag"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | 01-701-1015 | Y | 2013-01-04
+CDISCPILOT01 | 01-701-1023 | Y | 2012-08-05
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2013-01-04
+CDISCPILOT01 | DM | 01-701-1023 | 2012-08-05
+---
