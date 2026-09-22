@@ -1,0 +1,115 @@
+# MkDocs configuration for the coreJ rule authoring guide (rule-guide/).
+#
+# Build:   pip install mkdocs pymdown-extensions && mkdocs build --strict   -> site/
+# Preview: mkdocs serve                            -> http://127.0.0.1:8000
+#
+# ⛔ THIS FILE CANNOT LIVE INSIDE rule-guide/. MkDocs refuses a docs_dir that is the parent of
+# its own config — "The 'docs_dir' should not be the parent directory of the config file"
+# (measured, mkdocs 1.6.1, a hard ConfigurationError, not a warning). So the config sits at the
+# repo root and points INTO the guide. That is the only supported layout short of restructuring
+# the guide around a docs/ subdirectory.
+#
+# ⚠ The theme is deliberately `readthedocs`, which ships WITH MkDocs. A config naming a theme
+# from a separate package fails for anyone who runs a plain `pip install mkdocs`. For the nicer
+# rendering, `pip install mkdocs-material` and set `theme: name: material`.
+#
+# ⚠⚠ THE `slugify` LINE BELOW IS LOAD-BEARING — do not drop it to shed the dependency.
+# MkDocs and GitHub generate DIFFERENT anchors for the same heading, and the guide's headings
+# use em dashes throughout. Measured on `## Dates and times — the hull rule`:
+#
+#     GitHub / Gitea      dates-and-times--the-hull-rule     (em dash -> two spaces -> `--`)
+#     MkDocs default      dates-and-times-the-hull-rule      (whitespace collapsed to one `-`)
+#
+# The guide is read in the repo TODAY and published through MkDocs later, so one spelling has to
+# satisfy both. `pymdownx.slugs.slugify` reproduces GitHub's exactly — verified for all six
+# linked em-dash headings, for a heading opening with an emoji (leading `-` kept), and for
+# camelCase (`equalsIgnoreCase` -> `equalsignorecase`). Without it, MkDocs --strict reports ten
+# broken intra-guide anchors that are CORRECT in the repo view.
+#
+# ⇒ `pip install mkdocs pymdown-extensions` is the real build requirement.
+#
+# ⚠ nav lists all 26 pages explicitly rather than letting MkDocs infer it. Inference orders
+# files alphabetically, which would put the reference before the tutorial and scatter the
+# authoring chapters out of the order a rule is actually filled in. A page added to the guide
+# and not added here still builds and is still reachable by link — it is simply absent from the
+# sidebar, which is the failure mode to watch for.
+
+site_name: coreJ Rule Authoring Guide
+site_description: How to author conformance rules for the coreJ engine — for people who know CDISC, not the engine.
+docs_dir: rule-guide
+site_dir: site
+
+# ⛔⛔ WITHOUT THIS BLOCK A BROKEN ANCHOR IS A SILENT PASS — AND `--strict` ALONE DOES NOT
+# CATCH IT. Measured, mkdocs 1.6.1: by default a link to a heading that does not exist is
+# logged at INFO, and `mkdocs build --strict` printed it and still EXITED 0. `--strict`
+# promotes WARNINGs and cannot promote an INFO, so the severity has to be raised here first.
+#
+# ⚠ `error` is NOT an accepted value for these options (only warn / info / ignore), so the
+# working combination is `anchors: warn` PLUS `--strict` on the command line. Both halves are
+# required; either alone passes a bad anchor.
+#
+# ⇒ THE BUILD COMMAND IS `mkdocs build --strict`. Verified by sabotage on this tree:
+#   clean rc=0 · bad anchor rc=1 (named in a WARNING) · restored rc=0.
+validation:
+  # ⭐ A page in rule-guide/ that nobody added to `nav` is otherwise INVISIBLE in the sidebar and
+  # reported only at INFO — the exact gap the nav note above warns about. `warn` + --strict makes
+  # it fail instead. Verified by sabotage: removing one nav entry -> rc=1 naming the file.
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    anchors: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+theme:
+  name: readthedocs
+  highlightjs: true
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true
+      # GitHub-compatible anchors — see the note above before touching this.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+
+nav:
+  - Home: index.md
+
+  - Getting started:
+      - Your first rule: getting-started/your-first-rule.md
+      - Anatomy of a rule: getting-started/anatomy-of-a-rule.md
+      - Running a rule: getting-started/running-a-rule.md
+
+  - Authoring:
+      - Identity and executability: authoring/identity.md
+      - Scope: authoring/scope.md
+      - Requirements: authoring/requirements.md
+      - The check: authoring/the-check.md
+      - Bindings: authoring/bindings.md
+      - Joins: authoring/joins.md
+      - Grouping: authoring/grouping.md
+      - Wildcards and expansion: authoring/wildcards.md
+      - Outcome, severity and sensitivity: authoring/outcome.md
+      - Provenance and citations: authoring/provenance.md
+      - Standards and release: authoring/standards.md
+
+  - Semantics:
+      - Values and missing values: semantics/values-and-missing.md
+      - Comparison: semantics/comparison.md
+      - Types: semantics/types.md
+      - Absent columns: semantics/absent-columns.md
+      - Zero-row datasets: semantics/zero-rows.md
+
+  - Testing:
+      - Scenarios: testing/scenarios.md
+      - Self-review: testing/self-review.md
+
+  - Reference:
+      - Expression syntax: reference/expression-syntax.md
+      - Function reference: reference/functions.md
+      - Recipes: recipes.md
+      - Glossary: glossary.md

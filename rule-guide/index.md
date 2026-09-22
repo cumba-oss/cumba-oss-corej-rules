@@ -57,6 +57,12 @@ and they have a chapter each:
 - a column is [absent](semantics/absent-columns.md) from the dataset entirely
 - the dataset has [no rows](semantics/zero-rows.md)
 
+**If you know the shape you need** — a conditional requirement, a uniqueness check, an orphan
+check — [Recipes](recipes.md) has eight of them, each taken from a rule that ships.
+
+**If a word in this guide is unfamiliar**, [Glossary](glossary.md) defines it and points at the
+chapter that owns it.
+
 **If you need to look something up** — every operator, every function, every field — that is
 [Reference](reference/expression-syntax.md). Those pages are generated from the engine itself, so they
 cannot describe a function the engine does not have.
