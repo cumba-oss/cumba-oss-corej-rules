@@ -84,9 +84,10 @@ class RuleSrcExpressionWriterCorpusTest
     // `Executability: "Not Executable"`, which parks a rule. That is exactly why §5 of the plan
     // could say "authored CORE 518, shipped CORE 516". An EXACT set equality, so no headroom
     // applied.
-    // ⭐ +CDISC-CG0117 on 2026-09-22 (PLAN-port-core-expression-improvements, ported from
-    // internal): parked as an R-5.26 duplicate of CDISC-CG0118, the third contrapositive pair in
-    // the ARM/ACTARM family after CG0120/CG0121 and CG0126/CG0128.
+    // ⭐ 24 -> 25 on 2026-09-22 (PLAN-port-core-expression-improvements): CDISC-CG0117 parked as an
+    // R-5.26 duplicate of CDISC-CG0118 — the third contrapositive pair in the ARM/ACTARM family,
+    // after CG0120/CG0121 and CG0126/CG0128 took the same treatment on 2026-09-14. A
+    // Condition-implies-Rule pair and its contrapositive are violated on exactly the same rows.
     private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0117", "CDISC-CG0120",
             "CDISC-CG0126", "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361",
             "CDISC-CG0622", "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636",

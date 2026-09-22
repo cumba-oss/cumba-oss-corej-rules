@@ -166,23 +166,26 @@ class ScenarioFixtureCoverageRatchetTest
     // domain alone (AbsentDatasetSkip.resolvesExactOnly now has no corpus carrier); and
     // OrderFlipGuardCoverageRatchetTest lost 5 guard sites across 4 rules (CORE-000097 ×2,
     // -000250, -000310, -000717) — 26 entries / 28 sites -> 22 / 23.
-    // 544 -> 542 on 2026-09-22 (PLAN-join-shadowed-comparison-rules phase 6), and the figure is
-    // MEASURED on THIS repo rather than copied from the internal twin. This phase newly covers
-    // exactly ONE previously-uncovered rule -- CDISC-CG0032, which shipped with zero .cdt of any
-    // kind -- so the obvious arithmetic is 544 - 1 = 543. It is wrong: measured here, uncovered was
-    // 543 BEFORE the phase and 542 after, so 544 was already carrying one row of slack. Landing 543
-    // would have banked that slack silently, which is what a `<=` ratchet does when nobody
-    // re-measures; the other 18 scenarios attach to rules that already had fixtures.
-    // ⚑ The internal twin measured the same 543 -> 542, but that is a COINCIDENCE of the two
-    // corpora currently shipping the same 3 415 ids, not a reason to copy the number. Re-measure.
+    // 544 -> 542 on 2026-09-22 (PLAN-join-shadowed-comparison-rules phase 3), and the figure is
+    // MEASURED rather than derived, because the two are not the same number here. This phase newly
+    // covers exactly ONE previously-uncovered rule -- CDISC-CG0032, which shipped with zero .cdt of
+    // any kind (F1) -- so the obvious arithmetic is 544 - 1 = 543. It is wrong: measured on this
+    // tree, uncovered was 543 BEFORE the phase and 542 after, so 544 was already carrying one row
+    // of slack from an earlier corpus movement. Landing 543 would have banked that slack silently,
+    // which is precisely what a `<=` ratchet does when nobody re-measures: the other 18 scenarios
+    // added here attach to rules that already had fixtures and move this number not at all.
+    // ⛔ Re-measure, never subtract. The corpus moves under this file between plans.
+    // ⚑ Both trees measured the same 543 -> 542, and that is a COINCIDENCE of the two corpora
+    // currently shipping the same 3 415 ids -- not a reason to copy a number across. Re-measure on
+    // whichever tree you are editing.
     // ⭐ 536 -> 534 on 2026-09-22 by this plan's own review round: CG0127 and CG0129 gained their
     // first scenarios when the review found their cross-variable comparison half-wrapped. Measured
     // by zeroing and reading back - the review caught that the earlier move had NOT been
     // re-measured after those two files landed, which is exactly what this comment forbids.
-    // ⭐ 542 -> 536 on 2026-09-22 (PLAN-port-core-expression-improvements, ported from internal):
-    // six rules of the ARM/ACTARM reserved-value family gained their first scenario - CG0119,
-    // CG0121, CG0122, CG0145, CG0146 and CG0376. Measured by setting the ratchet to 0 and reading
-    // the count back; the OSS and internal corpora agree on 536.
+    // ⭐ 542 -> 536 on 2026-09-22 (PLAN-port-core-expression-improvements): six rules of the
+    // ARM/ACTARM reserved-value family gained their first scenario — CG0119, CG0121, CG0122,
+    // CG0145, CG0146 and CG0376, all of which the upper() alignment changed while nothing
+    // executed them. Measured by setting the ratchet to 0 and reading the count back, not derived.
     private static final int MAX_UNCOVERED = 534;
 
     /**

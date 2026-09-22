@@ -4,7 +4,9 @@
      Join_Type, Filter + its right-side-only / D89 skip contract), JoinType.java (json values
      "inner" / "left"), ChildMatchPreMerger.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
      resolution, child-wins on column collision), RelrecRowExpander.java (forward RELREC, inner
-     semantics, one row per matched pair). `_matched_` usage measured in the corpus. -->
+     semantics, one row per matched pair). `_matched_` usage measured in the corpus (8 authored checks at 2026-09-22: four whole-check
+     `not X._matched_` rules and the four unplanned-visit cascade carriers that use it as a tier
+     discriminator). -->
 
 `Match_Datasets` brings a second dataset into reach, so a check can compare across the two.
 
@@ -162,6 +164,49 @@ Check:
 
 `<DATASET>._matched_` is true on a primary row that found a partner. With a `left` join and a
 `Filter`, it is the natural way to ask *"does this subject have a fatal AE?"*
+
+### ⭐ The second use: saying what you conclude when the join found nothing
+
+`_matched_` is not only for rules whose whole question is "does a partner exist". It is also how a
+rule that reads a joined column says what it concludes **when there is no partner** — and without
+it, that case is decided by accident.
+
+The trap is that `var_exists(SV.SVPRESP)` looks like it answers "can I read this", but it is a
+**schema** fact, broadcast to every row: *does `SV` have this column at all*. It says nothing about
+whether **this** row matched. So a cascade written as
+
+```
+   var_exists(SV.SVPRESP) and SV.SVPRESP == "Y"          -- "SV says planned"
+or not var_exists(SV.SVPRESP) and <fallback>             -- "SV cannot say"
+```
+
+silently drops every unmatched row on a study whose `SV` *does* carry the column: the first arm is
+selected because the column exists, `SV.SVPRESP` on an unmatched row is the type default (`""`, not
+`"Y"`), and the second arm can never be reached. No finding, no `SKIPPED`, nothing in the report.
+
+Adding an explicit arm fixes it, and states the intent:
+
+```
+   SV._matched_ and SV.SVPRESP == "Y"
+or SV._matched_ and not var_exists(SV.SVPRESP) and <fallback>
+or not SV._matched_ and <what to conclude with no SV record>
+```
+
+⛔ **Two things this obliges you to do:**
+
+- **Declare the dataset.** `_matched_` is unresolvable without it — `Requirements.Datasets: ["SV"]`
+  — and the rule is a hard **ERROR** otherwise, not a skip (`D89b`: declare ⇒ skip, don't declare ⇒
+  error, with no third answer).
+- **Then cover the population that declaration excludes.** The rule now skips when the dataset is
+  absent. If that absence is legitimate, the study needs a sibling rule gated `not ds_exists("SV")`.
+
+⚠ **Join on the other dataset's own key.** A key component present on one side and absent on the
+other makes the row unequal *unconditionally*, so joining on a `Perm` column makes `_matched_` false
+for the whole study and routes every row to the unmatched arm — the failure looks exactly like "no
+partner ever existed". For `SV` that key is `USUBJID` + `VISITNUM`, never `VISIT`.
+
+⭐ The worked instance is the canonical `unplanned(visit)` predicate; the full doctrine, both
+polarities and the four-case table are house rules rather than guide material.
 
 ## `Filter` — narrow the other side before matching
 
