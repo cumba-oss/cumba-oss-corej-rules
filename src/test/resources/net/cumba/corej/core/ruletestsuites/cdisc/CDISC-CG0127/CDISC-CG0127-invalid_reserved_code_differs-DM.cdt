@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0127 expect=violation domain=DM
+#note "FRESH 2026-09-22 - this rule had NO scenario at all while the upper() alignment changed it, which is why the review caught the cross-variable half unwrapped. Row 2 is the real defect: ACTARMCD is the reserved code and ARMCD names a DIFFERENT arm, so the pair genuinely disagrees -> fires. Row 1 is the conformant pair. ⭐ Row 3 is the case the fix exists for: ACTARMCD='Scrnfail' against ARMCD='SCRNFAIL' is the SAME arm, differently spelled, and must NOT be reported as an arm disagreement - the mis-spelling is CDISC-CG9679/CG9680's business, not this rule's. Before upper() was put on BOTH sides of the comparison, row 3 fired with 'does not equal' for two values that name one arm."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-001 | SCRNFAIL | SCRNFAIL
+CDISCPILOT01 | DM | 01-002 | PBO      | SCRNFAIL
+CDISCPILOT01 | DM | 01-003 | SCRNFAIL | Scrnfail
+---
