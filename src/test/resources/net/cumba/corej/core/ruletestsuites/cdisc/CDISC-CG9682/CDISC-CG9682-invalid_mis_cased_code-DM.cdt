@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG9682 expect=violation domain=DM
+#note "The CODE half of the case-deviation backstop, minted by this plan's review round. Row 1 'SCRNFAIL' is the IG spelling -> silent. Rows 2 and 3 match the reserved code ignoring case but are not the IG spelling -> both fire. Row 4 is an ordinary arm code -> silent. ⚑ Before CG0127/CG0129 gained upper() on both sides of their cross-variable comparison, rows 2 and 3 were surfaced by those rules under the wrong message ('does not equal') - two codes differing only in case name ONE arm and are not an arm disagreement. This rule reports what is actually wrong."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD type=Char label="Planned Arm Code"
+---
+CDISCPILOT01 | DM | 01-001 | SCRNFAIL
+CDISCPILOT01 | DM | 01-002 | Scrnfail
+CDISCPILOT01 | DM | 01-003 | notassgn
+CDISCPILOT01 | DM | 01-004 | PBO
+---

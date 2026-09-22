@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-CG9682"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Planned Arm Code (ARMCD) carries one of the reserved\
+  \ non-treatment codes but does not spell it as the SDTMIG spells it (for example\
+  \ 'Scrnfail' or 'scrnfail' instead of 'SCRNFAIL')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARMCD"
+Check:
+  expression: >-
+    upper(ARMCD) in ["SCRNFAIL", "NOTASSGN"] and ARMCD not in ["SCRNFAIL", "NOTASSGN"]
+Outcome:
+  Message: "ARMCD carries a reserved non-treatment code that is not spelled as the\
+    \ SDTMIG spells it."
+  Output_Variables:
+  - "ARMCD"
+Source_Proposed:
+  Sheet_Issue: "#276"
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARMCD"
+  Condition: "ARMCD matches a reserved code ignoring case"
+  Rule: "ARMCD is spelled exactly as the IG spells the reserved code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"

@@ -1,0 +1,36 @@
+Core:
+  Id: "CDISC-CG9681"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Actual Arm Code (ACTARMCD) carries one of the reserved\
+  \ non-treatment codes but does not spell it as the SDTMIG spells it (for example\
+  \ 'Scrnfail' or 'scrnfail' instead of 'SCRNFAIL')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARMCD"
+Check:
+  expression: >-
+    upper(ACTARMCD) in ["SCRNFAIL", "NOTASSGN"] and ACTARMCD not in ["SCRNFAIL", "NOTASSGN"]
+Outcome:
+  Message: "ACTARMCD carries a reserved non-treatment code that is not spelled as\
+    \ the SDTMIG spells it."
+  Output_Variables:
+  - "ACTARMCD"
+Source_Proposed:
+  Sheet_Issue: "#275"
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARMCD"
+  Condition: "ACTARMCD matches a reserved code ignoring case"
+  Rule: "ACTARMCD is spelled exactly as the IG spells the reserved code"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"

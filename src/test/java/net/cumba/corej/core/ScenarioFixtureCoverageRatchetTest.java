@@ -175,11 +175,15 @@ class ScenarioFixtureCoverageRatchetTest
     // re-measures; the other 18 scenarios attach to rules that already had fixtures.
     // ⚑ The internal twin measured the same 543 -> 542, but that is a COINCIDENCE of the two
     // corpora currently shipping the same 3 415 ids, not a reason to copy the number. Re-measure.
+    // ⭐ 536 -> 534 on 2026-09-22 by this plan's own review round: CG0127 and CG0129 gained their
+    // first scenarios when the review found their cross-variable comparison half-wrapped. Measured
+    // by zeroing and reading back - the review caught that the earlier move had NOT been
+    // re-measured after those two files landed, which is exactly what this comment forbids.
     // ⭐ 542 -> 536 on 2026-09-22 (PLAN-port-core-expression-improvements, ported from internal):
     // six rules of the ARM/ACTARM reserved-value family gained their first scenario - CG0119,
     // CG0121, CG0122, CG0145, CG0146 and CG0376. Measured by setting the ratchet to 0 and reading
     // the count back; the OSS and internal corpora agree on 536.
-    private static final int MAX_UNCOVERED = 536;
+    private static final int MAX_UNCOVERED = 534;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus

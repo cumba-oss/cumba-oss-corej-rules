@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0122 expect=violation domain=DM
-#note "The ARM-side twin of CG0119's fires-more case. ARM='NOT ASSIGNED' differs from ACTARM='Placebo': invisible before upper(), a violation after."
+#note "The ARM-side twin of CG0119's fires-more case. ARM='NOT ASSIGNED' differs from ACTARM='Placebo': invisible before upper(), a violation after.. ⭐ Row 3 is what makes this file a test of the FIX and not just of the rule: ARM and ACTARM name ONE arm in two spellings, so the rule must stay silent. Revert upper() on the right-hand side and row 3 fires."
 #library standard=sdtmig version=3-2
 #expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-002
@@ -13,4 +13,5 @@ col ACTARM   type=Char label="Description of Actual Arm"
 ---
 CDISCPILOT01 | DM | 01-001 | Placebo | Placebo
 CDISCPILOT01 | DM | 01-002 | NOT ASSIGNED | Placebo
+CDISCPILOT01 | DM | 01-003 | NOT ASSIGNED | Not Assigned
 ---

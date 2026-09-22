@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0119 expect=violation domain=DM
-#note "THE OPPOSITE EFFECT TO CG0118's, and the reason the two must not share a fixture. CG0119 fires WHEN ACTARM is reserved and differs from ARM, so recognising the CT casing makes it fire MORE. Row 2 is 'SCREEN FAILURE' against ARM='Placebo' - invisible before upper(), a violation after."
+#note "THE OPPOSITE EFFECT TO CG0118's, and the reason the two must not share a fixture. CG0119 fires WHEN ACTARM is reserved and differs from ARM, so recognising the CT casing makes it fire MORE. Row 2 is 'SCREEN FAILURE' against ARM='Placebo' - invisible before upper(), a violation after.. ⭐ Row 3 is what makes this file a test of the FIX and not just of the rule: ARM and ACTARM name ONE arm in two spellings, so the rule must stay silent. Revert upper() on the right-hand side of the comparison and row 3 fires - the file reds. Without it, reverting the fix left every test green."
 #library standard=sdtmig version=3-2
 #expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-002
@@ -13,4 +13,5 @@ col ACTARM   type=Char label="Description of Actual Arm"
 ---
 CDISCPILOT01 | DM | 01-001 | Placebo | Placebo
 CDISCPILOT01 | DM | 01-002 | Placebo | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-003 | Screen Failure | SCREEN FAILURE
 ---
