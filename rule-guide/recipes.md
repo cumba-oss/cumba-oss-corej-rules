@@ -6,10 +6,14 @@
      Censused 2026-09-22 over 6 532 authored checks; the pattern frequencies quoted in the
      prose come from that census (empty 3 207 · var_exists 1 511 · has_multiple_values_for 305
      · is_inconsistent_across_dataset 203 · is_unique_set 137 · Match_Datasets 207 rules).
-     ⛔ CDISC-AD0688 was deliberately NOT used as the uniqueness exemplar — it carries
-     `is_unique_set([USUBJID, USUBJID, SPDEVID])`, USUBJID twice, while its own Description,
-     Message and Source all say "USUBJID and SPDEVID". Semantically inert (a repeated key does
-     not change set uniqueness) but wrong, and surfaced rather than copied. -->
+     ⛔ CDISC-AD0688 is deliberately NOT the uniqueness exemplar. It shipped
+     `is_unique_set([USUBJID, USUBJID, SPDEVID])` — USUBJID twice, while its own Description,
+     Message and Source all said "USUBJID and SPDEVID". Surfaced from this page rather than
+     copied, and FIXED 2026-09-22 (the duplicate is gone; the rule now reads
+     `[USUBJID, SPDEVID]`). Root cause: the 2026-08-23 is_unique_set flattening migration
+     preserved member order with no dedup BY DESIGN — see UniqueSetFlattener's javadoc, which
+     names this very rule as "filed, not fixed". The recipe-5 warning stays: nothing in the
+     engine rejects a repeated key and no scenario can catch one. -->
 
 Eight shapes that cover most of what a new rule needs to say. Each one is a real shipped rule,
 named so you can go and read the original.
@@ -105,7 +109,8 @@ Check:
 
 > ⚠ **List each key column once.** A repeated column is inert — uniqueness of
 > `(A, A, B)` is uniqueness of `(A, B)` — so it changes nothing, fails nothing, and quietly
-> contradicts the rule's own message. At least one shipped rule does this today.
+> contradicts the rule's own message. Nothing rejects it, and no scenario can catch it: the
+> verdict is identical either way, which is exactly why it survives review.
 
 ## 6 — A value must match a value in another dataset
 
