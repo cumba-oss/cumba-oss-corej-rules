@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-AD0258 expect=executionError domain=ADAE
+#expect-execution-error "join key AESEQ is Character in the primary dataset and Numeric in AE"
+#note "D4 (PLAN-join-key-type-identity) -- THE AXIS PIN. ADAE.AESEQ is Char and AE.AESEQ is Num: exactly the divergence CDISC-AD0199 exists to report, and the shape a cross-standard ADaM-to-SDTM key join meets in real submissions. This scenario pins TODAY'S answer BEFORE the D4 change, and today's answer is ASYMMETRIC PARTIAL MATCHING: KeyMatchRowExpander.tuple puts the RENDERED KeyPart in the key, so a character \"1\" and a numeric 1 both render \"1\" and JOIN, while \"05\" and \"5.0\" render themselves and do NOT join the numeric 5. Whether a subject's records join therefore depends on the SPELLING of a value whose type is already wrong -- which is the defect D4 rules on, not the fact that the answer is yes or no. Rows 2 and 3 fire; row 1 does not. D4-R1/R2 HAS NOW LANDED and this scenario carries the new answer: the rule ERRORS, naming the column and both types. Its pre-D4 answer -- pinned first, on purpose -- was expect=violation with expectViolationCount 2: rows 2 and 3 (\"05\" and \"5.0\") failed to join the numeric 5 while row 1 (\"1\") joined the numeric 1. That asymmetry is what the ruling removed. ⛔ If this scenario ever goes green as a violation again, the type check has been disarmed."
+#library standard=adamig version=1-1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Char
+col AEDECOD type=Char
+---
+S1 | 001 | 1   | HEADACHE
+S1 | 001 | 05  | NAUSEA
+S1 | 001 | 5.0 | RASH
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+---
+S1 | AE | 001 | 1
+S1 | AE | 001 | 5
+---

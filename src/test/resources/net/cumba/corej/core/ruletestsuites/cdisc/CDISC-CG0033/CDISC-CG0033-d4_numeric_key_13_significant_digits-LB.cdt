@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-CG0033 expect=noViolation domain=LB
+#note "D4 (PLAN-join-key-type-identity) §4.5 -- THE RENDERING PIN, and it is deliberately NOT a type case: VISITNUM is Num on BOTH sides, so nothing here touches the type axis. It isolates the SECOND behaviour change the D4 edit causes. KeyMatchRowExpander.tuple renders every key part through KeyPart.reportingForm(), which cleans a double to 12 SIGNIFICANT DIGITS (GroupKeyPolicy.PresentNumber.reportingForm -> DataValueSupport.getAsDoubleCleaned). LB.VISITNUM 99.0000000000001 and SV.VISITNUM 99.0000000000002 differ at the 13th significant digit, so both clean to 99 and the join MATCHES today: SV.SVPRESP=Y makes the visit planned, 99.x is not a TV.VISITNUM, and the rule FIRES. Dropping .reportingForm() makes PresentNumber compare EXACTLY, the two stop joining, SV.SVPRESP reads unmatched, the planned-visit condition goes false and the rule stops firing. ⇒ THIS HAS NOW LANDED: the scenario carries expect=noViolation, and its pre-D4 answer -- pinned first -- was a violation. ⛔ A zero finding-delta in phase 6 that ignores this axis is non-observation: §3's library measurement covers the TYPE axis only and says nothing about the rendering."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 99.0000000000001 | WEEK 99
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVPRESP  type=Char label="Pre-Specified"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99.0000000000002 | WEEK 99 | Y
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

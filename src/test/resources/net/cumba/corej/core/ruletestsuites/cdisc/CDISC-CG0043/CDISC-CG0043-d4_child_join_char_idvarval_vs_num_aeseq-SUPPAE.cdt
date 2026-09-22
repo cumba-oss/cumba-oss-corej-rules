@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0043 expect=violation domain=SUPPAE
+#note "D4 (PLAN-join-key-type-identity) §5 -- THE NON-HARM CONTROL for the excluded family, and CDISC-CG0043 had NO scenario at all before this one, so a regression here would have been invisible. This entry is Child:true keying [USUBJID, IDVAR, IDVARVAL] against AE: IDVARVAL is Char by the SDTM data model (Char in all 36 library datasets that define it) and is matched against the value of the variable NAMED by IDVAR -- here AESEQ, which is Num. So this is a Char-vs-Num join BY DESIGN, ruled long ago (JKM R6, ChildMatchIndex.normalizeJoinToken coerces the child token to the parent's type). D4-R5 EXCLUDES it, and §4.4 keeps it excluded by construction: the expander declines Child:true entries (KeyMatchRowExpander:264-265), so keySpec -- where the D4 check lives -- never sees it. ⛔ This scenario must read IDENTICALLY before and after D4. If it ever errors, the exclusion has leaked and eleven working rules in five files are broken."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=AESOSP
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Description text
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESMIE  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | N
+---

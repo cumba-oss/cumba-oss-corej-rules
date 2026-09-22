@@ -57,6 +57,73 @@ Keys:
 > question to leave to a default — an `inner` join silently removes exactly the rows the rule
 > exists to find. Say which you mean whenever the absence of a partner is part of the question.
 
+## Key types must agree — and what to do when they do not
+
+A join key is matched **by type**. A character `AESEQ` and a numeric `AESEQ` are not the same key,
+and a rule that meets such a pair **stops with an error** naming the column and both types:
+
+```
+Match_Datasets AE: join key AESEQ is Character in the primary dataset and Numeric in AE.
+```
+
+That is deliberate. The alternative — matching them anyway — only works for the *canonical*
+spelling: `"5"` would join `5`, while `"05"`, `"5.0"` and `" 5"` would not. Whether a subject's
+records joined would then depend on the **spelling** of a value whose type is already wrong, which
+is not something a rule should decide by accident.
+
+> **This is a data defect, not an authoring one.** In CDISC a variable of a given name has one
+> type — measured across the whole metadata library, every join key used anywhere in this corpus is
+> single-typed, `AESEQ` included. A divergence means the delivered study disagrees with the
+> standard, and `CDISC-AD0199` is the rule that reports exactly that. Your rule erroring is the
+> correct outcome: it says *"I cannot answer this question on this data"* instead of inventing an
+> answer.
+
+You have two ways to say what should happen instead.
+
+**Declare the types you need, and the rule skips cleanly.** This is the usual choice — the rule
+states its precondition and steps aside when the study does not meet it:
+
+```yaml
+Requirements:
+  Variables:
+    All:
+    - "AESEQ:N"        # the primary dataset
+    - "AE.AESEQ:N"     # the joined dataset
+```
+
+> ⚠⚠ **Declare BOTH sides.** A qualified entry like `AE.AESEQ:N` is checked against the **joined**
+> dataset only, and an unqualified one against the **primary** only. Declaring just the joined side
+> is the common mistake: on a study where the *primary* is the wrong type, that entry is satisfied,
+> the rule does not skip, and it errors anyway.
+
+**Or compare the keys as text, on purpose:**
+
+```yaml
+Match_Datasets:
+- Name: "AE"
+  Keys: ["STUDYID", "USUBJID", "AESEQ"]
+  Join_Type: "left"
+  Join_As_String: true
+```
+
+`Join_As_String` applies to **every** key of that entry, not only the mismatched one, so an entry's
+behaviour cannot change from study to study. It does not make `"05"` join `5` — it makes the text
+comparison explicit rather than accidental.
+
+> ⚠ Two things to know before reaching for it. Numeric keys under `Join_As_String` compare at **12
+> significant digits** rather than exactly, because that is the precision of the rendered form. And
+> it must be the unquoted boolean `true` — `"true"` in quotes is rejected as a load error rather
+> than silently accepted.
+
+There is no numeric counterpart, and none is planned: parsing text into a number is partial
+(`"ABC"` has no value) and it *invents* identity, collapsing `"05"`, `"5.0"` and `" 5"` onto the
+same key. A join may fail to find a match; it must never manufacture one.
+
+**Three cases are exempt**, because they match a text-carried key against a typed column by design
+and have their own rules: `Child: true`, `Name: "RELREC"`, and `SUPP--` / `SQ*` entries. A
+`SUPPAE.IDVARVAL` of `"1"` is *meant* to find `AE.AESEQ` of `1`. `Join_As_String` has no effect on
+these, and writing it on one is a load error rather than a silent no-op.
+
 ## Did it match? — `_matched_`
 
 A rule that asks *"is there a related record at all?"* does not need a column from the other
@@ -145,6 +212,7 @@ Two behaviours worth knowing before you use it:
 | does a related record exist? | `left` join + `_matched_`, usually with `Filter` |
 | does a related record *of a particular kind* exist? | `Filter` on the joined side |
 | my primary dataset points at a parent row | `Child: true` |
+| the two sides type the key differently | fix the data, or `Requirements.Variables` on **both** sides, or `Join_As_String: true` |
 | walk RELREC relationships | `Name: "RELREC"` + `Wildcard` |
 
 > ⚠ **A join changes what an unqualified name means in only one respect: nothing.** Unqualified
