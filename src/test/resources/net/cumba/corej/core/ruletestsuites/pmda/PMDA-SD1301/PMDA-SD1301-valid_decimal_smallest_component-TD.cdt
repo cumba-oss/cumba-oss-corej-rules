@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1301 expect=noViolation domain=TD
+#note "FIRES LESS after the port - the opposite direction to the week case, and the direction the plan originally had backwards (it claimed the function was uniformly stricter). The retired regex's components were bare (\\d+), so any decimal was invalid; the function's are \\d+(?:[.,]\\d*)? and ISO 8601 permits a decimal fraction in the SMALLEST populated component, comma or dot. 'P1.5Y' and 'P1,5Y' are therefore valid and must not fire."
+#library standard=sdtmig version=3-4
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TDORDER  type=Num  label="Order of Assessment Schedule"
+col TDANCVAR type=Char label="Anchor Variable Name"
+col TDSTOFF  type=Char label="Offset from the Anchor"
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | 0
+CDISCPILOT01 | TD | 2 | RSSTDTC | P1.5Y
+CDISCPILOT01 | TD | 3 | RSSTDTC | P1,5Y
+---

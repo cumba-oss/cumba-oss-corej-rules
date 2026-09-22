@@ -15,8 +15,7 @@ Requirements:
     - "TDSTOFF"
 Check:
   expression: >-
-    not empty(TDSTOFF) and TDSTOFF != "0" and TDSTOFF !~
-    /^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(?!$)(\\d+H)?(\\d+M)?(\\d+S)?)?$/
+    not empty(TDSTOFF) and TDSTOFF != "0" and invalid_duration(TDSTOFF, negative=false)
 Outcome:
   Message: "Invalid value for TDSTOFF variable: TDSTOFF must be 0, an ISO 8601 duration\
     \ (e.g. P80Y), or empty."

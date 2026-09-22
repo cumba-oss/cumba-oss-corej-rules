@@ -6,7 +6,17 @@ Description: "Raise an error when Description of Actual Arm (ACTARM) is populate
   \ its value does not match an Arm (ARM) entry in the Trial Arms (TA) dataset, and\
   \ it is not one of the reserved values 'Screen Failure', 'Not Assigned', 'Not Treated',\
   \ or 'Unplanned Treatment'."
-Executability: "Fully Executable"
+Executability: "Not Executable"
+ExecutabilityHint:
+  Category: "not executable"
+  Detail: "Parked as an R-5.26 duplicate of CDISC-CG0118 (owner rulings D-8 + D-18,\
+    \ 2026-09-14; applied to this pair 2026-09-22). The two are contrapositives -\
+    \ CG0117 reads 'not in TA.ARM implies reserved', CG0118 reads 'not reserved implies\
+    \ in TA.ARM' - so a Condition-implies-Rule pair is violated on exactly the same\
+    \ rows and one run reported the same finding twice. Both are CDISC / SDTMIG 3.2\
+    \ / DM, so the package sets are equal and parking loses no coverage. The same\
+    \ treatment the corpus already gave CG0120 (duplicate of CG0121) and CG0126 (duplicate\
+    \ of CG0128)."
 Scope:
   Domains:
     Include:
@@ -20,8 +30,8 @@ Bindings:
   expression: "distinct(ARM, domain=\"TA\")"
 Check:
   expression: >-
-    not empty(ACTARM) and ACTARM not in $ta_arm and ACTARM not in ["Screen Failure", "Not Assigned",
-    "Not Treated", "Unplanned Treatment"]
+    not empty(ACTARM) and ACTARM not in $ta_arm and upper(ACTARM) not in ["SCREEN FAILURE",
+    "NOT ASSIGNED", "NOT TREATED", "UNPLANNED TREATMENT"]
 Outcome:
   Message: "ACTARM is not among the values of ARM in the TA dataset and is not one\
     \ of the reserved values 'Screen Failure', 'Not Assigned', 'Not Treated', or 'Unplanned\

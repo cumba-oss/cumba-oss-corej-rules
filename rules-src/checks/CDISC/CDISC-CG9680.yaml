@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-CG9680"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Planned Arm (ARM) carries one of\
+  \ the reserved non-treatment values but does not spell it as the SDTMIG spells it\
+  \ (for example 'SCREEN FAILURE' or 'Screen failure' instead of 'Screen Failure')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ARM"
+Check:
+  expression: >-
+    upper(ARM) in ["SCREEN FAILURE", "NOT ASSIGNED"] and ARM not in ["Screen Failure",
+    "Not Assigned"]
+Outcome:
+  Message: "ARM carries a reserved non-treatment value that is not spelled as the\
+    \ SDTMIG spells it."
+  Output_Variables:
+  - "ARM"
+Source_Proposed:
+  Sheet_Issue: "#274"
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ARM"
+  Condition: "ARM matches a reserved value ignoring case"
+  Rule: "ARM is spelled exactly as the IG spells the reserved value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"

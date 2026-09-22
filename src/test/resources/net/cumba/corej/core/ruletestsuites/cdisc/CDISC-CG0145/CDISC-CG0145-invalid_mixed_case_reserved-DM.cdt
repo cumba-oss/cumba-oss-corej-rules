@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0145 expect=violation domain=DM
+#note "THE WIDENING THE DOUBLED-LIST COLLAPSE BUYS. This rule used to hand-roll case-insensitivity by listing both 'Screen Failure' and 'SCREEN FAILURE' inline - which catches those two spellings and no other. 'Screen failure' (row 2) matched neither, so a subject with a reference start date against a screen-failure arm went unreported. upper() catches every casing. ⚠ Fires MORE: revert the collapse and this file goes green for the wrong reason."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARM   type=Char label="Description of Actual Arm"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-001 | Placebo | 2013-01-04
+CDISCPILOT01 | DM | 01-002 | Screen failure | 2013-02-11
+---

@@ -84,12 +84,15 @@ class RuleSrcExpressionWriterCorpusTest
     // `Executability: "Not Executable"`, which parks a rule. That is exactly why §5 of the plan
     // could say "authored CORE 518, shipped CORE 516". An EXACT set equality, so no headroom
     // applied.
-    private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0120", "CDISC-CG0126",
-            "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361", "CDISC-CG0622",
-            "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636", "CDISC-CG0640",
-            "CDISC-CG0642", "CDISC-CG0643", "CDISC-CG0644", "CDISC-SEND-0202", "CDISC-SEND-0203",
-            "CDISC-SEND-0204", "CDISC-SEND-0205", "CDISC-SEND-0268", "DRAFT-900027", "FDA-SD0063",
-            "PMDA-SD0063");
+    // ⭐ +CDISC-CG0117 on 2026-09-22 (PLAN-port-core-expression-improvements, ported from
+    // internal): parked as an R-5.26 duplicate of CDISC-CG0118, the third contrapositive pair in
+    // the ARM/ACTARM family after CG0120/CG0121 and CG0126/CG0128.
+    private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0117", "CDISC-CG0120",
+            "CDISC-CG0126", "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361",
+            "CDISC-CG0622", "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636",
+            "CDISC-CG0640", "CDISC-CG0642", "CDISC-CG0643", "CDISC-CG0644", "CDISC-SEND-0202",
+            "CDISC-SEND-0203", "CDISC-SEND-0204", "CDISC-SEND-0205", "CDISC-SEND-0268",
+            "DRAFT-900027", "FDA-SD0063", "PMDA-SD0063");
 
     /**
      * Ordinary authored-text pins for the three formerly-curated expressions. ⚠ These are, and

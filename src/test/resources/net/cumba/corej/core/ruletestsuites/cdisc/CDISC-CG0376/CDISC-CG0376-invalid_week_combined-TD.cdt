@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0376 expect=violation domain=TD
+#note "FIRES MORE after the invalid_duration() port, and this is the movement the plan did not know about until it was measured. The retired regex carried (\\d+W)? INLINE in the component chain, so 'P1Y2W' and 'P2W3D' parsed as valid; the engine function treats W as an EXCLUSIVE alternative, so a week combined with any other component is invalid. ISO 8601 agrees with the function. ⚠ Revert the port and this file goes green - which is what makes it evidence."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+dataset TD class="TRIAL DESIGN" label="Trial Disease Assessments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TDORDER  type=Num  label="Order of Assessment Schedule"
+col TDANCVAR type=Char label="Anchor Variable Name"
+col TDSTOFF  type=Char label="Offset from the Anchor"
+---
+CDISCPILOT01 | TD | 1 | RSSTDTC | P80Y
+CDISCPILOT01 | TD | 2 | RSSTDTC | P1Y2W
+CDISCPILOT01 | TD | 3 | RSSTDTC | P2W3D
+---

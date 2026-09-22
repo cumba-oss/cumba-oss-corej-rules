@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0118 expect=noViolation domain=DM
+#note "THE SUPPRESSION THIS PORT BUYS. ACTARM='SCREEN FAILURE' is the reserved value in the CT casing, not the IG's 'Screen Failure', and it is not a TA.ARM entry. Before upper() the title-case list did not match it, so the rule fired with the misleading 'not among TA.ARM and not reserved' message. After upper() it is recognised as reserved and suppressed. ⚠ A fixture that merely passes proves nothing here - revert the upper() on this rule and this file MUST go red."
+#library standard=sdtmig version=3-2
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARM   type=Char label="Description of Actual Arm"
+---
+CDISCPILOT01 | DM | 01-001 | Placebo | Placebo
+CDISCPILOT01 | DM | 01-002 | Placebo | SCREEN FAILURE
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+---
+CDISCPILOT01 | TA | PBO   | Placebo | 1 | TRT
+---

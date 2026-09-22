@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0554-C expect=noViolation domain=AE
+#note "⛔ THE REGRESSION THE PORT INSTRUCTION WARNED ABOUT. CORE omits APID from this identifier list BY DESIGN, because it splits the Associated Persons case into its own rule - so a verbatim 'port the list' would have made CG0554-C fire on every AP dataset identified by APID. The instruction executed was 'add SPTOBID and STOCONID, nothing else', and this file pins that APID still satisfies the rule."
+#library standard=sdtmig version=3-4
+dataset AE class="EVENTS" label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | AP-001 | 1 | HEADACHE
+---

@@ -1,0 +1,37 @@
+Core:
+  Id: "CDISC-CG9679"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Description of Actual Arm (ACTARM) carries one of\
+  \ the reserved non-treatment values but does not spell it as the SDTMIG spells it\
+  \ (for example 'SCREEN FAILURE' or 'Screen failure' instead of 'Screen Failure')."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "ACTARM"
+Check:
+  expression: >-
+    upper(ACTARM) in ["SCREEN FAILURE", "NOT ASSIGNED", "NOT TREATED", "UNPLANNED TREATMENT"] and
+    ACTARM not in ["Screen Failure", "Not Assigned", "Not Treated", "Unplanned Treatment"]
+Outcome:
+  Message: "ACTARM carries a reserved non-treatment value that is not spelled as the\
+    \ SDTMIG spells it."
+  Output_Variables:
+  - "ACTARM"
+Source_Proposed:
+  Sheet_Issue: "#273"
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "ACTARM"
+  Condition: "ACTARM matches a reserved value ignoring case"
+  Rule: "ACTARM is spelled exactly as the IG spells the reserved value"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"

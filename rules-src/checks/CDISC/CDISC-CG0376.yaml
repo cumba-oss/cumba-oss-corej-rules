@@ -15,8 +15,7 @@ Requirements:
     - "TDSTOFF"
 Check:
   expression: >-
-    not empty(TDSTOFF) and TDSTOFF != "0" and TDSTOFF !~
-    /^P(?=\\d+[YMWD]|T\\d+[HMS])(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(?=\\d+[HMS])(\\d+H)?(\\d+M)?(\\d+S)?)?$/
+    not empty(TDSTOFF) and TDSTOFF != "0" and invalid_duration(TDSTOFF, negative=false)
 Outcome:
   Message: "TDSTOFF is populated with a value that is not 0 and not a positive value\
     \ in ISO 8601 duration format."

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0146 expect=noViolation domain=DM
+#note "⭐ THE SAME COLLAPSE, MOVING THE OTHER WAY - CG0145 and CG0146 are complements and the doubled-list removal pushes them in OPPOSITE directions. CG0146 fires when ACTARM is NOT reserved and RFSTDTC is empty. 'Screen failure' matched neither spelling in the old doubled list, so the rule treated it as a real arm and fired on the empty RFSTDTC; under upper() it is recognised as reserved and correctly says nothing. ⚠ Fires LESS."
+#library standard=sdtmig version=3-2
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ACTARM   type=Char label="Description of Actual Arm"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-001 | Placebo | 2013-01-04
+CDISCPILOT01 | DM | 01-002 | Screen failure |
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG9680 expect=violation domain=DM
+#note "The backstop this rule was minted for, with all three branches in one file. Row 1 'Screen Failure' is the IG spelling -> recognised as reserved AND spelled correctly -> silent. Row 2 'SCREEN FAILURE' is the CT casing and row 3 'Screen failure' is neither -> both match ignoring case but neither is the IG spelling -> both fire. Row 4 is an ordinary arm -> not reserved in any casing -> silent. ⚑ Before the upper() alignment, rows 2 and 3 were reported by CG0121 with the misleading 'not among TA.ARM and not reserved' message; this rule reports what is actually wrong."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARM   type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-001 | Screen Failure
+CDISCPILOT01 | DM | 01-002 | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-003 | Screen failure
+CDISCPILOT01 | DM | 01-004 | Placebo
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1053 expect=violation domain=TA
+#expectViolationCount 2
+#note "⭐⭐ REVERSED 2026-09-22 by the ARM-family upper() alignment, and the reversal is a FIX. This file used to expect SILENCE and was named -valid_case_sensitive-, arguing that 'neither mixed-case spelling matches the uppercase CT submission values ... correct, since a lower-case ARMCD is a different (CT) conformance failure this rule does not own'. That conflated two things: the CASING is indeed another rule's business, but the SUBSTANTIVE violation this rule owns - a screen-failure or not-assigned arm PRE-SPECIFIED in trial design - is present whatever the casing. 'Scrnfail' in TA is exactly the prohibited arm, mis-spelled. So rows 1 and 2 now fire, and the old expectation was pinning a genuine under-report as intended behaviour. Owner ruling 2026-09-22: upper() covers all 74 rules of the family."
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+---
+S1 | TA | Scrnfail | Screen Failure | 1
+S1 | TA | notassgn | Not Assigned   | 1
+S1 | TA | A        | Drug X 10 mg   | 1

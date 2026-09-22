@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1121 expect=noViolation domain=DM
+#note "⭐⭐ REVERSED 2026-09-22 by the ARM-family upper() alignment, and the reversal is a FIX. This file used to expect a VIOLATION on row 1 and was named -invalid_lowercase_armcd-, on the reading that the exception list is case-SENSITIVE so 'Scrnfail' is not 'SCRNFAIL' and the age exception does not apply. Its own note conceded this was merely 'why firing is the defensible reading' (finding SD1121-F1). Under upper() the exception applies, and that is the better answer: the subject IS a screen failure, just mis-cased, and demanding an age for a screen failure is exactly what the exception exists to prevent. Both rows are now correctly silent. Owner ruling 2026-09-22: upper() covers all 74 rules of the family."
+#library standard=sdtmig version=3-4
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGETXT  type=Char label="Age Range"
+col ARMCD   type=Char label="Planned Arm Code"
+---
+S1 | DM | 001 | .  |       | Scrnfail
+S1 | DM | 002 | .  |       | SCRNFAIL

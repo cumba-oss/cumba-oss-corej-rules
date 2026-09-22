@@ -19,8 +19,8 @@ Bindings:
   expression: "distinct(ARMCD, domain=\"TA\")"
 Check:
   expression: >-
-    not empty(ACTARMCD) and ACTARMCD not in $ta_armcd and ACTARMCD != "SCRNFAIL" and ACTARMCD !=
-    "NOTASSGN" and ACTARMCD != "NOTTRT" and ACTARMCD != "UNPLAN"
+    not empty(ACTARMCD) and ACTARMCD not in $ta_armcd and upper(ACTARMCD) != "SCRNFAIL" and
+    upper(ACTARMCD) != "NOTASSGN" and upper(ACTARMCD) != "NOTTRT" and upper(ACTARMCD) != "UNPLAN"
 Outcome:
   Message: "ACTARMCD (other than 'SCRNFAIL', 'NOTASSGN', 'NOTTRT', or 'UNPLAN') does\
     \ not match an ARMCD value in the Trial Arms (TA) dataset."

@@ -24,8 +24,8 @@ Bindings:
   expression: "record_count(domain=\"EX\", group=[USUBJID])"
 Check:
   expression: >-
-    ARMCD != "SCRNFAIL" and ARMCD != "NOTASSGN" and (not var_exists("ACTARMCD") or ACTARMCD !=
-    "NOTTRT") and $ex_record_count < 1
+    upper(ARMCD) != "SCRNFAIL" and upper(ARMCD) != "NOTASSGN" and (not var_exists("ACTARMCD") or
+    upper(ACTARMCD) != "NOTTRT") and $ex_record_count < 1
 Outcome:
   Message: "No Exposure (EX) record is present for the subject."
   Output_Variables:
