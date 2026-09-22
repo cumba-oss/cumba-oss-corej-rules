@@ -1,8 +1,8 @@
 #!RuleTest
 #test PMDA-AD0204 expect=skipped domain=ADLBC
-#note "ADLBC with PARAMCD/AVAL -> BDS. Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET] rejects -> skipped. FAMILY scope pin (AD0205-0207 share the identical block; not mirrored). AGE is present ON PURPOSE and is LOAD-BEARING: now that PMDA-AD0204 declares the bare AGE, the variable-requirement gate (RuleRunner:632) fires BEFORE the structure gate (:673), so without an AGE column this fixture would still skip -- on the requirement, not the structure -- and ExecutionVerdictCheck does not assert a reason for expect=skipped, so it would stay GREEN while pinning nothing. Do not drop AGE to simplify the dataset."
+#note "structure=BDS is the DECLARED tier and beats the columns (Fix #154) -> Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET] rejects a BDS dataset before execution. FAMILY scope pin (AD0205-0207 share the identical block; not mirrored). ⛔⛔ THE DM BLOCK IS LOAD-BEARING AND SO IS ADLBC.AGE -- WITHOUT EITHER THIS FILE PINS NOTHING. Requirements.Variables.All is [AGE, DM.AGE], and RuleRunner checks variable requirements at :632 BEFORE the Scope.Data_Structures gate at :673. Until 2026-09-22 this fixture had NO DM block at all, so it skipped on DM.AGE being unavailable and never reached the structure gate -- and ExecutionVerdictCheck asserts no REASON for expect=skipped, so it stayed GREEN while pinning nothing. MEASURED: with the whole Scope.Data_Structures block deleted from the rule, this test still passed. Both requirement entries must be SATISFIED here so that the structure gate is the only thing left to reject the dataset."
 #library standard=adamig version=1-3
-dataset ADLBC
+dataset ADLBC structure=BDS
 col STUDYID type=Char
 col USUBJID type=Char
 col PARAMCD type=Char
@@ -10,3 +10,13 @@ col AVAL    type=Num
 col AGE     type=Num
 ---
 CDISCPILOT01 | 01-701-1015 | GLUC | 5.1 | 63
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AGE     type=Num
+---
+CDISCPILOT01 | DM | 01-701-1015 | 63
+---
