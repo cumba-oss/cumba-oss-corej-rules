@@ -62,3 +62,17 @@ __pycache__/
 # documentation/ is INTERNAL-ONLY (owner ruling 2026-09-20). RuleScaffold regenerates
 # derivation artefacts under it during the build; they must never be committed here.
 /documentation/
+
+# ⭐ Added 2026-09-22, BEFORE the code that needs it, by PLAN-separate-generated-gate-inputs.
+# Internally that plan split documentation/ three ways: prose stays, machine output moves to
+# generated/, curated gate-enforced registers to registers/. The writer classes are TWINNED —
+# FindingsSnapshot, RoutingCensus, RuleDocCensus and SpecCorpusCensus all exist here and all
+# still write into documentation/ — so the next sync from internal will re-point them at
+# generated/ and this tree would start producing untracked files that `/documentation/` no
+# longer covers. On a PUBLIC repository that ends with someone's `git add -A` committing
+# generated artefacts nobody meant to publish.
+#
+# ⚠ These two lines are deliberately ahead of the code: an ignore added at port time is added
+# by whoever is already busy merging 300 files, which is exactly when it gets forgotten.
+/generated/
+/registers/
