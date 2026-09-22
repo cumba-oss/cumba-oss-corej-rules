@@ -122,7 +122,28 @@ same key. A join may fail to find a match; it must never manufacture one.
 **Three cases are exempt**, because they match a text-carried key against a typed column by design
 and have their own rules: `Child: true`, `Name: "RELREC"`, and `SUPP--` / `SQ*` entries. A
 `SUPPAE.IDVARVAL` of `"1"` is *meant* to find `AE.AESEQ` of `1`. `Join_As_String` has no effect on
-these, and writing it on one is a load error rather than a silent no-op.
+these, and writing it on one is a load error rather than a silent no-op — as it is on an entry with
+no `Keys` at all, which builds no key comparison to apply it to.
+
+### Sided keys must declare both sides
+
+If you use the `{ left, right }` form, **every** such element needs both halves as strings:
+
+```yaml
+Keys:
+- "STUDYID"
+- { left: "AEREFID", right: "EGREFID" }   # ✅
+- { left: "VISITNUM" }                    # ⛔ load error
+```
+
+The two sides are read as parallel lists and paired by position, so an element only one side can
+read does not make the pair "partly declared" — it shifts everything after it. A half-declared
+element, an empty object, or a non-string name is rejected at load.
+
+⛔ **Sided keys and the `Child` / `RELREC` / `SUPP--` family do not combine.** That family pivots on
+the standard `IDVAR` / `IDVARVAL` names, which are the same on both sides by construction, and its
+merge reads the left names only — so a sided declaration there would be silently ignored. It is a
+load error instead.
 
 ## Did it match? — `_matched_`
 

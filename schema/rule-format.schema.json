@@ -21,12 +21,12 @@
       "properties": {
         "Variables": {
           "type": ["object", "null"],
-          "description": "Column-presence requirements; the successor of the retired Scope.Variables (Include -> All, Exclude -> None). Entry vocabulary is unchanged: literal, `--` domain-prefix placeholder, qualified DATASET.VARIABLE (Fix #124), glob and /regex/. A requirement is for a thing whose absence means NOTHING TO CHECK - a presence rule must never list the variable it reports.",
+          "description": "Column-presence requirements; the successor of the retired Scope.Variables (Include -> All, Exclude -> None). Entry vocabulary: literal, `--` domain-prefix placeholder, qualified DATASET.VARIABLE (Fix #124), glob and /regex/ - each optionally followed by a TYPE TAG ':N' / ':C' (or ':Num' / ':Char', case-insensitive) demanding that the column is numeric or character as well as present. The type is the DATASET's own declared type, never the CDISC Library's or the Define-XML's (ruling D6); a type that cannot be classified does not block (D2). An entry with no tag means exactly what it always did. A requirement is for a thing whose absence means NOTHING TO CHECK - a presence rule must never list the variable it reports.",
           "additionalProperties": false,
           "properties": {
-            "All": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Every entry must be present. Byte-for-byte the former Scope.Variables.Include." },
-            "Any": { "oneOf": [ { "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 2 }, { "type": "array", "items": { "type": "array", "items": { "type": "string" }, "minItems": 2 }, "minItems": 1 } ], "description": "AND of ORs. Flat form is ONE group: at least one entry must be present; unmet only when EVERY entry is absent. Nested form is a list of such groups, EVERY group must be met. Two entries minimum per group (loader gate R4): a one-entry group is All with extra ceremony. Mixing strings and groups in one array is a load error (D2)." },
-            "None": { "type": ["array", "null"], "items": { "type": "string" }, "description": "No entry may be present. Byte-for-byte the former Scope.Variables.Exclude." }
+            "All": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Every entry must be present, and of the demanded type when it carries a ':N' / ':C' tag. Byte-for-byte the former Scope.Variables.Include for an untagged entry." },
+            "Any": { "oneOf": [ { "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 2 }, { "type": "array", "items": { "type": "array", "items": { "type": "string" }, "minItems": 2 }, "minItems": 1 } ], "description": "AND of ORs. Flat form is ONE group: at least one entry must be present; unmet only when EVERY entry is absent. Nested form is a list of such groups, EVERY group must be met. Two entries minimum per group (loader gate R4): a one-entry group is All with extra ceremony. Mixing strings and groups in one array is a load error (D2). An entry may carry a ':N' / ':C' type tag like an All entry; a group whose entries differ ONLY by tag is R4's one-entry-group error, since the disjunction is just \"the variable is present\"." },
+            "None": { "type": ["array", "null"], "items": { "type": "string" }, "description": "No entry may be present. Byte-for-byte the former Scope.Variables.Exclude. A type suffix is a LOAD ERROR here (gate R9, ruling D1): 'None: [X:N]' would mean \"no NUMERIC X may be present\", which a character X also satisfies - the opposite of how it reads. Express a type demand in All or Any instead." }
           }
         },
         "Datasets": {
@@ -223,13 +223,15 @@
       "type": "object",
       "properties": {
         "Name": { "type": ["string", "null"] },
-        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
+        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "required": ["left", "right"], "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
         "Child": { "type": ["boolean", "null"] },
+        "keep_missings": { "type": ["boolean", "null"] },
         "Wildcard": { "type": ["string", "null"] },
-        "Join_Type": { "type": ["string", "null"], "enum": ["inner", "left", null] },
+        "Join_Type": { "type": ["string", "null"] },
         "Filter": { "type": ["string", "null"] },
         "Join_As_String": { "type": ["boolean", "null"] }
-      }
+      },
+      "additionalProperties": false
     }
   }
 }
