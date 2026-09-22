@@ -462,6 +462,15 @@ class LeftJoinPositiveTestCoverageLintTest
                 broken.add(e.getKey() + ": no longer reads SV through a distinct(…, domain=\"SV\")"
                         + " operation, so it is no longer immune to the left-join exclusion");
             }
+            // ⭐ Presence of the operation is not enough — the immunity comes from reaching SV
+            // WITHOUT a join. A reporter that kept its binding and ALSO grew a Match_Datasets on SV
+            // would inherit the very R-7.9 defect it exists to cover, and the check above would
+            // still pass. All three carry zero Match_Datasets blocks at HEAD.
+            if (text.contains("Match_Datasets"))
+            {
+                broken.add(e.getKey() + ": grew a Match_Datasets block, so it may now reach SV"
+                        + " through a join and inherit the left-join exclusion it exists to report");
+            }
         }
         assertEquals(List.of(), broken,
                 "R-7.9's division of labour has broken: the cascade rules are allowed to stay silent"
