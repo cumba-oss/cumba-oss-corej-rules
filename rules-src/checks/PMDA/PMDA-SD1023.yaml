@@ -14,20 +14,36 @@ Scope:
 Requirements:
   Variables:
     All:
+    - "VISIT"
+    - "VISITNUM"
     - "TV.VISIT"
+  Datasets:
+  - "SV"
+Match_Datasets:
+- Join_Type: "left"
+  Keys:
+  - "USUBJID"
+  - "VISIT"
+  - "VISITNUM"
+  Name: "SV"
 Bindings:
 - name: "$tv_visit_keys"
   expression: "distinct([VISIT, VISITNUM], domain=\"TV\")"
 Check:
   expression: >-
-    not empty(VISIT) and not empty(VISITNUM) and not contains(upper(VISIT), "UNSCHEDUL") and not
-    contains(upper(VISIT), "UNPLAN") and tuple(VISIT, VISITNUM) not in $tv_visit_keys
+    not empty(VISIT) and not empty(VISITNUM) and (SV._matched_ and SV.SVPRESP == "Y" or SV._matched_
+    and not var_exists(SV.SVPRESP) and empty(SV.SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL")
+    and not contains(upper(VISIT), "UNPLAN") or not SV._matched_ and not contains(upper(VISIT),
+    "UNSCHEDUL") and not contains(upper(VISIT), "UNPLAN")) and tuple(VISIT, VISITNUM) not in
+    $tv_visit_keys
 Outcome:
   Message: "The (VISIT, VISITNUM) combination does not match any planned visit defined\
     \ in the Trial Visits (TV) dataset."
   Output_Variables:
   - "VISITNUM"
   - "VISIT"
+  - "SV.SVPRESP"
+  - "SV.SVUPDES"
   - "$tv_visit_keys"
 Source:
   Message: "VISIT/VISITNUM values do not match TV domain data"

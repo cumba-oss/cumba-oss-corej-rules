@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1023 expect=violation domain=LB
-#note "The KEY AXIS of D-TA-6a, pinned: row 2 carries the TV visit NAME (BASELINE) with the wrong VISITNUM (3). The pre-alignment FDA shape matched the name alone against TV.VISIT and was SILENT here; the adopted PMDA shape matches the (VISIT, VISITNUM) pair and fires, which is what the FDA sheet asks for ('Combination of Visit Name (VISIT) and Visit Number (VISITNUM) ... should match that in the TV domain'). Row 1 is the correctly-numbered control. Renamed from FDA-SD1023-invalid_no_svpresp-LB.cdt, whose SVPRESP fallback no longer exists."
+#note "The KEY AXIS of D-TA-6a, pinned: row 2 carries the TV visit NAME (BASELINE) with the wrong VISITNUM (3). The pre-alignment FDA shape matched the name alone against TV.VISIT and was SILENT here; the adopted PMDA shape matches the (VISIT, VISITNUM) pair and fires, which is what the FDA sheet asks for ('Combination of Visit Name (VISIT) and Visit Number (VISITNUM) ... should match that in the TV domain'). Row 1 is the correctly-numbered control. Renamed from FDA-SD1023-invalid_no_svpresp-LB.cdt, whose SVPRESP fallback no longer exists. ⭐ 2026-09-22 (PLAN-unplanned-visit-sv-match-tier): the rule now carries a left join to SV and Requirements.Datasets: [SV], so a fixture WITHOUT an SV dataset no longer exercises it at all — it SKIPs. The SV block below exists to satisfy that requirement and DELIBERATELY matches no row (USUBJID 01-701-9999), so every primary row takes the `not SV._matched_` tier and is decided by the VISIT name exactly as before. ⛔ The verdicts above are therefore UNCHANGED by the join, which is the point: do not add a matching SV row here without re-deriving them."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 #expectViolationAt row=2 USUBJID=01-701-1015 VISIT=BASELINE
@@ -25,3 +25,14 @@ col VISIT    type=Char label="Visit Name"
 ---
 CDISCPILOT01 | TV | 1 | SCREENING
 CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-9999 | 1 | SCREENING
+---

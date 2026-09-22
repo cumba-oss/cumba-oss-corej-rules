@@ -3,6 +3,11 @@ kind: rule
 description: |
   No-fire companion for PMDA-SD1023. Every scheduled (VISIT, VISITNUM) pair in VS matches a distinct
   pair defined in TV; the one unplanned visit is excluded case-insensitively.
+  ⭐ 2026-09-22 (PLAN-unplanned-visit-sv-match-tier): the rule gained a left join to SV and
+  Requirements.Datasets: [SV], so a spec with no SV dataset now SKIPs instead of executing — which is
+  what this spec started reporting. The SV block below satisfies the requirement and DELIBERATELY
+  matches no VS row (USUBJID 999), so every row takes the `not SV._matched_` tier and is decided by
+  the VISIT name, exactly as before. The expected result is unchanged: no violations.
 python_source: rules-sdtmig-3-4.json (PMDA-SD1023)
 rule:
   coreId: PMDA-SD1023
@@ -18,6 +23,10 @@ datasets:
     rows:
       - {STUDYID: S1, DOMAIN: TV, VISITNUM: '2', VISIT: WEEK 2}
       - {STUDYID: S1, DOMAIN: TV, VISITNUM: '3', VISIT: WEEK 3}
+  SV:
+    row_key: [STUDYID, USUBJID, VISITNUM]
+    rows:
+      - {STUDYID: S1, DOMAIN: SV, USUBJID: '999', VISITNUM: '1', VISIT: SCREENING}
 config:
   standard: sdtmig
   standard_version: '3.4'
@@ -25,5 +34,6 @@ library_mocks:
   classes:
     findings: [VS]
     trial-design: [TV]
+    special-purpose: [SV]
 expected_violations: []
 expected_errors: []

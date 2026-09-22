@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0031 expect=skipped domain=LB
+#note "⭐⭐ THE ABSENT-SV CONTROL, and it pins a DELIBERATE behaviour change (PLAN-unplanned-visit-sv-match-tier phase 1). The study carries NO SV dataset at all. BEFORE this plan the rule EXECUTED here and fired once on WEEK 99 through the name tier — measured, this file asserted exactly that and passed. NOW the rule declares Requirements.Datasets: [SV], because `SV._matched_` is unresolvable without it and D89b is binary: declare => SKIP, do not declare => ERROR. There is no third answer, and the ERROR is what this fixture caught. ⇒ a study with no SV gets an auditable SKIP naming SV instead of a TV check decided by visit name alone. ⛔ If this ever reads `violation` again, the declaration has been dropped and every no-SV study is one engine change away from erroring instead."
+#library standard=sdtmig version=3-2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+CDISCPILOT01 | LB | 01-701-1015 | 3 | ALB | 3  |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

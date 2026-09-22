@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1023 expect=noViolation domain=LB
-#note "All four exemption arms of the D-TA-6a shape: row 1 (BASELINE, 2) is a defined TV pair; row 2 UNSCHEDULED 1.01 carries the UNSCHEDUL substring; row 3 UNPLANNED VISIT carries UNPLAN; row 4 has VISIT populated but VISITNUM empty, which the not-empty guards skip. Rows 2-4 are all absent from TV, so a shape that dropped any one guard would fire here."
+#note "All four exemption arms of the D-TA-6a shape: row 1 (BASELINE, 2) is a defined TV pair; row 2 UNSCHEDULED 1.01 carries the UNSCHEDUL substring; row 3 UNPLANNED VISIT carries UNPLAN; row 4 has VISIT populated but VISITNUM empty, which the not-empty guards skip. Rows 2-4 are all absent from TV, so a shape that dropped any one guard would fire here. ⭐ 2026-09-22 (PLAN-unplanned-visit-sv-match-tier): the rule now carries a left join to SV and Requirements.Datasets: [SV], so a fixture WITHOUT an SV dataset no longer exercises it at all — it SKIPs. The SV block below exists to satisfy that requirement and DELIBERATELY matches no row (USUBJID 01-701-9999), so every primary row takes the `not SV._matched_` tier and is decided by the VISIT name exactly as before. ⛔ The verdicts above are therefore UNCHANGED by the join, which is the point: do not add a matching SV row here without re-deriving them."
 #library standard=sdtmig version=3-4
 dataset LB label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"
@@ -25,3 +25,14 @@ col VISIT    type=Char label="Visit Name"
 ---
 CDISCPILOT01 | TV | 1 | SCREENING
 CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-9999 | 1 | SCREENING
+---

@@ -15,6 +15,8 @@ Requirements:
     All:
     - "VISIT"
     - "TV.VISIT"
+  Datasets:
+  - "SV"
 Match_Datasets:
 - Join_Type: "left"
   Keys:
@@ -26,9 +28,10 @@ Bindings:
   expression: "distinct(VISIT, domain=\"TV\")"
 Check:
   expression: >-
-    (var_exists(SV.SVPRESP) and SV.SVPRESP == "Y" or not var_exists(SV.SVPRESP) and
+    (SV._matched_ and SV.SVPRESP == "Y" or SV._matched_ and not var_exists(SV.SVPRESP) and
     empty(SV.SVUPDES) and not contains(upper(VISIT), "UNSCHEDUL") and not contains(upper(VISIT),
-    "UNPLAN")) and not empty(VISIT) and VISIT not in $tv_visit
+    "UNPLAN") or not SV._matched_ and not contains(upper(VISIT), "UNSCHEDUL") and not
+    contains(upper(VISIT), "UNPLAN")) and not empty(VISIT) and VISIT not in $tv_visit
 Outcome:
   Message: "VISIT value for a visit determined to be planned — SV.SVPRESP is \"Y\"\
     , or SV carries no SVPRESP column and the visit has no unplanned-visit description\
