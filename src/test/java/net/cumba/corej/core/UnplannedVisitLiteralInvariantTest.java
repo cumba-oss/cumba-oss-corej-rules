@@ -61,6 +61,47 @@ class UnplannedVisitLiteralInvariantTest
     private static final String CANON_UNPLAN = "contains(upper(VISIT), \"UNPLAN\")";
 
     /**
+     * ⭐⭐ THE SECOND CANONICAL SPELLING, for the <b>joined</b> form only
+     * (PLAN-unplanned-visit-name-fallback, 2026-09-22). A rule whose primary is NOT {@code SV}
+     * reads the visit name from a column the primary may not carry — it is {@code Perm} in every
+     * domain — and an absent char column folds to {@code ""} (D34 #3), so the name test used to see
+     * a neutral name and judge the visit PLANNED <b>even when {@code SV} carried the name and it
+     * said UNSCHEDULED</b>. Since {@code TV} holds only PLANNED visits, an unscheduled visit is
+     * never in it, so that misjudgement reports a finding on every such visit.
+     *
+     * <p>
+     * ⛔ {@code coalesce} cannot express the fallback: it returns the first <b>non-missing</b>
+     * operand and the fold is {@code ""} — present, not missing — so it short-circuits. {@code
+     * concat} works because {@code contains} distributes over concatenation and a {@code ""}
+     * operand contributes nothing. ⚠ The {@code " "} separator is load-bearing: without it a marker
+     * could be spelled across the seam ({@code "UNS"} + {@code "CHEDULED"}). Neither literal
+     * contains a space.
+     * </p>
+     *
+     * <p>
+     * ⚠⚠ Which spelling a file must use is decided by <b>join shape, not by family</b>: a rule
+     * scoped {@code Domains.Include: ["SV"]} has {@code SV} as its primary, so its bare
+     * {@code VISIT} is already SV's own column and the joined spelling would be wrong there.
+     * </p>
+     */
+    private static final String CANON_UNSCHEDUL_JOINED = "contains(upper(concat(VISIT, \" \","
+            + " SV.VISIT)), \"UNSCHEDUL\")";
+
+    /** @see #CANON_UNSCHEDUL_JOINED */
+    private static final String CANON_UNPLAN_JOINED = "contains(upper(concat(VISIT, \" \","
+            + " SV.VISIT)), \"UNPLAN\")";
+
+    /**
+     * ⛔ Non-vacuity floor for the joined spelling, and it is an EXACT count, not slack. Exactly one
+     * rule carries it today — {@code CDISC-CG0033}, the only joined carrier that does not declare
+     * {@code VISIT} (the other three — {@code CG0031}, {@code FDA}/{@code PMDA-SD1023} — have
+     * {@code VISIT} in their subject, declare it and correctly SKIP when it is absent, per ruling
+     * {@code VA1}). Without this floor the joined branch could stop matching anything and the test
+     * would still be green, which is the failure mode the whole class exists to prevent.
+     */
+    private static final int JOINED_FLOOR = 1;
+
+    /**
      * Measured 2026-09-18 at the cascade's landing: 28 files — the 16 SV-scoped rules, the 4 joined
      * CDISC/CORE rules, FDA/PMDA SD1017/SD1018/SD1019 and FDA/PMDA SD1023. A floor, not an
      * equality: a future family may adopt the cascade, but a single file quietly moving its literal
@@ -79,6 +120,7 @@ class UnplannedVisitLiteralInvariantTest
     void everyVisitNameLiteralIsTheCanonicalCallAndNothingElse() throws IOException
     {
         Map<String, String> population = new TreeMap<>();
+        List<String> joined = new ArrayList<>();
         List<String> offences = new ArrayList<>();
         try (Stream<Path> walk = Files.walk(CHECKS_DIR))
         {
@@ -103,13 +145,27 @@ class UnplannedVisitLiteralInvariantTest
                 // Strip every canonical call; any surviving trace of either literal is a
                 // divergent spelling (case-flip, whitespace, wrong column, inner upper, a
                 // Bindings-bound remnant re-inlined wrong, ...).
-                String residue = e.replace(CANON_UNSCHEDUL, "").replace(CANON_UNPLAN, "");
+                // ⛔ ORDER MATTERS: strip the JOINED spellings FIRST. They contain the bare
+                // `VISIT` token but not the bare canonical CALL, so stripping is unambiguous —
+                // but stripping in the other order would leave `contains(upper(concat(` debris
+                // that no later replace removes, and the residue test below would red every
+                // joined file. Measured while landing CDISC-CG0033.
+                String residue = e.replace(CANON_UNSCHEDUL_JOINED, "")
+                        .replace(CANON_UNPLAN_JOINED, "").replace(CANON_UNSCHEDUL, "")
+                        .replace(CANON_UNPLAN, "");
+                if (e.contains(CANON_UNSCHEDUL_JOINED))
+                {
+                    joined.add(p.toString());
+                }
                 if (residue.contains("UNSCHEDUL") || residue.contains("\"UNPLAN\""))
                 {
                     offences.add(p + ": non-canonical literal spelling; Check after stripping the"
                             + " canonical calls still carries a name literal: " + residue);
                 }
-                if (!e.contains(CANON_UNPLAN))
+                // ⚑ The twin check is per-spelling: a file using the joined UNSCHEDUL call
+                // owes the joined UNPLAN call, never the bare one.
+                if (e.contains(CANON_UNSCHEDUL_JOINED) ? !e.contains(CANON_UNPLAN_JOINED)
+                        : !e.contains(CANON_UNPLAN))
                 {
                     offences.add(p + ": carries the UNSCHEDUL test but not the canonical UNPLAN"
                             + " twin — the two literals travel together in the cascade");
@@ -118,7 +174,19 @@ class UnplannedVisitLiteralInvariantTest
         }
         assertEquals(List.of(), offences,
                 "every copy of the unplanned-visit name test must be byte-identical to '"
-                        + CANON_UNSCHEDUL + "' / '" + CANON_UNPLAN + "' (D3 + Q-C)");
+                        + CANON_UNSCHEDUL + "' / '" + CANON_UNPLAN + "' — or, for a rule whose"
+                        + " primary is not SV, to '" + CANON_UNSCHEDUL_JOINED + "' / '"
+                        + CANON_UNPLAN_JOINED + "' (D3 + Q-C + the 2026-09-22 joined variant)");
+        // ⛔ The joined branch's own non-vacuity floor. Without it, a typo in
+        // CANON_*_JOINED makes the branch match nothing: `joined` stays empty, the residue test
+        // stops seeing those calls as canonical and reds — but if the rule ALSO reverted, both
+        // go quiet together and the test is green over a corpus that lost the fallback. The
+        // floor is what makes the second spelling a checked claim rather than a dead constant.
+        assertTrue(joined.size() >= JOINED_FLOOR,
+                "only " + joined.size() + " authored Check(s) carry the JOINED visit-name spelling"
+                        + " (floor " + JOINED_FLOOR + "); CDISC-CG0033 carries it today. Either the"
+                        + " constant no longer matches what is authored, or the fallback was"
+                        + " reverted — see plans/PLAN-unplanned-visit-name-fallback.md");
         assertTrue(population.size() >= FILE_FLOOR,
                 "only " + population.size() + " authored Checks carry the visit-name literals"
                         + " (floor " + FILE_FLOOR + ") — either the walk is broken or the"

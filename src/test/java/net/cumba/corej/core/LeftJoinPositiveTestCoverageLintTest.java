@@ -406,7 +406,17 @@ class LeftJoinPositiveTestCoverageLintTest
         List<String> missing = new ArrayList<>();
         byId.forEach((id, text) ->
         {
-            if (!text.contains("not SV._matched_"))
+            // ⛔⛔ WHITESPACE-NORMALISE BEFORE MATCHING (2026-09-22,
+            // PLAN-unplanned-visit-name-fallback). This read the RAW file text, so the match
+            // broke the moment RuleCanonicalizer re-wrapped the authored Check and the line
+            // happened to break between `not` and `SV._matched_` — which is exactly what it did
+            // to CDISC-CG0033. The arm was fully present (the generated package carries it); only
+            // the spelling across a newline had changed. ⚠ RuleCanonicalizer OWNS the wrapping
+            // and re-derives it from expression length, so any edit to any rule can move a break
+            // onto this token: a detector keyed on raw text is one character away from a false
+            // red, and "fixing" it by re-wrapping the yaml loops, because the next canonicalizer
+            // run puts the break back.
+            if (!text.replaceAll("\\s+", " ").contains("not SV._matched_"))
             {
                 missing.add(id);
             }

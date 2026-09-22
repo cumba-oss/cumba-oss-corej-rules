@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-CG0033 expect=noViolation domain=LB
+#note "The MIRROR of -noViolation_sv_names_it_unscheduled: LB carries VISIT = 'UNSCHEDULED 1' and SV carries NO VISIT column. This direction already worked before PLAN-unplanned-visit-name-fallback -- the name test read the primary -- and is pinned here so the concat cannot be 'simplified' to SV.VISIT alone, which would break it silently. concat(VISIT, \" \", SV.VISIT) yields 'UNSCHEDULED 1 ' and the marker is found. ⛔ Do not merge this with its mirror: they exercise opposite operands of the concat, and expect=noViolation is blind to WHICH one supplied the name."
+#library standard=sdtmig version=3-3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 99 | UNSCHEDULED 1
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
