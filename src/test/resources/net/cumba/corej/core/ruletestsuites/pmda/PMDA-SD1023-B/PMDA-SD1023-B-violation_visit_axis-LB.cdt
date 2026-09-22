@@ -1,0 +1,27 @@
+#!RuleTest
+#test PMDA-SD1023-B expect=violation domain=LB
+#note "⭐ THE MIRROR AXIS PIN. VISIT is "WEEK 99", which is NOT a TV visit name; VISITNUM is 2, which IS a TV visit number. ⛔ ADDED AT REVIEW 2026-09-22: the sibling's other axis pin (violation_visitnum_axis) closes only ONE direction — there VISIT matched TV and VISITNUM did not, so a VISIT-only mis-authoring reds but a VISITNUM-only one fires identically and stays green. This row is the reverse, so a VISITNUM-only mis-authoring reds here. Together the two pin the TUPLE. ⚠ CDISC-CG0033-B needs no mirror: it genuinely IS single-axis VISITNUM, so the shared note was correct there and over-claimed on these two when copied."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015 VISIT="WEEK 99"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

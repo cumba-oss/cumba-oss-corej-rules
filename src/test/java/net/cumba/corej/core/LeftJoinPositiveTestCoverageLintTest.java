@@ -260,6 +260,12 @@ class LeftJoinPositiveTestCoverageLintTest
         // ⚑ The same four leaves are GuardPositionLintTest's EXPECTED_DEFECTS, which went 4 keys
         // -> 2 in the same commit; if that map is ever two again while this floor is not, one of
         // the two instruments has stopped matching.
+        // ⚠⚠ CORRECTED at review 2026-09-22: this floor is a TAUTOLOGY and its own comment
+        // oversells it. `carrierRules` is `carriers.values()`, and `carriers` receives only the
+        // unconditional pin below — the derived walker contributes nothing on this corpus — so the
+        // detector could go completely blind and this would still read exactly 4. The
+        // non-vacuity it claims to provide is provided by everyCascadeCarrierStillShips (the ids
+        // resolve) and theUnmatchedRowReportersStillShip (the pairing holds), not by this.
         // ⚑ 2 -> 4 on 2026-09-22: FDA/PMDA-SD1023 joined the cascade. ⛔ The cross-check note
         // above is now INVERTED and corrected: GuardPositionLintTest.EXPECTED_DEFECTS is FOUR and
         // so is this floor, which is the agreement the note asks for. It was 4-vs-2 between
@@ -293,6 +299,19 @@ class LeftJoinPositiveTestCoverageLintTest
             }
         }
 
+        // ⛔⛔ THIS ASSERTION IS VACUOUS TODAY, and saying so is the point. Measured at review
+        // 2026-09-22: the DERIVED walker contributes ZERO carriers on this corpus — all 17 authored
+        // left-join rules classify out (a bare `not X._matched_` Check is emitted opaque with
+        // operator == null; `&`-expansion tokens are skipped; `empty(JOINED.COL)` is
+        // NULL_SATISFIED;
+        // and the four cascade rules' positive test is not topLevel, which is why they are pinned).
+        // So `carriers` is exactly the four pinned ids, every one is in SELF_REPORTING, and the
+        // loop
+        // above `continue`s on every iteration for ANY corpus state.
+        // ⇒ It is kept as a REINTRODUCTION ratchet for a future non-self-reporting carrier, exactly
+        // as GuardPositionLintTest.EXPECTED_DEFECTS was kept when it emptied. ⛔ It does NOT pin the
+        // CG0034 / SD0065 pairing any more — theUnmatchedRowReportersStillShip does, and that is
+        // what this class's javadoc promises.
         assertEquals(List.of(), uncovered,
                 "R-7.9: a left join with a positive test on a joined column drops the unmatched"
                         + " primary row silently, and NO rule in the corpus reports that row for the"
@@ -398,6 +417,55 @@ class LeftJoinPositiveTestCoverageLintTest
                         + " `not SV._matched_` arm of their own. The arm is gone from: " + missing
                         + " — either restore it, or remove the rule from SELF_REPORTING and give it"
                         + " a reporter.");
+    }
+
+
+    /**
+     * ⭐⭐ The pairing this class's javadoc promises, actually pinned.
+     *
+     * <p>
+     * R-7.9's owner ruling rests on a named division of labour: the cascade rules may stay silent
+     * on an unmatched row <em>because</em> {@code CDISC-CG0034} and {@code FDA}/{@code PMDA-SD0065}
+     * report it, and they are immune to the effect because they read {@code SV} through a
+     * {@code distinct(…, domain="SV")} <b>operation</b> rather than a join. The javadoc says
+     * <i>"delete CDISC-CG0034 and the documented division of labour silently becomes real
+     * under-reporting … So the pairing is pinned here"</i> — measured at review 2026-09-22, it was
+     * not: the coverage assertion cannot fail (see its comment), so deleting the reporters was
+     * green.
+     * </p>
+     *
+     * <p>
+     * ⚠ Both halves matter. A reporter that still ships but is re-authored to reach {@code SV}
+     * through a join would inherit the very defect it exists to cover, so the idiom is asserted
+     * too, not just the file's existence.
+     * </p>
+     */
+    @Test
+    void theUnmatchedRowReportersStillShip() throws Exception
+    {
+        Map<String, String> want = new TreeMap<>();
+        want.put("CDISC-CG0034", "CDISC");
+        want.put("FDA-SD0065", "FDA");
+        want.put("PMDA-SD0065", "PMDA");
+        List<String> broken = new ArrayList<>();
+        for (Map.Entry<String, String> e : want.entrySet())
+        {
+            Path f = Path.of("rules-src", "checks", e.getValue(), e.getKey() + ".yaml");
+            if (!Files.isRegularFile(f))
+            {
+                broken.add(e.getKey() + ": no longer ships");
+                continue;
+            }
+            String text = Files.readString(f);
+            if (!text.contains("domain=\\\"SV\\\""))
+            {
+                broken.add(e.getKey() + ": no longer reads SV through a distinct(…, domain=\"SV\")"
+                        + " operation, so it is no longer immune to the left-join exclusion");
+            }
+        }
+        assertEquals(List.of(), broken,
+                "R-7.9's division of labour has broken: the cascade rules are allowed to stay silent"
+                        + " on an unmatched row only because these rules report it — " + broken);
     }
 
 

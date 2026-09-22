@@ -1,0 +1,38 @@
+#!RuleTest
+#test FDA-SD1023 expect=violation domain=LB
+#note "⭐⭐ TRUTH-TABLE CASE 3 — tier 2, and it was asserted by NOTHING for this rule. SV MATCHES the row (join USUBJID+VISITNUM) but carries NO SVPRESP column — an SDTMIG 3.2/3.3 study, where SVPRESP does not exist. Tier 1 is false, tier 3 is false (the row matched), so only tier 2 can decide: `not var_exists(SV.SVPRESP)` is true, SVUPDES is absent so empty() is true, WEEK 99 is name-neutral ⇒ the visit is PLANNED ⇒ (WEEK 99, 99) is not a TV combination ⇒ FIRES. ⛔ DELETE THE TIER-2 CLAUSE AND THIS REDS. Until this file existed, every SD1023 fixture with an SVPRESP-less SV was deliberately UNMATCHED (USUBJID 01-701-9999), so they all fired through tier 3 and the whole clause could be deleted with the suite staying green — the round-1 commit claimed tiers 1 AND 2 were closed; only tier 1 was."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 VISIT="WEEK 99"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 2  | BASELINE
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB | 99 | WEEK 99
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 | WEEK 99
+---
