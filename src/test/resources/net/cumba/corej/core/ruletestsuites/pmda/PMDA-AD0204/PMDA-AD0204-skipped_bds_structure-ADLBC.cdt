@@ -1,11 +1,12 @@
 #!RuleTest
 #test PMDA-AD0204 expect=skipped domain=ADLBC
-#note "ADLBC with PARAMCD/AVAL -> BDS. Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET] rejects -> skipped. FAMILY scope pin (AD0205-0207 share the identical block; not mirrored)."
+#note "ADLBC with PARAMCD/AVAL -> BDS. Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET] rejects -> skipped. FAMILY scope pin (AD0205-0207 share the identical block; not mirrored). AGE is present ON PURPOSE and is LOAD-BEARING: now that PMDA-AD0204 declares the bare AGE, the variable-requirement gate (RuleRunner:632) fires BEFORE the structure gate (:673), so without an AGE column this fixture would still skip -- on the requirement, not the structure -- and ExecutionVerdictCheck does not assert a reason for expect=skipped, so it would stay GREEN while pinning nothing. Do not drop AGE to simplify the dataset."
 #library standard=adamig version=1-3
 dataset ADLBC
 col STUDYID type=Char
 col USUBJID type=Char
 col PARAMCD type=Char
 col AVAL    type=Num
+col AGE     type=Num
 ---
-CDISCPILOT01 | 01-701-1015 | GLUC | 5.1
+CDISCPILOT01 | 01-701-1015 | GLUC | 5.1 | 63

@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0032 expect=noViolation domain=SV
+#note "F1 of the plan's findings ledger: CDISC-CG0032 shipped with ZERO .cdt scenarios of any kind, so nothing executable stood between it and corpus drift. This is the conformant case -- every SV.VISITDY equals the TV.VISITDY of the same VISITNUM."
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISITDY  type=Num
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 1
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 15
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | 1
+CDISCPILOT01 | TV | 2 | 15
+---

@@ -166,7 +166,16 @@ class ScenarioFixtureCoverageRatchetTest
     // domain alone (AbsentDatasetSkip.resolvesExactOnly now has no corpus carrier); and
     // OrderFlipGuardCoverageRatchetTest lost 5 guard sites across 4 rules (CORE-000097 ×2,
     // -000250, -000310, -000717) — 26 entries / 28 sites -> 22 / 23.
-    private static final int MAX_UNCOVERED = 544;
+    // 544 -> 542 on 2026-09-22 (PLAN-join-shadowed-comparison-rules phase 6), and the figure is
+    // MEASURED on THIS repo rather than copied from the internal twin. This phase newly covers
+    // exactly ONE previously-uncovered rule -- CDISC-CG0032, which shipped with zero .cdt of any
+    // kind -- so the obvious arithmetic is 544 - 1 = 543. It is wrong: measured here, uncovered was
+    // 543 BEFORE the phase and 542 after, so 544 was already carrying one row of slack. Landing 543
+    // would have banked that slack silently, which is what a `<=` ratchet does when nobody
+    // re-measures; the other 18 scenarios attach to rules that already had fixtures.
+    // ⚑ The internal twin measured the same 543 -> 542, but that is a COINCIDENCE of the two
+    // corpora currently shipping the same 3 415 ids, not a reason to copy the number. Re-measure.
+    private static final int MAX_UNCOVERED = 542;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus

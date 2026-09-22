@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0032 expect=skipped domain=SV
+#note "THE JOINED HALF of the both-ways gate. TV carries NO VISITDY while SV does. TV.VISITDY is Permissible at SDTMIG 3.2/3.3/3.4, so a study can legitimately omit it -- and when it does, the absent joined column folds to a broadcast constant and the comparison is true on every planned-visit row whose own VISITDY differs from it. Declaring TV.VISITDY alongside the bare VISITDY makes the rule SKIP instead. Verdict 2-2: a Permissible column's absence is not a finding, so no reporter is owed. CDISC-CG0217 was already authored this way (\"TAETORD\", \"SE.TAETORD\") and is the model for this edit."
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISITDY  type=Num
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 1
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 15
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | WEEK 2
+---

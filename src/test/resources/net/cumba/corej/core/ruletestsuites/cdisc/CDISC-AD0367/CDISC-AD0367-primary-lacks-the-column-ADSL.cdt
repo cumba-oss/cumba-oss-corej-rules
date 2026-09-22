@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0367 expect=skipped domain=ADSL
+#note "THE SHAPE THIS PLAN GATES. ADSL carries NO ACTARM while DM does; before the declaration the absent column folded to a broadcast \"\" and differed from DM.ACTARM on every row. Verdict 2-2, NOT 2-1': ACTARM is Permissible in ADSL at ADaMIG 1.1/1.2/1.3 (and not published at all at 1.0, which is why this rule does not ship into rules-cdisc-adamig-1-0), so its absence is NOT a finding and NO reporter is owed -- by ruling, nothing else reports it. Skipping is the whole answer here."
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Y
+CDISCPILOT01 | 01-701-1023 | Y
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col ACTARM  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | Placebo
+CDISCPILOT01 | DM | 01-701-1023 | Placebo
+---

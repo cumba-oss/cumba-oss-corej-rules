@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0032 expect=violation domain=SV
+#note "F1, the firing half: SV.VISITDY 99 for VISITNUM 1 disagrees with the planned TV.VISITDY 1. Without this file the -valid case alone could not tell 'the rule is right' from 'the rule cannot fire' -- which is exactly the defect class this whole plan exists to close."
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISITDY  type=Num
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | 99
+CDISCPILOT01 | SV | 01-701-1015 | 2 | 15
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col VISITNUM type=Num
+col VISITDY  type=Num
+---
+CDISCPILOT01 | TV | 1 | 1
+CDISCPILOT01 | TV | 2 | 15
+---

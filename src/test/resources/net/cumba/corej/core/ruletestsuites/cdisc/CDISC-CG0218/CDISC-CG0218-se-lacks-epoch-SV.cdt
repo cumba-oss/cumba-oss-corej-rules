@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0218 expect=skipped domain=SV
+#note "THE JOINED HALF of the both-ways gate. SE carries NO EPOCH while SV does. SE.EPOCH is Permissible at SDTMIG 3.2/3.3/3.4; absent, it folds to a broadcast constant and the comparison fires on rows it cannot judge. The bare EPOCH was already declared -- this file pins the OTHER direction, which CDISC-CG0218-valid-SV.cdt (SV without EPOCH) does not reach. Verdict 2-2: Permissible, so no reporter is owed. Do not merge the two: they skip for opposite reasons and ExecutionVerdictCheck does not assert a reason for expect=skipped."
+dataset SV label="Subject Visits"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col SVSTDTC  type=Char
+col EPOCH    type=Char
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING | 2013-01-04 | SCREENING
+CDISCPILOT01 | SV | 01-701-1015 | 2 | WEEK 2 | 2013-01-18 | TREATMENT
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SESEQ   type=Num
+col SESTDTC type=Char
+col SEENDTC type=Char
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | 2013-01-04 | 2013-01-17
+CDISCPILOT01 | SE | 01-701-1015 | 2 | 2013-01-18 | 2013-02-01
+---

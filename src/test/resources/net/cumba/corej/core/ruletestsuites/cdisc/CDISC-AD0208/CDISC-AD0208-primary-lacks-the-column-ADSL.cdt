@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0208 expect=skipped domain=ADSL
+#note "THE SHAPE THIS PLAN GATES. ADSL carries NO SUBJID while DM does. Until 2026-09-21 the unqualified SUBJID resolved OUT OF THE JOIN, so the check read DM.SUBJID != DM.SUBJID -- always false, the rule structurally unable to fire. PLAN-unqualified-name-primary-only made an unqualified name mean the PRIMARY always, which turned the same shape into an OVER-FIRE: the absent ADSL column folds to a broadcast constant (the empty string) and differs from DM.SUBJID on every candidate row. => The rule now DECLARES the bare SUBJID in Requirements.Variables.All, so an ADSL without it SKIPS -- 0 findings by an auditable route. Verdict 2-1' per CORE-RULES-AUTHORING-GUIDELINES 4.4: the absence is itself a finding and is reported by CDISC-AD0055 (co-present in every adamig package this rule ships into). Do NOT 'fix' this by giving ADSL the column: -valid-ADSL.cdt already covers present-and-agreeing and -invalid-ADSL.cdt present-and-disagreeing. This file is the third shape, and the only one the engine change moved."
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Y
+CDISCPILOT01 | 01-701-1023 | Y
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SUBJID  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015
+CDISCPILOT01 | DM | 01-701-1023 | 1015
+---

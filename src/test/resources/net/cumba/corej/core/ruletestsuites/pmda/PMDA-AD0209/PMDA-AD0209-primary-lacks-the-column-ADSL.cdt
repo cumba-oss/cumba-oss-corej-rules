@@ -1,0 +1,22 @@
+#!RuleTest
+#test PMDA-AD0209 expect=skipped domain=ADSL
+#note "THE SHAPE THIS PLAN GATES, PMDA arm. ADSL carries NO SITEID while DM does. This rule reads 'not empty(SITEID) and SITEID != DM.SITEID', so before the declaration it did not flood -- it was SILENTLY inert: the leading guard is accidental protection, not a gate, and an operator cannot tell 'did not run' from 'found nothing'. With the bare SITEID declared the run reports SKIPPED instead. Verdict 2-1' per CORE-RULES-AUTHORING-GUIDELINES 4.4; the absence is reported by the universal PMDA-AD0047 (not contains_all($dataset_variables, $required_variables)), which is present in all four rules-pmda-adamig packages. Note PMDA-AD0047 is LIBRARY-DEPENDENT while this gate is not, so on a run with no library metadata the discharge is inert and the gate still stands."
+#library standard=adamig version=1-3
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SAFFL   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Y
+CDISCPILOT01 | 01-701-1023 | Y
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col SITEID  type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015 | 701
+CDISCPILOT01 | DM | 01-701-1023 | 701
+---
