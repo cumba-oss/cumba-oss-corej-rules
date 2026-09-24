@@ -69,7 +69,7 @@ class CrossStandardCollapseCorpusTest
             "TV", "UR", "VS");
 
     /** Value cycles probed per rule; the first that makes the CONTROL run fire is the witness. */
-    private static final String[][] CYCLES = new String[][]
+    private static final String[][] CYCLES =
     {
             {
                     "X"
@@ -436,7 +436,7 @@ class CrossStandardCollapseCorpusTest
         int c = 0;
         for (String col : cols)
         {
-            String[] vals = new String[]
+            String[] vals =
             {
                     cycle[c % cycle.length], cycle[(c + 1) % cycle.length]
             };

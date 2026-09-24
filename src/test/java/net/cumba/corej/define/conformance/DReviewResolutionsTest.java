@@ -13,6 +13,7 @@ import net.cumba.cdisc.define.DefineDomIo;
 import net.cumba.corej.define.conformance.eval.DocumentContext;
 import net.cumba.corej.define.conformance.eval.RuleEvaluator;
 import net.cumba.corej.define.conformance.eval.RuleResult;
+import net.cumba.corej.define.conformance.report.ConformanceFinding;
 import net.cumba.corej.define.conformance.report.ExecutionStatus;
 import net.cumba.corej.define.conformance.rule.ConformanceRule;
 import net.cumba.corej.define.conformance.tree.ElementNodeBuilder;
@@ -95,7 +96,7 @@ class DReviewResolutionsTest
     {
         Map<String, RuleResult> results = evaluate(DOC, "2.1");
         List<String> origin154 = results.get("DEFINE-XML-0154").findings().stream()
-                .map(f -> f.getXpath()).toList();
+                .map(ConformanceFinding::getXpath).toList();
         assertEquals(1, origin154.size(), origin154.toString());
         assertTrue(origin154.get(0).contains("IT.PLAIN"), origin154.toString());
 
@@ -104,7 +105,7 @@ class DReviewResolutionsTest
         // value-level Origin). IT.VLM1 (has Origin) and VL.Y's IT.DELEGATED (variable
         // carries the Origin) stay silent.
         List<String> valueLevel = results.get("DEFINE-XML-0155-B").findings().stream()
-                .map(f -> f.getXpath()).toList();
+                .map(ConformanceFinding::getXpath).toList();
         assertEquals(2, valueLevel.size(), valueLevel.toString());
         assertTrue(valueLevel.stream().allMatch(x -> x.contains("VL.X")), valueLevel.toString());
     }

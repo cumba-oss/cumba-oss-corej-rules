@@ -33,6 +33,8 @@ class AdamTemplatesOccdsRuleTest extends AbstractAdamTemplateTest
     /** Shared static field set in @BeforeAll, copied to instance in @TestFactory. */
     private static java.util.List<net.cumba.corej.core.model.Rule> expandedRulesForDomain;
 
+    // A @TestFactory: the DynamicTests of AbstractAdamTemplateTest carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> templateTests_OCCDS_valid()
     {
@@ -42,6 +44,8 @@ class AdamTemplatesOccdsRuleTest extends AbstractAdamTemplateTest
     }
 
 
+    // A @TestFactory: the DynamicTests of AbstractAdamTemplateTest carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> templateTests_OCCDS_invalid()
     {

@@ -187,7 +187,7 @@ class RulePackageLoaderExpressionJsonTest
         // can therefore exist only PROGRAMMATICALLY (like the field-form operation below), and
         // that is what still exercises the renderer's printed.isBlank() arm: the skeleton must
         // survive the rendering unchanged rather than becoming a blank `expression`.
-        net.cumba.corej.core.model.Rule rule = new net.cumba.corej.core.model.Rule();
+        Rule rule = new Rule();
         net.cumba.corej.core.model.RuleCore core = new net.cumba.corej.core.model.RuleCore();
         core.setId("T-0008");
         rule.setCore(core);
@@ -239,7 +239,7 @@ class RulePackageLoaderExpressionJsonTest
     @Test
     void programmaticFieldFormOperationConvertsToExpression() throws IOException
     {
-        net.cumba.corej.core.model.Rule rule = new net.cumba.corej.core.model.Rule();
+        Rule rule = new Rule();
         net.cumba.corej.core.model.Operation op = new net.cumba.corej.core.model.Operation();
         op.setId("$VAR");
         op.setOperator("variable_count");

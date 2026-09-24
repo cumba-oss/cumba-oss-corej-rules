@@ -204,7 +204,7 @@ class CrossCorpusDerivationTest
                 Rule.class);
         // 7b: an external binder materialises the Bindings itself — without this the classifier
         // sees no operations at all and a `$`-consuming Check derives RECORD.
-        net.cumba.corej.core.RulePackageLoader.normalizeOperations(src);
+        RulePackageLoader.normalizeOperations(src);
         assertDerives(id + " [rules-src]", src, expectedDomain, authoredSensitivity);
 
         // Form 2 — rules/ native expression, single-use operations inlined into the Check. The

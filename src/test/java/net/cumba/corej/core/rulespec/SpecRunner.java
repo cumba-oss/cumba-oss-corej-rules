@@ -344,8 +344,7 @@ public final class SpecRunner
         // Define-Item-Metadata / Dataset-Metadata-against-Define rules and the
         // define_dataset_names operation. Build a define-level provider from it and pass it on the
         // 9-arg execute; absent ⇒ null (every other spec is unaffected).
-        net.cumba.corej.core.exec.MetadataProvider defineProvider = defineProviderFrom(spec.name(),
-                spec.defineXml());
+        MetadataProvider defineProvider = defineProviderFrom(spec.name(), spec.defineXml());
         RuleExecutionResult result = RuleRunner.execute(rule, primaryTable, resolver, cdiscDomain,
                 library, /*joinCache=*/null, defineProvider);
 
@@ -637,9 +636,8 @@ public final class SpecRunner
      * when the spec declares no define block; an unusable block throws rather than being skipped
      * silently (the pre-P1 code returned from the lambda, which dropped one key without a word).
      */
-    static net.cumba.corej.core.exec.@org.jspecify.annotations.Nullable MetadataProvider defineProviderFrom(
-            @Nullable String specName,
-            com.fasterxml.jackson.databind.@org.jspecify.annotations.Nullable JsonNode defineXml)
+    static @Nullable MetadataProvider defineProviderFrom(@Nullable String specName,
+            com.fasterxml.jackson.databind.@Nullable JsonNode defineXml)
     {
         SpecDefineXml.validate(defineXml, specName);
         if (defineXml == null || !defineXml.isObject())

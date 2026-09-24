@@ -514,7 +514,7 @@ class ShippedSendSourceBlockMatchesWorkbookTest
                 }
             }
         }
-        assertEquals(new TreeSet<String>(), unguarded,
+        assertEquals(new TreeSet<>(), unguarded,
                 "SEND Source blocks now carry key(s) this guard does not compare. Add them to"
                         + " FIELDS with their sheet column label — an unguarded Source key is an"
                         + " untested transcription.");

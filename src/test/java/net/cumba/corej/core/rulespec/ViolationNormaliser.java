@@ -1,6 +1,7 @@
 package net.cumba.corej.core.rulespec;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,11 +173,7 @@ public final class ViolationNormaliser
             return value;
         }
         String[] parts = inner.split(", ", -1);
-        List<String> sorted = new ArrayList<>(parts.length);
-        for (String p : parts)
-        {
-            sorted.add(p);
-        }
+        List<String> sorted = new ArrayList<>(Arrays.asList(parts));
         java.util.Collections.sort(sorted);
         return "[" + String.join(", ", sorted) + "]";
     }

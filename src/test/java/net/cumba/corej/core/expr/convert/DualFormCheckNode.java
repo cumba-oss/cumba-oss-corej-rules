@@ -195,7 +195,7 @@ public final class DualFormCheckNode
      * @param out
      *            receives the names
      */
-    public static void collectRefNames(Expr e, java.util.Set<String> out)
+    public static void collectRefNames(Expr e, Set<String> out)
     {
         switch (e)
         {
@@ -281,7 +281,7 @@ public final class DualFormCheckNode
     /**
      * {@link #lowerCheckInPlace}'s level-map arm: every level lowered, its {@code Message} kept.
      */
-    private static boolean lowerLevelsInPlace(ObjectNode check, java.util.Set<String> levels)
+    private static boolean lowerLevelsInPlace(ObjectNode check, Set<String> levels)
     {
         boolean allLowered = true;
         for (String level : levels)

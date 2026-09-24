@@ -143,7 +143,7 @@ class ShippedNumTagAbsentRatchetTest
 
         Map<String, Integer> actual = new TreeMap<>();
         PRESENT.keySet().forEach(tag -> actual.put(tag, occurrences(corpus, tag)));
-        PRESENT.forEach((tag, floor) -> assertTrue(actual.get(tag) >= floor.intValue(),
+        PRESENT.forEach((tag, floor) -> assertTrue(actual.get(tag) >= floor,
                 "positive control: these tags are present in rules/ and the scan must find them —"
                         + " `" + tag + "` seen " + actual.get(tag) + " time(s), floor " + floor
                         + "; saw " + actual));

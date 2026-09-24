@@ -120,8 +120,7 @@ class CtRulesTest
                 continue;
             }
             assertEquals(ExecutionStatus.EXECUTED, result.status(), ruleId + " status");
-            int expected = aExpectedCounts == null ? 0
-                    : aExpectedCounts.getOrDefault(ruleId, 0).intValue();
+            int expected = aExpectedCounts == null ? 0 : aExpectedCounts.getOrDefault(ruleId, 0);
             assertEquals(expected, result.findings().size(),
                     ruleId + " finding count: " + result.findings());
         }

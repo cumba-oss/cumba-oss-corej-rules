@@ -595,8 +595,8 @@ class RuleFingerprintTest
         assertTrue(used.contains("TARGET"));
         assertTrue(used.contains("OTHER"));
         assertTrue(used.contains("$op"));
-        assertTrue(!used.contains("GUARD"));
-        assertTrue(!used.contains("Y"), "a literal value is not a name");
+        assertFalse(used.contains("GUARD"));
+        assertFalse(used.contains("Y"), "a literal value is not a name");
     }
 
 

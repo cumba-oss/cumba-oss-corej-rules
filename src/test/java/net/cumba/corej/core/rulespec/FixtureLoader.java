@@ -127,24 +127,29 @@ public final class FixtureLoader
         for (Map<String, Object> row : rows)
         {
             Object v = row.get(column);
-            if (v == null)
+            if (v != null)
             {
-                continue;
+                // The first non-null value decides the column's type.
+                return typeOfValue(v);
             }
-            if (v instanceof Long || v instanceof Integer || v instanceof Short
-                    || v instanceof Byte)
-            {
-                return DataValueType.LONG;
-            }
-            if (v instanceof Double || v instanceof Float)
-            {
-                return DataValueType.DOUBLE;
-            }
-            if (v instanceof Boolean)
-            {
-                return DataValueType.BOOLEAN;
-            }
-            return DataValueType.STRING;
+        }
+        return DataValueType.STRING;
+    }
+
+
+    private static DataValueType typeOfValue(Object v)
+    {
+        if (v instanceof Long || v instanceof Integer || v instanceof Short || v instanceof Byte)
+        {
+            return DataValueType.LONG;
+        }
+        if (v instanceof Double || v instanceof Float)
+        {
+            return DataValueType.DOUBLE;
+        }
+        if (v instanceof Boolean)
+        {
+            return DataValueType.BOOLEAN;
         }
         return DataValueType.STRING;
     }

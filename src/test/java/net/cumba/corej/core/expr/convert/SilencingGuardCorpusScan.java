@@ -153,12 +153,8 @@ final class SilencingGuardCorpusScan
     private static boolean familyIsShipped(String aLine)
     {
         int slash = aLine.indexOf('/');
-        if (slash <= 0)
-        {
-            return true;
-        }
-        return Files.isDirectory(Path.of(System.getProperty("projectBasedir"), "rules-src",
-                "checks", aLine.substring(0, slash)));
+        return slash <= 0 || Files.isDirectory(Path.of(System.getProperty("projectBasedir"),
+                "rules-src", "checks", aLine.substring(0, slash)));
     }
 
 

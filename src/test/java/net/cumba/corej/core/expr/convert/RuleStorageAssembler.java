@@ -261,8 +261,7 @@ public final class RuleStorageAssembler
         // path shares (RuleCorpusGenerator and both corpus round-trip tests each drive their own
         // loop around this method). Declaration first, then the rules: a package's header reads
         // before its body, and Jackson serialises in insertion order.
-        java.util.List<net.cumba.corej.core.model.StandardRef> declared = declaredStandards(name,
-                version);
+        List<net.cumba.corej.core.model.StandardRef> declared = declaredStandards(name, version);
         if (!declared.isEmpty())
         {
             pkg.set("standards", jsonOf(declared));
@@ -282,8 +281,7 @@ public final class RuleStorageAssembler
      *            the package version
      * @return the declared standards, empty when the standard is unmapped
      */
-    java.util.List<net.cumba.corej.core.model.StandardRef> declaredStandards(String name,
-            String version)
+    List<net.cumba.corej.core.model.StandardRef> declaredStandards(String name, String version)
     {
         return standardsMap.forPackage(name, version);
     }
@@ -491,7 +489,7 @@ public final class RuleStorageAssembler
 
     private static Map<String, JsonNode> loadTree(Path dir, String keyPath) throws IOException
     {
-        Map<String, JsonNode> out = new java.util.HashMap<>();
+        Map<String, JsonNode> out = new HashMap<>();
         if (!Files.isDirectory(dir))
         {
             return out;
@@ -531,15 +529,13 @@ public final class RuleStorageAssembler
      *            the declared standards
      * @return the JSON array node
      */
-    static com.fasterxml.jackson.databind.node.ArrayNode jsonOf(
-            java.util.List<net.cumba.corej.core.model.StandardRef> refs)
+    static ArrayNode jsonOf(List<net.cumba.corej.core.model.StandardRef> refs)
     {
         return JSON.valueToTree(refs);
     }
 
 
-    static String serialize(ObjectNode pkg)
-        throws com.fasterxml.jackson.core.JsonProcessingException
+    static String serialize(ObjectNode pkg) throws JsonProcessingException
     {
         return JSON.writeValueAsString(pkg) + "\n";
     }

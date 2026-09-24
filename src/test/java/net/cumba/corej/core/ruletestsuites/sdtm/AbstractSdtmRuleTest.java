@@ -73,12 +73,18 @@ abstract class AbstractSdtmRuleTest
             + "/src/test/resources/testdata_study/sdtm/define.xml";
 
     /** Every rule of the SDTMIG 3.4 family union, keyed by Core.Id. */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static Map<String, Rule> rulesByCoreId;
 
     /** All available SDTM domain tables, keyed by domain name (uppercase). */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static Map<String, IDataTable> domains;
 
     /** Resolves domain names to loaded tables. */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static DatasetResolver resolver;
 
     @BeforeAll
@@ -315,7 +321,7 @@ abstract class AbstractSdtmRuleTest
      * Returns a resolver that overrides multiple domains with modified tables. Preserves inventory
      * semantics (see {@link #resolverWith(String, IDataTable)}).
      */
-    OverridingResolver resolverWith(java.util.Map<String, IDataTable> overrides)
+    OverridingResolver resolverWith(Map<String, IDataTable> overrides)
     {
         return OverridingResolver.overrides(resolver, overrides);
     }

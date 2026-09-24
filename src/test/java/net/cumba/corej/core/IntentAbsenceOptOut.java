@@ -260,15 +260,16 @@ public final class IntentAbsenceOptOut
             if (absent != null)
             {
                 absentName = absent;
-                continue;
             }
-            String empty = directEmptyName(member);
-            if (empty != null)
+            else
             {
+                String empty = directEmptyName(member);
+                if (empty == null)
+                {
+                    return null;
+                }
                 emptyName = empty;
-                continue;
             }
-            return null;
         }
         return absentName != null && absentName.equals(emptyName) ? absentName : null;
     }

@@ -329,6 +329,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
      * and 3 are measuring.
      * </p>
      */
+    // A @TestFactory: the DynamicTests it returns carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> control_preMigrationClassScope_firesOnInvalidData()
     {
@@ -358,6 +360,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
      * {@code Scope.Data_Structures} since {@code Fix #230}) fires, because the suite's declaration
      * reaches {@code RuleRunner}'s structure gate.
      */
+    // A @TestFactory: the DynamicTests it returns carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> shippedDataStructureScope_firesWhenStructureDeclared()
     {
@@ -429,6 +433,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
      * and only this arm would move. <b>Retiring it would delete the only detector of both.</b>
      * </p>
      */
+    // A @TestFactory: the DynamicTests it returns carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> shippedDataStructureScope_isSkippedWhenStructureUndeclared()
     {
@@ -445,6 +451,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
 
 
     /** All distinct held families the three suites actually reach — the B5 deliverable list. */
+    // A @TestFactory: the DynamicTests it returns carry the assertions.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> heldFamiliesReachedByTheTemplateSuites()
     {

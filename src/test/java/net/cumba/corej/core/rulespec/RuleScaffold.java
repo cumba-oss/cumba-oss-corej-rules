@@ -131,7 +131,7 @@ public final class RuleScaffold
             // would bind to nothing and expand unfiltered with no diagnostic at all. Fail here
             // instead, on ANY key the model did not bind.
             rejectDroppedKeys(spec, rule);
-            net.cumba.corej.core.RulePackageLoader.normalizeJoinTypes(rule);
+            RulePackageLoader.normalizeJoinTypes(rule);
         }
         // The scaffold bypasses RulePackageLoader, so a built rule carries no native checkExpr and
         // would dispatch on the legacy engine. Install it here through the SAME single retention
@@ -143,12 +143,12 @@ public final class RuleScaffold
         // checkExpr is already present.
         if (rule != null && rule.getCheckExpr() == null)
         {
-            net.cumba.corej.core.RulePackageLoader.installNativeExpr(rule);
+            RulePackageLoader.installNativeExpr(rule);
         }
         // EC-37: the SAME effective-Output_Variables derivation a production load performs,
         // after installNativeExpr exactly like the loader/generator seams. Without this the
         // harness would assert pre-derivation behaviour that no production run exhibits.
-        net.cumba.corej.core.RulePackageLoader.deriveOutputVariables(rule);
+        RulePackageLoader.deriveOutputVariables(rule);
         return rule;
     }
 

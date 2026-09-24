@@ -169,8 +169,7 @@ class PmdaP4RulesTest
                 continue;
             }
             assertEquals(ExecutionStatus.EXECUTED, result.status(), ruleId + " status");
-            int expected = V20_ONLY_IDS.contains(ruleId) ? 1
-                    : EXPECTED_20.getOrDefault(ruleId, 0).intValue();
+            int expected = V20_ONLY_IDS.contains(ruleId) ? 1 : EXPECTED_20.getOrDefault(ruleId, 0);
             assertEquals(expected, result.findings().size(),
                     ruleId + " finding count: " + result.findings());
         }

@@ -220,7 +220,7 @@ class ScenarioFixtureCoverageRatchetTest
         // a dead scenario: it runs against nothing and its greenness means nothing.
         NavigableSet<String> fixtureOnly = new TreeSet<>(covered);
         fixtureOnly.removeAll(shipped);
-        assertEquals(new TreeSet<String>(), fixtureOnly,
+        assertEquals(new TreeSet<>(), fixtureOnly,
                 fixtureOnly.size() + " scenario fixtures name a rule id that no shipped package"
                         + " contains, so they assert nothing");
 

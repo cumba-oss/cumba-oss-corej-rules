@@ -196,7 +196,7 @@ class DerivedFieldEquivalenceTest
         {
             Rule rule = YAML.readValue(Files.readString(file, StandardCharsets.UTF_8), Rule.class);
             // 7b: materialise the Bindings before deriving (normalizeOperations javadoc).
-            net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
+            RulePackageLoader.normalizeOperations(rule);
             if (rule.getSensitivity() != null || rule.getCheck() == null)
             {
                 // The documented override set: not a clause-1 fixture, it is clause 2's.
@@ -426,7 +426,7 @@ class DerivedFieldEquivalenceTest
             }
             Rule authoredRule = YAML
                     .readValue(Files.readString(found.get(0), StandardCharsets.UTF_8), Rule.class);
-            net.cumba.corej.core.RulePackageLoader.normalizeOperations(authoredRule);
+            RulePackageLoader.normalizeOperations(authoredRule);
             Sensitivity authored = authoredRule.getSensitivity();
             if (authored == null)
             {

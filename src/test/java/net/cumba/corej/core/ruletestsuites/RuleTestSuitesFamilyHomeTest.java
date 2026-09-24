@@ -139,7 +139,7 @@ class RuleTestSuitesFamilyHomeTest
         Map<String, Boolean> actual = new TreeMap<>();
         for (AbstractRuleTestSuitesFactory factory : FACTORIES)
         {
-            actual.put(factory.family(), Boolean.valueOf(factory.requireDeclaredStandard()));
+            actual.put(factory.family(), factory.requireDeclaredStandard());
         }
         assertEquals(
                 Map.of("cdisc", Boolean.FALSE, DRAFT_FAMILY, Boolean.TRUE, "fda", Boolean.TRUE,

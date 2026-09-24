@@ -53,13 +53,8 @@ public class CdtResourceExtension implements ParameterResolver
         {
             return false;
         }
-        // Parameter-level annotation
-        if (aParameterContext.isAnnotated(CdtResource.class))
-        {
-            return true;
-        }
-        // Method-level annotation (single-parameter convenience case)
-        return aExtensionContext.getTestMethod()
+        // Parameter-level annotation, else method-level (single-parameter convenience case)
+        return aParameterContext.isAnnotated(CdtResource.class) || aExtensionContext.getTestMethod()
                 .filter(m -> m.isAnnotationPresent(CdtResource.class)).isPresent();
     }
 

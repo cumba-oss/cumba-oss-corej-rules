@@ -78,15 +78,23 @@ abstract class AbstractAdamRuleTest
             Map.entry("ADTTE", "BASIC DATA STRUCTURE"), Map.entry("ADVS", "BASIC DATA STRUCTURE"));
 
     /** All ADaM conformance rules, keyed by Core.Id (e.g., "CDISC-AD0001"). */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static Map<String, Rule> rulesByCoreId;
 
     /** ADaM domain tables, keyed by dataset name (uppercase). */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static Map<String, IDataTable> adamDomains;
 
     /** SDTM domain tables for cross-dataset rules. */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static Map<String, IDataTable> sdtmDomains;
 
     /** Combined resolver: ADaM + SDTM domains. */
+    // Set once by @BeforeAll and read by the subclasses' tests, so it cannot be final.
+    @SuppressWarnings("PMD.MutableStaticState")
     static DatasetResolver resolver;
 
     @BeforeAll

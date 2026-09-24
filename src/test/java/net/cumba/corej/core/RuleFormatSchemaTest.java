@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * ⚠ This used to validate <b>two</b> folders against the one schema, and the agreement between them
  * was a free cross-check: a broken path or glob on one side showed up as a disagreement. The second
  * folder is gone, so the only thing standing between a mis-resolved directory and a green "all
- * packages validate" is the explicit floor in {@link #validateFolder} — do not weaken it.
+ * packages validate" is the explicit floor in {@link #assertFolderValidates} — do not weaken it.
  * </p>
  */
 class RuleFormatSchemaTest
@@ -74,7 +74,7 @@ class RuleFormatSchemaTest
     }
 
 
-    private static void validateFolder(Path folder, int expectedPackages) throws Exception
+    private static void assertFolderValidates(Path folder, int expectedPackages) throws Exception
     {
         Schema schema = schema();
         List<String> failures = new ArrayList<>();
@@ -108,7 +108,7 @@ class RuleFormatSchemaTest
     {
         // rules/ holds the family-scoped expression packages RuleExprGenerator produces from
         // rules-src/, mirroring the manifest.
-        validateFolder(CorpusPaths.rules(), manifestPackages(CorpusPaths.rules()));
+        assertFolderValidates(CorpusPaths.rules(), manifestPackages(CorpusPaths.rules()));
     }
 
     // ---- Plan C §3.3: the level-keyed Check ------------------------------

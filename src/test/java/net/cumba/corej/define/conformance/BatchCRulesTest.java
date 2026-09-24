@@ -167,7 +167,7 @@ class BatchCRulesTest
     @Test
     void guardFixturePinsSubmissionGuardsAndCompanionRules()
     {
-        java.nio.file.Path dir = RULES_DIR;
+        Path dir = RULES_DIR;
         List<ConformanceRule> rules = RuleRepository.loadDirectory(dir).stream()
                 .filter(rule -> Set
                         .of("DEFINE-XML-0093", "DEFINE-XML-0108", "DEFINE-XML-0119",

@@ -397,7 +397,7 @@ public final class RuleDocCensus
         }
         catch (com.fasterxml.jackson.core.JsonProcessingException e)
         {
-            throw new java.io.UncheckedIOException(e);
+            throw new UncheckedIOException(e);
         }
         // 7b: an external binder materialises the Bindings itself, or the classifier derives
         // over a rule with no operations (a `$`-consuming Check then reads RECORD).

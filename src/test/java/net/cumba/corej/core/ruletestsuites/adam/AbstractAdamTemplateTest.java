@@ -918,7 +918,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                         numericCols.add(leaf.name);
                     }
                 }
-                catch (NumberFormatException _)
+                catch (NumberFormatException ignored)
                 {
                     // not numeric literal
                 }
@@ -934,7 +934,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                         numericCols.add(leaf.name);
                     }
                 }
-                catch (NumberFormatException _)
+                catch (NumberFormatException ignored)
                 {
                     // not numeric literal
                 }
@@ -1152,7 +1152,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                     int n = Integer.parseInt(leaf.valueText);
                     yield String.valueOf(n + 99);
                 }
-                catch (NumberFormatException _)
+                catch (NumberFormatException ignored)
                 {
                     // Non-numeric: append suffix
                 }
@@ -1626,7 +1626,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
          * absence is, and it is re-derived above. Do not put a standards list back.
          * </p>
          */
-        private static final java.util.Set<String> VALUE_TAGS = net.cumba.corej.core.expr.eval.ExprCompiler
+        private static final Set<String> VALUE_TAGS = net.cumba.corej.core.expr.eval.ExprCompiler
                 .comparisonMarkers();
 
         /** The value operand with a transparent type tag / conversion removed. */

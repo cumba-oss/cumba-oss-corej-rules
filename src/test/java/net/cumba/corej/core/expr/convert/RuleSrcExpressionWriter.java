@@ -266,6 +266,12 @@ public final class RuleSrcExpressionWriter
         {
             super(message);
         }
+
+
+        Unraisable(String message, Throwable cause)
+        {
+            super(message, cause);
+        }
     }
 
     /**
@@ -300,7 +306,7 @@ public final class RuleSrcExpressionWriter
         }
         catch (JsonProcessingException e)
         {
-            throw new Unraisable(relativePath + ": not parseable as YAML: " + e.getMessage());
+            throw new Unraisable(relativePath + ": not parseable as YAML: " + e.getMessage(), e);
         }
         String id = idOf(root, relativePath);
         JsonNode checkNode = root.get("Check");
@@ -343,7 +349,7 @@ public final class RuleSrcExpressionWriter
         }
         catch (JsonProcessingException e)
         {
-            throw new Unraisable(id + ": Check did not bind: " + e.getMessage());
+            throw new Unraisable(id + ": Check did not bind: " + e.getMessage(), e);
         }
         String plain = plainRaiseText(check);
 
@@ -400,7 +406,7 @@ public final class RuleSrcExpressionWriter
             }
             catch (JsonProcessingException e)
             {
-                throw new Unraisable(where + ": Check did not bind: " + e.getMessage());
+                throw new Unraisable(where + ": Check did not bind: " + e.getMessage(), e);
             }
             String plain = plainRaiseText(bound);
             divergent |= divergesFromPlainRaise(plain, expression);

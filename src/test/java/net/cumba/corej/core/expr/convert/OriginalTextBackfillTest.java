@@ -488,7 +488,7 @@ class OriginalTextBackfillTest
             if (b.name().startsWith("PMDA"))
             {
                 assertEquals(List.of("Message", "Description", "Domains", "Severity"),
-                        b.fields().stream().map(f -> f.yamlKey()).toList(),
+                        b.fields().stream().map(OriginalTextBackfill.SourceField::yamlKey).toList(),
                         b.name() + " must mirror the sheet's column order");
             }
         }
@@ -1186,6 +1186,8 @@ class OriginalTextBackfillTest
         // ADaM Rule Set column (the spelling that column's own header advertises) would out-rank
         // `1.3` and re-anchor an ADaM rule nobody decided to move. The old parseVersion mapped it
         // to [0,0] and it lost; the new key must not let it win by accident.
+        // Handed to write(), which closes it once the book is saved.
+        @SuppressWarnings("PMD.CloseResource")
         XSSFWorkbook wb = new XSSFWorkbook();
         sheet(wb, "Rules Catalogue", List.of(List.of("Identifiers", "", "", "", "", "", "", ""),
                 List.of("Rule ID", RULE_SET, "Class", "Subclass", "SEND/SDTM Domain",
@@ -1201,6 +1203,8 @@ class OriginalTextBackfillTest
         assertTrue(thrown.getMessage().contains("<bare numerics only>"), thrown.getMessage());
 
         // The mirror case: a bare numeric on SEND, whose familyOrder does NOT contain "".
+        // Handed to write(), which closes it once the book is saved.
+        @SuppressWarnings("PMD.CloseResource")
         XSSFWorkbook send = new XSSFWorkbook();
         sheet(send, "_GENETOXv1.0_DARTv1.2",
                 List.of(List.of("CDISC SEND Rule ID", "Class", "Domain", "Variable",
@@ -1292,6 +1296,8 @@ class OriginalTextBackfillTest
     {
         // The shape of SEND_Conformance_Rules_v5.0.xlsx row 1476 (CDISC-SEND-0280), the only
         // _x000D_-bearing cell in the six Source-bearing columns.
+        // Handed to write(), which closes it once the book is saved.
+        @SuppressWarnings("PMD.CloseResource")
         XSSFWorkbook wb = new XSSFWorkbook();
         sheet(wb, "_GENETOXv1.0_DARTv1.2",
                 List.of(List.of("CDISC SEND Rule ID", "Class", "Domain", "Variable",
@@ -1317,8 +1323,8 @@ class OriginalTextBackfillTest
     private static void sendCheck(Path fam, String id, String sheetId, String... versions)
         throws IOException
     {
-        StringBuilder sb = new StringBuilder("Core:\n  Id: \"" + id + "\"\nStandards:\n"
-                + "- Organization: \"CDISC\"\n  Standards:\n");
+        StringBuilder sb = new StringBuilder("Core:\n  Id: \"").append(id)
+                .append("\"\nStandards:\n- Organization: \"CDISC\"\n  Standards:\n");
         for (String version : versions)
         {
             int at = version.indexOf(" v");

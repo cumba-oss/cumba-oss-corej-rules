@@ -180,6 +180,8 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
 
+    // A @TestFactory: each scenario's DynamicTest runs its .cdt and asserts the outcome.
+    @SuppressWarnings("PMD.UnitTestShouldIncludeAssert")
     @TestFactory
     Stream<DynamicTest> scenarios() throws IOException
     {
@@ -220,11 +222,7 @@ abstract class AbstractRuleTestSuitesFactory
             return true;
         }
         String coreId = peekCoreId(aFile);
-        if (coreId == null)
-        {
-            return false;
-        }
-        return aFilter.stream().anyMatch(coreId::startsWith);
+        return coreId != null && aFilter.stream().anyMatch(coreId::startsWith);
     }
 
 

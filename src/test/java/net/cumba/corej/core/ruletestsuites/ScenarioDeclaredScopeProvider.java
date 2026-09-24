@@ -567,7 +567,7 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
 
 
     @Override
-    public java.util.Optional<Boolean> isCodelistExtensible(String aCodelistName)
+    public Optional<Boolean> isCodelistExtensible(String aCodelistName)
     {
         return base.isCodelistExtensible(aCodelistName);
     }

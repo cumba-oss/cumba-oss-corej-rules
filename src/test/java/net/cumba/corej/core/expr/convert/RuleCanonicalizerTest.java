@@ -48,7 +48,7 @@ class RuleCanonicalizerTest
      * the rule-editor REST round-trip — and {@code RuleSrcExpressionWriterCorpusTest}'s
      * byte-exactness would then be enforcing two different spellings of the same rule.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     void severityErrorIsStrippedNotRejected() throws IOException
     {
         List<String> warnings = new ArrayList<>();
@@ -61,7 +61,7 @@ class RuleCanonicalizerTest
     }
 
 
-    @org.junit.jupiter.api.Test
+    @Test
     void severityErrorIsStrippedCaseInsensitively() throws IOException
     {
         for (String spelling : List.of("Error", "error", "ERROR", " Error "))
@@ -74,7 +74,7 @@ class RuleCanonicalizerTest
     }
 
 
-    @org.junit.jupiter.api.Test
+    @Test
     void aNonDefaultSeverityIsKeptAndPlacedThird() throws IOException
     {
         for (String value : List.of("Reject", "Warning", "Info"))
@@ -689,9 +689,9 @@ class RuleCanonicalizerTest
             assertFalse(line.startsWith(" ") || line.endsWith(" "),
                     "a wrapped line may never start or end with a space: <" + line + ">");
         }
-        assertEquals(java.util.List.of("aaa", "\"bb  cc\"", "ddd eee"),
+        assertEquals(List.of("aaa", "\"bb  cc\"", "ddd eee"),
                 RuleCanonicalizer.wrapExpression(text, 8));
-        assertEquals(java.util.List.of(text), RuleCanonicalizer.wrapExpression(text, 200),
+        assertEquals(List.of(text), RuleCanonicalizer.wrapExpression(text, 200),
                 "text within the width stays one line");
     }
 

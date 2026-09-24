@@ -1,5 +1,7 @@
 package net.cumba.corej.core.ruletestsuites.testdata;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
@@ -8,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.cumba.cdisc.define.DefineXmlPruner;
@@ -78,6 +81,7 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
     void pruneSdtmDefine() throws Exception
     {
         pruneDefine(SDTM_SOURCE, SDTM_TARGET, SDTM_KEEP);
+        assertKeptExactly(SDTM_SOURCE, SDTM_TARGET, SDTM_KEEP);
     }
 
 
@@ -85,6 +89,22 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
     void pruneAdamDefine() throws Exception
     {
         pruneDefine(ADAM_SOURCE, ADAM_TARGET, ADAM_KEEP);
+        assertKeptExactly(ADAM_SOURCE, ADAM_TARGET, ADAM_KEEP);
+    }
+
+
+    /**
+     * The written define holds exactly the kept domains the source carried: every one of them
+     * survived the prune, and nothing else did.
+     */
+    private static void assertKeptExactly(Path source, Path target, Set<String> keep)
+        throws Exception
+    {
+        Set<String> expected = new TreeSet<>(collectItemGroupOIDs(source));
+        expected.retainAll(keep);
+        assertFalse(expected.isEmpty(), "none of " + keep + " is an ItemGroup of " + source);
+        assertEquals(expected, new TreeSet<>(collectItemGroupOIDs(target)),
+                "ItemGroups written to " + target);
     }
 
 

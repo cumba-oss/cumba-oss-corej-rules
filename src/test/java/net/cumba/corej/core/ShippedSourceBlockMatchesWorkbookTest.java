@@ -397,7 +397,7 @@ class ShippedSourceBlockMatchesWorkbookTest
                 }
             }
         }
-        assertEquals(new TreeSet<String>(), unguarded,
+        assertEquals(new TreeSet<>(), unguarded,
                 "PMDA-AD Source blocks now carry key(s) this guard does not compare. Add them to"
                         + " FIELDS with their sheet column label — an unguarded Source key is an"
                         + " untested transcription.");
@@ -424,7 +424,10 @@ class ShippedSourceBlockMatchesWorkbookTest
         Scan scan = scan();
         TreeSet<String> adamRows = new TreeSet<>();
         TreeSet<String> otherRows = new TreeSet<>();
-        scan.sheet().keySet().forEach(id -> (id.startsWith("AD") ? adamRows : otherRows).add(id));
+        for (String id : scan.sheet().keySet())
+        {
+            (id.startsWith("AD") ? adamRows : otherRows).add(id);
+        }
         assertTrue(adamRows.size() >= MIN_RULES, "control: only " + adamRows.size()
                 + " AD-prefixed rows were read from '" + SHEET + "' (2026-08-10: 366)");
 
@@ -439,7 +442,7 @@ class ShippedSourceBlockMatchesWorkbookTest
         }
         TreeSet<String> unclaimed = new TreeSet<>(adamRows);
         unclaimed.removeAll(claimed);
-        assertEquals(new TreeSet<String>(), unclaimed,
+        assertEquals(new TreeSet<>(), unclaimed,
                 "these '" + SHEET + "' rows of " + WORKBOOK + " are no longer transcribed by any"
                         + " shipped PMDA-AD rule. A sheet row that lost its rule is a coverage"
                         + " regression, not a formatting one.");

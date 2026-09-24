@@ -837,11 +837,6 @@ class NativeCorpusFullCoverageTest
             }
         }
 
-
-        private Scan()
-        {
-        }
-
     }
 
     /**
