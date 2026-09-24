@@ -132,6 +132,9 @@ pinned by `dependency.cumba-oss-corej.version` in the root pom.
 
 ### ⛔⛔ Five of this repo's gates CANNOT FAIL — they are structurally inert
 
+> ⭐ **Since 2026-09-24 PMD is no longer one of them**, so four remain. PMD now analyses the test
+> sources (see its row). The heading keeps its wording because other documents cite it by name.
+
 **Recorded 2026-09-19. A statement of fact about the ladder above, not a proposal
 to change it.** The gate command runs the same tool set every repo in the stack
 runs, and five of those tools **have no population to judge**, because this repo
@@ -141,7 +144,7 @@ holds **0 `.class` files** and `target/pmd.xml` lists **0 `<file>` elements**.
 
 | tool | configured gate | what actually happens |
 |---|---|---|
-| **PMD** | `-Dpmd.failOnViolation=true` in the gate command and in CI | runs, **analyses 0 source files**. Zero violations out of zero files. |
+| **PMD** | `-Dpmd.failOnViolation=true` in the gate command and in CI | ~~analyses 0 source files~~ ⭐ **No longer inert since 2026-09-24:** the PMD profile sets `includeTests=true` (databrowser-meta `PLAN-pmd-test-sources`), so PMD analyses `src/test/java` with the 118-rule set and can red this repo. |
 | **SpotBugs** | `-Dspotbugs.failOnError=true` | **0 classes** to analyse. |
 | **JaCoCo** | `<jacoco.line.coverage>0.80</jacoco.line.coverage>` | ⚠⚠ **The 0.80 line gate cannot fail, and it says the opposite.** The report goal logs *"Analyzed bundle 'Cumba OSS CDISC Rules' with 0 classes"* and `jacoco:check` then passes — a positive verdict over an empty measurement. The agent still attaches and a `jacoco.exec` is still written, so the build looks instrumented. |
 | **Pitest** | `<pitest.mutation.target>55</pitest.mutation.target>`, `<pitest.coverage.target>80</pitest.coverage.target>` | ⚠⚠ Not invoked by `install`/`verify` at all — it is a separate opt-in CI job (`mvn -B -P Pitest verify`) — and when it is, there is nothing to mutate. `<failWhenNoMutations>false</failWhenNoMutations>` turns that into a pass. **Those 55/80 thresholds have never been evaluated, not once.** |
