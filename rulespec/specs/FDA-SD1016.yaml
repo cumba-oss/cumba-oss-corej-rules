@@ -9,6 +9,13 @@ description: |
   (coreJ registers no lookup — RuleRunner.buildJoinedDatasets — and `empty`
   fires on an absent column, ExprCompiler.FIRES_ON_ABSENT_COLUMN), so BOTH IE
   rows fire. FDA-SD0071 shares this shape and rides on it.
+
+  ⭐ SUPERSEDED 2026-09-25 (PLAN-join-key-authoring-gate, owner ruling Q2 amended — the
+  pairing gate): every key column now carries a Requirements.Variables.All_Or_None group
+  [KEY, TI.KEY], and the first key IETESTCD is also required in All (Q9). With TI absent,
+  [IETESTCD, TI.IETESTCD] is only partly present and the rule SKIPS instead of reporting every
+  IE row against a trial-inclusion table that does not exist — a non-executable rule is a skip,
+  not a finding. The dataset setup is kept unchanged, so this spec now pins the skip.
 python_source: rules-sdtmig-3-4.json (FDA-SD1016)
 rule:
   coreId: FDA-SD1016
@@ -24,21 +31,8 @@ config:
 library_mocks:
   classes:
     findings: [IE]
-expected_violations:
-  - rule_id: FDA-SD1016
-    dataset: IE
-    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '001'}
-    status: SUCCESS
-    output_variables:
-      IECAT: INCLUSION
-      IETEST: Age >= 18
-      IETESTCD: INCL01
-  - rule_id: FDA-SD1016
-    dataset: IE
-    row_key: {IESEQ: 1, STUDYID: S1, USUBJID: '002'}
-    status: SUCCESS
-    output_variables:
-      IECAT: EXCLUSION
-      IETEST: Pregnant
-      IETESTCD: EXCL05
+# PLAN-join-key-authoring-gate: the join key's All_Or_None pairing group is only partly present,
+# so the rule SKIPS (the description's last paragraph).
+expected_status: SKIPPED
+expected_violations: []
 expected_errors: []

@@ -15,12 +15,16 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
+import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
 import net.cumba.corej.core.exec.RuleRunnerCalls;
+import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.gen.WildcardExpander;
+import net.cumba.corej.core.model.MatchDataset;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
+import net.cumba.corej.core.model.VariableRequirement;
 import net.cumba.datatable.testkit.SyntheticDataTable;
 import org.junit.jupiter.api.Test;
 
@@ -185,11 +189,19 @@ class NativeCorpusFullCoverageTest
 
     /**
      * ⛔ The known rules this harness structurally cannot dispatch: id → the population it belongs
-     * to plus a substring its failure must still carry. {@code CDISC-AD0720} (ADaM 1.1/1.2/1.3)
-     * reads a wildcard operand across a foreign dataset, and the harness's {@code DatasetResolver}
-     * is {@code _ -> null}: the runner therefore throws rather than returning a verdict. Listed —
-     * with the reason — instead of being swallowed by a bare {@code catch}, so a rule that starts
-     * throwing for any OTHER reason, or any other rule that starts throwing, fails this gate.
+     * to plus a substring its failure must still carry. Listed — with the reason — instead of being
+     * swallowed by a bare {@code catch}, so a rule that starts throwing for any OTHER reason, or
+     * any other rule that starts throwing, fails this gate.
+     *
+     * <p>
+     * ✅ <b>Empty since 2026-09-25.</b> Its one entry was {@code CDISC-AD0720} (ADaM 1.1/1.2/1.3),
+     * which reads a wildcard operand across a foreign dataset and threw <i>"requires a JoinLookup
+     * for foreign dataset"</i> while the harness's resolver was {@code _ -> null}.
+     * {@code PLAN-join-key-authoring-gate} gave the harness a {@link SyntheticInventory} serving
+     * each joined dataset (the rule's pairing groups are undecidable without one), so the rule now
+     * dispatches and the entry was REMOVED — the shrink this map is allowed. The machinery stays,
+     * so a new structural thrower is named here rather than swallowed.
+     * </p>
      *
      * <p>
      * ⚑ May only SHRINK: an entry is removed when its rule dispatches, never widened to quiet a new
@@ -226,8 +238,7 @@ class NativeCorpusFullCoverageTest
      * written fifteen minutes later in the same wave, and this note was never updated.
      * </p>
      */
-    private static final Map<String, Undispatchable> KNOWN_UNDISPATCHABLE = Map.of("CDISC-AD0720",
-            new Undispatchable(false, "requires a JoinLookup for foreign dataset"));
+    private static final Map<String, Undispatchable> KNOWN_UNDISPATCHABLE = Map.of();
 
     /**
      * One {@link #KNOWN_UNDISPATCHABLE} entry.
@@ -882,13 +893,23 @@ class NativeCorpusFullCoverageTest
             net.cumba.corej.core.exec.@org.jspecify.annotations.Nullable MetadataProvider aProvider)
     {
         Set<String> numeric = new LinkedHashSet<>();
+        Set<String> columns = new LinkedHashSet<>(aColumns);
+        requiredBareColumns(aRule, columns, numeric);
+        Map<String, Set<String>> foreign = foreignColumns(aRule);
+        int columnCount = columns.size();
+        for (Set<String> cols : foreign.values())
+        {
+            columnCount += cols.size();
+        }
         // Bounded by the column count: each retry declares one more column numeric, so the loop
         // cannot outlive the columns it has to convert.
-        for (int attempt = 0; attempt <= aColumns.size(); attempt++)
+        for (int attempt = 0; attempt <= columnCount; attempt++)
         {
-            SyntheticDataTable table = SyntheticDataTable.withNumeric("DM", List.copyOf(aColumns),
+            SyntheticDataTable table = SyntheticDataTable.withNumeric("DM", List.copyOf(columns),
                     numeric, 5);
-            RuleExecutionResult res = RuleRunnerCalls.execute(aRule, table, _ -> null, "DM",
+            DatasetResolver resolver = foreign.isEmpty() ? _ -> null
+                    : new SyntheticInventory(foreign, numeric);
+            RuleExecutionResult res = RuleRunnerCalls.execute(aRule, table, resolver, "DM",
                     aProvider, null, aProvider);
             String msg = res.getStatusMessage();
             if (!res.isError())
@@ -907,5 +928,176 @@ class NativeCorpusFullCoverageTest
             }
         }
         return new Attempt(Channel.TYPE_UNREADABLE, "retries exhausted");
+    }
+
+
+    /**
+     * Adds to {@code aColumns} the literal, unqualified names the rule's
+     * {@code Requirements.Variables} demand be present — every {@code All} entry and the bare
+     * member of every {@code All_Or_None} group — and marks a {@code :N}-typed one numeric.
+     *
+     * <p>
+     * ⭐ Added with {@code PLAN-join-key-authoring-gate} (2026-09-25). That sweep declared every
+     * keyed join's first key bare in {@code All} (its Q9) and paired every key column with its
+     * joined twin in an {@code All_Or_None} group; a key such as {@code USUBJID} is almost never
+     * read by the {@code Check} itself, so a table built from the {@code Check}'s columns alone
+     * made ~240 rules slide from "evaluated" to "skipped" on this harness — the coverage loss
+     * {@link #RECORD_DATA_RECORDED_FLOOR} exists to catch. A dispatch harness gives the rule what
+     * it declares it needs; whether the declaration is right is the {@code .cdt} corpus's question.
+     * </p>
+     *
+     * <p>
+     * Pattern entries (globs, {@code /regex/}, marker templates), {@code --} placeholders and
+     * {@code Any} / {@code None} are left alone: the first two name no single column, and the last
+     * two are satisfied — or unmet — by design of the rule, not by the harness.
+     * </p>
+     */
+    private static void requiredBareColumns(Rule aRule, Set<String> aColumns, Set<String> aNumeric)
+    {
+        VariableRequirement vars = aRule.getRequirements() == null ? null
+                : aRule.getRequirements().getVariables();
+        if (vars == null)
+        {
+            return;
+        }
+        List<String> entries = new ArrayList<>();
+        if (vars.getAll() != null)
+        {
+            entries.addAll(vars.getAll());
+        }
+        if (vars.getAllOrNoneGroups() != null)
+        {
+            vars.getAllOrNoneGroups().forEach(entries::addAll);
+        }
+        for (String raw : entries)
+        {
+            String entry = raw.trim();
+            boolean numericTag = entry.endsWith(":N") || entry.endsWith(":Num");
+            String name = TYPE_TAG.matcher(entry).replaceFirst("");
+            if (name.contains(".") || name.startsWith("--") || ScopeMatcher.isPatternEntry(name))
+            {
+                continue;
+            }
+            aColumns.add(name);
+            if (numericTag)
+            {
+                aNumeric.add(name);
+            }
+        }
+    }
+
+    /** A {@code :N} / {@code :C} (or {@code :Num} / {@code :Char}) type tag on a requirement. */
+    private static final java.util.regex.Pattern TYPE_TAG = java.util.regex.Pattern
+            .compile(":(N|C|Num|Char)$");
+
+    /**
+     * The foreign datasets a keyed rule joins, each with the columns the rule needs of it: the
+     * joined side of every key, and every qualified {@code All} / {@code All_Or_None} entry naming
+     * it. {@code Child} entries (their parent is resolved per row) and expansion templates
+     * ({@code &}-names) are skipped.
+     *
+     * <p>
+     * ⭐ Added with {@code PLAN-join-key-authoring-gate}, see {@link #requiredBareColumns}: a
+     * qualified requirement entry is <em>undecidable</em> with the bare {@code _ -> null} resolver
+     * (no foreign metadata source), and an undecidable entry SKIPS the rule by design — so without
+     * these datasets every keyed rule's pairing group skipped it here.
+     * </p>
+     */
+    private static Map<String, Set<String>> foreignColumns(Rule aRule)
+    {
+        Map<String, Set<String>> out = new java.util.LinkedHashMap<>();
+        if (aRule.getMatchDatasets() != null)
+        {
+            for (MatchDataset md : aRule.getMatchDatasets())
+            {
+                String name = md.getName();
+                List<String> right = md.getRightKeys();
+                if (name == null || right == null || right.isEmpty() || name.startsWith("&")
+                        || name.contains("--") || Boolean.TRUE.equals(md.getChild()))
+                {
+                    continue;
+                }
+                Set<String> cols = out.computeIfAbsent(name, _ -> new LinkedHashSet<>());
+                right.stream().filter(k -> !k.startsWith("&")).forEach(cols::add);
+            }
+        }
+        VariableRequirement vars = aRule.getRequirements() == null ? null
+                : aRule.getRequirements().getVariables();
+        if (vars != null)
+        {
+            List<String> entries = new ArrayList<>();
+            if (vars.getAll() != null)
+            {
+                entries.addAll(vars.getAll());
+            }
+            if (vars.getAllOrNoneGroups() != null)
+            {
+                vars.getAllOrNoneGroups().forEach(entries::addAll);
+            }
+            for (String raw : entries)
+            {
+                String entry = TYPE_TAG.matcher(raw.trim()).replaceFirst("");
+                int dot = entry.indexOf('.');
+                if (dot <= 0 || entry.startsWith("/"))
+                {
+                    continue;
+                }
+                String dataset = entry.substring(0, dot);
+                String column = entry.substring(dot + 1);
+                if (out.containsKey(dataset) && !ScopeMatcher.isPatternEntry(column))
+                {
+                    out.get(dataset).add(column);
+                }
+            }
+        }
+        return out;
+    }
+
+    /**
+     * A resolver WITH an inventory — the shape {@code ScopeVariableSource.of} needs to decide a
+     * qualified requirement entry — serving one synthetic table per joined dataset. Columns named
+     * in {@code numeric} (bare, or qualified with the dataset's name) are numeric, so a key the
+     * primary had to declare numeric is numeric on the joined side too.
+     */
+    private static final class SyntheticInventory implements DatasetResolver.WithInventory
+    {
+
+        private final Map<String, Set<String>> columns;
+
+        private final Set<String> numeric;
+
+        SyntheticInventory(Map<String, Set<String>> aColumns, Set<String> aNumeric)
+        {
+            columns = aColumns;
+            numeric = aNumeric;
+        }
+
+
+        @Override
+        public Set<String> availableDatasets()
+        {
+            return columns.keySet();
+        }
+
+
+        @Override
+        public net.cumba.datatable.@org.jspecify.annotations.Nullable IDataTable resolve(
+                String aName)
+        {
+            Set<String> cols = columns.get(aName);
+            if (cols == null)
+            {
+                return null;
+            }
+            Set<String> num = new LinkedHashSet<>();
+            for (String c : cols)
+            {
+                if (numeric.contains(c) || numeric.contains(aName + "." + c))
+                {
+                    num.add(c);
+                }
+            }
+            return SyntheticDataTable.withNumeric(aName, List.copyOf(cols), num, 5);
+        }
     }
 }

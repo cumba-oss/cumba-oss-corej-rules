@@ -12,6 +12,15 @@ description: |
   TE.ETCD renders "" -> canonical null, and the non-UNPLAN row fires even
   though TE carries a matching ETCD — identical verdict AND rendering in both
   lanes.
+
+  ⭐ SUPERSEDED 2026-09-25 (PLAN-join-key-authoring-gate, owner ruling Q2 amended — the
+  pairing gate): every key column now carries a Requirements.Variables.All_Or_None group
+  [KEY, TE.KEY]. Here ELEMENT is absent from SE and present in TE, so the group
+  [ELEMENT, TE.ELEMENT] is only partly present and the rule SKIPS. The row the text above
+  pins as firing was a FLOOD — TE carries the matching ETCD, and the finding came only from
+  the one-sided key — and that flood is exactly what the gate exists to remove (§6 Q2 table:
+  "SE/TA without ELEMENT (Perm; TE Req) — the ETCD check goes with it"). The dataset setup is
+  kept unchanged, so this spec now pins the skip.
 python_source: rules-sdtmig-3-4.json (FDA-SD1012)
 rule:
   coreId: FDA-SD1012
@@ -31,12 +40,8 @@ config:
 library_mocks:
   classes:
     events: [SE]
-expected_violations:
-  - rule_id: FDA-SD1012
-    dataset: SE
-    row_key: {SESEQ: 1, STUDYID: S1, USUBJID: '001'}
-    status: SUCCESS
-    output_variables:
-      ETCD: SCRN
-      TE.ETCD:
+# PLAN-join-key-authoring-gate: the join key's All_Or_None pairing group is only partly present,
+# so the rule SKIPS (the description's last paragraph).
+expected_status: SKIPPED
+expected_violations: []
 expected_errors: []
