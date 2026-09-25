@@ -63,11 +63,11 @@ import org.junit.jupiter.params.provider.CsvSource;
  * </p>
  *
  * <p>
- * ⚑ {@code matchesDomain} itself is <b>kept</b>, against L3's proposal to delete it: it is a
- * one-line delegate to {@code describeDomainMismatch(rule, name) == null} — not a mirror
- * implementation that could drift — it is a documented public API for callers that genuinely have
- * only a name, two parity tests in {@code corej-core} pin it equal to the describer, and roughly a
- * hundred assertions across five {@code ScopeMatcher*Test} classes read through it.
+ * ⚑ {@code matchesDomain} was at first kept, against L3's proposal to delete it, as a one-line
+ * delegate for callers that have only a name. It was retired from {@code src/main} on 2026-09-25
+ * ({@code PLAN-retire-dead-multi-match-lookup} U1): no production path called it. The engine tests
+ * that read through it now use the test-side forwarder {@code ScopeMatcherCalls}; this class calls
+ * the production {@code describeDomainMismatch} directly.
  * </p>
  */
 class ScopeMatcherShippedRuleScopeTest
