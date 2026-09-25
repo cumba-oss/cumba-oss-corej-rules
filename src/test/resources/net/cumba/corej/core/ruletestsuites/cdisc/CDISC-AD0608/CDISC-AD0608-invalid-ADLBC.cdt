@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0608 expect=violation domain=ADLBC
+#note "PLAN-join-key-authoring-gate phase 4: no APHASEN column; PHSDTM 22000 matches neither ADSL.PH1SDTM nor ADSL.PH2SDTM -> fires."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PHSDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 22000
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDTM type=Num
+col PH2SDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21950
+---

@@ -186,7 +186,13 @@ class ScenarioFixtureCoverageRatchetTest
     // ARM/ACTARM reserved-value family gained their first scenario — CG0119, CG0121, CG0122,
     // CG0145, CG0146 and CG0376, all of which the upper() alignment changed while nothing
     // executed them. Measured by setting the ratchet to 0 and reading the count back, not derived.
-    private static final int MAX_UNCOVERED = 534;
+    // ⭐ 534 -> 507 on 2026-09-25 (PLAN-join-key-authoring-gate phase 4): 27 ADaM rules whose
+    // requirements the sweep changed gained their first scenarios (valid / invalid / skipped each)
+    // — the §3b.2 twelve (CDISC-AD0604..AD0615, the PH* family), CDISC-AD0592..AD0603 (the
+    // period and sub-period comparisons) and CDISC-AD0498 / AD0706 / AD0707 (the constructed-name
+    // existence checks). Measured by setting the ratchet to 0 and reading 507 back; it equals the
+    // arithmetic this time, which is not why it was written.
+    private static final int MAX_UNCOVERED = 507;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus

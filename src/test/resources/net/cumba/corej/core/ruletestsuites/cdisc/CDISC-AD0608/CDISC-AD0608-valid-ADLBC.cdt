@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0608 expect=noViolation domain=ADLBC
+#note "PLAN-join-key-authoring-gate phase 4: no APHASEN column; PHSDTM 21950 equals ADSL.PH2SDTM, one of the ADSL.PH*SDTM family, so the value is matched."
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PHSDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21950
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDTM type=Num
+col PH2SDTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21950
+---

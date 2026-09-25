@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1016 expect=skipped domain=IE
+#note "PLAN-join-key-authoring-gate phase 3/4, sensitivity arm row 3 — EVERY key absent on both sides. Neither IE nor TI carries IETESTCD, IETEST or IECAT: every All_Or_None group is all-absent (satisfied), but the first key IETESTCD is also required in Requirements.Variables.All (§6 Q9), so the rule SKIPS. Before the gate the rule ran and JKM R7's all-absent key was an execution ERROR. Red-first: with IETESTCD removed from All this scenario fails with the rule errored."
+#library standard=sdtmig version=3-4
+dataset IE label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IEORRES  type=Char label="I/E Criterion Original Result"
+---
+CDISCPILOT01 | IE | 01-701-1015 | 1 | N
+---
+
+dataset TI label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TIRL     type=Char label="Inclusion/Exclusion Criterion Rule"
+---
+CDISCPILOT01 | TI | AGE >= 18

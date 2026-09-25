@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0592 expect=violation domain=ADLBC
+#note "PLAN-join-key-authoring-gate phase 4: APERIOD=2 names ADSL.AP02SDT; APERSDT 21915 differs from it -> fires."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APERIOD type=Num
+col APERSDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2 | 21915
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col AP01SDT type=Num
+col AP02SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21950
+---
