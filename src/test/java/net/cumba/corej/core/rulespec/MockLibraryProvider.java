@@ -16,8 +16,8 @@ import net.cumba.corej.core.metadata.AdamDataStructureDetector;
  * SKIPPED result for any rule needing Library data.
  *
  * <p>
- * Standard / version are sourced from the {@link SpecSchema.SpecConfig} so mocks don't have to
- * repeat them.
+ * The standard is sourced from the {@link SpecSchema.SpecConfig} so mocks don't have to repeat
+ * them.
  */
 public final class MockLibraryProvider implements MetadataProvider
 {
@@ -26,24 +26,20 @@ public final class MockLibraryProvider implements MetadataProvider
 
     private final String standard;
 
-    private final String version;
-
     public static MetadataProvider of(SpecSchema.SpecMocks mocks, SpecSchema.SpecConfig config)
     {
         if (mocks == null)
         {
             return null;
         }
-        return new MockLibraryProvider(mocks, config != null ? config.standard() : null,
-                config != null ? config.standardVersion() : null);
+        return new MockLibraryProvider(mocks, config != null ? config.standard() : null);
     }
 
 
-    private MockLibraryProvider(SpecSchema.SpecMocks mocks, String standard, String version)
+    private MockLibraryProvider(SpecSchema.SpecMocks mocks, String standard)
     {
         this.mocks = mocks;
         this.standard = standard;
-        this.version = version;
     }
 
 

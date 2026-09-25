@@ -78,7 +78,7 @@ class StudyValidationServiceCompanionTest
             MetadataProvider base = mock(MetadataProvider.class);
 
             MetadataProvider wrapped = StudyValidationService.maybeWrapCompanion(base, params,
-                    StandardKind.ADAM, effective, _ -> null);
+                    StandardKind.ADAM, effective);
 
             CompanionDomainsProvider companion = assertInstanceOf(CompanionDomainsProvider.class,
                     wrapped);
@@ -98,7 +98,7 @@ class StudyValidationServiceCompanionTest
         MetadataProvider base = mock(MetadataProvider.class);
 
         MetadataProvider result = StudyValidationService.maybeWrapCompanion(base, params,
-                StandardKind.SDTM, params.metadataProducts(), null);
+                StandardKind.SDTM, params.metadataProducts());
 
         assertSame(base, result, "SDTM run must not be wrapped");
     }
@@ -108,7 +108,7 @@ class StudyValidationServiceCompanionTest
     void tigAdamRun_uncachedCompanion_returnsBaseUnwrapped()
     {
         // A declared standards/tig/9-9/adam product routes the companion to tig 9-9/sdtm, which
-        // no store carries. With the API loader also yielding nothing the base is returned
+        // no store carries, so the base is returned
         // unwrapped (with a warning) rather than failing — standard_domains rules then SKIP.
         withStoreConfigured(() ->
         {
@@ -117,7 +117,7 @@ class StudyValidationServiceCompanionTest
             MetadataProvider base = mock(MetadataProvider.class);
 
             MetadataProvider result = StudyValidationService.maybeWrapCompanion(base, params,
-                    StandardKind.UNKNOWN, params.metadataProducts(), _ -> null);
+                    StandardKind.UNKNOWN, params.metadataProducts());
 
             assertSame(base, result, "an unresolvable companion must degrade, not wrap or fail");
         });

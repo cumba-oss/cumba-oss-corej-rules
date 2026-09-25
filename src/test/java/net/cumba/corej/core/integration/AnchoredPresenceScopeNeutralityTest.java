@@ -583,8 +583,7 @@ class AnchoredPresenceScopeNeutralityTest
         List<String> known = new ArrayList<>(aTargets);
         known.addAll(aReferences);
         LibraryValidator.Builder builder = LibraryValidator.builder()
-                .provider(provider(aCase, known)).rules(List.of(aRule))
-                .libraryUri("file:///study/" + aCase.coreId().toLowerCase(Locale.ROOT));
+                .provider(provider(aCase, known)).rules(List.of(aRule));
         for (String dataset : aTargets)
         {
             builder = builder.targetDataset(dataset, dataset.toLowerCase(Locale.ROOT) + ".xpt",

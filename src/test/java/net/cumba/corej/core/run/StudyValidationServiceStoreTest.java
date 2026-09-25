@@ -69,19 +69,16 @@ class StudyValidationServiceStoreTest
             StudyValidationParams params = StudyValidationParams.builder()
                     .manager(mock(IDataTableManager.class))
                     .metadataProducts(List.of("standards/adam/adamig-1-3")).build();
-            var adam = StudyValidationService.tryStoreProvider(params,
-                    StudyValidationService.StandardKind.ADAM, params.metadataProducts(),
-                    RunStandard.of("standards/adam/adamig-1-3"));
+            var adam = tryStore(params, StudyValidationService.StandardKind.ADAM,
+                    params.metadataProducts(), RunStandard.of("standards/adam/adamig-1-3"));
             assertNotNull(adam, "an ADaM run with a configured store loads offline");
             assertEquals(List.of("standards/adam/adamig-1-3"),
                     adam.declaredStructureKeyedProducts());
             StudyValidationParams unknown = StudyValidationParams.builder()
                     .manager(mock(IDataTableManager.class))
                     .metadataProducts(List.of("standards/mystery/1-0")).build();
-            assertEquals(null,
-                    StudyValidationService.tryStoreProvider(unknown,
-                            StudyValidationService.StandardKind.UNKNOWN, unknown.metadataProducts(),
-                            RunStandard.of("standards/mystery/1-0")));
+            assertEquals(null, tryStore(unknown, StudyValidationService.StandardKind.UNKNOWN,
+                    unknown.metadataProducts(), RunStandard.of("standards/mystery/1-0")));
         });
     }
 
@@ -100,10 +97,8 @@ class StudyValidationServiceStoreTest
             StudyValidationParams params = StudyValidationParams.builder()
                     .manager(mock(IDataTableManager.class))
                     .metadataProducts(List.of("standards/sdtmig/3-4")).build();
-            assertEquals(null,
-                    StudyValidationService.tryStoreProvider(params,
-                            StudyValidationService.StandardKind.SDTM, params.metadataProducts(),
-                            RunStandard.of("standards/sdtmig/3-4")));
+            assertEquals(null, tryStore(params, StudyValidationService.StandardKind.SDTM,
+                    params.metadataProducts(), RunStandard.of("standards/sdtmig/3-4")));
         }
         finally
         {
@@ -124,10 +119,8 @@ class StudyValidationServiceStoreTest
                     .manager(mock(IDataTableManager.class))
                     .metadataProducts(List.of("standards/sdtmig/9-9")).build();
             // Store resolves but no sdtmig/9-9 product ⇒ WARNING + degrade (null), no throw.
-            assertEquals(null,
-                    StudyValidationService.tryStoreProvider(params,
-                            StudyValidationService.StandardKind.SDTM, params.metadataProducts(),
-                            RunStandard.of("standards/sdtmig/9-9")));
+            assertEquals(null, tryStore(params, StudyValidationService.StandardKind.SDTM,
+                    params.metadataProducts(), RunStandard.of("standards/sdtmig/9-9")));
         });
     }
 
@@ -140,9 +133,8 @@ class StudyValidationServiceStoreTest
             StudyValidationParams params = StudyValidationParams.builder()
                     .manager(mock(IDataTableManager.class))
                     .metadataProducts(List.of("standards/sdtmig/3-4")).build();
-            var provider = StudyValidationService.tryStoreProvider(params,
-                    StudyValidationService.StandardKind.SDTM, params.metadataProducts(),
-                    RunStandard.of("standards/sdtmig/3-4"));
+            var provider = tryStore(params, StudyValidationService.StandardKind.SDTM,
+                    params.metadataProducts(), RunStandard.of("standards/sdtmig/3-4"));
             org.junit.jupiter.api.Assumptions.assumeTrue(provider != null,
                     "sdtmig/3-4 not in the seeded store");
             // getStandardModelVariables (the method behind GET_MODEL_COLUMN_ORDER) resolves a
@@ -156,4 +148,15 @@ class StudyValidationServiceStoreTest
                     Set.of("RDOMAIN", "USUBJID", "QNAM", "QVAL")));
         });
     }
+
+
+    /** The retired 4-argument form: the CT selection defaulted to the user's field alone (U13). */
+    private static net.cumba.corej.core.exec.@Nullable MetadataProvider tryStore(
+            StudyValidationParams aParams, StudyValidationService.StandardKind aKind,
+            List<String> aProducts, RunStandard aRunStandard)
+    {
+        return StudyValidationService.tryStoreProvider(aParams, aKind, aProducts, aRunStandard,
+                CtSelection.resolve(aParams.controlledTerminologyPackages(), List.of()));
+    }
+
 }
