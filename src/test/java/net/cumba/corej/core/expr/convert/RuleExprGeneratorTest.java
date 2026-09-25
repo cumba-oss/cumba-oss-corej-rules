@@ -49,7 +49,8 @@ class RuleExprGeneratorTest
         List<RulePackageManifest.Entry> entries = new ArrayList<>();
         for (String file : files)
         {
-            entries.add(new RulePackageManifest.Entry(file, "CDISC", "SDTMIG", "3.4", 1));
+            entries.add(
+                    new RulePackageManifest.Entry(file, "CDISC", "SDTMIG", "3.4", 1, List.of()));
         }
         return new RulePackageManifest("rules-src", entries);
     }

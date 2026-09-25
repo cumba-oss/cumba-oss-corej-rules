@@ -81,7 +81,7 @@ class RuleCorpusGeneratorTest
             ObjectNode canonical = assembler.assemblePackage(t.family(), t.standard(), t.version());
             nativeShaped.put(file, RuleStorageAssembler.serialize(canonical));
             entries.add(new RulePackageManifest.Entry(file, t.family(), t.standard(), t.version(),
-                    canonical.get("rules").size()));
+                    canonical.get("rules").size(), List.of()));
         }
         RulePackageManifest manifest = new RulePackageManifest("rules-src", entries);
         RuleExprGenerator.generate(nativeShaped, manifest, nativeDir);

@@ -133,7 +133,7 @@ class ExpressionFormAssemblyTest
             ObjectNode canonical = assembler.assemblePackage(t.family(), t.standard(), t.version());
             nativeShaped.put(file, RuleStorageAssembler.serialize(canonical));
             entries.add(new RulePackageManifest.Entry(file, t.family(), t.standard(), t.version(),
-                    canonical.get("rules").size()));
+                    canonical.get("rules").size(), List.of()));
         }
         assertEquals(1, entries.size(), "both rules name one (family, standard, version)");
         RulePackageManifest manifest = new RulePackageManifest("rules-src", entries);

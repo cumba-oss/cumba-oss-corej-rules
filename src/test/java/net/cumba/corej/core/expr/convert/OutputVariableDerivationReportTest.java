@@ -20,16 +20,17 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.OutputVariableDeriver;
 import net.cumba.corej.core.model.Outcome;
+import net.cumba.corej.core.model.OutputVariableToken;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import org.junit.jupiter.api.Test;
 
 /**
- * Phase 1 of {@code plans/done/PLAN-auto-output-variables.md}: runs
- * {@link OutputVariableDeriver#derivedOnly} over every rule of the shipped packages in
- * {@code rules/} and writes the authored-vs-derived delta to
- * {@code target/output-variable-derivation-report.md} — the in-repo replacement for the Phase-0b
- * scratch probe ({@code /home/claude/ov-derivation-phase0/OvProbe.java}).
+ * Phase 1 of {@code plans/done/PLAN-auto-output-variables.md}: runs the derived-only delta
+ * ({@link #derivedOnly}) over every rule of the shipped packages in {@code rules/} and writes the
+ * authored-vs-derived delta to {@code target/output-variable-derivation-report.md} — the in-repo
+ * replacement for the Phase-0b scratch probe
+ * ({@code /home/claude/ov-derivation-phase0/OvProbe.java}).
  *
  * <p>
  * <b>Report-only.</b> The corpus legitimately omits derivable entries (that is what the derivation
@@ -110,7 +111,7 @@ class OutputVariableDerivationReportTest
                 && rule.getOutcome().getOutputVariables() != null
                         ? List.copyOf(rule.getOutcome().getOutputVariables())
                         : List.of();
-        List<String> delta = OutputVariableDeriver.derivedOnly(rule);
+        List<String> delta = derivedOnly(rule);
         // The pure-derived list (what the deriver yields with no authored list at all) feeds
         // the inverse lint; computed by temporarily detaching the authored list.
         Outcome outcome = rule.getOutcome();
@@ -297,4 +298,30 @@ class OutputVariableDerivationReportTest
                 .append(total == 0 ? "-" : String.format(Locale.ROOT, "%.1f%%", 100.0 * n / total))
                 .append(" |\n");
     }
+
+
+    /**
+     * The derived-only contribution, {@code DERIVED \ AUTHORED}, both sides post-exclusion: the
+     * deriver has already subtracted the {@code !X} names and the authored side carries only the
+     * include entries ({@link OutputVariableToken#includes}), so an excluded name is on neither
+     * side. ⚑ This was {@code OutputVariableDeriver.derivedOnly} until 2026-09-25; the engine
+     * method had no production caller and was retired (PLAN-retire-dead-multi-match-lookup U2 /
+     * A37), and this report is its one consumer.
+     */
+    private static List<String> derivedOnly(Rule rule)
+    {
+        Outcome outcome = rule.getOutcome();
+        List<String> authored = OutputVariableToken
+                .includes(outcome == null ? null : outcome.getOutputVariables());
+        List<String> delta = new ArrayList<>();
+        for (String name : OutputVariableDeriver.derive(rule))
+        {
+            if (!authored.contains(name))
+            {
+                delta.add(name);
+            }
+        }
+        return List.copyOf(delta);
+    }
+
 }
