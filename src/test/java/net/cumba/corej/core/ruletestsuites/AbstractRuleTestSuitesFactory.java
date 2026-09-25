@@ -375,7 +375,7 @@ abstract class AbstractRuleTestSuitesFactory
         if (s.getDefineXml() != null)
         {
             OdmDefineXMLProvider parsed = parseDefineXml(aFile, s.getDefineXml());
-            defineProvider = new DefineXmlMetadataProvider(parsed);
+            defineProvider = new DefineXmlMetadataProvider(parsed, null);
             vlm = VlmResolver.from(parsed.metaDataVersion());
         }
 
