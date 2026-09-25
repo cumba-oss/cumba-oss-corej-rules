@@ -5,7 +5,7 @@
      numeric-expected -> all-missing, otherwise a STRING vector, which is why len(ABSENT) == 0
      holds alongside len(BLANK) == 0 (see BuiltinFunctions' len comment).
      FIRES_ON_ABSENT_COLUMN = {empty, is_missing}. Requirements skip semantics:
-     VariableRequirement / ScopeMatcher.matchesVariables. -->
+     VariableRequirement / ScopeMatcher.describeVariablesMismatch. -->
 
 A rule is offered datasets it was written for, but a dataset may still not carry every column the
 check names. This page is about what the engine does then — and about what you have to write,

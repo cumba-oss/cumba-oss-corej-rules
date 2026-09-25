@@ -4,8 +4,9 @@
      Scope.Variables rejected by loader gate R1; unknown keys -> gate R2),
      DomainScope (Include/Exclude/include_split_datasets), ClassScope, DataStructureScope,
      SubclassScope, DatasetScope (no split re-test, no include_split_datasets),
-     ScopeMatcher.matchesDomain:67 / matchesDataset:357 / matchesClass:386 (FINDINGS ABOUT
-     widening 438-447) / matchesUseCase:504 (comma-split, case-insensitive, absent-matches-all).
+     ScopeMatcher.describeDomainMismatch / describeDatasetMismatch / describeClassMismatch
+     (FINDINGS ABOUT widening via containsFindings) / matchesUseCase (comma-split,
+     case-insensitive, absent-matches-all).
      Vocabularies and the Include+Exclude measurement taken from rules-src/checks 2026-09-21. -->
 
 `Scope` decides **which datasets the rule is offered**.
