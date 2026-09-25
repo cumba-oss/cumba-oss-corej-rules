@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-CG0602 expect=violation domain=FA
+#note "PLAN-join-key-authoring-gate review round 1 (F7): FA record linked through RELREC to a CM record with CMTRT TYLENOL and an empty CMDECOD; FAOBJ ASPIRIN does not equal CMTRT -> fires."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 FASEQ=1 USUBJID=01-701-1015
+dataset FA label="Findings About"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Num label="Sequence Number"
+col FAOBJ type=Char label="Object of the Observation"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | ASPIRIN
+---
+
+dataset CM label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ type=Num label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDECOD type=Char label="Standardized Medication Name"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | TYLENOL | 
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | CM | 01-701-1015 | CMSEQ | 1 | R1
+CDISCPILOT01 | FA | 01-701-1015 | FASEQ | 1 | R1
+---

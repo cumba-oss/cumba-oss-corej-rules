@@ -192,7 +192,10 @@ class ScenarioFixtureCoverageRatchetTest
     // period and sub-period comparisons) and CDISC-AD0498 / AD0706 / AD0707 (the constructed-name
     // existence checks). Measured by setting the ratchet to 0 and reading 507 back; it equals the
     // arithmetic this time, which is not why it was written.
-    private static final int MAX_UNCOVERED = 507;
+    // ⭐ 507 -> 502 the same day (review round 1, F7): CDISC-CG0601 / CG0602 / CG0603 and
+    // CDISC-SEND-0198 / -0339, whose §3b declaration changed when they run, gained valid, invalid
+    // and skipped scenarios. Re-measured by zeroing (502 read back).
+    private static final int MAX_UNCOVERED = 502;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus
