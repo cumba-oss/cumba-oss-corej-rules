@@ -19,6 +19,7 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -335,7 +336,7 @@ class ExcludedOutputVariableShippedRuleTest
     private static RuleExecutionResult run(Rule aRule, RuleTestScenario aScenario,
             OverlayDataTable aPrimary)
     {
-        return RuleRunner.execute(aRule, aPrimary, aScenario.resolver(), aScenario.getDomain(),
+        return RuleRunnerCalls.execute(aRule, aPrimary, aScenario.resolver(), aScenario.getDomain(),
                 ScenarioLibrarySupport.resolveOrSkip(aScenario), null, aScenario.getDefine(),
                 Integer.MAX_VALUE, null, null, null);
     }

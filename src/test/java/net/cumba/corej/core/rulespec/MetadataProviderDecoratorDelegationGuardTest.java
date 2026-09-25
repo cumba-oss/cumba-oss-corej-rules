@@ -307,8 +307,10 @@ class MetadataProviderDecoratorDelegationGuardTest
      * guard that does not grow with the interface passes while the newest method is undelegated —
      * the guard failing at the one job it exists for. Phase 3 of
      * {@code PLAN-metadata-product-selection} made each entry a signature <em>pattern</em> for the
-     * same reason: the structure-keyed accessors now have a one-arg convenience and a two-arg
-     * primary, and a name-only guard cannot tell them apart.
+     * same reason: the structure-keyed accessors then had a one-arg convenience beside the two-arg
+     * primary, and a name-only guard could not tell them apart. (The one-arg conveniences were
+     * retired 2026-09-25 — {@code PLAN-retire-dead-multi-match-lookup} U1 / A27 — but the pattern
+     * discipline stays: an overload can come back.)
      * </p>
      *
      * <p>
@@ -329,16 +331,13 @@ class MetadataProviderDecoratorDelegationGuardTest
             // the two places this area gets debugged from.
             capability("declaredStructureKeyedProducts()",
                     "(?<![\\w.])List<String>\\s+%s\\s*\\(\\s*\\)"),
-            // ⚠⚠ Phase 3 of PLAN-metadata-product-selection: the TWO-ARG overloads are the PRIMARY
-            // methods — the one-arg forms are interface conveniences that delegate to them. A
-            // decorator that forwards only the one-arg form compiles, and silently strips the
-            // dataset's subclass from every structure-keyed lookup: the governing structure is
-            // never selected and the answer reverts to the base. These
-            // lose an ANSWER, not a log line, so they are the strictest entries here.
-            //
-            // ⚠ Only the two-arg forms are required. The one-arg overloads are interface
-            // conveniences that delegate to these; a decorator must NOT override them separately
-            // (see MetadataProvider), so demanding them here would mandate the redundant half.
+            // ⚠⚠ Phase 3 of PLAN-metadata-product-selection: the TWO-ARG accessors carry the
+            // dataset's subclass tokens, and a decorator that drops them silently strips the
+            // subclass from every structure-keyed lookup: the governing structure is never
+            // selected and the answer reverts to the base. These lose an ANSWER, not a log line,
+            // so they are the strictest entries here. (Until 2026-09-25 each had a one-arg
+            // convenience beside it that delegated with List.of(); those were retired as dead —
+            // U1 / A27 — so the two-arg form is now the only one.)
             capability("getRequiredVariablesForStructure(String, List<String>)", TWO_ARG),
             capability("getExpectedVariablesForStructure(String, List<String>)", TWO_ARG),
             // ⛔⛔ Phase 11 finding F6b/F4b — the DECLARED tier (Fix #119), the OLDEST pair on the
@@ -534,12 +533,6 @@ class MetadataProviderDecoratorDelegationGuardTest
      * </p>
      */
     private static final List<InheritableDefault> INHERITABLE_DEFAULTS = List.of(//
-            inheritable("getRequiredVariablesForStructure(String)", Why.SELF_DELEGATING,
-                    "the interface body is `return getRequiredVariablesForStructure(token, "
-                            + "List.of())`, and the two-arg primary IS required"),
-            inheritable("getExpectedVariablesForStructure(String)", Why.SELF_DELEGATING,
-                    "the interface body is `return getExpectedVariablesForStructure(token, "
-                            + "List.of())`, and the two-arg primary IS required"),
             inheritable("getDatasetClass(String, String)", Why.SELF_DELEGATING,
                     "the interface body is `return getDatasetClass(aCdiscDomain)`, so it lands in "
                             + "the one-arg form's override — and the one-arg form is itself a "
@@ -568,10 +561,11 @@ class MetadataProviderDecoratorDelegationGuardTest
     /**
      * One capability method, as its human-readable signature plus the pattern that proves a
      * decorator <b>declared</b> it. Matching on the bare name is not enough once the interface
-     * carries overloads: {@code contains("getRequiredVariablesForStructure(String ")} is satisfied
-     * by the one-arg form <em>and</em> by the two-arg form, so a guard keyed on names alone would
-     * pass while the primary overload went undelegated — the guard failing at the one job it exists
-     * for, in exactly the way Fix #369's rename was written to prevent.
+     * carries overloads: while the one-arg conveniences existed,
+     * {@code contains("getRequiredVariablesForStructure(String ")} was satisfied by the one-arg
+     * form <em>and</em> by the two-arg form, so a guard keyed on names alone would have passed
+     * while the primary overload went undelegated — the guard failing at the one job it exists for,
+     * in exactly the way Fix #369's rename was written to prevent.
      */
     private record Capability(String signature, String name, Pattern declaration)
     {

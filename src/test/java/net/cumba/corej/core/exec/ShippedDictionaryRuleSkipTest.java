@@ -84,8 +84,9 @@ class ShippedDictionaryRuleSkipTest
     private static RuleExecutionResult run(Rule r, IDataTable t, String domainPrefix,
             RuntimeDictionaryProvider dicts)
     {
-        return RuleRunner.execute(r, t, name -> name.equals(t.getMetaData().getName()) ? t : null,
-                domainPrefix, null, null, null, Integer.MAX_VALUE, null, dicts);
+        return RuleRunnerCalls.execute(r, t,
+                name -> name.equals(t.getMetaData().getName()) ? t : null, domainPrefix, null, null,
+                null, Integer.MAX_VALUE, null, dicts);
     }
 
 

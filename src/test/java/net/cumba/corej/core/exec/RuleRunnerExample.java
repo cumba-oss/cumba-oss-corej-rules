@@ -47,7 +47,7 @@ public final class RuleRunnerExample
                 .iterator().next();
 
         // 3. Execute — no DatasetResolver needed for single-table rules
-        RuleExecutionResult result = Objects.requireNonNull(RuleRunner.execute(rule, aeTable),
+        RuleExecutionResult result = Objects.requireNonNull(RuleRunnerCalls.execute(rule, aeTable),
                 "single-table execute returned no result");
 
         // 4. Inspect results
@@ -97,7 +97,8 @@ public final class RuleRunnerExample
             // (DatasetRuleResolver) passes OperationExecutor.unsplitNameFromData(table) to the
             // three-argument ScopeMatcher.describeDomainMismatch and does not have this gap;
             // real callers with a table in hand should do the same.
-            if (!ScopeMatcher.matchesDomain(rule, domainName))
+            if (ScopeMatcher.describeDomainMismatch(rule, domainName,
+                    SplitDatasetUtil.unsplitName(domainName)) != null)
             {
                 continue; // skip rules not applicable to this domain
             }
@@ -106,7 +107,7 @@ public final class RuleRunnerExample
             // templates — a `--` rule executed with NO domain context now errors loudly instead
             // of silently reading nothing.
             RuleExecutionResult result = Objects.requireNonNull(
-                    RuleRunner.execute(rule, table, _ -> null, domainName),
+                    RuleRunnerCalls.execute(rule, table, _ -> null, domainName),
                     "single-table execute returned no result");
 
             if (result.hasViolations())
@@ -155,7 +156,7 @@ public final class RuleRunnerExample
             }
 
             // D77: the primary is AE — hand the domain to the specialisation stage.
-            RuleExecutionResult result = RuleRunner.execute(rule, aeTable, resolver, "AE");
+            RuleExecutionResult result = RuleRunnerCalls.execute(rule, aeTable, resolver, "AE");
 
             if (result.hasViolations())
             {

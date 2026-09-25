@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
@@ -163,7 +163,7 @@ class SplitUnionTwinScenarioTest
     private static RuleExecutionResult execute(Rule aRule, OverlayDataTable aPrimary,
             RuleTestScenario aScenario)
     {
-        return RuleRunner.execute(aRule, aPrimary, aScenario.resolver(), aScenario.getDomain(),
+        return RuleRunnerCalls.execute(aRule, aPrimary, aScenario.resolver(), aScenario.getDomain(),
                 null, null, null, Integer.MAX_VALUE, null, null, null);
     }
 

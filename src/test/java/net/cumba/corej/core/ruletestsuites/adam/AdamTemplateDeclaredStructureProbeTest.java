@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.model.ClassScope;
 import net.cumba.corej.core.model.DataStructureScope;
 import net.cumba.corej.core.model.Rule;
@@ -491,8 +491,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
 
     private RuleExecutionResult execute(Case c, MetadataProvider provider)
     {
-        return RuleRunner.execute(c.rule(), c.table(), resolverWith(c.suite().domain(), c.table()),
-                c.suite().domain(), provider, null);
+        return RuleRunnerCalls.execute(c.rule(), c.table(),
+                resolverWith(c.suite().domain(), c.table()), c.suite().domain(), provider, null);
     }
 
 

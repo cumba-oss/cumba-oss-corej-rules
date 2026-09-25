@@ -13,7 +13,7 @@ import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.ruletestsuites.CdtResourceExtension;
@@ -349,7 +349,7 @@ abstract class AbstractSdtmRuleTest
      */
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainPrefix)
     {
-        return RuleRunner.execute(rule, table, resolver, domainPrefix, null, null);
+        return RuleRunnerCalls.execute(rule, table, resolver, domainPrefix, null, null);
     }
 
 
@@ -360,7 +360,7 @@ abstract class AbstractSdtmRuleTest
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainPrefix,
             DatasetResolver customResolver)
     {
-        return RuleRunner.execute(rule, table, customResolver, domainPrefix, null, null);
+        return RuleRunnerCalls.execute(rule, table, customResolver, domainPrefix, null, null);
     }
 
 
@@ -372,7 +372,8 @@ abstract class AbstractSdtmRuleTest
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainPrefix,
             DatasetResolver customResolver, MetadataProvider libraryProvider)
     {
-        return RuleRunner.execute(rule, table, customResolver, domainPrefix, libraryProvider, null);
+        return RuleRunnerCalls.execute(rule, table, customResolver, domainPrefix, libraryProvider,
+                null);
     }
 
     // ---- Assertion helpers ----

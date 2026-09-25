@@ -15,7 +15,7 @@ import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.OperationExecutor;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleExecutionStatus;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.exec.StubMetadataProvider;
 import net.cumba.corej.core.metadata.AdamDataStructureDetector;
@@ -254,7 +254,8 @@ public final class SpecRunner
         // (`CdiscDomainResolver.cdiscDomainOf(table)`, LibraryValidator.java:1063) and then uses
         // that one value twice: as the resolver's domain name for scope matching
         // (`generator.setDomainName(cdiscDomain)`, :1080) and as the execution-time `--`
-        // substitution prefix (`String domainPrefix = cdiscDomain;`, :1125 → `RuleRunner.execute(
+        // substitution prefix (`String domainPrefix = cdiscDomain;`, :1125 →
+        // `RuleRunnerCalls.execute(
         // rule, table, resolver, domainPrefix, …)`, :1228). The resolver reads the row-0 DOMAIN
         // value first and falls back to `SplitDatasetUtil.unsplitName(memberName)`.
         //
@@ -345,8 +346,8 @@ public final class SpecRunner
         // define_dataset_names operation. Build a define-level provider from it and pass it on the
         // 9-arg execute; absent ⇒ null (every other spec is unaffected).
         MetadataProvider defineProvider = defineProviderFrom(spec.name(), spec.defineXml());
-        RuleExecutionResult result = RuleRunner.execute(rule, primaryTable, resolver, cdiscDomain,
-                library, /*joinCache=*/null, defineProvider);
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, primaryTable, resolver,
+                cdiscDomain, library, /*joinCache=*/null, defineProvider);
 
         List<CanonicalViolation> observed = ViolationNormaliser.normalise(result, primaryTable,
                 primaryDomain, rowKey);

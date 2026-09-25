@@ -13,7 +13,7 @@ import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.ruletestsuites.CdtResourceExtension;
@@ -388,14 +388,14 @@ abstract class AbstractAdamRuleTest
 
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName)
     {
-        return RuleRunner.execute(rule, table, resolver, domainName, null, null);
+        return RuleRunnerCalls.execute(rule, table, resolver, domainName, null, null);
     }
 
 
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName,
             DatasetResolver customResolver)
     {
-        return RuleRunner.execute(rule, table, customResolver, domainName, null, null);
+        return RuleRunnerCalls.execute(rule, table, customResolver, domainName, null, null);
     }
 
 
@@ -407,7 +407,8 @@ abstract class AbstractAdamRuleTest
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName,
             DatasetResolver customResolver, MetadataProvider libraryProvider)
     {
-        return RuleRunner.execute(rule, table, customResolver, domainName, libraryProvider, null);
+        return RuleRunnerCalls.execute(rule, table, customResolver, domainName, libraryProvider,
+                null);
     }
 
     // ---- Assertion helpers ----

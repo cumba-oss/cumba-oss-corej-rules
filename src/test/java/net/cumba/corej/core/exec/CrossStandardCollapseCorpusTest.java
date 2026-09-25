@@ -412,12 +412,12 @@ class CrossStandardCollapseCorpusTest
         {
             IDataTable t1 = table(tableName, cols, cycle);
             IDataTable t2 = table(tableName, cols, cycle);
-            RuleExecutionResult ctl = RuleRunner.execute(rule, t1, new ProbeResolver(tableName, t1),
-                    tableName, null, null, null, Integer.MAX_VALUE, null, null, null, reported,
-                    Set.of());
-            RuleExecutionResult now = RuleRunner.execute(rule, t2, new ProbeResolver(tableName, t2),
-                    tableName, null, null, null, Integer.MAX_VALUE, null, null, null, reported,
-                    read);
+            RuleExecutionResult ctl = RuleRunnerCalls.execute(rule, t1,
+                    new ProbeResolver(tableName, t1), tableName, null, null, null,
+                    Integer.MAX_VALUE, null, null, null, reported, Set.of());
+            RuleExecutionResult now = RuleRunnerCalls.execute(rule, t2,
+                    new ProbeResolver(tableName, t2), tableName, null, null, null,
+                    Integer.MAX_VALUE, null, null, null, reported, read);
             return new Probe(String.valueOf(ctl.getStatus()), ctl.getViolations().size(),
                     String.valueOf(now.getStatus()), now.getViolations().size(),
                     tableName + ":" + String.join("|", cycle));

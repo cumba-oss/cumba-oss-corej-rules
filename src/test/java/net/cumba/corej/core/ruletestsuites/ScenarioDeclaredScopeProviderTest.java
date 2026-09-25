@@ -19,7 +19,7 @@ import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.corej.core.metadata.AdamSubclassDetector;
 import net.cumba.corej.core.model.Rule;
@@ -333,7 +333,7 @@ class ScenarioDeclaredScopeProviderTest
 
         ScenarioDeclaredScopeProvider.Slots slots = ScenarioDeclaredScopeProvider.install(adae,
                 null, defineDouble(), "inline.cdt", true);
-        RuleExecutionResult result = RuleRunner.execute(rule, adae, resolverFor(adae), "ADAE",
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adae, resolverFor(adae), "ADAE",
                 slots.library(), null, slots.define());
 
         assertTrue(result.isSkipped(),
@@ -342,8 +342,8 @@ class ScenarioDeclaredScopeProviderTest
 
         // Counter-proof that the fixture is not vacuous: hand the same rule a Library provider and
         // it executes and fires (ADAE starts with "AD", the double declares no dataset class).
-        RuleExecutionResult withLibrary = RuleRunner.execute(rule, adae, resolverFor(adae), "ADAE",
-                defineDouble());
+        RuleExecutionResult withLibrary = RuleRunnerCalls.execute(rule, adae, resolverFor(adae),
+                "ADAE", defineDouble());
         assertFalse(withLibrary.isSkipped(), statusOf(withLibrary));
         assertTrue(withLibrary.hasViolations());
     }
@@ -455,7 +455,7 @@ class ScenarioDeclaredScopeProviderTest
         assertEquals("OCCURRENCE DATA STRUCTURE", slots.define().getDeclaredDatasetClass("ADAE"),
                 "the class= declaration must reach RuleRunner's declared tier");
 
-        RuleExecutionResult result = RuleRunner.execute(rule, declared, resolverFor(declared),
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, declared, resolverFor(declared),
                 "ADAE", slots.library(), null, slots.define());
         assertFalse(result.isSkipped(), statusOf(result));
         assertFalse(result.isError(), statusOf(result));
@@ -479,7 +479,7 @@ class ScenarioDeclaredScopeProviderTest
         Rule rule = rulesByCoreId.get("CDISC-AD0261");
         assertNotNull(rule);
 
-        RuleExecutionResult result = RuleRunner.execute(rule, declared, resolverFor(declared),
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, declared, resolverFor(declared),
                 "ADAE", null, null, null);
 
         assertTrue(result.isSkipped(), statusOf(result));
@@ -568,8 +568,8 @@ class ScenarioDeclaredScopeProviderTest
                 : null;
         ScenarioDeclaredScopeProvider.Slots slots = ScenarioDeclaredScopeProvider.install(aTable,
                 null, define, "inline.cdt", true);
-        return RuleRunner.execute(rule, aTable, resolverFor(aTable), "ADAE", slots.library(), null,
-                slots.define());
+        return RuleRunnerCalls.execute(rule, aTable, resolverFor(aTable), "ADAE", slots.library(),
+                null, slots.define());
     }
 
 

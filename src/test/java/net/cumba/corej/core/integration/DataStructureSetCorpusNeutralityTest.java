@@ -142,9 +142,10 @@ class DataStructureSetCorpusNeutralityTest
                     continue;
                 }
                 compared++;
-                boolean before = ScopeMatcher.matchesDataStructure(rule, List.of(pair.getValue()));
-                boolean after = ScopeMatcher.matchesDataStructure(rule,
-                        AdamDataStructureDetector.structureSet(pair.getKey()));
+                boolean before = ScopeMatcher.describeDataStructureMismatch(rule,
+                        List.of(pair.getValue())) == null;
+                boolean after = ScopeMatcher.describeDataStructureMismatch(rule,
+                        AdamDataStructureDetector.structureSet(pair.getKey())) == null;
                 if (before != after)
                 {
                     divergences.add(entry.getKey() + ": " + pair.getKey() + " matched=" + after

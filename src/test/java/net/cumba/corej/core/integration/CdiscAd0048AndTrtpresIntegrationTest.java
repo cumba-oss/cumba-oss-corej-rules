@@ -10,7 +10,7 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.expr.convert.RulePackageExpressionJson;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -94,7 +94,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
 
         IDataTable adsl = adsl("AGE", "SEX", "RACE");
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adsl, self(adsl));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adsl, self(adsl));
 
         assertEquals(1, result.getViolationCount(),
                 "ADSL has no *FL column → variable_count=0 → rule fires once");
@@ -108,7 +108,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
 
         IDataTable adsl = adsl("SAFFL");
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adsl, self(adsl));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adsl, self(adsl));
 
         assertEquals(0, result.getViolationCount(),
                 "ADSL has SAFFL → variable_count=1 → rule does not fire");
@@ -122,7 +122,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
 
         IDataTable adsl = adsl("SAFFL", "EFFFL", "ITTFL");
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adsl, self(adsl));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adsl, self(adsl));
 
         assertEquals(0, result.getViolationCount(),
                 "ADSL has multiple *FL columns → variable_count>0 → rule does not fire");
@@ -140,7 +140,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
 
         IDataTable adsl = adsl("FL");
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adsl, self(adsl));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adsl, self(adsl));
 
         assertEquals(1, result.getViolationCount(),
                 "Bare 'FL' column does not satisfy `^.+FL$` → variable_count=0 → rule fires");
@@ -157,7 +157,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
         IDataTable adbds = MockTable.of().col("STUDYID", "S001").col("USUBJID", "S01")
                 .col("PARAMCD", "PARAM1").name("ADBDS").build();
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adbds, self(adbds));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adbds, self(adbds));
 
         assertEquals(1, result.getViolationCount(),
                 "No treatment variable + USUBJID present → rule fires");
@@ -172,7 +172,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
         IDataTable adbds = MockTable.of().col("STUDYID", "S001").col("USUBJID", "S01")
                 .col("TRTP", "Drug A").name("ADBDS").build();
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adbds, self(adbds));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adbds, self(adbds));
 
         assertEquals(0, result.getViolationCount(),
                 "TRTP present → treatment_var_count>0 → no violation");
@@ -202,7 +202,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
         IDataTable adsl = MockTable.of().col("STUDYID", "S001").col("USUBJID", "S01")
                 .col(columnName, columnValue).name("ADSL").build();
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adsl, self(adsl));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adsl, self(adsl));
 
         assertEquals(0, result.getViolationCount(), reason);
     }
@@ -219,7 +219,7 @@ class CdiscAd0048AndTrtpresIntegrationTest
         IDataTable adbds = MockTable.of().col("STUDYID", "S001").col("USUBJID", "S01")
                 .col("TRTRESP", "Responder").name("ADBDS").build();
 
-        RuleExecutionResult result = RuleRunner.execute(rule, adbds, self(adbds));
+        RuleExecutionResult result = RuleRunnerCalls.execute(rule, adbds, self(adbds));
 
         assertEquals(1, result.getViolationCount(),
                 "TRTRESP doesn't match the TRT* identifier patterns → rule fires");

@@ -17,6 +17,7 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.gen.WildcardExpander;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -907,8 +908,8 @@ class NativeCorpusFullCoverageTest
         {
             SyntheticDataTable table = SyntheticDataTable.withNumeric("DM", List.copyOf(aColumns),
                     numeric, 5);
-            RuleExecutionResult res = RuleRunner.execute(aRule, table, _ -> null, "DM", aProvider,
-                    null, aProvider);
+            RuleExecutionResult res = RuleRunnerCalls.execute(aRule, table, _ -> null, "DM",
+                    aProvider, null, aProvider);
             String msg = res.getStatusMessage();
             if (!res.isError())
             {

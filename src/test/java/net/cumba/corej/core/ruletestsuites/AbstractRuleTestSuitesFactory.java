@@ -23,7 +23,7 @@ import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.exec.ScopeVariableSource;
 import net.cumba.corej.core.exec.Violation;
@@ -554,7 +554,7 @@ abstract class AbstractRuleTestSuitesFactory
         // Plan C §3.4: the scenario's `#runLevel`, or the engine default (Warning) when it
         // declares none — so every scenario in this suite that says nothing is a
         // default-threshold baseline, exactly as it was before per-level Checks existed.
-        return RuleRunner.execute(aRule, aPrimary, aResolver, aDomain, aLibrary, null, aDefine,
+        return RuleRunnerCalls.execute(aRule, aPrimary, aResolver, aDomain, aLibrary, null, aDefine,
                 Integer.MAX_VALUE, null, aDictionaries, aVlm, java.util.Set.of(),
                 java.util.Set.of(),
                 net.cumba.corej.core.exec.EngineLimits.resolveSeverityThreshold(aRunLevel));

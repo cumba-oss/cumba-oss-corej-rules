@@ -154,9 +154,9 @@ public final class StubMetadataProvider implements MetadataProvider
      * <b>Fix #223 — the declare channel.</b> Registers what the sponsor <em>declares</em> the
      * dataset to be: the Define-XML {@code def:Class} value, and optionally its
      * {@code def:SubClass} names. Hand this provider to the {@code defineProvider} parameter of
-     * {@code RuleRunner.execute(rule, table, resolver, prefix, library, joinCache, define)} and the
-     * {@code Scope.Data_Structures} / {@code Scope.Subclasses} gates resolve from the declaration
-     * instead of re-deriving a structure out of the fixture's columns.
+     * {@code RuleRunnerCalls.execute(rule, table, resolver, prefix, library, joinCache, define)}
+     * and the {@code Scope.Data_Structures} / {@code Scope.Subclasses} gates resolve from the
+     * declaration instead of re-deriving a structure out of the fixture's columns.
      *
      * <p>
      * ⚑ <b>Why this exists.</b> A probe on the 3-arg {@code execute} overload has no way to

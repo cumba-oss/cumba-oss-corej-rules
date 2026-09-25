@@ -63,8 +63,8 @@ class StageBErrorReasonReachabilityTest
         IDataTable table = MockTable.of().name("AE").col("AEOCCUR", "N").build();
         Rule rule = exprRule("TEST-STAGEB-1", "--OCCUR != \"N\"");
 
-        RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-1",
-                null);
+        RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-1", null,
+                null, Set.of());
 
         // Anti-vacuity: without this the test would "pass" on a gate that produced nothing at
         // all, because reasonsFrom(null, ...) is the empty list by contract.
@@ -115,8 +115,8 @@ class StageBErrorReasonReachabilityTest
         IDataTable table = MockTable.of().name("AE").col("AEOCCUR", "N").build();
         Rule rule = exprRule("TEST-STAGEB-3", "AEOCCUR != \"N\"");
 
-        RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-3",
-                null);
+        RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-3", null,
+                null, Set.of());
 
         assertNull(result);
         assertEquals(List.of(), ViolationNormaliser.reasonsFrom(result, null));

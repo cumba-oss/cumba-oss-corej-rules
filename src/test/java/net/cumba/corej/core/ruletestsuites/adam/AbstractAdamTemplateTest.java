@@ -16,7 +16,7 @@ import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.exec.DatasetRuleResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
 import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunner;
+import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.expr.eval.Domain;
 import net.cumba.corej.core.gen.GeneratedRuleInfo;
@@ -393,7 +393,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 {
                     return; // cannot build valid data for this rule pattern
                 }
-                RuleExecutionResult result = RuleRunner.execute(rule, table,
+                RuleExecutionResult result = RuleRunnerCalls.execute(rule, table,
                         resolverWith(domainName, table), domainName,
                         declaringLibrary(table, declaredStructure), null);
                 // An ERROR also carries the "__error__" sentinel, so without this the failure
@@ -446,7 +446,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 {
                     return; // cannot build invalid data for this rule pattern
                 }
-                RuleExecutionResult result = RuleRunner.execute(rule, table,
+                RuleExecutionResult result = RuleRunnerCalls.execute(rule, table,
                         resolverWith(domainName, table), domainName,
                         declaringLibrary(table, declaredStructure), null);
                 // ⚠⚠ The not-errored assertion comes FIRST and is not decoration. RuleRunner
