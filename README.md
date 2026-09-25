@@ -56,7 +56,6 @@ tag returns the same bytes.
 | `rules-src/checks/` | The authored rule corpus — 3 308 YAML checks across the `CDISC`, `FDA`, `PMDA` and `DRAFT` families |
 | `rules-define-src/` | 409 authored Define-XML conformance rules |
 | `rulespec/specs/` | 531 rule-execution specs, run by `RuleExecutionSpecTest` |
-| `rulespec/parity-diff-baseline.json` | The known-divergence baseline those specs are read against |
 | `schema/rule-format.schema.json` | Machine-readable schema every generated rule package is validated against |
 | `src/test/resources/.../ruletestsuites/` | 7 704 `.cdt` scenario fixtures |
 

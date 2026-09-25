@@ -32,8 +32,7 @@ import org.junit.jupiter.api.Test;
  * {@code Requirements.Variables.All}, unless the guard is deliberately Python-load-bearing (see
  * below), in which case it is added to the baseline with that justification.</li>
  * <li>A baseline entry <b>no longer found</b> fails: the guard was hoisted/removed — delete the
- * stale line so the baseline only shrinks deliberately (same contract as
- * {@code parity-diff-baseline.json}).</li>
+ * stale line so the baseline only shrinks deliberately.</li>
  * </ul>
  *
  * <p>
