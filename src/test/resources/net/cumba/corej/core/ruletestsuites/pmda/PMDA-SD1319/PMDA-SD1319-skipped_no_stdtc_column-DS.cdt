@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD1319 expect=skipped domain=DS
+#note "dataset DS without the DSSTDTC column (plus the DM block). Requirements.Variables.All [--STDTC] (PLAN-join-key-authoring-gate §3b, as the FDA twin authors it) skips the rule: `not empty(--STDTC)` is a conjunct, so the rule cannot answer without the column. Re-pinned from the PIN-TODAY `noViolation` (finding SD1319-F1: a SILENT no-finding by broadcast fold) — non-executability is a skip, not a pass. Was PMDA-SD1319-valid_no_stdtc_column_silent-DS.cdt."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col DSSEQ   type=Num
+col DSDECOD type=Char
+---
+S1 | DS | 001 | 1 | RANDOMIZED
+---
+
+dataset DM class="SPECIAL PURPOSE"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col RFICDTC  type=Char
+---
+S1 | DM | 001 | 2020-01-01

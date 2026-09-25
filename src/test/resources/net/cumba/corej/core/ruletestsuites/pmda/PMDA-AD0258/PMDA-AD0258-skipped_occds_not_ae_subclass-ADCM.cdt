@@ -1,10 +1,20 @@
 #!RuleTest
 #test PMDA-AD0258 expect=skipped domain=ADCM
-#note "dataset ADCM; CMTRT (the TRT suffix detects OCCDS; no AEDECOD/AETERM, so AdamSubclassDetector's literal name test yields NO subclass). Scope.Subclasses.Include [ADVERSE EVENT] requires a positive detection -> skipped. Pins the OCCDS+AE gate pair."
+#note "dataset ADCM; CMTRT (the TRT suffix detects OCCDS; no AEDECOD/AETERM, so AdamSubclassDetector's literal name test yields NO subclass). Scope.Subclasses.Include [ADVERSE EVENT] requires a positive detection -> skipped. Pins the OCCDS+AE gate pair. An AE block carrying the three join keys (and an AESEQ column on ADCM) is present so that the Subclasses scope is the ONLY reason to skip: without it the key's All_Or_None pairing group (PLAN-join-key-authoring-gate) would skip the rule as well, and this scenario would stop proving its own claim."
 #library standard=adamig version=1-1
 dataset ADCM
 col STUDYID type=Char
 col USUBJID type=Char
 col CMTRT   type=Char
+col AESEQ   type=Num
 ---
-S1 | 001 | ASPIRIN
+S1 | 001 | ASPIRIN | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+---
+S1 | AE | 001 | 1

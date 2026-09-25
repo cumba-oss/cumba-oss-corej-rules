@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0053 expect=skipped domain=ADLBC
-#note "dataset ADLBC with PARAMCD/AVAL -> detected BDS. Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET] rejects -> skipped. (DLAD positive case is a recorded carve-out: the token has no column-detection tier.)"
+#note "dataset ADLBC with PARAMCD/AVAL -> detected BDS. Scope.Data_Structures.Include [SUBJECT LEVEL ANALYSIS DATASET, DEVICE LEVEL ANALYSIS DATASET] rejects -> skipped. (DLAD positive case is a recorded carve-out: the token has no column-detection tier.) A DM block carrying the join key(s) is present so that the Data_Structures scope is the ONLY reason to skip: without it the key's All_Or_None pairing group (PLAN-join-key-authoring-gate) would skip the rule as well, and this scenario would stop proving its own claim."
 #library standard=adamig version=1-3
 dataset ADLBC
 col STUDYID type=Char
@@ -9,3 +9,11 @@ col PARAMCD type=Char
 col AVAL    type=Num
 ---
 CDISCPILOT01 | 01-701-1015 | GLUC | 5.1
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | DM | 01-701-1015
