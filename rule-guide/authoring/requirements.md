@@ -139,8 +139,10 @@ sets to be equal — `[["TRTxxP", "ADSL.TRTxxP"]]` runs when no `TRTxxP` exists 
 same ones exist on both sides, and skips when ADSL has `TRT01P` only while the primary has
 `TRT01P` and `TRT02P`. A literal entry takes part by presence only, so two differently named
 literals can be paired. Pattern entries in one group must therefore be the **same pattern** on
-each side — `[["TRTxxP", "ADSL.TRTxxPN"]]` could never match the same names and is rejected at
-load.
+each side — `[["TRTxxP", "ADSL.TRTxxPN"]]` is not guaranteed to match the same names and is
+rejected at load. A glob may differ in case between the two sides (globs match case-blind); a
+marker template or a `/regex/` must be spelled identically, and a template with its markers
+upper-cased (`ADSL.TRTXXP` beside `TRTxxP`) is a literal name no dataset carries — also rejected.
 
 The load-time rules are `Any`'s — flat is one group, nested is several, two distinct entries per
 group, no mixed shape, a warning on an entry repeated across groups — plus three of its own:
@@ -148,7 +150,7 @@ group, no mixed shape, a warning on an entry repeated across groups — plus thr
 | you write | what happens |
 |---|---|
 | `None: ["VISITDY"]` and `All_Or_None: [["VISITDY", "TV.VISITDY"]]` | **load error** — `None` forbids it, so the group could only ever be all-absent |
-| `All_Or_None: [["TRTxxP", "ADSL.TRTxxPN"]]` | **load error** — two pattern shapes in one group can never resolve to the same names |
+| `All_Or_None: [["TRTxxP", "ADSL.TRTxxPN"]]` | **load error** — two pattern shapes in one group are not guaranteed to resolve to the same names |
 | `All_Or_None: [["VISITDY:N", "TV.VISITDY"]]` | **load error** — the facet decides presence, and a column present with the wrong type is neither present nor absent |
 
 An entry shared with `Any` is legal: "these travel together" and "one of these is present" are
