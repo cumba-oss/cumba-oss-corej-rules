@@ -155,11 +155,14 @@ An entry shared with `Any` is legal: "these travel together" and "one of these i
 independent claims. The facet is evaluated after `All`, `Any` and `None`, so a rule whose other
 facets are unmet keeps reporting exactly the reason it always did.
 
-> ⛔ **A group column is not a declaration for a filter or `_matched_`.** When both sides are
-> absent the rule *runs* — that is the point — so a `Match_Datasets` filter or a `_matched_` test
-> that reads a group column reaches the bind with the column missing, and the engine reports the
-> unresolvable binding as an error rather than skipping. Declaring the column in `All` or `Any`
-> is what makes such a read skip; a group is the wrong tool for a column the check must read.
+> ⛔ **A group column with no `All`/`Any` partner is not a declaration for a filter or
+> `_matched_`.** When both sides are absent the rule *runs* — that is the point — so a
+> `Match_Datasets` filter or a `_matched_` test that reads a column declared **only** in a group
+> reaches the bind with the column missing, and the engine reports the unresolvable binding as an
+> error rather than skipping. Declaring the column in `All` or `Any` is what makes such a read
+> skip — and in the first-key shape above (the key in `All` *and* in its group) it does, because
+> the requirement skip runs before the bind is reached. A group alone is the wrong tool for a
+> column the check must read.
 
 > ⚠ **No shipped rule uses `All_Or_None` yet.** Whether a rule adopts it is an authoring decision
 > taken per join key, not something the engine applies on its own.
