@@ -97,6 +97,11 @@ Match_Datasets:
 - **`Child: true` entries declare their keys bare in `All` only** (`USUBJID`, `IDVAR`,
   `IDVARVAL` on the SUPP--/CO/RELREC primary). The parent is resolved per row, so it has no name
   to declare.
+- **A joined dataset absent from the study skips the rule.** Its qualified half (`DM.USUBJID`)
+  is then absent while the primary's bare key is present, so the group is only partly present —
+  the rule cannot be answered, and non-executability is not a finding. If the joined dataset's
+  **absence must itself be reported**, that is a separate dataset-presence rule (e.g.
+  `not ds_exists("TA")`), not something the joining rule can say.
 - **Expansion-template keys** (`&DOM`, `&DOMSEQ`) cannot be declared — loader gate R6 bars a
   token from `Requirements` — so only a literal first key goes in `All`.
 
