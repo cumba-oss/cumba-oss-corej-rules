@@ -138,37 +138,22 @@ public final class RuleStorageAssembler
      * {@code Fix #159}, {@code plans/done/PLAN-not-executable-parks-a-rule.md}.
      *
      * <p>
-     * <b>ONE place, deliberately.</b> The filter sits on {@link #checks} rather than on either
-     * emission path, so <em>both</em> shipped corpora inherit it from a single decision:
-     * {@link #discoverPackages()} never derives a {@code (family, standard, version)} tuple from a
-     * parked rule and {@link #assemblePackage} never selects one, so the rule reaches neither
-     * branch of {@code RuleCorpusGenerator} — the legacy copy and the native conversion are both
-     * built from the assembled node. A per-branch skip would be two things to keep in step.
-     * </p>
-     *
-     * <p>
-     * ⚠ Until 2026-08-06 the reason given here was different: {@code rules/} was derived
-     * <em>from</em> {@code rules-legacy/}, so a rule the assembler omitted was absent from
-     * {@code rules/} by transitivity. The two corpora now derive independently, and the conclusion
-     * survives only because the filter sits <em>upstream of the fan-out</em>, on the loaded
-     * {@code checks} map. Move it downstream and it stops covering both.
-     * </p>
-     *
-     * <p>
-     * ⚑ <b>That is what parks the rule in the Python fork.</b> {@code rules-legacy/} is the fork's
-     * corpus and the fork has no {@code Executability}-driven load behaviour at all — it reads the
-     * field only to echo it into its report. Omitting the rule from the corpus is therefore the
-     * whole mechanism on that side: the engine change stays Java-only while the parking is
-     * universal. Skipping only {@code rules/} would park the rule in Java and leave the fork
-     * over-reporting, which is backwards.
+     * <b>ONE place, deliberately.</b> The filter sits on {@link #checks} rather than on the
+     * emission path: {@link #discoverPackages()} never derives a
+     * {@code (family, standard, version)} tuple from a parked rule and {@link #assemblePackage}
+     * never selects one, so the rule reaches no package that {@code RuleCorpusGenerator} writes,
+     * whether {@code rules/} or {@code rules-release/}. ⚑ Until wave 33 the generator fanned out
+     * into a second, Python-facing {@code rules-legacy/} corpus, and the filter's position upstream
+     * of that fan-out is what kept a parked rule out of both. That branch and the Python parity
+     * lane are gone ({@code PLAN-cut-rules-legacy}), so there is one branch today.
      * </p>
      *
      * <p>
      * ⚠ <b>This does NOT make {@code RulePackageLoader.removeParkedRules} redundant, or the
-     * reverse. Do not delete either as duplication.</b> The rule editor, the CDISC-Library API path
-     * and any hand-authored package bypass this tool entirely, so a {@code Not Executable} rule can
-     * still reach the engine without ever passing through here; equally, the loader-side skip
-     * cannot keep the rule out of {@code rules-legacy/}, which the fork loads with no such guard.
+     * reverse. Do not delete either as duplication.</b> A package that did not come out of this
+     * tool (hand-authored, or handed to {@code RulePackageLoader.load} / {@code loadFromString}
+     * from outside the shipped corpus) bypasses it, so a {@code Not Executable} rule can still
+     * reach the engine; the loader-side skip is what stops it there.
      * </p>
      *
      * @param loaded
