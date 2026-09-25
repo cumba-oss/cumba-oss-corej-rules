@@ -967,9 +967,6 @@ expected 'col ...' or '---' separator, got: colPARAMCD type=Char
 See `net.cumba.corej.ruletest.cdt.CdtLoader`:
 
 ```java
-// From filesystem
-TestDataTable table = CdtLoader.load(Path.of("path/to/file.cdt"));
-
 // From classpath
 TestDataTable table = CdtLoader.loadResource(
     "net/cumba/corej/core/ruletestsuites/cdisc/CDISC-AD0117/CDISC-AD0117-valid-ADLBC.cdt");
