@@ -22,6 +22,7 @@ import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.VariableRequirement;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * The join-key authoring gate, ARMED: every keyed {@code Match_Datasets} entry of the authored
@@ -54,7 +55,8 @@ import org.junit.jupiter.api.Test;
  * </tr>
  * <tr>
  * <td>{@code Child: true} (SUPP--, CO, SQ--, RELREC primaries)</td>
- * <td>every key bare in {@code All}; nothing on the parent side, which is resolved per row</td>
+ * <td>every key bare in {@code All}; nothing on the parent side, which is resolved per row — and no
+ * group naming the key, unless an ordinary entry of the same rule keys on it too</td>
  * </tr>
  * <tr>
  * <td>expansion template ({@code &}-token name or key)</td>
@@ -135,21 +137,12 @@ class JoinKeyDeclarationLintTest
     @Test
     void everyKeyedJoinDeclaresItsKey() throws IOException
     {
-        Census all = new Census();
-        List<Path> files;
-        try (Stream<Path> walk = Files.walk(CHECKS_DIR))
-        {
-            files = walk.filter(p -> p.toString().endsWith(".yaml")).sorted().toList();
-        }
-        for (Path file : files)
-        {
-            all.add(check(read(file)));
-        }
-        assertTrue(all.violations.isEmpty(),
-                all.violations.size() + " keyed Match_Datasets declaration(s) missing — every key"
-                        + " column of a keyed join is declared (PLAN-join-key-authoring-gate; the"
-                        + " rule-guide page authoring/requirements.md, 'Declaring a join key'):\n  "
-                        + String.join("\n  ", all.violations));
+        Census all = checkTree(CHECKS_DIR);
+        assertTrue(all.violations.isEmpty(), all.violations.size()
+                + " keyed Match_Datasets declaration(s) missing — every key"
+                + " column of a keyed join is declared (PLAN-join-key-authoring-gate; the"
+                + " rule-guide page authoring/joins.md, 'Declare the key — required for every"
+                + " keyed join'):\n  " + String.join("\n  ", all.violations));
         assertEquals(EXPECTED_ORDINARY, all.ordinary,
                 "ordinary keyed entries — a new keyed rule? confirm it declares its key, then move"
                         + " the pin");
@@ -242,6 +235,11 @@ class JoinKeyDeclarationLintTest
                 child.replace("All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
                         "All: [\"QNAM\", \"USUBJID\", \"IDVAR\"]"),
                 "T-CHILD", "IDVARVAL", "Child key");
+        assertRedNaming(
+                child.replace("    All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n",
+                        "    All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n"
+                                + "    All_Or_None: [[\"IDVAR\", \"AE.IDVAR\"]]\n"),
+                "T-CHILD", "IDVAR", "named by an All_Or_None group");
 
         String template = """
                 Core: {Id: "T-TEMPLATE"}
@@ -255,6 +253,65 @@ class JoinKeyDeclarationLintTest
         assertClean(template);
         assertRedNaming(template.replace("    All: [\"STUDYID\"]\n", ""), "T-TEMPLATE", "STUDYID",
                 "first key");
+    }
+
+
+    @Test
+    void aRuleFileTheAssemblerWouldNotReadIsReported(@TempDir Path aDir) throws IOException
+    {
+        String yaml = """
+                Core: {Id: "T-FILE"}
+                Requirements:
+                  Variables:
+                    All: ["USUBJID"]
+                    All_Or_None: [["USUBJID", "DM.USUBJID"]]
+                Match_Datasets:
+                - Name: "DM"
+                  Keys: ["USUBJID"]
+                """;
+        Files.writeString(aDir.resolve("T-FILE.yaml"), yaml);
+        Census clean = checkTree(aDir);
+        assertTrue(clean.violations.isEmpty(), clean.violations::toString);
+        assertEquals(1, clean.ordinary);
+        Files.writeString(aDir.resolve("T-STRAY.yml"), yaml.replace("T-FILE", "T-STRAY"));
+        Files.writeString(aDir.resolve("T-STRAY2.json"), "{}");
+        Census red = checkTree(aDir);
+        assertEquals(2, red.violations.size(), red.violations::toString);
+        assertTrue(red.violations.stream().anyMatch(v -> v.contains("T-STRAY.yml")),
+                red.violations::toString);
+        assertTrue(red.violations.stream().anyMatch(v -> v.contains("T-STRAY2.json")),
+                red.violations::toString);
+    }
+
+
+    /**
+     * Every regular file under {@code aDir}: a {@code .yaml} rule is checked, and ANY other file is
+     * a violation. ⚑ The corpus assembler reads {@code .yaml} only ({@code RuleStorageAssembler}),
+     * so a rule saved as {@code .yml} or {@code .json} would be neither shipped nor linted —
+     * silently; a walk filtered to {@code .yaml} would be blind to exactly that file (review round
+     * 1, F5).
+     */
+    static Census checkTree(Path aDir) throws IOException
+    {
+        Census all = new Census();
+        List<Path> files;
+        try (Stream<Path> walk = Files.walk(aDir))
+        {
+            files = walk.filter(Files::isRegularFile).sorted().toList();
+        }
+        for (Path file : files)
+        {
+            if (file.getFileName().toString().endsWith(".yaml"))
+            {
+                all.add(check(read(file)));
+            }
+            else
+            {
+                all.violations.add(file + ": not a .yaml file — the corpus assembler reads .yaml"
+                        + " only, so this rule would be neither shipped nor checked here");
+            }
+        }
+        return all;
     }
 
 
@@ -335,6 +392,17 @@ class JoinKeyDeclarationLintTest
                         c.violations.add(where + ": Child key " + k
                                 + " is not bare in Requirements.Variables.All (Q2 amendment rule 2)");
                     }
+                    // A Child entry's parent is resolved per row and has no nameable side, so a
+                    // group naming the key pairs it with nothing the ruling allows (Q2 amendment
+                    // rule 2). Exempt only when the same bare key also keys an ordinary entry of
+                    // this rule, whose group legitimately names it.
+                    if (groups.stream().anyMatch(g -> g.contains(fold(k)))
+                            && !keysAnOrdinaryEntry(joins, k))
+                    {
+                        c.violations.add(where + ": Child key " + k
+                                + " is named by an All_Or_None group — a Child key is declared bare"
+                                + " in All only (Q2 amendment rule 2)");
+                    }
                 }
                 continue;
             }
@@ -399,6 +467,21 @@ class JoinKeyDeclarationLintTest
             }
         }
         return sides;
+    }
+
+
+    private static boolean keysAnOrdinaryEntry(List<MatchDataset> joins, String bareKey)
+    {
+        for (MatchDataset md : joins)
+        {
+            List<String> left = md.getKeys();
+            if (left != null && !Boolean.TRUE.equals(md.getChild())
+                    && left.stream().anyMatch(k -> fold(k).equals(fold(bareKey))))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
