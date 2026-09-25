@@ -497,13 +497,6 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
 
 
     @Override
-    public List<String> getModelColumnOrder(String aDomain)
-    {
-        return base.getModelColumnOrder(aDomain);
-    }
-
-
-    @Override
     public boolean isDomainCustom(String aDomain)
     {
         return base.isDomainCustom(aDomain);
@@ -573,13 +566,6 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
     }
 
 
-    @Override
-    public Map<String, String> getCodelistTermMappings(String aCodelistName)
-    {
-        return base.getCodelistTermMappings(aCodelistName);
-    }
-
-
     /**
      * ⚠⚠ Delegated — the sibling of the four codelist accessors around it, and the one that was
      * missed. Its interface default is {@code Optional.empty()} ("I have no rich codelist view"),
@@ -610,13 +596,6 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
     public @Nullable String getStandard()
     {
         return base.getStandard();
-    }
-
-
-    @Override
-    public @Nullable String getVersion()
-    {
-        return base.getVersion();
     }
 
 

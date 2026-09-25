@@ -1816,13 +1816,6 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 
 
         @Override
-        public List<String> getModelColumnOrder(String domain)
-        {
-            return List.of();
-        }
-
-
-        @Override
         public boolean isDomainCustom(String domain)
         {
             return false;
@@ -1865,24 +1858,11 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
 
 
         @Override
-        public Map<String, String> getCodelistTermMappings(String codelistName)
-        {
-            return Map.of();
-        }
-
-
-        @Override
         public String getStandard()
         {
             return "ADaMIG";
         }
 
-
-        @Override
-        public String getVersion()
-        {
-            return "1.3";
-        }
     }
 
 }

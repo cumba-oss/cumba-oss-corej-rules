@@ -144,13 +144,6 @@ final class CompositeMetadataProvider implements MetadataProvider
 
 
     @Override
-    public List<String> getModelColumnOrder(String domain)
-    {
-        return firstNonEmptyList(p -> p.getModelColumnOrder(domain), mock, pickle);
-    }
-
-
-    @Override
     public List<String> getCodelistTerms(String codelistCode)
     {
         return firstNonEmptyList(p -> p.getCodelistTerms(codelistCode), mock, pickle);
@@ -184,31 +177,25 @@ final class CompositeMetadataProvider implements MetadataProvider
     }
 
 
-    @Override
-    public Map<String, String> getCodelistTermMappings(String codelistName)
-    {
-        return firstNonEmptyMap(p -> p.getCodelistTermMappings(codelistName), mock, pickle);
-    }
-
-
     /**
-     * ⚠⚠ Delegated — the sibling of {@link #getCodelistTermMappings} above, and the one that was
-     * missed. The interface default is {@code Map.of()} ("I have no code map"), which is honest for
-     * a leaf and silently wrong here: {@code MetadataLibraryProvider} — the pickle half every spec
-     * naming a standard/version composes in — <b>does</b> implement it, so inheriting the default
-     * made {@code library_variable_code_pair_matches} (FDA-CT2003 / PMDA-CT2003) see no concept ids
-     * on the spec path, with no diagnostic. Same shape as the {@code getCodelist} case closed in
+     * ⚠⚠ Delegated — the sibling of the codelist accessors above ({@link #getCodelistTerms},
+     * {@link #getCodelist}), and the one that was missed. The interface default is {@code Map.of()}
+     * ("I have no code map"), which is honest for a leaf and silently wrong here:
+     * {@code MetadataLibraryProvider} — the pickle half every spec naming a standard/version
+     * composes in — <b>does</b> implement it, so inheriting the default made
+     * {@code library_variable_code_pair_matches} (FDA-CT2003 / PMDA-CT2003) see no concept ids on
+     * the spec path, with no diagnostic. Same shape as the {@code getCodelist} case closed in
      * 4b710bc2, one accessor over.
      *
      * <p>
      * Merge semantics: {@link #firstNonEmptyMap}, i.e. <b>whole-answer precedence</b>, not a
      * per-key union of the two halves — the same helper every other {@code Map<String, String>}
-     * accessor on this class uses ({@code getCodelistTermMappings}, {@code getVariableMetadata},
-     * {@code getDatasetMetadata}). Deliberate rather than incidental: the class contract above is
-     * that the spec's explicit mock is authoritative and the pickle answers only what the mock does
-     * not, so a union would let pickle-derived concept ids leak into a map a spec deliberately
-     * mocked and silently change that spec's verdict. An empty map here is "cannot answer" (see the
-     * interface javadoc), never a meaningful answer, so folding it into the fallback loses nothing.
+     * accessor on this class uses ({@code getVariableMetadata}, {@code getDatasetMetadata}).
+     * Deliberate rather than incidental: the class contract above is that the spec's explicit mock
+     * is authoritative and the pickle answers only what the mock does not, so a union would let
+     * pickle-derived concept ids leak into a map a spec deliberately mocked and silently change
+     * that spec's verdict. An empty map here is "cannot answer" (see the interface javadoc), never
+     * a meaningful answer, so folding it into the fallback loses nothing.
      * </p>
      */
     @Override
@@ -426,14 +413,6 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         MetadataProvider primary = mock != null ? mock : pickle;
         return primary != null ? primary.getStandard() : "";
-    }
-
-
-    @Override
-    public String getVersion()
-    {
-        MetadataProvider primary = mock != null ? mock : pickle;
-        return primary != null ? primary.getVersion() : "";
     }
 
 

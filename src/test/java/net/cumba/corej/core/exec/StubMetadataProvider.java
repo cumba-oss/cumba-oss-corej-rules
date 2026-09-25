@@ -260,13 +260,6 @@ public final class StubMetadataProvider implements MetadataProvider
 
 
     @Override
-    public List<String> getModelColumnOrder(String domain)
-    {
-        return List.of();
-    }
-
-
-    @Override
     public List<String> getDatasetNames()
     {
         // ONLY defineDatasets — see the class javadoc. Do not "simplify" this to
@@ -296,13 +289,6 @@ public final class StubMetadataProvider implements MetadataProvider
     }
 
 
-    @Override
-    public Map<String, String> getCodelistTermMappings(String codelistName)
-    {
-        return Map.of();
-    }
-
-
     /** Registers a variable's term submission value → concept id map (E9). */
     public StubMetadataProvider codeMap(String domain, String variable, Map<String, String> map)
     {
@@ -322,13 +308,6 @@ public final class StubMetadataProvider implements MetadataProvider
     public String getStandard()
     {
         return "sdtmig";
-    }
-
-
-    @Override
-    public String getVersion()
-    {
-        return "3.4";
     }
 
 }

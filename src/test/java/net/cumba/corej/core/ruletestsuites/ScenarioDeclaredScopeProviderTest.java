@@ -254,7 +254,6 @@ class ScenarioDeclaredScopeProviderTest
 
         assertEquals(List.of("STUDYID", "USUBJID"), wrapped.getRequiredVariables("ADAE"));
         assertEquals("adamig", wrapped.getStandard());
-        assertEquals("1-3", wrapped.getVersion());
     }
 
     // ---- 5: F-R8 — the slot decision, and the refusal that replaces the empty stand-in --

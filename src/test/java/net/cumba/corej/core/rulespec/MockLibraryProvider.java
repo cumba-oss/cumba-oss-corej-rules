@@ -69,13 +69,6 @@ public final class MockLibraryProvider implements MetadataProvider
 
 
     @Override
-    public List<String> getModelColumnOrder(String domain)
-    {
-        return get(mocks.modelColumnOrder(), domain, List.of());
-    }
-
-
-    @Override
     public boolean isDomainCustom(String domain)
     {
         return get(mocks.domainCustom(), domain, false);
@@ -380,23 +373,9 @@ public final class MockLibraryProvider implements MetadataProvider
 
 
     @Override
-    public Map<String, String> getCodelistTermMappings(String codelistName)
-    {
-        return get(mocks.codelistTermMappings(), codelistName, Map.of());
-    }
-
-
-    @Override
     public String getStandard()
     {
         return standard;
-    }
-
-
-    @Override
-    public String getVersion()
-    {
-        return version;
     }
 
 
