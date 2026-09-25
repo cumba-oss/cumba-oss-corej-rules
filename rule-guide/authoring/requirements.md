@@ -123,7 +123,9 @@ Match_Datasets:
 ```
 
 Write the primary's side bare and the joined side qualified, as `All` does it. Groups may have
-more than two entries; a three-entry group needs all three or none.
+more than two entries; a three-entry group needs all three or none. An entry may sit in `All`
+**and** in its group — the convention for a join's first key puts it in both, so `All` guarantees
+the bare side and the group decides the joined side.
 
 | study | `All: [VISITDY, TV.VISITDY]` | undeclared | `All_Or_None: [[VISITDY, TV.VISITDY]]` |
 |---|---|---|---|
@@ -136,20 +138,28 @@ the set of concrete column names it matches, and an all-present group additional
 sets to be equal — `[["TRTxxP", "ADSL.TRTxxP"]]` runs when no `TRTxxP` exists anywhere or when the
 same ones exist on both sides, and skips when ADSL has `TRT01P` only while the primary has
 `TRT01P` and `TRT02P`. A literal entry takes part by presence only, so two differently named
-literals can be paired.
+literals can be paired. Pattern entries in one group must therefore be the **same pattern** on
+each side — `[["TRTxxP", "ADSL.TRTxxPN"]]` could never match the same names and is rejected at
+load.
 
 The load-time rules are `Any`'s — flat is one group, nested is several, two distinct entries per
-group, no mixed shape, a warning on an entry repeated across groups — plus two of its own:
+group, no mixed shape, a warning on an entry repeated across groups — plus three of its own:
 
 | you write | what happens |
 |---|---|
-| `All: ["VISITDY"]` and `All_Or_None: [["VISITDY", "TV.VISITDY"]]` | **load error** — `All` already makes it present, so the group could only ever be all-present |
-| `None: ["VISITDY"]` and the same group | **load error** — `None` forbids it, so the group could only ever be all-absent |
+| `None: ["VISITDY"]` and `All_Or_None: [["VISITDY", "TV.VISITDY"]]` | **load error** — `None` forbids it, so the group could only ever be all-absent |
+| `All_Or_None: [["TRTxxP", "ADSL.TRTxxPN"]]` | **load error** — two pattern shapes in one group can never resolve to the same names |
 | `All_Or_None: [["VISITDY:N", "TV.VISITDY"]]` | **load error** — the facet decides presence, and a column present with the wrong type is neither present nor absent |
 
 An entry shared with `Any` is legal: "these travel together" and "one of these is present" are
 independent claims. The facet is evaluated after `All`, `Any` and `None`, so a rule whose other
 facets are unmet keeps reporting exactly the reason it always did.
+
+> ⛔ **A group column is not a declaration for a filter or `_matched_`.** When both sides are
+> absent the rule *runs* — that is the point — so a `Match_Datasets` filter or a `_matched_` test
+> that reads a group column reaches the bind with the column missing, and the engine reports the
+> unresolvable binding as an error rather than skipping. Declaring the column in `All` or `Any`
+> is what makes such a read skip; a group is the wrong tool for a column the check must read.
 
 > ⚠ **No shipped rule uses `All_Or_None` yet.** Whether a rule adopts it is an authoring decision
 > taken per join key, not something the engine applies on its own.
