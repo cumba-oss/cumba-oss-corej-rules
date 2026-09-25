@@ -19,7 +19,6 @@ import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleRunner;
 import net.cumba.corej.core.exec.RuleRunnerCalls;
-import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.gen.WildcardExpander;
 import net.cumba.corej.core.model.MatchDataset;
 import net.cumba.corej.core.model.Rule;
@@ -139,6 +138,15 @@ class NativeCorpusFullCoverageTest
     // is the skip-after-dispatch population this counter excludes and that one absorbed — real,
     // and measured here for the first time. The constant is deliberately NOT lowered for it: 6000
     // still clears the stricter count with 123 to spare.
+    // ⭐ Re-measured 2026-09-25 (PLAN-join-key-authoring-gate, review round 1 F3), CORE-free = all:
+    // 6145 verdicts at cumba-corej-rules 34810c86 (before the sweep, AD0720 throwing), 5883 after
+    // the sweep with the harness unchanged, 6126 after the harness learned the key columns
+    // (keyColumns / foreignColumns). The net -19 package entries are 5 rule ids, each a §3b read
+    // column the sweep declared and this synthetic table does not carry — CDISC-SEND-0127 / -0283
+    // (SESEQ, read only in a binding), FDA-SD1089 / -1093 (--STDY / --ENDY, read under var_exists)
+    // and PMDA-SD1319 (--STDTC, a placeholder the DM table does not resolve): intended skips, the
+    // sweep's point. Gained: CDISC-AD0053 / AD0256 (their declared key half is now decidable) and
+    // CDISC-AD0720 (dispatches). The floor stays at its policy value: 6000 clears 6126 by 126.
     private static final int RECORD_DATA_RECORDED_FLOOR = 6000;
 
     /**
@@ -894,7 +902,7 @@ class NativeCorpusFullCoverageTest
     {
         Set<String> numeric = new LinkedHashSet<>();
         Set<String> columns = new LinkedHashSet<>(aColumns);
-        requiredBareColumns(aRule, columns, numeric);
+        keyColumns(aRule, columns, numeric);
         Map<String, Set<String>> foreign = foreignColumns(aRule);
         int columnCount = columns.size();
         for (Set<String> cols : foreign.values())
@@ -932,75 +940,73 @@ class NativeCorpusFullCoverageTest
 
 
     /**
-     * Adds to {@code aColumns} the literal, unqualified names the rule's
-     * {@code Requirements.Variables} demand be present — every {@code All} entry and the bare
-     * member of every {@code All_Or_None} group — and marks a {@code :N}-typed one numeric.
+     * Adds to {@code aColumns} the primary-side KEY columns of the rule's keyed
+     * {@code Match_Datasets} entries — and nothing else the rule declares — marking one numeric
+     * when the rule's {@code All} types it {@code :N}.
      *
      * <p>
      * ⭐ Added with {@code PLAN-join-key-authoring-gate} (2026-09-25). That sweep declared every
-     * keyed join's first key bare in {@code All} (its Q9) and paired every key column with its
-     * joined twin in an {@code All_Or_None} group; a key such as {@code USUBJID} is almost never
-     * read by the {@code Check} itself, so a table built from the {@code Check}'s columns alone
-     * made ~240 rules slide from "evaluated" to "skipped" on this harness — the coverage loss
-     * {@link #RECORD_DATA_RECORDED_FLOOR} exists to catch. A dispatch harness gives the rule what
-     * it declares it needs; whether the declaration is right is the {@code .cdt} corpus's question.
+     * keyed join's key columns in {@code Requirements.Variables} — the first key bare in
+     * {@code All} (its Q9), every key in an {@code All_Or_None} pairing group with its joined twin,
+     * a {@code Child} entry's keys bare in {@code All}. A key such as {@code USUBJID} is almost
+     * never read by the {@code Check} itself, so a table built from the {@code Check}'s columns
+     * alone made 262 package entries slide from "evaluated" to "skipped" here (6 145 → 5 883
+     * verdicts). The harness supplies exactly what the sweep added and no more.
      * </p>
      *
      * <p>
-     * Pattern entries (globs, {@code /regex/}, marker templates), {@code --} placeholders and
-     * {@code Any} / {@code None} are left alone: the first two name no single column, and the last
-     * two are satisfied — or unmet — by design of the rule, not by the harness.
+     * ⛔ <b>Deliberately NOT every declared column</b> (review round 1, F3). An earlier draft
+     * supplied every bare {@code All} entry, which also satisfied requirements the sweep never
+     * touched — a rule that had always skipped here for want of a declared column started to
+     * evaluate, and that inflation hides exactly the slide {@link #RECORD_DATA_RECORDED_FLOOR}
+     * exists to catch. Key columns are the sweep's whole footprint on this harness; an expansion
+     * token ({@code &DOMSEQ}) names no column and is left out.
      * </p>
      */
-    private static void requiredBareColumns(Rule aRule, Set<String> aColumns, Set<String> aNumeric)
+    private static void keyColumns(Rule aRule, Set<String> aColumns, Set<String> aNumeric)
     {
-        VariableRequirement vars = aRule.getRequirements() == null ? null
-                : aRule.getRequirements().getVariables();
-        if (vars == null)
+        if (aRule.getMatchDatasets() == null)
         {
             return;
         }
-        List<String> entries = new ArrayList<>();
-        if (vars.getAll() != null)
+        VariableRequirement vars = aRule.getRequirements() == null ? null
+                : aRule.getRequirements().getVariables();
+        List<String> all = vars == null || vars.getAll() == null ? List.of() : vars.getAll();
+        for (MatchDataset md : aRule.getMatchDatasets())
         {
-            entries.addAll(vars.getAll());
-        }
-        if (vars.getAllOrNoneGroups() != null)
-        {
-            vars.getAllOrNoneGroups().forEach(entries::addAll);
-        }
-        for (String raw : entries)
-        {
-            String entry = raw.trim();
-            boolean numericTag = entry.endsWith(":N") || entry.endsWith(":Num");
-            String name = TYPE_TAG.matcher(entry).replaceFirst("");
-            if (name.contains(".") || name.startsWith("--") || ScopeMatcher.isPatternEntry(name))
+            List<String> left = md.getKeys();
+            if (left == null)
             {
                 continue;
             }
-            aColumns.add(name);
-            if (numericTag)
+            for (String key : left)
             {
-                aNumeric.add(name);
+                if (key.startsWith("&"))
+                {
+                    continue;
+                }
+                aColumns.add(key);
+                if (all.contains(key + ":N") || all.contains(key + ":Num"))
+                {
+                    aNumeric.add(key);
+                }
             }
         }
     }
 
-    /** A {@code :N} / {@code :C} (or {@code :Num} / {@code :Char}) type tag on a requirement. */
-    private static final java.util.regex.Pattern TYPE_TAG = java.util.regex.Pattern
-            .compile(":(N|C|Num|Char)$");
 
     /**
-     * The foreign datasets a keyed rule joins, each with the columns the rule needs of it: the
-     * joined side of every key, and every qualified {@code All} / {@code All_Or_None} entry naming
-     * it. {@code Child} entries (their parent is resolved per row) and expansion templates
+     * The foreign datasets a keyed rule joins, each with its joined-side KEY columns only.
+     * {@code Child} entries (their parent is resolved per row) and expansion templates
      * ({@code &}-names) are skipped.
      *
      * <p>
-     * ⭐ Added with {@code PLAN-join-key-authoring-gate}, see {@link #requiredBareColumns}: a
-     * qualified requirement entry is <em>undecidable</em> with the bare {@code _ -> null} resolver
-     * (no foreign metadata source), and an undecidable entry SKIPS the rule by design — so without
-     * these datasets every keyed rule's pairing group skipped it here.
+     * ⭐ Added with {@code PLAN-join-key-authoring-gate}, see {@link #keyColumns}: a qualified
+     * requirement entry is <em>undecidable</em> with the bare {@code _ -> null} resolver (no
+     * foreign metadata source), and an undecidable entry SKIPS the rule by design — so without
+     * these datasets every keyed rule's pairing group skipped it here. ⛔ Only the key columns are
+     * served, not the other qualified columns a rule declares (review round 1, F3): a declared
+     * {@code DM.ACTARM} stays absent, exactly as before the sweep, so the rule skips as it did.
      * </p>
      */
     private static Map<String, Set<String>> foreignColumns(Rule aRule)
@@ -1019,35 +1025,6 @@ class NativeCorpusFullCoverageTest
                 }
                 Set<String> cols = out.computeIfAbsent(name, _ -> new LinkedHashSet<>());
                 right.stream().filter(k -> !k.startsWith("&")).forEach(cols::add);
-            }
-        }
-        VariableRequirement vars = aRule.getRequirements() == null ? null
-                : aRule.getRequirements().getVariables();
-        if (vars != null)
-        {
-            List<String> entries = new ArrayList<>();
-            if (vars.getAll() != null)
-            {
-                entries.addAll(vars.getAll());
-            }
-            if (vars.getAllOrNoneGroups() != null)
-            {
-                vars.getAllOrNoneGroups().forEach(entries::addAll);
-            }
-            for (String raw : entries)
-            {
-                String entry = TYPE_TAG.matcher(raw.trim()).replaceFirst("");
-                int dot = entry.indexOf('.');
-                if (dot <= 0 || entry.startsWith("/"))
-                {
-                    continue;
-                }
-                String dataset = entry.substring(0, dot);
-                String column = entry.substring(dot + 1);
-                if (out.containsKey(dataset) && !ScopeMatcher.isPatternEntry(column))
-                {
-                    out.get(dataset).add(column);
-                }
             }
         }
         return out;
