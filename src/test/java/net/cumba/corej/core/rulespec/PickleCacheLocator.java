@@ -31,12 +31,14 @@ import net.cumba.corej.core.metadata.pickle.PickleCache;
  * </p>
  *
  * <p>
- * Precedence is <b>property first, then environment</b> — the order
- * {@link PickleCache#openIfConfigured()} established and every call site here inherited. (The
- * deleted {@code PickleMetadataProviderFactory.resolveConfiguredDir} used the opposite order; the
- * two differed only when both keys were set and disagreed, a combination with no caller in this
- * tree, and the store's own {@code StoreMetadataProviderFactory.resolveConfiguredFile} is a
- * separate key entirely.)
+ * Precedence is <b>property first, then environment</b> — the order the engine's former
+ * {@code PickleCache.openIfConfigured()} established (retired with
+ * PLAN-retire-dead-multi-match-lookup U6, 2026-09-25; the keys are still
+ * {@link PickleCache#CACHE_DIR_PROPERTY} / {@link PickleCache#CACHE_DIR_ENV}) and every call site
+ * here inherited. (The deleted {@code PickleMetadataProviderFactory.resolveConfiguredDir} used the
+ * opposite order; the two differed only when both keys were set and disagreed, a combination with
+ * no caller in this tree, and the store's own
+ * {@code StoreMetadataProviderFactory.resolveConfiguredFile} is a separate key entirely.)
  * </p>
  */
 public final class PickleCacheLocator
