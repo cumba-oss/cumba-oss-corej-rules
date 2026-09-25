@@ -97,8 +97,10 @@ Match_Datasets:
 - **`Child: true` entries declare their keys bare in `All` only** (`USUBJID`, `IDVAR`,
   `IDVARVAL` on the SUPP--/CO/RELREC primary). The parent is resolved per row, so it has no name
   to declare.
-- **A joined dataset absent from the study skips the rule.** Its qualified half (`DM.USUBJID`)
-  is then absent while the primary's bare key is present, so the group is only partly present —
+- **A joined dataset absent from the study skips the rule of an ordinary keyed entry** (one
+  carrying a key group); `Child` entries, `&DOM` templates and keyless joins are not affected.
+  The group's qualified half (`DM.USUBJID`) is then absent while the primary's bare key is
+  present, so the group is only partly present —
   the rule cannot be answered, and non-executability is not a finding. If the joined dataset's
   **absence must itself be reported**, that is a separate dataset-presence rule (e.g.
   `not ds_exists("TA")`), not something the joining rule can say.
