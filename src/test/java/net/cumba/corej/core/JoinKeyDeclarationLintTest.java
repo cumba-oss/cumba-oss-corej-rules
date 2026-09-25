@@ -260,6 +260,24 @@ class JoinKeyDeclarationLintTest
         assertRedNaming(childAndDm.replace("- Name: \"DM\"\n  Keys: [\"USUBJID\"]\n", ""),
                 "T-CHILD-DM", "USUBJID", "named by an All_Or_None group");
 
+        // ...and an expansion template sharing the key does NOT license the group (review round 3,
+        // T1): a template carries no key group, so it is not an ordinary entry.
+        String childAndTemplate = """
+                Core: {Id: "T-CHILD-TPL"}
+                Requirements:
+                  Variables:
+                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL", "STUDYID"]
+                    All_Or_None: [["USUBJID", "XX.USUBJID"]]
+                Match_Datasets:
+                - Name: "SUPP--"
+                  Child: true
+                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                - Name: "&DOM"
+                  Keys: ["STUDYID", "USUBJID", "&DOMSEQ"]
+                """;
+        assertRedNaming(childAndTemplate, "T-CHILD-TPL", "USUBJID",
+                "named by an All_Or_None group");
+
         String template = """
                 Core: {Id: "T-TEMPLATE"}
                 Requirements:
@@ -494,8 +512,15 @@ class JoinKeyDeclarationLintTest
         for (MatchDataset md : joins)
         {
             List<String> left = md.getKeys();
-            if (left != null && !Boolean.TRUE.equals(md.getChild())
-                    && left.stream().anyMatch(k -> fold(k).equals(fold(bareKey))))
+            // ORDINARY only (review round 3, T1): neither a Child entry nor an expansion template
+            // (an &-token name or key) carries a key group, so neither licenses one.
+            if (left == null || Boolean.TRUE.equals(md.getChild())
+                    || String.valueOf(md.getName()).startsWith("&")
+                    || left.stream().anyMatch(k -> k.startsWith("&")))
+            {
+                continue;
+            }
+            if (left.stream().anyMatch(k -> fold(k).equals(fold(bareKey))))
             {
                 return true;
             }
