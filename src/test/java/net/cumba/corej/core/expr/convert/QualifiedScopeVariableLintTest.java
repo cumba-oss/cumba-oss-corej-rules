@@ -243,16 +243,19 @@ class QualifiedScopeVariableLintTest
 
 
     /**
-     * The {@code All}, {@code Any} and {@code None} lists, skipping the {@code null}s.
+     * The {@code All}, {@code Any}, {@code None} and {@code All_Or_None} lists, skipping the
+     * {@code null}s.
      *
      * <p>
-     * ⚠ All THREE facets: a qualified entry is exactly as unresolvable in {@code Any} as in
-     * {@code All}, and a facet left out here is a facet this lint cannot see.
+     * ⚠ All FOUR facets: a qualified entry is exactly as unresolvable in {@code Any} or in an
+     * {@code All_Or_None} group as in {@code All}, and a facet left out here is a facet this lint
+     * cannot see. ({@code All_Or_None} joined 2026-09-25, PLAN-join-key-pairing — its qualified
+     * side is the whole point of the facet, so a typo there is the likeliest of all.)
      * </p>
      */
     private static List<List<String>> listsOf(VariableRequirement variables)
     {
-        List<List<String>> lists = new ArrayList<>(3);
+        List<List<String>> lists = new ArrayList<>(4);
         if (variables.getAll() != null)
         {
             lists.add(variables.getAll());
@@ -264,6 +267,10 @@ class QualifiedScopeVariableLintTest
         if (variables.getNone() != null)
         {
             lists.add(variables.getNone());
+        }
+        if (!variables.allOrNoneUnion().isEmpty())
+        {
+            lists.add(variables.allOrNoneUnion());
         }
         return lists;
     }
