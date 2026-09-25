@@ -96,7 +96,8 @@ Match_Datasets:
   a load warning.
 - **`Child: true` entries declare their keys bare in `All` only** (`USUBJID`, `IDVAR`,
   `IDVARVAL` on the SUPP--/CO/RELREC primary). The parent is resolved per row, so it has no name
-  to declare.
+  to declare — and no `All_Or_None` group may name a `Child` key, unless an ordinary entry of the
+  same rule also keys on it (a `DM` join sharing `USUBJID` carries `[USUBJID, DM.USUBJID]`).
 - **A joined dataset absent from the study skips the rule of an ordinary keyed entry** (one
   carrying a key group); `Child` entries, `&DOM` templates and keyless joins are not affected.
   The group's qualified half (`DM.USUBJID`) is then absent while the primary's bare key is
