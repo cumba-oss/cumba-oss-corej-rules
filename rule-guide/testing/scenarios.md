@@ -74,6 +74,7 @@ A `skipped` scenario proves a requirement is real. What you withhold depends on 
 | `Variables.All` | one listed column — every entry must be present |
 | `Variables.Any` | **all** listed columns; withholding one is not enough |
 | `Variables.None` | nothing — it **adds** a listed column |
+| `Variables.All_Or_None` | **one** entry of a group, keeping the others — withholding the whole group is the all-absent case, which runs |
 | `Datasets` | the whole `dataset` block for that name |
 
 ## Writing a scenario that proves something

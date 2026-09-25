@@ -200,8 +200,9 @@ everything it does not name, and an `Exclude` already includes everything it doe
 
 **`Requirements`** says what must exist before the rule is answerable. An `All` or `Any` entry may
 carry a **type suffix** — `AESTDY:N`, `AETERM:C` — demanding the column be numeric or character as
-well as present; an unmet type **skips** the rule rather than erroring. `Variables` takes three
-facets, ANDed: `All` (every one must exist), `Any` (at least one), `None` (none may exist).
+well as present; an unmet type **skips** the rule rather than erroring. `Variables` takes four
+facets, ANDed: `All` (every one must exist), `Any` (at least one), `None` (none may exist),
+`All_Or_None` (each group all present or all absent — for a join key optional on both sides).
 `Datasets` lists datasets that must be present in the run. An unmet requirement **skips** the
 rule for that dataset — a distinct outcome from "ran and found nothing".
 

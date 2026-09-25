@@ -1,9 +1,11 @@
 # Requirements
 
 <!-- Grounded: Requirements.java (Variables/Datasets authored; Library/Define/Dictionary marked
-     "Derived"), VariableRequirement.java (All/Any/None semantics, entry vocabulary, the M2-D24 /
-     M3-F.1 owner ruling, None has zero corpus carriers), AnyGroupsJson.java (the full parse
-     table, gate R4 arms), Rule.java (Variable_Universe default DATA, skipIfLibraryDefined). -->
+     "Derived"), VariableRequirement.java (All/Any/None/All_Or_None semantics, entry vocabulary,
+     the M2-D24 / M3-F.1 owner ruling, None has zero corpus carriers), AnyGroupsJson.java (the
+     full parse table shared by Any and All_Or_None, gate R4 arms), ScopeMatcher.java
+     (describeAllOrNoneGroup: presence per entry, pattern entries compared resolved),
+     Rule.java (Variable_Universe default DATA, skipIfLibraryDefined). -->
 
 `Requirements` says what must exist **before the rule is answerable at all**.
 
@@ -42,7 +44,7 @@ the most expensive mistake in this chapter, and it is invisible from the outside
 Require what the check needs in order to **ask** its question. Never what the check is asking
 *about*.
 
-## `Variables` — three facets, ANDed
+## `Variables` — four facets, ANDed
 
 ```yaml
 Requirements:
@@ -50,9 +52,10 @@ Requirements:
     All:  ["AESTDTC", "AEENDTC"]
     Any:  ["AEDECOD", "AETERM"]
     None: ["AEENDY"]
+    All_Or_None: [["VISITDY", "TV.VISITDY"]]
 ```
 
-All three, and `Scope`, must hold together.
+All four, and `Scope`, must hold together.
 
 ### `All` — every entry must be present
 
@@ -93,9 +96,67 @@ meaningless once a richer column is available.
 > in the corpus exercises it, so you are the first reader of any error it produces. Prefer `All`
 > or `Any` where either expresses the same thing.
 
+### `All_Or_None` — every entry present, or none of them
+
+`All_Or_None` is a list of **groups**, spelled exactly like `Any`. A group is satisfied when
+**all** of its entries are present **or none** is. A group that is only partly present skips the
+rule, and the reason names both halves:
+
+```
+Requirements.Variables.All_Or_None group 1 [VISITDY, TV.VISITDY] is only partly present — present: [TV.VISITDY], absent: [VISITDY]
+```
+
+It exists for one shape: a **join key that is optional on both sides**. `VISITDY` is permissible
+in SV and in TV, so a valid study can carry it on both sides, on neither, or on one. Joined on
+both, or dropped on neither, the rule is right. Carried on one side only, no row matches and every
+planned visit is reported. Neither `All` (skips the "neither" study, which should run) nor leaving
+the column undeclared (floods the one-sided study) can say what this facet says:
+
+```yaml
+Requirements:
+  Variables:
+    All: ["VISITNUM", "VISIT", "TV.VISITNUM", "TV.VISIT"]
+    All_Or_None: [["VISITDY", "TV.VISITDY"]]
+Match_Datasets:
+- Name: "TV"
+  Keys: ["VISITNUM", "VISIT", "VISITDY"]
+```
+
+Write the primary's side bare and the joined side qualified, as `All` does it. Groups may have
+more than two entries; a three-entry group needs all three or none.
+
+| study | `All: [VISITDY, TV.VISITDY]` | undeclared | `All_Or_None: [[VISITDY, TV.VISITDY]]` |
+|---|---|---|---|
+| both sides carry it | runs | runs | runs |
+| neither side carries it | **skips** | runs | runs |
+| one side only | skips | **floods** | skips |
+
+**Wildcard entries are compared resolved.** A glob, a `/regex/` or a marker template resolves to
+the set of concrete column names it matches, and an all-present group additionally needs those
+sets to be equal — `[["TRTxxP", "ADSL.TRTxxP"]]` runs when no `TRTxxP` exists anywhere or when the
+same ones exist on both sides, and skips when ADSL has `TRT01P` only while the primary has
+`TRT01P` and `TRT02P`. A literal entry takes part by presence only, so two differently named
+literals can be paired.
+
+The load-time rules are `Any`'s — flat is one group, nested is several, two distinct entries per
+group, no mixed shape, a warning on an entry repeated across groups — plus two of its own:
+
+| you write | what happens |
+|---|---|
+| `All: ["VISITDY"]` and `All_Or_None: [["VISITDY", "TV.VISITDY"]]` | **load error** — `All` already makes it present, so the group could only ever be all-present |
+| `None: ["VISITDY"]` and the same group | **load error** — `None` forbids it, so the group could only ever be all-absent |
+| `All_Or_None: [["VISITDY:N", "TV.VISITDY"]]` | **load error** — the facet decides presence, and a column present with the wrong type is neither present nor absent |
+
+An entry shared with `Any` is legal: "these travel together" and "one of these is present" are
+independent claims. The facet is evaluated after `All`, `Any` and `None`, so a rule whose other
+facets are unmet keeps reporting exactly the reason it always did.
+
+> ⚠ **No shipped rule uses `All_Or_None` yet.** Whether a rule adopts it is an authoring decision
+> taken per join key, not something the engine applies on its own.
+
 ## What an entry may be
 
-The same vocabulary on all three facets:
+The same vocabulary on all four facets:
 
 | entry | means |
 |---|---|
@@ -106,7 +167,7 @@ The same vocabulary on all three facets:
 | `/^AE.*DTC$/` | a regular expression |
 
 Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) — `AESTDY:N`,
-`DM.AGE:N`, `"/^AE.*DTC$/:C"` — on the `All` and `Any` facets.
+`DM.AGE:N`, `"/^AE.*DTC$/:C"` — on the `All` and `Any` facets, and on those two only.
 
 A qualified entry is how you require a column in a dataset other than the one the rule is running
 on — usually one you are about to [join](joins.md).
@@ -159,15 +220,17 @@ Two cases resolve the type elsewhere:
 - **A variable delivered through the SUPP-QNAM pivot** takes that `SUPPxx` table's **`QVAL`**
   type, because that is how its values actually arrive.
 
-### ⛔ `None` does not accept a suffix
+### ⛔ `None` and `All_Or_None` do not accept a suffix
 
 ```yaml
-None: ["AESTDY:N"]     # load error
+None: ["AESTDY:N"]                       # load error
+All_Or_None: [["AESTDY:N", "DM.AGE"]]    # load error
 ```
 
-It would have to mean *"no numeric variable of that name may be present"* — which a variable of
-the **other** type also satisfies, making the requirement meaningless. The loader rejects it by
-name.
+In `None` it would have to mean *"no numeric variable of that name may be present"* — which a
+variable of the **other** type also satisfies, making the requirement meaningless. In
+`All_Or_None` the facet decides presence, and a column that is present with the wrong type is
+neither present nor absent. The loader rejects both by name.
 
 ### ⚠ Two entries differing only by suffix are one entry
 

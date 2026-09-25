@@ -471,6 +471,7 @@ The requirements a `skipped` scenario can be built on
 | `Requirements.Variables.All` | one listed column | **every** entry must be present |
 | `Requirements.Variables.Any` | **all** listed columns — withholding one is not enough | the leg is unmet only when *every* entry is absent |
 | `Requirements.Variables.None` | nothing — it **adds** a listed column | no listed entry may be present |
+| `Requirements.Variables.All_Or_None` | **one** entry of a group, keeping the others | a group is unmet only when partly present — withholding the whole group is the all-absent case, which runs |
 | `Requirements.Datasets` | the whole `dataset` block for that name | the run must carry it |
 | a qualified `DATASET.VARIABLE` entry | the foreign `dataset` block, or that column in it | the foreign metadata decides the entry |
 
