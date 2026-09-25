@@ -241,6 +241,25 @@ class JoinKeyDeclarationLintTest
                                 + "    All_Or_None: [[\"IDVAR\", \"AE.IDVAR\"]]\n"),
                 "T-CHILD", "IDVAR", "named by an All_Or_None group");
 
+        // The exception (review round 2, M1): a Child key that ALSO keys an ordinary entry of the
+        // same rule is legitimately named by that entry's group.
+        String childAndDm = """
+                Core: {Id: "T-CHILD-DM"}
+                Requirements:
+                  Variables:
+                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All_Or_None: [["USUBJID", "DM.USUBJID"]]
+                Match_Datasets:
+                - Name: "SUPP--"
+                  Child: true
+                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                - Name: "DM"
+                  Keys: ["USUBJID"]
+                """;
+        assertClean(childAndDm);
+        assertRedNaming(childAndDm.replace("- Name: \"DM\"\n  Keys: [\"USUBJID\"]\n", ""),
+                "T-CHILD-DM", "USUBJID", "named by an All_Or_None group");
+
         String template = """
                 Core: {Id: "T-TEMPLATE"}
                 Requirements:
