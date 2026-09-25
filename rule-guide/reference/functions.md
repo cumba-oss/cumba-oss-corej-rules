@@ -149,7 +149,7 @@ Check:
   expression: 'empty(coalesce(AEDECOD, AETERM))'
 ```
 
-**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing. When every operand is missing or `""`, the result is missing.
+**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing.
 
 
 ### ds_exists
