@@ -968,11 +968,12 @@ See `net.cumba.corej.ruletest.cdt.CdtLoader`:
 
 ```java
 // From classpath
-TestDataTable table = CdtLoader.loadResource(
+OverlayDataTable table = CdtLoader.loadResource(
     "net/cumba/corej/core/ruletestsuites/cdisc/CDISC-AD0117/CDISC-AD0117-valid-ADLBC.cdt");
 
 // From a String (useful for inline test cases)
-TestDataTable table = CdtLoader.parse(content, "sourceName");
+OverlayDataTable table = CdtLoader.parse(content, "sourceName");
 ```
 
-The loader has no external dependencies beyond the base `TestDataTable` API.
+The loader returns `net.cumba.datatable.impl.support.OverlayDataTable` (from `cumba-datatable-impl`) and
+needs nothing beyond that.
