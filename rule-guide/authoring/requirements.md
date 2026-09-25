@@ -2,7 +2,7 @@
 
 <!-- Grounded: Requirements.java (Variables/Datasets authored; Library/Define/Dictionary marked
      "Derived"), VariableRequirement.java (All/Any/None/All_Or_None semantics, entry vocabulary,
-     the M2-D24 / M3-F.1 owner ruling, None has zero corpus carriers), AnyGroupsJson.java (the
+     the M2-D24 / M3-F.1 owner ruling, None is rare in the corpus), AnyGroupsJson.java (the
      full parse table shared by Any and All_Or_None, gate R4 arms), ScopeMatcher.java
      (describeAllOrNoneGroup: presence per entry, pattern entries compared resolved),
      Rule.java (Variable_Universe default DATA, skipIfLibraryDefined). -->
@@ -92,9 +92,9 @@ Four shapes are rejected at load rather than interpreted:
 The rule runs only when none of the listed columns exists. Use it for a rule whose question is
 meaningless once a richer column is available.
 
-> ⚠ **`None` has no rules using it today.** The engine supports it and it is tested, but nothing
-> in the corpus exercises it, so you are the first reader of any error it produces. Prefer `All`
-> or `Any` where either expresses the same thing.
+> ⚠ **`None` is rare.** Measured 2026-09-25, 43 authored rules use it (e.g.
+> `CDISC-SEND-0378-A`), against some 1 660 using `All`. Prefer `All` or `Any` where either
+> expresses the same thing.
 
 ### `All_Or_None` — every entry present, or none of them
 
@@ -166,8 +166,10 @@ facets are unmet keeps reporting exactly the reason it always did.
 > the requirement skip runs before the bind is reached. A group alone is the wrong tool for a
 > column the check must read.
 
-> ⚠ **No shipped rule uses `All_Or_None` yet.** Whether a rule adopts it is an authoring decision
-> taken per join key, not something the engine applies on its own.
+> ⭐ **Every keyed join declares its key columns this way** — one group per key column, the first
+> key also in `All` — and the corpus is held to it by `JoinKeyDeclarationLintTest`. The convention
+> and its reasons are in [Joins — Declare the key](joins.md#-declare-the-key--required-for-every-keyed-join).
+> The engine never applies it on its own: a rule without the declaration simply runs.
 
 ## What an entry may be
 

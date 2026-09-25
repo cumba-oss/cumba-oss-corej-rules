@@ -59,6 +59,55 @@ Keys:
 > question to leave to a default — an `inner` join silently removes exactly the rows the rule
 > exists to find. Say which you mean whenever the absence of a partner is part of the question.
 
+## ⛔ Declare the key — required for every keyed join
+
+**A rule that joins on a key MUST declare every key column in
+[`Requirements.Variables`](requirements.md).** Undeclared, a study that lacks a key column does
+not skip the rule — it runs it: a key absent on one side contributes an empty value, no row
+matches, and every row is reported (a flood); a key set absent on both sides is an execution
+error. Neither is an answer about the data. Declared, the rule **skips**, and the skip names the
+column.
+
+The declaration, per key column:
+
+```yaml
+Requirements:
+  Variables:
+    All: ["VISITNUM"]                 # the FIRST key, bare
+    All_Or_None:                      # every key: bare side + joined side, one group each
+    - ["VISITNUM", "TV.VISITNUM"]
+    - ["VISIT", "TV.VISIT"]
+    - ["VISITDY", "TV.VISITDY"]
+Match_Datasets:
+- Name: "TV"
+  Keys: ["VISITNUM", "VISIT", "VISITDY"]
+```
+
+- **One [`All_Or_None`](requirements.md#all_or_none--every-entry-present-or-none-of-them) group
+  per key column**, `[KEY, DS.KEY]` — for a sided key `[LEFT, DS.RIGHT]`. A key present on one
+  side only skips the rule; a key absent on **both** sides is dropped from the join and the rule
+  runs on the remaining keys (a `Perm` key such as `VISITDY` may legitimately be missing from
+  both).
+- **The first key also bare in `All`.** That is what turns "every key absent on both sides" into
+  a skip instead of an error, and it guarantees the primary side of the key the rule is mostly
+  about. Where the check already requires it in `All`, nothing is added.
+- **Several joins on the same key share ONE group** — `[USUBJID, DM.USUBJID, AE.USUBJID]` for a
+  rule joining DM and AE on `USUBJID`. Two groups repeating `USUBJID` mean the same thing but draw
+  a load warning.
+- **`Child: true` entries declare their keys bare in `All` only** (`USUBJID`, `IDVAR`,
+  `IDVARVAL` on the SUPP--/CO/RELREC primary). The parent is resolved per row, so it has no name
+  to declare.
+- **Expansion-template keys** (`&DOM`, `&DOMSEQ`) cannot be declared — loader gate R6 bars a
+  token from `Requirements` — so only a literal first key goes in `All`.
+
+The corpus is held to this by `JoinKeyDeclarationLintTest`: a keyed entry without its
+declarations fails the build, naming the rule and the key.
+
+> ⚠ **The key is not the only column to declare.** A column the check *reads* is declared bare in
+> `All` too when its presence is a precondition of the check — never a column that is one
+> disjunct among several, and never the column whose absence **is** the finding
+> ([the one rule](requirements.md#-the-one-rule-that-matters-more-than-the-syntax)).
+
 ## Key types must agree — and what to do when they do not
 
 A join key is matched **by type**. A character `AESEQ` and a numeric `AESEQ` are not the same key,
@@ -246,6 +295,9 @@ parent's columns**. The check can then read those columns directly.
 
 The remaining keys — `Keys` minus `IDVAR` and `IDVARVAL` — narrow which parent rows are
 considered.
+
+> ⛔ **Declare the child-side keys bare in `All`** — see
+> [Declare the key](#-declare-the-key--required-for-every-keyed-join).
 
 > ⚠ **`STUDYID` participates only if you declare it.** It is not added implicitly. Omitting it
 > from `Keys` means rows are matched across studies, which matters for a pooled submission.
