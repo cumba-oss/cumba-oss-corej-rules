@@ -27,7 +27,11 @@ class TestHomeIsSandboxedTest
                 home.getParent() != null
                         && "target".equals(home.getParent().getFileName().toString()),
                 "user.home must sit directly under target/, but is " + home);
-        assertTrue(!home.equals(HomeStaysCleanExtension.realHome()),
-                "user.home must not be the real home " + HomeStaysCleanExtension.realHome());
+        // The real home is the environment's; the redirect never touches it. (The engine has no
+        // home tier of its own, so no HomeStaysCleanExtension here - review round 2.)
+        String env = System.getenv("HOME") != null ? System.getenv("HOME")
+                : System.getenv("USERPROFILE");
+        assertTrue(env == null || !home.equals(Path.of(env).toAbsolutePath()),
+                "user.home must not be the real home " + env);
     }
 }
