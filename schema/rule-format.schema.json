@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cumba.net/corej/rule-format.schema.json",
   "title": "coreJ CDISC rule package",
-  "description": "Machine-readable schema for the rule packages under rules-legacy/ and rules/ (R-P5, plans/done/PLAN-native-engine-residuals.md). Deliberately permissive where the engine is lenient (the loader disables FAIL_ON_UNKNOWN_PROPERTIES, so extra fields are allowed everywhere); strict on the shapes the engine actually dispatches on: the package envelope, the Check tree (all/any/not/expression - the operator-leaf alternative was removed with the v1 model, phase 7d), Bindings, Match_Datasets, the Outcome, and the Sensitivity / Executability / Variable_Universe enums (Phase 2 of plans/PLAN-extend-expression-engine.md: the loader fails loud — Rule.loadError, executed as ERROR — on a present-but-unrecognized value for these fields; an absent or null field stays legal). Rule_Type is no longer a rule field (plans/PLAN-leaf-scope-domain-inference.md phase 7): a rule carrying it fails to load.",
+  "description": "Machine-readable schema for the rule packages under rules-legacy/ and rules/ (R-P5, plans/done/PLAN-native-engine-residuals.md). Closed on every object of a rule the engine binds (PLAN-rule-unknown-keys-gate, owner ruling 2026-09-25: \"unknown keys in a rule should always result in a load error\"): the rule object, Core, Scope, Outcome, Grouping, each Authorities / Expansion / Match_Datasets entry and each object element of Match_Datasets[].Keys declare exactly the keys the engine binds, so a key the loader rejects is rejected here too. Two deliberate openings, both covered by the loader instead: the condition node (#/$defs/check), whose stray keys beside all/any/not/expression the engine reports (closing it here would reject a level's Message through levelCheck's allOf), and the children of Scope, which stay untyped apart from Datasets. Strict, too, on the shapes the engine actually dispatches on: the package envelope, the Check tree (all/any/not/expression - the operator-leaf alternative was removed with the v1 model, phase 7d), Bindings, Match_Datasets, the Outcome, and the Sensitivity / Executability / Variable_Universe enums (Phase 2 of plans/PLAN-extend-expression-engine.md: the loader fails loud — Rule.loadError, executed as ERROR — on a present-but-unrecognized value for these fields; an absent or null field stays legal). Rule_Type is no longer a rule field (plans/PLAN-leaf-scope-domain-inference.md phase 7): a rule carrying it fails to load.",
   "type": "object",
   "required": ["rules"],
   "properties": {
@@ -52,9 +52,12 @@
     "rule": {
       "type": "object",
       "required": ["Check"],
+      "additionalProperties": false,
+      "$comment": "Closed (PLAN-rule-unknown-keys-gate): every key below is one the engine binds, and the loader reports any other key at the top level of a rule as a per-rule load error naming it. Deliberately NOT declared although the engine model has a property for them: id (set from the key of the rules map, never authored inside the rule), Rule_Type and Operations (retired - the loader rejects both by name). Source / Source_Proposed are authoring provenance, stripped from every package by ReleaseShapeTrimmer; a package carrying either fails to load.",
       "properties": {
         "Core": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "Id": { "type": "string" },
             "Status": { "type": "string" },
@@ -84,12 +87,18 @@
           ]
         },
         "ExecutabilityHint": { "type": ["object", "string", "null"] },
-        "Authorities": { "type": ["array", "null"] },
+        "Authorities": { "type": ["array", "null"], "items": { "$ref": "#/$defs/authority" } },
         "Scope": {
           "type": ["object", "null"],
-          "description": "Which datasets the rule is ABOUT - selection, never a verdict (plans/PLAN-scope-requirements-split.md section 4.1). Classes, Domains, Datasets, Data_Structures, Subclasses, Use_Case. Deliberately left untyped apart from Datasets (PLAN-scope-data-structures-subclasses.md): the axes are validated byte-exactly at load, and a schema copy of the closed vocabularies would be a second place to drift. Scope carries NO Variables block: it retired to Requirements.Variables, and a surviving one is a load error on a corpus rule (loader gate R1) because the engine model no longer binds it.",
+          "description": "Which datasets the rule is ABOUT - selection, never a verdict (plans/PLAN-scope-requirements-split.md section 4.1). Classes, Domains, Datasets, Data_Structures, Subclasses, Use_Case. Deliberately left untyped apart from Datasets (PLAN-scope-data-structures-subclasses.md): the axes are validated byte-exactly at load, and a schema copy of the closed vocabularies would be a second place to drift. Scope itself is closed: its six keys are declared, so an unknown sibling of them fails here as it fails at load; an unknown key INSIDE Classes / Domains / Use_Case / Data_Structures / Subclasses is the loader's to reject (PLAN-rule-unknown-keys-gate T1-9). Scope carries NO Variables block: it retired to Requirements.Variables, and a surviving one is a load error on a corpus rule (loader gate R1) because the engine model no longer binds it.",
+          "additionalProperties": false,
           "properties": {
-            "Datasets": { "$ref": "#/$defs/datasetScope" }
+            "Classes": {},
+            "Domains": {},
+            "Datasets": { "$ref": "#/$defs/datasetScope" },
+            "Use_Case": {},
+            "Data_Structures": {},
+            "Subclasses": {}
           }
         },
         "Requirements": { "$ref": "#/$defs/requirements" },
@@ -102,6 +111,7 @@
         },
         "Outcome": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "Message": { "type": ["string", "null"] },
             "Output_Variables": {
@@ -133,6 +143,7 @@
         "Grouping": {
           "type": ["object", "null"],
           "description": "Fix #180 - the rule-level grouping block: the grouping key plus its keep_missings disposition. Java-only: the Python reference engine has no channel for keep_missings, so the legacy view is degraded back to the flat Grouping_Variables and the parameter is dropped. Mutually exclusive with Grouping_Variables.",
+          "additionalProperties": false,
           "properties": {
             "Variables": {
               "type": ["array", "null"],
@@ -145,7 +156,41 @@
           "type": ["string", "null"],
           "enum": ["Data", "Define", null],
           "description": "PLAN-leaf-scope-domain-inference.md section 3.7 - which variables the VAR cursor iterates for a rule whose evaluation domain carries that cursor: Data (default when absent; the dataset's columns in column order) or Define (the Define-XML ItemDefs of the domain in ItemDef order; no Define-XML provider means SKIPPED). Iteration only - Requirements.Variables still filters within the universe. Never derived from operand classes. Define on a Check with no variable cursor is a load error."
+        },
+        "wildcards": {
+          "type": ["object", "null"],
+          "description": "Engine extension (rule specification, Engine Fields - wildcards): per wildcard group name, the inclusive min / max bounds a captured value must satisfy; candidates outside every bound are dropped by the WildcardExpander. A group name that appears in no wildcard of the rule is a load error.",
+          "additionalProperties": {
+            "type": ["object", "null"],
+            "properties": {
+              "min": { "type": ["integer", "null"] },
+              "max": { "type": ["integer", "null"] }
+            }
+          }
+        },
+        "skipIfLibraryDefined": {
+          "type": ["boolean", "null"],
+          "description": "Engine extension: when true, expanded rules are skipped for variables that have CDISC Library definitions (the Library-driven checks are more precise)."
+        },
+        "wildcardExclude": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "description": "Engine extension (rule specification, Engine Fields - wildcardExclude): secondary columns that must NOT be treated as a pairing secondary when a bare-* / *N / *C template expands."
+        },
+        "wildcardPairCatalogue": {
+          "type": ["boolean", "null"],
+          "description": "Engine extension (rule specification, Engine Fields - wildcardPairCatalogue): when true, an empty-suffix wildcard pairing template only expands for secondary columns in the curated CDISC-standard pair catalogue."
         }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "description": "One Authorities entry. A shipped package carries the release shape {Organization, Rule_Ids} (ReleaseShapeTrimmer); Standards is admitted for an untrimmed package, whose engine binding is the authored standard / reference tree (not typed here). Closed: any other key is a load error under Authorities[i] (PLAN-rule-unknown-keys-gate).",
+      "additionalProperties": false,
+      "properties": {
+        "Organization": { "type": ["string", "null"] },
+        "Standards": { "type": ["array", "null"] },
+        "Rule_Ids": { "type": ["array", "null"], "items": { "type": "string" } }
       }
     },
     "checkOrLevels": {
@@ -156,7 +201,7 @@
       ]
     },
     "plainCheck": {
-      "description": "A Check that declares no level at all - one condition, one level, at the rule's effective Severity. The propertyNames clause is what makes a MIXED map ({ERROR: ..., expression: ...}) invalid: without it the mixed map would satisfy this branch (the condition shapes tolerate extra keys, because the loader runs with FAIL_ON_UNKNOWN_PROPERTIES off) and the oneOf would match exactly once and pass. It uses the ^[A-Z][A-Z0-9_]*$ level-SHAPED test the deserialiser (RuleCheckDeserializer.LEVEL_SHAPED) uses, not an enumeration of the four canonical names: enumerating the names accepted a mixed map whose level key was misspelled or non-canonical ({CRITICAL: ..., expression: ...}), which the loader rejects. Every legitimate condition key (all/any/not/expression, the leaf fields) is lower-case, so no well-formed plain Check carries an all-caps key. Known residual: a mixed-CASE mis-spelt level key ({Error: ...}) is not level-shaped and still passes this branch - the loader's parseOrNull dispatch catches it.",
+      "description": "A Check that declares no level at all - one condition, one level, at the rule's effective Severity. The propertyNames clause is what makes a MIXED map ({ERROR: ..., expression: ...}) invalid: without it the mixed map would satisfy this branch (the condition shape #/$defs/check is deliberately open - see its $comment) and the oneOf would match exactly once and pass. It uses the ^[A-Z][A-Z0-9_]*$ level-SHAPED test the deserialiser (RuleCheckDeserializer.LEVEL_SHAPED) uses, not an enumeration of the four canonical names: enumerating the names accepted a mixed map whose level key was misspelled or non-canonical ({CRITICAL: ..., expression: ...}), which the loader rejects. Every legitimate condition key (all/any/not/expression, the leaf fields) is lower-case, so no well-formed plain Check carries an all-caps key. Known residual: a mixed-CASE mis-spelt level key ({Error: ...}) is not level-shaped and still passes this branch - the loader's parseOrNull dispatch catches it.",
       "allOf": [
         { "$ref": "#/$defs/check" },
         {
@@ -182,7 +227,9 @@
       "allOf": [{ "$ref": "#/$defs/check" }],
       "properties": {
         "Message": { "type": ["string", "null"], "description": "This level's message; absent means the rule's Outcome.Message." }
-      }
+      },
+      "unevaluatedProperties": false,
+      "$comment": "unevaluatedProperties, NOT additionalProperties: additionalProperties sees only this object's own properties (Message), so it would reject expression / all / any / not in every level entry. unevaluatedProperties also counts the keys the allOf's check evaluated, so a level entry admits exactly one condition's keys plus Message."
     },
     "check": {
       "type": "object",
@@ -198,7 +245,7 @@
         { "required": ["not"] },
         { "required": ["expression"] }
       ],
-      "$comment": "The operator-leaf alternative ({ operator:, name:, value:, value_is_literal:, regex:, prefix:, suffix:, within:, ordering:, ... }) was REMOVED on 2026-09-17 together with its leaf $def. Phase 7d of plans/PLAN-typed-expression-engine.md deleted the v1 operator-leaf model whole (ExprLowering, CheckConditionLeaf, CheckOperator), and CheckConditionDeserializer now REJECTS a Check node carrying operator: with a message naming expression: as the replacement. While the alternative stood, this schema validated a rule the loader refuses - a machine-readable document asserting the opposite of the engine, which is worse than a stale sentence because something downstream believes it. Corpus at removal: 0 files with an operator-leaf Check."
+      "$comment": "The operator-leaf alternative ({ operator:, name:, value:, value_is_literal:, regex:, prefix:, suffix:, within:, ordering:, ... }) was REMOVED on 2026-09-17 together with its leaf $def. Phase 7d of plans/PLAN-typed-expression-engine.md deleted the v1 operator-leaf model whole (ExprLowering, CheckConditionLeaf, CheckOperator), and CheckConditionDeserializer now REJECTS a Check node carrying operator: with a message naming expression: as the replacement. While the alternative stood, this schema validated a rule the loader refuses - a machine-readable document asserting the opposite of the engine, which is worse than a stale sentence because something downstream believes it. Corpus at removal: 0 files with an operator-leaf Check. DELIBERATELY OPEN (PLAN-rule-unknown-keys-gate, review H2): additionalProperties:false here would reject a level's Message through levelCheck's allOf. A key beside a condition's dispatch key ({expression, Mesage}, {all, expression}) is rejected by the loader instead - per rule under Check, whole package under Precondition."
     },
     "binding": {
       "type": "object",
@@ -212,6 +259,7 @@
     "expansion": {
       "type": "object",
       "required": ["token", "over"],
+      "additionalProperties": false,
       "properties": {
         "token": { "type": "string", "description": "The exact string substituted wherever it occurs in the rule body. Author-chosen; must carry a non-alphanumeric sigil so it can never collide with a CDISC variable name (R-5.17)." },
         "over": { "enum": ["shared_variables", "domain_from_variable"], "description": "The binding source. Closed and extensible: a third source costs one new value here plus its resolver in TokenExpander." },
@@ -224,7 +272,7 @@
       "type": "object",
       "properties": {
         "Name": { "type": ["string", "null"] },
-        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "required": ["left", "right"], "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
+        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "required": ["left", "right"], "additionalProperties": false, "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
         "Child": { "type": ["boolean", "null"] },
         "keep_missings": { "type": ["boolean", "null"] },
         "Join_Type": { "type": ["string", "null"] },
