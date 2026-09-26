@@ -147,9 +147,8 @@ class RuleScaffoldDroppedKeysTest
                 Requirements:
                   Variabels: {All: [COMPLFL]}""");
         IllegalStateException ex = buildAndExpectRejection(yaml);
-        assertTrue(ex.getMessage().contains("Requirements.Variabels"),
-                () -> "Message must name the block AND the key ('Requirements.Variabels'): "
-                        + ex.getMessage());
+        assertTrue(ex.getMessage().contains("unknown key 'Variabels' under 'Requirements'"),
+                () -> "Message must name the block AND the key (R2's shape): " + ex.getMessage());
     }
 
 
@@ -167,9 +166,8 @@ class RuleScaffoldDroppedKeysTest
                   Variables:
                     AnyOf: [AESTDTC, AEENDTC]""");
         IllegalStateException ex = buildAndExpectRejection(yaml);
-        assertTrue(ex.getMessage().contains("Requirements.Variables.AnyOf"),
-                () -> "Message must name the facet's full path"
-                        + " ('Requirements.Variables.AnyOf'): " + ex.getMessage());
+        assertTrue(ex.getMessage().contains("unknown key 'AnyOf' under 'Requirements.Variables'"),
+                () -> "Message must name the facet's full path (R2's shape): " + ex.getMessage());
     }
 
 
@@ -182,9 +180,8 @@ class RuleScaffoldDroppedKeysTest
                   Domains: {Include: [AE]}
                   Datasets: {Includes: [AE]}""");
         IllegalStateException ex = buildAndExpectRejection(yaml);
-        assertTrue(ex.getMessage().contains("Scope.Datasets.Includes"),
-                () -> "Message must name the block AND the key ('Scope.Datasets.Includes'): "
-                        + ex.getMessage());
+        assertTrue(ex.getMessage().contains("unknown key 'Includes' under 'Scope.Datasets'"),
+                () -> "Message must name the block AND the key (R2's shape): " + ex.getMessage());
     }
 
 
