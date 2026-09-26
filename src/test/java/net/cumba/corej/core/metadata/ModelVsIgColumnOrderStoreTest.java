@@ -7,12 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.MetadataProvider;
@@ -214,10 +217,44 @@ class ModelVsIgColumnOrderStoreTest
     }
 
 
-    @Test
-    void theSkewRosterIsExactForEveryPackageTheRuleShipsIn()
+    /**
+     * The packages the generated corpus ships {@link #RULE_ID} in, as store keys
+     * ({@code rules-fda-sendig-dart-1-1.json} &rarr; {@code "sendig dart-1-1"}): every
+     * {@code rules-*.json} under the corpus directory is loaded and asked, so the population is the
+     * corpus's, not a count written into this class.
+     */
+    private static Set<String> shippingPackages() throws IOException
     {
-        assertEquals(10, SKEW.size(), "FDA-SD0058 ships in ten packages; the roster covers each");
+        Set<String> out = new TreeSet<>();
+        try (Stream<Path> files = Files.list(CorpusPaths.rules()))
+        {
+            for (Path file : files.sorted().toList())
+            {
+                String name = file.getFileName().toString();
+                if (!name.startsWith("rules-") || !name.endsWith(".json"))
+                {
+                    continue;
+                }
+                if (RulePackageLoader.load(file).getRules().containsKey(RULE_ID))
+                {
+                    // rules-<family>-<standard>-<version>.json
+                    String[] parts = name.substring(0, name.length() - ".json".length()).split("-",
+                            4);
+                    out.add(parts[2] + " " + parts[3]);
+                }
+            }
+        }
+        assertFalse(out.isEmpty(), RULE_ID + " ships in no generated package");
+        return out;
+    }
+
+
+    @Test
+    void theSkewRosterIsExactForEveryPackageTheRuleShipsIn() throws IOException
+    {
+        assertEquals(shippingPackages(), SKEW.keySet(),
+                "the roster must cover exactly the packages the generated corpus ships " + RULE_ID
+                        + " in");
         for (Map.Entry<String, Map<String, Set<String>>> e : SKEW.entrySet())
         {
             assertEquals(new TreeMap<>(e.getValue()), skewOf(provider(e.getKey())),
