@@ -37,7 +37,10 @@ import org.junit.jupiter.api.Test;
  * Since that plan the net is the engine's own composite, {@code RulePackageLoader.unknownKeyErrors}
  * — so the cases below also cover a top-level key, an {@code Outcome} key, a key beside
  * {@code expression:} in {@code Check} (which must fail the scaffold, never run the spec with the
- * condition dropped), a {@code Match_Datasets} typo and an inline {@code Source:} block.
+ * condition dropped), a {@code Match_Datasets} typo and an inline {@code Source:} block — and,
+ * since §5.7 of that plan, the loader's join-key declaration gate
+ * ({@code RulePackageLoader.joinKeyDeclarationErrors}), so a spec cannot pin a keyed join the
+ * product refuses.
  * </p>
  */
 class RuleScaffoldDroppedKeysTest
@@ -231,6 +234,39 @@ class RuleScaffoldDroppedKeysTest
         IllegalStateException ex = buildAndExpectRejection(yaml);
         assertTrue(ex.getMessage().contains("unknown key 'Join_type' under 'Match_Datasets[0]'"),
                 ex::getMessage);
+    }
+
+
+    /**
+     * The join-key net ({@code RuleScaffold.rejectUndeclaredJoinKeys}, PLAN-rule-unknown-keys-gate
+     * §5.7, review round 4 H7): a keyed {@code Match_Datasets} entry the product loader refuses —
+     * its key undeclared in {@code Requirements.Variables} — must fail the scaffold, never run the
+     * spec on a rule no package could load. The declared twin passes (control).
+     */
+    @Test
+    void undeclaredJoinKey_isRejected()
+    {
+        String yaml = specWith("net_jk", """
+                Scope:
+                  Domains: {Include: [AE]}
+                Match_Datasets:
+                  - {Name: DM, Keys: [USUBJID]}""");
+        IllegalStateException ex = buildAndExpectRejection(yaml);
+        assertTrue(ex.getMessage().contains("refuses this rule's Match_Datasets"), ex::getMessage);
+        assertTrue(ex.getMessage().contains(
+                "key USUBJID has no Requirements.Variables.All_Or_None group holding both USUBJID"
+                        + " and DM.USUBJID"),
+                ex::getMessage);
+        String declared = specWith("net_jk_ok", """
+                Scope:
+                  Domains: {Include: [AE]}
+                Requirements:
+                  Variables:
+                    All: [USUBJID]
+                    All_Or_None: [[USUBJID, DM.USUBJID]]
+                Match_Datasets:
+                  - {Name: DM, Keys: [USUBJID]}""");
+        assertDoesNotThrow(() -> RuleScaffold.build(SpecLoader.loadFromString(declared), "AE"));
     }
 
 

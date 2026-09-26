@@ -491,7 +491,15 @@ class JoinKeyDeclarationLintTest
         {
             List<String> left = md.getKeys();
             List<String> right = md.getRightKeys();
-            if (left == null || right == null || Boolean.TRUE.equals(md.getChild()))
+            // ORDINARY entries only, as keysAnOrdinaryEntry and the loader twin
+            // (RulePackageLoader.joinSidesOf) read it: neither a Child entry nor an expansion
+            // template (an &-token name or key) contributes a `NAME.RIGHT` side — a template's
+            // name is a token, not a dataset (PLAN-rule-unknown-keys-gate review round 4, G2).
+            if (left == null || right == null || md.getName() == null
+                    || Boolean.TRUE.equals(md.getChild())
+                    || String.valueOf(md.getName()).startsWith("&")
+                    || left.stream().anyMatch(k -> k.startsWith("&"))
+                    || right.stream().anyMatch(k -> k.startsWith("&")))
             {
                 continue;
             }

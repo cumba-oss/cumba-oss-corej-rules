@@ -107,6 +107,7 @@ public final class RuleScaffold
             // would bind to nothing and expand unfiltered with no diagnostic at all. Fail here
             // instead, on ANY key the model did not bind.
             rejectDroppedKeys(spec, rule);
+            rejectUndeclaredJoinKeys(spec, rule);
             RulePackageLoader.normalizeJoinTypes(rule);
         }
         // The scaffold bypasses RulePackageLoader, so a built rule carries no native checkExpr and
@@ -167,6 +168,34 @@ public final class RuleScaffold
                     + " block that should now be `Requirements: {Variables: {All: …}}`"
                     + " (PLAN-scope-requirements-split.md), an inline `Source:` block (authoring"
                     + " provenance, not engine format) or a typo.");
+        }
+    }
+
+
+    /**
+     * The scaffold's join-key net, the sibling of {@link #rejectDroppedKeys}: this lane never runs
+     * {@code finishLoad}, so without it a spec could pin the behaviour of a keyed
+     * {@code Match_Datasets} entry that the product loader refuses ({@code
+     * RulePackageLoader.validateJoinKeyDeclarations}, PLAN-rule-unknown-keys-gate §5.7 — every
+     * keyed join declares its key in {@code Requirements.Variables}). A spec's inline rule is held
+     * to the shipped shape exactly as the corpus is ({@code JoinKeyDeclarationLintTest}).
+     *
+     * @param spec
+     *            the spec being scaffolded, named in the failure message
+     * @param rule
+     *            the bound rule
+     * @throws IllegalStateException
+     *             if the loader reports an undeclared join key
+     */
+    private static void rejectUndeclaredJoinKeys(SpecSchema spec, Rule rule)
+    {
+        List<String> errors = RulePackageLoader.joinKeyDeclarationErrors(rule);
+        if (!errors.isEmpty())
+        {
+            throw new IllegalStateException("Spec '" + spec.name() + "': the product loader"
+                    + " refuses this rule's Match_Datasets — " + String.join("; ", errors)
+                    + ". A spec cannot pin a rule the loader would not load; declare the key"
+                    + " (rule-guide authoring/joins.md, 'Declare the key').");
         }
     }
 
