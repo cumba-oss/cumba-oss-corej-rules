@@ -217,6 +217,23 @@ public final class FindingsSnapshot
     /** Runs the study validation and projects it to rows. */
     public static Snapshot snapshot() throws IOException
     {
+        return project(run(null));
+    }
+
+
+    /**
+     * Runs the study validation this snapshot censuses — optionally under a run use case, which the
+     * committed artifact never uses ({@code UseCaseFilterSnapshotTest} is the one caller that
+     * passes one, to prove the use-case filter against the same study and corpus).
+     *
+     * @param useCase
+     *            the run's use case, or {@code null} for the census run itself
+     * @return the raw result
+     * @throws IOException
+     *             when the untracked study fixture or the pickle corpus is missing
+     */
+    public static StudyValidationResult run(@Nullable String useCase) throws IOException
+    {
         Path study = studyDir();
         if (!Files.isDirectory(study))
         {
@@ -232,15 +249,14 @@ public final class FindingsSnapshot
                 .defineXmlPath(study.resolve("define.xml").toString()).rulesPackages(RULES_PACKAGES)
                 .rulesDir(CorpusPaths.rules().toString()).ruleThreads(1)
                 .maxErrorsPerRule(MAX_ERRORS_PER_RULE).severityThreshold(SEVERITY_THRESHOLD)
-                .build();
+                .useCase(useCase).build();
         // tryStoreProvider reads CDISC_METADATA_STORE / cdisc.metadata.store, not a params field —
         // point it at the seeded store for the duration of the run and restore afterwards.
         String prev = System.getProperty(StoreMetadataProviderFactory.STORE_PROPERTY);
         System.setProperty(StoreMetadataProviderFactory.STORE_PROPERTY, store.toString());
         try
         {
-            StudyValidationResult result = new StudyValidationService().validate(params);
-            return project(result);
+            return new StudyValidationService().validate(params);
         }
         finally
         {
