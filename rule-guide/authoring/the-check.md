@@ -130,6 +130,12 @@ When a weaker form of the same finding is genuinely worth reporting. The usual c
 only *"these may disagree"*. Reporting the second as an error would be wrong, and dropping it
 would lose a real signal.
 
+A second case is **a reference that is out of date**. `FDA-SD0058` asks whether a variable is
+allowed in a dataset: in neither the SDTM model list nor the IG's list it is a sponsor variable
+(`ERROR`); in the IG's list but not the model's, the IG has simply run ahead of the model version it
+links to (`WARNING`). Its two rungs are written as **disjoint** conditions, so neither relies on the
+engine's rule that a finding a stricter level already reported is not reported again by a weaker one.
+
 Do not use a ladder to express two different requirements. That is two rules.
 
 ### Two shapes that are load errors

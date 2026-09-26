@@ -29,7 +29,8 @@ the library holds nothing under.
 **Every such function is total over that.** It answers with its own declared *empty result* —
 a count answers `0`, a set answers the empty set, a predicate answers `false`, a text lookup
 answers `""`, a calculation answers missing — and the check then computes honestly over that
-value. A section headed **When there is nothing to answer** states which, per function.
+value. A section headed **When there is nothing to answer** states which, per function. ⚠ A few
+library lookups are exceptions and SKIP the rule instead; their section says so.
 
 > ⛔ **An empty answer is a value, never a "do not fire".** `record_count(domain="DS")` on a study
 > with no `DS` dataset is **`0`**, so `$n == 0` **fires** — the rule reports, it does not stand
@@ -2696,7 +2697,7 @@ Check:
 
 The example above is the complete call — this function takes no arguments beyond its optional target.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is mapped to *library not available*. To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
 
 ### get_dataset_filtered_variables
 
@@ -2742,6 +2743,8 @@ Check:
 
 The column order of the standard's model, as a list
 
+It is the **pure SDTM model walk** for the dataset's observation class: the IG's own dataset variables are never merged in. Where an IG runs ahead of the model version it links to, a variable the IG defines for the dataset is therefore **absent** from this list (60 of them at SENDIG 3.0, 5 at SDTMIG 3.3, none at SDTMIG 3.4). `FDA-SD0058` binds it next to the IG list from [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) and reports such a variable at `WARNING`, a variable in neither list at `ERROR`.
+
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column | no | The column to read |
@@ -2761,7 +2764,7 @@ Check:
 
 The example above is the complete call — this function takes no arguments beyond its optional target.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty model list is mapped to *library not available*, so `varname() not in $s` never fans out over every column. A sponsor-defined (custom) domain resolves no model list today, so a rule binding this operation skips it.
 
 ### get_model_filtered_variables
 
@@ -2827,7 +2830,7 @@ Check:
 
 The example above is the complete call — this function takes no arguments beyond its optional target.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: when no row's parent domain resolves a model list, the operation answers *library not available*.
 
 ### natural_key_variables
 
