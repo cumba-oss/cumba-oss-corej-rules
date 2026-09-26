@@ -308,10 +308,11 @@ Use_Case: "INDH, PROD"
 > `Use_Case: ["INDH", "PROD"]` is not the shape the engine reads. Whitespace around the commas is
 > trimmed.
 
-> ⛔ **A malformed value is a load error.** The codes are upper-case letters separated by commas,
-> with no empty code and no duplicate (`R-4.10`). `"INDH;PROD"`, `"indh"`, `"INDH,"` or `" "` make
-> the rule an ERROR execution instead of running: once a run names a use case, a misspelt code
-> would match none and silently skip the rule.
+> ⛔ **A malformed value is a load error.** The codes are upper-case letters separated by commas
+> (blanks around a comma are fine), with no empty code and no code listed more than once
+> (`R-4.10` / `R-4.10a`). `"INDH;PROD"`, `"indh"`, `"INDH,"` or `" "` make the rule an ERROR
+> execution instead of running, and the error names the value — plus the spelling to write,
+> when one exists — so the author sees it at load.
 
 ## Things that are not scope
 
