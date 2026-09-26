@@ -17,6 +17,7 @@ import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.ruletestsuites.CdtResourceExtension;
+import net.cumba.corej.core.ruletestsuites.ScenarioInvocationExtension;
 import net.cumba.corej.ruletest.cdt.CdtLoader;
 import net.cumba.corej.ruletest.cdt.ruletest.OverridingResolver;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario.Verdict;
@@ -40,7 +41,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * The {@link CdtResourceExtension} is registered so subclasses can use {@code @CdtResource("...")}
  * on test parameters to declaratively load {@code .cdt} files.
  */
-@ExtendWith(CdtResourceExtension.class)
+@ExtendWith(
+{
+        CdtResourceExtension.class, ScenarioInvocationExtension.class
+})
 abstract class AbstractAdamRuleTest
 {
 

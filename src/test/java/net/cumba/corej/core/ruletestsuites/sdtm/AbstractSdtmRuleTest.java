@@ -17,6 +17,7 @@ import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.ruletestsuites.CdtResourceExtension;
+import net.cumba.corej.core.ruletestsuites.ScenarioInvocationExtension;
 import net.cumba.corej.ruletest.cdt.CdtLoader;
 import net.cumba.corej.ruletest.cdt.ruletest.OverridingResolver;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario.Verdict;
@@ -53,7 +54,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * {@code PLAN-retire-core-family} re-pointed 22 of them at surviving twins in that same union and
  * deleted one (see {@code SdtmAllRuleTest}).
  */
-@ExtendWith(CdtResourceExtension.class)
+@ExtendWith(
+{
+        CdtResourceExtension.class, ScenarioInvocationExtension.class
+})
 abstract class AbstractSdtmRuleTest
 {
 
