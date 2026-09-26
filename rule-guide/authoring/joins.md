@@ -306,9 +306,15 @@ considered.
 
 > ⛔ **A `Child` entry is joined only through its pointer — it has no direct join.** The engine
 > builds no keyed lookup for it, so `AE._matched_` and a dotted read such as `AE.AESMIE` are
-> **load errors** on a `Child` entry — and so are their template spellings, `SUPPAE._matched_` or
-> `SUPPAE.QVAL` against a `SUPP--` entry. Read the parent's columns **bare**: they arrive through
-> the merge above, under their own names.
+> **load errors** on a `Child` entry — in the `Check`, in a `Bindings` expression, in
+> `Output_Variables`, and as a qualified wildcard (`AE.**SMIE`, `AE.${X}`) — and so are their
+> template spellings, `SUPPAE._matched_`, `SUPPAE.QVAL` or `SUPP--.QVAL` against a `SUPP--` entry.
+> Read the parent's columns **bare**: they arrive through the merge above, under their own names.
+> Two more load errors on a `Child` entry: its `Name` must be a concrete dataset or a template with
+> a **trailing** `--` (`SUPP--`, `SQ--`), and `keep_missings: false` has no effect on it (the
+> pointer merge keeps blank keys unconditionally). ⚠ One shape no check sees: a read whose
+> *qualifier* is itself substituted (`${X}.COL`) is bound per row and, on a `Child` entry, reads the
+> not-supplied default silently — do not write it.
 
 > ⛔ **Declare the child-side keys bare in `All`** — see
 > [Declare the key](#-declare-the-key--required-for-every-keyed-join).
