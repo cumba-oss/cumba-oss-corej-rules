@@ -108,7 +108,10 @@ Match_Datasets:
 - **Expansion-template keys** (`&DOM`, `&DOMSEQ`) cannot be declared — loader gate R6 bars a
   token from `Requirements` — so only a literal first key goes in `All`.
 
-The corpus is held to this by `JoinKeyDeclarationLintTest`: a keyed entry without its
+The corpus is held to this by `JoinKeyDeclarationLintTest`, and **every package by the loader**
+(`RulePackageLoader.validateJoinKeyDeclarations`, the same shape rules): a keyed entry whose key is not
+declared is a per-rule **load error** naming the rule, the entry and the key — in a user package too,
+which the lint cannot see. In the corpus the lint fires first: a keyed entry without its
 declarations fails the build, naming the rule and the key.
 
 > ⚠ **The key is not the only column to declare.** A column the check *reads* is declared bare in
