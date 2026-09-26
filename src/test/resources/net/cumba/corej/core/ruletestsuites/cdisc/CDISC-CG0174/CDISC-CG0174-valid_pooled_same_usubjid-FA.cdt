@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-CG0174 expect=noViolation domain=FA
+# Rule:Description: Raise an error when a related record is present in the parent domain dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent record.
+#note "POOLED package (PLAN-relrec-studyid-link V1): the same person keeps USUBJID U1 in studies S1 and S2 (SDTMIG 3.4 4.2.3) and has AESEQ 1 in both. The S1 RELREC row links FA FASEQ 1 to the S1 AE record (HEADACHE = FAOBJ). The S2 AE record (NAUSEA) is NOT the linked record: a RELREC link joins within ONE study, the RELREC row's own. Before the fix the record-level path keyed on (USUBJID, value) alone and reported HEADACHE != NAUSEA as a violation."
+dataset FA label="Findings About"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Char label="Sequence Number"
+col FAOBJ type=Char label="Object of the Observation"
+---
+S1 | FA | U1 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | U1 | 1 | HEADACHE | HEADACHE
+S2 | AE | U1 | 1 | NAUSEA | NAUSEA
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+S1 | AE | U1 | AESEQ | 1 | R1
+S1 | FA | U1 | FASEQ | 1 | R1
+---

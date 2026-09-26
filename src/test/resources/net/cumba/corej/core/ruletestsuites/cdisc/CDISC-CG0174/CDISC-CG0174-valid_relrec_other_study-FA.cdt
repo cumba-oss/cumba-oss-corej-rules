@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-CG0174 expect=noViolation domain=FA
+# Rule:Description: Raise an error when a related record is present in the parent domain dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent record.
+#note "RELREC names another study (PLAN-relrec-studyid-link V2): every FA and AE row is in S1 and FAOBJ (ASPIRIN) differs from AETERM/AEDECOD (HEADACHE), but the RELREC rows say STUDYID = S2. A RELREC row names its record by STUDYID too (SDTMIG 3.4 8.2), so no S1 record is linked and this rule has nothing to compare. The dangling S2 reference is another rule's finding. Before the fix the RELREC STUDYID was never read and the rule fired."
+dataset FA label="Findings About"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Char label="Sequence Number"
+col FAOBJ type=Char label="Object of the Observation"
+---
+S1 | FA | U1 | 1 | ASPIRIN
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | U1 | 1 | HEADACHE | HEADACHE
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+S2 | AE | U1 | AESEQ | 1 | R1
+S2 | FA | U1 | FASEQ | 1 | R1
+---
