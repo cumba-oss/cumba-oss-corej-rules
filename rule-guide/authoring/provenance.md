@@ -1,8 +1,9 @@
 # Provenance and citations
 
-<!-- Grounded: rule-check.schema.json (Original_Description / Original_Condition descriptions —
-     CDISC/ADaM only; omitted for FDA/PMDA which have no condition column),
-     rule-doc.schema.json (docs file = Core + Citations, both required),
+<!-- Grounded: rule-check.schema.json (Source / Source_Proposed declared as open objects; the
+     retired Original_Description / Original_Condition / Outcome.Original_Message and Variants
+     deleted, 0 carriers, PLAN-rule-unknown-keys-gate), ReleaseShapeTrimmer (strips Source /
+     Source_Proposed from every package), rule-doc.schema.json (docs file = Core + Citations, both required),
      Citation.java (Cited_Guidance, Document, Item, Section), and the composite citation key
      observed in rules-src/docs (ORG|STANDARD|VERSION||RULEID|RULEVERSION). Source /
      Source_Proposed field sets measured across rules-src/checks 2026-09-21. -->
@@ -67,18 +68,21 @@ and finds they disagree.
 > problem is just a second opinion. Say what is wrong with the original and why the correction
 > follows from it.
 
-## `Original_Description` and `Original_Condition`
+## Provenance stays in the authored file
 
-```yaml
-Original_Description: "TSVAL must conform to ISO 8601."
-Original_Condition: "TSPARMCD = 'AGEMAX'"
-```
+`Source` and `Source_Proposed` belong to the rule file under `rules-src/checks` and nowhere else.
+The build **strips both from every released package**: the engine never reads them, and a
+package is what the engine loads.
 
-The source sheet's rule and condition text **before any house rephrasing**, so a later reader can
-see exactly what was changed when `Description` was written.
+> ⛔ **A package that carries either one fails to load.** An unknown key at any level of a rule is
+> a load error, and in a package these two are unknown keys — the error names the key and says to
+> delete it. This bites only when a package is written by hand from an authored file; the build
+> never ships one.
 
-They come from the CDISC and ADaM sheets, which have a condition column. FDA and PMDA sheets do
-not, so rules from those families carry `Original_Condition` only where there is one to carry.
+> ⚑ **`Original_Description`, `Original_Condition` and `Outcome.Original_Message` are retired.**
+> They held the source sheet's text before house rephrasing, and `Source` supersedes them. No rule
+> carries them any more, the canonicaliser drops a straggler from a rule file, and in a package
+> they are unknown keys like any other.
 
 ## The docs file — `Citations`
 

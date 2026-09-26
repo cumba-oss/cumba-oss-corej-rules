@@ -36,7 +36,7 @@ A rule file answers six questions, in this order:
 | **[Applicability](#applicability)** | what does it run on? | `Scope` · `Requirements` · `Variable_Universe` · `skipIfLibraryDefined` |
 | **[Execution](#execution)** | what does it compute? | `Precondition` · `Bindings` · `Check` · `Match_Datasets` · `Grouping` · `wildcards` · `wildcardExclude` · `wildcardPairCatalogue` · `Expansion` |
 | **[Result](#result)** | what does it report? | `Outcome` · `Severity` · `Sensitivity` |
-| **[Provenance](#provenance)** | why does it exist? | `Source` · `Source_Proposed` · `Original_Description` · `Original_Condition` |
+| **[Provenance](#provenance)** | why does it exist? | `Source` · `Source_Proposed` |
 | **[Release](#release)** | where does it ship? | `Standards` |
 
 Blocks may be written in any order. The order above is the order the groups are explained, and
@@ -130,8 +130,6 @@ Source:
 Source_Proposed:
   Rule: "TSVAL conforms to ISO 8601 duration format"
   Sheet_Issue: "The published wording says 'ISO 8601' without naming the duration form."
-Original_Description: "TSVAL must conform to ISO 8601."
-Original_Condition: "TSPARMCD = 'AGEMAX'"
 
 # ---- Release -------------------------------------------------------------
 Standards:
@@ -304,8 +302,8 @@ wrong with the published text. Use it when the source is ambiguous or mistaken: 
 implements the corrected reading, and this block is the record of the discrepancy, so the
 divergence is deliberate and visible instead of looking like an authoring error.
 
-**`Original_Description`** and **`Original_Condition`** keep the source sheet's rule and condition
-text from before any house rephrasing, so a later reader can see what was changed.
+Both blocks live in the authored file only: the build strips them from every released package,
+and a package that still carries one fails to load.
 
 → [Provenance and citations](../authoring/provenance.md)
 

@@ -51,8 +51,10 @@ names what to write instead:
 | `group:` · `level:` · `filter:` · any other parameter | parameters go **inside** the expression, as keyword arguments |
 | anything else | a binding is two keys |
 
-This strictness is deliberate. The loader otherwise ignores unknown keys, and an ignored
-parameter is the worst possible outcome: the binding computes something subtly different from
+This strictness is deliberate, and it is the loader's rule everywhere, not only here: an unknown
+key at **any** level of a rule is a load error. It is sharper for a binding than elsewhere — a stray
+key fails the **whole package**, not only the rule — because an ignored parameter is the worst
+possible outcome: the binding computes something subtly different from
 what you wrote, the rule runs, and it under-reports in silence.
 
 ```yaml
