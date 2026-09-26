@@ -5,7 +5,14 @@
   "description": "Machine-readable schema for the rule packages under rules-legacy/ and rules/ (R-P5, plans/done/PLAN-native-engine-residuals.md). Closed on every object of a rule the engine binds (PLAN-rule-unknown-keys-gate, owner ruling 2026-09-25: \"unknown keys in a rule should always result in a load error\"): the rule object, Core, Scope, Outcome, Grouping, each Authorities / Expansion / Match_Datasets entry and each object element of Match_Datasets[].Keys declare exactly the keys the engine binds, so a key the loader rejects is rejected here too. Two deliberate openings, both covered by the loader instead: the condition node (#/$defs/check), whose stray keys beside all/any/not/expression the engine reports (closing it here would reject a level's Message through levelCheck's allOf), and the children of Scope, which stay untyped apart from Datasets. Strict, too, on the shapes the engine actually dispatches on: the package envelope, the Check tree (all/any/not/expression - the operator-leaf alternative was removed with the v1 model, phase 7d), Bindings, Match_Datasets, the Outcome, and the Sensitivity / Executability / Variable_Universe enums (Phase 2 of plans/PLAN-extend-expression-engine.md: the loader fails loud — Rule.loadError, executed as ERROR — on a present-but-unrecognized value for these fields; an absent or null field stays legal). Rule_Type is no longer a rule field (plans/PLAN-leaf-scope-domain-inference.md phase 7): a rule carrying it fails to load.",
   "type": "object",
   "required": ["rules"],
+  "additionalProperties": false,
+  "$comment": "The package envelope is closed to rules + standards (PLAN-rule-unknown-keys-gate T1-6): any other package-level key, and any key on a standards[] entry beyond id / role, fails the whole package at load - there is no rule to attach it to.",
   "properties": {
+    "standards": {
+      "type": ["array", "null"],
+      "description": "The standards the package's rules are written against (role primary) or consult (role companion). Serialised from the engine's StandardRef record.",
+      "items": { "$ref": "#/$defs/standardRef" }
+    },
     "rules": {
       "type": "object",
       "additionalProperties": {
@@ -14,6 +21,14 @@
     }
   },
   "$defs": {
+    "standardRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "role": { "type": ["string", "null"] }
+      }
+    },
     "requirements": {
       "type": ["object", "null"],
       "description": "What the rule needs in order to be able to answer AT ALL (plans/PLAN-scope-requirements-split.md section 4). An unmet requirement is a SKIPPED status naming it, never a finding. All facets are ANDed with each other and with Scope. Typed strictly - unlike the rule level, this block has no legacy shapes to tolerate, and the loader itself rejects an unknown key under it (gate R2).",
@@ -86,7 +101,15 @@
             { "type": "null" }
           ]
         },
-        "ExecutabilityHint": { "type": ["object", "string", "null"] },
+        "ExecutabilityHint": {
+          "type": ["object", "null"],
+          "description": "The actionable 'how' beside Executability, never in place of it. Closed to the two keys the engine binds (PLAN-rule-unknown-keys-gate); every carrier is an object, so the string form this schema used to admit is gone.",
+          "additionalProperties": false,
+          "properties": {
+            "Category": { "type": ["string", "null"] },
+            "Detail": { "type": ["string", "null"] }
+          }
+        },
         "Authorities": { "type": ["array", "null"], "items": { "$ref": "#/$defs/authority" } },
         "Scope": {
           "type": ["object", "null"],
