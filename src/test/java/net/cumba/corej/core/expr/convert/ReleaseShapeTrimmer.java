@@ -63,11 +63,12 @@ import java.util.Set;
  * <h2>⚠⚠ Delete whole keys; never rewrite a nested block and leave residue</h2>
  *
  * <p>
- * {@code FAIL_ON_UNKNOWN_PROPERTIES} is disabled and an unknown <em>top-level</em> rule key is
- * tolerated, so dropping {@code Source} / {@code Source_Proposed} is free. But
- * {@code RulePackageLoader.validateRequirementsShape} turns any unbound key under {@code Scope} or
- * {@code Requirements} into a per-rule {@code loadError}. Nothing here touches those blocks, and
- * nothing added here should.
+ * Since {@code PLAN-rule-unknown-keys-gate} an unknown key at <em>any</em> level of a rule is a
+ * per-rule {@code loadError} — the top level included — so dropping {@code Source} /
+ * {@code Source_Proposed} is not merely free, it is REQUIRED: a package that still carried them
+ * would fail every rule at load. And a nested block rewritten with residue would be rejected the
+ * same way ({@code RulePackageLoader.validateUnknownKeys}). Nothing here touches the nested blocks,
+ * and nothing added here should.
  * </p>
  *
  * <h2>What is deliberately KEPT, and why</h2>

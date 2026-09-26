@@ -1,6 +1,7 @@
 # Provenance and citations
 
-<!-- Grounded: rule-check.schema.json (Source / Source_Proposed declared as open objects; the
+<!-- Grounded: the authored rule schema — internal documentation/rule-check.schema.json; the OSS twin
+     carries only the packaged schema/rule-format.schema.json — (Source / Source_Proposed declared as open objects; the
      retired Original_Description / Original_Condition / Outcome.Original_Message and Variants
      deleted, 0 carriers, PLAN-rule-unknown-keys-gate), ReleaseShapeTrimmer (strips Source /
      Source_Proposed from every package), rule-doc.schema.json (docs file = Core + Citations, both required),

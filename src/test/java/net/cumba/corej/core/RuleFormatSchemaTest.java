@@ -162,4 +162,54 @@ class RuleFormatSchemaTest
                         .isEmpty(),
                 "NOTICE mixed into a plain Check is rejected too");
     }
+
+
+    /**
+     * ⭐ The schema-side negative control ({@code PLAN-rule-unknown-keys-gate} &#167;7.3, review
+     * C1): one unknown key planted under every closed object of the packaged format must be
+     * rejected, and the clean twin of each plant must validate — so a closure that quietly reopened
+     * (or one the schema never had) reds here, not only in the engine.
+     */
+    @Test
+    void everyClosedObjectRejectsAnUnknownKey() throws Exception
+    {
+        Schema schema = schema();
+        String clean = """
+                {"standards":[{"id":"sdtmig/3-4","role":"primary"}],
+                 "rules":{"T-0001":{
+                   "Core":{"Id":"T-0001","Status":"Published","Version":"1"},
+                   "ExecutabilityHint":{"Category":"Library","Detail":"d"},
+                   "Authorities":[{"Organization":"CDISC","Rule_Ids":["CG0001"]}],
+                   "Scope":{"Domains":{"Include":["AE"]},"Datasets":{"Include":["AE"]}},
+                   "Requirements":{"Variables":{"All":["AESEQ"]},"Datasets":["DM"]},
+                   "Bindings":[{"name":"$n","expression":"record_count()"}],
+                   "Match_Datasets":[{"Name":"DM","Keys":["USUBJID",{"left":"A","right":"B"}]}],
+                   "Grouping":{"Variables":["USUBJID"]},
+                   "wildcards":{"xx":{"min":1,"max":9}},
+                   "Expansion":[{"token":"&V","over":"shared_variables","with":"ADSL"}],
+                   "Outcome":{"Message":"m","Output_Variables":["AESEQ"]},
+                   "Check":{"ERROR":{"expression":"a > b","Message":"e"}}}}}
+                """;
+        assertTrue(schema.validate(MAPPER.readTree(clean)).isEmpty(),
+                "the control package validates: " + schema.validate(MAPPER.readTree(clean)));
+        List<String> closed = List.of("", "/standards/0", "/rules/T-0001", "/rules/T-0001/Core",
+                "/rules/T-0001/ExecutabilityHint", "/rules/T-0001/Authorities/0",
+                "/rules/T-0001/Scope", "/rules/T-0001/Scope/Datasets", "/rules/T-0001/Requirements",
+                "/rules/T-0001/Requirements/Variables", "/rules/T-0001/Bindings/0",
+                "/rules/T-0001/Match_Datasets/0", "/rules/T-0001/Match_Datasets/0/Keys/1",
+                "/rules/T-0001/Grouping", "/rules/T-0001/wildcards/xx", "/rules/T-0001/Expansion/0",
+                "/rules/T-0001/Outcome", "/rules/T-0001/Check", "/rules/T-0001/Check/ERROR");
+        List<String> accepted = new ArrayList<>();
+        for (String pointer : closed)
+        {
+            JsonNode root = MAPPER.readTree(clean);
+            ((com.fasterxml.jackson.databind.node.ObjectNode) root.at(pointer)).put("Xplant", 1);
+            List<com.networknt.schema.Error> errors = schema.validate(root);
+            if (errors.stream().noneMatch(e -> e.toString().contains("Xplant")))
+            {
+                accepted.add(pointer + " -> " + errors);
+            }
+        }
+        assertTrue(accepted.isEmpty(), "closed objects that accepted a planted key: " + accepted);
+    }
 }
