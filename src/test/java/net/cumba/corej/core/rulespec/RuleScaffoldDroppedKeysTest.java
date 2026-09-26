@@ -196,8 +196,8 @@ class RuleScaffoldDroppedKeysTest
                 "Outcome: {Message: \"m\", Mesage: \"m2\", Output_Variables: [AESTDTC]}");
         IllegalStateException ex = buildAndExpectRejection(yaml);
         assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Outcome'"),
-                () -> ex.getMessage());
-        assertTrue(ex.getMessage().contains("did you mean 'Message'?"), () -> ex.getMessage());
+                ex::getMessage);
+        assertTrue(ex.getMessage().contains("did you mean 'Message'?"), ex::getMessage);
     }
 
 
@@ -215,8 +215,7 @@ class RuleScaffoldDroppedKeysTest
                   Domains: {Include: [AE]}""").replace("Check: {expression: 'not empty(AESTDTC)'}",
                 "Check: {expression: 'not empty(AESTDTC)', Mesage: 'm'}");
         IllegalStateException ex = buildAndExpectRejection(yaml);
-        assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Check'"),
-                () -> ex.getMessage());
+        assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Check'"), ex::getMessage);
     }
 
 
@@ -231,7 +230,7 @@ class RuleScaffoldDroppedKeysTest
                   - {Name: DM, Keys: [USUBJID], Join_type: left}""");
         IllegalStateException ex = buildAndExpectRejection(yaml);
         assertTrue(ex.getMessage().contains("unknown key 'Join_type' under 'Match_Datasets[0]'"),
-                () -> ex.getMessage());
+                ex::getMessage);
     }
 
 
@@ -245,8 +244,8 @@ class RuleScaffoldDroppedKeysTest
                 Source: {Domains: AE, Rule: "text"}""");
         IllegalStateException ex = buildAndExpectRejection(yaml);
         assertTrue(ex.getMessage().contains("unknown key 'Source' at the top level of the rule"),
-                () -> ex.getMessage());
-        assertTrue(ex.getMessage().contains("authoring provenance"), () -> ex.getMessage());
+                ex::getMessage);
+        assertTrue(ex.getMessage().contains("authoring provenance"), ex::getMessage);
     }
 
 
