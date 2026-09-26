@@ -48,8 +48,8 @@ name. The expansion happens before the check runs, once per resolved name.
 → [Wildcards and expansion](authoring/wildcards.md)
 
 **Wildcard** — `--` in an SDTM variable name, standing for the domain prefix (`--STDTC` in `AE`
-is `AESTDTC`). ⚠ In `Match_Datasets` the key `Wildcard` means something else entirely: RELREC
-forward expansion.
+is `AESTDTC`). ⚠ A `Match_Datasets` key once spelled `Wildcard` is unrelated, retired, and a load
+error.
 
 ## Execution
 

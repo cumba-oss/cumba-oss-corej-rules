@@ -97,7 +97,6 @@ Match_Datasets:
   Child: true
   Filter: 'QNAM == "TSVALX"'
 - Name: "RELREC"
-  Wildcard: "PC"
 Grouping:
   Variables: ["USUBJID"]
   keep_missings: false
@@ -250,8 +249,9 @@ the finding.
 **`Match_Datasets`** joins another dataset so the check can see both sides. Each entry takes
 `Name`, `Keys`, `Join_Type` (`inner` or `left`) and `Filter` — a boolean expression over the
 joined dataset's **own** rows, applied before the key index is built, so it cannot depend on
-which row survives the join. `Child` and `Wildcard` select the two special join shapes:
-parent-row resolution for `SUPP--` / `CO` / `RELREC` primaries, and forward RELREC expansion.
+which row survives the join. Two special join shapes: `Child` selects parent-row resolution
+for `SUPP--` / `CO` / `RELREC` primaries, and a keyless `RELREC` entry selects forward RELREC
+expansion. Any other key is a load error.
 
 **`Grouping`** changes the unit of evaluation from the row to the group: `Variables` are the
 grouping keys, and `keep_missings` decides whether rows with a missing key form groups of their

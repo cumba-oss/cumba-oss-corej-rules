@@ -1,6 +1,6 @@
 # Joins
 
-<!-- Grounded: MatchDataset.java (Name, Keys incl. the sided {left,right} shape, Wildcard, Child,
+<!-- Grounded: MatchDataset.java (Name, Keys incl. the sided {left,right} shape, Child,
      Join_Type, Filter + its right-side-only / D89 skip contract), JoinType.java (json values
      "inner" / "left"), ChildMatchPreMerger.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
      resolution, child-wins on column collision), RelrecRowExpander.java (forward RELREC, inner
@@ -325,22 +325,31 @@ considered.
 > ⚠ **On a column-name collision the child wins.** If the primary already has a column of that
 > name, the parent's value does not overwrite it.
 
-## `Wildcard` — forward RELREC expansion
+## Forward RELREC — `Name: RELREC` with no `Keys`
 
 ```yaml
 Match_Datasets:
 - Name: "RELREC"
-  Wildcard: "PC"
 ```
 
-Builds one evaluation row per *(primary record, related record)* pair via RELREC, with the
-related columns reachable as `RELREC.*`.
+A keyless `RELREC` entry is what selects this shape. It builds one evaluation row per
+*(primary record, related record)* pair via RELREC, with the related columns reachable as
+`RELREC.*`.
 
-Two behaviours worth knowing before you use it:
+Three behaviours worth knowing before you use it:
 
 - It is **inner** — a primary record with no related record produces no row, so a rule written
   this way cannot report *"nothing is related"*.
 - A declared forward join with no matching pairs yields **zero rows**, and therefore no findings.
+- It pairs the primary record with **every** related record, whatever its domain. To mean one
+  related domain, read its columns by their **literal** names and guard them: on a pairing with a
+  record of another domain `RELREC.PCRFTDTC` is absent and reads empty, so
+  `not empty(RELREC.PCRFTDTC)` keeps that row silent. `RELREC.**<suffix>` instead resolves per
+  related record against *that* record's own prefix.
+
+> ⛔ **`Wildcard` is retired and is a load error.** It was accepted on this entry and read by
+> nothing; it never filtered the related domain. Any other key an entry does not model is a load
+> error too.
 
 ## Which shape do you need?
 
@@ -351,7 +360,7 @@ Two behaviours worth knowing before you use it:
 | does a related record *of a particular kind* exist? | `Filter` on the joined side |
 | my primary dataset points at a parent row | `Child: true` |
 | the two sides type the key differently | fix the data, or `Requirements.Variables` on **both** sides, or `Join_As_String: true` |
-| walk RELREC relationships | `Name: "RELREC"` + `Wildcard` |
+| walk RELREC relationships | `Name: "RELREC"`, no `Keys` |
 
 > ⚠ **A join changes what an unqualified name means in only one respect: nothing.** Unqualified
 > names keep referring to the primary dataset even after a join. If you mean the joined side,
