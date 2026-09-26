@@ -192,22 +192,34 @@ class RuleFormatSchemaTest
                 """;
         assertTrue(schema.validate(MAPPER.readTree(clean)).isEmpty(),
                 "the control package validates: " + schema.validate(MAPPER.readTree(clean)));
-        List<String> closed = List.of("", "/standards/0", "/rules/T-0001", "/rules/T-0001/Core",
-                "/rules/T-0001/ExecutabilityHint", "/rules/T-0001/Authorities/0",
-                "/rules/T-0001/Scope", "/rules/T-0001/Scope/Datasets", "/rules/T-0001/Requirements",
-                "/rules/T-0001/Requirements/Variables", "/rules/T-0001/Bindings/0",
-                "/rules/T-0001/Match_Datasets/0", "/rules/T-0001/Match_Datasets/0/Keys/1",
-                "/rules/T-0001/Grouping", "/rules/T-0001/wildcards/xx", "/rules/T-0001/Expansion/0",
-                "/rules/T-0001/Outcome", "/rules/T-0001/Check", "/rules/T-0001/Check/ERROR");
+        // Pointers relative to the RULE object (the package's rules map is reached through
+        // Jackson, not a path — CorpusPathAnchoringGuardTest); "" and "/standards/0" are the two
+        // package-level closures.
+        List<String> packageLevel = List.of("", "/standards/0");
+        List<String> ruleLevel = List.of("", "/Core", "/ExecutabilityHint", "/Authorities/0",
+                "/Scope", "/Scope/Datasets", "/Requirements", "/Requirements/Variables",
+                "/Bindings/0", "/Match_Datasets/0", "/Match_Datasets/0/Keys/1", "/Grouping",
+                "/wildcards/xx", "/Expansion/0", "/Outcome", "/Check", "/Check/ERROR");
         List<String> accepted = new ArrayList<>();
-        for (String pointer : closed)
+        for (String pointer : packageLevel)
         {
             JsonNode root = MAPPER.readTree(clean);
             ((com.fasterxml.jackson.databind.node.ObjectNode) root.at(pointer)).put("Xplant", 1);
             List<com.networknt.schema.Error> errors = schema.validate(root);
             if (errors.stream().noneMatch(e -> e.toString().contains("Xplant")))
             {
-                accepted.add(pointer + " -> " + errors);
+                accepted.add("package" + pointer + " -> " + errors);
+            }
+        }
+        for (String pointer : ruleLevel)
+        {
+            JsonNode root = MAPPER.readTree(clean);
+            JsonNode rule = root.get("rules").get("T-0001");
+            ((com.fasterxml.jackson.databind.node.ObjectNode) rule.at(pointer)).put("Xplant", 1);
+            List<com.networknt.schema.Error> errors = schema.validate(root);
+            if (errors.stream().noneMatch(e -> e.toString().contains("Xplant")))
+            {
+                accepted.add("rule" + pointer + " -> " + errors);
             }
         }
         assertTrue(accepted.isEmpty(), "closed objects that accepted a planted key: " + accepted);

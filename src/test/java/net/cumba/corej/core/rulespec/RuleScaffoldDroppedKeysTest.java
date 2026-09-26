@@ -193,7 +193,7 @@ class RuleScaffoldDroppedKeysTest
                 Scope:
                   Domains: {Include: [AE]}""").replace(
                 "Outcome: {Message: \"m\", Output_Variables: [AESTDTC]}",
-                "Outcome: {Message: \"m\", Mesage: \"m2\", Output_Variables: [AESTDTC]}");
+                "Outcome: {Mesage: \"m2\", Output_Variables: [AESTDTC]}");
         IllegalStateException ex = buildAndExpectRejection(yaml);
         assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Outcome'"),
                 ex::getMessage);
