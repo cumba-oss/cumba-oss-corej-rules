@@ -5,8 +5,10 @@
      DomainScope (Include/Exclude/include_split_datasets), ClassScope, DataStructureScope,
      SubclassScope, DatasetScope (no split re-test, no include_split_datasets),
      ScopeMatcher.describeDomainMismatch / describeDatasetMismatch / describeClassMismatch
-     (FINDINGS ABOUT widening via containsFindings) / matchesUseCase (comma-split,
-     case-insensitive, absent-matches-all).
+     (FINDINGS ABOUT widening via containsFindings) / describeUseCaseMismatch (comma-split,
+     case-insensitive, absent-matches-all; wired in by PLAN-use-case-scope-filter: first axis of
+     DatasetRuleResolver.describeScopeSkip, and LibraryValidator's anchor pass), RulePackageLoader
+     validateUseCaseShape (R-4.10 / R-4.10a load error), StudyValidationParams (single-code input).
      Vocabularies and the Include+Exclude measurement taken from rules-src/checks 2026-09-21. -->
 
 `Scope` decides **which datasets the rule is offered**.
@@ -281,10 +283,18 @@ The matching rule has three arms:
 |---|---|
 | no use case supplied to the run | **every** rule is in scope; the axis does nothing |
 | a use case is supplied, and the rule declares none | the rule **is** in scope |
-| a use case is supplied, and the rule declares some | in scope only if one of them is **exactly** the supplied one |
+| a use case is supplied, and the rule declares some | in scope only if **any** one of them is the supplied one |
 
 So declaring a `Use_Case` **narrows** a rule to that context, and leaving it absent keeps the rule
-universal. Matching is case-insensitive.
+universal. Each code is compared whole and case-insensitively: `PROD` matches `prod`, never `PRO`.
+
+A rule outside the run's use case is **not executed** and is reported `SKIPPED` — one
+`Skipped_Rules` row per target dataset, with the reason `use case NONCLIN not in Scope.Use_Case
+[INDH]`, and `SKIPPED` in `Rules_Report`. That is the report shape of every other scope axis. A
+study-level rule is filtered the same way.
+
+The run names **one** use case, a single code of letters (e.g. `-uc INDH`). A list such as
+`INDH, PROD` is rejected when the run starts: only a rule may list several.
 
 ### Several use cases
 
@@ -297,6 +307,11 @@ Use_Case: "INDH, PROD"
 > ⚠ **Not a YAML array.** The field binds as a single string and is split on commas at match time;
 > `Use_Case: ["INDH", "PROD"]` is not the shape the engine reads. Whitespace around the commas is
 > trimmed.
+
+> ⛔ **A malformed value is a load error.** The codes are upper-case letters separated by commas,
+> with no empty code and no duplicate (`R-4.10`). `"INDH;PROD"`, `"indh"`, `"INDH,"` or `" "` make
+> the rule an ERROR execution instead of running: once a run names a use case, a misspelt code
+> would match none and silently skip the rule.
 
 ## Things that are not scope
 

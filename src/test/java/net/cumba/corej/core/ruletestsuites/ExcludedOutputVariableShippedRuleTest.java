@@ -192,8 +192,9 @@ class ExcludedOutputVariableShippedRuleTest
                 // Re-pointed 2026-09-19 (PLAN-retire-core-family.md phase 5): CORE-000040's
                 // fixtures migrated to its expression-identical twin CDISC-CG0656, which carries
                 // the same Output_Variables ["VISITNUM", "!SVPRESP", "$tv_visitnum"] and the same
-                // Scope but for the INERT Use_Case axis (§9.3 item 6), so the exclusion contract
-                // is unchanged. The CORE row could not stay: its fixture no longer exists.
+                // Scope but for the Use_Case axis (§9.3 item 6): the twin declares no Use_Case, so
+                // no use case excludes it and the exclusion contract is unchanged. The CORE row
+                // could not stay: its fixture no longer exists.
                 Arguments.of("CDISC-CG0656", "rules-cdisc-sdtmig-3-4.json",
                         "cdisc/CDISC-CG0656/CDISC-CG0656-invalid-SV.cdt", "VISITNUM",
                         Set.of("SVPRESP"), Set.of("SVPRESP")),
