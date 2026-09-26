@@ -77,10 +77,11 @@ public final class ViolationNormaliser
             {
                 for (Map.Entry<String, String> e : v.getValues().entrySet())
                 {
-                    // Per canonical contract (§3.5: "Missing values: null"), coerce empty
-                    // strings to null. The Java engine emits "" for missing-or-invalid
-                    // IDataValue; Python emits null. Without this coercion both would diverge
-                    // on every Output_Variable that resolves to a missing cell.
+                    // Per canonical contract (§3.5), coerce empty strings to null. ⚠ Since
+                    // 2026-09-25 (PLAN-member-set-identity-hardening, owner: "print the marker")
+                    // the engine prints a MISSING cell as its marker (".", ".A", …), so a spec
+                    // expects '.' there; "" now reaches this line only for a present blank (or a
+                    // row-less dataset-level finding), which the specs spell as null.
                     String value = e.getValue();
                     if (value == null || value.isEmpty())
                     {
