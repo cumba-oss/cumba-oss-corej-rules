@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0058 expect=skipped domain=VS
+#note "PLAN-model-vs-ig-column-order §4b row 3: the IG list is served but the MODEL list is not -> the rule SKIPS (get_model_column_order maps an absent/empty answer to LIBRARY_NOT_AVAILABLE), exactly as before the ladder. An empty model list must never fan every column out to a level. Discriminating: VSCUSTOM and VSCSTATE would both fire if a model list were served."
+#library standard=sendig version=3-0
+#library domain-variables VS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VSSEQ:Identifier VSTESTCD:Topic "VSTEST:Synonym Qualifier" "VSORRES:Result Qualifier" "VSCSTATE:Record Qualifier"
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSCSTATE type=Char label="Consciousness State"
+col VSCUSTOM type=Char label="Sponsor Defined Variable"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120 | CONSCIOUS | X
+---

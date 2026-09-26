@@ -3,9 +3,12 @@ kind: rule
 description: |
   Variable-Metadata + Operation port. FDA-SD0058: every variable in an Observation
   Class dataset must be an allowed model variable. Operation `get_model_column_order`
-  builds $allowed_variables (the model list for the class); the check fires for any
-  variable_name that is_not_contained_by that list. The AE dataset below adds AEFOO,
-  which is not a model variable for the Events class, so it fires.
+  builds $model_variables (the model list for the class) and
+  `get_dataset_filtered_variables` builds $ig_variables (the IG-defined variables the
+  dataset carries). The ERROR level fires for a variable in neither list, the WARNING
+  level for one the IG defines but the model does not (PLAN-model-vs-ig-column-order,
+  owner ruling 2026-09-25). The AE dataset below adds AEFOO, which is in neither list,
+  so the ERROR level fires; SDTMIG 3.4 has no model/IG skew, so no WARNING exists here.
 python_source: rules-sdtmig-3-4.json (CORE-000550)
 rule:
   coreId: FDA-SD0058
@@ -26,7 +29,8 @@ expected_violations:
     row_key: {AESEQ: null, STUDYID: null, USUBJID: null}
     status: SUCCESS
     output_variables:
-      $allowed_variables: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBEATNO, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
+      $ig_variables: '[AESEQ, AETERM, DOMAIN, STUDYID, USUBJID]'
+      $model_variables: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBEATNO, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
         AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEPCHGI, AEEVDTYP, AEEVINTX, AEEVLINT, AEGRPID, AEHLGT, AEHLGTCD, AEHLT, AEHLTCD, AELAT, AELLT, AELLTCD, AELNKGRP, AELNKID, AELOC, AEMODIFY, AENOMDY,
         AENOMLBL, AEOCCUR, AEOUT, AEPARTY, AEPATT, AEPDUR, AEPORTOT, AEPRESP, AEPRTYID, AEPTCD, AEPTFL, AEREASND, AEREASOC, AERECID, AEREFID, AEREL, AERELNST, AERFTDTC, AERLDEV, AERLPRC, AERLPRT, AERPDY,
         AERPENDY, AERPSTDY, AESCAN, AESCAT, AESCONG, AESDISAB, AESDTH, AESEQ, AESER, AESEV, AESHOSP, AESINTV, AESLIFE, AESMIE, AESOC, AESOCCD, AESOD, AESPID, AESTAT, AESTDTC, AESTDY, AESTINT, AESTRF, AESTRTPT,

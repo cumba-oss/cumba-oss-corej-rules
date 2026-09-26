@@ -2,25 +2,50 @@ Core:
   Id: "FDA-SD0058"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable present in a dataset is not listed in\
-  \ the SDTM model list of allowed variables for the observation class."
+Description: "Raise an error when a variable present in a dataset is in neither the\
+  \ SDTM model list of allowed variables for the observation class nor the IG's variable\
+  \ list for the dataset (a sponsor-defined variable). Raise a warning when the IG\
+  \ defines the variable for the dataset but the SDTM model version the IG links to\
+  \ does not list it for the observation class (the IG runs ahead of its model)."
 Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "Two shapes escape the check. (1) A dataset whose domain the model walk\
+    \ cannot place in an observation class resolves no model list and the rule is\
+    \ SKIPPED for it: every sponsor-defined (custom) domain, and the special-purpose\
+    \ and trial-design datasets of an IG whose linked model carries no variables for\
+    \ them (e.g. most of SENDIG-AR 1.0). (2) The model's '--' templates are substituted\
+    \ without regard to the domain, so a template meant for one domain is allowed\
+    \ on every dataset of the class (AEBEATNO on AE; CDISC-CG0542 reports --BEATNO\
+    \ outside EG)."
 Scope:
   Domains:
     Include:
     - "ALL"
 Bindings:
-- name: "$allowed_variables"
+- name: "$model_variables"
   expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
 Check:
-  expression: >-
-    varname() not in $allowed_variables
+  ERROR:
+    expression: >-
+      varname() not in $model_variables and varname() not in $ig_variables
+    Message: "Variable is in neither the SDTM model list of allowed variables for the\
+      \ observation class nor the IG's variable list for the dataset (sponsor-defined)."
+  WARNING:
+    expression: >-
+      varname() not in $model_variables and varname() in $ig_variables
+    Message: "Variable is defined by the IG for this dataset but is not in the SDTM model\
+      \ list of allowed variables for the observation class of the model version the IG\
+      \ links to."
 Outcome:
   Message: "Variable is present in the dataset but is not listed in the SDTM model\
     \ list of allowed variables for the observation class."
   Output_Variables:
   - "variable_name"
-  - "$allowed_variables"
+  - "$model_variables"
+  - "$ig_variables"
 Source:
   FDA_Validator_Rule_Message: "Variable appears in dataset, but is not in SDTM model"
   FDA_Validator_Rule_Description: "Only variables listed in SDTM model should appear\
