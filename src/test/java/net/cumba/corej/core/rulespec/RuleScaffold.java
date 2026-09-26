@@ -6,15 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.SequencedSet;
 import net.cumba.corej.core.RulePackageLoader;
-import net.cumba.corej.core.model.DatasetScope;
-import net.cumba.corej.core.model.Requirements;
 import net.cumba.corej.core.model.Rule;
-import net.cumba.corej.core.model.Scope;
-import net.cumba.corej.core.model.VariableRequirement;
 
 /**
  * Synthesises a {@link Rule} for a parity spec:
@@ -67,13 +61,13 @@ import net.cumba.corej.core.model.VariableRequirement;
  * ({@code RulePackageLoader.validateRetiredUnderscoreKeys},
  * {@code plans/done/PLAN-underscore-field-retirement.md} §3 G), so a spec left on a retired
  * {@code _wildcards:} spelling would bind to nothing and run <b>unfiltered</b> — silently, with no
- * diagnostic anywhere. That half is now covered locally by
- * {@link #rejectDroppedKeys(SpecSchema, Rule)}: any key the model did not bind fails the scaffold —
- * top-level, and (since this lane is a third reader of rule JSON that never runs loader gates R1
- * and R2) also under {@code Scope}, {@code Scope.Datasets}, {@code Requirements} and
- * {@code Requirements.Variables}, whose own collectors the {@link Rule}-level one never sees. So
- * the blind spot no longer depends on a reviewer noticing. The other five omissions remain
- * uncovered.</li>
+ * diagnostic anywhere. That half is covered by {@link #rejectDroppedKeys(SpecSchema, Rule)}, which
+ * since {@code PLAN-rule-unknown-keys-gate} calls the engine's own composite
+ * {@code RulePackageLoader.unknownKeyErrors} — every unknown or stray key at every level of the
+ * rule (the retired spellings, R1, R2's unknown-key arm, {@code Match_Datasets}, the {@code Check}
+ * grammar's stray keys and every nested block's collector), in the loader's own wording — instead
+ * of a hand-copied walk of five collectors that had to be mirrored by hand. So the blind spot no
+ * longer depends on a reviewer noticing. The other five omissions remain uncovered.</li>
  * </ul>
  *
  * <p>
@@ -87,24 +81,6 @@ public final class RuleScaffold
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    /**
-     * Top-level rule keys the core {@link Rule} model deliberately leaves unbound. {@code Source}
-     * is authoring provenance carried by every corpus rule (11 995 occurrences across
-     * {@code rules/}) and read by tooling, never by the engine — it is dropped by a production load
-     * too, so dropping it here is not a divergence.
-     *
-     * <p>
-     * {@code Source_Proposed} is the same kind of key and joins it for the same reason
-     * ({@code plans/done/PLAN-source-proposed-block.md} §4 item 3): the row we ask the authority to
-     * publish, unmodelled by the engine and dropped at load. Without the entry
-     * {@link #rejectDroppedKeys} would throw the day a pinned spec's rule gains a proposal — the
-     * five pinned specs are the only rules carrying an inline {@code Source:} inside their
-     * {@code rule:} object, which is why this allowlist exists at all.
-     * </p>
-     */
-    private static final java.util.Set<String> UNMODELLED_BUT_LEGAL = java.util.Set.of("Source",
-            "Source_Proposed");
 
     private RuleScaffold()
     {
@@ -154,89 +130,43 @@ public final class RuleScaffold
 
 
     /**
-     * Fails the scaffold when a spec's rule carries a key the model did not bind — at the top level
-     * <b>or</b> in one of the nested blocks that carry their own collector. The mapper is lenient
-     * by design (a production load is too), but this lane replays none of the loader's validation
-     * passes, so an unbound key here is silent in a way it is nowhere else — the exact shape
-     * {@code PLAN-underscore-field-retirement.md} §8 names as "the one place where 'the guard will
-     * catch it' is false".
+     * The scaffold's drop-net — the engine's judgement, not a copy of it. This lane binds with its
+     * own mapper and never runs {@code finishLoad}, so it asks the loader's composite
+     * {@code RulePackageLoader.unknownKeyErrors} (PLAN-rule-unknown-keys-gate &#167;5.5) for every
+     * unknown or stray key of the bound rule: a retired spelling, {@code Scope.Variables} (R1), an
+     * unknown key under {@code Scope} / {@code Requirements} (R2), a {@code Match_Datasets} typo, a
+     * key beside {@code expression:} in {@code Check} (which makes the binding DROP the condition,
+     * so a scaffold that ignored {@code Rule.rawCheckLevels} would run the spec with no
+     * {@code Check} at all) and every nested block's collector. Each is a <em>deleted</em>
+     * requirement or a silently changed rule rather than a skipped one: the spec then executes on
+     * something its author did not write, and on this lane that reads as an engine result.
      *
      * <p>
-     * Four blocks below the top level own a {@code @JsonAnySetter} collector, and the
-     * {@link Rule}-level one never sees their keys: {@link Scope} (a {@code Variables:} block
-     * surviving the {@code Requirements} migration —
-     * {@code plans/done/PLAN-scope-requirements-split.md}), {@link DatasetScope},
-     * {@link Requirements} (a misspelled block name) and {@link VariableRequirement} (a misspelled
-     * facet, e.g. {@code AnyOf:} for {@code Any:}). Together with {@link Rule} that is every
-     * collector the model has, i.e. the same reach as loader gates R1 and R2
-     * ({@code RulePackageLoader.validateRetiredScopeVariables} /
-     * {@code validateRequirementsShape}). Each is a <em>deleted</em> requirement rather than a
-     * skipped rule: the spec then executes unrestricted, and on this lane that reads as a parity
-     * result — several parity baseline entries exist precisely because a variable requirement makes
-     * Java SKIP where Python executes. The loader's gates R1/R2 read exactly these collectors; this
-     * lane runs neither, so the net has to read them itself.
+     * ⚑ {@code Source} / {@code Source_Proposed} are no longer allow-listed (T1-1 a): they are
+     * authoring provenance the corpus build strips from every package, so a spec's inline
+     * {@code rule:} carries none — the five pinned ADaM specs that did were cleaned.
+     * </p>
      *
      * @param spec
      *            the spec being scaffolded, named in the failure message
      * @param rule
      *            the bound rule
      * @throws IllegalStateException
-     *             if any unbound key other than {@link #UNMODELLED_BUT_LEGAL} was seen
+     *             if the loader reports any unknown or stray key
      */
     private static void rejectDroppedKeys(SpecSchema spec, Rule rule)
     {
-        List<String> dropped = new ArrayList<>(rule.getUnknownKeys().stream()
-                .filter(k -> !UNMODELLED_BUT_LEGAL.contains(k)).toList());
-        Scope scope = rule.getScope();
-        if (scope != null)
+        List<String> errors = RulePackageLoader.unknownKeyErrors(rule);
+        if (!errors.isEmpty())
         {
-            collectNested(dropped, "Scope", scope.getUnknownKeys());
-            DatasetScope datasets = scope.getDatasets();
-            if (datasets != null)
-            {
-                collectNested(dropped, "Scope.Datasets", datasets.getUnknownKeys());
-            }
-        }
-        Requirements requirements = rule.getRequirements();
-        if (requirements != null)
-        {
-            collectNested(dropped, "Requirements", requirements.getUnknownKeys());
-            VariableRequirement variables = requirements.getVariables();
-            if (variables != null)
-            {
-                collectNested(dropped, "Requirements.Variables", variables.getUnknownKeys());
-            }
-        }
-        if (!dropped.isEmpty())
-        {
-            throw new IllegalStateException("Spec '" + spec.name() + "': rule key(s) " + dropped
-                    + " bound to nothing and were silently dropped. This lane does not run the"
-                    + " loader's validation passes, so nothing else would report it — check for a"
-                    + " retired `_`-prefixed spelling (PLAN-underscore-field-retirement.md §3 G),"
-                    + " a `Scope: {Variables: …}` block that should now be"
-                    + " `Requirements: {Variables: {All: …}}` (PLAN-scope-requirements-split.md)"
-                    + " or a typo.");
-        }
-    }
-
-
-    /**
-     * Adds a nested block's unbound keys to the drop list, qualified by the block name so the
-     * failure message says where the key was found ({@code Scope.Variables},
-     * {@code Requirements.Variabels}, {@code Requirements.Variables.AnyOf}).
-     *
-     * @param sink
-     *            the drop list being built
-     * @param block
-     *            dotted path of the block that collected the keys
-     * @param keys
-     *            that block's collector contents; may be empty
-     */
-    private static void collectNested(List<String> sink, String block, SequencedSet<String> keys)
-    {
-        for (String key : keys)
-        {
-            sink.add(block + "." + key);
+            throw new IllegalStateException("Spec '" + spec.name() + "': rule key(s) bound to"
+                    + " nothing and would be silently dropped — " + String.join("; ", errors)
+                    + ". This lane does not run the loader's validation passes, so nothing else"
+                    + " would report it — check for a retired `_`-prefixed spelling"
+                    + " (PLAN-underscore-field-retirement.md §3 G), a `Scope: {Variables: …}`"
+                    + " block that should now be `Requirements: {Variables: {All: …}}`"
+                    + " (PLAN-scope-requirements-split.md), an inline `Source:` block (authoring"
+                    + " provenance, not engine format) or a typo.");
         }
     }
 

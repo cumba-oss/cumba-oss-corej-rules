@@ -27,11 +27,18 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * ⚠ These are hand-authored gate tests: they prove the net fires, never that a shipped spec carries
- * an offending key. Measured 2026-08-25 over 1 105 files — the module's 1 048 spec YAMLs plus their
- * one {@code $ref}ed rule fixture and the 56 {@code coreId}-resolved
- * {@code ../corej-rules/rules/rules-*.json} packages — 14 435 {@code Scope} and 5 736
- * {@code Requirements} blocks (4 734 of them with {@code Variables}) carry <b>0</b> unknown nested
- * keys. The net is preventive, and {@code Scope.Datasets} has no carrier at all yet.
+ * an offending key. Measured 2026-09-26 ({@code PLAN-rule-unknown-keys-gate} phase 1, every key at
+ * every level against the engine's bound-key roster): the 955 specs carrying a {@code rule:} held
+ * only the harness directives {@code coreId} / {@code $ref} (resolved before binding) and five
+ * inline {@code Source:} blocks, since removed; the 47 generated packages (12 838 rules) held
+ * <b>0</b> unknown keys. The net is preventive.
+ *
+ * <p>
+ * Since that plan the net is the engine's own composite, {@code RulePackageLoader.unknownKeyErrors}
+ * — so the cases below also cover a top-level key, an {@code Outcome} key, a key beside
+ * {@code expression:} in {@code Check} (which must fail the scaffold, never run the spec with the
+ * condition dropped), a {@code Match_Datasets} typo and an inline {@code Source:} block.
+ * </p>
  */
 class RuleScaffoldDroppedKeysTest
 {
@@ -178,6 +185,71 @@ class RuleScaffoldDroppedKeysTest
         assertTrue(ex.getMessage().contains("Scope.Datasets.Includes"),
                 () -> "Message must name the block AND the key ('Scope.Datasets.Includes'): "
                         + ex.getMessage());
+    }
+
+
+    /** The composite's reach beyond R1/R2: a nested block the old hand-copied walk never read. */
+    @Test
+    void unknownKeyUnderOutcome_isRejected()
+    {
+        String yaml = specWith("net_outcome", """
+                Scope:
+                  Domains: {Include: [AE]}""").replace(
+                "Outcome: {Message: \"m\", Output_Variables: [AESTDTC]}",
+                "Outcome: {Message: \"m\", Mesage: \"m2\", Output_Variables: [AESTDTC]}");
+        IllegalStateException ex = buildAndExpectRejection(yaml);
+        assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Outcome'"),
+                () -> ex.getMessage());
+        assertTrue(ex.getMessage().contains("did you mean 'Message'?"), () -> ex.getMessage());
+    }
+
+
+    /**
+     * ⚠ The case that made the composite necessary (review M2): a stray key beside
+     * {@code expression:} makes the {@code Check:} binding DROP the condition. A scaffold reading
+     * only the collectors would have run this spec with no {@code Check} at all, which is worse
+     * than silence — it asserts a rule that checks nothing.
+     */
+    @Test
+    void strayKeyBesideExpressionInCheck_failsTheScaffold()
+    {
+        String yaml = specWith("net_check", """
+                Scope:
+                  Domains: {Include: [AE]}""").replace("Check: {expression: 'not empty(AESTDTC)'}",
+                "Check: {expression: 'not empty(AESTDTC)', Mesage: 'm'}");
+        IllegalStateException ex = buildAndExpectRejection(yaml);
+        assertTrue(ex.getMessage().contains("unknown key 'Mesage' under 'Check'"),
+                () -> ex.getMessage());
+    }
+
+
+    /** The {@code Match_Datasets} gate the old walk skipped. */
+    @Test
+    void misspelledMatchDatasetsKey_isRejected()
+    {
+        String yaml = specWith("net_md", """
+                Scope:
+                  Domains: {Include: [AE]}
+                Match_Datasets:
+                  - {Name: DM, Keys: [USUBJID], Join_type: left}""");
+        IllegalStateException ex = buildAndExpectRejection(yaml);
+        assertTrue(ex.getMessage().contains("unknown key 'Join_type' under 'Match_Datasets[0]'"),
+                () -> ex.getMessage());
+    }
+
+
+    /** T1-1 (a): an inline {@code Source:} block is not engine format and is not allow-listed. */
+    @Test
+    void inlineSourceBlock_isRejected()
+    {
+        String yaml = specWith("net_source", """
+                Scope:
+                  Domains: {Include: [AE]}
+                Source: {Domains: AE, Rule: "text"}""");
+        IllegalStateException ex = buildAndExpectRejection(yaml);
+        assertTrue(ex.getMessage().contains("unknown key 'Source' at the top level of the rule"),
+                () -> ex.getMessage());
+        assertTrue(ex.getMessage().contains("authoring provenance"), () -> ex.getMessage());
     }
 
 

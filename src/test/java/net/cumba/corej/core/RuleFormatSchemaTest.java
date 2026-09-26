@@ -20,8 +20,9 @@ import org.junit.jupiter.api.Test;
  * R-P5 — every shipped rule package in the expression-syntax {@code rules/} corpus must validate
  * against the machine-readable format schema {@code schema/rule-format.schema.json}. The schema is
  * strict on the shapes the engine dispatches on (package envelope, Check tree, Operations,
- * Match_Datasets) and deliberately permissive on extra fields (the loader runs with
- * {@code FAIL_ON_UNKNOWN_PROPERTIES} off).
+ * Match_Datasets) and, since {@code PLAN-rule-unknown-keys-gate}, closed on every object the engine
+ * binds — an unknown key anywhere in a rule is a load error there, and the schema says the same one
+ * step earlier.
  *
  * <p>
  * ⚠ This used to validate <b>two</b> folders against the one schema, and the agreement between them
