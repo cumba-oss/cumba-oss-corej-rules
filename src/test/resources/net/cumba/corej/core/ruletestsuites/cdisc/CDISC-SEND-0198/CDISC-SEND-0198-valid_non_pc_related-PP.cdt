@@ -1,0 +1,50 @@
+#!RuleTest
+#test CDISC-SEND-0198 expect=noViolation domain=PP
+# Rule:Description: Raise an error when the Date/Time of Reference Point (PPRFTDTC) in the Pharmacokinetics Parameters (PP) domain does not equal the Date/Time of Reference Point (PCRFTDTC) of a related Pharmacokinetics Concentrations (PC) record.
+#note "Pins the authority reading (the related PC record only). One RELREC group relates the PP record to a PC record that AGREES and to an LB record whose LBRFTDTC (2020-01-05T08:00) DIFFERS from PPRFTDTC. The engine pairs PP with both; on the PP-LB pairing RELREC.PCRFTDTC is absent, reads empty, and the not-empty guard keeps the row silent. Sensitivity arm: rewriting RELREC.PCRFTDTC to RELREC.**RFTDTC (upstream's Wildcard alias meaning) makes the PP-LB pairing fire exactly once (PLAN-match-datasets-wildcard)."
+#library standard=sendig version=3-1-1
+dataset PP label="Pharmacokinetics Parameters"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PPSEQ type=Num label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+SEND01 | PP | SEND01-1001 | 1 | CMAX | 2020-01-01T08:00
+---
+
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ type=Num label="Sequence Number"
+col PCTEST type=Char label="Test Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+SEND01 | PC | SEND01-1001 | 1 | DRUGX | 2020-01-01T08:00
+---
+
+dataset LB label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTEST type=Char label="Lab Test or Examination Name"
+col LBRFTDTC type=Char label="Date/Time of Reference Point"
+---
+SEND01 | LB | SEND01-1001 | 1 | Glucose | 2020-01-05T08:00
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+SEND01 | PP | SEND01-1001 | PPSEQ | 1 | R1
+SEND01 | PC | SEND01-1001 | PCSEQ | 1 | R1
+SEND01 | LB | SEND01-1001 | LBSEQ | 1 | R1
+---

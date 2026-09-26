@@ -1,0 +1,50 @@
+#!RuleTest
+#test FDA-SD9747 expect=noViolation domain=PP
+# Rule:Description: Raise an error when PPCAT and RELREC.PCRFTDTC are populated, PPRFTDTC equals RELREC.PCRFTDTC, and PPCAT does not equal RELREC.PCTEST.
+#note "Pins the authority reading (the RELREC-related PC record only). One RELREC group relates the PP record to a PC record that AGREES (same reference timepoint, PCTEST equals PPCAT) and to an LB record at the SAME reference timepoint whose LBTEST differs from PPCAT. The engine pairs PP with both; on the PP-LB pairing RELREC.PCRFTDTC is absent, reads empty, and the not-empty guard keeps the row silent. Sensitivity arm: rewriting RELREC.PCRFTDTC / RELREC.PCTEST to RELREC.**RFTDTC / RELREC.**TEST (upstream Wildcard alias meaning) makes the PP-LB pairing fire exactly once (PLAN-match-datasets-wildcard)."
+#library standard=sdtmig version=3-4
+dataset PP label="Pharmacokinetics Parameters"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PPSEQ type=Num label="Sequence Number"
+col PPCAT type=Char label="Parameter Category"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | DRUG_X | 2014-01-15
+---
+
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ type=Num label="Sequence Number"
+col PCTEST type=Char label="Pharmacokinetic Test Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUG_X | 2014-01-15
+---
+
+dataset LB label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ type=Num label="Sequence Number"
+col LBTEST type=Char label="Lab Test or Examination Name"
+col LBRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUCOSE | 2014-01-15
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | PP | 01-701-1015 | PPSEQ | 1 | R1
+CDISCPILOT01 | PC | 01-701-1015 | PCSEQ | 1 | R1
+CDISCPILOT01 | LB | 01-701-1015 | LBSEQ | 1 | R1
+---
