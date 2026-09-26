@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * Most TA rule-test scenarios have been migrated to extended-CDT files under
- * {@code src/test/resources/net/cumba/corej/core/ruletestsuites/core/CORE-*\/} and are executed by
- * {@code RuleTestSuitesCoreFactoryTest}. Methods below remain in Java because their data cannot
- * round-trip through the CDT format (e.g. a non-numeric string deliberately stuffed into a
- * {@code type=Num} column to trigger a pattern-mismatch rule).
+ * {@code src/test/resources/net/cumba/corej/core/ruletestsuites/core/CORE-*\/} and were executed by
+ * {@code RuleTestSuitesCoreFactoryTest} (⚑ both deleted with the CORE family in 2026-09; since
+ * PLAN-dead-code-followups a capture from this suite writes into the captured rule's own family
+ * directory, {@code cdisc/}, {@code fda/}, {@code pmda/} or {@code draft/}). Methods below remain
+ * in Java because their data cannot round-trip through the CDT format (e.g. a non-numeric string
+ * deliberately stuffed into a {@code type=Num} column to trigger a pattern-mismatch rule).
  * </p>
  */
 class SdtmTaRuleTest extends AbstractSdtmRuleTest // NOSONAR S3577 — Underscore-categorised name is
