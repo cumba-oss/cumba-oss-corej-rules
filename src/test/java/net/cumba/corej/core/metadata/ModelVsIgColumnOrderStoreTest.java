@@ -52,8 +52,9 @@ import org.junit.jupiter.api.Test;
  * {@code get_model_column_order}). Pinned as an exact roster, not a count: a model or IG bump that
  * trades one variable for another conserves a count and changes the roster.</li>
  * <li><b>The rule's verdict on it</b> — the shipped corpus rule, loaded from the generated package,
- * reports an IG-only variable at WARNING and a variable in neither list at ERROR, and a dataset
- * whose model list is empty (a sponsor-defined domain) SKIPS.</li>
+ * reports an IG-only variable at WARNING and a variable in neither list at ERROR; a sponsor-defined
+ * domain is judged by the model list of the class the scope matcher gives it
+ * ({@code PLAN-custom-domain-model-walk}), and one no class tier places SKIPS.</li>
  * </ol>
  *
  * <p>
@@ -329,18 +330,38 @@ class ModelVsIgColumnOrderStoreTest
 
 
     @Test
-    void aSponsorDefinedDomainResolvesNoModelListAndSkips() throws IOException
+    void aSponsorDefinedDomainIsJudgedByItsSniffedClass() throws IOException
     {
-        // §4b row 3 on real metadata: the model walk places a custom domain in no class, so the
-        // model list is empty and the rule SKIPS — before the ladder as after it. The IG list is
-        // empty too, so nothing here depends on which IG operation is bound.
+        // PLAN-custom-domain-model-walk: the walk places a custom domain in the class the scope
+        // matcher sniffs from its own columns (FINDINGS here), so the model list is that class's.
+        // A custom domain has no IG dataset, so the IG list is the same walk: the sponsor variable
+        // is in neither list (ERROR), every other column is in both (silent).
         IDataTable xx = dataset("XX", "STUDYID", "USUBJID", "XXSEQ", "XXTESTCD", "XXTEST",
                 "XXORRES", "XXFOO");
         MetadataProvider sendig = provider("sendig 3-0");
+        List<String> model = sendig.getStandardModelVariables(xx, null);
+        assertNotNull(model);
+        assertTrue(
+                model.containsAll(
+                        List.of("STUDYID", "USUBJID", "XXSEQ", "XXTESTCD", "XXTEST", "XXORRES")),
+                "the FINDINGS model walk under the XX prefix: " + model);
+        assertEquals(List.of(), sendig.getColumnOrder("XX"),
+                "the domain-keyed IG order stays unserved (CDW-D2 (b))");
+        assertEquals(Map.of("XXFOO", Severity.ERROR),
+                findings(run("rules-fda-sendig-3-0.json", "sendig 3-0", xx)));
+    }
+
+
+    @Test
+    void aSponsorDefinedDomainNoClassTierPlacesSkips() throws IOException
+    {
+        // No topic variable: no tier resolves a class, the model list is empty and the rule SKIPS
+        // — before the fix as after it (CDW-D3 (b)).
+        IDataTable xx = dataset("XX", "STUDYID", "USUBJID", "XXSEQ", "XXVAL", "XXFOO");
+        MetadataProvider sendig = provider("sendig 3-0");
         assertEquals(List.of(), sendig.getStandardModelVariables(xx, null));
-        assertEquals(List.of(), sendig.getColumnOrder("XX"));
         RuleExecutionResult result = run("rules-fda-sendig-3-0.json", "sendig 3-0", xx);
-        assertTrue(result.isSkipped(), "a custom domain resolves no model list: " + result);
+        assertTrue(result.isSkipped(), "no class tier places the domain: " + result);
         assertTrue(result.getViolations().isEmpty());
     }
 }

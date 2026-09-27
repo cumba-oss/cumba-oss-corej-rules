@@ -10,14 +10,19 @@ Description: "Raise an error when a variable present in a dataset is in neither 
 Executability: "Partially Executable - Possible Underreporting"
 ExecutabilityHint:
   Category: "partially executable"
-  Detail: "Two shapes escape the check. (1) A dataset whose domain the model walk\
-    \ cannot place in an observation class resolves no model list and the rule is\
-    \ SKIPPED for it: every sponsor-defined (custom) domain, and the special-purpose\
-    \ and trial-design datasets of an IG whose linked model carries no variables for\
-    \ them (e.g. most of SENDIG-AR 1.0). (2) The model's '--' templates are substituted\
-    \ without regard to the domain, so a template meant for one domain is allowed\
-    \ on every dataset of the class (AEBEATNO on AE; CDISC-CG0542 reports --BEATNO\
-    \ outside EG)."
+  Detail: "Two shapes escape the check. (1) A dataset the model walk cannot place\
+    \ in an observation class, or whose class the linked model carries no variables\
+    \ for, resolves no model list and the rule is SKIPPED for it: a domain the run's\
+    \ IG does not define whose columns show no class (no DOMAIN column, or no topic\
+    \ variable the class sniffer recognises - e.g. SDTMIG-MD's DI and DR in an SDTMIG\
+    \ 3.4 run), and a special-purpose or trial-design domain the linked model has\
+    \ no dataset for (e.g. SM, TD and TM under SDTMIG 3.1.2). Every other domain the\
+    \ IG does not define - a sponsor-defined domain, or a standard one the IG leaves\
+    \ out, such as the SEND domains SENDIG-AR 1.0 omits - is judged against the model\
+    \ variables of the class the scope matcher gives it. (2) The model's '--' templates\
+    \ are substituted without regard to the domain, so a template meant for one domain\
+    \ is allowed on every dataset of the class (AEBEATNO on AE; CDISC-CG0542 reports\
+    \ --BEATNO outside EG)."
 Scope:
   Domains:
     Include:

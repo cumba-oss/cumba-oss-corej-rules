@@ -1,9 +1,9 @@
 #!RuleTest
 #test CDISC-SEND-0269 expect=violation domain=BW
-#note "BWTERM is the EVENTS topic variable --TERM under BW's prefix: absent from the FINDINGS model table (conjunct 1 true) and present in the EVENTS table (conjunct 2 true) -> fires. BWLAT is the DISCRIMINATOR: it IS in the FINDINGS model table, so conjunct 1 is false and it must stay silent even though it is absent from BW's IG column order (that was SEND267's territory, retired by M3-D12(d))."
+#note "BWTERM is the EVENTS topic variable --TERM under BW's prefix: absent from the FINDINGS model table (conjunct 1 true) and present in the EVENTS table (conjunct 2 true) -> fires. BWLAT is the DISCRIMINATOR: it IS in the FINDINGS model table, so conjunct 1 is false and it must stay silent even though it is absent from BW's IG variable list (that was SEND267's territory, retired by M3-D12(d))."
 #library standard=sendig version=3-0
 #library model-column-order      BW STUDYID DOMAIN USUBJID POOLID BWSEQ BWGRPID BWTESTCD BWTEST BWORRES BWORRESU BWSTRESC BWSTRESN BWSTRESU BWSTAT BWREASND BWLAT BWDIR BWDTC BWDY
-#library column-order            BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWTEST BWORRES BWORRESU BWSTRESC BWSTRESN BWSTRESU BWSTAT BWREASND BWBLFL BWFAST BWDTC BWDY BWNOMDY
+#library domain-variables        BW STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier BWSEQ:Identifier BWTESTCD:Topic "BWTEST:Synonym Qualifier" "BWORRES:Result Qualifier" "BWORRESU:Variable Qualifier" "BWSTRESC:Result Qualifier" "BWSTRESN:Result Qualifier" "BWSTRESU:Variable Qualifier" "BWSTAT:Record Qualifier" "BWREASND:Record Qualifier" "BWBLFL:Record Qualifier" "BWFAST:Record Qualifier" BWDTC:Timing BWDY:Timing BWNOMDY:Timing
 #library model-class-variables   FINDINGS      --TESTCD:Topic "--TEST:Synonym Qualifier" "--ORRES:Result Qualifier" "--STRESC:Result Qualifier" "--STAT:Record Qualifier" "--REASND:Record Qualifier" "--LAT:Variable Qualifier" "--DIR:Variable Qualifier"
 #library model-class-variables   "FINDINGS ABOUT" --TESTCD:Topic "--TEST:Synonym Qualifier" "--OBJ:Record Qualifier" "--ORRES:Result Qualifier"
 #library model-class-variables   EVENTS        --TERM:Topic "--DECOD:Synonym Qualifier" "--SEV:Record Qualifier" "--SER:Record Qualifier" "--OUT:Record Qualifier"

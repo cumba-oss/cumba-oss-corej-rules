@@ -1,9 +1,9 @@
 #!RuleTest
 #test CDISC-SEND-0270 expect=skipped domain=BW
-#note "model-column-order and column-order are declared but NO model-class-variables, so the four class-selecting operations resolve nothing and D-6 makes the rule SKIP. BWCUSTOM is present and would fire if the rule ran, so a silent noViolation here would be the vacuous shape, not a pass."
+#note "model-column-order and domain-variables are declared but NO model-class-variables, so the four class-selecting operations resolve nothing and D-6 makes the rule SKIP. BWCUSTOM is present and would fire if the rule ran, so a silent noViolation here would be the vacuous shape, not a pass."
 #library standard=sendig version=3-0
 #library model-column-order      BW STUDYID DOMAIN USUBJID POOLID BWSEQ BWGRPID BWTESTCD BWTEST BWORRES BWORRESU BWSTRESC BWSTRESN BWSTRESU BWSTAT BWREASND BWLAT BWDIR BWDTC BWDY
-#library column-order            BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWTEST BWORRES BWORRESU BWSTRESC BWSTRESN BWSTRESU BWSTAT BWREASND BWBLFL BWFAST BWDTC BWDY BWNOMDY
+#library domain-variables        BW STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier BWSEQ:Identifier BWTESTCD:Topic "BWTEST:Synonym Qualifier" "BWORRES:Result Qualifier" "BWORRESU:Variable Qualifier" "BWSTRESC:Result Qualifier" "BWSTRESN:Result Qualifier" "BWSTRESU:Variable Qualifier" "BWSTAT:Record Qualifier" "BWREASND:Record Qualifier" "BWBLFL:Record Qualifier" "BWFAST:Record Qualifier" BWDTC:Timing BWDY:Timing BWNOMDY:Timing
 dataset BW class=FINDINGS label="Body Weight"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

@@ -2764,7 +2764,9 @@ Check:
 
 The example above is the complete call — this function takes no arguments beyond its optional target.
 
-**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty model list is mapped to *library not available*, so `varname() not in $s` never fans out over every column. A sponsor-defined (custom) domain resolves no model list today, so a rule binding this operation skips it.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty model list is mapped to *library not available*, so `varname() not in $s` never fans out over every column.
+
+**A domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM/CM/FA/MH) — is walked under the observation class the **scope matcher** gives the dataset from its own columns (the study's declared class, the product, the curated domain map, then the topic-variable sniff), so the class a rule is scoped by and the class its model list comes from are one class. Only a dataset no class tier places (no `DOMAIN` column, or no topic variable the sniff recognises), or one whose class the linked model has no variables for, resolves an empty list — and then the rule is skipped. The same walk backs [`get_model_filtered_variables()`](#get_model_filtered_variables), [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables), [`natural_key_variables()`](#natural_key_variables) and [`get_parent_model_column_order()`](#get_parent_model_column_order); the filtered lookups answer the empty set where this one skips. [`get_column_order_from_library()`](#get_column_order_from_library) stays keyed by the domain name: the IG has no column order for such a domain, so it skips.
 
 ### get_model_filtered_variables
 
