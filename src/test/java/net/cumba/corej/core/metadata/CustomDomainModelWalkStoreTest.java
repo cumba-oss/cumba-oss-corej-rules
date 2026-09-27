@@ -44,10 +44,11 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * Such a domain is a sponsor's own ({@code XX}), or a standard one the run's IG leaves out: at
- * SENDIG-AR 1.0 every SEND domain but {@code DM}, at SENDIG-DART 1.1 {@code EG PM TF VS CV RE}. The
- * provider's metadata library is the IG product's table view, which has no table for it, so before
- * the fix both SDTM walks answered {@code []}: the model-order rules SKIPPED, and the rules reading
- * the total operations ({@code get_model_filtered_variables}, {@code natural_key_variables},
+ * SENDIG-AR 1.0 every SEND domain but {@code DM}, {@code CM}, {@code FA} and {@code MH}, at
+ * SENDIG-DART 1.1 {@code EG PM TF VS CV RE}. The provider's metadata library is the IG product's
+ * table view, which has no table for it, so before the fix both SDTM walks answered {@code []}: the
+ * model-order rules SKIPPED, and the rules reading the total operations
+ * ({@code get_model_filtered_variables}, {@code natural_key_variables},
  * {@code get_dataset_filtered_variables}) ran against an empty list and false-fired. The walk now
  * places the dataset in the class the scope matcher gives it, from its own columns.
  * </p>
@@ -276,7 +277,9 @@ class CustomDomainModelWalkStoreTest
             String aExpectedClass, String aWhat)
     {
         String member = aTable.getMetaData().getName();
-        String scope = aProvider.getDatasetClass(member, member, columnsOf(aTable));
+        // The scope matcher's own ladder (LibraryValidator calls the same method).
+        String scope = ScopeClassLadder.classOf(aProvider, member,
+                CdiscDomainResolver.cdiscDomainOf(aTable), aTable, _ -> null);
         assertEquals(aExpectedClass, scope, aWhat + ": scope class");
         List<Map<String, String>> forced = aProvider.getStandardModelVariablesForClass(aTable, null,
                 scope);
@@ -406,11 +409,40 @@ class CustomDomainModelWalkStoreTest
             List<String> model = ar.getStandardModelVariables(t, null);
             assertNotNull(model, domain);
             assertTrue(model.containsAll(ig), domain + " (" + scope + "): " + model);
+            // Algorithm B has no domain-keyed model tier: for a non-general-observation class it
+            // answers [] (plan section 5b C3) — so get_dataset_filtered_variables(),
+            // natural_key_variables() and var_*("LIBRARY") see nothing here. Pinned so a change to
+            // it is a decision, not a drift (PLAN-library-var-custom-domains builds on it).
+            assertEquals(List.of(), ar.getStandardVariablesDetailed(t, null),
+                    domain + ": algorithm B");
             assertEquals(Map.of(), byVariable(run(pkg, "sendig ar-1-0", "FDA-SD0058", t), domain));
             assertEquals(0, count(run(pkg, "sendig ar-1-0", "FDA-SD1079", t), domain), domain);
             judged.add(domain);
         }
         assertEquals(Set.of("CO", "POOLDEF", "RELREC", "SE", "TA", "TE", "TS", "TX"), judged);
+    }
+
+
+    @Test
+    void anAssociatedPersonsDatasetIsJudgedExactlyWhereScopePlacesIt() throws IOException
+    {
+        // Review round 1, LOW-2: APXX carries no APXXTERM, so scope inherits the parent's class —
+        // and places APXX nowhere when the parent XX is absent. The walk takes the same answer.
+        IDataTable apxx = table("APXX",
+                List.of("STUDYID", "DOMAIN", "APID", "RSUBJID", "SREL", "XXSEQ", "XXTERM", "XXFOO"),
+                new String[]
+                {
+                        "S", "APXX", "A1", "U1", "MOTHER", "1", "t", "f"
+                });
+        IDataTable xx = dataset("XX", SHAPES.get("EVENTS"));
+        RuleExecutionResult withParent = run(FDA_34, SDTMIG_34, "FDA-SD0058", apxx, xx);
+        assertEquals(Map.of("XXFOO", Severity.ERROR), byVariable(withParent, "APXX with XX"));
+        RuleExecutionResult orphan = run(FDA_34, SDTMIG_34, "FDA-SD0058", apxx);
+        assertTrue(orphan.isSkipped(), "no parent, no class, no model list: " + orphan);
+        MetadataProvider provider = provider(SDTMIG_34);
+        assertNull(ScopeClassLadder.classOf(provider, "APXX", "APXX", apxx, _ -> null));
+        assertEquals("EVENTS", ScopeClassLadder.classOf(provider, "APXX", "APXX", apxx,
+                name -> "XX".equals(name) ? xx : null));
     }
 
     // ------------------------------------------------------------------
