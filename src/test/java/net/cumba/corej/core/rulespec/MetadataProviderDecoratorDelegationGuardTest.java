@@ -290,6 +290,15 @@ class MetadataProviderDecoratorDelegationGuardTest
     private static final String MAP_LIST_OF_TABLE = "(?<![\\w.])" + MAP_LIST + "\\s+%s\\s*"
             + "\\(\\s*IDataTable\\s+(\\w+)\\s*,\\s*DatasetResolver\\s+(\\w+)\\s*\\)";
 
+    /**
+     * {@code Map<String, String> name(IDataTable t, DatasetResolver r, String a, String b)} — the
+     * LIBRARY read's IG-absent tier.
+     */
+    private static final String MAP_OF_TABLE_TWO_STRINGS = "(?<![\\w.])Map\\s*<\\s*String\\s*,"
+            + "\\s*String\\s*>\\s+%s\\s*\\(\\s*IDataTable\\s+(\\w+)\\s*,"
+            + "\\s*DatasetResolver\\s+(\\w+)\\s*,\\s*String\\s+(\\w+)\\s*,"
+            + "\\s*String\\s+(\\w+)\\s*\\)";
+
     /** {@code List<Map<String, String>> name(IDataTable t, DatasetResolver r, String c)}. */
     private static final String MAP_LIST_OF_TABLE_STRING = "(?<![\\w.])" + MAP_LIST
             + "\\s+%s\\s*\\(\\s*IDataTable\\s+(\\w+)\\s*,"
@@ -444,10 +453,15 @@ class MetadataProviderDecoratorDelegationGuardTest
             // ⛔ The engine-side copy must NOT copy this promotion: its population contains
             // DefineXmlMetadataProvider, which does not delegate this method, and that class is
             // not under THIS repo's SCAN_ROOTS. The ledgers differ because the populations do.
-            capability("getCodelistCodeMap(String, String)", MAP_OF_TWO_STRINGS));
+            capability("getCodelistCodeMap(String, String)", MAP_OF_TWO_STRINGS),
+            // PLAN-library-var-custom-domains: the last tier of the LIBRARY variable read. Its
+            // {} default means "not served", which the var_*("LIBRARY") rules read as a silent
+            // pass; a decorator inheriting it hides the tier of the provider it wraps.
+            capability("getIgAbsentVariableMetadata(IDataTable, DatasetResolver, String, String)",
+                    MAP_OF_TABLE_TWO_STRINGS));
 
     /** Floor on the capability set itself, so an accidental deletion reds. */
-    private static final int MIN_CAPABILITIES = 22;
+    private static final int MIN_CAPABILITIES = 23;
 
     /** Floor on the interface's own default count, so a truncated parse cannot pass. */
     private static final int MIN_INTERFACE_DEFAULTS = 26;

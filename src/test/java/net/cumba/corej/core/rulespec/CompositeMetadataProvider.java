@@ -345,6 +345,20 @@ final class CompositeMetadataProvider implements MetadataProvider
     }
 
 
+    /**
+     * {@code PLAN-library-var-custom-domains} — the LIBRARY read's IG-absent tier, with the same
+     * whole-answer precedence as {@link #getVariableMetadata}.
+     */
+    @Override
+    public Map<String, String> getIgAbsentVariableMetadata(IDataTable aTable,
+            DatasetResolver aResolver, String aDomain, String aVariable)
+    {
+        return firstNonEmptyMap(
+                p -> p.getIgAbsentVariableMetadata(aTable, aResolver, aDomain, aVariable), mock,
+                pickle);
+    }
+
+
     @Override
     public List<Map<String, String>> getDomainVariables(String domain)
     {

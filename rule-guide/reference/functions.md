@@ -3126,6 +3126,8 @@ The variable's label; available at every level
 expression: 'var_label("DATA") =~ /^[a-z]/'
 ```
 
+**At `LIBRARY`, a dataset whose domain the run's IG does not define has no label** — nor a codelist, core designation or ordinal: the SDTM model's labels are class-level ones, not the label a standard gives the domain, and a sponsor may adjust the labels of a domain it defines. A rule guarded by `not empty(var_label("LIBRARY"))` therefore does not judge such a dataset. Its name, data type and role do come from the model (see [`var_type`](#var_type)).
+
 ### var_length
 
 `var_length([x,] level)` → **value**
@@ -3176,6 +3178,8 @@ The variable's name; available at every level
 ```yaml
 expression: 'not empty(var_name("DEFINE"))'
 ```
+
+**At `LIBRARY`, a dataset whose domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM, CM, FA and MH; at SENDIG-DART 1.1 EG, PM, TF, VS, CV and RE) — takes its name from the SDTM model's variable of the observation class the scope matcher gives the dataset. If no class places the dataset, if the class is a special-purpose, trial-design or relationship one, or if the model has no such variable (a sponsor's own variable), there is no value, as for any variable the Library does not know.
 
 ### var_ordinal
 
@@ -3228,6 +3232,8 @@ The variable's role — identifier, topic, qualifier and so on; `DEFINE` and `LI
 expression: 'not empty(var_role("DEFINE"))'
 ```
 
+**At `LIBRARY`, a dataset whose domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM, CM, FA and MH; at SENDIG-DART 1.1 EG, PM, TF, VS, CV and RE) — takes its role from the SDTM model's variable of the observation class the scope matcher gives the dataset. If no class places the dataset, if the class is a special-purpose, trial-design or relationship one, or if the model has no such variable (a sponsor's own variable), there is no value, as for any variable the Library does not know.
+
 ### var_type
 
 `var_type([x,] level)` → **value**
@@ -3244,6 +3250,8 @@ The variable's data type; available at every level
 ```yaml
 expression: 'var_type("DATA") != "Num"'
 ```
+
+**At `LIBRARY`, a dataset whose domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM, CM, FA and MH; at SENDIG-DART 1.1 EG, PM, TF, VS, CV and RE) — takes its data type from the SDTM model's variable of the observation class the scope matcher gives the dataset. If no class places the dataset, if the class is a special-purpose, trial-design or relationship one, or if the model has no such variable (a sponsor's own variable), there is no value, as for any variable the Library does not know.
 
 ### variable_names
 

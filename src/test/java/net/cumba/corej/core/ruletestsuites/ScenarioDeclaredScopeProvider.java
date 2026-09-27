@@ -518,6 +518,14 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
 
 
     @Override
+    public Map<String, String> getIgAbsentVariableMetadata(IDataTable aTable,
+            DatasetResolver aResolver, String aDomain, String aVariable)
+    {
+        return base.getIgAbsentVariableMetadata(aTable, aResolver, aDomain, aVariable);
+    }
+
+
+    @Override
     public List<Map<String, String>> getDomainVariables(String aDomain)
     {
         return base.getDomainVariables(aDomain);
