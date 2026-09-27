@@ -349,6 +349,21 @@ class LibraryVarCustomDomainStoreTest
     }
 
 
+    /**
+     * The same standard SEND dataset with a label no standard gives any variable — the dataset a
+     * SENDIG label rule exists to report.
+     */
+    private static IDataTable wronglyLabelledSend(String aDomain, List<String> aColumns)
+    {
+        Map<String, String> labels = new HashMap<>();
+        for (String column : aColumns)
+        {
+            labels.put(column, "Not The Standard Label");
+        }
+        return labelled(aDomain, aColumns, labels, false);
+    }
+
+
     private static Rule shipped(String aPackageFile, String aRuleId) throws IOException
     {
         Rule rule = rulesOf(aPackageFile).get(aRuleId);
@@ -715,9 +730,12 @@ class LibraryVarCustomDomainStoreTest
             assertOnlyTheTypeErrorFires(fda, ar, "FDA-SD0055", d.getKey(), d.getValue());
             // The LVC-F1 gap, asserted as TODAY's answer and not as correct: the model's
             // class-level labels are not SENDIG's (328 differ at AR), so none is served, and the
-            // label rule stays silent on a conformant dataset and on a wrong one alike.
+            // label rule stays silent on a conformant dataset and on a wrong one alike. ⚠ A
+            // SENDIG-label view (LVC-F1 ⓑ) would — rightly — make the wrong one fire.
             assertEquals(Set.of(), reportedOn(fda, ar, "FDA-SE0063",
                     conformantSend(d.getKey(), d.getValue(), false)), d.getKey());
+            assertEquals(Set.of(), reportedOn(fda, ar, "FDA-SE0063",
+                    wronglyLabelledSend(d.getKey(), d.getValue())), d.getKey());
         }
     }
 
@@ -740,9 +758,14 @@ class LibraryVarCustomDomainStoreTest
                     domain);
             assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0009.1", conformant),
                     domain);
-            // LVC-F1, as today's answer: 102 labels differ at DART, so none is served.
+            // LVC-F1, as today's answer: 102 labels differ at DART, so none is served — silent on a
+            // conformant dataset and on a wrongly labelled one alike. ⚠ A SENDIG-label view
+            // (LVC-F1 ⓑ) would — rightly — make the wrong one fire.
+            IDataTable wrong = wronglyLabelledSend(domain, columns);
             assertEquals(Set.of(), reportedOn(fda, dart, "FDA-SE0063", conformant), domain);
             assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0276", conformant), domain);
+            assertEquals(Set.of(), reportedOn(fda, dart, "FDA-SE0063", wrong), domain);
+            assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0276", wrong), domain);
         }
     }
 
@@ -789,6 +812,64 @@ class LibraryVarCustomDomainStoreTest
     // ------------------------------------------------------------------
     // 4. Non-regression: every shape tiers 1-3 answer reads exactly as without the tier
     // ------------------------------------------------------------------
+
+
+    @Test
+    void anApMemberWhoseDomainCellNamesTheParentIsReadAsScopeClassifiesIt() throws IOException
+    {
+        // Review round 1, P1: member APXX, DOMAIN cell XX, no XX dataset. Scope classifies it by
+        // its own code XX and columns (XXTESTCD: FINDINGS); the read's domain tier re-adds the AP
+        // prefix (APXX) for the associated-persons shim, and the class used to be keyed by that
+        // key too — the ladder then sniffed APXXTESTCD, missed, fell through to the absent parent
+        // and served nothing, so SEND-0005 kept reporting every Define-declared variable.
+        IDataTable apxx = MockTable.of().name("APXX").col("DOMAIN", "XX").col("STUDYID", "S")
+                .col("APID", "A").col("XXSEQ", "1").col("XXTESTCD", "T").col("XXORRES", "r")
+                .col("XXFOO", "x").build();
+        for (String pkg : List.of("sdtmig 3-4", "sendig 3-1-1", "sendig ar-1-0"))
+        {
+            MetadataProvider provider = provider(pkg);
+            assertEquals("FINDINGS",
+                    ScopeClassLadder.classOf(provider, "APXX", "XX", apxx, NO_RESOLVER), pkg);
+            assertEquals("Topic", read(provider, apxx, "XXTESTCD").get("role"), pkg);
+            assertEquals("Identifier", read(provider, apxx, "APID").get("role"),
+                    pkg + ": the AP shim rides the domain tier's AP-prefixed key");
+            assertEquals(Map.of(), read(provider, apxx, "XXFOO"), pkg);
+        }
+    }
+
+
+    @Test
+    void theTierItselfAnswersNothingForADomainTheIgDefines()
+    {
+        // S3.3's early return, pinned where it is observable. Through the READ it changes no
+        // answer: the read's domain tier has already walked the same merged IG + model list for
+        // an IG-defined domain and missed, so a second walk misses too — the return only saves
+        // that walk (S5). The provider's own contract ("a domain the IG does not define") is what
+        // a direct call sees: an IG variable, a variable the MODEL defines and the IG does not
+        // (--BODSYS is a Findings-class model variable none of these IGs lists for LB — measured
+        // 2026-09-27), and a sponsor variable all answer {}. Without the early return the walk
+        // would serve the first two.
+        int asked = 0;
+        for (String pkg : List.of("sdtmig 3-2", "sdtmig 3-4", "sendig 3-1-1", "sendig dart-1-1"))
+        {
+            MetadataProvider provider = provider(pkg);
+            IDataTable lb = dataset("LB", List.of("STUDYID", "USUBJID", "LBSEQ", "LBTESTCD",
+                    "LBORRES", "LBBODSYS", "LBFOO"));
+            for (String column : columnsOf(lb))
+            {
+                assertEquals(Map.of(),
+                        provider.getIgAbsentVariableMetadata(lb, NO_RESOLVER, "LB", column),
+                        pkg + " LB." + column);
+                asked++;
+            }
+            assertFalse(read(provider, lb, "LBTESTCD").isEmpty(),
+                    pkg + ": the read answers LBTESTCD from the domain tier");
+            assertTrue(read(provider, lb, "LBBODSYS").containsKey("label"),
+                    pkg + ": the read answers the model-only LBBODSYS from the domain tier's merged"
+                            + " walk, label included — not from the IG-absent tier");
+        }
+        assertEquals(32, asked);
+    }
 
 
     @Test
