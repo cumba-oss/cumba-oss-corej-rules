@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0562 expect=violation domain=VS
+# Rule:Description: Raise an error when REPNUM is in the dataset and there are multiple records for a subject for a test within the timeframe identified by the timing variables on the record, and --REPNUM is missing or not unique per subject per test per timing variables.
+#note "PLAN-grouping-key-identity (noise pair, a missed finding): VISITNUM is the only Timing variable. Two SYSBP records at VISITNUM 4.9999999999994 come first, then one at 5 -- two exact-distinct timing values that render alike ('5'). Key identity is always exact (register D64h), so they are two groups; the two-record group has an empty VSREPNUM -> rows 1 and 2 fire, row 3 (a group of one) does not. Before the plan the later one-record block overwrote the shared rendered key, every row read a count of 1 and nothing fired."
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 VSSEQ=1
+#expectViolationAt row=2 USUBJID=01-701-1015 VSSEQ=2
+#library standard=sdtmig version=3-4
+#library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VISITNUM:Timing VSREPNUM:Qualifier DOMAIN:Identifier
+dataset VS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ type=Num label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VISITNUM type=Num label="Visit Number"
+col VSREPNUM type=Char label="Repetition Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 4.9999999999994 |
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 4.9999999999994 |
+CDISCPILOT01 | VS | 01-701-1015 | 3 | SYSBP | 5 |
+---
