@@ -278,6 +278,42 @@ class JoinKeyDeclarationLintTest
         assertRedNaming(childAndTemplate, "T-CHILD-TPL", "USUBJID",
                 "named by an All_Or_None group");
 
+        // Round 5, F1: a NAMELESS ordinary entry is exempt and inert
+        // (RuleRunner.buildJoinedDatasets
+        // skips it), so it licenses nothing — and, F2 a, it is not judged itself (control).
+        String childAndInert = """
+                Core: {Id: "T-CHILD-INERT"}
+                Requirements:
+                  Variables:
+                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All_Or_None: [["USUBJID", "FOO.BAR"]]
+                Match_Datasets:
+                - Name: "SUPP--"
+                  Child: true
+                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                - Keys: ["USUBJID"]
+                """;
+        assertRedNaming(childAndInert, "T-CHILD-INERT", "USUBJID", "named by an All_Or_None group");
+        assertClean(childAndInert.replace("    All_Or_None: [[\"USUBJID\", \"FOO.BAR\"]]\n", ""));
+
+        // Round 5, F2 b (the reviewer's input, agreed with the loader): a token on the RIGHT side
+        // makes the entry an expansion template too, so it licenses nothing whatever its name.
+        String childAndRightTemplate = """
+                Core: {Id: "T-CHILD-RTPL"}
+                Requirements:
+                  Variables:
+                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All_Or_None: [["USUBJID", "DM.USUBJID"]]
+                Match_Datasets:
+                - Name: "SUPP--"
+                  Child: true
+                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                - Name: "DM"
+                  Keys: [{left: "USUBJID", right: "&K"}]
+                """;
+        assertRedNaming(childAndRightTemplate, "T-CHILD-RTPL", "USUBJID",
+                "named by an All_Or_None group");
+
         String template = """
                 Core: {Id: "T-TEMPLATE"}
                 Requirements:
@@ -443,6 +479,14 @@ class JoinKeyDeclarationLintTest
                 }
                 continue;
             }
+            if (md.getName() == null)
+            {
+                // An ORDINARY entry without a name has no NAME.RIGHT side to declare against and
+                // is inert at run time (RuleRunner.buildJoinedDatasets skips it) — exempt, as the
+                // loader twin exempts it (review round 5, F2 a). A nameless Child entry was judged
+                // above: the child pre-merger joins on it.
+                continue;
+            }
             c.ordinary++;
             if (!all.contains(fold(left.get(0))))
             {
@@ -520,11 +564,15 @@ class JoinKeyDeclarationLintTest
         for (MatchDataset md : joins)
         {
             List<String> left = md.getKeys();
+            List<String> right = md.getRightKeys();
             // ORDINARY only (review round 3, T1): neither a Child entry nor an expansion template
-            // (an &-token name or key) carries a key group, so neither licenses one.
-            if (left == null || Boolean.TRUE.equals(md.getChild())
+            // (an &-token name or key — on EITHER side, the loader's isExpansionTemplateEntry
+            // predicate, round 5 F2 b) carries a key group, so neither licenses one; nor does a
+            // NAMELESS ordinary entry, which is exempt and inert (round 5, F1).
+            if (left == null || md.getName() == null || Boolean.TRUE.equals(md.getChild())
                     || String.valueOf(md.getName()).startsWith("&")
-                    || left.stream().anyMatch(k -> k.startsWith("&")))
+                    || left.stream().anyMatch(k -> k.startsWith("&"))
+                    || (right != null && right.stream().anyMatch(k -> k.startsWith("&"))))
             {
                 continue;
             }
