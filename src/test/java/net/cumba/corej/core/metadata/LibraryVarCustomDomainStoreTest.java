@@ -336,7 +336,8 @@ class LibraryVarCustomDomainStoreTest
     }
 
 
-    private static Rule shipped(String aPackageFile, String aRuleId) throws IOException
+    /** The rules of one generated package, loaded once. */
+    private static Map<String, Rule> rulesOf(String aPackageFile) throws IOException
     {
         Map<String, Rule> rules = PACKAGES.get(aPackageFile);
         if (rules == null)
@@ -344,7 +345,13 @@ class LibraryVarCustomDomainStoreTest
             rules = RulePackageLoader.load(CorpusPaths.rules(aPackageFile)).getRules();
             PACKAGES.put(aPackageFile, rules);
         }
-        Rule rule = rules.get(aRuleId);
+        return rules;
+    }
+
+
+    private static Rule shipped(String aPackageFile, String aRuleId) throws IOException
+    {
+        Rule rule = rulesOf(aPackageFile).get(aRuleId);
         assertNotNull(rule, aRuleId + " must ship in " + aPackageFile);
         assertNull(rule.getLoadError(), aRuleId + " must load clean: " + rule.getLoadError());
         return rule;
@@ -371,7 +378,7 @@ class LibraryVarCustomDomainStoreTest
                 String[] parts = name.substring(0, name.length() - ".json".length()).split("-", 4);
                 String store = parts[2] + " " + parts[3];
                 if (("sdtmig".equals(parts[2]) || "sendig".equals(parts[2]))
-                        && shipsIn(name, aRuleId) && storeServes(store))
+                        && rulesOf(name).containsKey(aRuleId) && storeServes(store))
                 {
                     out.put(name, store);
                 }
@@ -379,18 +386,6 @@ class LibraryVarCustomDomainStoreTest
         }
         assertFalse(out.isEmpty(), aRuleId + " ships in no package the store serves");
         return out;
-    }
-
-
-    private static boolean shipsIn(String aPackageFile, String aRuleId) throws IOException
-    {
-        Map<String, Rule> rules = PACKAGES.get(aPackageFile);
-        if (rules == null)
-        {
-            rules = RulePackageLoader.load(CorpusPaths.rules(aPackageFile)).getRules();
-            PACKAGES.put(aPackageFile, rules);
-        }
-        return rules.containsKey(aRuleId);
     }
 
 
