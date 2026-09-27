@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0562 expect=violation domain=VS
 # Rule:Description: Raise an error when REPNUM is in the dataset and there are multiple records for a subject for a test within the timeframe identified by the timing variables on the record, and --REPNUM is missing or not unique per subject per test per timing variables.
-#note "PLAN-grouping-key-identity (signed zero, a missed finding): VISITNUM is the only Timing variable. One SYSBP record at VISITNUM -0.0 and one at 0.0 -- one value (IEEE 754: -0.0 == 0.0; register D84 works on the real value; owner: '-0 and 0 are to be treated as one key everywhere'), so one timing group of two records with an empty VSREPNUM -> rows 1 and 2 fire. Row 3 (VISITNUM 1.5) is a group of one and never fires; it keeps the column non-integral so no load path can compress it to a long buffer. Before the plan the raw index split the two zeros into two one-record blocks and nothing fired."
+#note "PLAN-grouping-key-identity (signed zero, a missed finding): VISITNUM is the only Timing variable. One SYSBP record at VISITNUM -0.0 and one at 0.0 -- one value (IEEE 754: -0.0 == 0.0; register D84 works on the real value; owner: '-0 and 0 are to be treated as one key everywhere'), so one timing group of two records with an empty VSREPNUM -> rows 1 and 2 fire. Row 3 (VISITNUM 1.5) is a group of one and never fires. Before the plan the raw index split the two zeros into two one-record blocks and nothing fired. Since PLAN-negative-zero-on-load (NZL O1) a loaded -0.0 is 0.0; the rule-test harness keeps this cell raw on purpose, so it stands in for a computed -0.0 (GKI Q4)."
 #expectViolationCount 2
 #expectViolationAt row=1 USUBJID=01-701-1015 VSSEQ=1
 #expectViolationAt row=2 USUBJID=01-701-1015 VSSEQ=2

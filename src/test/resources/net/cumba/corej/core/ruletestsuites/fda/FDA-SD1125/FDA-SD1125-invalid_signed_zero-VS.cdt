@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1125 expect=violation domain=VS
-#note "PLAN-grouping-key-identity (signed zero): rows 1 and 2 share --TPTREF/--TPT and carry VISITNUM -0.0 and 0.0 -- one value (IEEE 754: -0.0 == 0.0; register D84; owner: '-0 and 0 are to be treated as one key everywhere'), so one key group, and they disagree on the planned elapsed time (PT1H vs PT2H) -> both fire, as in FDA-SD1125-invalid-VS.cdt. Row 3 (VISITNUM 1.5) is its own group and silent; it keeps the column non-integral so no load path can compress it to a long buffer. Before the plan the raw index split the two zeros into two consistent groups and nothing fired."
+#note "PLAN-grouping-key-identity (signed zero): rows 1 and 2 share --TPTREF/--TPT and carry VISITNUM -0.0 and 0.0 -- one value (IEEE 754: -0.0 == 0.0; register D84; owner: '-0 and 0 are to be treated as one key everywhere'), so one key group, and they disagree on the planned elapsed time (PT1H vs PT2H) -> both fire, as in FDA-SD1125-invalid-VS.cdt. Row 3 (VISITNUM 1.5) is its own group and silent. Before the plan the raw index split the two zeros into two consistent groups and nothing fired. Since PLAN-negative-zero-on-load (NZL O1) a loaded -0.0 is 0.0; the rule-test harness keeps this cell raw on purpose, so it stands in for a computed -0.0 (GKI Q4)."
 #library standard=sdtmig version=3-4
 #expectViolationCount 2
 #expectViolationAt row=1 VSTPT="1H POST" VSELTM=PT1H
