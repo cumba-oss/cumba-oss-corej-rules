@@ -84,9 +84,11 @@ final class ScenarioLibrarySupport
         String origin = "the fixture store "
                 + MetadataStoreFixture.storeFile().map(Path::toString).orElse("(none)");
         return fixture.map(f -> new ScenarioStore(f, origin, "", false))
-                .orElseGet(() -> new ScenarioStore(null, origin, "no CDISC metadata store (set "
-                        + "CDISC_METADATA_STORE, or CDISC_PICKLE_CACHE_DIR so the fixture can seed"
-                        + " one)", false));
+                .orElseGet(() -> new ScenarioStore(null, origin,
+                        "no CDISC metadata store (set "
+                                + "CDISC_METADATA_STORE, or CDISC_PICKLE_CACHE_DIR /"
+                                + " -Dcdisc.pickle.cache.dir so the fixture can seed one)",
+                        false));
     }
 
 
@@ -100,8 +102,9 @@ final class ScenarioLibrarySupport
      * {@link Assumptions#assumeTrue} when there is no store, the store is unreadable, or it does
      * not serve the referenced product. It <b>fails</b> when the configured store is of another
      * format version, and when the ref pins a {@code ct=} package the store does not hold — the
-     * resolver would substitute an empty package and a scenario could pass against no terms at
-     * all.</li>
+     * resolver would substitute an empty package and a scenario could pass against no terms at all.
+     * The product is checked <em>before</em> the pinned CT, so a store that lacks the product skips
+     * rather than fails (README-CDT, skip gate 1; LAC review round 2, L-4).</li>
      * </ul>
      */
     static MetadataProvider resolveOrSkip(RuleTestScenario aScenario)
@@ -117,13 +120,13 @@ final class ScenarioLibrarySupport
                 () -> store.unavailable() + " — failing " + aScenario.getCoreId());
         Assumptions.assumeTrue(factory != null,
                 () -> store.unavailable() + " — skipping " + aScenario.getCoreId());
-        requirePinnedCtPackages(aScenario, ref, store);
         Optional<MetadataProvider> resolved = ScenarioLibraryResolver.resolve(ref,
                 Objects.requireNonNull(factory));
         Assumptions.assumeTrue(resolved.isPresent(),
                 () -> store.origin() + " does not serve " + ref.getStandard() + " "
                         + ref.getVersion() + " (product not in the store) — skipping "
                         + aScenario.getCoreId());
+        requirePinnedCtPackages(aScenario, ref, store);
         return resolved.orElseThrow();
     }
 

@@ -1,6 +1,7 @@
 package net.cumba.corej.core.ruletestsuites;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -9,11 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import net.cumba.corej.core.rulespec.MetadataStoreFixture;
+import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.opentest4j.TestAbortedException;
 
 /**
@@ -32,51 +34,45 @@ import org.opentest4j.TestAbortedException;
  * </p>
  *
  * <p>
- * The population is discovered, not listed — every {@code .cdt} of every family subtree whose
- * prelude carries a {@code #library-ref} line — and floored by the two AD0200 scenarios, so the
- * test cannot pass by finding nothing.
+ * The population is discovered, not listed — every {@code .cdt} the suite admits (the factory's own
+ * shebang predicate) under every family of {@link RuleTestSuitesFamilyHomeTest#FACTORIES}, whose
+ * parsed scenario carries a {@code #library-ref} ({@link RuleTestCdt#load(Path)}, so a tab, a BOM
+ * or any other spelling the format accepts is discovered too) — and floored by the two AD0200
+ * scenarios, so the test cannot pass by finding nothing. A permanent negative control
+ * ({@link #theDetectorReportsAnUnresolvableRef(Path)}) feeds the detector a synthetic ref the store
+ * cannot serve and requires it to be reported (LAC review round 2, L-2 / L-3 / optional control).
  * </p>
  */
 class LibraryRefScenariosExecuteTest
 {
 
-    /** The family subtrees and the factory that runs each; one per concrete factory class. */
-    private static final Map<String, AbstractRuleTestSuitesFactory> FACTORIES = Map.of("cdisc",
-            new RuleTestSuitesCdiscFactoryTest(), "draft", new RuleTestSuitesDraftFactoryTest(),
-            "fda", new RuleTestSuitesFdaFactoryTest(), "pmda", new RuleTestSuitesPmdaFactoryTest());
-
     /** The floor: the scenarios D1 un-skipped. Both must be in the discovered population. */
     private static final List<String> REQUIRED = List.of("CDISC-AD0200-valid-ADSL-libref.cdt",
             "CDISC-AD0200-invalid-ADSL-libref.cdt");
 
+    /** Runs one scenario the way a factory does; an abort is a skip. */
+    @FunctionalInterface
+    interface ScenarioRunner
+    {
+
+        void run(Path aScenario) throws IOException;
+    }
+
     @Test
     void everyLibraryRefScenarioRunsWhenTheBuildHasAStore() throws IOException
     {
-        List<Path> scenarios = new ArrayList<>();
-        List<AbstractRuleTestSuitesFactory> runners = new ArrayList<>();
-        for (Map.Entry<String, AbstractRuleTestSuitesFactory> e : FACTORIES.entrySet())
+        List<String> names = new ArrayList<>();
+        List<String> skipped = new ArrayList<>();
+        List<Runnable> runs = new ArrayList<>();
+        int population = 0;
+        for (AbstractRuleTestSuitesFactory factory : RuleTestSuitesFamilyHomeTest.FACTORIES)
         {
-            assertTrue(e.getKey().equals(e.getValue().family()),
-                    "factory for " + e.getKey() + " reports family " + e.getValue().family());
-            Path root = AbstractRuleTestSuitesFactory.familyRoot(e.getKey());
-            if (!Files.isDirectory(root))
-            {
-                continue;
-            }
-            try (Stream<Path> walk = Files.walk(root))
-            {
-                for (Path p : walk.filter(Files::isRegularFile)
-                        .filter(p -> p.getFileName().toString().endsWith(".cdt")).sorted().toList())
-                {
-                    if (hasLibraryRef(p))
-                    {
-                        scenarios.add(p);
-                        runners.add(e.getValue());
-                    }
-                }
-            }
+            List<Path> scenarios = discover(
+                    AbstractRuleTestSuitesFactory.familyRoot(factory.family()));
+            population += scenarios.size();
+            scenarios.forEach(p -> names.add(p.getFileName().toString()));
+            runs.add(() -> skipped.addAll(notRun(scenarios, factory::runScenario)));
         }
-        List<String> names = scenarios.stream().map(p -> p.getFileName().toString()).toList();
         assertTrue(names.containsAll(REQUIRED),
                 "the #library-ref population must contain " + REQUIRED + " — found " + names);
 
@@ -84,41 +80,87 @@ class LibraryRefScenariosExecuteTest
                 "no pickle corpus, so no fixture store — LibraryProviderGuardTest fails loudly for"
                         + " that case");
 
-        List<String> skipped = new ArrayList<>();
-        for (int i = 0; i < scenarios.size(); i++)
-        {
-            try
-            {
-                runners.get(i).runScenario(scenarios.get(i));
-            }
-            catch (TestAbortedException e)
-            {
-                skipped.add(scenarios.get(i).getFileName() + ": " + e.getMessage());
-            }
-        }
+        runs.forEach(Runnable::run);
         if (!skipped.isEmpty())
         {
-            fail("the build has a metadata store, yet " + skipped.size() + " of " + scenarios.size()
+            fail("the build has a metadata store, yet " + skipped.size() + " of " + population
                     + " #library-ref scenario(s) did not run: " + skipped);
         }
     }
 
 
-    /** A {@code #library-ref} directive anywhere in the scenario's {@code #} prelude. */
-    private static boolean hasLibraryRef(Path aFile) throws IOException
+    /**
+     * The detector's negative control: a scenario whose ref names a product the store does not hold
+     * — written with a BOM and tab separators, which a hand-rolled prelude scan missed — must be
+     * DISCOVERED and REPORTED. It also pins a CT package no store holds, so it is reported (a skip)
+     * only while the product gate runs before the pinned-CT gate (L-4); with the old order it fails
+     * here instead.
+     */
+    @Test
+    void theDetectorReportsAnUnresolvableRef(@TempDir Path aDir) throws IOException
     {
-        for (String line : Files.readAllLines(aFile, UTF_8))
+        Path scenario = aDir.resolve("CDISC-AD0200-synthetic-unresolvable-libref.cdt");
+        Files.writeString(scenario,
+                "\uFEFF#!RuleTest\n" + "#test CDISC-AD0200 expect=noViolation domain=ADSL\n"
+                        + "#library-ref\tstandard=adamig\tversion=9-9\tct=adamct-2099-01-01\n"
+                        + "dataset ADSL\ncol STUDYID type=Char\n---\nCDISCPILOT01\n---\n",
+                UTF_8);
+        assertEquals(List.of(scenario), discover(aDir),
+                "the synthetic #library-ref scenario was not discovered");
+
+        Assumptions.assumeTrue(MetadataStoreFixture.storeFile().isPresent(),
+                "no pickle corpus, so no fixture store");
+        List<String> reported = notRun(List.of(scenario),
+                p -> ScenarioLibrarySupport.resolveOrSkip(RuleTestCdt.load(p)));
+        assertEquals(1, reported.size(), "the unresolvable ref was not reported: " + reported);
+        assertTrue(reported.get(0).contains("does not serve adamig 9-9"),
+                "reported for the wrong reason: " + reported);
+    }
+
+
+    /** Every {@code .cdt} under {@code aRoot} the suite admits whose scenario has a library ref. */
+    static List<Path> discover(Path aRoot) throws IOException
+    {
+        List<Path> found = new ArrayList<>();
+        if (!Files.isDirectory(aRoot))
         {
-            String t = line.strip();
-            if (t.startsWith("#library-ref ") || "#library-ref".equals(t))
+            return found;
+        }
+        try (Stream<Path> walk = Files.walk(aRoot))
+        {
+            for (Path p : walk.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith(".cdt"))
+                    .filter(AbstractRuleTestSuitesFactory::hasShebang).sorted().toList())
             {
-                return true;
-            }
-            if (!t.isEmpty() && !t.startsWith("#"))
-            {
-                return false;
+                if (RuleTestCdt.load(p).getLibraryRef() != null)
+                {
+                    found.add(p);
+                }
             }
         }
-        return false;
+        return found;
+    }
+
+
+    /** The scenarios that aborted (skipped) instead of running, with the abort message. */
+    static List<String> notRun(List<Path> aScenarios, ScenarioRunner aRunner)
+    {
+        List<String> skipped = new ArrayList<>();
+        for (Path p : aScenarios)
+        {
+            try
+            {
+                aRunner.run(p);
+            }
+            catch (TestAbortedException e)
+            {
+                skipped.add(p.getFileName() + ": " + e.getMessage());
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException(p + " could not be read", e);
+            }
+        }
+        return skipped;
     }
 }

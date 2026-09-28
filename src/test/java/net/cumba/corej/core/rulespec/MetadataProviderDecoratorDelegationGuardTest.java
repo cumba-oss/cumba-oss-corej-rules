@@ -424,8 +424,8 @@ class MetadataProviderDecoratorDelegationGuardTest
             // null. A decorator that inherits one answers on behalf of a Library provider that
             // does publish the metadata, and the operation reading it degrades to a silent pass or
             // to LIBRARY_NOT_AVAILABLE ⇒ SKIP. Both decorators wrap exactly such a provider
-            // (MetadataLibraryProvider, built from the pickle cache), which is what makes these
-            // enforceable here.
+            // (MetadataLibraryProvider, built from the unified metadata store), which is what
+            // makes these enforceable here.
             capability("getStandardVariableNames()", LIST_NO_ARG),
             capability("getStandardDatasetNames()", LIST_NO_ARG),
             capability("getPublishedCtPackages()", LIST_NO_ARG),

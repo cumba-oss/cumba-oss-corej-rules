@@ -292,8 +292,13 @@ abstract class AbstractRuleTestSuitesFactory
      * never executes" hazard the ratchet exists to catch, inverted. Reading only the head keeps the
      * failure surface exactly where it was before the delegation.
      * </p>
+     *
+     * <p>
+     * Package-private since 2026-09-28 so that {@code LibraryRefScenariosExecuteTest} admits
+     * exactly the files the suite admits (LAC review round 2, L-3).
+     * </p>
      */
-    private static boolean hasShebang(Path aPath)
+    static boolean hasShebang(Path aPath)
     {
         try (BufferedReader r = Files.newBufferedReader(aPath, UTF_8))
         {

@@ -389,7 +389,7 @@ col DOMAIN  type=Char
 | `#expectViolationAt [row=<N>] [severity=<LEVEL>] [COL=value ...]` | no | assert one fired location, and optionally the check level it fired at; repeatable, exact-set match |
 | `#library <kind> ...` | no | inline CDISC-Library metadata (see below) |
 | `#library-include <file.yaml>` | no | pull Library metadata from a YAML sidecar |
-| `#library-ref standard=<id> version=<id> [ct=<pkg> ...] [substandard=<id>]` | no | run against a **real** CDISC Library (see below); mutually exclusive with `#library` / `#library-include` |
+| `#library-ref standard=<id> version=<id> [ct=<pkg> ...] [substandard=<id>]` | no | run against **real** CDISC Library metadata, as held in our unified metadata store (see below); mutually exclusive with `#library` / `#library-include` |
 | `#define-xml <file.xml>` | no | run against a **real** Define-XML sidecar (same directory); serves `define_*` AND `define_vlm_*` accessors; mutually exclusive with `#define` / `#define-include` |
 | `#dictionaries dummy` | no | run with the checked-in dummy external-dictionary bundle (see below) |
 | `#runLevel <LEVEL>` | no | the **run severity threshold** for this scenario — the weakest check level it evaluates (see *Check levels and the run threshold*) |
@@ -863,11 +863,11 @@ directives override it per key, regardless of line order**. `#library-include`
 is input-only: writing a scenario back out (`RuleTestCdt.toString`) flattens it
 to inline `#library` directives.
 
-### Running against a real CDISC Library (`#library-ref`)
+### Running against real CDISC Library metadata (`#library-ref`)
 
 The two modes above build a *synthetic* in-memory provider. Alternatively, a
-scenario can run against the **real CDISC Library** for a given standard and
-version — useful for checking a rule against actual published metadata rather
+scenario can run against the **real CDISC Library metadata, as held in our
+unified metadata store**, for a given standard and version — useful for checking a rule against actual published metadata rather
 than hand-curated values.
 
 ```
@@ -905,7 +905,7 @@ machine-local paths are committed):
 
 | Variable | System property | Purpose | Default |
 |----------|-----------------|---------|---------|
-| `CDISC_METADATA_STORE` | `cdisc.metadata.store` | our unified metadata store (one zip); used only when it names an existing file | the store `MetadataStoreFixture` seeds for the build (`target/metadata-store/store.zip`, from the pickle corpus `CDISC_PICKLE_CACHE_DIR` names) |
+| `CDISC_METADATA_STORE` | `cdisc.metadata.store` | our unified metadata store (one zip); used only when it names an existing file | the store `MetadataStoreFixture` seeds for the build (`target/metadata-store/store.zip`, from the pickle corpus `CDISC_PICKLE_CACHE_DIR` or `-Dcdisc.pickle.cache.dir` names) |
 
 No API key is involved: the resolver (`ScenarioLibraryResolver`) builds the provider from the
 store, which is what the product evaluates against. `ScenarioLibrarySupport` picks the store
@@ -918,9 +918,11 @@ variable, so both `#library-ref` scenarios skipped on every run
 **Skip behaviour** — a `#library-ref` scenario is *skipped* (not failed) at one of two gates:
 
 1. **Before the rule runs** (`ScenarioLibrarySupport.resolveOrSkip`): there is no store (none
-   configured, and the fixture cannot seed one because `CDISC_PICKLE_CACHE_DIR` is unset); or the
+   configured, and the fixture cannot seed one because neither `CDISC_PICKLE_CACHE_DIR` nor
+   `-Dcdisc.pickle.cache.dir` names the pickle corpus); or the
    store cannot be opened; or it does not hold the referenced product (IG / declared ADaM
-   product) — `resolve()` answers empty. The skip message names which.
+   product) — `resolve()` answers empty. The skip message names which. The product is checked
+   **before** the `ct=` pins below, so a store without the product skips rather than fails.
 2. **After the rule ran** (`ScenarioLibrarySupport.skipRefIfNotExecuted`): the provider was built
    but the rule reported `SKIPPED`/`ERROR` (not applied to an `expect=skipped` scenario, whose
    skip is the contract under test).

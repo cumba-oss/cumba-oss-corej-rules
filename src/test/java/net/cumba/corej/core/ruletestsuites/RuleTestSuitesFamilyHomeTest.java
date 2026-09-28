@@ -40,9 +40,10 @@ class RuleTestSuitesFamilyHomeTest
      * Every scenario factory in this package, one instance each. The {@code family()} strings come
      * from the factories themselves rather than a literal list, so this test cannot drift from the
      * factories it guards; {@link #everyFactoryIsRegisteredHere()} pins the converse (a new factory
-     * must be added here).
+     * must be added here). Package-private: {@code LibraryRefScenariosExecuteTest} walks the same
+     * roster, so a new family reaches it without a second hand-kept list (LAC review round 2, L-2).
      */
-    private static final List<AbstractRuleTestSuitesFactory> FACTORIES = List.of(
+    static final List<AbstractRuleTestSuitesFactory> FACTORIES = List.of(
             new RuleTestSuitesCdiscFactoryTest(), new RuleTestSuitesDraftFactoryTest(),
             new RuleTestSuitesFdaFactoryTest(), new RuleTestSuitesPmdaFactoryTest());
 
