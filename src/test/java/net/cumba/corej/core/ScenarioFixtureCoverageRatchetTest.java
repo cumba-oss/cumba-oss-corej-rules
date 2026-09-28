@@ -203,8 +203,8 @@ class ScenarioFixtureCoverageRatchetTest
     // row of slack from an earlier corpus movement. CDISC-AD0581 moves nothing here — it was
     // already covered (by a skipped scenario), and its planned invalid scenario was kept out
     // because the released rule SKIPS on its own violation case (the plan's findings). That
-    // invalid scenario landed with PLAN-wildcard-universal-absence (the rule now names first
-    // instances instead of templates); coverage is unchanged, AD0581 was already covered.
+    // invalid scenario landed with PLAN-wildcard-universal-absence (the templates moved out of the
+    // Check into Requirements.Variables.None); coverage is unchanged, AD0581 was already covered.
     private static final int MAX_UNCOVERED = 493;
 
     /**

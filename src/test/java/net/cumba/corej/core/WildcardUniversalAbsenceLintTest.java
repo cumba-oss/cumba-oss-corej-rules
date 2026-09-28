@@ -44,14 +44,18 @@ import org.junit.jupiter.api.Test;
  *
  * <p>
  * <b>The fix.</b> A negated presence template asks <i>"is no member of the family present?"</i>,
- * and {@code Requirements.Variables.None} answers exactly that: a template entry there skips the
- * rule when ANY member is present (at-least-one-column matching), and lets it run when none is. So
- * the exact rewrite moves the negated templates into {@code None} and drops them from the Check.
- * Naming the family's first instance ({@code TRT01P} for {@code TRTxxP}) is exact only where the IG
- * guarantees the family is contiguous from {@code 01} / {@code 1} in that dataset class — ADSL. A
- * BDS dataset copies ADSL variables selectively, so a period-2 dataset may carry {@code TRT02P}
- * without {@code TRT01P}, and the first-instance form would report it falsely. The rule-guide page
- * {@code authoring/wildcards.md} states the authoring rule this lint enforces.
+ * and {@code Requirements.Variables.None} answers exactly that: an entry there skips the rule when
+ * ANY matching column is present, and lets it run when none is. Spell the entry as a
+ * {@code /regex/} ({@code /TRT[0-9]{2}P/} for {@code TRTxxP}): it matches case-insensitively, like
+ * the Check's own column lookup, whereas a template entry matches case-sensitively and would miss a
+ * lower-case {@code trt01p}. Moving the templates to {@code None} is exact only when every one of
+ * them is a top-level conjunct of a single-level Check ({@code CDISC-AD0581}'s shape); under an
+ * {@code or} ({@code not var_exists("TRTxxP") or AVAL > 100}) it is not, because {@code None} skips
+ * the whole rule. Naming the family's first instance ({@code TRT01P} for {@code TRTxxP}) is exact
+ * only where the IG guarantees the family is contiguous from {@code 01} / {@code 1} in that dataset
+ * class — ADSL. A BDS dataset copies ADSL variables selectively, so a period-2 dataset may carry
+ * {@code TRT02P} without {@code TRT01P}, and the first-instance form would report it falsely. The
+ * rule-guide page {@code authoring/wildcards.md} states the authoring rule this lint enforces.
  * </p>
  *
  * <p>
@@ -94,8 +98,8 @@ class WildcardUniversalAbsenceLintTest
      * Distinct shipped rule ids carrying at least one presence template. ⚠ EXACT, not a floor: a
      * new presence-template rule moves it, and the failure asks you to confirm the rule has a
      * positive anchor — which this test then checks. Measured 2026-09-28
-     * (PLAN-wildcard-universal-absence phase 1): 141 before {@code CDISC-AD0581} was rewritten onto
-     * first instances, 140 after.
+     * (PLAN-wildcard-universal-absence): 141 before {@code CDISC-AD0581}'s templates moved out of
+     * its Check into {@code Requirements.Variables.None}, 140 after.
      */
     private static final int EXPECTED_PRESENCE_TEMPLATE_RULES = 140;
 
@@ -174,9 +178,12 @@ class WildcardUniversalAbsenceLintTest
                 + " rule(s) test every presence template only in negated form. The engine expands"
                 + " a template once per matching column and SKIPS the rule when none matches —"
                 + " exactly the case a negated presence test is written to catch — so such a rule"
-                + " can never fire (engine gap G4). Fix: move the negated templates into"
-                + " Requirements.Variables.None (it skips the rule when ANY member is present) and"
-                + " drop them from the Check. Name the first instance (TRT01P for TRTxxP) only"
+                + " can never fire (engine gap G4). Fix, when the negated templates are top-level"
+                + " conjuncts of a single-level Check: move them into Requirements.Variables.None"
+                + " as /regex/ entries (/TRT[0-9]{2}P/ for TRTxxP — case-insensitive, like the"
+                + " Check's column lookup; a template entry is case-sensitive) and drop them from"
+                + " the Check; None skips the rule when ANY member is present. Under an or, None"
+                + " is not equivalent. Name the first instance (TRT01P for TRTxxP) only"
                 + " where the IG guarantees the family starts at 01/1 in that dataset class (ADSL;"
                 + " not BDS, which copies variables selectively). If the rule really tests a member"
                 + " per index, add the positive anchor it has"
