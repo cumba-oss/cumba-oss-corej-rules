@@ -905,20 +905,33 @@ machine-local paths are committed):
 
 | Variable | System property | Purpose | Default |
 |----------|-----------------|---------|---------|
-| `CDISC_METADATA_STORE` | `cdisc.metadata.store` | our unified metadata store (one zip) | the store `MetadataStoreFixture` seeds for the build (`target/metadata-store/store.zip`, from the pickle corpus `CDISC_PICKLE_CACHE_DIR` names) |
+| `CDISC_METADATA_STORE` | `cdisc.metadata.store` | our unified metadata store (one zip); used only when it names an existing file | the store `MetadataStoreFixture` seeds for the build (`target/metadata-store/store.zip`, from the pickle corpus `CDISC_PICKLE_CACHE_DIR` names) |
 
 No API key is involved: the resolver (`ScenarioLibraryResolver`) builds the provider from the
-store, which is what the product evaluates against. ⚠ Until 2026-09-28 the corpus build set
-neither variable, so both `#library-ref` scenarios skipped on every run
-(`PLAN-cdisc-library-access-cleanup` D1); `ScenarioLibrarySupport` now falls back to the
-fixture store.
+store, which is what the product evaluates against. `ScenarioLibrarySupport` picks the store
+**once per JVM** — the configured one when it names an existing file, else the fixture store — and
+hands it to `ScenarioLibraryResolver.resolve(LibraryRef, StoreMetadataProviderFactory)`
+explicitly; nothing sets a system property. ⚠ Until 2026-09-28 the corpus build set neither
+variable, so both `#library-ref` scenarios skipped on every run
+(`PLAN-cdisc-library-access-cleanup` D1).
 
-**Skip behaviour** — a `#library-ref` scenario is *skipped* (not failed) when:
+**Skip behaviour** — a `#library-ref` scenario is *skipped* (not failed) at one of two gates:
 
-1. no store is configured and the fixture cannot seed one (`CDISC_PICKLE_CACHE_DIR` unset), or
-2. a store is available but the product could not be served (missing product or CT package,
-   unreadable store), so the rule reports `SKIPPED`/`ERROR`. ⚠ A store of another FORMAT
-   version fails the scenario instead of skipping it.
+1. **Before the rule runs** (`ScenarioLibrarySupport.resolveOrSkip`): there is no store (none
+   configured, and the fixture cannot seed one because `CDISC_PICKLE_CACHE_DIR` is unset); or the
+   store cannot be opened; or it does not hold the referenced product (IG / declared ADaM
+   product) — `resolve()` answers empty. The skip message names which.
+2. **After the rule ran** (`ScenarioLibrarySupport.skipRefIfNotExecuted`): the provider was built
+   but the rule reported `SKIPPED`/`ERROR` (not applied to an `expect=skipped` scenario, whose
+   skip is the contract under test).
+
+A **missing CT package is neither**: the store factory substitutes an empty package for it (a
+`WARNING` in the log; an ADaM ref's `sdtmct` fallback is dropped instead) and the rule runs
+against no terms of that package. The harness therefore
+**fails** a scenario whose `ct=` pins a package the store does not hold, rather than letting it
+pass against empty CT. A store of another FORMAT version also fails the scenario instead of
+skipping it. And `LibraryRefScenariosExecuteTest` fails the build if any `#library-ref` scenario
+skips while the fixture store exists.
 
 In CI, which seeds the fixture store, both scenarios therefore RUN. Any CT-dependent scenario
 must pin a specific `ct=` package id for reproducibility.

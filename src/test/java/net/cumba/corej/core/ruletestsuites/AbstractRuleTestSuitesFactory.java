@@ -323,7 +323,10 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
 
-    private void runScenario(Path aFile) throws IOException
+    // Package-private, not private, since 2026-09-28: LibraryRefScenariosExecuteTest drives the
+    // #library-ref scenarios through THIS method, so that a skip there is judged on the same path
+    // the factories run (LAC review round 1, L2).
+    void runScenario(Path aFile) throws IOException
     {
         RuleTestScenario s = RuleTestCdt.load(aFile);
 
