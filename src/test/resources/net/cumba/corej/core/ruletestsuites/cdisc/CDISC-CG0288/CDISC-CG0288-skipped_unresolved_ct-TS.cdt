@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0288 expect=skipped domain=TS
+#note "A Library IS present, but TSVCDVER=2099-01-01 names the CT package sdtmct-2099-01-01, which the store lacks (only sdtmct-2024-09-27 is declared): the function has nothing usable to answer, raises the provider capability's unusable-answer signal, and the rule SKIPs (Rule skipped - library returned no data for get_codelist_attributes) before the Check runs. Without the signal not empty($VALID_TERM_CODES) would read [] as false and the rule would PASS (PLAN-binding-expressions provider capability, arm b)."
+#library standard=sdtmig version=3-4
+#library codelist-attributes sdtmct-2024-09-27 "Term CCODE" C49488 C66731
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVCDREF type=Char
+col TSVCDVER type=Char
+col TSVALCD  type=Char
+---
+S1 | TS | 1 | SPECIES | HUMAN | CDISC | 2099-01-01 | C000000

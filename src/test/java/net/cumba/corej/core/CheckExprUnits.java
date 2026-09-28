@@ -201,6 +201,79 @@ public final class CheckExprUnits
     }
 
 
+    /**
+     * Wave 0 ({@code PLAN-binding-expressions} C2–C5): the datasets the <b>compiled</b> binding
+     * {@code name} of {@code rule} reads — every nested call's {@code domain=} string literal and,
+     * when {@code dotted} is set, every dotted reference's qualifier — in first-seen order, as
+     * authored. Empty when {@code name} is not a compiled binding (an operation binding keeps its
+     * own {@code domain:} arm in every reader). The corpus readers that resolve a {@code $}-id to
+     * the dataset it reads share this one walk.
+     *
+     * @param rule
+     *            the (normalised) rule
+     * @param name
+     *            the {@code $}-name, may be {@code null}
+     * @param dotted
+     *            whether dotted references count ({@code false}: only the "read through an
+     *            operation" surface, a nested call's {@code domain=})
+     * @return the datasets read
+     */
+    public static java.util.SequencedSet<String> compiledBindingDatasets(Rule rule,
+            @Nullable String name, boolean dotted)
+    {
+        java.util.SequencedSet<String> out = new java.util.LinkedHashSet<>();
+        net.cumba.corej.core.model.CompiledBinding binding = rule.compiledBinding(name);
+        if (binding != null)
+        {
+            collectDatasets(binding.expression(), dotted, out);
+        }
+        return out;
+    }
+
+
+    private static void collectDatasets(Expr e, boolean dotted, Set<String> out)
+    {
+        switch (e)
+        {
+        case Expr.Ref ref ->
+        {
+            int dot = ref.name().indexOf('.');
+            if (dotted && dot > 0 && !ref.name().startsWith("$"))
+            {
+                out.add(ref.name().substring(0, dot));
+            }
+        }
+        case Expr.Call call ->
+        {
+            if (call.kwargs().get("domain") instanceof Expr.Lit lit
+                    && lit.kind() == Expr.LitKind.STRING)
+            {
+                out.add((String) lit.value());
+            }
+            call.args().forEach(a -> collectDatasets(a, dotted, out));
+            call.kwargs().values().forEach(a -> collectDatasets(a, dotted, out));
+        }
+        case Expr.Binary binary ->
+        {
+            collectDatasets(binary.left(), dotted, out);
+            collectDatasets(binary.right(), dotted, out);
+        }
+        case Expr.And and -> and.parts().forEach(p -> collectDatasets(p, dotted, out));
+        case Expr.Or or -> or.parts().forEach(p -> collectDatasets(p, dotted, out));
+        case Expr.Not not -> collectDatasets(not.inner(), dotted, out);
+        case Expr.Lit lit ->
+        {
+            if (lit.kind() == Expr.LitKind.LIST)
+            {
+                @SuppressWarnings("unchecked")
+                List<Expr> items = (List<Expr>) lit.value();
+                items.forEach(item -> collectDatasets(item, dotted, out));
+            }
+        }
+        }
+    }
+
+
     /** {@link #checkExpr(Rule)} for a bare condition node. */
     public static @Nullable Expr toExpr(@Nullable CheckCondition condition)
     {

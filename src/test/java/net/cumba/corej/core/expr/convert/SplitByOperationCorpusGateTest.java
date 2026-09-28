@@ -20,11 +20,20 @@ import org.junit.jupiter.api.Test;
  * {@code split_by(<col>, "<delim>")} ({@code CDISC-SEND-0049} is the pattern; {@code FDA-CT2002}
  * likewise). An operation result is broadcast to every row ({@code ExprCompiler.operationCallPlan}
  * &rarr; {@code ConstVector}), while a {@code split_by} result is a per-row-<em>varying</em> token
- * list, so the operator has no {@code OperationType} <b>by architecture</b> — a rule declaring one
- * cannot load ({@code normalizeOperations} &rarr; {@code unknown operation function}), and until
- * phase 3 the corpus pipeline silently repaired that by lowering the declaration into the Check.
- * That lowering is retired; this gate makes the loader's implicit rejection an explicit,
+ * list, so the operator has no {@code OperationType} <b>by architecture</b>. Until wave 0 a rule
+ * declaring one could not load ({@code normalizeOperations} &rarr; {@code unknown operation
+ * function}), and until phase 3 the corpus pipeline silently repaired that by lowering the
+ * declaration into the Check; this gate made the loader's implicit rejection an explicit,
  * at-the-source hard failure.
+ *
+ * <p>
+ * ⚑ <b>Wave 0 changed the premise</b> ({@code PLAN-binding-expressions}, row C8): a
+ * {@code Bindings:} entry may now hold any expression, so a declared {@code split_by(…)} binding
+ * LOADS — as a compiled binding, a per-row token list. The gate stays, now as a corpus convention:
+ * the per-row list shape is proven at engine level only (a test-seam producer, §4.1), and its
+ * corpus {@code .cdt} coverage belongs to the first wave that ports a per-row list callable — until
+ * then the corpus keeps authoring the inline spelling every shipped split rule already uses.
+ * </p>
  *
  * <p>
  * A JUnit corpus gate rather than a {@code lint-rules.py} rule: the lint is propose-only / INFO,

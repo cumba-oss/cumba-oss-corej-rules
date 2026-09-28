@@ -148,7 +148,7 @@ public final class IntentAbsenceOptOut
             String name = absentTolerantEmptinessName(conjunct);
             if (name == null)
             {
-                name = emptinessName(conjunct, operations);
+                name = emptinessName(conjunct, operations, rule);
             }
             if (name == null)
             {
@@ -157,7 +157,7 @@ public final class IntentAbsenceOptOut
                 // absent-tolerant emptiness spelling handled above.
                 return null;
             }
-            String dataset = datasetOf(name, operations);
+            String dataset = datasetOf(name, operations, rule);
             if (dataset != null && !own.contains(dataset))
             {
                 foreign.add(dataset);
@@ -311,7 +311,8 @@ public final class IntentAbsenceOptOut
      * derived flag {@code $flag == true} where {@code $flag} is a {@code variable_is_null}
      * operation. {@code null} for every other shape.
      */
-    private static @Nullable String emptinessName(Expr conjunct, Map<String, Operation> ops)
+    private static @Nullable String emptinessName(Expr conjunct, Map<String, Operation> ops,
+            Rule rule)
     {
         String direct = directEmptyName(conjunct);
         if (direct != null)
@@ -329,6 +330,13 @@ public final class IntentAbsenceOptOut
             if (operation != null && NULL_FLAG_OPERATIONS.contains(operation.getOperator()))
             {
                 return ref.name();
+            }
+            // PLAN-binding-expressions C4: a COMPILED flag answers through its expression — a
+            // `$flag: empty(X)` binding read `$flag == true` is the emptiness probe of X.
+            net.cumba.corej.core.model.CompiledBinding compiled = rule.compiledBinding(ref.name());
+            if (compiled != null)
+            {
+                return directEmptyName(compiled.expression());
             }
         }
         return null;
@@ -359,8 +367,16 @@ public final class IntentAbsenceOptOut
      * any of today's four matches uses.
      * </p>
      */
-    private static @Nullable String datasetOf(String name, Map<String, Operation> ops)
+    private static @Nullable String datasetOf(String name, Map<String, Operation> ops, Rule rule)
     {
+        if (name.startsWith("$") && rule.compiledBinding(name) != null)
+        {
+            // PLAN-binding-expressions C4: a COMPILED binding reads the dataset its expression
+            // reads; one that reads none or several stays unresolved, as an unknown id always did.
+            java.util.SequencedSet<String> read = CheckExprUnits.compiledBindingDatasets(rule, name,
+                    true);
+            return read.size() == 1 ? read.getFirst() : null;
+        }
         if (name.startsWith("$"))
         {
             Operation operation = ops.get(name);

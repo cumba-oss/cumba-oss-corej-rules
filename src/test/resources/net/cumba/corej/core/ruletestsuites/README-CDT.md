@@ -686,6 +686,7 @@ assert `"My Label"` against `"Other Label"`.
 #library codelist-codes         DOMAIN VARIABLE TERM=Cxxxxxx TERM=Cxxxxxx ...
 #library codelist-term-ccodes   CODELIST TERM=Cxxxxxx TERM=Cxxxxxx ...
 #library codelist-meta          CODELIST ccode=Cxxxxxx pref="NCI Preferred Term"
+#library codelist-attributes    PKG "ATTRIBUTE" VALUE VALUE ...
 ```
 
 The last four keyword-payload kinds (`codelist-extensible`,
@@ -767,6 +768,23 @@ most recent additions.
   NCI concept id, `pref=` its NCI preferred term. The codelist's own submission
   value is the directive key itself. These feed the
   `codelist_terms(level="codelist", ...)` shapes.
+
+- **`codelist-attributes`** declares one **CT package**'s values of one
+  attribute — what `MetadataProvider.getCodelistAttribute(pkg, attribute)`
+  serves, and the only input of the `get_codelist_attributes` function
+  (`CDISC-CG0288`, PLAN-binding-expressions). The package id is the one the
+  function derives per row from the target and version values
+  (`TSVCDREF = "CDISC CT"`, `TSVCDVER = 2024-09-27` → `sdtmct-2024-09-27`
+  under an SDTM standard); quote an attribute with a space:
+
+  ```
+  #library codelist-attributes sdtmct-2024-09-27 "Term CCODE" C49488 C66731
+  ```
+
+  ⚠ An undeclared package or attribute answers an **empty** list, and the
+  function refuses an empty answer: the rule is `skipped`, never silently
+  passed. That is the `expect=skipped` shape to pin, alongside the null-Library
+  skip.
 
   An undeclared variable has an empty map, so it never fires — that is also why an
   `expect=skipped` is *not* reachable here: the skip gate is a **null Library

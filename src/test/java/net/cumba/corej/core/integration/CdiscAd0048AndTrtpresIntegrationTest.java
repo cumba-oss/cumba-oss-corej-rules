@@ -2,7 +2,6 @@ package net.cumba.corej.core.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
@@ -237,7 +236,10 @@ class CdiscAd0048AndTrtpresIntegrationTest
         assertNotNull(rule.getExecutability());
         // The variable_count(name_pattern=…) operation is now inlined into the Check (Form A): the
         // Operations block is dropped and the rule compiles natively with the inline call.
-        assertNull(rule.getOperations(), "operation inlined into the Check — no Operations block");
+        // PLAN-binding-expressions C7: no binding of EITHER kind (the operation list alone would go
+        // vacuous if the binding compiled instead of disappearing).
+        assertTrue(rule.bindingOrder().isEmpty(),
+                "operation inlined into the Check — no Bindings block");
         assertNotNull(rule.getCheckExpr(), "the inlined rule must be native");
         String expr = RulePackageExpressionJson.toExpressionJson(rule);
         assertTrue(expr.contains("variable_count(") && expr.contains("name_pattern"),

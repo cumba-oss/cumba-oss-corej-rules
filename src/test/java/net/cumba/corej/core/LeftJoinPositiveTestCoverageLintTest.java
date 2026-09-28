@@ -489,6 +489,25 @@ class LeftJoinPositiveTestCoverageLintTest
 
 
     /**
+     * PLAN-binding-expressions C3 negative control: a COMPILED binding reading a dataset through a
+     * nested operation call covers it when the Check tests membership negatively against the
+     * binding's id — the pre-wave-0 walk resolved the id against {@code getOperations()} only.
+     */
+    @Test
+    void aCompiledBindingReadingThroughANestedOperationCoversItsDataset()
+    {
+        Rule rule = new Rule();
+        rule.setCompiledBindings(
+                List.of(new net.cumba.corej.core.model.CompiledBinding("$c",
+                        net.cumba.corej.core.expr.CheckExpressionParser
+                                .parse("coalesce(distinct(USUBJID, domain=\"EX\"), USUBJID)"),
+                        List.of(), null)));
+        Expr check = net.cumba.corej.core.expr.CheckExpressionParser.parse("USUBJID not in $c");
+        assertEquals(Set.of("EX"), reportedUnmatchedRowDatasets(rule, CheckExprUnits.units(check)));
+    }
+
+
+    /**
      * Datasets this rule reports an unmatched row for: it reads the dataset through an
      * <b>operation</b> (so an absent row is simply not in the result — no join, no null-filled
      * columns) and tests membership negatively against that operation's id.
@@ -503,6 +522,24 @@ class LeftJoinPositiveTestCoverageLintTest
             List<CheckExprUnits.Unit> units)
     {
         Set<String> covered = new LinkedHashSet<>();
+        // PLAN-binding-expressions C3: a COMPILED binding that reads a dataset through a nested
+        // operation call (its domain=) covers it the same way, when the Check tests membership
+        // negatively against the binding's id — its $-id answers through its expression.
+        if (rule.getCompiledBindings() != null)
+        {
+            for (net.cumba.corej.core.model.CompiledBinding binding : rule.getCompiledBindings())
+            {
+                for (CheckExprUnits.Unit unit : units)
+                {
+                    if (NOT_CONTAINED.equals(unit.operator())
+                            && binding.name().equals(valueText(unit.value())))
+                    {
+                        CheckExprUnits.compiledBindingDatasets(rule, binding.name(), false)
+                                .forEach(d -> covered.add(d.toUpperCase(Locale.ROOT)));
+                    }
+                }
+            }
+        }
         if (rule.getOperations() == null)
         {
             return covered;

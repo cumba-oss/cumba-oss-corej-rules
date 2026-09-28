@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.model.Operation;
@@ -27,17 +28,30 @@ class OperationExpressionRoundTripTest
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    /**
+     * Wave 0 ({@code PLAN-binding-expressions} C1): the shipped {@code Bindings} entries that are
+     * NOT a single top-level operation call — compiled bindings, which the operation printer/parser
+     * pair has nothing to say about — counted across every generated package (a rule ships in one
+     * package per standard version it declares). An exact pin, both directions: a new compiled
+     * binding must be counted here, and a compiled binding the routing stopped seeing reds too.
+     */
+    private static final int EXPECTED_COMPILED_BINDINGS = 3;
+
+    /** The rules those compiled bindings belong to. */
+    private static final Set<String> EXPECTED_COMPILED_RULES = Set.of("CDISC-CG0288");
+
     @Test
     void everyShippedOperationRoundTrips() throws Exception
     {
         Path rulesDir = CorpusPaths.rules();
         List<Operation> all = new ArrayList<>();
+        List<String> owners = new ArrayList<>();
         try (Stream<Path> files = Files.list(rulesDir))
         {
             for (Path file : files.filter(p -> p.getFileName().toString().endsWith(".json"))
                     .sorted().toList())
             {
-                collectOperations(MAPPER.readTree(Files.readString(file)), all);
+                collectOperations(MAPPER.readTree(Files.readString(file)), all, owners);
             }
         }
         assertTrue(all.size() >= 20,
@@ -45,8 +59,22 @@ class OperationExpressionRoundTripTest
 
         int fieldForm = 0;
         int expressionForm = 0;
-        for (Operation orig : all)
+        int compiled = 0;
+        Set<String> compiledRules = new java.util.TreeSet<>();
+        for (int i = 0; i < all.size(); i++)
         {
+            Operation orig = all.get(i);
+            // ⭐ Wave 0: the population is exactly the bindings the ENGINE routes to the operation
+            // path — the one predicate (BindingRouting), never a copy of it. A compiled binding is
+            // counted and skipped: pushing it through OperationExpressionParser.normalize would be
+            // the "unknown operation function" load error it no longer is.
+            if (orig.getOperator() == null
+                    && !BindingRouting.routesToOperation(orig.getExpression()))
+            {
+                compiled++;
+                compiledRules.add(owners.get(i));
+                continue;
+            }
             if (orig.getOperator() == null)
             {
                 // EC-51 Half B: this branch used to `continue`, and since the corpus rewrite every
@@ -76,6 +104,11 @@ class OperationExpressionRoundTripTest
                 "the shipped corpus is stored in expression form, so the branch that used to skip"
                         + " it must now be the one doing the work; saw " + fieldForm
                         + " field-form and " + expressionForm + " expression-form");
+        assertEquals(EXPECTED_COMPILED_BINDINGS, compiled,
+                "compiled (non-operation-call) bindings across the generated packages");
+        assertEquals(EXPECTED_COMPILED_RULES, compiledRules);
+        assertEquals(all.size() - compiled, fieldForm + expressionForm,
+                "every operation-call binding was round-tripped, none skipped");
     }
 
 
@@ -325,7 +358,8 @@ class OperationExpressionRoundTripTest
     }
 
 
-    private static void collectOperations(JsonNode root, List<Operation> out) throws Exception
+    private static void collectOperations(JsonNode root, List<Operation> out, List<String> owners)
+        throws Exception
     {
         JsonNode rules = root.get("rules");
         if (rules == null || !rules.isObject())
@@ -348,6 +382,7 @@ class OperationExpressionRoundTripTest
                 op.setId(opNode.path("name").asText(null));
                 op.setExpression(opNode.path("expression").asText(null));
                 out.add(op);
+                owners.add(entry.getValue().path("Core").path("Id").asText(entry.getKey()));
             }
         }
     }

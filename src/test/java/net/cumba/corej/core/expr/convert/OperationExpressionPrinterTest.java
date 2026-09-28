@@ -1,6 +1,7 @@
 package net.cumba.corej.core.expr.convert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -164,12 +165,14 @@ class OperationExpressionPrinterTest
         assertRoundTrip(terms,
                 "codelist_terms(codelists=[DOMAIN], level=\"term\", returntype=\"code\")");
 
-        Operation attrs = new Operation();
-        attrs.setOperator("get_codelist_attributes");
-        attrs.setCtAttribute("Term CCODE");
-        attrs.setVersion("TSVCDVER");
-        assertRoundTrip(attrs,
-                "get_codelist_attributes(ct_attribute=\"Term CCODE\", version=\"TSVCDVER\")");
+        // get_codelist_attributes left the operation surface in wave 0 (PLAN-binding-expressions):
+        // it is a registry function now, and its binding is a compiled binding, printed by the
+        // expression printer the Check is printed by. Its round-trip lives on that surface.
+        String attrs = "get_codelist_attributes(TSVCDREF, TSVCDVER, ct_attribute=\"Term CCODE\")";
+        assertEquals(attrs, net.cumba.corej.core.expr.ExpressionPrinter
+                .print(net.cumba.corej.core.expr.CheckExpressionParser.parse(attrs)));
+        assertFalse(BindingRouting.routesToOperation(attrs),
+                "no longer an operation call — the compiled-binding path");
 
         Operation dates = new Operation();
         dates.setOperator("valid_codelist_dates");

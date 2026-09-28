@@ -254,7 +254,9 @@ class ShippedExpansionTemplateTest
                     coreId + " must name a recognised expansion source");
             // The pre-Fix-#146 shape referenced $adsl_value / $adam_seq with no Operations block:
             // the operands never resolved and the rule shipped as a silent no-op.
-            assertNull(template.getOperations(), coreId + " needs no Operations block");
+            // PLAN-binding-expressions C7: "no binding of EITHER kind" — asserting only the
+            // operation list would go vacuous the moment a binding compiled instead.
+            assertTrue(template.bindingOrder().isEmpty(), coreId + " needs no Bindings block");
         }
     }
 

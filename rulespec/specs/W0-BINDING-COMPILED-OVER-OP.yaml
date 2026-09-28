@@ -1,0 +1,52 @@
+name: W0-BINDING-COMPILED-OVER-OP
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a binding over a binding, COMPILED over OPERATION:
+  `$n: record_count()` is a single top-level OperationType call and keeps the operation path
+  (D-W0-1); `$limit: $n - 1` is compiled and reads it through the hand-over (§5.0). With four AE
+  rows, $n = 4 and $limit = 3, so only AESEQ 4 fires, reporting the compiled dataset-level value.
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-compiled-over-operation
+  Core: {Id: W0-BINDING-COMPILED-OVER-OP}
+  Description: AESEQ must not exceed the record count minus one.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$n"
+    expression: 'record_count()'
+  - name: "$limit"
+    expression: '$n - 1'
+  Check:
+    expression: 'AESEQ > $limit'
+  Outcome:
+    Message: AESEQ exceeds the record count minus one.
+    Output_Variables: [$limit, AESEQ]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    column_types:
+      AESEQ: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: '1'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: '2'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: '3'}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: '4'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-COMPILED-OVER-OP
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 4}
+    status: SUCCESS
+    output_variables:
+      $limit: '3'
+      # D4a: every operation result is derived, so the operation binding $n is reported too.
+      $n: '4'
+      AESEQ: '4'
+expected_errors: []

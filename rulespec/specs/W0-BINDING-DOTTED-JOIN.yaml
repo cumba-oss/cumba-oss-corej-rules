@@ -1,0 +1,71 @@
+name: W0-BINDING-DOTTED-JOIN
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a compiled binding holding a DOTTED reference
+  through a declared join. `$age: DM.AGE` reads the joined DM column per row of the merged AE
+  table. The join key is DUPLICATED on the base side (subject 01 has two AE records), so the
+  binding must be aligned to the merged table row by row: the finding COUNT is pinned — two
+  findings for subject 01, none for 02. A binding evaluated against the wrong table (DM's one row
+  per subject) would report one finding, or the wrong subject.
+
+  The keyed join carries the §5.7 declaration (`PLAN-rule-unknown-keys-gate`): one
+  `All_Or_None` group `[USUBJID, DM.USUBJID]` and the key bare in `All`.
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-dotted-join
+  Core: {Id: W0-BINDING-DOTTED-JOIN}
+  Description: An adverse event must not be recorded for a subject younger than 18.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Requirements:
+    Variables:
+      All: [USUBJID, "DM.AGE"]
+      All_Or_None: [[USUBJID, DM.USUBJID]]
+  Match_Datasets:
+    - Name: DM
+      Keys: [USUBJID]
+  Bindings:
+  - name: "$age"
+    expression: 'DM.AGE'
+  Check:
+    expression: '$age < 18'
+  Outcome:
+    Message: The subject is younger than 18.
+    Output_Variables: [$age, USUBJID]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AETERM: HEADACHE}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 2, AETERM: NAUSEA}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '02', AESEQ: 3, AETERM: RASH}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    column_types:
+      AGE: LONG
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '01', AGE: '16'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '02', AGE: '40'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-DOTTED-JOIN
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      $age: '16'
+      USUBJID: '01'
+  - rule_id: W0-BINDING-DOTTED-JOIN
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 2}
+    status: SUCCESS
+    output_variables:
+      $age: '16'
+      USUBJID: '01'
+expected_errors: []

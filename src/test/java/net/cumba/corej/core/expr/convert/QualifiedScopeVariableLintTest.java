@@ -277,6 +277,27 @@ class QualifiedScopeVariableLintTest
 
 
     /**
+     * PLAN-binding-expressions C2 negative control: a COMPILED binding's dotted qualifier and its
+     * nested call's {@code domain=} are declared datasets. Before wave 0's widening the walk read
+     * {@code getOperations()} alone and would have seen neither.
+     */
+    @Test
+    void aCompiledBindingDeclaresTheDatasetsItReads()
+    {
+        Rule rule = new Rule();
+        rule.setCompiledBindings(List.of(
+                new net.cumba.corej.core.model.CompiledBinding("$d",
+                        net.cumba.corej.core.expr.CheckExpressionParser.parse("DM.RFSTDTC"),
+                        List.of(), null),
+                new net.cumba.corej.core.model.CompiledBinding("$n",
+                        net.cumba.corej.core.expr.CheckExpressionParser
+                                .parse("record_count(domain=\"ex\") + 0"),
+                        List.of("$d"), null)));
+        assertEquals(Set.of("DM", "EX"), declaredDatasets(rule));
+    }
+
+
+    /**
      * Upper-cased dataset names the rule itself declares — every {@code Match_Datasets.Name} plus
      * every {@code Operations} {@code domain:}.
      */
@@ -305,6 +326,17 @@ class QualifiedScopeVariableLintTest
                 {
                     names.add(op.getMinuendDomain().toUpperCase(Locale.ROOT));
                 }
+            }
+        }
+        // PLAN-binding-expressions C2: a COMPILED binding declares the datasets its expression
+        // reads — nested calls' domain= and dotted qualifiers — exactly as an operation's domain:.
+        if (rule.getCompiledBindings() != null)
+        {
+            for (net.cumba.corej.core.model.CompiledBinding binding : rule.getCompiledBindings())
+            {
+                net.cumba.corej.core.CheckExprUnits
+                        .compiledBindingDatasets(rule, binding.name(), true)
+                        .forEach(dataset -> names.add(dataset.toUpperCase(Locale.ROOT)));
             }
         }
         return names;

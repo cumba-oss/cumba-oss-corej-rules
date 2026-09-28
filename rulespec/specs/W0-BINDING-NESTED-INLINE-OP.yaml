@@ -1,0 +1,39 @@
+name: W0-BINDING-NESTED-INLINE-OP
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 (I1) — a library-dependent OPERATION nested in a
+  compiled binding, with NO Library provider: `domain_is_custom() == false` is not a single top-level
+  OperationType call, so it compiles, and the provider gate must still see the nested operation
+  (`ProviderNeeds.ofExpr` reads an inline operation call by its `OperationType`). The rule is
+  SKIPPED, exactly as the same call declared as its own binding would be.
+
+  No Library provider: `adamig`, no `library_mocks` (see W0-BINDING-NESTED-PROVIDER).
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-nested-inline-operation
+  Core: {Id: W0-BINDING-NESTED-INLINE-OP}
+  Description: A standard domain must not carry AETERM empty.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$standard"
+    expression: 'domain_is_custom() == false'
+  Check:
+    expression: '$standard and empty(AETERM)'
+  Outcome:
+    Message: AETERM is empty in a standard domain.
+    Output_Variables: [AETERM]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AETERM: ''}
+config:
+  standard: adamig
+  standard_version: '1.3'
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

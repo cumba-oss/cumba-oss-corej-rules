@@ -1,0 +1,53 @@
+name: W0-BINDING-OP-OVER-COMPILED
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a binding over a binding, OPERATION over COMPILED:
+  the `minus` operation's minuend and subtrahend are both COMPILED dataset-level LIST bindings
+  (list literals). §5.0 / I5: an operation reading a compiled binding receives the RAW list, never
+  a `Vector` — so the set difference is pinned element by element in the rendered
+  `$missing`. The I5 bypass (handing the Vector over) would yield ONE element, the vector's
+  `toString()`, and this spec would red.
+
+  The Check is dataset-level (it reads only dataset-level bindings), so the rule reports ONE
+  dataset-level finding, rendered with row 0's key (D111).
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-operation-over-compiled
+  Core: {Id: W0-BINDING-OP-OVER-COMPILED}
+  Description: Every expected term must be subtracted.
+  Sensitivity: Dataset
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$expected"
+    expression: '["AETERM", "AESEV", "AEOUT", "AESER"]'
+  - name: "$present"
+    expression: '["AESEV", "AESER"]'
+  - name: "$missing"
+    expression: 'minus($expected, subtract=$present)'
+  Check:
+    expression: 'not empty($missing)'
+  Outcome:
+    Message: Some expected terms remain.
+    Output_Variables: [$missing]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AETERM: HEADACHE}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 2, AETERM: NAUSEA}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-OP-OVER-COMPILED
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 1}
+    status: SUCCESS
+    output_variables:
+      # minus is order-preserving ([AETERM, AEOUT]); the report renders a collection sorted.
+      $missing: '[AEOUT, AETERM]'
+expected_errors: []

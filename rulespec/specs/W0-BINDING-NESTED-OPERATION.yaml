@@ -1,0 +1,54 @@
+name: W0-BINDING-NESTED-OPERATION
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a compiled binding NESTING an operation call:
+  `USUBJID in distinct(USUBJID, domain="DM")` is not a single top-level OperationType call
+  (D-W0-1), so it compiles like the Check, with the nested `distinct` running through the inline
+  operation path. It is a per-row CONDITION binding, read by the Check as `$in_dm == false` (the corpus spelling of a
+  boolean binding read; a bare `$b` is not a condition).
+
+  Rows: subjects 01 and 02 are in DM, 03 is not -> exactly one finding, on 03.
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-nested-operation
+  Core: {Id: W0-BINDING-NESTED-OPERATION}
+  Description: Every AE subject must be in DM.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$in_dm"
+    expression: 'USUBJID in distinct(USUBJID, domain="DM")'
+  Check:
+    expression: '$in_dm == false'
+  Outcome:
+    Message: The AE subject is not in DM.
+    Output_Variables: [USUBJID]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AETERM: HEADACHE}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '02', AESEQ: 2, AETERM: NAUSEA}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '03', AESEQ: 3, AETERM: RASH}
+  DM:
+    row_key: [STUDYID, USUBJID]
+    rows:
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '01'}
+      - {STUDYID: S1, DOMAIN: DM, USUBJID: '02'}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-NESTED-OPERATION
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '03', AESEQ: 3}
+    status: SUCCESS
+    output_variables:
+      # D4a: a compiled binding contributes its id — the per-row verdict at the finding row.
+      $in_dm: 'false'
+      USUBJID: '03'
+expected_errors: []

@@ -363,7 +363,12 @@ public final class RuleDocCensus
                 // named for lint-rules.py and generate-inventory.py.
                 String expression = op.path("expression").asText("");
                 int paren = expression.indexOf('(');
-                if (paren > 0)
+                // PLAN-binding-expressions C6: only an OPERATION-call binding has an operator.
+                // A compiled binding (upper(AETERM), a registry function, arithmetic) is not an
+                // operation — its leading name would census as an operator that does not exist.
+                // The predicate is the engine's own routing, never a copy of it.
+                if (paren > 0 && net.cumba.corej.core.expr.convert.BindingRouting
+                        .routesToOperation(expression))
                 {
                     o = expression.substring(0, paren).trim();
                 }

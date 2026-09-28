@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0288 expect=violation domain=TS
+#note "TSVALCD C000000 is not in sdtmct-2024-09-27's Term CCODE set {C49488, C66731} -> fires once, on the CDISC row only; the MEDDRA row is outside the rule (prefix guard). Pins the dataset-level list binding as a membership right-hand side (TSVALCD not in $VALID_TERM_CODES) and not empty($VALID_TERM_CODES) over the function's broadcast list."
+#library standard=sdtmig version=3-4
+#library codelist-attributes sdtmct-2024-09-27 "Term CCODE" C49488 C66731
+#expectViolationCount 1
+#expectViolationAt TSVALCD=C000000
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVCDREF type=Char
+col TSVCDVER type=Char
+col TSVALCD  type=Char
+---
+S1 | TS | 1 | SPECIES | HUMAN        | CDISC  | 2024-09-27 | C000000
+S1 | TS | 2 | INDIC   | HYPERTENSION | MEDDRA | 25.0       | 10020772

@@ -263,13 +263,13 @@ public final class GuardPositionAudit
         String ruleId = ruleId(rule);
         for (CheckExprUnits.Unit unit : units)
         {
-            record(unit, ruleId, operations, own, guardable, out);
+            record(rule, unit, ruleId, operations, own, guardable, out);
         }
-        return mitigate(units, operations, own, out);
+        return mitigate(rule, units, operations, own, out);
     }
 
 
-    private static void record(CheckExprUnits.Unit unit, String ruleId,
+    private static void record(Rule rule, CheckExprUnits.Unit unit, String ruleId,
             Map<String, Operation> operations, Set<String> own, @Nullable Set<String> guardable,
             List<PresenceLeaf> out)
     {
@@ -286,7 +286,7 @@ public final class GuardPositionAudit
         }
         else if (COLUMN_PRESENCE.contains(operator))
         {
-            dataset = datasetOf(name, operations);
+            dataset = datasetOf(name, operations, rule);
         }
         else
         {
@@ -318,10 +318,10 @@ public final class GuardPositionAudit
      * dataset the misplaced unit itself names.
      * </p>
      */
-    private static List<PresenceLeaf> mitigate(List<CheckExprUnits.Unit> units,
+    private static List<PresenceLeaf> mitigate(Rule rule, List<CheckExprUnits.Unit> units,
             Map<String, Operation> operations, Set<String> own, List<PresenceLeaf> leaves)
     {
-        Set<String> dangerous = dangerousDatasets(units, operations, own);
+        Set<String> dangerous = dangerousDatasets(rule, units, operations, own);
         if (dangerous.isEmpty())
         {
             return List.copyOf(leaves);
@@ -360,7 +360,7 @@ public final class GuardPositionAudit
      * {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP vacuous-on-empty} membership unit. An absent dataset
      * there yields an empty set and the membership test fires on every row.
      */
-    private static Set<String> dangerousDatasets(List<CheckExprUnits.Unit> units,
+    private static Set<String> dangerousDatasets(Rule rule, List<CheckExprUnits.Unit> units,
             Map<String, Operation> operations, Set<String> own)
     {
         Set<String> dangerous = new TreeSet<>();
@@ -381,6 +381,16 @@ public final class GuardPositionAudit
                 if (domain != null && !"*".equals(domain) && !own.contains(domain))
                 {
                     dangerous.add(domain);
+                }
+                // PLAN-binding-expressions C5: a COMPILED binding reading a dataset through a
+                // nested operation call (its domain=) floods on that dataset's absence the same
+                // way.
+                for (String read : CheckExprUnits.compiledBindingDatasets(rule, ref, false))
+                {
+                    if (!"*".equals(read) && !own.contains(read))
+                    {
+                        dangerous.add(read);
+                    }
                 }
             }
         }
@@ -592,8 +602,17 @@ public final class GuardPositionAudit
 
 
     /** The dataset a <b>column</b> name reads, or {@code null} when it is local. */
-    private static @Nullable String datasetOf(String name, Map<String, Operation> operations)
+    private static @Nullable String datasetOf(String name, Map<String, Operation> operations,
+            Rule rule)
     {
+        if (name.startsWith("$") && rule.compiledBinding(name) != null)
+        {
+            // PLAN-binding-expressions C5: a COMPILED binding reads the dataset its expression
+            // reads; one that reads none or several stays unresolved, as an unknown id always did.
+            java.util.SequencedSet<String> read = CheckExprUnits.compiledBindingDatasets(rule, name,
+                    true);
+            return read.size() == 1 ? read.getFirst() : null;
+        }
         if (name.startsWith("$"))
         {
             Operation operation = operations.get(name);

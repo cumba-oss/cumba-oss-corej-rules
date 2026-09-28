@@ -1,0 +1,41 @@
+name: W0-BINDING-NESTED-PROVIDER
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a PROVIDER-DEPENDENT call nested in a compiled
+  binding, with NO Library provider: `get_codelist_attributes` carries the LIBRARY provider
+  capability (§5.2), and `ProviderNeeds.ofBindings` finds it inside
+  `not empty(get_codelist_attributes(...))`. The rule is SKIPPED — never a silent PASS, which is
+  what `not empty([])` would otherwise answer.
+
+  No Library provider: the spec runs under `adamig` with no `library_mocks`, for which the harness
+  builds none (`SpecRunner.libraryProviderFor`: SDTM family only), exactly the
+  `LibraryProviderGuardTest` exclusion.
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-nested-provider-call
+  Core: {Id: W0-BINDING-NESTED-PROVIDER}
+  Description: TSVALCD must be a term code of the named CT version.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [TS]}
+  Bindings:
+  - name: "$has_codes"
+    expression: 'not empty(get_codelist_attributes(TSVCDREF, TSVCDVER, ct_attribute="Term CCODE"))'
+  Check:
+    expression: '$has_codes and TSVALCD == "C000000"'
+  Outcome:
+    Message: TSVALCD is not a term code.
+    Output_Variables: [TSVALCD]
+datasets:
+  TS:
+    row_key: [STUDYID, TSSEQ, TSPARMCD]
+    rows:
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: SPECIES, TSVAL: HUMAN, TSVCDREF: CDISC, TSVCDVER: '2024-09-27', TSVALCD: C000000}
+config:
+  standard: adamig
+  standard_version: '1.3'
+expected_status: SKIPPED
+expected_violations: []
+expected_errors: []

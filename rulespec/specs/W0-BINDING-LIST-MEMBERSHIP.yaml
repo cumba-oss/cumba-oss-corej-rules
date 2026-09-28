@@ -1,0 +1,46 @@
+name: W0-BINDING-LIST-MEMBERSHIP
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a compiled dataset-level LIST binding as the RHS of
+  membership: `$allowed` is a list literal (option 2 of §3.1: one list in a `ConstVector`), read
+  by `AESEV not in $allowed` as a membership set, and reported whole in `Output_Variables`.
+
+  Rows: MILD and SEVERE are members, FATAL is not -> exactly one finding.
+
+  ⚠ SYNTHETIC INLINE RULE (precedent EC21 / EC18) — no shipped rule authors this form yet.
+rule:
+  id: w0-binding-list-membership
+  Core: {Id: W0-BINDING-LIST-MEMBERSHIP}
+  Description: AESEV must be one of the allowed severities.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$allowed"
+    expression: '["MILD", "MODERATE", "SEVERE"]'
+  Check:
+    expression: 'AESEV not in $allowed'
+  Outcome:
+    Message: AESEV is not an allowed severity.
+    Output_Variables: [AESEV, $allowed]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AESEV: MILD}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 2, AESEV: FATAL}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '02', AESEQ: 3, AESEV: SEVERE}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-LIST-MEMBERSHIP
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 2}
+    status: SUCCESS
+    output_variables:
+      AESEV: FATAL
+      $allowed: '[MILD, MODERATE, SEVERE]'
+expected_errors: []

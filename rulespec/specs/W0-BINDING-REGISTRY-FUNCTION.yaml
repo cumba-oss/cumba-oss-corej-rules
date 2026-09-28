@@ -1,0 +1,60 @@
+name: W0-BINDING-REGISTRY-FUNCTION
+kind: rule
+description: |
+  PLAN-binding-expressions (wave 0) phase 4 — a `Bindings:` entry holding a REGISTRY FUNCTION,
+  not an Operation call. `upper(AETERM)` is a per-row value binding compiled like the Check
+  (D-W0-1: anything but a single top-level OperationType call is a compiled binding). The
+  finding reports the binding's value AT THE FINDING ROW through `Output_Variables` (R16 D4a),
+  never row 0's and never the whole column.
+
+  ⚠ SYNTHETIC INLINE RULE, deliberately (precedent EC21 / EC18: an ENGINE regression pin must not
+  depend on a corpus rule). No shipped rule authors this form yet — `.cdt` suites can only drive
+  shipped rules, so the new forms are pinned here.
+
+  Rows:
+    - AESEQ 1: AETERM HEADACHE -> upper equals -> no fire
+    - AESEQ 2: AETERM Nausea   -> $term_upper NAUSEA != Nausea -> FIRE, reports NAUSEA
+    - AESEQ 3: AETERM Rash     -> $term_upper RASH != Rash -> FIRE, reports RASH
+rule:
+  id: w0-binding-registry-function
+  Core: {Id: W0-BINDING-REGISTRY-FUNCTION}
+  Description: AETERM must be upper case.
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Bindings:
+  - name: "$term_upper"
+    expression: 'upper(AETERM)'
+  Check:
+    expression: '$term_upper != AETERM'
+  Outcome:
+    Message: AETERM is not upper case.
+    Output_Variables: [$term_upper, AETERM]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 1, AETERM: HEADACHE}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '01', AESEQ: 2, AETERM: Nausea}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '02', AESEQ: 3, AETERM: Rash}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: W0-BINDING-REGISTRY-FUNCTION
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '01', AESEQ: 2}
+    status: SUCCESS
+    output_variables:
+      $term_upper: NAUSEA
+      AETERM: Nausea
+  - rule_id: W0-BINDING-REGISTRY-FUNCTION
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '02', AESEQ: 3}
+    status: SUCCESS
+    output_variables:
+      $term_upper: RASH
+      AETERM: Rash
+expected_errors: []
