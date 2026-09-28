@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0472 expect=violation domain=ADSL
+#note "strat1r / strat1rn spelled in lower case. Column names match case-insensitively on every surface (owner ruling 2026-09-28), so the lowercase spelling a SAS dataset may carry satisfies the Requirements.Variables.All templates and the rule executes with the same verdict as on the uppercase twin (PMDA-AD0472-invalid_two_labels_for_one_code): group STRAT1RN=1 holds STRAT1R {REGIONA x2, RA x1}, so row 3 is the lone minority (PMDA-AD0472: STRATwR must hold one value per STRATwRN)."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=003
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col strat1r  type=Char
+col strat1rn type=Num
+---
+S1 | 001 | REGIONA | 1
+S1 | 002 | REGIONA | 1
+S1 | 003 | RA      | 1
+S1 | 004 | REGIONB | 2

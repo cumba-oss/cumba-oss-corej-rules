@@ -186,6 +186,16 @@ The same vocabulary on all four facets:
 Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) — `AESTDY:N`,
 `DM.AGE:N`, `"/^AE.*DTC$/:C"` — on the `All` and `Any` facets, and on those two only.
 
+<!-- Owner ruling 2026-09-28 ("Case-insensitive everywhere"; "if it is to be revised in the
+     future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
+     CIT §1. -->
+> ⭐ **Every entry matches a column name ignoring letter case** — a literal, a `--` placeholder, a
+> qualified name, a glob, a `/regex/` and a [marker template](wildcards.md) such as `TRTxxP` alike:
+> `trt01p` in a SAS dataset satisfies `TRTxxP` and `TRT01P` equally, and the rule then reads it
+> under its actual name. Write entries in the CDISC upper-case spelling regardless; never rely on
+> case to tell two columns apart. ⛔ This is a decision, not a default: if the case rule is ever
+> revised, it is revised for every surface at once — never for one kind of entry alone.
+
 A qualified entry is how you require a column in a dataset other than the one the rule is running
 on — usually one you are about to [join](joins.md).
 

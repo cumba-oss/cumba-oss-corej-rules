@@ -68,13 +68,13 @@ Such a rule can never report anything.
 A negated template asks *"is no member of the family present?"*, and that is precisely what an
 entry in [`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present) answers:
 the rule is skipped when **any** matching column is present, and runs when none is. Move the
-negated templates there, one [regular-expression entry](requirements.md#what-an-entry-may-be) per
-template, and keep only the literal names in the Check:
+negated templates there — the template itself is the entry — and keep only the literal names in
+the Check:
 
 ```yaml
 Requirements:
   Variables:
-    None: ["/TRT[0-9]{2}P/", "/TRT[0-9]{2}A/", "/TRTPG[0-9]+/"]
+    None: ["TRTxxP", "TRTxxA", "TRTPGy"]
 Check:
   expression: 'not var_exists("TRTP") and not var_exists("TRTA")'
 ```
@@ -84,10 +84,21 @@ nothing to report. On a dataset carrying none of them it runs and reports. With 
 in the Check, remove the rule's `wildcards` block as well — a bound on a token no name uses is a
 load error (above).
 
-> ⚠ **Write the `/regex/`, not the template.** `xx` and `zz` become `[0-9]{2}`, `y` becomes
-> `[0-9]+`, `w` becomes `[0-9]`. A `/regex/` entry matches the whole name **ignoring case**, as the
-> Check's `var_exists` does; a template entry such as `"TRTxxP"` matches **case-sensitively**, so
-> a SAS dataset carrying `trt01p` would not be skipped and would be reported falsely.
+<!-- Owner ruling 2026-09-28 ("Case-insensitive everywhere"; "if it is to be revised in the
+     future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
+     CIT §1. Until then a template entry was the one case-sensitive column matcher, and this page
+     advised a /regex/ per template for that reason alone. -->
+> ⭐ **Write the template, not a `/regex/`.** Column names match **ignoring case on every
+> surface**, templates included: `"TRTxxP"` matches `trt01p` exactly as the Check's `var_exists`,
+> a glob and a `/regex/` entry do, and the expansion reads the column under its actual name. A
+> `/regex/` written only to gain case-insensitivity says less than the template and hides the
+> family it stands for.
+>
+> ⛔ **This is a decision, not a default, and it is revised everywhere or nowhere.** Should the
+> case rule ever change, it changes for every surface at once — templates, literals, globs,
+> `/regex/` entries, the Check's column references and its template expansion — never for one of
+> them alone. That column names *should* be upper case is reported once, by the dedicated naming
+> rules, not by every rule skipping or misfiring.
 
 > ⚠ **The move is exact only when every negated template is a top-level conjunct** of a Check
 > with a single level, as above. Under an `or` it is not: `None` skips the whole rule, so

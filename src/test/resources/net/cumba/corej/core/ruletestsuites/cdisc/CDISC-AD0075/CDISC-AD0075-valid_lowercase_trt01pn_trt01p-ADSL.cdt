@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0075 expect=noViolation domain=ADSL
+# Rule:Description: TRTxxPN is present and TRTxxP is not present
+#note "trt01pn and trt01p both present in lower case. The Check template TRTxxPN expands over the lowercase column, and the expanded not var_exists(TRT01P) finds the lowercase trt01p (column names match case-insensitively on every surface, owner ruling 2026-09-28) -> no violation (CR75 satisfied)."
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col trt01pn type=Char
+col trt01p type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | Placebo
+---

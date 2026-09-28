@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0075 expect=violation domain=ADSL
+# Rule:Description: TRTxxPN is present and TRTxxP is not present
+#note "trt01pn present in lower case, no TRT01P in any case. Column names match case-insensitively on every surface (owner ruling 2026-09-28): the Check template TRTxxPN expands over the lowercase column and binds its actual name, so the rule executes; CR75 — TRTxxP is required where TRTxxPN is present (ADaMIG 1.3 Table 3.2.4) -> violation."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADSL class=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col trt01pn type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1
+---

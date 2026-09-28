@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0719 expect=skipped domain=ADLBC
+# Rule:Description: Raise an error when a BDS dataset contains none of the subject-level or record-level treatment variables defined in the IG.
+#note "Only TRTAG1 is present. It is a member of the TRTAGy family defined in the IG (ADaMIG 1.1/1.2/1.3 Table 3.3.2.1 (record-level treatment variables for BDS)), so the CR719 requirement is met and the Requirements.Variables.None entry TRTAGy skips the rule."
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col TRTAG1 type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | X
+---
