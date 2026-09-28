@@ -340,14 +340,20 @@ numbers have no case.
 A **column name a rule handles as a value** — `varname()`, the list
 `get_column_order_from_dataset()` returns — is a string and compares exactly like one (owner,
 2026-09-28: *"a String that contains a column name is still a string in the engine"*; rulings
-register `CIT §3`). A rule that wants such a name to match the library's upper-case names folds the
-**dataset side**: `upper(varname()) in $required_variables`,
-`equalsIgnoreCase(varname(), var_name("LIBRARY"))`, and for a list a sibling binding
-`$dataset_variables_upper: upper($dataset_variables)` read by `contains_all` /
-`is_ordered_subset_of` / `shares_elements_with` / `minus` — [`upper`](functions.md#upper) and
-[`lower`](functions.md#lower) fold a list element by element. The library side is assumed upper
-case and is not wrapped. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
-exactly (`QNAM == "AESOSP"`, `IDVAR not in $rdomain_variables`).
+register `CIT §3`). A rule that wants such a name to match regardless of letter case folds
+**both sides** — the owner's *"compare the upper case version of a name against the upper case
+version of a list of strings"*: `upper(varname()) in $required_variables` (the case-insensitive
+membership surface upper-cases the list as well as the probe), `equalsIgnoreCase(varname(),
+var_name("LIBRARY"))`, and for two lists a sibling binding per side —
+`$dataset_variables_upper: upper($dataset_variables)`, `$required_variables_upper:
+upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` /
+`shares_elements_with`; [`upper`](functions.md#upper) and [`lower`](functions.md#lower) fold a list
+element by element. A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
+`upper(varname()) =~ /^ANL\d\dFL$/`, `prefix(upper(varname()), 2)`, with the literal or pattern
+spelled in upper case. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
+exactly (`QNAM == "AESOSP"`); `IDVAR not in $rdomain_variables_upper` folds the referenced
+dataset's column list and leaves the `IDVAR` cell exact, so a lower-case `IDVAR` value still does
+not name a variable.
 
 `tuple(a, b) in distinct([a, b], domain="D")` tests a **whole row-tuple** against another
 dataset's tuples, rather than element by element.

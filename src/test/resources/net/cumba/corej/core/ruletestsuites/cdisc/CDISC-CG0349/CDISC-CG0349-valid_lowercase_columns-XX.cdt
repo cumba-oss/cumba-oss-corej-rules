@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0349 expect=noViolation domain=XX
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0349 (Rule: first 2 characters of the variable name = the 2-character domain code). The domain code XX is a DOMAIN value; the variable names are lowercase. xxseq, xxtestcd, xxtest and xxorres start with the domain code in another letter case, which the rule compares after folding the name (CIT 1 / CIT 3), so none fires; the exempt variables do not fire either."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+dataset XX class=FINDINGS label="Custom Findings"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col xxseq    type=Num  label="Sequence Number"
+col xxtestcd type=Char label="Test Short Name"
+col xxtest   type=Char label="Test Name"
+col xxorres  type=Char label="Result or Finding in Original Units"
+col visitnum type=Num  label="Visit Number"
+---
+S1 | XX | 001 | 1 | TEST1 | Test One | 5 | 1
+---

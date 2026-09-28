@@ -19,9 +19,11 @@ Requirements:
 Bindings:
 - name: "$rdomain_variables"
   expression: "distinct(IDVAR, value_is_reference=true)"
+- name: "$rdomain_variables_upper"
+  expression: "upper($rdomain_variables)"
 Check:
   expression: >-
-    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables
+    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables_upper
 Outcome:
   Message: "IDVAR does not represent a variable present in the dataset referenced\
     \ by RDOMAIN."
@@ -29,6 +31,7 @@ Outcome:
   - "RDOMAIN"
   - "IDVAR"
   - "$rdomain_variables"
+  - "!$rdomain_variables_upper"
 Source:
   Class: "SPC"
   Domain: "CO,  SUPP--, RELREC"

@@ -16,7 +16,8 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    varname() =~ /^ANL\\d\\d(FL|FN)$/ and varname() !~ /^ANL(0[1-9]|[1-9][0-9])(FL|FN)$/
+    upper(varname()) =~ /^ANL\\d\\d(FL|FN)$/ and upper(varname()) !~
+    /^ANL(0[1-9]|[1-9][0-9])(FL|FN)$/
 Outcome:
   Message: "Illegal variable name: zz is not in [01-99] for ANLzzFL/FN."
   Output_Variables:

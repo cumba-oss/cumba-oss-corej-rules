@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0370 expect=noViolation domain=CO
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0370 (Condition: IDVAR ^= null; Rule: IDVAR is a variable in the domain = RDOMAIN). The referenced DM carries its columns in lower case; the IDVAR cell names USUBJID as the standard spells it. The IDVAR cell is a string and stays exact; the referenced dataset's column list is a name list in the dataset's spelling, which the rule upper-cases (CIT 3) -> USUBJID is a variable of DM -> no violation. The boundary twin is CDISC-CG0370-invalid_lowercase_idvar_value-CO (a lowercase IDVAR cell still fires)."
+dataset CO label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL type=Char label="Comment"
+---
+CDISCPILOT01 | CO | 01-701-1015 | DM | USUBJID | 01-701-1015 | Subject comment
+---
+
+dataset DM label=Demographics
+col studyid type=Char label="Study Identifier"
+col domain type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

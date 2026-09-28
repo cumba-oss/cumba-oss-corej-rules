@@ -17,20 +17,26 @@ Scope:
 Bindings:
 - name: "$required_variables"
   expression: "required_variables()"
+- name: "$required_variables_upper"
+  expression: "upper($required_variables)"
 - name: "$dataset_variables"
   expression: "get_column_order_from_dataset()"
 - name: "$dataset_variables_upper"
   expression: "upper($dataset_variables)"
-- name: "$missing_required_variables"
+- name: "$required_variables_absent_upper"
   expression: "minus($required_variables, subtract=$dataset_variables_upper)"
+- name: "$missing_required_variables"
+  expression: "minus($required_variables_absent_upper, subtract=$dataset_variables)"
 Check:
   expression: >-
-    not contains_all($dataset_variables_upper, $required_variables)
+    not contains_all($dataset_variables_upper, $required_variables_upper)
 Outcome:
   Message: "A Required ADaM variable is not present in the dataset."
   Output_Variables:
   - "$missing_required_variables"
   - "!$dataset_variables_upper"
+  - "!$required_variables_upper"
+  - "!$required_variables_absent_upper"
 Source:
   Message: "Required variable is not present"
   Description: "Variables described in ADaM as Required must be included in the dataset."

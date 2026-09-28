@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0514 expect=violation domain=ADLBC
+#note "Authority: ADaM Conformance Rules v5.0 CR514 ('A variable ending in STMF must contain Start Time Imputation Flag in the label'). Lowercase names on the rule's two name tests: astmf ends in STMF and its label 'Start Time Flag' has no Imputation-Flag suffix -> one violation, reported as astmf. trtstmf and tr01stmf carry the same non-conforming label but are the rule's own ^TR(T|nn)STMF$ exclusion, so they stay silent only if the exclusion also folds the name (CIT 3)."
+#library standard=adamig version=1-3
+#library column-order ADLBC STUDYID USUBJID PARAMCD
+#expectViolationCount 1
+#expectViolationAt variable_label="Start Time Flag" variable_name=astmf
+dataset ADLBC class=BDS
+col studyid type=Char
+col usubjid type=Char
+col paramcd type=Char
+col astmf type=Char label="Start Time Flag"
+col trtstmf type=Char label="Start Time Flag"
+col tr01stmf type=Char label="Start Time Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | x | x
+---

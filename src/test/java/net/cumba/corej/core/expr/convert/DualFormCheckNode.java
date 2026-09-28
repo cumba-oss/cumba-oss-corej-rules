@@ -395,6 +395,16 @@ public final class DualFormCheckNode
     private static final Set<String> SUBSTRING_PREDICATES = Set.of("contains", "does_not_contain",
             "starts_with", "ends_with");
 
+    /** The case folds a rule wraps around a column NAME it tests as a string (CIT &#167;3). */
+    private static final Set<String> CASE_FOLDS = Set.of("upper", "lower");
+
+    /**
+     * The operands a column-NAME source lowers to: {@code varname()} and the three levels of
+     * {@code var_name(...)}.
+     */
+    private static final Set<String> NAME_OPERANDS = Set.of("variable_name", "define_variable_name",
+            "library_variable_name");
+
     /**
      * The legacy-form restoration pre-pass (the retired {@code ExprLowering.restoreLegacyForms}):
      * raise-side-only constructs are rewritten back to shapes the operator-leaf vocabulary can
@@ -608,7 +618,7 @@ public final class DualFormCheckNode
                     return folded;
                 }
                 requireArgs(c.name(), c.args().size(), 2);
-                return leaf(nameOf(c.args().get(0)), "does_not_contain",
+                return leaf(nameOf(caseFoldedNameSubject(c.args().get(0))), "does_not_contain",
                         substringLiteral(c.args().get(1)));
             }
         }
@@ -759,7 +769,7 @@ public final class DualFormCheckNode
         }
         String op = b.op() == Expr.BinOp.MATCH ? "matches_regex" : "not_matches_regex";
         ObjectNode out = NODES.objectNode();
-        out.put("name", nameOf(b.left()));
+        out.put("name", nameOf(caseFoldedNameSubject(b.left())));
         out.put("operator", op);
         out.set("value", NODES.textNode((String) lit.value()));
         out.put("value_is_literal", true);
@@ -959,7 +969,8 @@ public final class DualFormCheckNode
         if (SUBSTRING_PREDICATES.contains(n))
         {
             requireArgs(n, argc, 2);
-            return leaf(nameOf(c.args().get(0)), n, substringLiteral(c.args().get(1)));
+            return leaf(nameOf(caseFoldedNameSubject(c.args().get(0))), n,
+                    substringLiteral(c.args().get(1)));
         }
         return switch (n)
         {
@@ -1271,12 +1282,63 @@ public final class DualFormCheckNode
     {
         if (e instanceof Expr.Call c && c.kwargs().isEmpty() && c.args().size() == 2
                 && ("prefix".equals(c.name()) || "suffix".equals(c.name()))
-                && c.args().get(0) instanceof Expr.Ref && c.args().get(1) instanceof Expr.Lit lit
-                && lit.kind() == Expr.LitKind.NUMBER)
+                && c.args().get(1) instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.NUMBER)
         {
-            return c;
+            Expr subject = c.args().get(0);
+            if (subject instanceof Expr.Ref)
+            {
+                return c;
+            }
+            Expr folded = caseFoldedNameSubject(subject);
+            if (folded != subject && folded instanceof Expr.Ref)
+            {
+                return new Expr.Call(c.name(), List.of(folded, c.args().get(1)), Map.of());
+            }
         }
         return null;
+    }
+
+
+    /**
+     * {@code X} for {@code upper(X)} / {@code lower(X)} over a column-NAME source, else {@code e}
+     * unchanged — the Java mirror of {@code check_expr.py}'s {@code _case_folded_subject}.
+     *
+     * <p>
+     * CIT &#167;3, phase 3c of {@code PLAN-case-insensitive-templates} (2026-09-28): a rule tests a
+     * column name as a string with the dataset side case-folded ({@code ends_with(upper(varname()),
+     * "FL")}, {@code upper(varname()) =~ /^ANL/}, {@code prefix(upper(varname()), 2) not in $x}) so
+     * the test also holds on lowercase-named data. The fold changes the letter case compared, not
+     * what the rule reads or tests, so it lowers to the SAME leaf as the unwrapped form; without
+     * this every folded rule would be unlowerable and drop out of every leaf-derived instrument.
+     * Deliberately narrow: only the subject of a regex match, a substring predicate and a
+     * prefix/suffix affix, and only over a NAME source. A folded CELL value
+     * ({@code not contains(upper(VISIT), "UNSCHEDUL")}) is not unwrapped: the v1 vocabulary has a
+     * case-insensitive leaf for a value, so a plain leaf would misstate it.
+     * </p>
+     */
+    private static Expr caseFoldedNameSubject(Expr e)
+    {
+        if (e instanceof Expr.Call c && CASE_FOLDS.contains(c.name()) && c.args().size() == 1
+                && c.kwargs().isEmpty() && isNameSubject(c.args().get(0)))
+        {
+            return c.args().get(0);
+        }
+        return e;
+    }
+
+
+    private static boolean isNameSubject(Expr e)
+    {
+        if (e instanceof Expr.Ref r)
+        {
+            return NAME_OPERANDS.contains(r.name());
+        }
+        if ("variable_name".equals(currentVariableOperand(e)))
+        {
+            return true;
+        }
+        String operand = MetadataOperandMapping.reverseToOperand(e);
+        return operand != null && NAME_OPERANDS.contains(operand);
     }
 
 

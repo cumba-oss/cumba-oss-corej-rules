@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0042 expect=violation domain=ADLBC
+#note "Authority: ADaM Conformance Rules v5.0 CR42 ('A numeric variable with a suffix of TM does not have a time format, excluding ARELTM and variables with a suffix of DTM'). Lowercase names: asttm is numeric, suffix TM, format 8. -> one violation, reported as asttm. areltm carries the same shape but is the rule's ARELTM exception, compared with equalsIgnoreCase, so it stays silent in any letter case (CIT 3)."
+#expectViolationCount 1
+#expectViolationAt variable_data_type=Num variable_format=8. variable_name=asttm
+dataset ADLBC
+col studyid type=Char
+col usubjid type=Char
+col asttm type=Num format=8.
+col areltm type=Num format=8.
+---
+CDISCPILOT01 | 01-701-1015 | 13.5 | 2.5
+---

@@ -547,11 +547,12 @@ The value lower-cased. Also spelled `lowcase`.
 expression: 'lower(SEX) == "m"'
 ```
 
-**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing.
+**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
-`distinct(…)` result), returns a **new list** with every element lower-cased, in order; a missing
-element folds to `""` exactly as a missing scalar does. Confirmed by the owner 2026-09-28 together
+`distinct(…)` result), returns a **new list** with every element lower-cased, in order; a **missing
+element stays missing** — it is carried through unchanged, in its position (missing propagates
+through the string functions, register `D36`), never folded to `""`. Confirmed by the owner 2026-09-28 together
 with [`upper`](#upper)'s list form (rulings register `CIT §3`).
 
 ### max_value_length
@@ -798,15 +799,19 @@ The value upper-cased. Also spelled `upcase`.
 expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 ```
 
-**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing.
+**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
-`distinct(…)` result), returns a **new list** with every element upper-cased, in order; a missing
-element folds to `""` exactly as a missing scalar does. This is how a rule compares the dataset's
+`distinct(…)` result), returns a **new list** with every element upper-cased, in order; a **missing
+element stays missing** — it is carried through unchanged, in its position (missing propagates
+through the string functions, rulings register `D36`), never folded to `""`. This is how a rule compares the dataset's
 column names against the library's names (owner, 2026-09-28: *"upper allows a list of strings as
 parameter and returns a list of these strings converted to upper case"*; rulings register
 `CIT §3`): a column name a rule handles as a value is a string and compares exactly like one, so
-the rule folds the **dataset side** and leaves the library's upper-case names alone —
+the rule folds **both sides** — the owner's *"compare the upper case version of a name against the
+upper case version of a list of strings"*; folding a library list is a no-op under the owner's
+assumption that library names are upper case, and it spares the rule from deciding which side is
+the library —
 
 ```yaml
 Bindings:
@@ -816,16 +821,31 @@ Bindings:
   expression: "get_column_order_from_dataset()"
 - name: "$dataset_variables_upper"
   expression: "upper($dataset_variables)"
-- name: "$missing_required_variables"
+- name: "$required_variables_upper"
+  expression: "upper($required_variables)"
+- name: "$required_variables_absent_upper"
   expression: "minus($required_variables, subtract=$dataset_variables_upper)"
+- name: "$missing_required_variables"
+  expression: "minus($required_variables_absent_upper, subtract=$dataset_variables)"
 Check:
-  expression: "not contains_all($dataset_variables_upper, $required_variables)"
+  expression: "not contains_all($dataset_variables_upper, $required_variables_upper)"
+Outcome:
+  Output_Variables:
+  - "$missing_required_variables"
+  - "!$dataset_variables_upper"
+  - "!$required_variables_upper"
+  - "!$required_variables_absent_upper"
 ```
 
-The un-folded `$dataset_variables` stays available for `Output_Variables`, so a reported name keeps
-the dataset's own spelling. The scalar spellings are `upper(varname()) in $required_variables` and
-`equalsIgnoreCase(varname(), var_name("LIBRARY"))`. A `QNAM` / `IDVAR` **cell** is a value and is
-not folded — it compares exactly, as every string does.
+The un-folded bindings stay available for `Output_Variables` (each sibling is excluded with
+`!$x_upper`), so a reported name keeps its own spelling; the two-step `minus` subtracts both
+spellings of the dataset's names, so the missing list keeps a library name — or an unmatched template
+such as `TRTxxP` — verbatim and drops a template instance the dataset carries in its own spelling. The
+scalar spellings are `upper(varname()) in $required_variables` (the membership surface folds the
+list too) and `equalsIgnoreCase(varname(), var_name("LIBRARY"))`; a name **test** is
+`ends_with(upper(varname()), "DTC")` / `upper(varname()) =~ /^ANL\d\dFL$/`. A `QNAM` / `IDVAR`
+**cell** is a value and is not folded — it compares exactly, as every string does. The naming rules
+(`varname() !~ /[a-z]/` and kin) test the letter case of the name itself and are never folded.
 
 
 ## Numbers and arithmetic

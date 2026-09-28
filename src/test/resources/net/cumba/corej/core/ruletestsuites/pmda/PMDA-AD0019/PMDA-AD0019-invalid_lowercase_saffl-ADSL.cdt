@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0019 expect=violation domain=ADSL
+#note "Authority: PMDA Validation Rules v6.0 AD0019 ('For subject-level character population flag variables: N = no, Y = yes. Null values are not allowed'). The population flags are recognised in any letter case (CIT 1 / CIT 3): the lowercase saffl is empty on row 2 -> one violation, reported as saffl."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=saffl
+dataset ADSL class=ADSL
+col studyid type=Char
+col usubjid type=Char
+col saffl   type=Char
+col ittfl   type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Y | Y
+CDISCPILOT01 | 01-701-1023 |   | Y
+---

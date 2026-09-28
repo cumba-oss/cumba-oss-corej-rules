@@ -140,9 +140,12 @@ same ones exist on both sides, and skips when ADSL has `TRT01P` only while the p
 `TRT01P` and `TRT02P`. A literal entry takes part by presence only, so two differently named
 literals can be paired. Pattern entries in one group must therefore be the **same pattern** on
 each side — `[["TRTxxP", "ADSL.TRTxxPN"]]` is not guaranteed to match the same names and is
-rejected at load. A glob may differ in case between the two sides (globs match case-blind); a
-marker template or a `/regex/` must be spelled identically, and a template with its markers
-upper-cased (`ADSL.TRTXXP` beside `TRTxxP`) is a literal name no dataset carries — also rejected.
+rejected at load. Every pattern *matches* column names ignoring case (`CIT §1`), but this load-time
+check compares the patterns as **written**: a glob may differ in case between the two sides; a
+marker template or a `/regex/` must be spelled identically (a regex's escapes and inline flags make
+its spelling significant, and a template's markers are what make it a template), and a template
+with its markers upper-cased (`ADSL.TRTXXP` beside `TRTxxP`) is a literal name no dataset carries —
+also rejected.
 
 The load-time rules are `Any`'s — flat is one group, nested is several, two distinct entries per
 group, no mixed shape, a warning on an entry repeated across groups — plus three of its own:
@@ -255,13 +258,16 @@ Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) �
      future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
      CIT §1. -->
 > ⭐ **Every entry matches a column name ignoring letter case** — a literal, a `--` placeholder, a
-> qualified name (and a supplemental qualifier's `QNAM`), a glob, a `/regex/` and a
+> qualified name, a glob, a `/regex/` and a
 > [marker template](wildcards.md) such as `TRTxxP` alike:
 > `trt01p` in a SAS dataset satisfies `TRTxxP` and `TRT01P` equally, and the rule then reads it
-> under its actual name. Write entries in the CDISC upper-case spelling regardless; never rely on
-> case to tell two columns apart. ⛔ This is a decision, not a default (owner, 2026-09-28; rulings
-> register entry `CIT §1`): if the case rule is ever revised, it is revised for every surface at
-> once — never for one kind of entry alone.
+> under its actual name. The metadata lookups keyed by a column's name ignore case the same way —
+> the Define-XML `ItemDef` and value-level (VLM) metadata behind `var_*("DEFINE")` / `vlm_*`, and
+> the library's metadata for a variable the IG does not list. Write entries in the CDISC upper-case spelling regardless; never rely on
+> case to tell two columns apart. A supplemental qualifier found through the SUPP-QNAM pivot is the
+> exception: its `QNAM` is a cell value and is compared exactly (`CIT §3`). ⛔ This is a decision,
+> not a default (owner, 2026-09-28; rulings register entry `CIT §1`): if the case rule is ever
+> revised, it is revised for every surface at once — never for one kind of entry alone.
 
 A qualified entry is how you require a column in a dataset other than the one the rule is running
 on — usually one you are about to [join](joins.md).

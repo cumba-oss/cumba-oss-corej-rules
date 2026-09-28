@@ -16,7 +16,7 @@ Bindings:
   expression: "get_column_order_from_library()"
 Check:
   expression: >-
-    ends_with(varname(), "ETMF") and varname() !~ /^TR(T|0[1-9]|[1-9][0-9])ETMF$/ and
+    ends_with(upper(varname()), "ETMF") and upper(varname()) !~ /^TR(T|0[1-9]|[1-9][0-9])ETMF$/ and
     (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
     contains(var_label("DATA"), "Time")) and upper(varname()) not in $library_variables
 Outcome:

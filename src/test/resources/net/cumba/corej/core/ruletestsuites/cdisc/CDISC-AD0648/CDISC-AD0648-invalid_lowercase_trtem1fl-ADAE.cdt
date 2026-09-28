@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0648 expect=violation domain=ADAE
+#note "Authority: ADaM Conformance Rules v5.0 CR648 ('TRTEMwFL is Y but TRTEMFL is not Y'). The TRTEMwFL family is recognised in any letter case (CIT 1 / CIT 3): the lowercase trtem1fl = Y while trtemfl = N -> one violation, reported as trtem1fl."
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=trtem1fl
+dataset ADAE structure=OCCDS
+col studyid type=Char
+col usubjid type=Char
+col aseq type=Num
+col trtem1fl type=Char
+col trtemfl type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | Y | N
+---

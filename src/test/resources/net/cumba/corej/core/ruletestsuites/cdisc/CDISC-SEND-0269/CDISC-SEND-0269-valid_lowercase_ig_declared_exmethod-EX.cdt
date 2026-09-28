@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0269 expect=noViolation domain=EX
+#note "Authority: SEND Conformance Rules v5.0 SEND269 (Condition: the variable is not in the general observation class table applicable to the domain AND exists in another class table; Rule: the variable cannot be added). The lowercase twin of CDISC-SEND-0269-valid_ig_declared_exmethod-EX: exmethod is declared by SENDIG's own EX table, so the IG-list conjunct is FALSE and the rule is silent. The IG list is served from the dataset's own columns in the dataset's spelling, so the rule compares the upper-cased name against the upper-cased IG list (CIT 3); comparing it against the un-folded list fired here."
+#library standard=sendig version=3-0
+#library model-column-order      EX STUDYID DOMAIN USUBJID POOLID EXSEQ EXGRPID EXREFID EXSPID EXTRT EXDOSE EXDOSTXT EXDOSU EXDOSFRM EXDOSFRQ EXDOSTOT EXDOSRGM EXROUTE EXLOT EXLOC EXSTDTC EXENDTC EXSTDY EXENDY
+#library domain-variables        EX STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier EXSEQ:Identifier EXTRT:Topic "EXDOSE:Record Qualifier" "EXDOSU:Variable Qualifier" "EXDOSFRM:Variable Qualifier" "EXROUTE:Variable Qualifier" "EXMETHOD:Record Qualifier" EXSTDTC:Timing EXENDTC:Timing EXSTDY:Timing EXENDY:Timing
+#library model-class-variables   FINDINGS      --TESTCD:Topic "--TEST:Synonym Qualifier" "--ORRES:Result Qualifier" "--STRESC:Result Qualifier" "--METHOD:Record Qualifier" "--LAT:Variable Qualifier"
+#library model-class-variables   "FINDINGS ABOUT" --TESTCD:Topic "--TEST:Synonym Qualifier" "--OBJ:Record Qualifier" "--ORRES:Result Qualifier"
+#library model-class-variables   EVENTS        --TERM:Topic "--DECOD:Synonym Qualifier" "--SEV:Record Qualifier"
+#library model-class-variables   INTERVENTIONS --TRT:Topic "--DOSE:Record Qualifier" "--DOSU:Variable Qualifier" "--ROUTE:Variable Qualifier"
+dataset EX class=INTERVENTIONS label="Exposure"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col exseq    type=Num  label="Sequence Number"
+col extrt    type=Char label="Name of Treatment"
+col exdose   type=Num  label="Dose"
+col exmethod type=Char label="Method of Administration"
+---
+S1 | EX | 001 | 1 | VEHICLE | 10 | GAVAGE

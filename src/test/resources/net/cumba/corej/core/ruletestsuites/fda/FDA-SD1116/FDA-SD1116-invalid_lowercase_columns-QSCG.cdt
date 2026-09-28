@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1116 expect=violation domain=QSCG
+#note "Authority: FDA Validator Rules v1.6 SD1116 / FDA Business Rules v1.5 FDAB018 (a variable shared by the datasets of a split domain has the same length in each). The lowercase twin of FDA-SD1116-invalid-QSCG: qscat is length 10 in QSCG and 20 in QSFT -> fires on qscat, reported in the dataset's spelling (CIT 3: upper-cased name against the upper-cased mismatch list)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=qscat
+dataset QSCG label="Questionnaires CG"
+col studyid  type=Char length=12 label="Study Identifier"
+col domain   type=Char length=2  label="Domain Abbreviation"
+col usubjid  type=Char length=20 label="Unique Subject Identifier"
+col qsseq    type=Num  length=8  label="Sequence Number"
+col qstestcd type=Char length=8  label="Question Short Name"
+col qscat    type=Char length=10 label="Category of Question"
+col qsorres  type=Char length=40 label="Finding in Original Units"
+---
+S1 | QS | 001 | 1 | CGI01 | CGI | 3
+---
+
+dataset QSFT label="Questionnaires FT"
+col studyid  type=Char length=12 label="Study Identifier"
+col domain   type=Char length=2  label="Domain Abbreviation"
+col usubjid  type=Char length=20 label="Unique Subject Identifier"
+col qsseq    type=Num  length=8  label="Sequence Number"
+col qstestcd type=Char length=8  label="Question Short Name"
+col qscat    type=Char length=20 label="Category of Question"
+col qsorres  type=Char length=40 label="Finding in Original Units"
+---
+S1 | QS | 001 | 1 | FT01 | FUNCTIONAL TEST | 5

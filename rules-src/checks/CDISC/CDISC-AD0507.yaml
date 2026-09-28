@@ -15,7 +15,7 @@ Bindings:
   expression: "get_column_order_from_library()"
 Check:
   expression: >-
-    ends_with(varname(), "DTF") and (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not
+    ends_with(upper(varname()), "DTF") and (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not
     contains(var_label("DATA"), "Date")) and upper(varname()) not in $library_variables
 Outcome:
   Message: "A variable ending in DTF has a label that does not end with 'Imputation\

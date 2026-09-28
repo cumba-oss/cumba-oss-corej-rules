@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0054 expect=noViolation domain=DM
+#note "Authority: FDA Validator Rules v1.6 SD0054 (a variable declared in the Define-XML must be present in the dataset). The Define-XML declares its DM variables in lower case (studyid, domain, usubjid, age) and the dataset carries all four in upper case. Presence does not depend on letter case: the rule compares the upper-cased dataset names against the upper-cased define names (CIT 3; the owner's upper-case assumption covers the metadata library only, not the define) -> no violation."
+#library standard=sdtmig version=3-4
+#define column-order DM studyid domain usubjid age
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+---
+S1 | DM | S1-001 | 34

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1299 expect=noViolation domain=LB
+#note "Authority: FDA Validator Rules v1.6 SD1299 / SDTMIG Conformance Rules v2.0 CG0065, CG0219 (a general-observation-class dataset contains at least one Timing variable). The lowercase twin of FDA-SD1299-valid-LB: lbdtc is a Timing variable in any letter case; the rule compares the upper-cased dataset names against the upper-cased Timing list (CIT 3) -> no violation."
+#library standard=sdtmig version=3-4
+#library model-variables LB --DTC:Timing --DY:Timing
+dataset LB label="Laboratory Test Results"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col lbseq    type=Num  label="Sequence Number"
+col lbtestcd type=Char label="Lab Test Short Name"
+col lborres  type=Char label="Result or Finding in Original Units"
+col lbdtc    type=Char label="Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 4.1 | 2020-02-01
+S1 | LB | 001 | 2 | ALT | 22  | 2020-02-01

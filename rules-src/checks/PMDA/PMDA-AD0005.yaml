@@ -13,8 +13,9 @@ Scope:
     - "OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    ends_with(varname(), "FL") and varname() !~ /^(.*RFL|.*PFL|ABLFL|ANL(0[1-9]|[1-9][0-9])FL)$/ and
-    not empty(value()) and value() not in ["Y", "N"]
+    ends_with(upper(varname()), "FL") and upper(varname()) !~
+    /^(.*RFL|.*PFL|ABLFL|ANL(0[1-9]|[1-9][0-9])FL)$/ and not empty(value()) and value() not in ["Y",
+    "N"]
 Outcome:
   Message: "A variable whose name ends in 'FL' has a value that is not Y, N or empty."
   Output_Variables:

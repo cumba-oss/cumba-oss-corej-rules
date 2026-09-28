@@ -18,8 +18,8 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    ends_with(varname(), "FN") and varname() !~ /^(ABLFN|ANL(0[1-9]|[1-9][0-9])FN)$/ and not
-    empty(value()) and value() not in [0, 1]
+    ends_with(upper(varname()), "FN") and upper(varname()) !~ /^(ABLFN|ANL(0[1-9]|[1-9][0-9])FN)$/
+    and not empty(value()) and value() not in [0, 1]
 Outcome:
   Message: "A variable whose name ends in 'FN' has a value that is not 0, 1 or missing."
   Output_Variables:

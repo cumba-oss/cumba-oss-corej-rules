@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1021 expect=noViolation domain=CO
+#note "Authority: FDA Validator Rules v1.6 SD1021 / FDA Business Rules v1.5 FDAB015 (unexpected character values), which exempt the COVALn and TSVALn free-text variables. The exemption names the variable in any letter case (CIT 1 / CIT 3): the lowercase coval (leading space) and coval1 (a lone '.') are COVALn and must not be reported."
+#library standard=sdtmig version=3-4
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col studyid type=Char label="Study Identifier"
+col rdomain type=Char label="Related Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col coseq   type=Num  label="Sequence Number"
+col coval   type=Char label="Comment"
+col coval1  type=Char label="Comment Continued"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | " subject reported dizziness" | "."

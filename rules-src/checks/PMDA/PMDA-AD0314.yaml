@@ -16,8 +16,8 @@ Scope:
     - "ADVERSE EVENT"
 Check:
   expression: >-
-    varname() =~ /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)\\d$/ and varname() !~
-    /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)[1-9]$/
+    upper(varname()) =~ /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)\\d$/ and upper(varname())
+    !~ /^(DECDORG|BDSYORG|HLGTORG|HLTORG|LLTORG|LLTNORG)[1-9]$/
 Outcome:
   Message: "An Original/Prior MedDRA Coding variable (*ORGy: DECDORGy, BDSYORGy, HLGTORGy,\
     \ HLTORGy, LLTORGy, LLTNORGy) has a single-digit 'y' index outside [1-9]."

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0003 expect=violation domain=LB
+#note "Authority: FDA Validator Rules v1.6 SD0003 (a *DTC variable must conform to ISO 8601; SDTMIG Conformance Rules CG0066-68). The *DTC suffix names the variable in any letter case (CIT 1 / CIT 3): the lowercase lbdtc on row 2 holds '2020-13-45', month 13 / day 45, not an ISO 8601 date -> one violation, reported as lbdtc."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=lbdtc
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col lbseq    type=Num  label="Sequence Number"
+col lbtestcd type=Char label="Lab Test or Examination Short Name"
+col lbdtc    type=Char label="Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | 2020-01-15
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 2020-13-45

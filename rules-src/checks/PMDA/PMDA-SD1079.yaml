@@ -13,6 +13,8 @@ Scope:
 Bindings:
 - name: "$model_column_order"
   expression: "get_model_column_order()"
+- name: "$model_column_order_upper"
+  expression: "upper($model_column_order)"
 - name: "$column_order_from_dataset"
   expression: "get_column_order_from_dataset()"
 - name: "$column_order_from_dataset_upper"
@@ -20,7 +22,7 @@ Bindings:
 Check:
   expression: >-
     not empty($model_column_order) and not is_ordered_subset_of($column_order_from_dataset_upper,
-    $model_column_order)
+    $model_column_order_upper)
 Outcome:
   Message: "Variables are not in the correct order as shown in the SDTM Model for\
     \ the observation class."
@@ -28,6 +30,7 @@ Outcome:
   - "$column_order_from_dataset"
   - "$model_column_order"
   - "!$column_order_from_dataset_upper"
+  - "!$model_column_order_upper"
 Source:
   Message: "Variable is in wrong order within domain"
   Description: "The order of variables should reflect the order of the variables in\

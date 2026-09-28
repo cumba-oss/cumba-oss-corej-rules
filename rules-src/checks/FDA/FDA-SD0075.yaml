@@ -15,9 +15,11 @@ Scope:
 Bindings:
 - name: "$rdomain_variables"
   expression: "distinct(IDVAR, value_is_reference=true)"
+- name: "$rdomain_variables_upper"
+  expression: "upper($rdomain_variables)"
 Check:
   expression: >-
-    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables
+    var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables_upper
 Outcome:
   Message: "IDVAR does not represent a variable present in the dataset referenced\
     \ by RDOMAIN."
@@ -25,6 +27,7 @@ Outcome:
   - "RDOMAIN"
   - "IDVAR"
   - "$rdomain_variables"
+  - "!$rdomain_variables_upper"
 Source:
   FDA_Validator_Rule_Message: "Invalid IDVAR"
   FDA_Validator_Rule_Description: "Identifying Variable (IDVAR) must have a valid\

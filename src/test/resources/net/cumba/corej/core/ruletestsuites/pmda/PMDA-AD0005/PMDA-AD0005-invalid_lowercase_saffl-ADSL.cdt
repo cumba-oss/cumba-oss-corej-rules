@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0005 expect=violation domain=ADSL
+#note "Authority: PMDA Validation Rules v6.0 AD0005 ('A variable with a suffix of FL must have a value that is Y, N or null'; Exception 1: RFL, PFL, ABLFL, ANLzzFL). Lowercase names on both name tests: saffl ends in FL, is not an exception and holds X -> one violation, reported as saffl. ablfl and anl01fl also hold X but are Exception 1, so they stay silent only if the exception test folds the name too (CIT 3)."
+#library standard=adamig version=1-0
+#expectViolationCount 1
+#expectViolationAt row=1 variable_name=saffl variable_value=X
+dataset ADSL structure=ADSL
+col studyid type=Char
+col usubjid type=Char
+col saffl   type=Char
+col ablfl   type=Char
+col anl01fl type=Char
+---
+CDISCPILOT01 | 01-701-1015 | X | X | X

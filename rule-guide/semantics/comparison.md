@@ -216,10 +216,15 @@ case.
 > ⭐ **A column name handled as a value is a string** (owner, 2026-09-28; rulings register
 > `CIT §3`). Column names match ignoring case wherever the engine looks a column *up* (`CIT §1`),
 > but a `varname()`, a `QNAM` cell or an element of `get_column_order_from_dataset()` is a value,
-> and a value compares as ruled here — exactly. A rule that compares a dataset-side NAME against
-> the library folds the dataset side (`upper(varname())`, `upper($dataset_variables)`,
-> `equalsIgnoreCase(varname(), …)`); a `QNAM` / `IDVAR` cell is left as it is; the engine never
-> treats a string specially because it holds a column name.
+> and a value compares as ruled here — exactly. A rule that compares or tests a NAME folds it,
+> and folds **both sides** of a comparison (the owner's *"compare the upper case version of a name
+> against the upper case version of a list of strings"*): `upper(varname()) in $x` (the membership
+> surface above folds the list too), `equalsIgnoreCase(varname(), …)`, `upper($dataset_variables)`
+> against `upper($required_variables)`; and a name **test** folds the name it tests —
+> `ends_with(upper(varname()), "DTC")`, `upper(varname()) =~ /^ANL\d\dFL$/` — against a literal
+> or pattern authored in upper case. A `QNAM` / `IDVAR` cell is left as it is; the engine never
+> treats a string specially because it holds a column name. The naming rules (`varname() !~ /[a-z]/`
+> and kin) test the letter case of the name on purpose and are never folded.
 
 ### Dates — ask for one, and you get one
 

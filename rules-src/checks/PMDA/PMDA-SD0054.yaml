@@ -16,16 +16,19 @@ Bindings:
   expression: "upper($dataset_variables)"
 - name: "$define_variables"
   expression: "define_variable_names()"
+- name: "$define_variables_upper"
+  expression: "upper($define_variables)"
 - name: "$missing_define_variables"
-  expression: "minus($define_variables, subtract=$dataset_variables_upper)"
+  expression: "minus($define_variables_upper, subtract=$dataset_variables_upper)"
 Check:
   expression: >-
-    not contains_all($dataset_variables_upper, $define_variables)
+    not contains_all($dataset_variables_upper, $define_variables_upper)
 Outcome:
   Message: "A variable declared in the Define-XML is not present in the dataset."
   Output_Variables:
   - "$missing_define_variables"
   - "!$dataset_variables_upper"
+  - "!$define_variables_upper"
 Source:
   Message: "Variable in define.xml is not present in the dataset"
   Description: "Variables listed in the data definition document (define.xml) should\

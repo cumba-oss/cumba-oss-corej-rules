@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0030 expect=violation domain=BW
+#note "Authority: SEND Conformance Rules v5.0 SEND30 ('Variable name is in uppercase'). This is a NAMING rule: its subject is the letter case of the name itself, so it is the one place a lowercase name is reported (CIT 1) and its name test is never case-folded (CIT 3). bwtestcd and Bwstresn contain a lowercase letter -> two violations, one per variable, reported in the dataset's spelling; the upper-case STUDYID, DOMAIN, USUBJID and BWSEQ do not fire."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt variable_name=bwtestcd
+#expectViolationAt variable_name=Bwstresn
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col bwtestcd type=Char label="Test Short Name"
+col Bwstresn type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | BW | 001 | 1 | BW | 250

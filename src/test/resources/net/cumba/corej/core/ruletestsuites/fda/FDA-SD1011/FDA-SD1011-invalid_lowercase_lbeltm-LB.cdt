@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD1011 expect=violation domain=LB
+#note "Authority: FDA Validator Rules v1.6 SD1011 (a duration / elapsed-time / interval variable, name ending in DUR, ELTM, EVLINT, STINT, ENINT, must hold an ISO 8601 duration). The name suffix is recognised in any letter case (CIT 1 / CIT 3): the lowercase lbeltm on row 2 holds '30 min' instead of 'PT30M' -> one violation, reported as lbeltm."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 variable_name=lbeltm
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col lbseq    type=Num  label="Sequence Number"
+col lbtestcd type=Char label="Lab Test or Examination Short Name"
+col lbeltm   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB  | PT1H
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | 30 min

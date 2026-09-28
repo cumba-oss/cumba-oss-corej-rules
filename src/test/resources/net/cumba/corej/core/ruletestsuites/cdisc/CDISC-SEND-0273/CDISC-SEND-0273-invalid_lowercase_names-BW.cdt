@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0273 expect=violation domain=BW
+#note "Authority: SEND Conformance Rules v5.0 SEND273 ('Variable label is unique'). The lowercase twin of CDISC-SEND-0273-invalid-BW: bworres and bwstresc both carry the label 'Result' -> both fire, reported in the dataset's spelling. Label uniqueness does not depend on the letter case of the names; the rule compares the upper-cased name against the upper-cased duplicate list (CIT 3)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt variable_name=bworres
+#expectViolationAt variable_name=bwstresc
+dataset BW label="Body Weight"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col bwseq    type=Num  label="Sequence Number"
+col bworres  type=Char label="Result"
+col bwstresc type=Char label="Result"
+---
+S1 | BW | 001 | 1 | 250 | 250

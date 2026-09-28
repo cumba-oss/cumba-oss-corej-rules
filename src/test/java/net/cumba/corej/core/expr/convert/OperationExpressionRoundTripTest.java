@@ -35,20 +35,24 @@ class OperationExpressionRoundTripTest
      * package per standard version it declares). An exact pin, both directions: a new compiled
      * binding must be counted here, and a compiled binding the routing stopped seeing reds too.
      */
-    private static final int EXPECTED_COMPILED_BINDINGS = 120;
+    private static final int EXPECTED_COMPILED_BINDINGS = 255;
 
     /**
      * The rules those compiled bindings belong to. 3 → 120 on 2026-09-28
      * ({@code PLAN-case-insensitive-templates} phase 3b, register CIT §3): the 23 name-list rules
      * gained a compiled sibling {@code $x_upper: upper($x)} that folds the dataset side of the name
-     * comparison, one per package the rule ships in (117 instances), beside CG0288's three.
+     * comparison, one per package the rule ships in (117 instances), beside CG0288's three. 120 →
+     * 255 the same day (phase 3c + review round 2, CIT §3): the owner's formula applied to BOTH
+     * sides — the same 23 rules fold their reference list too ({@code $y_upper: upper($y)}), and
+     * CG0370 / FDA-SD0075 / PMDA-SD0075 fold the referenced dataset's column list
+     * ({@code $rdomain_variables_upper}); measured, both corpora.
      */
     private static final Set<String> EXPECTED_COMPILED_RULES = Set.of("CDISC-CG0288",
             "CDISC-AD9704", "CDISC-CG0014", "CDISC-CG0016", "CDISC-CG0219", "CDISC-CG0330",
-            "CDISC-CG0664", "CDISC-SEND-0012", "CDISC-SEND-0013", "CDISC-SEND-0048",
-            "CDISC-SEND-0393", "FDA-SD0054", "FDA-SD0056", "FDA-SD0057", "FDA-SD1079", "FDA-SD1299",
-            "FDA-SE0056", "FDA-SE0057", "PMDA-AD0047", "PMDA-SD0054", "PMDA-SD0056", "PMDA-SD0057",
-            "PMDA-SD1079", "PMDA-SD1299");
+            "CDISC-CG0370", "FDA-SD0075", "PMDA-SD0075", "CDISC-CG0664", "CDISC-SEND-0012",
+            "CDISC-SEND-0013", "CDISC-SEND-0048", "CDISC-SEND-0393", "FDA-SD0054", "FDA-SD0056",
+            "FDA-SD0057", "FDA-SD1079", "FDA-SD1299", "FDA-SE0056", "FDA-SE0057", "PMDA-AD0047",
+            "PMDA-SD0054", "PMDA-SD0056", "PMDA-SD0057", "PMDA-SD1079", "PMDA-SD1299");
 
     @Test
     void everyShippedOperationRoundTrips() throws Exception
