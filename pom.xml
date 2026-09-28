@@ -69,8 +69,6 @@
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <mockito.agent></mockito.agent>
-
         <!--
             Minimum line coverage enforced by the jacoco-maven-plugin
             check execution (see <pluginManagement> below). 0.80 = 80%.
@@ -1419,8 +1417,15 @@
 
             ⚠ Selection is by TAG, never by <includes>/<excludes>: -Dtest overrides includes and
             excludes but not groups, so a `-Dtest=…` run with the switch still runs each tagged
-            class exactly once, here. For the same reason this execution tolerates a -Dtest filter
-            that selects none of its tests.
+            class exactly once, here.
+            ⚠ The tag is spelled twice — FindingsSnapshot.TAG and the two values below — so this
+            execution sets failIfNoTests: a rename on one side selects nothing here, and that is a
+            red build instead of a snapshot that silently stopped running. The flip side: with the
+            switch on, a -Dtest filter must name at least one tagged class, or this execution reds.
+            (surefire.failIfNoSpecifiedTests does not help either way: it fires only when the
+            -Dtest pattern matches no test CLASS at all, before any tag filtering.)
+            The fork marker -Dcorej.findingsSnapshot.fork=true in the argLine is read by
+            FindingsSnapshot.FORK_MARKER, which then fails the run if the JaCoCo agent is attached.
         -->
         <profile>
             <id>findings-snapshot</id>
@@ -1448,7 +1453,7 @@
                                 <goals><goal>test</goal></goals>
                                 <configuration>
                                     <groups>findings-snapshot</groups>
-                                    <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                                    <failIfNoTests>true</failIfNoTests>
                                     <argLine>-Dcorej.findingsSnapshot.fork=true ${mockito.agent}</argLine>
                                 </configuration>
                             </execution>

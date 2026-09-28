@@ -158,8 +158,22 @@ public final class FindingsSnapshot
      * {@code FindingsSnapshotDriftTest} and {@code UseCaseFilterSnapshotTest} both need it, and the
      * pom runs the two in one dedicated fork so the second reads what the first ran. Same inputs,
      * same JVM, and both only read the result. Guarded by the class lock ({@link #censusRun()}).
+     *
+     * <p>
+     * ⚠ Keyed on nothing: it holds the run over the inputs as they were at the <b>first</b> call —
+     * the study fixture, the rule corpus, the seeded metadata store and the pickle cache directory
+     * it was seeded from ({@code CDISC_PICKLE_CACHE_DIR} / {@code -Dcdisc.pickle.cache.dir}). A
+     * caller that changes any of those inside the JVM and wants a run over the new inputs must not
+     * go through {@link #run(String) run(null)}.
+     * </p>
      */
     private static @Nullable StudyValidationResult census;
+
+    /**
+     * The system property the pom's {@code findings-snapshot} execution sets on its fork (its
+     * {@code argLine}), and only there. It arms {@link #requireNoJacocoAgent()}.
+     */
+    static final String FORK_MARKER = "corej.findingsSnapshot.fork";
 
     private FindingsSnapshot()
     {
@@ -253,7 +267,9 @@ public final class FindingsSnapshot
      *
      * <p>
      * The census run itself ({@code null}) is run once per JVM and memoized ({@link #census}); a
-     * use-case run is run afresh on every call.
+     * use-case run is run afresh on every call. ⚠ The memo reflects the inputs at the first call
+     * (study, corpus, metadata store, pickle cache directory) — a caller that changes an input
+     * within the JVM must not use {@code run(null)}.
      * </p>
      *
      * @param useCase
@@ -286,6 +302,7 @@ public final class FindingsSnapshot
 
     private static StudyValidationResult execute(@Nullable String useCase) throws IOException
     {
+        requireNoJacocoAgent();
         Path study = studyDir();
         if (!Files.isDirectory(study))
         {
@@ -320,6 +337,36 @@ public final class FindingsSnapshot
             {
                 System.setProperty(StoreMetadataProviderFactory.STORE_PROPERTY, prev);
             }
+        }
+    }
+
+
+    /**
+     * In the pom's dedicated snapshot fork (marked by {@link #FORK_MARKER}), refuses to run with
+     * the JaCoCo agent attached. The runs use {@link #RULE_THREADS} threads, and every thread then
+     * writes the agent's shared probe arrays: measured 2026-09-28, four threads with the agent ran
+     * about twice as slow as one thread, and several times slower than four threads without it. The
+     * fork drops the agent on purpose; this makes its return loud instead of silently slow. Outside
+     * that fork (an IDE run, the default execution) it checks nothing.
+     */
+    static void requireNoJacocoAgent()
+    {
+        if (!Boolean.getBoolean(FORK_MARKER))
+        {
+            return;
+        }
+        List<String> agents = java.lang.management.ManagementFactory.getRuntimeMXBean()
+                .getInputArguments().stream().filter(a -> a.startsWith("-javaagent:")
+                        && a.toLowerCase(java.util.Locale.ROOT).contains("jacoco"))
+                .toList();
+        if (!agents.isEmpty())
+        {
+            throw new IllegalStateException("the findings-snapshot fork (-D" + FORK_MARKER
+                    + "=true) runs with the JaCoCo agent attached: " + agents + ". With "
+                    + RULE_THREADS + " rule threads the agent's probe contention makes"
+                    + " the study run about twice as slow as a sequential one. The pom's"
+                    + " findings-snapshot execution must keep its argLine free of @{argLine} and"
+                    + " non-empty (an empty argLine falls back to the one jacoco sets).");
         }
     }
 
