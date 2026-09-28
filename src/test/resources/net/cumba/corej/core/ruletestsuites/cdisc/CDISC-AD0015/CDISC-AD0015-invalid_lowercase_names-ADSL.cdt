@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0015 expect=violation domain=ADSL
+#note "Authority: ADaM Conformance Rules v5.0 CR15 (a variable name contains a character other than letters (A-Z), underscores (_), or numerals (0-9)). A naming rule: a variable name holds only upper-case letters, digits and underscore, so its test is case-SENSITIVE and is never folded (owner 2026-09-28, register CIT 3). A lowercase ADSL: studyid and usubjid each report once, in the dataset's own spelling; AGE is a valid name and stays silent. Every other rule runs normally on the lowercase names (CIT 1/3) - this rule and CDISC-AD0014 are where a lowercase name is reported."
+#expectViolationCount 2
+#expectViolationAt variable_name=studyid
+#expectViolationAt variable_name=usubjid
+dataset ADSL
+col studyid type=Char
+col usubjid type=Char
+col AGE type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 56
+---

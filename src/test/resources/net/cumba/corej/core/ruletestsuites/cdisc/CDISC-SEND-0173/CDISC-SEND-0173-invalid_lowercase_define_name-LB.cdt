@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0173 expect=violation domain=LB
+#note "Authority: SENDIG 3.1.1 (LBTOXGR / LBTOX: the sponsor is expected to provide the dictionary name and version in define.xml). The define declares the variable in the sponsor's spelling lbtoxgr; a define name is not a library name, so the rule folds it before comparing with LBTOX / LBTOXGR (CIT 1/3). Its CodeListRef points at a CodeList WITHOUT <ExternalCodeList> -> var_external_dictionary(DEFINE) empty -> one violation, reported in the define's spelling. USUBJID and LBTESTCD stay silent."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0173-lowercase-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=lbtoxgr
+dataset LB
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRES  type=Char
+---
+S1 | LB | 001 | 1 | GLUC | 5.5
+---

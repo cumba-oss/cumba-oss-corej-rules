@@ -351,9 +351,10 @@ upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` 
 element by element. A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
 `upper(varname()) =~ /^ANL\d\dFL$/`, `prefix(upper(varname()), 2)`, with the literal or pattern
 spelled in upper case. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
-exactly (`QNAM == "AESOSP"`); `IDVAR not in $rdomain_variables_upper` folds the referenced
-dataset's column list and leaves the `IDVAR` cell exact, so a lower-case `IDVAR` value still does
-not name a variable.
+exactly (`QNAM == "AESOSP"`); `IDVAR not in $rdomain_variables and IDVAR not in
+$rdomain_variables_upper` compares the exact `IDVAR` cell with the referenced dataset's column list
+in both spellings: a lower-case `IDVAR` value does not name an upper-case variable, but it does
+name a column spelled exactly like it (an all-lowercase study).
 
 `tuple(a, b) in distinct([a, b], domain="D")` tests a **whole row-tuple** against another
 dataset's tuples, rather than element by element.

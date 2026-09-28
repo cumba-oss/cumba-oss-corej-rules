@@ -222,9 +222,17 @@ case.
 > surface above folds the list too), `equalsIgnoreCase(varname(), …)`, `upper($dataset_variables)`
 > against `upper($required_variables)`; and a name **test** folds the name it tests —
 > `ends_with(upper(varname()), "DTC")`, `upper(varname()) =~ /^ANL\d\dFL$/` — against a literal
-> or pattern authored in upper case. A `QNAM` / `IDVAR` cell is left as it is; the engine never
-> treats a string specially because it holds a column name. The naming rules (`varname() !~ /[a-z]/`
-> and kin) test the letter case of the name on purpose and are never folded.
+> or pattern authored in upper case. A `QNAM` / `IDVAR` / `DOMAIN` cell is left as it is; the
+> engine never treats a string specially because it holds a column name. Where such an exact cell
+> meets a folded name (or a folded name list), the rule compares **both spellings** —
+> `IDVAR not in $rdomain_variables and IDVAR not in $rdomain_variables_upper`, or
+> `prefix(varname(), 2) not in $domain_list and prefix(upper(varname()), 2) not in $domain_list` —
+> so a cell that names a column in exactly the column's own spelling (an all-lowercase study) still
+> matches. The naming rules (`varname() =~ /.*[a-z]/`, `varname() !~ /^[A-Z0-9_]+$/` and kin) test
+> the letter case or the characters of the name on purpose and are never folded. The
+> `varname() !~ /[a-z]/` of `CDISC-AD0018` / `AD0709` / `PMDA-AD0018` is **not** a naming rule: it
+> is the template carve-out of ruling `M2-D15`, which recognises an index-template name such as
+> `CRITy` by its lower-case marker; it is not folded either.
 
 ### Dates — ask for one, and you get one
 

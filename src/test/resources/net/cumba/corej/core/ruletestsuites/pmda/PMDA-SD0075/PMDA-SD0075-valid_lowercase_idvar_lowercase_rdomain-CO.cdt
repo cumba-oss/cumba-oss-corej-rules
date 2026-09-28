@@ -1,0 +1,37 @@
+#!RuleTest
+#test PMDA-SD0075 expect=noViolation domain=CO
+#note "An all-lowercase study: each CO IDVAR cell (lbseq, aeseq) names a column of its RDOMAIN dataset in exactly that dataset's own spelling. The IDVAR cell is a string and stays exact; it matches the referenced column list as spelled, so the rule's fold of that list (CIT 3) must not turn an exact match into a finding -> no violation."
+#library standard=sdtmig version=3-4
+dataset CO label="Comments"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col rdomain  type=Char label="Related Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col coseq    type=Num  label="Sequence Number"
+col idvar    type=Char label="Identifying Variable"
+col idvarval type=Char label="Identifying Variable Value"
+col coval    type=Char label="Comment"
+---
+S1 | CO | LB | 001 | 1 | lbseq | 1 | legit reference
+S1 | CO | AE | 001 | 2 | aeseq | 1 | legit reference
+---
+
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col lbseq    type=Num  label="Sequence Number"
+col lbtestcd type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col aeseq   type=Num  label="Sequence Number"
+col aeterm  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | Headache
+---

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0349 expect=noViolation domain=XX
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0349 (Rule: first 2 characters of the variable name = the 2-character domain code). An all-lowercase custom domain: the DOMAIN cell is xx and the variables xxseq, xxtestcd, xxtest, xxorres start with xx in exactly that spelling. The DOMAIN cell is a string and stays exact; the rule folds the variable name (CIT 3), which must not turn an exact prefix match into a finding -> no violation. Boundary twin: CDISC-CG0349-valid_lowercase_columns-XX (upper-case DOMAIN XX, lowercase names, valid through the fold)."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+dataset XX class=FINDINGS label="Custom Findings"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col xxseq    type=Num  label="Sequence Number"
+col xxtestcd type=Char label="Test Short Name"
+col xxtest   type=Char label="Test Name"
+col xxorres  type=Char label="Result or Finding in Original Units"
+col visitnum type=Num  label="Visit Number"
+---
+S1 | xx | 001 | 1 | TEST1 | Test One | 5 | 1
+---

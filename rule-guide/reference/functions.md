@@ -549,6 +549,11 @@ expression: 'lower(SEX) == "m"'
 
 **Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
 
+⚠ **This scalar behaviour contradicts rulings register `D36`**, which the owner confirmed on 2026-09-28
+(*"D36 stands"*): missing propagates through the string functions, so `upper` / `lower` of a missing
+value is to return **missing**, not `""`. `PLAN-case-fold-missing-d36` makes it do so; until then the
+statement above describes the engine as it is, not as ruled.
+
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result), returns a **new list** with every element lower-cased, in order; a **missing
 element stays missing** — it is carried through unchanged, in its position (missing propagates
@@ -800,6 +805,11 @@ expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 ```
 
 **Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
+
+⚠ **This scalar behaviour contradicts rulings register `D36`**, which the owner confirmed on 2026-09-28
+(*"D36 stands"*): missing propagates through the string functions, so `upper` / `lower` of a missing
+value is to return **missing**, not `""`. `PLAN-case-fold-missing-d36` makes it do so; until then the
+statement above describes the engine as it is, not as ruled.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result), returns a **new list** with every element upper-cased, in order; a **missing
@@ -2744,7 +2754,7 @@ Bindings:
 - name: "$library_variables"
   expression: 'get_column_order_from_library()'
 Check:
-  expression: 'varname() not in $library_variables'
+  expression: 'upper(varname()) not in $library_variables'
 ```
 
 The example above is the complete call — this function takes no arguments beyond its optional target.

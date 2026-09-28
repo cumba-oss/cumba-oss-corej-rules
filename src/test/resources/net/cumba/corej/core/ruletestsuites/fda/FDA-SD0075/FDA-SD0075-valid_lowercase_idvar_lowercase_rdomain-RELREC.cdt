@@ -1,0 +1,36 @@
+#!RuleTest
+#test FDA-SD0075 expect=noViolation domain=RELREC
+#note "An all-lowercase study: each RELREC IDVAR cell (aeseq, cmseq) names a column of its RDOMAIN dataset in exactly that dataset's own spelling. The IDVAR cell is a string and stays exact; it matches the referenced column list as spelled, so the rule's fold of that list (CIT 3) must not turn an exact match into a finding -> no violation."
+#library standard=sdtmig version=3-4
+dataset RELREC class=RELATIONSHIP label="Related Records"
+col studyid  type=Char label="Study Identifier"
+col rdomain  type=Char label="Related Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col idvar    type=Char label="Identifying Variable"
+col idvarval type=Char label="Identifying Variable Value"
+col reltype  type=Char label="Relationship Type"
+col relid    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | aeseq | 1 | ONE  | 1
+S1 | CM | 001 | cmseq | 1 | MANY | 1
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col aeseq   type=Num  label="Sequence Number"
+col aeterm  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col cmseq   type=Num  label="Sequence Number"
+col cmtrt   type=Char label="Reported Name of Drug, Med, or Therapy"
+---
+S1 | CM | 001 | 1 | ASPIRIN
+---
