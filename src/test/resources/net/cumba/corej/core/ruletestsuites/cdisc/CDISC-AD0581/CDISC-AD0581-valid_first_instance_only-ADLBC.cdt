@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0581 expect=noViolation domain=ADLBC
+# Rule:Description: None of TRTP, TRTPGy, TRTA, and TRTAGy are present and none of the character treatment variables in ADSL defined in the IG are present
+#note "Only TRT01P is present (no TRTP, no TRTA) -> TRTxxP is present for xx=01, no violation. ADaMIG numbers xx from 01, so a dataset carrying any TRTxxP carries TRT01P."
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col TRT01P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | Placebo
+---

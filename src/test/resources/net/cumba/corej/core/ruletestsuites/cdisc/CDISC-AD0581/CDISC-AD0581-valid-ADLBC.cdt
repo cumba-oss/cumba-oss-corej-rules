@@ -1,13 +1,7 @@
 #!RuleTest
-#test CDISC-AD0581 expect=skipped domain=ADLBC
+#test CDISC-AD0581 expect=noViolation domain=ADLBC
 # Rule:Description: None of TRTP, TRTPGy, TRTA, and TRTAGy are present and none of the character treatment variables in ADSL defined in the IG are present
-#note "G4 skip pin: the rule's wildcard variables match no fixture column (WildcardExpander NoMatch), so the rule does not apply and the harness reports a skip - the scenario pins that boundary until engine gap G4 lands."
-# ENGINE-GAP G4 (adam-rule-engine-gaps.md): the universal-absence case (NO treatment
-# variable present) cannot be expressed — a wildcard not_exists is skipped when zero
-# columns match (WildcardExpander.expand empty -> the rule is skipped), which is exactly
-# the violation case. Even with TRTP present the expander matches nothing, so the rule
-# never executes on this fixture - hence the expect=skipped pin. The invalid sibling
-# (CDISC-AD0581-invalid-ADLBC.cdt) was REMOVED because it cannot fire until G4 lands.
+#note "TRTP present -> a treatment variable exists, no violation. The rule executes: it names no wildcard template, so nothing is expanded and nothing is skipped."
 dataset ADLBC
 col STUDYID type=Char
 col USUBJID type=Char

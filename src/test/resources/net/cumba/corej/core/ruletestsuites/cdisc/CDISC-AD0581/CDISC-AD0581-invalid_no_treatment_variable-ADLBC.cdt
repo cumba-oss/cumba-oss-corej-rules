@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0581 expect=violation domain=ADLBC
+# Rule:Description: None of TRTP, TRTPGy, TRTA, and TRTAGy are present and none of the character treatment variables in ADSL defined in the IG are present
+#note "A BDS dataset carrying none of the 14 treatment variables -> one dataset-level violation."
+#expectViolationCount 1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5
+CDISCPILOT01 | 01-701-1023 | ALT | 20.0
+---
