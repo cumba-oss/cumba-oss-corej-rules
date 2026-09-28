@@ -59,7 +59,40 @@ present?"*. It makes the rule a **template**: the engine runs it once per matchi
 (`TRT01P`, `TRT02P`, …), and on a dataset where **no** column matches it does not run the rule at
 all — it reports it **skipped**.
 
-That is harmless when the rule also tests a template **positively**:
+That is fatal when **every** presence template is negated. `not var_exists("TRTxxP")` is true
+exactly when no `TRTxxP` exists — the one dataset the engine skips — and false whenever one does.
+Such a rule can never report anything.
+
+### The fix: `Requirements.Variables.None`
+
+A negated template asks *"is no member of the family present?"*, and that is precisely what a
+template entry in
+[`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present) answers: the rule
+is skipped when **any** member is present, and runs when none is. Move the negated templates there
+and keep only the literal names in the Check:
+
+```yaml
+Requirements:
+  Variables:
+    None: ["TRTxxP", "TRTxxA", "TRTPGy"]
+Check:
+  expression: 'not var_exists("TRTP") and not var_exists("TRTA")'
+```
+
+On a dataset carrying `TRT02P` the rule is skipped — a treatment variable exists, so there is
+nothing to report. On a dataset carrying none of them it runs and reports. With no template left
+in the rule, remove its `wildcards` block as well — a bound on a token no name uses is a load error
+(above).
+
+> ⚠ **Naming the first instance instead (`TRT01P` for `TRTxxP`) is exact only where the IG
+> guarantees the family starts at `01` / `1` in that dataset class** — ADSL. A BDS dataset copies
+> ADSL variables **selectively**, so a period-2 dataset may carry `TRT02P` or `TR02PG1` without
+> the first member, and the first-instance form would report it falsely.
+
+### When a positive template is enough
+
+A rule that really tests one member **per index** keeps its template and needs a **positive**
+presence test beside the negated one:
 
 ```yaml
 Check:
@@ -69,28 +102,16 @@ Check:
 With no `TRTxxAN` the condition is false anyway, so the skip loses nothing; with `TRT01AN` present
 the rule runs for `xx = 01` and asks about `TRT01A`. The positive test is the rule's **anchor**.
 
-It is fatal when **every** presence template is negated. `not var_exists("TRTxxP")` is true exactly
-when no `TRTxxP` exists — the one dataset the engine skips — and false whenever one does. Such a
-rule can never report anything.
-
-When the question really is *"is any member of the family present?"*, name the family's **first
-instance** instead of the template. ADaM numbers `xx` from `01` and `y` from `1`, so a dataset
-carrying any member carries the first:
-
-| instead of | write |
-|---|---|
-| `not var_exists("TRTxxP")` | `not var_exists("TRT01P")` |
-| `not var_exists("TRTPGy")` | `not var_exists("TRTPG1")` |
-| `not var_exists("TRxxPGy")` | `not var_exists("TR01PG1")` |
-
-With no template left, remove the rule's `wildcards` block as well — a bound on a token no name
-uses is a load error (above).
-
 > ⛔ **`WildcardUniversalAbsenceLintTest` fails the corpus build** on any rule whose presence
-> templates are all negated — through `not`, `var_not_exists` and `not (… or …)` alike. It is the
-> reason this is a rule and not advice: `CDISC-AD0581`, which tests fourteen treatment variables
-> for absence, spelled eight of them as templates and was skipped on exactly the datasets it
-> exists to report.
+> templates are **all** negated — through `not`, `var_not_exists` and `not (… or …)` alike.
+> `CDISC-AD0581`, which tests fourteen treatment variables for absence, spelled eight of them as
+> templates and was skipped on exactly the datasets it exists to report.
+>
+> ⚠ **That is all it checks.** One positive presence template clears a rule, and two shapes still
+> lose findings past it: a marker bound **only** by a negated template while another marker has
+> the positive anchor, and a positive anchor under `or` beside a branch with no template
+> (`var_exists("TRTxxP") or X == "Y"` is skipped on zero matches, and the `X` branch with it).
+> Review those by hand.
 
 ## Pairing templates: `wildcardExclude` and `wildcardPairCatalogue`
 
