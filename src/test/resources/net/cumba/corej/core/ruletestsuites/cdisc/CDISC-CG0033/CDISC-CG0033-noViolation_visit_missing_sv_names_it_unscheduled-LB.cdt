@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-CG0033 expect=noViolation domain=LB
+#note "The mirror of -noViolation_sv_visit_missing_unscheduled: the primary's VISIT is a GENUINE missing (a bare `.`, MissingValue.MIS) while the matched SV row's VISIT names the visit 'UNSCHEDULED 1'. Authority (rules-src/docs/CDISC/CDISC-CG0033.yaml, SDTMIG 4.4.5): only PLANNED visits must take their VISITNUM from TV, and a visit named unscheduled is not planned, so the rule is silent. Under register D36 upper(VISIT) of the missing is that missing and contains over it answers false (D13 / R2-20), so contains(upper(SV.VISIT), \"UNSCHEDUL\") decides -- the per-name spelling reads whichever name exists. SDTMIG 3-3 on purpose: SVPRESP does not exist before 3.4, so tier 2 is the deciding branch."
+#library standard=sdtmig version=3-3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 99 | .
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 | UNSCHEDULED 1 |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

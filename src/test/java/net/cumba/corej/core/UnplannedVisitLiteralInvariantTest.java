@@ -71,8 +71,9 @@ class UnplannedVisitLiteralInvariantTest
      *
      * <p>
      * ⭐ <b>Re-spelled per name on 2026-09-28</b> ({@code PLAN-case-fold-missing-d36}): the joined
-     * spelling is the bare call <em>plus</em> {@code contains(upper(SV.VISIT), …)}, one for one,
-     * never {@code contains(upper(concat(VISIT, " ", SV.VISIT)), …)}. Under register D36 a missing
+     * spelling is the bare call <em>plus</em> {@code contains(upper(SV.VISIT), …)} as the adjacent
+     * conjunct ({@link #PAIR_UNSCHEDUL}), never
+     * {@code contains(upper(concat(VISIT, " ", SV.VISIT)), …)}. Under register D36 a missing
      * operand makes {@code concat} <b>missing</b> (identity kept, D86a), so the {@code concat}
      * spelling found no marker whenever either name was a genuine missing and reported the visit as
      * planned; {@code contains} over a missing name answers false (D13 / R2-20), so the per-name
@@ -91,6 +92,22 @@ class UnplannedVisitLiteralInvariantTest
 
     /** @see #CANON_UNSCHEDUL_JOINED */
     private static final String CANON_UNPLAN_JOINED = "contains(upper(SV.VISIT), \"UNPLAN\")";
+
+    /**
+     * ⭐ The <b>canonical joined unit</b>: the bare test and its {@code SV.VISIT} twin as ADJACENT
+     * conjuncts, in that order — {@code not contains(upper(VISIT), "<LIT>") and not
+     * contains(upper(SV.VISIT), "<LIT>")}. Matched against the stored expression as YAML reads it:
+     * the authored {@code >-} block is folded to ONE line with single spaces, so the unit is a
+     * plain substring. A joined carrier must spell every bare test of a literal inside this unit
+     * (unit count == bare count == {@code SV.VISIT} count, per literal) — see the pairing check for
+     * what that does and does not guarantee.
+     */
+    private static final String PAIR_UNSCHEDUL = "not " + CANON_UNSCHEDUL + " and not "
+            + CANON_UNSCHEDUL_JOINED;
+
+    /** @see #PAIR_UNSCHEDUL */
+    private static final String PAIR_UNPLAN = "not " + CANON_UNPLAN + " and not "
+            + CANON_UNPLAN_JOINED;
 
     /**
      * ⛔ Non-vacuity pin for the joined spelling — an EXACT count, asserted with
@@ -175,25 +192,36 @@ class UnplannedVisitLiteralInvariantTest
                 {
                     joined.add(p.toString());
                 }
-                // ⛔⛔ THE SV.VISIT TEST TRAVELS ONE-FOR-ONE WITH ITS BARE TWIN (review
-                // 2026-09-22, F2, re-shaped 2026-09-28). The joined spelling IS the bare call plus
-                // the SV.VISIT call, so a joined carrier necessarily carries both; what it must
-                // not do is carry them in different NUMBERS — a tier with the bare call and no
-                // SV.VISIT call reads the visit name from the primary only, which is the defect
-                // the joined form exists to fix. Before F2 the checks below were per-FILE
-                // existence tests, so a file could carry the fallback in one tier and lose it in
-                // another and be clean on every assertion: reverting only CDISC-CG0033's tier 2 —
-                // the branch that decides on SDTMIG 3.2/3.3, where SVPRESP does not exist —
-                // reddened nothing here; only one .cdt caught it. A per-corpus floor cannot see a
-                // per-file inconsistency; a per-literal count can.
-                if (hasJoined && (countOf(e, CANON_UNSCHEDUL_JOINED) != countOf(e, CANON_UNSCHEDUL)
-                        || countOf(e, CANON_UNPLAN_JOINED) != countOf(e, CANON_UNPLAN)))
+                // ⛔⛔ THE SV.VISIT TEST TRAVELS WITH ITS BARE TWIN AS ONE ADJACENT UNIT (review
+                // 2026-09-22, F2; re-shaped 2026-09-28 twice — per-literal counts, then the
+                // adjacent pair unit). A tier with the bare call and no SV.VISIT call reads the
+                // visit name from the primary only, which is the defect the joined form exists to
+                // fix. History of what each shape could NOT see:
+                // * per-FILE existence (before F2): reverting only CDISC-CG0033's tier 2 — the
+                // branch that decides on SDTMIG 3.2/3.3, where SVPRESP does not exist —
+                // reddened nothing here; only one .cdt caught it;
+                // * per-literal COUNT equality (bare count == SV.VISIT count per file): blind to
+                // a TIER SWAP — moving tier B's bare conjuncts into tier A keeps both counts
+                // equal while tier B loses its bare test and tier A tests the primary twice
+                // (review round 1 of PLAN-case-fold-missing-d36, T-M2).
+                // Now every bare test must sit in the adjacent unit PAIR_* (unit count == bare
+                // count == SV.VISIT count, per literal), so a conjunct moved away from its twin
+                // breaks a unit and reds. ⚠ What this still does NOT prove: that each TIER
+                // carries a unit. Moving a WHOLE unit from one tier to another keeps every unit
+                // intact — the lint reads a flat string and does not parse the or-tiers — so that
+                // edit is caught only by the per-tier .cdt scenarios (CDISC-CG0033's tier-A and
+                // tier-B unscheduled-name scenarios), never here.
+                if (hasJoined && (countOf(e, PAIR_UNSCHEDUL) != countOf(e, CANON_UNSCHEDUL)
+                        || countOf(e, PAIR_UNSCHEDUL) != countOf(e, CANON_UNSCHEDUL_JOINED)
+                        || countOf(e, PAIR_UNPLAN) != countOf(e, CANON_UNPLAN)
+                        || countOf(e, PAIR_UNPLAN) != countOf(e, CANON_UNPLAN_JOINED)))
                 {
-                    offences.add(p + ": the SV.VISIT name tests do not pair one-for-one with the"
-                            + " bare VISIT tests. A rule reaching SV through a join owes BOTH calls"
-                            + " in every tier (guidelines 5.6); a tier carrying only the bare call"
-                            + " reads the visit name from the primary only, which is the defect"
-                            + " the joined form exists to fix.");
+                    offences.add(p + ": a bare VISIT name test and its SV.VISIT twin are not"
+                            + " spelled as one adjacent unit '" + PAIR_UNSCHEDUL + "' / '"
+                            + PAIR_UNPLAN + "' every time. A rule reaching SV through a join owes"
+                            + " BOTH calls, side by side, in every tier (guidelines 5.6); a bare"
+                            + " call without its adjacent twin reads the visit name from the"
+                            + " primary only, which is the defect the joined form exists to fix.");
                 }
                 if (!hasJoined && !hasBare)
                 {
@@ -202,8 +230,9 @@ class UnplannedVisitLiteralInvariantTest
                 if (hasJoined
                         && countOf(e, CANON_UNSCHEDUL_JOINED) != countOf(e, CANON_UNPLAN_JOINED))
                 {
-                    offences.add(p + ": the joined UNSCHEDUL and UNPLAN calls are not paired"
-                            + " one-for-one — the two literals travel together in every tier");
+                    offences.add(p + ": the joined UNSCHEDUL and UNPLAN calls differ in number"
+                            + " — the two literals travel together (a per-file count; the tiers"
+                            + " themselves are the .cdt scenarios' to check)");
                 }
                 if (residue.contains("UNSCHEDUL") || residue.contains("\"UNPLAN\""))
                 {
@@ -225,8 +254,9 @@ class UnplannedVisitLiteralInvariantTest
                 "every copy of the unplanned-visit name test must be byte-identical to '"
                         + CANON_UNSCHEDUL + "' / '" + CANON_UNPLAN + "' — or, for a rule whose"
                         + " primary is not SV, to that PLUS '" + CANON_UNSCHEDUL_JOINED + "' / '"
-                        + CANON_UNPLAN_JOINED + "' one-for-one (D3 + Q-C + the 2026-09-22 joined"
-                        + " variant, re-spelled per name 2026-09-28 under D36)");
+                        + CANON_UNPLAN_JOINED + "' as the adjacent unit '" + PAIR_UNSCHEDUL
+                        + "' (D3 + Q-C + the 2026-09-22 joined variant, re-spelled per name"
+                        + " 2026-09-28 under D36)");
         // ⛔ The joined branch's own non-vacuity floor. Without it, a typo in
         // CANON_*_JOINED makes the branch match nothing: `joined` stays empty, the residue test
         // stops seeing those calls as canonical and reds — but if the rule ALSO reverted, both

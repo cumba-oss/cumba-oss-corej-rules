@@ -323,8 +323,6 @@ Check:
   expression: 'concat(DOMAIN, "SEQ") == varname()'
 ```
 
-**Missing and empty** — A missing or empty operand contributes `""`, so the result is the other operands joined.
-
 
 ### contains
 
