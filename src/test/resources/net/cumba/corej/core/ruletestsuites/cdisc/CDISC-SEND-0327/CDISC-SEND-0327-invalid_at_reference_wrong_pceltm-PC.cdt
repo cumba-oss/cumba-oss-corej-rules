@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0327 expect=violation domain=PC
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej SendPcProfileRulesProbeTest.send0327_firesOnPreDoseOrAtReferenceWithWrongPceltm. Row 1 is pre-dose at PT0H, row 2 pre-dose at -PT1H, row 3 collected AT the reference point (PCDTC == PCRFTDTC) with PT2H, row 4 post-dose, row 5 date-only, row 6 has an empty PCRFTDTC -> rows 2 and 3 fire: the at-reference boundary is inside the rule (<=), and the empty-reference row is excluded."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=S1
+#expectViolationAt row=3 USUBJID=S1
+dataset PC label="Pharmacokinetic Concentrations"
+col USUBJID  type=Char
+col PCDTC    type=Char
+col PCRFTDTC type=Char
+col PCELTM   type=Char
+---
+S1 | 2023-01-15T08:00 | 2023-01-15T09:00 | PT0H
+S1 | 2023-01-15T08:00 | 2023-01-15T09:00 | -PT1H
+S1 | 2023-01-15T09:00 | 2023-01-15T09:00 | PT2H
+S1 | 2023-01-15T10:00 | 2023-01-15T09:00 | PT1H
+S1 | 2023-01-15       | 2023-01-15       | PT2H
+S1 | 2023-01-15T08:00 |                  | PT2H

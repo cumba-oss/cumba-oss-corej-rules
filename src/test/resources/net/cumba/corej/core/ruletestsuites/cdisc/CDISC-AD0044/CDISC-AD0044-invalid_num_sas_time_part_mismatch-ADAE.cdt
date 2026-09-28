@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-AD0044 expect=violation domain=ADAE
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej CdiscAd0044And0045IntegrationTest.cdiscAd0044_mismatchedTimePart_oneViolation. Numeric SAS values, the ADaM shape: ASTDTM 86400.5 is day 1 at 00:00:00.5, ASTTM 0.6 is 00:00:00.6 -> the time part differs -> violation."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASTDTM  type=Num format=DATETIME20.
+col ASTTM   type=Num format=TIME8.
+---
+CDISCPILOT01 | 01-701-1015 | 86400.5 | 0.6

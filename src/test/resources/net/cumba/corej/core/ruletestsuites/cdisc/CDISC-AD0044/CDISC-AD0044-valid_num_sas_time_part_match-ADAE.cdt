@@ -1,0 +1,10 @@
+#!RuleTest
+#test CDISC-AD0044 expect=noViolation domain=ADAE
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej CdiscAd0044And0045IntegrationTest.cdiscAd0044_matchingTimePart_noViolation. Numeric SAS values, the ADaM shape: ASTDTM 86400.5 is day 1 at 00:00:00.5, ASTTM 0.5 is 00:00:00.5 -> the time part matches -> no violation. The invalid sibling differs only in ASTTM."
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASTDTM  type=Num format=DATETIME20.
+col ASTTM   type=Num format=TIME8.
+---
+CDISCPILOT01 | 01-701-1015 | 86400.5 | 0.5

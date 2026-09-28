@@ -23,7 +23,7 @@ both engine twins, the engine tests that only asserted a rule's verdict went wit
 them, and the engine's mechanism tests now carry hand-written inline rules that are
 not copies of corpus rules. The generator that rebuilt the copy,
 `scripts/build-core-fixtures.py` (stage 1 of `scripts/regen-rules-corpus.sh`), was
-deleted from this repo in the same plan. A rule's verdict is now proven only here,
+deleted from `cumba-corej-rules` in the same plan. A rule's verdict is now proven only here,
 by its `.cdt` scenarios. ⚑ Until the retirement a drift showed up only as an engine
 test pinning a rule this corpus no longer contained — it happened twice
 (2026-09-23, 2026-09-25) with nothing red.
