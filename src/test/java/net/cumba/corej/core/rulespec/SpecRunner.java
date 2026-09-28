@@ -28,8 +28,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * End-to-end rulespec executor for the Java engine: loads a spec YAML, runs the rule / check
- * against its fixture datasets, and asserts the three channels (violations, status, errors) against
- * the spec's Java-canonical expectations.
+ * against its fixture datasets, and asserts the four channels (violations, status, status message,
+ * errors) against the spec's Java-canonical expectations — the status message only where a spec
+ * declares one (see {@link SpecResult}).
  *
  * <p>
  * Only {@link Mode#ASSERT} is implemented; {@link #run(Path, Mode)} rejects any other mode.
