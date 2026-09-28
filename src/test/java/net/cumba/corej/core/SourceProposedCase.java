@@ -151,8 +151,10 @@ public enum SourceProposedCase
     // "could not be read directly" because the CDISC Library cache's genetox RULES endpoint is
     // empty -- but that is the wrong endpoint. The IG METADATA one,
     // api_mdr_sendig_genetox-1-0%3Fexpand%3Dtrue.json.gz -> GV -> datasetVariables -> GVMETHOD,
-    // carries "core": "Req" (role Record Qualifier, ordinal 25) under CDISC_API_CACHE, the cache
-    // CrossStandardCollapseCorpusTest already reads for exactly this field. Ruling I's test --
+    // carries "core": "Req" (role Record Qualifier, ordinal 25) — read on 2026-09-19 from the
+    // then-current CDISC Library API cache; CrossStandardCollapseCorpusTest pins exactly this field
+    // as a hard-coded set transcribed from that cache on 2026-08-11 and reads nothing. Ruling I's
+    // test --
     // every
     // variable the rule names is Core = Required -- therefore PASSES, and SEND12 IS published for
     // SENDIG-GENETOX v1.0 (workbook sheet _GENETOXv1.0_DARTv1.2 row 66). CDISC-SEND-9430 is the

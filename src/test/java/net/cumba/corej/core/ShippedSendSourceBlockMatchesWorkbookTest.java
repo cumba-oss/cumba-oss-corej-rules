@@ -207,8 +207,10 @@ class ShippedSendSourceBlockMatchesWorkbookTest
     // for that -- every variable the rule names is Core = Required -- could not be applied, since
     // "the Library cache's genetox rules endpoint is empty". That is the wrong endpoint. The IG
     // METADATA one, api_mdr_sendig_genetox-1-0%3Fexpand%3Dtrue.json.gz -> GV -> datasetVariables ->
-    // GVMETHOD, carries "core": "Req" (role Record Qualifier, ordinal 25); the cache is
-    // CDISC_API_CACHE, which CrossStandardCollapseCorpusTest already reads for this very field. So
+    // GVMETHOD, carries "core": "Req" (role Record Qualifier, ordinal 25) — read on 2026-09-19 from
+    // the then-current CDISC Library API cache; CrossStandardCollapseCorpusTest pins the same field
+    // as a hard-coded set transcribed from that cache on 2026-08-11 and reads nothing at run time.
+    // So
     // ruling I's test passes, SEND12 is published for SENDIG-GENETOX v1.0 (this sheet, row 66,
     // version cell "SENDIG-GENETOX v1.0"), and the rule now carries that row's verbatim six cells
     // as Source plus the own-sheet SEND12 reference -- so it RESOLVES and belongs here no longer.
