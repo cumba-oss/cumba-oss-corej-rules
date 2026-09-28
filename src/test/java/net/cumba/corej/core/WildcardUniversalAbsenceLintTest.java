@@ -38,17 +38,30 @@ import org.junit.jupiter.api.Test;
  * {@code not var_exists("TRTxxP") and not var_exists("TRTxxA")} — is violated exactly when no such
  * column exists, which is exactly the case the engine skips; whenever a column does exist, the
  * negated test is false. Such a rule can never fire (engine gap G4). {@code CDISC-AD0581} had this
- * shape until {@code PLAN-wildcard-universal-absence} (meta repo) rewrote it onto the first
- * instances ({@code TRT01P}, {@code TRTPG1}, …), which ADaMIG's numbering from {@code 01} /
- * {@code 1} makes sound.
+ * shape until {@code PLAN-wildcard-universal-absence} (meta repo) moved its eight templates into
+ * {@code Requirements.Variables.None}.
  * </p>
  *
  * <p>
- * A positive presence template anchors the expansion
- * ({@code var_exists("TRTxxAN") and not var_exists("TRTxxA")}): with no match the conjunction is
- * false anyway, so the skip loses no finding. The fix for a flagged rule is therefore either a
- * positive anchor or the first instance of each template. The rule-guide page
+ * <b>The fix.</b> A negated presence template asks <i>"is no member of the family present?"</i>,
+ * and {@code Requirements.Variables.None} answers exactly that: a template entry there skips the
+ * rule when ANY member is present (at-least-one-column matching), and lets it run when none is. So
+ * the exact rewrite moves the negated templates into {@code None} and drops them from the Check.
+ * Naming the family's first instance ({@code TRT01P} for {@code TRTxxP}) is exact only where the IG
+ * guarantees the family is contiguous from {@code 01} / {@code 1} in that dataset class — ADSL. A
+ * BDS dataset copies ADSL variables selectively, so a period-2 dataset may carry {@code TRT02P}
+ * without {@code TRT01P}, and the first-instance form would report it falsely. The rule-guide page
  * {@code authoring/wildcards.md} states the authoring rule this lint enforces.
+ * </p>
+ *
+ * <p>
+ * <b>What this lint does NOT check.</b> It flags one shape: every presence template of the rule
+ * negated. A single positive presence template clears the rule, and that is weaker than "the
+ * zero-match skip loses nothing". Two cases pass it and can still lose a finding: a marker bound
+ * <i>only</i> by a negated template while another marker has a positive anchor, and a positive
+ * anchor under {@code or} beside a non-template sibling ({@code var_exists("TRTxxP") or X == "Y"}
+ * skips on zero matches, and with it the {@code X} branch). Neither is detected here (review round
+ * 1 of {@code PLAN-wildcard-universal-absence}; the corpus was not censused for them).
  * </p>
  *
  * <h2>Detection, on the parsed Check</h2>
@@ -161,8 +174,12 @@ class WildcardUniversalAbsenceLintTest
                 + " rule(s) test every presence template only in negated form. The engine expands"
                 + " a template once per matching column and SKIPS the rule when none matches —"
                 + " exactly the case a negated presence test is written to catch — so such a rule"
-                + " can never fire (engine gap G4). Name the first instance (TRT01P for TRTxxP,"
-                + " TRTPG1 for TRTPGy), or add a positive anchor"
+                + " can never fire (engine gap G4). Fix: move the negated templates into"
+                + " Requirements.Variables.None (it skips the rule when ANY member is present) and"
+                + " drop them from the Check. Name the first instance (TRT01P for TRTxxP) only"
+                + " where the IG guarantees the family starts at 01/1 in that dataset class (ADSL;"
+                + " not BDS, which copies variables selectively). If the rule really tests a member"
+                + " per index, add the positive anchor it has"
                 + " (var_exists(\"TRTxxAN\") and not var_exists(\"TRTxxA\")). See the rule-guide"
                 + " page authoring/wildcards.md.\n  " + String.join("\n  ", lines));
         assertEquals(EXPECTED_PRESENCE_TEMPLATE_RULES, census.templateRules.size(),
