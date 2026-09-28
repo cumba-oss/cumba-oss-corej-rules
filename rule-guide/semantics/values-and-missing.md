@@ -146,7 +146,15 @@ Pass one to a function and you do not get a default — you get a missing value 
 ```
 len(<missing>)      →  missing, not 0
 upper(<missing>)    →  missing
+upper(.A)           →  .A          (the SAME missing — identity kept)
+concat(.A, "x")     →  .A          (one missing operand poisons the result)
+concat(.A, .B)      →  .           (two different identities collapse to the plain missing)
 ```
+
+The string functions — `upper` / `lower`, `trim`, `normalize_space`, `prefix` / `suffix`, `substring`,
+`concat` — hand a missing input's **own** missing value through (rulings register `D36`, identity per
+`D85c` / `D86a`). Only a computed no-result, such as `substring` with a start past the end, is the plain
+missing.
 
 It matches **no** regular expression, including one that matches the empty string. It equals no
 string literal, including `""`, including inside a membership list.

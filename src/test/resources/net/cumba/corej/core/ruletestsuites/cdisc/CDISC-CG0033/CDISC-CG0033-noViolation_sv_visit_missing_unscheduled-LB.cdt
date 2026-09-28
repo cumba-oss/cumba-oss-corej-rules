@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-CG0033 expect=noViolation domain=LB
+#note "SV.VISIT is a GENUINE missing (a bare `.`, MissingValue.MIS) while the primary's VISIT names the visit 'UNSCHEDULED 1' -- the case the .cdt char-missing contract (§1b) anticipated. Authority: SDTMIG CG0033 tests VISITNUM against TV only for a PLANNED visit, and a visit named unscheduled is not planned, so the rule is silent. Under register D36 a missing operand makes concat(VISIT, \" \", SV.VISIT) MISSING (identity kept, D86a), so the former spelling upper(concat(...)) found no marker, judged the visit planned, and reported it -- a false positive from a missing name. The name test is therefore spelled per name: contains(upper(VISIT), ...) decides here, and contains over the missing SV.VISIT answers false (D13 / R2-20). SDTMIG 3-3 on purpose: SVPRESP does not exist before 3.4, so tier 2 is the deciding branch. ⚠ This file is the sensitivity arm's target -- restore the concat spelling and it MUST red."
+#library standard=sdtmig version=3-3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 99 | UNSCHEDULED 1
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVUPDES  type=Char label="Description of Unplanned Visit"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 99 | . |
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | TV | 1 | SCREENING
+CDISCPILOT01 | TV | 2 | BASELINE
+---

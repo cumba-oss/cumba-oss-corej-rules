@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0033 expect=noViolation domain=LB
-#note "The MIRROR of -noViolation_sv_names_it_unscheduled: LB carries VISIT = 'UNSCHEDULED 1' and SV carries NO VISIT column. This direction already worked before PLAN-unplanned-visit-name-fallback -- the name test read the primary -- and is pinned here so the concat cannot be 'simplified' to SV.VISIT alone, which would break it silently. concat(VISIT, \" \", SV.VISIT) yields 'UNSCHEDULED 1 ' and the marker is found. ⛔ Do not merge this with its mirror: they exercise opposite operands of the concat, and expect=noViolation is blind to WHICH one supplied the name."
+#note "The MIRROR of -noViolation_sv_names_it_unscheduled: LB carries VISIT = 'UNSCHEDULED 1' and SV carries NO VISIT column. This direction already worked before PLAN-unplanned-visit-name-fallback -- the name test read the primary -- and is pinned here so the per-name test cannot be 'simplified' to SV.VISIT alone, which would break it silently. contains(upper(VISIT), \"UNSCHEDUL\") finds the marker in the primary's own name. ⛔ Do not merge this with its mirror: they exercise opposite names of the pair, and expect=noViolation is blind to WHICH one supplied the name."
 #library standard=sdtmig version=3-3
 dataset LB class=FINDINGS label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"

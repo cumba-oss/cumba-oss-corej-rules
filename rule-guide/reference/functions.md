@@ -299,7 +299,7 @@ Check:
 
 `concat(a, b[, c])` → **value**
 
-Joins two or three values into one string; a missing operand contributes `""`
+Joins two or three values into one string; a missing operand makes the result missing
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -313,6 +313,8 @@ Joins two or three values into one string; a missing operand contributes `""`
 Check:
   expression: 'concat(STUDYID, "-", USUBJID) != SUBJID'
 ```
+
+**Missing and empty** — A missing operand makes the result **that missing value** (rulings register `D36`: one missing part poisons the result). The identity is kept — `.A` in gives `.A` out — and when the operands carry two or more distinct missing identities the result is the plain `MIS` (`D86a`). A present `""` contributes nothing, and so does an absent character column (it reads as `""`).
 
 **Minimal — required parameters only**
 
@@ -547,12 +549,7 @@ The value lower-cased. Also spelled `lowcase`.
 expression: 'lower(SEX) == "m"'
 ```
 
-**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
-
-⚠ **This scalar behaviour contradicts rulings register `D36`**, which the owner confirmed on 2026-09-28
-(*"D36 stands"*): missing propagates through the string functions, so `upper` / `lower` of a missing
-value is to return **missing**, not `""`. `PLAN-case-fold-missing-d36` makes it do so; until then the
-statement above describes the engine as it is, not as ruled.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result), returns a **new list** with every element lower-cased, in order; a **missing
@@ -601,6 +598,8 @@ Trims the value and collapses each run of internal whitespace to a single space
 expression: 'upper(normalize_space(var_label("DATA"))) not in library_variable_label_values'
 ```
 
+**Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` is a present value and yields `""` (it used to yield missing).
+
 ### prefix
 
 `prefix(x, n)` → **value**
@@ -618,7 +617,7 @@ The first `n` characters; a shorter value is returned whole
 expression: 'prefix(TSVCDREF, 5) == "CDISC"'
 ```
 
-**Missing and empty** — A missing input folds to `""` first, so the result is `""`. A value shorter than `n` is returned whole.
+**Missing and empty** — A missing `x` yields **that missing value**, identity kept (rulings register `D36`); a missing `n` makes the result missing too (the identities of `x` and `n` combine per `D86a`: one distinct identity ⇒ that identity, two ⇒ `MIS`). `""` yields `""`. A value shorter than `n` — or a non-positive or non-integral `n` — returns the value whole.
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
 
@@ -713,7 +712,7 @@ Check:
   expression: 'empty(substring(AETERM, 2))'
 ```
 
-**Missing and empty** — A missing input yields missing. `""` is evaluated literally against the bounds rather than being suppressed beforehand.
+**Missing and empty** — A missing `x`, `start` or `length` yields **that operand's missing value**, identity kept (rulings register `D36`; two or more distinct identities collapse to `MIS`, `D86a`). `""` is evaluated literally against the bounds rather than being suppressed beforehand — `substring("", 1)` is a start past the end of a length-0 string, so it is the computed missing `MIS`.
 
 ⛔ **Type error on character bounds.** `start` and `length` must be numeric; a character column raises a rule ERROR. Convert with `num(...)`.
 
@@ -735,7 +734,7 @@ The last `n` characters; a shorter value is returned whole
 expression: 'suffix(QNAM, 1) =~ /^[A-Z0-9]$/'
 ```
 
-**Missing and empty** — A missing input folds to `""` first, so the result is `""`. A value shorter than `n` is returned whole.
+**Missing and empty** — As [`prefix`](#prefix): a missing `x` or `n` yields that missing value, identity kept (rulings register `D36` / `D86a`); `""` yields `""`; a value shorter than `n` — or a non-positive or non-integral `n` — returns the value whole.
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
 
@@ -786,7 +785,7 @@ The value with leading and trailing whitespace removed
 expression: 'trim(QVAL) != QVAL'
 ```
 
-**Missing and empty** — A missing input yields `""`, not missing.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` yields `""`.
 
 ### upper
 
@@ -804,12 +803,7 @@ The value upper-cased. Also spelled `upcase`.
 expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 ```
 
-**Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing. (The list form differs: see below.)
-
-⚠ **This scalar behaviour contradicts rulings register `D36`**, which the owner confirmed on 2026-09-28
-(*"D36 stands"*): missing propagates through the string functions, so `upper` / `lower` of a missing
-value is to return **missing**, not `""`. `PLAN-case-fold-missing-d36` makes it do so; until then the
-statement above describes the engine as it is, not as ruled.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result), returns a **new list** with every element upper-cased, in order; a **missing

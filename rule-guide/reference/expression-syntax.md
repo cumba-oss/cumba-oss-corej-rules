@@ -428,7 +428,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 | function | returns | what it does |
 |---|---|---|
-| [`concat(a, b[, c])`](functions.md#concat) | value | Joins two or three values into one string; a missing operand contributes `""` |
+| [`concat(a, b[, c])`](functions.md#concat) | value | Joins two or three values into one string; a missing operand makes the result that missing (`D36`) |
 | [`contains(x, needle)`](functions.md#contains) | boolean | True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated spelling `does_not_contain(x, needle)` exists; prefer `not contains(x, needle)`. |
 | [`count(x)`](functions.md#count) | value | Number of elements in a list-valued operand — 1 for a present scalar, 0 for missing or `""`. Also spelled `size`. |
 | [`does_not_equal_string_part(name, value, regex=)`](functions.md#does_not_equal_string_part) | boolean | True when `value` differs from capture-group 1 of `regex=` applied to `name` |
