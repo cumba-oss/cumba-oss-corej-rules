@@ -905,18 +905,22 @@ machine-local paths are committed):
 
 | Variable | System property | Purpose | Default |
 |----------|-----------------|---------|---------|
-| `CDISC_API_KEY` | `cdisc.library.api.key` | API key | — (required to enable) |
-| `CDISC_API_CACHE` | `cdisc.library.api.cache` | offline cache dir | `~/.cdiscApiCache` |
-| `CDISC_API_URL` | `cdisc.library.api.url` | API base URL | public CDISC API |
+| `CDISC_METADATA_STORE` | `cdisc.metadata.store` | our unified metadata store (one zip) | the store `MetadataStoreFixture` seeds for the build (`target/metadata-store/store.zip`, from the pickle corpus `CDISC_PICKLE_CACHE_DIR` names) |
+
+No API key is involved: the resolver (`ScenarioLibraryResolver`) builds the provider from the
+store, which is what the product evaluates against. ⚠ Until 2026-09-28 the corpus build set
+neither variable, so both `#library-ref` scenarios skipped on every run
+(`PLAN-cdisc-library-access-cleanup` D1); `ScenarioLibrarySupport` now falls back to the
+fixture store.
 
 **Skip behaviour** — a `#library-ref` scenario is *skipped* (not failed) when:
 
-1. no API key is configured (`CDISC_API_KEY` / `cdisc.library.api.key` unset), or
-2. the Library is configured but the product fetch degrades (offline, bad
-   version, API down), so the rule reports `SKIPPED`/`ERROR`.
+1. no store is configured and the fixture cannot seed one (`CDISC_PICKLE_CACHE_DIR` unset), or
+2. a store is available but the product could not be served (missing product or CT package,
+   unreadable store), so the rule reports `SKIPPED`/`ERROR`. ⚠ A store of another FORMAT
+   version fails the scenario instead of skipping it.
 
-This keeps credential-less CI green; `#library-ref` scenarios are a development
-tool and are **not** part of automated regression. Any CT-dependent scenario
+In CI, which seeds the fixture store, both scenarios therefore RUN. Any CT-dependent scenario
 must pin a specific `ct=` package id for reproducibility.
 
 Round-trips: writing a `#library-ref` scenario back out
