@@ -31,6 +31,7 @@ import net.cumba.corej.core.expr.typed.StageBChecker;
 import net.cumba.corej.core.expr.typed.TypeExpectations;
 import net.cumba.corej.core.gen.WildcardExpander;
 import net.cumba.corej.core.metadata.AdamDataStructureDetector;
+import net.cumba.corej.core.metadata.AdamStructureClassification;
 import net.cumba.corej.core.metadata.MetadataLibraryProvider;
 import net.cumba.corej.core.metadata.store.MetadataStore;
 import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
@@ -38,7 +39,11 @@ import net.cumba.corej.core.metadata.store.StoredDataStructure;
 import net.cumba.corej.core.metadata.store.StoredProduct;
 import net.cumba.corej.core.metadata.store.StoredVariable;
 import net.cumba.corej.core.metadata.store.StoredVariableSet;
+import net.cumba.corej.core.model.CheckCondition;
+import net.cumba.corej.core.model.CheckConditionAll;
+import net.cumba.corej.core.model.CheckConditionAny;
 import net.cumba.corej.core.model.CheckConditionExpression;
+import net.cumba.corej.core.model.CheckConditionNot;
 import net.cumba.corej.core.model.MatchDataset;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
@@ -75,30 +80,43 @@ import org.junit.jupiter.api.Test;
  * ({@link MetadataStoreFixture}), never the pickle index: SDTM/SEND datasets through
  * {@code StoreMetadataProviderFactory.forSdtm(…).getDomainVariables} with the engine's own dataset
  * class ({@link MetadataLibraryProvider#getDatasetClass(String)}); ADaM data structures read off
- * the {@link StoredProduct} records (the provider serves only the Req core for ADaM, plan §2.5).
- * ADaM {@code class} strings are canonicalised exactly as the engine does
- * ({@code MetadataLibraryProvider.ADAM_CLASS_ALIASES} / {@code STRUCTURE_CLASS_OVERRIDES}, which
- * are package-private — copied, not widened, because the plan allows no engine API change).
+ * the {@link StoredProduct} records (the provider serves only the Req core for ADaM, plan §2.5),
+ * each classified by the ENGINE — structure token and subclass through
+ * {@link AdamStructureClassification}, which calls {@code MetadataLibraryProvider}'s own
+ * (package-private / private) mapping rather than copying its alias and override maps.
  *
  * <p>
- * An ADaM rule's scope is matched against its primary product's structures plus the ADaM supplement
- * products ({@code adam-occds}, {@code adam-adae}, {@code adam-md}, …), which publish the OCCDS and
- * device structures the IG products do not. ADaM joins to SDTM ({@code DM}, {@code AE}) resolve
- * against the union of every SDTMIG product in the store (S5).
+ * An ADaM rule's scope is matched against its primary IG product's structures and, for a structure
+ * token that IG product publishes <b>no</b> structure for, the ADaM supplement products' structures
+ * of that token ({@code adam-occds}/{@code adam-adae} for OCCDS on an IG that has none, the
+ * {@code adam-md} device tokens). A supplement structure of a token the IG does publish
+ * ({@code adam-poppk}'s and {@code adam-nca}'s BDS, {@code adam-tte}'s {@code BDS for TTE}) is left
+ * out: those carry copied ADSL variables ({@code AGE}, {@code SEX}, {@code TRTxxP} …), and letting
+ * them define a BDS rule's scope would hide exactly the bare {@code AGE} meaning {@code ADSL.AGE}
+ * this lint exists to find. ADaM joins to SDTM ({@code DM}, {@code AE}) resolve against the union
+ * of every SDTMIG product in the store (S5).
  * </p>
  *
- * <h2>Nothing is dropped silently</h2> A (rule, package) whose scope selects no library dataset is
- * named in R-EMPTY; a join target no product defines is counted in R-UNRES; a statically
- * unresolvable wildcard read (an ADaM capture template such as {@code TRTxxP}, or a {@code *} root)
- * is named in R-CAPTURE (S2); a read the {@code Child: true} exclusion takes out is named in
- * R-CHILD; a joined read the rule declares for the primary is named in R-DECLARED. Each is pinned
- * for exact equality, and the reach per family is pinned too (S8) — a census that went blind would
- * still report zero flags.
+ * <h2>Nothing examined is dropped silently</h2> A (rule, package) whose scope selects no library
+ * dataset is named in R-EMPTY; a join target no product defines is counted in R-UNRES; a read no
+ * static census resolves — an ADaM capture template inside an expression such as {@code TRTxxP}, a
+ * {@code *} root, an {@code Output_Variables} template no library dataset publishes, and an
+ * {@code Expansion} token read bare ({@code &VAR}, {@code &DOMSEQ}) — is named in R-CAPTURE (S2); a
+ * read the {@code Child: true} exclusion takes out is named in R-CHILD; a joined read the rule
+ * declares for the primary is named in R-DECLARED. The three rule registers are keyed by (rule,
+ * name) with the number of packages each was seen in, and every one is pinned for exact equality.
+ * So are the reach per family (joined (rule, package) pairs examined) and the CANDIDATES per family
+ * — (rule, package, name) bare reads no scoped dataset defines, counted before any join or
+ * declaration is consulted (S8): a family whose library answered nothing, or whose scope stopped
+ * resolving, moves one of them even when the flags stay at zero. {@code Output_Variables} templates
+ * ({@code APxxSDT}) are judged by LITERAL equality against the template names the library publishes
+ * — the engine reports such an entry only when a column of exactly that name exists, which on the
+ * primary it never does.
  *
  * <p>
  * ⭐ <b>Non-vacuity, twice</b> (S10): the predicate runs over synthetic rules of every exemption and
  * non-exemption on every build, and the live sabotage recorded in the plan's status file (a
- * {@code rules-src} rule edited to a bare joined read) turned this test red before it was armed.
+ * {@code rules-src} rule edited to a bare joined read) turned the armed test red.
  * </p>
  */
 class UnqualifiedJoinedReadLintTest
@@ -106,41 +124,40 @@ class UnqualifiedJoinedReadLintTest
 
     private static final String SUPPQUAL = "SUPPQUAL";
 
-    /**
-     * {@code MetadataLibraryProvider.ADAM_CLASS_ALIASES}: the pre-1.3 ADaM {@code class} spellings.
-     */
-    private static final Map<String, String> ADAM_CLASS_ALIASES = Map.of("ADSL",
-            AdamDataStructureDetector.ADSL, "BDS", AdamDataStructureDetector.BDS, "OCCDS",
-            AdamDataStructureDetector.OCCDS, "ADAE", AdamDataStructureDetector.OCCDS);
-
-    /** {@code MetadataLibraryProvider.STRUCTURE_CLASS_OVERRIDES}: a structure with no class. */
-    private static final Map<String, String> STRUCTURE_CLASS_OVERRIDES = Map
-            .of("standards/adam/adam-tte-1-0\tBDS for TTE", AdamDataStructureDetector.BDS);
-
     // Measured 2026-09-28 at cumba-corej-rules 0f3869f2 (PLAN-unqualified-joined-column-gate
-    // phase 2c). EXACT — see the assertion messages for what may move each one.
+    // phase 2c), re-measured in its review-fix round (lane GF) after CDISC-AD0592's
+    // Output_Variables fix. EXACT — see the assertion messages for what may move each one.
 
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
             "SEND", 142);
 
-    private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.of("adam/adamig-1-0\t&DOM",
-            1, "adam/adamig-1-1\t&DOM", 1, "adam/adamig-1-2\t&DOM", 1, "adam/adamig-1-3\t&DOM", 1,
-            "sendig/dart-1-2\tDM", 2, "sendig/dart-1-2\tDS", 1, "sendig/dart-1-2\tRELREC", 2,
-            "sendig/dart-1-2\tSJ", 3);
+    private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 21,
+            "SEND", 6);
+
+    private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
+            Map.entry("adam/adamig-1-0\t&DOM", 1), Map.entry("adam/adamig-1-1\t&DOM", 1),
+            Map.entry("adam/adamig-1-2\t&DOM", 1), Map.entry("adam/adamig-1-3\t&DOM", 1),
+            Map.entry("sendig/ar-1-0\tRELREC (no variables)", 1),
+            Map.entry("sendig/ar-1-0\tSV (no variables)", 1),
+            Map.entry("sendig/ar-1-0\tTA (no variables)", 1),
+            Map.entry("sendig/ar-1-0\tTE (no variables)", 1), Map.entry("sendig/dart-1-2\tDM", 2),
+            Map.entry("sendig/dart-1-2\tDS", 1), Map.entry("sendig/dart-1-2\tRELREC", 2),
+            Map.entry("sendig/dart-1-2\tSJ", 3));
 
     private static final Set<String> EXPECTED_EMPTY = Set.of(
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
             "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");
 
-    private static final Set<String> EXPECTED_CAPTURES = Set.of("CDISC-AD0592\tAPxxSDT");
+    private static final Map<String, Integer> EXPECTED_CAPTURES = Map.of("CDISC-AD0591\t&VAR", 2,
+            "CDISC-AD0898\t&DOMSEQ", 4);
 
-    private static final Set<String> EXPECTED_CHILD = Set.of("CDISC-CG0043\tAESMIE",
-            "FDA-SD1143\tAESMIE");
+    private static final Map<String, Integer> EXPECTED_CHILD = Map.of("CDISC-CG0043\tAESMIE", 3,
+            "FDA-SD1143\tAESMIE", 4);
 
-    private static final Map<String, String> EXPECTED_DECLARED = Map.of("CDISC-AD0899\tRFSTDTC\tDM",
-            "All", "CDISC-CG0217\tTAETORD\tSE", "All", "CDISC-CG0218\tEPOCH\tSE", "All",
-            "PMDA-AD0258\tAESEQ\tAE", "All_Or_None pair", "PMDA-AD0367\tACTARM\tDM", "All");
+    private static final Map<String, Integer> EXPECTED_DECLARED = Map.of(
+            "CDISC-AD0899\tRFSTDTC\tDM\tAll", 4, "CDISC-CG0217\tTAETORD\tSE\tAll", 3,
+            "CDISC-CG0218\tEPOCH\tSE\tAll", 3, "PMDA-AD0367\tACTARM\tDM\tAll", 1);
 
     /**
      * One library dataset (SDTM/SEND) or data structure (ADaM) a rule's scope may select, or a join
@@ -158,13 +175,24 @@ class UnqualifiedJoinedReadLintTest
      *            ADaM only: the published subclass, if any
      * @param variables
      *            the concrete variable names it defines
+     * @param templateNames
+     *            the ADaM wildcard variable templates it defines, as published ({@code TRTxxP} …)
      * @param templates
-     *            the ADaM wildcard variable templates it defines ({@code TRTxxP} …), compiled
+     *            the same templates, compiled
      */
     record LibraryDataset(String name, @Nullable String datasetClass, List<String> structureTokens,
-            List<String> subclasses, Set<String> variables, List<Pattern> templates)
+            List<String> subclasses, Set<String> variables, Set<String> templateNames,
+            List<Pattern> templates)
     {
 
+        /** The store publishes the dataset but no variable of it. */
+        boolean isEmpty()
+        {
+            return variables.isEmpty() && templates.isEmpty();
+        }
+
+
+        /** A concrete name the dataset defines, or one one of its templates matches. */
         boolean defines(String aVariable)
         {
             if (variables.contains(aVariable))
@@ -182,10 +210,23 @@ class UnqualifiedJoinedReadLintTest
         }
 
 
+        /**
+         * Whether the dataset publishes exactly this name — a concrete variable or, verbatim, a
+         * template ({@code APxxSDT}). How an {@code Output_Variables} template is judged: the
+         * engine reports it only for a column of exactly that name, so a template that merely
+         * MATCHES it ({@code *SDT} matches {@code APxxSDT}) says nothing about it.
+         */
+        boolean publishes(String aName)
+        {
+            return variables.contains(aName) || templateNames.contains(aName);
+        }
+
+
         static LibraryDataset of(String aName, @Nullable String aClass, List<String> aStructures,
                 List<String> aSubclasses, Iterable<String> aNames)
         {
             Set<String> concrete = new TreeSet<>();
+            Set<String> templateNames = new TreeSet<>();
             List<Pattern> templates = new ArrayList<>();
             for (String n : aNames)
             {
@@ -196,10 +237,12 @@ class UnqualifiedJoinedReadLintTest
                 }
                 else
                 {
+                    templateNames.add(n);
                     templates.add(template);
                 }
             }
-            return new LibraryDataset(aName, aClass, aStructures, aSubclasses, concrete, templates);
+            return new LibraryDataset(aName, aClass, aStructures, aSubclasses, concrete,
+                    templateNames, templates);
         }
     }
 
@@ -229,6 +272,13 @@ class UnqualifiedJoinedReadLintTest
         /** family → joined (rule, package) pairs examined against a resolved library. */
         final Map<String, Integer> reach = new TreeMap<>();
 
+        /**
+         * family → CANDIDATES: (rule, package, name) bare reads no scoped dataset defines, counted
+         * before any join, {@code Child} or declaration test — the population the predicate is then
+         * asked about.
+         */
+        final Map<String, Integer> candidates = new TreeMap<>();
+
         /** {@code ruleId \t X \t J} → the packages the flag was raised in. */
         final Map<String, Set<String>> flags = new TreeMap<>();
 
@@ -238,18 +288,21 @@ class UnqualifiedJoinedReadLintTest
         /** R-UNRES: {@code standard \t target} → (rule, package) references. */
         final Map<String, Integer> unresolved = new TreeMap<>();
 
-        /** R-CAPTURE: {@code ruleId \t name} of a statically unresolvable wildcard read. */
-        final Set<String> captures = new TreeSet<>();
+        /**
+         * R-CAPTURE: {@code ruleId \t name} of a read no static census resolves → the packages it
+         * was seen in.
+         */
+        final Map<String, Set<String>> captures = new TreeMap<>();
 
-        /** R-CHILD: {@code ruleId \t X} a {@code Child: true} parent supplies (D2). */
-        final Set<String> childExcluded = new TreeSet<>();
+        /** R-CHILD: {@code ruleId \t X} a {@code Child: true} parent supplies (D2) → packages. */
+        final Map<String, Set<String>> childExcluded = new TreeMap<>();
 
         /**
-         * R-DECLARED: {@code ruleId \t X \t J} a join carries, no scoped dataset defines, and the
-         * rule declares — the exempted half of the population, whose size is what makes a zero flag
-         * count mean something.
+         * R-DECLARED: {@code ruleId \t X \t J \t how} a join carries, no scoped dataset defines,
+         * and the rule declares → packages. The exempted half of the population, whose size is what
+         * makes a zero flag count mean something.
          */
-        final Map<String, String> declared = new TreeMap<>();
+        final Map<String, Set<String>> declared = new TreeMap<>();
 
         /** Rules that carry a load error — examined by nothing, so they must not exist. */
         final Set<String> loadErrors = new TreeSet<>();
@@ -272,7 +325,10 @@ class UnqualifiedJoinedReadLintTest
             {
                 for (MatchDataset md : joins)
                 {
-                    unresolved.merge(aStandard + "\t" + md.getName(), 1, Integer::sum);
+                    if (md != null)
+                    {
+                        unresolved.merge(aStandard + "\t" + md.getName(), 1, Integer::sum);
+                    }
                 }
                 return;
             }
@@ -286,41 +342,36 @@ class UnqualifiedJoinedReadLintTest
             }
             reach.merge(aUniverse.family(), 1, Integer::sum);
             Map<String, LibraryDataset> targets = new LinkedHashMap<>();
-            List<@Nullable LibraryDataset> childParents = new ArrayList<>();
+            boolean childEntry = false;
             for (MatchDataset md : joins)
             {
-                String name = md.getName() == null ? "" : md.getName().toUpperCase(Locale.ROOT);
-                LibraryDataset target = aUniverse.joinTargets().get(name);
-                if (Boolean.TRUE.equals(md.getChild()))
+                if (md == null)
                 {
-                    // A Child parent is resolved per row (RDOMAIN), so an entry whose name is not
-                    // a concrete dataset (SUPP--, a pattern) may supply any column: null here.
-                    childParents.add(target);
                     continue;
                 }
-                if (target == null)
+                if (Boolean.TRUE.equals(md.getChild()))
                 {
-                    unresolved.merge(aUniverse.standard() + "\t" + md.getName(), 1, Integer::sum);
+                    // The engine resolves a Child entry's parent per row from RDOMAIN
+                    // (ChildMatchPreMerger), never from the entry's Name — so whatever the entry
+                    // is called, its parent may supply anything the library defines.
+                    childEntry = true;
+                    continue;
+                }
+                String name = md.getName() == null ? "" : md.getName().toUpperCase(Locale.ROOT);
+                LibraryDataset target = aUniverse.joinTargets().get(name);
+                if (target == null || target.isEmpty())
+                {
+                    // A target the store publishes with NO variables (sendig/ar-1-0's companion
+                    // TA, SV, …) judges nothing, exactly like one it does not publish: counted.
+                    unresolved.merge(aUniverse.standard() + "\t" + md.getName()
+                            + (target == null ? "" : " (no variables)"), 1, Integer::sum);
                     continue;
                 }
                 targets.putIfAbsent(name, target);
             }
-            Set<String> reads = new LinkedHashSet<>();
-            List<Expr> roots = StageBChecker.expressionRoots(aRule);
-            if (roots.isEmpty() && aRule.getCheck() != null)
-            {
-                // A Check with no compiled form — a wildcard template the engine expands per
-                // dataset (S2). Its parsed expression still names every bare read.
-                if (aRule.getCheck() instanceof CheckConditionExpression expression)
-                {
-                    roots = List.of(expression.expr());
-                }
-                else
-                {
-                    captures.add(id + "\t(uncompiled Check)");
-                }
-            }
-            reads.addAll(TypeExpectations.of(roots).valueReadColumns());
+            List<Expr> roots = expressions(aRule);
+            Set<String> reads = new LinkedHashSet<>(TypeExpectations.of(roots).valueReadColumns());
+            Set<String> literal = new TreeSet<>();
             List<String> outputs = aRule.getOutcome() == null ? null
                     : aRule.getOutcome().getOutputVariables();
             for (String output : outputs == null ? List.<String> of() : outputs)
@@ -329,46 +380,71 @@ class UnqualifiedJoinedReadLintTest
                 {
                     reads.add(output);
                 }
+                else if (isExpansionToken(output))
+                {
+                    captures.computeIfAbsent(id + "\t" + output, k -> new TreeSet<>())
+                            .add(aPackage);
+                }
                 else if (isCaptureWildcard(output))
                 {
-                    captures.add(id + "\t" + output);
+                    // An Output_Variables template is reported only when a column of exactly that
+                    // name exists — so it is judged by literal equality against the template
+                    // names the library publishes, and counted when none publishes it.
+                    if (publishedAnywhere(aUniverse, output))
+                    {
+                        reads.add(output);
+                        literal.add(output);
+                    }
+                    else
+                    {
+                        captures.computeIfAbsent(id + "\t" + output, k -> new TreeSet<>())
+                                .add(aPackage);
+                    }
                 }
             }
+            Set<String> captured = new TreeSet<>();
             for (Expr root : roots)
             {
-                collectCaptures(root, id, captures);
+                collectCaptures(root, captured);
             }
+            captured.forEach(c -> captures.computeIfAbsent(id + "\t" + c, k -> new TreeSet<>())
+                    .add(aPackage));
             if (scope.isEmpty())
             {
                 empty.add(aPackage + "\t" + id);
                 return;
             }
-            if (childParents.isEmpty() && targets.isEmpty())
+            List<String> undefined = new ArrayList<>();
+            for (String x : reads)
+            {
+                if (!definedByAny(scope, x, literal.contains(x)))
+                {
+                    undefined.add(x);
+                }
+            }
+            candidates.merge(aUniverse.family(), undefined.size(), Integer::sum);
+            if (!childEntry && targets.isEmpty())
             {
                 return;
             }
             VariableRequirement vars = aRule.effectiveVariableRequirement();
-            for (String x : reads)
+            for (String x : undefined)
             {
-                if (definedByAny(scope, x))
-                {
-                    continue;
-                }
                 String bare = bareDeclaration(vars, x, scope);
-                boolean childSupplies = false;
-                for (LibraryDataset parent : childParents)
-                {
-                    childSupplies |= parent == null ? definedByAny(aUniverse.scopeCandidates(), x)
-                            : parent.defines(x);
-                }
+                boolean exact = literal.contains(x);
+                boolean childSupplies = childEntry
+                        && (definedByAny(aUniverse.scopeCandidates(), x, exact) || definedByAny(
+                                List.copyOf(aUniverse.joinTargets().values()), x, exact));
                 if (childSupplies && bare == null)
                 {
-                    childExcluded.add(id + "\t" + x);
+                    childExcluded.computeIfAbsent(id + "\t" + x, k -> new TreeSet<>())
+                            .add(aPackage);
                     continue;
                 }
                 for (Map.Entry<String, LibraryDataset> target : targets.entrySet())
                 {
-                    if (!target.getValue().defines(x) || childSupplies)
+                    LibraryDataset joined = target.getValue();
+                    if (!(exact ? joined.publishes(x) : joined.defines(x)) || childSupplies)
                     {
                         continue;
                     }
@@ -382,7 +458,8 @@ class UnqualifiedJoinedReadLintTest
                     }
                     else
                     {
-                        declared.put(key, declaration);
+                        declared.computeIfAbsent(key + "\t" + declaration, k -> new TreeSet<>())
+                                .add(aPackage);
                     }
                 }
             }
@@ -393,6 +470,8 @@ class UnqualifiedJoinedReadLintTest
         {
             aOut.println(
                     "[UnqualifiedJoinedReadLint] reach (joined rule x package examined): " + reach);
+            aOut.println("[UnqualifiedJoinedReadLint] candidates (rule x package x bare read no"
+                    + " scoped dataset defines): " + candidates);
             aOut.println("[UnqualifiedJoinedReadLint] FLAGS: " + flags.size());
             flags.forEach((k, v) -> aOut.println("  FLAG\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] R-EMPTY: " + empty.size());
@@ -400,15 +479,59 @@ class UnqualifiedJoinedReadLintTest
             aOut.println("[UnqualifiedJoinedReadLint] R-UNRES: " + unresolved.size());
             unresolved.forEach((k, v) -> aOut.println("  UNRES\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] R-CAPTURE: " + captures.size());
-            captures.forEach(c -> aOut.println("  CAPTURE\t" + c));
+            captures.forEach((k, v) -> aOut.println("  CAPTURE\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] R-DECLARED: " + declared.size());
             declared.forEach((k, v) -> aOut.println("  DECLARED\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] R-CHILD: " + childExcluded.size());
-            childExcluded.forEach(c -> aOut.println("  CHILD\t" + c));
+            childExcluded.forEach((k, v) -> aOut.println("  CHILD\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] load errors: " + loadErrors.size());
             loadErrors.forEach(c -> aOut.println("  LOADERR\t" + c));
         }
+
+
+        /** A register keyed by (rule, name …) → the number of packages each entry was seen in. */
+        static Map<String, Integer> packageCounts(Map<String, Set<String>> aRegister)
+        {
+            Map<String, Integer> counts = new TreeMap<>();
+            aRegister.forEach((k, v) -> counts.put(k, v.size()));
+            return counts;
+        }
     }
+
+    /**
+     * The expressions a rule evaluates: the engine's own roots
+     * ({@link StageBChecker#expressionRoots}) and, for a Check with no compiled form — a template
+     * the engine expands per dataset (S2) — its parsed expression, level by level.
+     */
+    static List<Expr> expressions(Rule aRule)
+    {
+        List<Expr> roots = new ArrayList<>(StageBChecker.expressionRoots(aRule));
+        if (aRule.getCheckExpr() == null && aRule.getCheckLevelExprs() == null)
+        {
+            for (CheckCondition condition : aRule.checkConditions())
+            {
+                collectExpressions(condition, roots);
+            }
+        }
+        return roots;
+    }
+
+
+    private static void collectExpressions(@Nullable CheckCondition aCondition, List<Expr> aOut)
+    {
+        switch (aCondition)
+        {
+        case null ->
+        {
+            // an absent sub-condition names nothing
+        }
+        case CheckConditionExpression e -> aOut.add(e.expr());
+        case CheckConditionAll all -> all.getConditions().forEach(c -> collectExpressions(c, aOut));
+        case CheckConditionAny any -> any.getConditions().forEach(c -> collectExpressions(c, aOut));
+        case CheckConditionNot not -> collectExpressions(not.getCondition(), aOut);
+        }
+    }
+
 
     @Test
     void noRuleReadsABareNameOnlyAJoinCarries() throws IOException
@@ -458,9 +581,11 @@ class UnqualifiedJoinedReadLintTest
         assertTrue(census.flags.isEmpty(), census.flags.size() + " bare read(s) of a column only"
                 + " a joined dataset carries. An unqualified name always means the PRIMARY's"
                 + " column (ruling UVC), so each of these reads the D76 default, never the join —"
-                + " silently. Qualify the read as J.X (authoring rule R-7.7), or, when the primary"
-                + " really is meant, declare X bare in Requirements.Variables All or an Any group"
-                + " (rule-guide authoring/joins.md). ruleId / X / J -> packages:\n  "
+                + " silently. Qualify the read as J.X; or, when the primary really is meant,"
+                + " declare X in Requirements.Variables — bare in All, bare in an Any group, or"
+                + " the pair [X, J.X] in an All_Or_None group (rule guide, authoring/joins.md,"
+                + " \"A bare name only the join carries fails the build\")."
+                + " ruleId / X / J -> packages:\n  "
                 + String.join("\n  ", census.flags.entrySet().stream()
                         .map(e -> e.getKey().replace('\t', ' ') + " " + e.getValue()).toList()));
         // ⛔ The ratchets below are EXACT (S8): a census that stopped seeing a family, a package or
@@ -470,17 +595,53 @@ class UnqualifiedJoinedReadLintTest
                 + " family — a new joined rule moves this (confirm it reads no bare joined column,"
                 + " then move the pin); a family that DROPPED means the library or the corpus went"
                 + " short and the zero above is no longer evidence");
+        assertEquals(EXPECTED_CANDIDATES, census.candidates, "CANDIDATES per family: (rule,"
+                + " package, bare read) no scoped dataset defines, before any join or declaration"
+                + " test. A family whose library answered nothing, or whose scope stopped"
+                + " resolving, moves this even while the flags stay at zero");
         assertEquals(EXPECTED_UNRESOLVED, census.unresolved, "R-UNRES: join targets no store"
                 + " product defines, (standard, target) -> references. None of these joins is"
                 + " examined; a new entry is a join the lint cannot judge — say so in the commit");
         assertEquals(EXPECTED_EMPTY, census.empty, "R-EMPTY: (package, rule) whose scope selects"
                 + " no library dataset, so none of its reads is examined");
-        assertEquals(EXPECTED_CAPTURES, census.captures, "R-CAPTURE: wildcard reads (an ADaM"
-                + " capture template, a * root) no static census resolves (S2)");
-        assertEquals(EXPECTED_CHILD, census.childExcluded, "R-CHILD: bare reads a Child: true"
-                + " parent supplies (D2) — excluded, and counted so they stay SEEN");
-        assertEquals(EXPECTED_DECLARED, census.declared, "R-DECLARED: bare reads a join carries"
-                + " that the rule declares for the primary — the exempted population");
+        assertEquals(EXPECTED_CAPTURES, Census.packageCounts(census.captures), "R-CAPTURE: reads"
+                + " no static census resolves (an ADaM capture template, a * root, an unpublished"
+                + " Output_Variables template, an Expansion token; S2), (rule, name) -> packages");
+        assertEquals(EXPECTED_CHILD, Census.packageCounts(census.childExcluded), "R-CHILD: bare"
+                + " reads a Child: true parent supplies (D2) — excluded, and counted so they stay"
+                + " SEEN; (rule, name) -> packages");
+        assertEquals(EXPECTED_DECLARED, Census.packageCounts(census.declared), "R-DECLARED: bare"
+                + " reads a join carries that the rule declares for the primary — the exempted"
+                + " population; (rule, name, join, how) -> packages");
+    }
+
+
+    @Test
+    void adamStructuresAreClassifiedByTheEngineOverridesIncluded() throws IOException
+    {
+        // The lint reads token and subclass through the engine (AdamStructureClassification), not
+        // a copy of its maps: the two structures whose published record is incomplete must come
+        // back with the engine's override, or a scope over them is judged on the wrong class.
+        Path storeFile = MetadataStoreFixture.storeFile().orElseThrow(
+                () -> new AssertionError("No metadata store: set CDISC_PICKLE_CACHE_DIR"));
+        Map<String, String> seen = new TreeMap<>();
+        try (MetadataStore store = MetadataStore.open(storeFile))
+        {
+            for (String key : List.of("standards/adam/adam-adae-1-0",
+                    "standards/adam/adam-tte-1-0"))
+            {
+                for (StoredDataStructure s : store.product(key).orElseThrow().dataStructures())
+                {
+                    seen.put(key + "\t" + s.name(),
+                            AdamStructureClassification.structureToken(key, s) + " / "
+                                    + AdamStructureClassification.subClass(key, s));
+                }
+            }
+        }
+        assertEquals(Map.of("standards/adam/adam-adae-1-0\tADAE",
+                AdamDataStructureDetector.OCCDS + " / ADVERSE EVENT",
+                "standards/adam/adam-tte-1-0\tBDS for TTE",
+                AdamDataStructureDetector.BDS + " / TIME-TO-EVENT"), seen);
     }
 
     // ------------------------------------------------------------------
@@ -497,6 +658,8 @@ class UnqualifiedJoinedReadLintTest
 
     private static final String READ_RFSTDTC = "RFSTDTC != AESTDTC";
 
+    private static final String READ_AESTDTC_EMPTY = "AESTDTC == \\\"\\\"";
+
     @Test
     void thePredicateFlagsAnUndeclaredBareJoinedReadAndHonoursEveryExemption() throws IOException
     {
@@ -505,7 +668,7 @@ class UnqualifiedJoinedReadLintTest
                 null), "T-POS\tRFSTDTC\tDM");
         // Output_Variables is the same mistake where a user sees it
         assertFlags(rule("T-OV", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
-                "AESTDTC == \\\"\\\"", "[\"AESTDTC\", \"RFSTDTC\"]"), "T-OV\tRFSTDTC\tDM");
+                READ_AESTDTC_EMPTY, "[\"AESTDTC\", \"RFSTDTC\"]"), "T-OV\tRFSTDTC\tDM");
         // None is not a declaration
         assertFlags(rule("T-NONE", "[\"AE\"]", KEYED_DM, USUBJID, null, "[\"RFSTDTC\"]", DM_KEY,
                 READ_RFSTDTC, null), "T-NONE\tRFSTDTC\tDM");
@@ -533,6 +696,51 @@ class UnqualifiedJoinedReadLintTest
         // a scoped dataset that defines the name (the CDISC-CG0031 shape) is no flag
         assertFlags(rule("T-BROAD", "[\"AE\", \"DM\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
                 READ_RFSTDTC, null));
+        // "J defines X": a read defined NOWHERE — not in scope, not by the join — is no flag
+        // (a sponsor variable); only a column the join carries is
+        assertFlags(rule("T-SPONSOR", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
+                "SPONSVAR != AESTDTC", null));
+        // a pair naming a DIFFERENT variable of the same join does not declare RFSTDTC
+        assertFlags(
+                rule("T-PAIR-VAR", "[\"AE\"]", KEYED_DM, USUBJID, null, null,
+                        DM_KEY + ", [\"RFSTDTC\", \"DM.USUBJID\"]", READ_RFSTDTC, null),
+                "T-PAIR-VAR\tRFSTDTC\tDM");
+    }
+
+
+    @Test
+    void aDashDashOrTemplateDeclarationDeclaresExactlyWhatItExpandsTo() throws IOException
+    {
+        // `--STDTC` on AE expands to AESTDTC — not to RFSTDTC, though RFSTDTC ends in STDTC
+        assertFlags(rule("T-DASH", "[\"AE\"]", KEYED_DM, "[\"USUBJID\", \"--STDTC\"]", null, null,
+                DM_KEY, READ_RFSTDTC, null), "T-DASH\tRFSTDTC\tDM");
+        // ... and where the expansion IS the read, it declares it: on a SUPP-- dataset the
+        // variable prefix is "" (OperationExecutor.variableWildcardPrefix), so `--RFSTDTC` is
+        // RFSTDTC
+        String suppKeys = "[\"QNAM\", \"USUBJID\", \"--RFSTDTC\"]";
+        Census dash = census(rule("T-DASH-SUPP", "[\"SUPPAE\"]", KEYED_DM, suppKeys, null, null,
+                DM_KEY, "QNAM == \\\"AESOSP\\\" and RFSTDTC != \\\"\\\"", null));
+        assertEquals(Map.of(), dash.flags);
+        assertEquals(Set.of("T-DASH-SUPP\tRFSTDTC\tDM\tAll"), dash.declared.keySet());
+
+        // an ADaM template (WildcardExpander.scopeVariableWildcardPattern) declares every
+        // concrete name it matches — TRTxxP declares TRT01P — and nothing else
+        String keyedAdsl = """
+                "Match_Datasets": [{"Name": "ADSL", "Keys": ["USUBJID"]}],
+                """;
+        String adslKey = "[\"USUBJID\", \"ADSL.USUBJID\"]";
+        assertFlags(rule("T-TPL-UNDECLARED", "[\"AE\"]", keyedAdsl, USUBJID, null, null, adslKey,
+                "TRT01P != AESTDTC", null), "T-TPL-UNDECLARED\tTRT01P\tADSL");
+        Census template = census(rule("T-TPL", "[\"AE\"]", keyedAdsl, "[\"USUBJID\", \"TRTxxP\"]",
+                null, null, adslKey, "TRT01P != AESTDTC", null));
+        assertEquals(Map.of(), template.flags);
+        assertEquals(Set.of("T-TPL\tTRT01P\tADSL\tAll"), template.declared.keySet());
+        assertFlags(rule("T-TPL-OTHER", "[\"AE\"]", keyedAdsl, "[\"USUBJID\", \"TRTxxA\"]", null,
+                null, adslKey, "TRT01P != AESTDTC", null), "T-TPL-OTHER\tTRT01P\tADSL");
+        // an Output_Variables template the join publishes LITERALLY (the CDISC-AD0592 shape) is
+        // the same defect where a user sees it: the engine reports no column of that name
+        assertFlags(rule("T-OV-TPL", "[\"AE\"]", keyedAdsl, USUBJID, null, null, adslKey,
+                READ_AESTDTC_EMPTY, "[\"AESTDTC\", \"TRTxxP\"]"), "T-OV-TPL\tTRTxxP\tADSL");
     }
 
 
@@ -548,7 +756,7 @@ class UnqualifiedJoinedReadLintTest
         Census c = census(rule("T-CHILD", "[\"SUPPAE\"]", child, suppKeys, null, null, null,
                 readAesmie, null));
         assertEquals(Map.of(), c.flags);
-        assertEquals(Set.of("T-CHILD\tAESMIE"), c.childExcluded);
+        assertEquals(Set.of("T-CHILD\tAESMIE"), c.childExcluded.keySet());
 
         // the tie-break: an ordinary MH entry carries EPOCH, and so does the Child parent AE —
         // the parent supplies it under the bare name, so it is excluded, not flagged
@@ -562,7 +770,7 @@ class UnqualifiedJoinedReadLintTest
         Census tie = census(
                 rule("T-TIE", "[\"SUPPAE\"]", both, suppKeys, null, null, mhKey, readEpoch, null));
         assertEquals(Map.of(), tie.flags);
-        assertEquals(Set.of("T-TIE\tEPOCH"), tie.childExcluded);
+        assertEquals(Set.of("T-TIE\tEPOCH"), tie.childExcluded.keySet());
         // ... and without the Child entry the same read IS the defect
         String plain = """
                 "Match_Datasets": [{"Name": "MH", "Keys": ["USUBJID"]}],
@@ -590,7 +798,18 @@ class UnqualifiedJoinedReadLintTest
 
         Census capture = census(rule("T-CAP", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
                 "TRTxxP != AESTDTC", null));
-        assertEquals(Set.of("T-CAP\tTRTxxP"), capture.captures);
+        assertEquals(Set.of("T-CAP\tTRTxxP"), capture.captures.keySet());
+
+        // an Output_Variables template no library dataset publishes is counted, not judged ...
+        Census unpublished = census(rule("T-OVCAP", "[\"AE\"]", KEYED_DM, USUBJID, null, null,
+                DM_KEY, READ_AESTDTC_EMPTY, "[\"AESTDTC\", \"QQxxZ\"]"));
+        assertEquals(Set.of("T-OVCAP\tQQxxZ"), unpublished.captures.keySet());
+        assertEquals(Map.of(), unpublished.flags);
+        // ... and an Expansion token read bare is counted wherever it is read, never dropped
+        Census expansion = census(rule("T-EXP", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
+                "not empty(`&VAR`) and `&VAR` != `DM.&VAR`", "[\"&VAR\", \"DM.&VAR\"]"));
+        assertEquals(Set.of("T-EXP\t&VAR"), expansion.captures.keySet());
+        assertEquals(Set.of("synthetic"), expansion.captures.get("T-EXP\t&VAR"));
     }
 
 
@@ -641,7 +860,10 @@ class UnqualifiedJoinedReadLintTest
         return rule;
     }
 
-    /** A four-dataset SDTM-shaped library for the synthetic controls. */
+    /**
+     * An SDTM-shaped library for the synthetic controls, plus an {@code ADSL} publishing one ADaM
+     * template ({@code TRTxxP}) for the template arms.
+     */
     private static final Universe SYNTHETIC;
     static
     {
@@ -655,8 +877,11 @@ class UnqualifiedJoinedReadLintTest
                         List.of("STUDYID", "USUBJID", "RFSTDTC", "AGE")),
                 LibraryDataset.of("SV", "SPECIAL PURPOSE", List.of(), List.of(),
                         List.of("STUDYID", "USUBJID", "VISIT", "VISITNUM")),
-                LibraryDataset.of(SUPPQUAL, "RELATIONSHIP", List.of(), List.of(), List.of("STUDYID",
-                        "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM", "QVAL")));
+                LibraryDataset.of(SUPPQUAL, "RELATIONSHIP", List.of(), List.of(),
+                        List.of("STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM",
+                                "QVAL")),
+                LibraryDataset.of("ADSL", null, List.of(), List.of(),
+                        List.of("STUDYID", "USUBJID", "TRTxxP")));
         Map<String, LibraryDataset> targets = new LinkedHashMap<>();
         datasets.forEach(d -> targets.put(d.name(), d));
         SYNTHETIC = new Universe("synthetic", "SDTM", datasets, targets);
@@ -719,11 +944,17 @@ class UnqualifiedJoinedReadLintTest
     }
 
 
-    private static boolean definedByAny(List<LibraryDataset> aDatasets, String aVariable)
+    /**
+     * Whether any of {@code aDatasets} defines {@code aVariable} — by
+     * {@link LibraryDataset#publishes} when {@code aExact} (an {@code Output_Variables} template),
+     * else by {@link LibraryDataset#defines}.
+     */
+    private static boolean definedByAny(List<LibraryDataset> aDatasets, String aVariable,
+            boolean aExact)
     {
         for (LibraryDataset d : aDatasets)
         {
-            if (d.defines(aVariable))
+            if (aExact ? d.publishes(aVariable) : d.defines(aVariable))
             {
                 return true;
             }
@@ -832,6 +1063,25 @@ class UnqualifiedJoinedReadLintTest
     }
 
 
+    /**
+     * A bare {@code Expansion} token read ({@code &VAR}, {@code &DOMSEQ}): the engine substitutes
+     * it per expansion, so no static census resolves it (counted in R-CAPTURE). A qualified
+     * {@code ADSL.&VAR} is not a bare read and is not counted.
+     */
+    private static boolean isExpansionToken(String aName)
+    {
+        return aName.startsWith("&") && aName.indexOf('.') < 0;
+    }
+
+
+    /** Whether any dataset of the library publishes exactly {@code aName}. */
+    private static boolean publishedAnywhere(Universe aUniverse, String aName)
+    {
+        return definedByAny(aUniverse.scopeCandidates(), aName, true)
+                || definedByAny(List.copyOf(aUniverse.joinTargets().values()), aName, true);
+    }
+
+
     /** S2: a wildcard column read no static census can resolve (an ADaM template, a * root). */
     private static boolean isCaptureWildcard(String aName)
     {
@@ -841,28 +1091,29 @@ class UnqualifiedJoinedReadLintTest
     }
 
 
-    private static void collectCaptures(Expr aExpr, String aId, Set<String> aOut)
+    private static void collectCaptures(Expr aExpr, Set<String> aOut)
     {
         switch (aExpr)
         {
-        case Expr.And a -> a.parts().forEach(p -> collectCaptures(p, aId, aOut));
-        case Expr.Or o -> o.parts().forEach(p -> collectCaptures(p, aId, aOut));
-        case Expr.Not n -> collectCaptures(n.inner(), aId, aOut);
+        case Expr.And a -> a.parts().forEach(p -> collectCaptures(p, aOut));
+        case Expr.Or o -> o.parts().forEach(p -> collectCaptures(p, aOut));
+        case Expr.Not n -> collectCaptures(n.inner(), aOut);
         case Expr.Binary b ->
         {
-            collectCaptures(b.left(), aId, aOut);
-            collectCaptures(b.right(), aId, aOut);
+            collectCaptures(b.left(), aOut);
+            collectCaptures(b.right(), aOut);
         }
         case Expr.Call c ->
         {
-            c.args().forEach(p -> collectCaptures(p, aId, aOut));
-            c.kwargs().values().forEach(p -> collectCaptures(p, aId, aOut));
+            c.args().forEach(p -> collectCaptures(p, aOut));
+            c.kwargs().values().forEach(p -> collectCaptures(p, aOut));
         }
         case Expr.Ref r ->
         {
-            if (r.kind() == OperandKind.WILDCARD_COLUMN && isCaptureWildcard(r.name()))
+            if ((r.kind() == OperandKind.WILDCARD_COLUMN && isCaptureWildcard(r.name()))
+                    || isExpansionToken(r.name()))
             {
-                aOut.add(aId + "\t" + r.name());
+                aOut.add(r.name());
             }
         }
         case Expr.Lit l ->
@@ -873,7 +1124,7 @@ class UnqualifiedJoinedReadLintTest
                 {
                     if (item instanceof Expr e)
                     {
-                        collectCaptures(e, aId, aOut);
+                        collectCaptures(e, aOut);
                     }
                 }
             }
@@ -939,12 +1190,25 @@ class UnqualifiedJoinedReadLintTest
             }
             if (adam)
             {
+                // A supplement structure joins the scope only for a structure token the IG product
+                // publishes NO structure for (OCCDS before adamig-1-3's era, the device tokens).
+                // One of a token the IG does publish (adam-poppk / adam-nca BDS, adam-tte's BDS
+                // for TTE) carries copied ADSL variables, and would hide a bare AGE meaning
+                // ADSL.AGE on every BDS rule.
+                Set<String> igTokens = new TreeSet<>();
+                scope.forEach(d -> igTokens.add(String.valueOf(d.datasetClass())));
                 for (String key : store.productCatalogue())
                 {
                     if (key.startsWith("standards/adam/")
                             && !key.startsWith("standards/adam/adamig-"))
                     {
-                        scope.addAll(adamStructures(key));
+                        for (LibraryDataset d : adamStructures(key))
+                        {
+                            if (d.datasetClass() != null && !igTokens.contains(d.datasetClass()))
+                            {
+                                scope.add(d);
+                            }
+                        }
                     }
                 }
                 sdtmUnion().forEach(targets::putIfAbsent);
@@ -1027,15 +1291,7 @@ class UnqualifiedJoinedReadLintTest
             for (StoredDataStructure s : product.dataStructures())
             {
                 String name = String.valueOf(s.name());
-                String token = STRUCTURE_CLASS_OVERRIDES.get(aKey + "\t" + name);
-                if (token == null && s.className() != null)
-                {
-                    String upper = s.className().trim().toUpperCase(Locale.ROOT);
-                    String canonical = ADAM_CLASS_ALIASES.getOrDefault(upper, upper);
-                    token = AdamDataStructureDetector.STRUCTURE_TOKENS.contains(canonical)
-                            ? canonical
-                            : null;
-                }
+                String token = AdamStructureClassification.structureToken(aKey, s);
                 List<String> vars = new ArrayList<>();
                 for (StoredVariableSet set : s.variableSets())
                 {
@@ -1049,8 +1305,8 @@ class UnqualifiedJoinedReadLintTest
                 }
                 List<String> structures = token == null ? List.of()
                         : AdamDataStructureDetector.structureSet(token);
-                List<String> subclasses = s.subClass() == null || s.subClass().isBlank() ? List.of()
-                        : List.of(s.subClass().trim().toUpperCase(Locale.ROOT));
+                String subclass = AdamStructureClassification.subClass(aKey, s);
+                List<String> subclasses = subclass == null ? List.of() : List.of(subclass);
                 out.add(LibraryDataset.of(name, token, structures, subclasses, vars));
             }
             return out;

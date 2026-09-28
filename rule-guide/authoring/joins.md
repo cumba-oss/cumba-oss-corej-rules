@@ -135,15 +135,26 @@ date(EXSTDTC) < date(RFXSTDTC)       ⛔ EX defines no RFXSTDTC, so this is neve
 date(EXSTDTC) < date(DM.RFXSTDTC)    ✅
 ```
 
+The same holds for an ADaM template in `Output_Variables`: a bare `APxxSDT` names a column of
+exactly that name on the primary, which no dataset has, so the finding reports nothing for it. The
+joined period dates are reported as `ADSL.AP${*}SDT` (every `ADSL` column the template matches).
+
 The corpus build rejects such a rule (`UnqualifiedJoinedReadLintTest`), naming the rule, the name
 and the join. There are two ways out:
 
 - **Qualify it** — `DM.RFXSTDTC`. This is almost always what was meant.
-- **Declare it**, when the primary really is meant — typically a broadly scoped rule whose primary
-  may legitimately carry the column itself (`EPOCH`, `VISIT`). A bare entry in `All` (the rule
-  skips where the primary lacks it), a bare entry in an `Any` group, or an `All_Or_None` group
+- **Declare it**, when the primary really is meant. A broadly scoped rule rarely needs to: if any
+  dataset in its scope defines the name (a rule over every domain reading `VISIT` is judged against
+  `SV` too), it is not flagged at all. Declaring is for a **narrowly** scoped rule whose primary may
+  carry a column the standard's list for it omits — a Permissible variable such as `EPOCH` or
+  `TAETORD` on `SV`, or a variable an ADaM dataset copies from `ADSL`. A bare entry in `All` (the
+  rule skips where the primary lacks it), a bare entry in an `Any` group, or an `All_Or_None` group
   pairing the bare and the joined side — `[X, DM.X]` — each says which side the bare name means.
-  `None`, and a qualified `DM.X` on its own, do not.
+  They differ where the primary lacks `X`: the `All` entry skips the rule; the pair skips only when
+  the join carries `X` and runs when neither side does; an `Any` group skips only when none of its
+  members is present. So with the last two the check can still run on the absent column's constant,
+  and that verdict must be the one you want. `None`, and a qualified `DM.X` on its own, do not
+  declare it.
 
 "Defined by the scope" is judged against the standard's own dataset definitions: a name any
 dataset in the rule's scope defines is not flagged, even when the join carries it too. `Child:
