@@ -205,7 +205,11 @@ class ScenarioFixtureCoverageRatchetTest
     // because the released rule SKIPS on its own violation case (the plan's findings). That
     // invalid scenario landed with PLAN-wildcard-universal-absence (the templates moved out of the
     // Check into Requirements.Variables.None); coverage is unchanged, AD0581 was already covered.
-    private static final int MAX_UNCOVERED = 493;
+    // ⭐ 493 -> 463 on 2026-09-28 (PLAN-distinct-scenarios-ahead phase 3): the thirty rules whose
+    // distinct() read had no scenario at all gained their first .cdt suites (76 files, copied
+    // byte-identically from the internal corpus) — seventeen CG rules and thirteen SEND rules.
+    // Re-measured in this twin by setting the ratchet to 0 and reading 463 back.
+    private static final int MAX_UNCOVERED = 463;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus
