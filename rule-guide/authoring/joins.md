@@ -19,7 +19,8 @@ Check:
 ```
 
 Columns of the joined dataset are referenced **dot-qualified** — `DM.RFSTDTC`. Unqualified names
-always mean the primary dataset.
+always mean the primary dataset, and a bare name that only the join carries
+[fails the build](#-a-bare-name-only-the-join-carries-fails-the-build).
 
 ## The ordinary join
 
@@ -118,6 +119,35 @@ declarations fails the build, naming the rule and the key.
 > `All` too when its presence is a precondition of the check — never a column that is one
 > disjunct among several, and never the column whose absence **is** the finding
 > ([the one rule](requirements.md#-the-one-rule-that-matters-more-than-the-syntax)).
+
+## ⛔ A bare name only the join carries fails the build
+
+A bare `X` is the **primary** dataset's column, whatever the rule joins. So when no dataset in the
+rule's scope defines `X` but a joined dataset does, a bare `X` — in the `Check`, a binding or
+`Output_Variables` — does not read the join: it reads the primary's
+[absent-column value](../semantics/absent-columns.md) (`""` or missing on every row), and the rule
+reports too few findings, or wrong ones, with nothing to say so.
+
+A rule scoped to `EX` that joins `DM` on `USUBJID`:
+
+```
+date(EXSTDTC) < date(RFXSTDTC)       ⛔ EX defines no RFXSTDTC, so this is never DM's
+date(EXSTDTC) < date(DM.RFXSTDTC)    ✅
+```
+
+The corpus build rejects such a rule (`UnqualifiedJoinedReadLintTest`), naming the rule, the name
+and the join. There are two ways out:
+
+- **Qualify it** — `DM.RFXSTDTC`. This is almost always what was meant.
+- **Declare it**, when the primary really is meant — typically a broadly scoped rule whose primary
+  may legitimately carry the column itself (`EPOCH`, `VISIT`). A bare entry in `All` (the rule
+  skips where the primary lacks it), a bare entry in an `Any` group, or an `All_Or_None` group
+  pairing the bare and the joined side — `[X, DM.X]` — each says which side the bare name means.
+  `None`, and a qualified `DM.X` on its own, do not.
+
+"Defined by the scope" is judged against the standard's own dataset definitions: a name any
+dataset in the rule's scope defines is not flagged, even when the join carries it too. `Child:
+true` entries are exempt — their parent's columns are read bare by design.
 
 ## Key types must agree — and what to do when they do not
 

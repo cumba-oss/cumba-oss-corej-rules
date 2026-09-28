@@ -189,6 +189,13 @@ Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) �
 A qualified entry is how you require a column in a dataset other than the one the rule is running
 on — usually one you are about to [join](joins.md).
 
+> ⛔ **A bare entry is also how a joining rule says that a bare name means the primary.** When no
+> dataset in the rule's scope defines `X` but a joined dataset does, a bare `X` in the check fails
+> the corpus build unless `X` is declared: bare in `All`, bare in an `Any` group, or paired
+> `[X, J.X]` in an `All_Or_None` group. `None`, and a qualified `J.X` alone, do not declare it.
+> Usually the fix is to qualify the read instead — see
+> [Joins](joins.md#-a-bare-name-only-the-join-carries-fails-the-build).
+
 ## Demanding a type as well as presence
 
 An `All` or `Any` entry may end in a **type suffix**, so the entry demands that the column is
