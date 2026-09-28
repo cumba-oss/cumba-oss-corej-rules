@@ -52,14 +52,18 @@ public final class SpecRunner
      * Outcome of running one spec against the Java engine.
      *
      * <p>
-     * Three assertion channels, <b>all always on</b>: {@link SpecResult#violationsMatch()},
-     * {@link SpecResult#statusMatches()} and {@link SpecResult#errorsMatch()}. The status channel
-     * had an opt-in gate ({@code -Dparity.assertStatus} / {@code PARITY_ASSERT_STATUS}) while the
-     * corpus was being triaged; PLAN-parity-expected-status P4 removed it deliberately, because a
-     * field that can be switched off is a field that dies again — and being switchable-off is
-     * precisely how {@code expected_status} came to be declared-but-never-read for the whole of M1.
-     * The errors channel (PLAN-parity-expected-errors) is on for the same reason and never had a
-     * toggle at all. Do not reintroduce one.
+     * Four assertion channels, <b>all always on</b>: {@link SpecResult#violationsMatch()},
+     * {@link SpecResult#statusMatches()}, {@link SpecResult#statusMessageMatches()} and
+     * {@link SpecResult#errorsMatch()}. The status-message channel
+     * ({@code PLAN-binding-expressions} review round 1, T1) is always evaluated but asserts only
+     * what a spec declares: an absent {@code expected_status_message} matches any message, so it
+     * tells two SKIPs apart where a spec cares ("no Library access" versus "library returned no
+     * data for …"). The status channel had an opt-in gate ({@code -Dparity.assertStatus} /
+     * {@code PARITY_ASSERT_STATUS}) while the corpus was being triaged; PLAN-parity-expected-status
+     * P4 removed it deliberately, because a field that can be switched off is a field that dies
+     * again — and being switchable-off is precisely how {@code expected_status} came to be
+     * declared-but-never-read for the whole of M1. The errors channel (PLAN-parity-expected-errors)
+     * is on for the same reason and never had a toggle at all. Do not reintroduce one.
      */
     public record SpecResult(String specName, List<CanonicalViolation> observed,
             List<String> observedErrors, List<CanonicalViolation> expected,
