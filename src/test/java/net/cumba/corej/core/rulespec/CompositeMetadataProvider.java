@@ -9,15 +9,16 @@ import net.cumba.datatable.IDataTable;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Parity-harness {@link MetadataProvider} that layers the offline pickle-backed library provider
- * over the spec's {@link MockLibraryProvider}.
+ * Spec-harness {@link MetadataProvider} that layers the store-backed library provider (our unified
+ * metadata store, seeded by {@code MetadataStoreFixture}) over the spec's
+ * {@link MockLibraryProvider}.
  *
  * <p>
  * Precedence: the spec's explicit mock is authoritative — every query resolves from the mock first,
- * falling back to the pickle (offline library) provider only when the mock has nothing to say. This
- * realises decision #3's intent (pickle supplies the library/model metadata the mocks don't) while
- * never overriding a value a spec deliberately mocked (e.g. a small {@code expected_variables}
- * set). When either delegate is {@code null}, the other answers alone.
+ * falling back to the store-backed (offline library) provider only when the mock has nothing to
+ * say. This realises decision #3's intent (the store supplies the library/model metadata the mocks
+ * don't) while never overriding a value a spec deliberately mocked (e.g. a small
+ * {@code expected_variables} set). When either delegate is {@code null}, the other answers alone.
  * </p>
  */
 final class CompositeMetadataProvider implements MetadataProvider
@@ -25,28 +26,28 @@ final class CompositeMetadataProvider implements MetadataProvider
 
     private final @Nullable MetadataProvider mock;
 
-    private final @Nullable MetadataProvider pickle;
+    private final @Nullable MetadataProvider stored;
 
-    CompositeMetadataProvider(@Nullable MetadataProvider aMock, @Nullable MetadataProvider aPickle)
+    CompositeMetadataProvider(@Nullable MetadataProvider aMock, @Nullable MetadataProvider aStored)
     {
         mock = aMock;
-        pickle = aPickle;
+        stored = aStored;
     }
 
-    // ---- library/model queries: mock first (explicit spec mock wins), pickle fallback ----
+    // ---- library/model queries: mock first (explicit spec mock wins), store fallback ----
 
 
     @Override
     public List<String> getRequiredVariables(String domain)
     {
-        return firstNonEmptyList(p -> p.getRequiredVariables(domain), mock, pickle);
+        return firstNonEmptyList(p -> p.getRequiredVariables(domain), mock, stored);
     }
 
 
     @Override
     public List<String> getExpectedVariables(String domain)
     {
-        return firstNonEmptyList(p -> p.getExpectedVariables(domain), mock, pickle);
+        return firstNonEmptyList(p -> p.getExpectedVariables(domain), mock, stored);
     }
 
     // ⚠ Fix #368: delegated for the same reason as the engine's own wrappers — the interface
@@ -60,7 +61,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     public boolean supportsStructureKeyedVariables()
     {
         return (mock != null && mock.supportsStructureKeyedVariables())
-                || (pickle != null && pickle.supportsStructureKeyedVariables());
+                || (stored != null && stored.supportsStructureKeyedVariables());
     }
 
 
@@ -73,7 +74,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     public boolean isLibraryUnavailable()
     {
         return (mock != null && mock.isLibraryUnavailable())
-                || (pickle != null && pickle.isLibraryUnavailable());
+                || (stored != null && stored.isLibraryUnavailable());
     }
 
     // ⚠ Phase 3 of PLAN-metadata-product-selection: the TWO-ARG form is the primary one. A
@@ -87,7 +88,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         return firstNonNullList(
                 p -> p.getRequiredVariablesForStructure(structureToken, subclassTokens), mock,
-                pickle);
+                stored);
     }
 
 
@@ -97,7 +98,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         return firstNonNullList(
                 p -> p.getExpectedVariablesForStructure(structureToken, subclassTokens), mock,
-                pickle);
+                stored);
     }
 
 
@@ -105,13 +106,14 @@ final class CompositeMetadataProvider implements MetadataProvider
      * Review finding F6 — the structure-keyed provenance, delegated. Log-only in effect, but the
      * log it feeds is {@code OperationExecutor}'s Fix #369 SKIP diagnostic, and without this
      * override every spec run reported {@code declared product(s) <unknown>} — in the very harness
-     * this area is debugged from. Mock-first / pickle-fallback like every other list here: the spec
-     * mock declares no products, so in practice this resolves to the pickle provider's declaration.
+     * this area is debugged from. Mock-first / store-fallback like every other list here: the spec
+     * mock declares no products, so in practice this resolves to the store-backed provider's
+     * declaration.
      */
     @Override
     public List<String> declaredStructureKeyedProducts()
     {
-        return firstNonEmptyList(MetadataProvider::declaredStructureKeyedProducts, mock, pickle);
+        return firstNonEmptyList(MetadataProvider::declaredStructureKeyedProducts, mock, stored);
     }
 
 
@@ -139,20 +141,21 @@ final class CompositeMetadataProvider implements MetadataProvider
     @Override
     public List<String> getColumnOrder(String domain)
     {
-        return firstNonEmptyList(p -> p.getColumnOrder(domain), mock, pickle);
+        return firstNonEmptyList(p -> p.getColumnOrder(domain), mock, stored);
     }
 
 
     @Override
     public List<String> getCodelistTerms(String codelistCode)
     {
-        return firstNonEmptyList(p -> p.getCodelistTerms(codelistCode), mock, pickle);
+        return firstNonEmptyList(p -> p.getCodelistTerms(codelistCode), mock, stored);
     }
 
 
-    // Same precedence as getCodelistTerms: an explicit spec mock wins, the pickle-backed library
+    // Same precedence as getCodelistTerms: an explicit spec mock wins, the store-backed library
     // answers otherwise. Inheriting the interface's honest-empty default here would flip every
-    // non-(term,value) codelist_terms shape to LIBRARY_NOT_AVAILABLE on behalf of a pickle
+    // non-(term,value) codelist_terms shape to LIBRARY_NOT_AVAILABLE on behalf of a store-backed
+    // provider
     // provider that CAN answer — exactly the shape the Fix #368 note above warns about.
     @Override
     public java.util.Optional<net.cumba.datatable.metadata.ICodeList> getCodelist(
@@ -160,7 +163,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         for (MetadataProvider p : new MetadataProvider[]
         {
-                mock, pickle
+                mock, stored
         })
         {
             if (p != null)
@@ -181,7 +184,7 @@ final class CompositeMetadataProvider implements MetadataProvider
      * ⚠⚠ Delegated — the sibling of the codelist accessors above ({@link #getCodelistTerms},
      * {@link #getCodelist}), and the one that was missed. The interface default is {@code Map.of()}
      * ("I have no code map"), which is honest for a leaf and silently wrong here:
-     * {@code MetadataLibraryProvider} — the pickle half every spec naming a standard/version
+     * {@code MetadataLibraryProvider} — the store half every spec naming a standard/version
      * composes in — <b>does</b> implement it, so inheriting the default made
      * {@code library_variable_code_pair_matches} (FDA-CT2003 / PMDA-CT2003) see no concept ids on
      * the spec path, with no diagnostic. Same shape as the {@code getCodelist} case closed in
@@ -192,39 +195,39 @@ final class CompositeMetadataProvider implements MetadataProvider
      * per-key union of the two halves — the same helper every other {@code Map<String, String>}
      * accessor on this class uses ({@code getVariableMetadata}, {@code getDatasetMetadata}).
      * Deliberate rather than incidental: the class contract above is that the spec's explicit mock
-     * is authoritative and the pickle answers only what the mock does not, so a union would let
-     * pickle-derived concept ids leak into a map a spec deliberately mocked and silently change
-     * that spec's verdict. An empty map here is "cannot answer" (see the interface javadoc), never
-     * a meaningful answer, so folding it into the fallback loses nothing.
+     * is authoritative and the store answers only what the mock does not, so a union would let
+     * store-derived concept ids leak into a map a spec deliberately mocked and silently change that
+     * spec's verdict. An empty map here is "cannot answer" (see the interface javadoc), never a
+     * meaningful answer, so folding it into the fallback loses nothing.
      * </p>
      */
     @Override
     public Map<String, String> getCodelistCodeMap(String aDomain, String aVariable)
     {
-        return firstNonEmptyMap(p -> p.getCodelistCodeMap(aDomain, aVariable), mock, pickle);
+        return firstNonEmptyMap(p -> p.getCodelistCodeMap(aDomain, aVariable), mock, stored);
     }
 
 
     @Override
     public List<String> getCodelistAttribute(String ctPackageId, String ctAttribute)
     {
-        // The mock has no CT-package access; this resolves from the pickle-backed provider.
+        // The mock has no CT-package access; this resolves from the store-backed provider.
         return firstNonEmptyList(p -> p.getCodelistAttribute(ctPackageId, ctAttribute), mock,
-                pickle);
+                stored);
     }
 
 
     @Override
     public List<Map<String, String>> getModelVariables(String domain)
     {
-        return firstNonEmptyMapList(p -> p.getModelVariables(domain), mock, pickle);
+        return firstNonEmptyMapList(p -> p.getModelVariables(domain), mock, stored);
     }
 
 
     @Override
     public List<Map<String, String>> getModelVariablesForClass(String aModelClass)
     {
-        return firstNonEmptyMapList(p -> p.getModelVariablesForClass(aModelClass), mock, pickle);
+        return firstNonEmptyMapList(p -> p.getModelVariablesForClass(aModelClass), mock, stored);
     }
 
 
@@ -232,7 +235,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     public @Nullable List<String> getStandardModelVariables(IDataTable aTable,
             DatasetResolver aResolver)
     {
-        return firstNonNull(p -> p.getStandardModelVariables(aTable, aResolver), mock, pickle);
+        return firstNonNull(p -> p.getStandardModelVariables(aTable, aResolver), mock, stored);
     }
 
 
@@ -241,7 +244,7 @@ final class CompositeMetadataProvider implements MetadataProvider
             DatasetResolver aResolver)
     {
         return firstNonNull(p -> p.getStandardModelVariablesDetailed(aTable, aResolver), mock,
-                pickle);
+                stored);
     }
 
 
@@ -251,7 +254,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         return firstNonNull(
                 p -> p.getStandardModelVariablesForClass(aTable, aResolver, aModelClass), mock,
-                pickle);
+                stored);
     }
 
 
@@ -259,7 +262,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     public @Nullable List<Map<String, String>> getStandardVariablesDetailed(IDataTable aTable,
             DatasetResolver aResolver)
     {
-        return firstNonNull(p -> p.getStandardVariablesDetailed(aTable, aResolver), mock, pickle);
+        return firstNonNull(p -> p.getStandardVariablesDetailed(aTable, aResolver), mock, stored);
     }
 
 
@@ -267,17 +270,17 @@ final class CompositeMetadataProvider implements MetadataProvider
     public @Nullable List<String> getStandardVariableNames()
     {
         // EC-13 — mirror the Python harness, whose `variable_names` reads the mock-built
-        // `variables_metadata` only. The spec mock wins; pickle answers only when no mock is
+        // `variables_metadata` only. The spec mock wins; the store answers only when no mock is
         // supplied (no shipping spec relies on the real product here).
-        return firstNonNull(MetadataProvider::getStandardVariableNames, mock, pickle);
+        return firstNonNull(MetadataProvider::getStandardVariableNames, mock, stored);
     }
 
 
     @Override
     public @Nullable List<String> getStandardDatasetNames()
     {
-        // EC-14 layer (i) — the spec mock wins; pickle answers only when no mock is supplied.
-        return firstNonNull(MetadataProvider::getStandardDatasetNames, mock, pickle);
+        // EC-14 layer (i) — the spec mock wins; the store answers only when no mock is supplied.
+        return firstNonNull(MetadataProvider::getStandardDatasetNames, mock, stored);
     }
 
 
@@ -285,44 +288,45 @@ final class CompositeMetadataProvider implements MetadataProvider
      * <b>R11</b> — the name-keyed carry-over lookup.
      *
      * <p>
-     * ⛔⛔ <b>Review finding R-5 — this was {@code firstNonNull}, and that made the pickle half
+     * ⛔⛔ <b>Review finding R-5 — this was {@code firstNonNull}, and that made the store half
      * unreachable.</b> {@code MetadataProvider.getPublishedVariablesByName} is a {@code default}
      * method returning {@code List.of()}, so a mock that does not override it answers EMPTY BUT
      * NON-NULL — and {@code firstNonNull} accepted that as the answer for every variable name.
-     * Measured: mock alone {@code []}, pickle alone one candidate, composite {@code []}. Every
-     * other non-nullable list accessor here uses {@code firstNonEmptyList} for exactly this reason
-     * (see {@code getDeclaredSubClasses}). Same trap as the {@code default}-method decorator hole
-     * that has now bitten this plan three times.
+     * Measured: mock alone {@code []}, store alone one candidate, composite {@code []}. Every other
+     * non-nullable list accessor here uses {@code firstNonEmptyList} for exactly this reason (see
+     * {@code getDeclaredSubClasses}). Same trap as the {@code default}-method decorator hole that
+     * has now bitten this plan three times.
      * </p>
      */
     @Override
     public List<PublishedVariable> getPublishedVariablesByName(String variableName)
     {
-        return firstNonEmptyList(p -> p.getPublishedVariablesByName(variableName), mock, pickle);
+        return firstNonEmptyList(p -> p.getPublishedVariablesByName(variableName), mock, stored);
     }
 
 
     @Override
     public boolean isDomainCustom(String domain)
     {
-        // Custom iff the explicit spec mock declares it custom OR the offline pickle computes it
-        // custom from product membership. A plain mock-first read would shadow the pickle with the
+        // Custom iff the explicit spec mock declares it custom OR the store-backed provider
+        // computes it
+        // custom from product membership. A plain mock-first read would shadow the store with the
         // mock's false-by-default for un-mocked domains, hiding a genuinely custom domain
         // (CORE-000376, where no domain_is_custom mock is supplied). No spec mocks
         // domain_is_custom=false, so the OR cannot override a deliberate negative mock.
         return (mock != null && mock.isDomainCustom(domain))
-                || (pickle != null && pickle.isDomainCustom(domain));
+                || (stored != null && stored.isDomainCustom(domain));
     }
 
 
     /**
      * F-corej-ct-02 — strictly mock-primary, and deliberately <em>not</em> a {@code firstNonEmpty}
-     * fallback onto the pickle half.
+     * fallback onto the store half.
      *
      * <p>
      * The mock now answers {@link java.util.Optional#empty()} for a codelist it does not hold, so
      * an empty answer here is an honest "the spec's metadata cannot resolve this codelist" and the
-     * engine surfaces it as a rule SKIP. Deferring to the offline pickle library on empty would let
+     * engine surfaces it as a rule SKIP. Deferring to the store-backed library on empty would let
      * real CT answer where the scenario deliberately declares its own metadata, which can make a
      * rule <em>fire</em> where the spec never described the codelist at all.
      * </p>
@@ -330,18 +334,18 @@ final class CompositeMetadataProvider implements MetadataProvider
     @Override
     public java.util.Optional<Boolean> isCodelistExtensible(String codelistName)
     {
-        MetadataProvider primary = mock != null ? mock : pickle;
+        MetadataProvider primary = mock != null ? mock : stored;
         return primary != null ? primary.isCodelistExtensible(codelistName)
                 : java.util.Optional.empty();
     }
 
-    // ---- study/dataset queries: mock first, pickle fallback ----
+    // ---- study/dataset queries: mock first, store fallback ----
 
 
     @Override
     public Map<String, String> getVariableMetadata(String domain, String variable)
     {
-        return firstNonEmptyMap(p -> p.getVariableMetadata(domain, variable), mock, pickle);
+        return firstNonEmptyMap(p -> p.getVariableMetadata(domain, variable), mock, stored);
     }
 
 
@@ -355,42 +359,43 @@ final class CompositeMetadataProvider implements MetadataProvider
     {
         return firstNonEmptyMap(
                 p -> p.getIgAbsentVariableMetadata(aTable, aResolver, aDomain, aVariable), mock,
-                pickle);
+                stored);
     }
 
 
     @Override
     public List<Map<String, String>> getDomainVariables(String domain)
     {
-        return firstNonEmptyMapList(p -> p.getDomainVariables(domain), mock, pickle);
+        return firstNonEmptyMapList(p -> p.getDomainVariables(domain), mock, stored);
     }
 
 
     @Override
     public Map<String, String> getDatasetMetadata(String domain)
     {
-        return firstNonEmptyMap(p -> p.getDatasetMetadata(domain), mock, pickle);
+        return firstNonEmptyMap(p -> p.getDatasetMetadata(domain), mock, stored);
     }
 
 
     @Override
     public List<String> getPublishedCtPackages()
     {
-        return firstNonEmptyList(MetadataProvider::getPublishedCtPackages, mock, pickle);
+        return firstNonEmptyList(MetadataProvider::getPublishedCtPackages, mock, stored);
     }
 
 
     /**
      * Fix #235: the declared {@code def:Class} tier, mock first. Without this override the
      * composite fell through to {@link MetadataProvider}'s {@code null} default and silently
-     * swallowed {@link MockLibraryProvider#getDeclaredDatasetClass}'s answer whenever a pickle
-     * provider was present — i.e. on every spec that names a standard/version, which is all of the
-     * ADaM ones. Same mock-wins precedence as every other accessor here.
+     * swallowed {@link MockLibraryProvider#getDeclaredDatasetClass}'s answer whenever a
+     * store-backed provider provider was present — i.e. on every spec that names a
+     * standard/version, which is all of the ADaM ones. Same mock-wins precedence as every other
+     * accessor here.
      */
     @Override
     public @Nullable String getDeclaredDatasetClass(String aDatasetName)
     {
-        return firstNonNull(p -> p.getDeclaredDatasetClass(aDatasetName), mock, pickle);
+        return firstNonNull(p -> p.getDeclaredDatasetClass(aDatasetName), mock, stored);
     }
 
 
@@ -399,33 +404,33 @@ final class CompositeMetadataProvider implements MetadataProvider
      * added the {@code def:Class} half of and left here. Same mock-wins precedence; first
      * <em>non-empty</em> rather than first non-null, because the contract's "declares nothing" is
      * the empty list, not {@code null}, so an empty answer from the mock must fall through to the
-     * pickle exactly as every other list accessor in this class does.
+     * the store exactly as every other list accessor in this class does.
      */
     @Override
     public List<String> getDeclaredSubClasses(String aDatasetName)
     {
-        return firstNonEmptyList(p -> p.getDeclaredSubClasses(aDatasetName), mock, pickle);
+        return firstNonEmptyList(p -> p.getDeclaredSubClasses(aDatasetName), mock, stored);
     }
 
 
     @Override
     public @Nullable String getDatasetClass(String aDomain)
     {
-        return firstNonNull(p -> p.getDatasetClass(aDomain), mock, pickle);
+        return firstNonNull(p -> p.getDatasetClass(aDomain), mock, stored);
     }
 
 
     @Override
     public @Nullable String getDatasetClass(@Nullable String aMemberName, String aCdiscDomain)
     {
-        return firstNonNull(p -> p.getDatasetClass(aMemberName, aCdiscDomain), mock, pickle);
+        return firstNonNull(p -> p.getDatasetClass(aMemberName, aCdiscDomain), mock, stored);
     }
 
 
     @Override
     public String getStandard()
     {
-        MetadataProvider primary = mock != null ? mock : pickle;
+        MetadataProvider primary = mock != null ? mock : stored;
         return primary != null ? primary.getStandard() : "";
     }
 
@@ -433,7 +438,7 @@ final class CompositeMetadataProvider implements MetadataProvider
     @Override
     public @Nullable String getDefineVersion()
     {
-        return firstNonNull(MetadataProvider::getDefineVersion, mock, pickle);
+        return firstNonNull(MetadataProvider::getDefineVersion, mock, stored);
     }
 
     // ---- helpers ----

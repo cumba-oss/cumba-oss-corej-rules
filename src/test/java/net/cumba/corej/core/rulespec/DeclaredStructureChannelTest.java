@@ -205,11 +205,11 @@ class DeclaredStructureChannelTest
     {
         MetadataProvider mock = mockWithClasses(
                 Map.of("occurrence data structure", List.of("ADAE")));
-        // A second-layer provider that declares nothing — the shape the offline pickle provider
+        // A second-layer provider that declares nothing — the shape the store-backed provider
         // has for these specs. The mock's answer must survive the composition.
-        MetadataProvider pickle = mockWithClasses(Map.of("events", List.of("AE")));
+        MetadataProvider stored = mockWithClasses(Map.of("events", List.of("AE")));
         assertEquals(AdamDataStructureDetector.OCCDS,
-                new CompositeMetadataProvider(mock, pickle).getDeclaredDatasetClass("ADAE"));
-        assertNull(new CompositeMetadataProvider(pickle, pickle).getDeclaredDatasetClass("ADAE"));
+                new CompositeMetadataProvider(mock, stored).getDeclaredDatasetClass("ADAE"));
+        assertNull(new CompositeMetadataProvider(stored, stored).getDeclaredDatasetClass("ADAE"));
     }
 }
