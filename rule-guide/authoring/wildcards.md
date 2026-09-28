@@ -65,24 +65,33 @@ Such a rule can never report anything.
 
 ### The fix: `Requirements.Variables.None`
 
-A negated template asks *"is no member of the family present?"*, and that is precisely what a
-template entry in
-[`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present) answers: the rule
-is skipped when **any** member is present, and runs when none is. Move the negated templates there
-and keep only the literal names in the Check:
+A negated template asks *"is no member of the family present?"*, and that is precisely what an
+entry in [`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present) answers:
+the rule is skipped when **any** matching column is present, and runs when none is. Move the
+negated templates there, one [regular-expression entry](requirements.md#what-an-entry-may-be) per
+template, and keep only the literal names in the Check:
 
 ```yaml
 Requirements:
   Variables:
-    None: ["TRTxxP", "TRTxxA", "TRTPGy"]
+    None: ["/TRT[0-9]{2}P/", "/TRT[0-9]{2}A/", "/TRTPG[0-9]+/"]
 Check:
   expression: 'not var_exists("TRTP") and not var_exists("TRTA")'
 ```
 
 On a dataset carrying `TRT02P` the rule is skipped — a treatment variable exists, so there is
 nothing to report. On a dataset carrying none of them it runs and reports. With no template left
-in the rule, remove its `wildcards` block as well — a bound on a token no name uses is a load error
-(above).
+in the Check, remove the rule's `wildcards` block as well — a bound on a token no name uses is a
+load error (above).
+
+> ⚠ **Write the `/regex/`, not the template.** `xx` and `zz` become `[0-9]{2}`, `y` becomes
+> `[0-9]+`, `w` becomes `[0-9]`. A `/regex/` entry matches the whole name **ignoring case**, as the
+> Check's `var_exists` does; a template entry such as `"TRTxxP"` matches **case-sensitively**, so
+> a SAS dataset carrying `trt01p` would not be skipped and would be reported falsely.
+
+> ⚠ **The move is exact only when every negated template is a top-level conjunct** of a Check
+> with a single level, as above. Under an `or` it is not: `None` skips the whole rule, so
+> `not var_exists("TRTxxP") or AVAL > 100` would lose its `AVAL` branch.
 
 > ⚠ **Naming the first instance instead (`TRT01P` for `TRTxxP`) is exact only where the IG
 > guarantees the family starts at `01` / `1` in that dataset class** — ADSL. A BDS dataset copies
