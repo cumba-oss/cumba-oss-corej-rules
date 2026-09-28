@@ -86,7 +86,7 @@ load error (above).
 
 <!-- Owner ruling 2026-09-28 ("Case-insensitive everywhere"; "if it is to be revised in the
      future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
-     CIT §1. Until then a template entry was the one case-sensitive column matcher, and this page
+     CIT §1. Until then a template entry was the one case-sensitive Requirements entry, and this page
      advised a /regex/ per template for that reason alone. -->
 > ⭐ **Write the template, not a `/regex/`.** Column names match **ignoring case on every
 > surface**, templates included: `"TRTxxP"` matches `trt01p` exactly as the Check's `var_exists`,
