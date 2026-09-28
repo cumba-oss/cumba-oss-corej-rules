@@ -19,17 +19,20 @@ Scope:
 Bindings:
 - name: "$dataset_variables"
   expression: "get_column_order_from_dataset()"
+- name: "$dataset_variables_upper"
+  expression: "upper($dataset_variables)"
 - name: "$timing_variables"
   expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
     )"
 Check:
   expression: >-
-    not shares_elements_with($dataset_variables, $timing_variables)
+    not shares_elements_with($dataset_variables_upper, $timing_variables)
 Outcome:
   Message: "No timing variables are present in the dataset."
   Output_Variables:
   - "$dataset_variables"
   - "$timing_variables"
+  - "!$dataset_variables_upper"
 Source:
   FDA_Validator_Rule_Message: "No timing variables are present in dataset"
   FDA_Validator_Rule_Description: "All domains based on the general observation classes\

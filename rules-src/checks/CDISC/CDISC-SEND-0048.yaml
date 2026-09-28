@@ -14,16 +14,19 @@ Bindings:
   expression: "get_column_order_from_library()"
 - name: "$column_order_from_dataset"
   expression: "get_column_order_from_dataset()"
+- name: "$column_order_from_dataset_upper"
+  expression: "upper($column_order_from_dataset)"
 Check:
   expression: >-
-    not empty($column_order_from_library) and not is_ordered_subset_of($column_order_from_dataset,
-    $column_order_from_library)
+    not empty($column_order_from_library) and not
+    is_ordered_subset_of($column_order_from_dataset_upper, $column_order_from_library)
 Outcome:
   Message: "The order of the variables in the dataset does not follow the order presented\
     \ in the SENDIG."
   Output_Variables:
   - "$column_order_from_dataset"
   - "$column_order_from_library"
+  - "!$column_order_from_dataset_upper"
 Source:
   Class: "ALL"
   Domain: "ALL"

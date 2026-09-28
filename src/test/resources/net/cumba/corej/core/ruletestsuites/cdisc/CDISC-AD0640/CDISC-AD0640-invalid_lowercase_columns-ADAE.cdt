@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0640 expect=violation domain=ADAE
+# Rule:Description: Raise an error when SDTM SUPPAE contains a record with QNAM=AETRTEM for a subject but AETRTEM is not a column of the corresponding ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+#note "AE carries aetrtem and ADAE does not, every column spelled in lower case as a SAS dataset may carry it. Column names match case-insensitively on every surface (owner ruling 2026-09-28): the qualified requirement AE.AETRTEM is met by the lowercase column and the Check's var_exists finds no AETRTEM in ADAE. CR640 (AETRTEM delivered for AE but not present in the ADAE dataset) -> violation."
+#expectViolationCount 1
+dataset ADAE
+col studyid type=Char
+col usubjid type=Char
+col aseq type=Num
+col aeterm type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col studyid type=Char
+col usubjid type=Char
+col aeseq type=Num
+col aetrtem type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | Y
+---

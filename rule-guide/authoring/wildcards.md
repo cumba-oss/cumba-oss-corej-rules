@@ -96,8 +96,11 @@ load error (above).
 >
 > ⛔ **This is a decision, not a default, and it is revised everywhere or nowhere.** Should the
 > case rule ever change, it changes for every surface at once — templates, literals, globs,
-> `/regex/` entries, the Check's column references and its template expansion, the supplemental
-> qualifier's `QNAM` — never for one of them alone (rulings register entry `CIT §1`). That column names *should* be upper case is reported once, by the dedicated naming
+> `/regex/` entries, the Check's column references and its template expansion — never for one of
+> them alone (rulings register entry `CIT §1`). A column name a rule handles as a **value** —
+> `varname()`, the list `get_column_order_from_dataset()` returns — is a string and is folded in
+> the **rule** (`upper(…)`, register entry `CIT §3`), never by the engine; a `QNAM` cell is a value
+> and compares exactly. That column names *should* be upper case is reported once, by the dedicated naming
 > rules, not by every rule skipping or misfiring.
 
 > ⚠ **The move is exact only when every negated template is a top-level conjunct** of a Check

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0330 expect=violation domain=VS
+#note "Lowercase columns with vstest declared before vstestcd, contradicting the SDTM Model order for VS (VSTESTCD before VSTEST). CG0330 -> the dataset order is not an ordered subset of the Model order and the rule fires once for the dataset; the reported dataset order keeps the dataset's own spelling."
+#library standard=sdtmig version=3-3
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSGRPID VSTESTCD VSTEST VSCAT VSPOS VSORRES VSORRESU
+#expectViolationCount 1
+dataset VS label="Vital Signs"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col vsseq    type=Num  label="Sequence Number"
+col vstest   type=Char label="Vital Signs Test Name"
+col vstestcd type=Char label="Vital Signs Test Short Name"
+col vsorres  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | Systolic Blood Pressure | SYSBP | 120

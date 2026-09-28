@@ -337,6 +337,18 @@ VISITNUM in [1, 2, 3]              # NUMERIC membership
 `upper(X) in [...]` is the case-insensitive surface; it is always string membership, since
 numbers have no case.
 
+A **column name a rule handles as a value** — `varname()`, the list
+`get_column_order_from_dataset()` returns — is a string and compares exactly like one (owner,
+2026-09-28: *"a String that contains a column name is still a string in the engine"*; rulings
+register `CIT §3`). A rule that wants such a name to match the library's upper-case names folds the
+**dataset side**: `upper(varname()) in $required_variables`,
+`equalsIgnoreCase(varname(), var_name("LIBRARY"))`, and for a list a sibling binding
+`$dataset_variables_upper: upper($dataset_variables)` read by `contains_all` /
+`is_ordered_subset_of` / `shares_elements_with` / `minus` — [`upper`](functions.md#upper) and
+[`lower`](functions.md#lower) fold a list element by element. The library side is assumed upper
+case and is not wrapped. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
+exactly (`QNAM == "AESOSP"`, `IDVAR not in $rdomain_variables`).
+
 `tuple(a, b) in distinct([a, b], domain="D")` tests a **whole row-tuple** against another
 dataset's tuples, rather than element by element.
 

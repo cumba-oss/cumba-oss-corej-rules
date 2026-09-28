@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0012 expect=noViolation domain=BW
+#note "Every variable the SENDIG declares Required for BW is present, the columns spelled in lower case as a SAS dataset may carry them. SEND12 tests presence: a present column in any letter case is present (column names match case-insensitively, owner ruling 2026-09-28; the rule compares the upper-cased dataset names against the library's upper-case names) -> conformant, no finding."
+#library standard=sendig version=3-1-1
+#library required-variables BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD
+dataset BW label="Body Weight"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col bwseq    type=Num  label="Sequence Number"
+col bwtestcd type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | BW

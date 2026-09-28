@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0043 expect=noViolation domain=SUPPAE
+#note "The SUPPAE record's QNAM VALUE is spelled aesosp in lower case and the parent AE record has AESMIE=N. CG0043 selects the record by QNAM == \"AESOSP\": a QNAM cell is a string value and compares exactly, as every string does (owner ruling 2026-09-28, register CIT §3; the same regime PMDA-SD1365-valid_case_mismatch_not_matched pins under ruling M2-D25) -> the record is not an AESOSP qualifier to this rule, no violation. That QNAM should be upper case is CDISC-SEND-0030 / PMDA-SD1474's business, reported once."
+#library standard=sdtmig version=3-4
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+S1 | AE | 001 | AESEQ | 1 | aesosp | Other Medically Important SAE | Description text
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESMIE  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | N
+---

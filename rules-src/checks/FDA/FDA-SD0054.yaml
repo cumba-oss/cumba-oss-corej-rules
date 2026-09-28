@@ -12,17 +12,20 @@ Scope:
 Bindings:
 - name: "$dataset_variables"
   expression: "get_column_order_from_dataset()"
+- name: "$dataset_variables_upper"
+  expression: "upper($dataset_variables)"
 - name: "$define_variables"
   expression: "define_variable_names()"
 - name: "$missing_define_variables"
-  expression: "minus($define_variables, subtract=$dataset_variables)"
+  expression: "minus($define_variables, subtract=$dataset_variables_upper)"
 Check:
   expression: >-
-    not contains_all($dataset_variables, $define_variables)
+    not contains_all($dataset_variables_upper, $define_variables)
 Outcome:
   Message: "A variable declared in the Define-XML is not present in the dataset."
   Output_Variables:
   - "$missing_define_variables"
+  - "!$dataset_variables_upper"
 Source:
   FDA_Validator_Rule_Message: "Variable in define.xml is not present in the dataset"
   FDA_Validator_Rule_Description: "Variables listed in the data definition document\

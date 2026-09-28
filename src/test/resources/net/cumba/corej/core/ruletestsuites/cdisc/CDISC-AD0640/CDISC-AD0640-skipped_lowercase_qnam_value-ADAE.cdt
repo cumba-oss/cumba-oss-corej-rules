@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-AD0640 expect=skipped domain=ADAE
+# Rule:Description: Raise an error when SDTM SUPPAE contains a record with QNAM=AETRTEM for a subject but AETRTEM is not a column of the corresponding ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+#note "AE has no AETRTEM column; SUPPAE carries a supplemental qualifier whose QNAM VALUE is spelled aetrtem in lower case. CR640's condition is SUPPAE.QNAM=AETRTEM: a QNAM cell is a string value and compares case-sensitively as every string does (owner ruling 2026-09-28: a string that contains a column name is still a string in the engine; register CIT §3), so the SUPP-QNAM pivot does not deliver AETRTEM, the requirement AE.AETRTEM is unmet and the rule is skipped. That QNAM should be upper case is CDISC-SEND-0030 / PMDA-SD1474's business, reported once."
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | aetrtem | Treatment Emergent Flag | Y
+---

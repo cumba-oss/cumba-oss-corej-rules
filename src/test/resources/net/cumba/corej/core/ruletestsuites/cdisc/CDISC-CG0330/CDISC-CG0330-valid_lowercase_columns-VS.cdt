@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0330 expect=noViolation domain=VS
+#note "The dataset's columns follow the SDTM Model order for VS (VSTESTCD before VSTEST), spelled in lower case as a SAS dataset may carry them. CG0330 tests the ORDER of the variables; letter case is not order (owner ruling 2026-09-28: the rule compares the upper-cased dataset order against the Model's upper-case order) -> the dataset order is an ordered subset of the Model order, no violation."
+#library standard=sdtmig version=3-3
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSGRPID VSTESTCD VSTEST VSCAT VSPOS VSORRES VSORRESU
+dataset VS label="Vital Signs"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col vsseq    type=Num  label="Sequence Number"
+col vstestcd type=Char label="Vital Signs Test Short Name"
+col vstest   type=Char label="Vital Signs Test Name"
+col vsorres  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120

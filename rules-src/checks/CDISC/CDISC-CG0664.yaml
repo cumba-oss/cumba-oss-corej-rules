@@ -14,9 +14,11 @@ Bindings:
   expression: "get_model_column_order()"
 - name: "$column_order_from_dataset"
   expression: "get_column_order_from_dataset()"
+- name: "$column_order_from_dataset_upper"
+  expression: "upper($column_order_from_dataset)"
 Check:
   expression: >-
-    not empty($model_column_order) and not is_ordered_subset_of($column_order_from_dataset,
+    not empty($model_column_order) and not is_ordered_subset_of($column_order_from_dataset_upper,
     $model_column_order)
 Outcome:
   Message: "Variables are not in the correct order as shown in the SDTM Model for\
@@ -24,6 +26,7 @@ Outcome:
   Output_Variables:
   - "$column_order_from_dataset"
   - "$model_column_order"
+  - "!$column_order_from_dataset_upper"
 Source:
   Class: "ALL"
   Domain: "ALL"

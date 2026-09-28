@@ -226,8 +226,9 @@ entry `CIT §2`), exactly as it evaluates a rule against a dataset:
 - **Supplemental qualifiers count.** A qualified entry whose variable half is a plain name (not a
   glob, `/regex/` or template) is also found as a supplemental qualifier: a row of
   `SUPP<dataset>` — `SUPPAE` for `AE.AETRTEM`, the entry's *own* dataset's supplement, not the
-  supplement of the dataset the rule runs on — whose `QNAM` names the variable, in any letter
-  case. It is looked for **before** a missing dataset counts as unavailable: `All: [AE.AETRTEM]`
+  supplement of the dataset the rule runs on — whose `QNAM` **equals** the variable name, compared
+  as a string, exactly (a `QNAM` cell is a value; rulings register `CIT §3`). It is looked for
+  **before** a missing dataset counts as unavailable: `All: [AE.AETRTEM]`
   in a study with no `AE` but a `SUPPAE` row `QNAM = AETRTEM` is **met** and the rule runs, and
   `None: [AE.AETRTEM]` **skips** the rule whenever `SUPPAE` carries that `QNAM`, with or without
   `AE`. A type suffix on such an entry is checked against `SUPPAE`'s `QVAL` type.

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0012-A expect=violation domain=BW
+#note "Lowercase columns; the SENDIG-Required bwtestcd is empty on row 2. SEND12 (a Required variable cannot be null for any record) -> one finding on row 2: the per-variable cursor varname() yields the dataset's spelling and the rule compares its upper-cased form against the library's Required list."
+#library standard=sendig version=3-1-1
+#library required-variables BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD
+#expectViolationCount 1
+#expectViolationAt row=2
+dataset BW label="Body Weight"
+col studyid  type=Char label="Study Identifier"
+col domain   type=Char label="Domain Abbreviation"
+col usubjid  type=Char label="Unique Subject Identifier"
+col bwseq    type=Num  label="Sequence Number"
+col bwtestcd type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | BW
+S1 | BW | 001 | 2 |

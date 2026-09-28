@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0012 expect=violation domain=BW
+#note "Lowercase columns; the SENDIG-Required BWTESTCD is genuinely absent. SEND12 (Required variable must be present) -> one dataset-level finding, and the missing variable is reported in the library's spelling (BWTESTCD), the present ones never re-spelled."
+#library standard=sendig version=3-1-1
+#library required-variables BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD
+#expectViolationCount 1
+dataset BW label="Body Weight"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col bwseq   type=Num  label="Sequence Number"
+---
+S1 | BW | 001 | 1

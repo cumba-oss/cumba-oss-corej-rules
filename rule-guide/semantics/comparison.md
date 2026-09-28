@@ -213,6 +213,14 @@ the weaker surface here. It is the same partiality in both.
 `upper(X) in [...]` is the case-insensitive surface, and is always textual — numbers have no
 case.
 
+> ⭐ **A column name handled as a value is a string** (owner, 2026-09-28; rulings register
+> `CIT §3`). Column names match ignoring case wherever the engine looks a column *up* (`CIT §1`),
+> but a `varname()`, a `QNAM` cell or an element of `get_column_order_from_dataset()` is a value,
+> and a value compares as ruled here — exactly. A rule that compares a dataset-side NAME against
+> the library folds the dataset side (`upper(varname())`, `upper($dataset_variables)`,
+> `equalsIgnoreCase(varname(), …)`); a `QNAM` / `IDVAR` cell is left as it is; the engine never
+> treats a string specially because it holds a column name.
+
 ### Dates — ask for one, and you get one
 
 ⭐ **Rewritten 2026-09-21.** This section used to read *"Dates are not dates here — membership is

@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0054 expect=noViolation domain=DM
+#note "The Define-XML declares STUDYID, DOMAIN, USUBJID and AGE for DM and the submitted dataset carries all four, spelled in lower case as a SAS dataset may carry them. SD0054 (a variable declared in define.xml must be present in the dataset) is a presence test; the column is present in any letter case (owner ruling 2026-09-28: the rule compares the upper-cased dataset names against the define's names) -> no violation."
+#library standard=sdtmig version=3-4
+#define column-order DM STUDYID DOMAIN USUBJID AGE
+dataset DM label="Demographics"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+col age     type=Num  label="Age"
+---
+S1 | DM | S1-001 | 34

@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD0054 expect=violation domain=DM
+#note "Lowercase columns; the Define-XML declares AGE for DM and the dataset genuinely lacks it. SD0054 -> one dataset-level finding naming AGE in the define's spelling."
+#library standard=sdtmig version=3-4
+#define column-order DM STUDYID DOMAIN USUBJID AGE
+#expectViolationCount 1
+dataset DM label="Demographics"
+col studyid type=Char label="Study Identifier"
+col domain  type=Char label="Domain Abbreviation"
+col usubjid type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001

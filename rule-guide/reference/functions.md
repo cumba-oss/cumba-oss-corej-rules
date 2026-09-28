@@ -549,6 +549,11 @@ expression: 'lower(SEX) == "m"'
 
 **Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing.
 
+**List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
+`distinct(…)` result), returns a **new list** with every element lower-cased, in order; a missing
+element folds to `""` exactly as a missing scalar does. Confirmed by the owner 2026-09-28 together
+with [`upper`](#upper)'s list form (rulings register `CIT §3`).
+
 ### max_value_length
 
 `max_value_length([name])` → **value**
@@ -794,6 +799,33 @@ expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 ```
 
 **Missing and empty** — A missing input and `""` both yield `""` — the value is folded literally rather than propagating as missing.
+
+**List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
+`distinct(…)` result), returns a **new list** with every element upper-cased, in order; a missing
+element folds to `""` exactly as a missing scalar does. This is how a rule compares the dataset's
+column names against the library's names (owner, 2026-09-28: *"upper allows a list of strings as
+parameter and returns a list of these strings converted to upper case"*; rulings register
+`CIT §3`): a column name a rule handles as a value is a string and compares exactly like one, so
+the rule folds the **dataset side** and leaves the library's upper-case names alone —
+
+```yaml
+Bindings:
+- name: "$required_variables"
+  expression: "required_variables()"
+- name: "$dataset_variables"
+  expression: "get_column_order_from_dataset()"
+- name: "$dataset_variables_upper"
+  expression: "upper($dataset_variables)"
+- name: "$missing_required_variables"
+  expression: "minus($required_variables, subtract=$dataset_variables_upper)"
+Check:
+  expression: "not contains_all($dataset_variables_upper, $required_variables)"
+```
+
+The un-folded `$dataset_variables` stays available for `Output_Variables`, so a reported name keeps
+the dataset's own spelling. The scalar spellings are `upper(varname()) in $required_variables` and
+`equalsIgnoreCase(varname(), var_name("LIBRARY"))`. A `QNAM` / `IDVAR` **cell** is a value and is
+not folded — it compares exactly, as every string does.
 
 
 ## Numbers and arithmetic

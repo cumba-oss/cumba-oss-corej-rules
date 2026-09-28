@@ -14,15 +14,18 @@ Bindings:
   expression: "required_variables()"
 - name: "$dataset_variables"
   expression: "get_column_order_from_dataset()"
+- name: "$dataset_variables_upper"
+  expression: "upper($dataset_variables)"
 - name: "$missing_required_variables"
-  expression: "minus($required_variables, subtract=$dataset_variables)"
+  expression: "minus($required_variables, subtract=$dataset_variables_upper)"
 Check:
   expression: >-
-    not contains_all($dataset_variables, $required_variables)
+    not contains_all($dataset_variables_upper, $required_variables)
 Outcome:
   Message: "A variable marked as Required in the SEND IG is not present in the dataset."
   Output_Variables:
   - "$missing_required_variables"
+  - "!$dataset_variables_upper"
 Source:
   FDA_Validator_Rule_Message: "SEND Required variable not found"
   FDA_Validator_Rule_Description: "Variables described in SEND IG as Required must\

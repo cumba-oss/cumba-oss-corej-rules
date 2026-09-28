@@ -14,15 +14,18 @@ Bindings:
   expression: "expected_variables()"
 - name: "$dataset_variables"
   expression: "get_column_order_from_dataset()"
+- name: "$dataset_variables_upper"
+  expression: "upper($dataset_variables)"
 - name: "$missing_expected_variables"
-  expression: "minus($expected_variables, subtract=$dataset_variables)"
+  expression: "minus($expected_variables, subtract=$dataset_variables_upper)"
 Check:
   expression: >-
-    not contains_all($dataset_variables, $expected_variables)
+    not contains_all($dataset_variables_upper, $expected_variables)
 Outcome:
   Message: "An Expected variable is not present in the dataset."
   Output_Variables:
   - "$missing_expected_variables"
+  - "!$dataset_variables_upper"
 Source:
   Class: "ALL"
   Domain: "ALL"
