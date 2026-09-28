@@ -135,9 +135,12 @@ date(EXSTDTC) < date(RFXSTDTC)       ⛔ EX defines no RFXSTDTC, so this is neve
 date(EXSTDTC) < date(DM.RFXSTDTC)    ✅
 ```
 
-The same holds for an ADaM template in `Output_Variables`: a bare `APxxSDT` names a column of
-exactly that name on the primary, which no dataset has, so the finding reports nothing for it. The
-joined period dates are reported as `ADSL.AP${*}SDT` (every `ADSL` column the template matches).
+The same holds for an ADaM template in `Output_Variables` when the `Check` does not itself read
+that template: a bare `APxxSDT` names a column of exactly that name on the primary, which no dataset
+has, so the finding reports nothing for it. The joined period dates are reported as
+`ADSL.AP${*}SDT` (every `ADSL` column the template matches). A template the `Check` does read is
+different: the rule is expanded once per matching column, and the `Output_Variables` entry is
+renamed with it — `TRTxxP` in both reports the `TRT01P` the check just read.
 
 The corpus build rejects such a rule (`UnqualifiedJoinedReadLintTest`), naming the rule, the name
 and the join. There are two ways out:

@@ -100,18 +100,23 @@ import org.junit.jupiter.api.Test;
  * <h2>Nothing examined is dropped silently</h2> A (rule, package) whose scope selects no library
  * dataset is named in R-EMPTY; a join target no product defines is counted in R-UNRES; a read no
  * static census resolves — an ADaM capture template inside an expression such as {@code TRTxxP}, a
- * {@code *} root, an {@code Output_Variables} template no library dataset publishes, and an
- * {@code Expansion} token read bare ({@code &VAR}, {@code &DOMSEQ}) — is named in R-CAPTURE (S2); a
- * read the {@code Child: true} exclusion takes out is named in R-CHILD; a joined read the rule
- * declares for the primary is named in R-DECLARED. The three rule registers are keyed by (rule,
- * name) with the number of packages each was seen in, and every one is pinned for exact equality.
- * So are the reach per family (joined (rule, package) pairs examined) and the CANDIDATES per family
- * — (rule, package, name) bare reads no scoped dataset defines, counted before any join or
- * declaration is consulted (S8): a family whose library answered nothing, or whose scope stopped
- * resolving, moves one of them even when the flags stay at zero. {@code Output_Variables} templates
- * ({@code APxxSDT}) are judged by LITERAL equality against the template names the library publishes
- * — the engine reports such an entry only when a column of exactly that name exists, which on the
- * primary it never does.
+ * {@code *} root, an {@code Output_Variables} template no library dataset publishes or the rule's
+ * own Check binds, and an {@code Expansion} token read bare ({@code &VAR}, {@code &DOMSEQ}) — is
+ * named in R-CAPTURE (S2); a read the {@code Child: true} exclusion takes out is named in R-CHILD;
+ * a joined read the rule declares for the primary is named in R-DECLARED. The three rule registers
+ * are keyed by (rule, name) with the number of packages each was seen in, and every one is pinned
+ * for exact equality. So are the reach per family (joined (rule, package) pairs examined) and the
+ * CANDIDATES per family — (rule, package, name) bare reads no scoped dataset defines, counted
+ * before any join or declaration is consulted (S8): a family whose library answered nothing, or
+ * whose scope stopped resolving, moves one of them even when the flags stay at zero. An
+ * {@code Output_Variables} template the rule's Check does NOT itself read ({@code APxxSDT} beside a
+ * Check over {@code APERIOD}) is judged by LITERAL equality against the template names the library
+ * publishes — the engine reports such an entry only when a column of exactly that name exists,
+ * which on the primary it never does. One the Check DOES read ({@code CDISC-AD0231}: Check and
+ * {@code Output_Variables} both {@code TRTxxP}) is not: the rule is a template, and
+ * {@code WildcardExpander.expandRule} renames every {@code Output_Variables} entry through the
+ * Check's bound wildcards, so the entry names the concrete column the expansion read. It is counted
+ * in R-CAPTURE under the same (rule, name) as the Check's read, never judged literally.
  *
  * <p>
  * ⭐ <b>Non-vacuity, twice</b> (S10): the predicate runs over synthetic rules of every exemption and
@@ -212,9 +217,11 @@ class UnqualifiedJoinedReadLintTest
 
         /**
          * Whether the dataset publishes exactly this name — a concrete variable or, verbatim, a
-         * template ({@code APxxSDT}). How an {@code Output_Variables} template is judged: the
-         * engine reports it only for a column of exactly that name, so a template that merely
-         * MATCHES it ({@code *SDT} matches {@code APxxSDT}) says nothing about it.
+         * template ({@code APxxSDT}). How an {@code Output_Variables} template the rule's Check
+         * does not itself read is judged: the engine reports it only for a column of exactly that
+         * name, so a template that merely MATCHES it ({@code *SDT} matches {@code APxxSDT}) says
+         * nothing about it. (One the Check reads is renamed by the expansion and never reaches here
+         * — see the class javadoc.)
          */
         boolean publishes(String aName)
         {
@@ -372,6 +379,9 @@ class UnqualifiedJoinedReadLintTest
             List<Expr> roots = expressions(aRule);
             Set<String> reads = new LinkedHashSet<>(TypeExpectations.of(roots).valueReadColumns());
             Set<String> literal = new TreeSet<>();
+            // The templates the engine binds per expansion — the key set of expandRule's name map
+            // (the Check's, every level, and its compiled bindings').
+            Set<String> bound = WildcardExpander.collectWildcardNames(aRule);
             List<String> outputs = aRule.getOutcome() == null ? null
                     : aRule.getOutcome().getOutputVariables();
             for (String output : outputs == null ? List.<String> of() : outputs)
@@ -387,10 +397,19 @@ class UnqualifiedJoinedReadLintTest
                 }
                 else if (isCaptureWildcard(output))
                 {
-                    // An Output_Variables template is reported only when a column of exactly that
-                    // name exists — so it is judged by literal equality against the template
-                    // names the library publishes, and counted when none publishes it.
-                    if (publishedAnywhere(aUniverse, output))
+                    // A template the Check binds is renamed with the expansion (expandRule's
+                    // nameMap), so it names the column the Check read: counted, never judged —
+                    // and counted rather than skipped, so the entry stays SEEN in R-CAPTURE.
+                    // Only an Output_Variables template the Check does NOT read is reported
+                    // solely for a column of exactly that name — so that one is judged by literal
+                    // equality against the template names the library publishes, and counted
+                    // when none publishes it.
+                    if (bound.contains(output))
+                    {
+                        captures.computeIfAbsent(id + "\t" + output, k -> new TreeSet<>())
+                                .add(aPackage);
+                    }
+                    else if (publishedAnywhere(aUniverse, output))
                     {
                         reads.add(output);
                         literal.add(output);
@@ -605,8 +624,9 @@ class UnqualifiedJoinedReadLintTest
         assertEquals(EXPECTED_EMPTY, census.empty, "R-EMPTY: (package, rule) whose scope selects"
                 + " no library dataset, so none of its reads is examined");
         assertEquals(EXPECTED_CAPTURES, Census.packageCounts(census.captures), "R-CAPTURE: reads"
-                + " no static census resolves (an ADaM capture template, a * root, an unpublished"
-                + " Output_Variables template, an Expansion token; S2), (rule, name) -> packages");
+                + " no static census resolves (an ADaM capture template, a * root, an Output_Variables"
+                + " template no library publishes or the Check binds, an Expansion token; S2),"
+                + " (rule, name) -> packages");
         assertEquals(EXPECTED_CHILD, Census.packageCounts(census.childExcluded), "R-CHILD: bare"
                 + " reads a Child: true parent supplies (D2) — excluded, and counted so they stay"
                 + " SEEN; (rule, name) -> packages");
@@ -741,6 +761,21 @@ class UnqualifiedJoinedReadLintTest
         // the same defect where a user sees it: the engine reports no column of that name
         assertFlags(rule("T-OV-TPL", "[\"AE\"]", keyedAdsl, USUBJID, null, null, adslKey,
                 READ_AESTDTC_EMPTY, "[\"AESTDTC\", \"TRTxxP\"]"), "T-OV-TPL\tTRTxxP\tADSL");
+        // ... and the scope side is judged literally too: XP's template *P MATCHES the string
+        // TRTxxP but does not publish it, so it does not define the entry, and the ADSL join's
+        // verbatim TRTxxP is still the defect
+        assertFlags(
+                rule("T-OV-TPL-SCOPE", "[\"XP\"]", keyedAdsl, USUBJID, null, null, adslKey,
+                        "USUBJID == \\\"\\\"", "[\"TRTxxP\"]"),
+                TEMPLATE_SCOPE, "T-OV-TPL-SCOPE\tTRTxxP\tADSL");
+        // ... but an Output_Variables template the rule's own Check reads (the CDISC-AD0231 shape:
+        // Check and Output_Variables both TRTxxP) is renamed through the Check's bound wildcards
+        // (WildcardExpander.expandRule), so it names the column the Check read: counted with the
+        // Check's read, never judged literally — no flag, though ADSL publishes TRTxxP verbatim
+        Census bound = census(rule("T-OV-BOUND", "[\"AE\"]", keyedAdsl, USUBJID, null, null,
+                adslKey, "TRTxxP != AESTDTC", "[\"AESTDTC\", \"TRTxxP\"]"));
+        assertEquals(Map.of(), bound.flags);
+        assertEquals(Set.of("T-OV-BOUND\tTRTxxP"), bound.captures.keySet());
     }
 
 
@@ -777,6 +812,16 @@ class UnqualifiedJoinedReadLintTest
                 """;
         assertFlags(rule("T-TIE-PLAIN", "[\"SUPPAE\"]", plain, suppKeys, null, null, mhKey,
                 readEpoch, null), "T-TIE-PLAIN\tEPOCH\tMH");
+
+        // the parent is resolved per row from RDOMAIN, never from the entry's Name: a read the
+        // NAMED parent (AE) does not define is still supplied by whichever dataset does — MHTERM
+        // by a scope candidate only (MH), RFSTDTC by a join target only (DM)
+        Census anyParent = census(rule("T-CHILD-ANY", "[\"SUPPAE\"]", child, suppKeys, null, null,
+                null, "QNAM == \\\"AESOSP\\\" and MHTERM != \\\"\\\" and RFSTDTC != \\\"\\\"",
+                null), CHILD_SPLIT);
+        assertEquals(Map.of(), anyParent.flags);
+        assertEquals(Set.of("T-CHILD-ANY\tMHTERM", "T-CHILD-ANY\tRFSTDTC"),
+                anyParent.childExcluded.keySet());
     }
 
 
@@ -805,17 +850,24 @@ class UnqualifiedJoinedReadLintTest
                 DM_KEY, READ_AESTDTC_EMPTY, "[\"AESTDTC\", \"QQxxZ\"]"));
         assertEquals(Set.of("T-OVCAP\tQQxxZ"), unpublished.captures.keySet());
         assertEquals(Map.of(), unpublished.flags);
-        // ... and an Expansion token read bare is counted wherever it is read, never dropped
+        // ... and an Expansion token read bare is counted wherever it is read, never dropped:
+        // &DOMSEQ only in the Check, &VAR only in Output_Variables, so each path has its own entry
         Census expansion = census(rule("T-EXP", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
-                "not empty(`&VAR`) and `&VAR` != `DM.&VAR`", "[\"&VAR\", \"DM.&VAR\"]"));
-        assertEquals(Set.of("T-EXP\t&VAR"), expansion.captures.keySet());
+                "not empty(`&DOMSEQ`) and `&DOMSEQ` != `DM.&DOMSEQ`", "[\"&VAR\", \"DM.&VAR\"]"));
+        assertEquals(Set.of("T-EXP\t&DOMSEQ", "T-EXP\t&VAR"), expansion.captures.keySet());
         assertEquals(Set.of("synthetic"), expansion.captures.get("T-EXP\t&VAR"));
     }
 
 
     private static void assertFlags(Rule aRule, String... aExpected)
     {
-        Census c = census(aRule);
+        assertFlags(aRule, SYNTHETIC, aExpected);
+    }
+
+
+    private static void assertFlags(Rule aRule, Universe aUniverse, String... aExpected)
+    {
+        Census c = census(aRule, aUniverse);
         assertEquals(Set.of(aExpected), c.flags.keySet(),
                 () -> "synthetic rule " + aRule.effectiveId() + ": " + c.flags);
         assertEquals(Set.of(), c.empty, "the synthetic scope must resolve");
@@ -824,8 +876,14 @@ class UnqualifiedJoinedReadLintTest
 
     private static Census census(Rule aRule)
     {
+        return census(aRule, SYNTHETIC);
+    }
+
+
+    private static Census census(Rule aRule, Universe aUniverse)
+    {
         Census c = new Census();
-        c.examine("synthetic", "synthetic", SYNTHETIC, aRule);
+        c.examine("synthetic", "synthetic", aUniverse, aRule);
         assertEquals(Set.of(), c.loadErrors, "a synthetic fixture must load cleanly");
         assertEquals(1, c.reach.values().stream().mapToInt(Integer::intValue).sum(),
                 "the synthetic rule was not examined");
@@ -865,6 +923,16 @@ class UnqualifiedJoinedReadLintTest
      * template ({@code TRTxxP}) for the template arms.
      */
     private static final Universe SYNTHETIC;
+
+    /**
+     * Scope candidates and join targets that DIFFER, as an ADaM package's do (the SDTM union is a
+     * join target only): {@code MH} is a scope candidate only, {@code DM} a join target only.
+     */
+    private static final Universe CHILD_SPLIT;
+
+    /** A scoped {@code XP} whose template {@code *P} matches the string {@code TRTxxP}. */
+    private static final Universe TEMPLATE_SCOPE;
+
     static
     {
         List<LibraryDataset> datasets = List.of(
@@ -882,14 +950,25 @@ class UnqualifiedJoinedReadLintTest
                                 "QVAL")),
                 LibraryDataset.of("ADSL", null, List.of(), List.of(),
                         List.of("STUDYID", "USUBJID", "TRTxxP")));
+        SYNTHETIC = universe(datasets, datasets);
+        Map<String, LibraryDataset> byName = SYNTHETIC.joinTargets();
+        CHILD_SPLIT = universe(List.of(byName.get(SUPPQUAL), byName.get("AE"), byName.get("MH")),
+                List.of(byName.get("AE"), byName.get("DM")));
+        TEMPLATE_SCOPE = universe(List.of(LibraryDataset.of("XP", "FINDINGS", List.of(), List.of(),
+                List.of("STUDYID", "USUBJID", "*P"))), List.of(byName.get("ADSL")));
+    }
+
+    private static Universe universe(List<LibraryDataset> aScope, List<LibraryDataset> aTargets)
+    {
         Map<String, LibraryDataset> targets = new LinkedHashMap<>();
-        datasets.forEach(d -> targets.put(d.name(), d));
-        SYNTHETIC = new Universe("synthetic", "SDTM", datasets, targets);
+        aTargets.forEach(d -> targets.put(d.name(), d));
+        return new Universe("synthetic", "SDTM", aScope, targets);
     }
 
     // ------------------------------------------------------------------
     // Scope and declarations
     // ------------------------------------------------------------------
+
 
     /** S3: whether the rule's scope selects this library dataset / structure. */
     static boolean inScope(Rule aRule, LibraryDataset aDataset)
