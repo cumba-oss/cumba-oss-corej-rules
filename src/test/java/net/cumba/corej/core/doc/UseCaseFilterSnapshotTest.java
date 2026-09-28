@@ -16,6 +16,7 @@ import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Scope;
 import net.cumba.corej.core.run.StudyValidationResult;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * </p>
  */
 @EnabledIfSystemProperty(named = "corej.findingsSnapshot", matches = "true")
+@Tag(FindingsSnapshot.TAG)
 class UseCaseFilterSnapshotTest
 {
 

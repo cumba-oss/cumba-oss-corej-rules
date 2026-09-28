@@ -1389,6 +1389,74 @@
                 </plugins>
             </build>
         </profile>
+
+        <!--
+            ==== findings-snapshot: the study-running tests in a fork of their own ====
+
+            Activated by -Dcorej.findingsSnapshot=true, the same switch the tests' own
+            @EnabledIfSystemProperty reads. Without the switch this profile is absent: the default
+            execution runs every test and the study-running ones report as skipped, as before.
+
+            With it, the default execution excludes the JUnit tag `findings-snapshot`
+            (FindingsSnapshot.TAG) and the `findings-snapshot` execution below runs ONLY that tag,
+            after the default one, in a fresh fork.
+
+            Why a fork of its own: the default fork builds MockTable fixtures, and Mockito's inline
+            mock maker then taxes every real value in that JVM for the JVM's lifetime — a study run
+            is markedly slower there than in a fresh JVM.
+            Why ONE fork for all of them: FindingsSnapshot memoizes the census run per JVM, so the
+            tagged classes share it only if they share the fork. Keep forkCount 1 / reuseForks true
+            for this execution.
+            Why no JaCoCo agent in it (argLine without @{argLine}): the study runs with several rule
+            threads (FindingsSnapshot.RULE_THREADS), and the agent's per-class probe arrays are
+            then written by every thread at once — the cache-line contention costs a multiple of
+            the run itself. It buys nothing here: this repo has no production classes, so the
+            report never reads what the agent would record.
+            ⚠ That argLine must never be EMPTY: Maven treats an empty value as unset, surefire then
+            falls back to the ${argLine} property jacoco:prepare-agent has set, and the agent is
+            back with nothing to say so. The marker property corej.findingsSnapshot.fork is what
+            keeps it non-empty (${mockito.agent} may resolve to nothing).
+
+            ⚠ Selection is by TAG, never by <includes>/<excludes>: -Dtest overrides includes and
+            excludes but not groups, so a `-Dtest=…` run with the switch still runs each tagged
+            class exactly once, here. For the same reason this execution tolerates a -Dtest filter
+            that selects none of its tests.
+        -->
+        <profile>
+            <id>findings-snapshot</id>
+            <activation>
+                <property>
+                    <name>corej.findingsSnapshot</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-test</id>
+                                <configuration>
+                                    <excludedGroups>findings-snapshot</excludedGroups>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>findings-snapshot</id>
+                                <phase>test</phase>
+                                <goals><goal>test</goal></goals>
+                                <configuration>
+                                    <groups>findings-snapshot</groups>
+                                    <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                                    <argLine>-Dcorej.findingsSnapshot.fork=true ${mockito.agent}</argLine>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <name>Cumba OSS CDISC Rules</name>
@@ -2240,6 +2308,28 @@
                             <fail>true</fail>
                         </configuration>
                     </execution>
+                    <!--
+                        The fence for the skipped JaCoCo check (see the jacoco-maven-plugin entry):
+                        the check is skipped because this repo has no production Java, and this
+                        fails the build as soon as it has some, instead of letting the skip exempt
+                        it silently.
+                    -->
+                    <execution>
+                        <id>no-main-java-while-jacoco-check-skipped</id>
+                        <phase>validate</phase>
+                        <goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <requireFilesDontExist>
+                                    <files>
+                                        <file>${project.basedir}/src/main/java</file>
+                                    </files>
+                                    <message>src/main/java exists, but the JaCoCo line-coverage check is skipped in this repo because it had no production Java. Remove the check's skip in the jacoco-maven-plugin entry and this execution together, so the new code is gated.</message>
+                                </requireFilesDontExist>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -2283,9 +2373,29 @@
                 <artifactId>git-commit-id-maven-plugin</artifactId>
             </plugin>
 
+            <!--
+                ⚠ The JaCoCo line-coverage CHECK is skipped in this repo, by policy (FGT-3,
+                PLAN-fast-gate-tests): the repo has no production Java — it ships a rule corpus,
+                and its Java is tests and test-scope generators — so the check's bundle holds no
+                classes and the check could never fail. A check that cannot fail only pretends to
+                gate. The agent and the report stay (the findings-snapshot profile's fork runs
+                without the agent — see there).
+
+                The skip is only honest while there is nothing to cover, so it is fenced: the
+                enforcer execution `no-main-java-while-jacoco-check-skipped` fails the build the
+                moment src/main/java appears. Whoever adds production Java removes both.
+            -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!--

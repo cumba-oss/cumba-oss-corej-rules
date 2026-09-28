@@ -136,6 +136,31 @@ public final class FindingsSnapshot
      */
     public static final int MAX_ERRORS_PER_RULE = 50;
 
+    /**
+     * The run's rule threads: the parallel path users run (owner ruling FGT-1,
+     * {@code PLAN-fast-gate-tests}: the sequential production default is mostly overridden to 4 or
+     * 8). The rows do not depend on it — a thread count that moved a row would be a nondeterminism
+     * defect in the engine, and the drift test would name it.
+     */
+    public static final int RULE_THREADS = 4;
+
+    /**
+     * The JUnit tag of the tests that run the study ({@code FindingsSnapshotDriftTest},
+     * {@code UseCaseFilterSnapshotTest}). Under {@code -Dcorej.findingsSnapshot=true} the pom's
+     * {@code findings-snapshot} profile runs exactly this tag in a surefire execution of its own —
+     * a fresh fork, both classes in it so they share {@link #census} — and removes it from the
+     * default execution.
+     */
+    public static final String TAG = "findings-snapshot";
+
+    /**
+     * The census run ({@code useCase == null}), memoized for the JVM:
+     * {@code FindingsSnapshotDriftTest} and {@code UseCaseFilterSnapshotTest} both need it, and the
+     * pom runs the two in one dedicated fork so the second reads what the first ran. Same inputs,
+     * same JVM, and both only read the result. Guarded by the class lock ({@link #censusRun()}).
+     */
+    private static @Nullable StudyValidationResult census;
+
     private FindingsSnapshot()
     {
     }
@@ -226,6 +251,11 @@ public final class FindingsSnapshot
      * committed artifact never uses ({@code UseCaseFilterSnapshotTest} is the one caller that
      * passes one, to prove the use-case filter against the same study and corpus).
      *
+     * <p>
+     * The census run itself ({@code null}) is run once per JVM and memoized ({@link #census}); a
+     * use-case run is run afresh on every call.
+     * </p>
+     *
      * @param useCase
      *            the run's use case, or {@code null} for the census run itself
      * @return the raw result
@@ -233,6 +263,28 @@ public final class FindingsSnapshot
      *             when the untracked study fixture or the pickle corpus is missing
      */
     public static StudyValidationResult run(@Nullable String useCase) throws IOException
+    {
+        return useCase == null ? censusRun() : execute(useCase);
+    }
+
+
+    /**
+     * The memoized census run. A failed run is not memoized: the next caller runs it again and sees
+     * the same failure.
+     */
+    private static synchronized StudyValidationResult censusRun() throws IOException
+    {
+        StudyValidationResult r = census;
+        if (r == null)
+        {
+            r = execute(null);
+            census = r;
+        }
+        return r;
+    }
+
+
+    private static StudyValidationResult execute(@Nullable String useCase) throws IOException
     {
         Path study = studyDir();
         if (!Files.isDirectory(study))
@@ -247,7 +299,7 @@ public final class FindingsSnapshot
         StudyValidationParams params = StudyValidationParams.builder()
                 .manager(new LocalDataTableManager()).dataLibrary(study.toString())
                 .defineXmlPath(study.resolve("define.xml").toString()).rulesPackages(RULES_PACKAGES)
-                .rulesDir(CorpusPaths.rules().toString()).ruleThreads(1)
+                .rulesDir(CorpusPaths.rules().toString()).ruleThreads(RULE_THREADS)
                 .maxErrorsPerRule(MAX_ERRORS_PER_RULE).severityThreshold(SEVERITY_THRESHOLD)
                 .useCase(useCase).build();
         // tryStoreProvider reads CDISC_METADATA_STORE / cdisc.metadata.store, not a params field —
