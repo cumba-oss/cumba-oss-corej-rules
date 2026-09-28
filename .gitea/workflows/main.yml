@@ -67,10 +67,12 @@ jobs:
 
       # CDISC pickle corpus (restore/fetch below, save at the end of the job). It is
       # the SEED of the unified metadata store: MetadataStoreFixture seeds the store
-      # once per JVM from this directory (PickleCache.CACHE_DIR_ENV); no test reads a
-      # .pkl file directly. Without it the tests that resolve library metadata
-      # through the store FAIL, not skip: LibraryProviderGuardTest, which hard-fails
-      # by design, and the specs FDA-SD9999, FDA-SD9999-define-only-leak and
+      # once per JVM from this directory (PickleCache.CACHE_DIR_ENV); only
+      # PickleMetadataReaderTest, the test of the pickle reader the seeder uses, reads
+      # a .pkl file — every check reads the store. Without it the tests that
+      # resolve library metadata through the store FAIL, not skip:
+      # LibraryProviderGuardTest, which hard-fails by design, and the specs
+      # FDA-SD9999, FDA-SD9999-define-only-leak and
       # PMDA-SD9999, which flip EXECUTED -> SKIPPED. Every other store-backed suite
       # skips instead.
       # PickleCacheLocator has NO built-in default — it deliberately resolves

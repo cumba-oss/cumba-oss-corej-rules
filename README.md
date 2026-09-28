@@ -167,7 +167,8 @@ same record for the same reason (it has a `src/main/`, but only `resources/` and
 
 `MetadataStoreFixture` seeds the unified metadata store (`target/metadata-store/store.zip`)
 once per JVM from the pickle corpus named by `CDISC_PICKLE_CACHE_DIR` /
-`-Dcdisc.pickle.cache.dir`; no test reads a `.pkl` file directly. Without it the tests that
+`-Dcdisc.pickle.cache.dir`; only `PickleMetadataReaderTest`, the test of the pickle reader the
+seeder uses, reads a `.pkl` file — every check reads the store. Without it the tests that
 resolve library metadata through the store **fail rather than skip** —
 `LibraryProviderGuardTest` hard-fails by design, and the execution specs that need a
 library silently flip `EXECUTED` → `SKIPPED`, which would invalidate every

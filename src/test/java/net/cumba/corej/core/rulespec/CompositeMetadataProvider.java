@@ -154,9 +154,9 @@ final class CompositeMetadataProvider implements MetadataProvider
 
     // Same precedence as getCodelistTerms: an explicit spec mock wins, the store-backed library
     // answers otherwise. Inheriting the interface's honest-empty default here would flip every
-    // non-(term,value) codelist_terms shape to LIBRARY_NOT_AVAILABLE on behalf of a store-backed
-    // provider
-    // provider that CAN answer — exactly the shape the Fix #368 note above warns about.
+    // non-(term,value) codelist_terms shape to LIBRARY_NOT_AVAILABLE on behalf of a
+    // store-backed provider that CAN answer — exactly the shape the Fix #368 note above warns
+    // about.
     @Override
     public java.util.Optional<net.cumba.datatable.metadata.ICodeList> getCodelist(
             String aCodelistName)
@@ -309,10 +309,9 @@ final class CompositeMetadataProvider implements MetadataProvider
     public boolean isDomainCustom(String domain)
     {
         // Custom iff the explicit spec mock declares it custom OR the store-backed provider
-        // computes it
-        // custom from product membership. A plain mock-first read would shadow the store with the
-        // mock's false-by-default for un-mocked domains, hiding a genuinely custom domain
-        // (CORE-000376, where no domain_is_custom mock is supplied). No spec mocks
+        // computes it custom from product membership. A plain mock-first read would shadow the
+        // store with the mock's false-by-default for un-mocked domains, hiding a genuinely custom
+        // domain (CORE-000376, where no domain_is_custom mock is supplied). No spec mocks
         // domain_is_custom=false, so the OR cannot override a deliberate negative mock.
         return (mock != null && mock.isDomainCustom(domain))
                 || (stored != null && stored.isDomainCustom(domain));
