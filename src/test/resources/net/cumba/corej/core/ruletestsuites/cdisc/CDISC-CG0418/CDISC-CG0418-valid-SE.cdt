@@ -1,0 +1,52 @@
+#!RuleTest
+#test CDISC-CG0418 expect=noViolation domain=SE
+#note "Authority: SDTM/SDTMIG Conformance Rules v2.0 CG0418, Rule 'TAETORD order of elements match order in TA within ARM of the Subject'. Partially Executable (Underreporting): the Check tests only membership in the study-wide TA.TAETORD set, not the subject's own arm nor the order, so this fixture keeps every row valid WITHIN the subject's arm (DM.ARMCD) and in TA order -- no row the authority flags beyond what the Check sees. The primary is SE, not TA: the rule is scope ALL and with TA as the primary a foreign-bound and a primary-bound read of TAETORD would agree. S1-001 (arm A) walks SCRN 1, TRTA 2, FU 3 and S1-002 (arm B) walks SCRN 1, TRTB 2, FU 3 -- each TAETORD is that element's order in the subject's own arm, in sequence. Row 3 is an UNPLAN element whose TAETORD is null, as SDTMIG prescribes for an unplanned element -> not evaluated. Silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | S1-001 | 1 | SCRN   | Screening | 1 | 2024-01-01
+S1 | SE | S1-001 | 2 | TRTA   | Drug A    | 2 | 2024-01-10
+S1 | SE | S1-001 | 3 | UNPLAN |           |   | 2024-02-01
+S1 | SE | S1-001 | 4 | FU     | Follow-up | 3 | 2024-02-10
+S1 | SE | S1-002 | 1 | SCRN   | Screening | 1 | 2024-01-02
+S1 | SE | S1-002 | 2 | TRTB   | Drug B    | 2 | 2024-01-11
+S1 | SE | S1-002 | 3 | FU     | Follow-up | 3 | 2024-02-11
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | S1-001 | A | Drug A
+S1 | DM | S1-002 | B | Drug B
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | TA | A | Drug A | 1 | SCRN | Screening | SCREENING
+S1 | TA | A | Drug A | 2 | TRTA | Drug A    | TREATMENT
+S1 | TA | A | Drug A | 3 | FU   | Follow-up | FOLLOW-UP
+S1 | TA | B | Drug B | 1 | SCRN | Screening | SCREENING
+S1 | TA | B | Drug B | 2 | TRTB | Drug B    | TREATMENT
+S1 | TA | B | Drug B | 3 | FU   | Follow-up | FOLLOW-UP
+---

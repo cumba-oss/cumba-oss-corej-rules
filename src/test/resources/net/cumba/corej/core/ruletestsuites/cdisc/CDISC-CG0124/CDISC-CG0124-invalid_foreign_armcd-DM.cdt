@@ -1,0 +1,32 @@
+#!RuleTest
+#test CDISC-CG0124 expect=violation domain=DM
+#note "S3 foreign discrimination (SKELETON-distinct-function hazard 3: under domain=\"TA\" the ARMCD column is TA's, not the primary DM's). Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0124 (SDTMIG 3.2), Condition \"ACTARMCD not in TA.ARMCD\", Rule \"ACTARMCD in (SCRNFAIL, NOTASSGN, NOTTRT, UNPLAN)\"; exemption literals are the sheet's exact upper-case values. Row 1: ACTARMCD=XANLO and DM.ARMCD=XANLO, TA does not define XANLO -> fires. Row 2: ACTARMCD=XANHI is a TA arm (a subject treated off-plan, which CG0124 does not judge) -> silent. A port that read ARMCD from DM would build {XANLO, PBO}: row 1 silent and row 2 firing, so the exact-set pin reds in both directions."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-001 ACTARMCD=XANLO
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-001 | XANLO | XANLO
+CDISCPILOT01 | DM | 01-002 | PBO   | XANHI
+CDISCPILOT01 | DM | 01-003 | PBO   | PBO
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | PBO   | Placebo         | 1 | SCRN | Screening
+CDISCPILOT01 | TA | PBO   | Placebo         | 2 | PBO  | Placebo
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 1 | SCRN | Screening
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 2 | XANH | Xanomeline High
+---

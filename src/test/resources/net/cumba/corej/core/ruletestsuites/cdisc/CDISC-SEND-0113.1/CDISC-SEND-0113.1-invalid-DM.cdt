@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-SEND-0113.1 expect=violation domain=DM
+#note "Authority: SEND Conformance Rules v5.0 SEND113.1 (SENDIG 3.0-3.1.1, DART 1.1/1.2, GENETOX 1.0; scenario at SENDIG 3.1.1), Condition \"SETCD ^= null\", Rule \"DM.SETCD = TX.SETCD for a given TX record\" (\"The value of SETCD in DM must be one of the SETCD values in TX\"). Row 2: SETCD=L1 is not a TX.SETCD -> fires. Row 1 carries a TX set; row 3's SETCD is null (Condition excludes it) -> silent. This S2 is also the S3 foreign discriminator (SKELETON-distinct-function hazard 3): a port reading SETCD from DM instead of TX would put each row's own SETCD in the set and never fire."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=S1-002 SETCD=L1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col SETCD   type=Char label="Set Code"
+---
+S1 | DM | S1-001 | 001 | M | 1 | Control   | C1
+S1 | DM | S1-002 | 002 | F | 2 | High Dose | L1
+S1 | DM | S1-003 | 003 | M | 2 | High Dose |
+---
+
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S1 | TX | C1 | Control   | 1 | ARMCD   | Planned Arm Code | 1
+S1 | TX | C1 | Control   | 2 | SPGRPCD | Sponsor-Defined Group Code | 1
+S1 | TX | H1 | High Dose | 3 | ARMCD   | Planned Arm Code | 2
+S1 | TX | H1 | High Dose | 4 | SPGRPCD | Sponsor-Defined Group Code | 2
+---

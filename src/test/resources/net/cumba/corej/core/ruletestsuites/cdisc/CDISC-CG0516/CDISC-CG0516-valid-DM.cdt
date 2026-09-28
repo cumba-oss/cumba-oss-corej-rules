@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-CG0516 expect=noViolation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0516 (SDTMIG 3.3/3.4), Condition \"Study does not use multi-stage arm assignments and ARMCD ^= null\", Rule \"ARMCD in TA.ARMCD\". The fixture models a single-stage study (one randomisation, every arm fully defined in TA), so the Condition's multi-stage clause holds and every flagged row is an authority violation (Partially Executable: that clause is not evaluated, status file P0-4). Every populated ARMCD (A, B) is a TA.ARMCD; row 3 (screen failure) has a null ARMCD, which the Condition excludes -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+STUDY01 | DM | S-001 | A | Drug A | A | Drug A |
+STUDY01 | DM | S-002 | B | Drug B | B | Drug B |
+STUDY01 | DM | S-003 |   |        |   |        | SCREEN FAILURE
+STUDY01 | DM | S-004 | B | Drug B |   |        | ASSIGNED, NOT TREATED
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+STUDY01 | TA | A | Drug A | 1 | SCRN | Screening | SCREENING
+STUDY01 | TA | A | Drug A | 2 | DRGA | Drug A    | TREATMENT
+STUDY01 | TA | B | Drug B | 1 | SCRN | Screening | SCREENING
+STUDY01 | TA | B | Drug B | 2 | DRGB | Drug B    | TREATMENT
+---

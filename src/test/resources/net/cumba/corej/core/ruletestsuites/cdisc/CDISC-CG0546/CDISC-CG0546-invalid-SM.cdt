@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0546 expect=violation domain=SM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0546 (SDTMIG 3.3/3.4; Condition MIDSTYPE = TM.MIDSTYPE and TM.TMRPT = Y; Rule: MIDS is suffixed with a sequence number in consistent chronological order). Partially Executable (underreporting): the Check tests only the numeric suffix, not the numbering order -- every repeated milestone here is numbered 1, 2, ... in SMSTDTC order, so no out-of-order set is pinned (plan §2.4). No S3 file: the Match_Datasets TM join on MIDSTYPE already implies membership whenever TM.TMRPT = Y (plan §2.2). Row 2's MIDS HYPO is an instance of the repeatable (TMRPT=Y) HYPOGLYCEMIC EVENT milestone and carries no sequence-number suffix -> fires. Row 1 (DIAGNOSIS, TMRPT=N) needs no suffix; row 3 (HYPO1, the subject's only instance) is suffixed."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 MIDS=HYPO
+dataset SM label="Subject Disease Milestones"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SMSEQ    type=Num  label="Sequence Number"
+col MIDS     type=Char label="Disease Milestone Instance Name"
+col MIDSTYPE type=Char label="Disease Milestone Type"
+col SMSTDTC  type=Char label="Start Date/Time of Milestone"
+---
+CDISCPILOT01 | SM | 01-701-1015 | 1 | DIAGNOSIS | DIAGNOSIS          | 2013-01-10
+CDISCPILOT01 | SM | 01-701-1015 | 2 | HYPO      | HYPOGLYCEMIC EVENT | 2014-01-20
+CDISCPILOT01 | SM | 01-701-1023 | 1 | HYPO1     | HYPOGLYCEMIC EVENT | 2014-02-11
+---
+
+dataset TM label="Trial Disease Milestones"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col MIDSTYPE type=Char label="Disease Milestone Type"
+col TMRPT    type=Char label="Disease Milestone Repetition Indicator"
+---
+CDISCPILOT01 | TM | DIAGNOSIS          | N
+CDISCPILOT01 | TM | HYPOGLYCEMIC EVENT | Y
+---

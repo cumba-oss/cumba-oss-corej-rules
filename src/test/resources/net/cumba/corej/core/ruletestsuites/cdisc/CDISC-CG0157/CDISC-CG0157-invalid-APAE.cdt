@@ -1,0 +1,38 @@
+#!RuleTest
+#test CDISC-CG0157 expect=violation domain=APAE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0157 (Condition: relationship described is to a study subject; Rule: RSUBJID in DM.USUBJID). An RSUBJID that is a POOLDEF POOLID describes a relationship to a pool, not to a subject, so the Condition does not hold for it. Row 3's RSUBJID 01-701-9999 is neither a POOLDEF POOLID (so it describes a subject relationship) nor a DM.USUBJID -> fires. Row 1 matches DM only and row 2 matches POOLDEF only, so each of the two foreign sets is needed for one silent row: a port that lost either binding (an empty set) fires a second time."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 APID=AP-03 RSUBJID=01-701-9999
+dataset APAE class=EVENTS label="Associated Persons Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject, Device or Study Relationship"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | APAE | AP-01 | 01-701-1015 | MOTHER, BIOLOGICAL | 1 | RASH
+CDISCPILOT01 | APAE | AP-02 | POOL01      | CAREGIVER          | 1 | COUGH
+CDISCPILOT01 | APAE | AP-03 | 01-701-9999 | FATHER, BIOLOGICAL | 1 | FEVER
+---
+
+dataset POOLDEF label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | POOL01 | 01-701-1023
+CDISCPILOT01 | POOL01 | 01-701-1028
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+CDISCPILOT01 | DM | 01-701-1028
+---

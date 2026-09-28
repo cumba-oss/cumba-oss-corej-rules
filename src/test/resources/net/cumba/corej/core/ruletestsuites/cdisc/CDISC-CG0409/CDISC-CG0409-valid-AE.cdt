@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0409 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0409 (Rule: STUDYID = DM.STUDYID). Primary is AE, not DM: the rule scope is ALL and includes DM itself, where the foreign and primary readings agree (scope-ALL trap, plan §2.2). Every AE.STUDYID equals the DM STUDYID CDISCPILOT01."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE
+CDISCPILOT01 | AE | 01-701-1023 | 1 | NAUSEA
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

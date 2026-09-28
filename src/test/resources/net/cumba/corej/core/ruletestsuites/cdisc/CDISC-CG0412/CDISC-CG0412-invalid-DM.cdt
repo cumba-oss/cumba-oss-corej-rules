@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-CG0412 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0412 (SDTMIG 3.2; Condition DM.ACTARMCD not in (SCRNFAIL, NOTASSGN, NOTTRT); Rule: subject records in DS > 0). Partially Executable (underreporting): the Check upper()-folds ACTARMCD, so a lower-case exemption literal would be exempted by the Check but flagged by the authority -- no such row is in this fixture (plan §2.4). Subject 01-701-1023 (ACTARMCD=XANHI, not exempt) has no DS record -> row 2 fires. Row 1 has a DS record; row 3 (SCRNFAIL) is exempt by the Condition. ALSO THE S3 DISCRIMINATOR (SKELETON-distinct-function hazard 3): USUBJID in distinct(USUBJID, domain=DS) belongs to the FOREIGN dataset DS; a port that read USUBJID from the primary DM would find every subject in its own set and fall silent."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 ACTARMCD=XANHI
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 | PBO      | PBO
+CDISCPILOT01 | DM | 01-701-1023 | XANHI    | XANHI
+CDISCPILOT01 | DM | 01-701-1028 | SCRNFAIL | SCRNFAIL
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | COMPLETED | COMPLETED
+---

@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-SEND-0333 expect=noViolation domain=PP
+#note "Authority: SEND Conformance Rules v5.0 SEND333 (Condition: PC records contribute to a single time concentration profile in PP; Rule: PCNOMDY & PCTPTREF = PPNOMDY & PPTPTREF). Partially Executable (underreporting): the Check tests the PP pair against the study-wide set of PC pairs, not against the pair of that profile own PC records; here every silent PP row pairs with its OWN subject profile, so the unchecked association is not violated (plan §2.4). PCNOMDY / PPNOMDY are declared Num. Each PP row's (PPNOMDY, PPTPTREF) is exactly the (PCNOMDY, PCTPTREF) of the PC records of that subject's profile: S1-001 day 1; S1-002 day 1 and day 28."
+#library standard=sendig version=3-1-1
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPNOMDY  type=Num  label="Nominal Study Day for Tabulations"
+col PPTPTREF type=Char label="Time Point Reference"
+---
+S1 | PP | S1-001 | 1 | CMAX | 1  | Day 1 Dose
+S1 | PP | S1-002 | 1 | CMAX | 1  | Day 1 Dose
+S1 | PP | S1-002 | 2 | CMAX | 28 | Day 28 Dose
+---
+
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCNOMDY  type=Num  label="Nominal Study Day for Tabulations"
+col PCTPTREF type=Char label="Time Point Reference"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | PC | S1-001 | 1 | DRUGX | 1  | Day 1 Dose  | 1
+S1 | PC | S1-001 | 2 | DRUGX | 1  | Day 1 Dose  | 2
+S1 | PC | S1-002 | 1 | DRUGX | 1  | Day 1 Dose  | 1
+S1 | PC | S1-002 | 2 | DRUGX | 1  | Day 1 Dose  | 2
+S1 | PC | S1-002 | 3 | DRUGX | 28 | Day 28 Dose | 1
+S1 | PC | S1-002 | 4 | DRUGX | 28 | Day 28 Dose | 2
+---

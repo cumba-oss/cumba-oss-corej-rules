@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0034 expect=violation domain=LB
+#note "S4(b), a subject with NO SV records at all. Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0034 (Condition VISITNUM ^= null; Rule VISITNUM in SV.VISITNUM; Description: VISITNUM must match a VISITNUM value FOR THE SUBJECT in SV). Subject 01-701-1028 has no SV record, so no VISITNUM of that subject can match an SV VISITNUM for the subject -> row 2 fires. Row 1 (01-701-1015, 1) is in its subject's SV set and is silent. Catches a port whose group lookup, on a key absent from SV, answers anything but the empty set (e.g. a study-wide set, which holds 1 and would silence row 2)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1028 VISITNUM=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 1 | SCREENING
+CDISCPILOT01 | LB | 01-701-1028 | 1 | ALB | 1 | SCREENING
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING
+CDISCPILOT01 | SV | 01-701-1015 | 2 | BASELINE
+---

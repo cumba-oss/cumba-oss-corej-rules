@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-CG0124 expect=noViolation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0124 (SDTMIG 3.2), Condition \"ACTARMCD not in TA.ARMCD\", Rule \"ACTARMCD in (SCRNFAIL, NOTASSGN, NOTTRT, UNPLAN)\"; exemption literals are the sheet's exact upper-case values. Every ACTARMCD is either an ARMCD TA defines (PBO, XANHI) or one of the four exemption values -> no row meets the Condition without meeting the Rule. No blank ACTARMCD and no lower-case exemption literal (neither is decided by the sheet text)."
+#library standard=sdtmig version=3-2
+#expectViolationCount 0
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ACTARMCD type=Char label="Actual Arm Code"
+---
+CDISCPILOT01 | DM | 01-001 | PBO      | PBO
+CDISCPILOT01 | DM | 01-002 | XANHI    | XANHI
+CDISCPILOT01 | DM | 01-003 | SCRNFAIL | SCRNFAIL
+CDISCPILOT01 | DM | 01-004 | NOTASSGN | NOTASSGN
+CDISCPILOT01 | DM | 01-005 | XANHI    | NOTTRT
+CDISCPILOT01 | DM | 01-006 | PBO      | UNPLAN
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | PBO   | Placebo         | 1 | SCRN | Screening
+CDISCPILOT01 | TA | PBO   | Placebo         | 2 | PBO  | Placebo
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 1 | SCRN | Screening
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 2 | XANH | Xanomeline High
+---

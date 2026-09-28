@@ -1,0 +1,32 @@
+#!RuleTest
+#test CDISC-CG0128 expect=noViolation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0128 (SDTMIG 3.2), Condition \"ARMCD not in TA.ARMCD\", Rule \"ARMCD in (SCRNFAIL, NOTASSGN)\". Partially Executable: the Check case-folds the exemption literals (status file P0-4), so no lower-case exemption value appears here. ARMCD is a TA arm (PBO, XANHI) or one of the two exemption values -> silent. No blank ARMCD (ARMCD is Req in SDTMIG 3.2 and the sheet text does not decide a null)."
+#library standard=sdtmig version=3-2
+#expectViolationCount 0
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-001 | PBO      | Placebo
+CDISCPILOT01 | DM | 01-002 | XANHI    | Xanomeline High
+CDISCPILOT01 | DM | 01-003 | SCRNFAIL | Screen Failure
+CDISCPILOT01 | DM | 01-004 | NOTASSGN | Not Assigned
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | PBO   | Placebo         | 1 | SCRN | Screening
+CDISCPILOT01 | TA | PBO   | Placebo         | 2 | PBO  | Placebo
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 1 | SCRN | Screening
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 2 | XANH | Xanomeline High
+---

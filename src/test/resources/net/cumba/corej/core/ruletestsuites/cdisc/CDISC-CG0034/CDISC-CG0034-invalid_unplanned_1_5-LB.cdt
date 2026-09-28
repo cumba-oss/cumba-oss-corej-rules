@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0034 expect=violation domain=LB
+#note "Numeric scenario (VISITNUM declared Num on both sides). Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0034 (Condition VISITNUM ^= null; Rule VISITNUM in SV.VISITNUM; Description: VISITNUM must match a VISITNUM value FOR THE SUBJECT in SV). Subject 01-701-1015 has the unplanned SV visit 1.5; subject 01-701-1023 does not. Row 1 (01-701-1015, 1.5) is silent; row 2 (01-701-1023, 1.5) fires; row 3 (01-701-1023, 2) is silent. Catches a port that builds typed sets and renders or compares the non-integral 1.5 differently on the two sides (row 1 would fire), or that drops the per-subject grouping (row 2 would fall silent)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 VISITNUM=1.5
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 1.5 | UNSCHEDULED 1.5
+CDISCPILOT01 | LB | 01-701-1023 | 1 | ALB | 1.5 | UNSCHEDULED 1.5
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB | 2   | BASELINE
+---
+
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1   | SCREENING
+CDISCPILOT01 | SV | 01-701-1015 | 1.5 | UNSCHEDULED 1.5
+CDISCPILOT01 | SV | 01-701-1015 | 2   | BASELINE
+CDISCPILOT01 | SV | 01-701-1023 | 1   | SCREENING
+CDISCPILOT01 | SV | 01-701-1023 | 2   | BASELINE
+---

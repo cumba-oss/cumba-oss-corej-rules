@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0410 expect=violation domain=SV
+#note "Authority: SDTM/SDTMIG Conformance Rules v2.0 CG0410, Condition 'Scheduled or Contingent visit (exists in TV)', Rule 'VISITNUM identifies unique record within subject'. Subject S1-001 has TWO records with VISITNUM=2, a planned visit (TV defines 2), so VISITNUM does not identify a unique record within that subject -> rows 2 and 3 BOTH fire (neither record is uniquely identified; is_unique_set is false for every member of a repeated tuple). S1-002's single VISITNUM=2 (row 5) is unique within its own subject -> silent. Not a foreign-discrimination pin: the rule tests 'in', so a primary-bound read would also fire here; the discriminator is -valid_unplanned_duplicate-SV."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=S1-001 VISITNUM=2
+#expectViolationAt row=3 USUBJID=S1-001 VISITNUM=2
+dataset SV label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Visit"
+---
+S1 | SV | S1-001 | 1 | SCREENING | 2024-01-02
+S1 | SV | S1-001 | 2 | BASELINE  | 2024-01-10
+S1 | SV | S1-001 | 2 | BASELINE  | 2024-01-12
+S1 | SV | S1-001 | 3 | WEEK 4    | 2024-02-07
+S1 | SV | S1-002 | 2 | BASELINE  | 2024-01-11
+---
+
+dataset TV label="Trial Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col TVSTRL   type=Char label="Visit Start Rule"
+---
+S1 | TV | 1 | SCREENING | Start of screening
+S1 | TV | 2 | BASELINE  | Day 1
+S1 | TV | 3 | WEEK 4    | Day 29
+---

@@ -1,0 +1,31 @@
+#!RuleTest
+#test CDISC-SEND-0389 expect=noViolation domain=TP
+#note "Authority: SEND Conformance Rules v5.0 SEND389 (SENDIG-DART 1.1/1.2), Rule 'TP.RSTGCD = TT.RSTGCD'; Plain Text: 'The values of RSTGCD used in the Trial Repro Paths dataset must match values for the same Repro Stage in the Trial Repro Stages dataset.' Path F0F walks PREMAT, MAT, GEST; path F0M walks PREMAT, MAT -- every TP.RSTGCD is a stage TT defines -> silent."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 0
+dataset TP class="TRIAL DESIGN" label="Trial Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Reproductive Path Code"
+col RPATH    type=Char label="Reproductive Path"
+col TPSTGORD type=Num  label="Planned Order of Repro Stage"
+col RSTGCD   type=Char label="Repro Stage Code"
+---
+S1 | TP | F0F | F0 Female | 1 | PREMAT
+S1 | TP | F0F | F0 Female | 2 | MAT
+S1 | TP | F0F | F0 Female | 3 | GEST
+S1 | TP | F0M | F0 Male   | 1 | PREMAT
+S1 | TP | F0M | F0 Male   | 2 | MAT
+---
+
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTDUR   type=Char label="Planned Duration of Repro Stage"
+---
+S1 | TT | PREMAT | Premating | P14D
+S1 | TT | MAT    | Mating    | P14D
+S1 | TT | GEST   | Gestation |
+---

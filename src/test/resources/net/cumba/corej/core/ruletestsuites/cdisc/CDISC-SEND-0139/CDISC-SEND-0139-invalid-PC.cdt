@@ -1,0 +1,31 @@
+#!RuleTest
+#test CDISC-SEND-0139 expect=violation domain=PC
+#note "Authority: SEND Conformance Rules v5.0 SEND139 (Condition: POOLID exists in any domain; Rule: POOLID exists in POOLDEF; and a record exists for each subject in POOLID). Partially Executable (underreporting): the Check covers only the first half; here every pool in use has a POOLDEF record for each of its member subjects, so the unchecked half is not violated (plan §2.4). Primary is PC, not POOLDEF: the rule scope is ALL and includes POOLDEF itself, where the foreign and primary readings agree (scope-ALL trap, plan §2.2). Row 2's POOLID POOL9 is not defined in POOLDEF -> fires. Row 1's POOL1 is defined; row 3 has no POOLID. ALSO THE S3 DISCRIMINATOR (SKELETON-distinct-function hazard 3): POOLID in distinct(POOLID, domain=POOLDEF) belongs to the FOREIGN dataset POOLDEF; a port that read POOLID from the primary PC would find POOL9 in its own set and fall silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 POOLID=POOL9
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCTEST   type=Char label="Test Name"
+col PCORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | PC |        | POOL1 | 1 | DRUGX | Drug X | 12.5
+S1 | PC |        | POOL9 | 2 | DRUGX | Drug X | 13.1
+S1 | PC | S1-005 |       | 1 | DRUGX | Drug X | 11.0
+---
+
+dataset POOLDEF label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | POOL1 | S1-001
+S1 | POOL1 | S1-002
+S1 | POOL2 | S1-003
+S1 | POOL2 | S1-004
+---

@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0009 expect=noViolation domain=AE
+#note "Authority: SDTM/SDTMIG Conformance Rules v2.0 CG0009, Rule 'EPOCH in TA.EPOCH'; Description: raise an error when EPOCH is POPULATED and matches no TA.EPOCH. Rows 1-2 carry SCREENING and TREATMENT, both TA epochs -> silent. Row 3 leaves EPOCH blank (an AE outside any epoch), which the Description exempts -> silent. The primary is AE, not TA: the rule is scope ALL and with TA as the primary a foreign-bound and a primary-bound read of EPOCH would agree."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | SCREENING
+S1 | AE | S1-001 | 2 | NAUSEA   | TREATMENT
+S1 | AE | S1-002 | 1 | RASH     |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | TA | A | Drug A | 1 | SCRN | Screening | SCREENING
+S1 | TA | A | Drug A | 2 | TRTA | Drug A    | TREATMENT
+S1 | TA | B | Drug B | 1 | SCRN | Screening | SCREENING
+S1 | TA | B | Drug B | 2 | TRTB | Drug B    | TREATMENT
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0349 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0349 (Condition: custom domain and variable name is not one of the non-prefixed standard variables; Rule: first 2 characters of the variable name = the 2-character domain code). Per-variable rule: pinned by variable_name=, never row=. LB is a standard (non-custom) domain, so the Condition 'custom domain' does not hold and the mis-prefixed variable XXFLAG is not reported by this rule (only XX is declared custom)."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col XXFLAG   type=Char label="Sponsor Flag"
+---
+S1 | LB | 001 | 1 | ALB | 4.1 | Y
+---

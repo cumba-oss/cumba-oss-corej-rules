@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0009 expect=violation domain=AE
+#note "S7, LABELLED MECHANISM PIN (plan PLAN-distinct-scenarios-ahead §2.6), not an authority verdict about data. TA is ABSENT from the submission. Q17-a: distinct(EPOCH, domain=TA) over an absent dataset returns the operation's declared EmptyResult.SET, the empty list, and 'EPOCH not in []' is true (D81b), so BOTH populated rows (1 and 2) fire; row 3 is blank and guarded out. In production Fix #222 AbsentDatasetSkip would turn this into SKIPPED only if the run's package shipped a presence rule for TA -- no SDTM package does (presence rules exist for TS, EX, DM, TV), so this flood IS the production verdict. The RuleTest harness passes empty reported-dataset sets, so a .cdt can only ever show the flood. Precedent: PMDA-SD2288 / PMDA-AD0256. If a TA presence rule is ever shipped, this file's verdict must move to SKIPPED."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=S1-001 EPOCH=SCREENING
+#expectViolationAt row=2 USUBJID=S1-001 EPOCH=TREATMENT
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | SCREENING
+S1 | AE | S1-001 | 2 | NAUSEA   | TREATMENT
+S1 | AE | S1-002 | 1 | RASH     |
+---

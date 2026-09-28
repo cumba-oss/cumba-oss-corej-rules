@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-SEND-0222 expect=noViolation domain=TA
+#note "Authority: SEND Conformance Rules v5.0 SEND222, Rule 'TA.ETCD = TE.ETCD'; Plain Text: 'The values of ETCD used in the Trial Arms dataset must match values for the same Element in the Trial Elements dataset.' Every TA.ETCD (SCRN, TRT, RECOV across both arms) is an element code TE defines -> silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | TA | 1 | Control   | 1 | SCRN  | Screening | SCREENING
+S1 | TA | 1 | Control   | 2 | TRT   | Treatment | TREATMENT
+S1 | TA | 2 | High Dose | 1 | SCRN  | Screening | SCREENING
+S1 | TA | 2 | High Dose | 2 | TRT   | Treatment | TREATMENT
+S1 | TA | 2 | High Dose | 3 | RECOV | Recovery  | RECOVERY
+---
+
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+S1 | TE | SCRN  | Screening | First day of acclimation
+S1 | TE | TRT   | Treatment | First dose
+S1 | TE | RECOV | Recovery  | Day after last dose
+---

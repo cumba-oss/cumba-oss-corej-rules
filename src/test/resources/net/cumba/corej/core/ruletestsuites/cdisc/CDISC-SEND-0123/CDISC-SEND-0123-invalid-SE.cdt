@@ -1,0 +1,32 @@
+#!RuleTest
+#test CDISC-SEND-0123 expect=violation domain=SE
+#note "Authority: SEND Conformance Rules v5.0 SEND123 (SENDIG 3.0 only), Condition 'Element occurs that is not one of the planned elements', Rule 'ETCD = UNPLAN'; Plain Text: 'If an element differs significantly from the planned element to the extent that it should be considered a new element, UNPLAN is used as the value for ETCD and ELEMENT is left blank'. Partially Executable (Overreporting): the Check cannot tell an unplanned element from a mis-coded planned one, and does not test the companion 'ELEMENT is left blank'; so every UNPLAN row here keeps ELEMENT blank, and the flagged row is unambiguously an element outside the plan (its ELEMENT names no TE element). Row 3 records an element that is not one of the planned elements (ETCD=WASHOUT, 'Unscheduled Washout' -- TE plans only SCRN, TRT, RECOV) but codes it WASHOUT instead of UNPLAN -> FIRES. Rows 1, 2 and 4 are planned elements -> silent. ALSO THE S3 FOREIGN-DISCRIMINATION PIN (SKELETON-distinct-function hazard 3): WASHOUT exists only in the primary SE, so a port that read ETCD from SE instead of TE would find row 3's own value in its own set and fall silent."
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=S1-001 ETCD=WASHOUT
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+---
+S1 | SE | S1-001 | 1 | SCRN    | Screening           | 2024-01-01
+S1 | SE | S1-001 | 2 | TRT     | Treatment           | 2024-01-08
+S1 | SE | S1-001 | 3 | WASHOUT | Unscheduled Washout | 2024-02-05
+S1 | SE | S1-001 | 4 | RECOV   | Recovery            | 2024-02-12
+---
+
+dataset TE label="Trial Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col TESTRL  type=Char label="Rule for Start of Element"
+---
+S1 | TE | SCRN  | Screening | First day of acclimation
+S1 | TE | TRT   | Treatment | First dose
+S1 | TE | RECOV | Recovery  | Day after last dose
+---

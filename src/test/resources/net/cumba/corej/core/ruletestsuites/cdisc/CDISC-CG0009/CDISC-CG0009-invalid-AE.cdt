@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-CG0009 expect=violation domain=AE
+#note "Authority: SDTM/SDTMIG Conformance Rules v2.0 CG0009, Rule 'EPOCH in TA.EPOCH'. Row 2's EPOCH=FOLLOW-UP is populated and TA defines only SCREENING and TREATMENT -> FIRES. Row 1 (TREATMENT) is a TA epoch and row 3 is blank (exempt per the Description) -> silent. ALSO THE S3 FOREIGN-DISCRIMINATION PIN (SKELETON-distinct-function hazard 3): FOLLOW-UP exists only in the primary AE, so a port that read EPOCH from AE instead of TA would put row 2's own value in its own set and fall silent. The primary is AE, not TA (scope-ALL trap: with TA as primary both readings agree)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=S1-001 EPOCH=FOLLOW-UP
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | AE | S1-001 | 1 | HEADACHE | TREATMENT
+S1 | AE | S1-001 | 2 | NAUSEA   | FOLLOW-UP
+S1 | AE | S1-002 | 1 | RASH     |
+---
+
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+S1 | TA | A | Drug A | 1 | SCRN | Screening | SCREENING
+S1 | TA | A | Drug A | 2 | TRTA | Drug A    | TREATMENT
+S1 | TA | B | Drug B | 1 | SCRN | Screening | SCREENING
+S1 | TA | B | Drug B | 2 | TRTB | Drug B    | TREATMENT
+---

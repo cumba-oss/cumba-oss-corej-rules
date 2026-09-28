@@ -1,0 +1,36 @@
+#!RuleTest
+#test CDISC-SEND-0236.1 expect=violation domain=TX
+#note "Authority: SEND Conformance Rules v5.0 SEND236.1 (SENDIG 3.0-3.1.1, DART 1.1/1.2, GENETOX 1.0; scenario at SENDIG 3.1.1), Condition \"TXPARMCD = ARMCD\", Rule \"TXVAL is present in the TA.ARMCD\". Row 3: TXPARMCD=ARMCD with TXVAL=3, not a TA.ARMCD -> fires. Row 1's TXVAL=1 is a TA arm -> silent. Rows 2 (SPECIES=RAT) and 4 (SPGRPCD=3) are outside the Condition, and TXPARMCD is compared exactly, so their TXVALs are not judged -> silent."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=3 SETCD=L1 TXPARMCD=ARMCD TXVAL=3
+dataset TX label="Trial Sets"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col SETCD    type=Char label="Set Code"
+col SET      type=Char label="Set Description"
+col TXSEQ    type=Num  label="Sequence Number"
+col TXPARMCD type=Char label="Trial Set Parameter Short Name"
+col TXPARM   type=Char label="Trial Set Parameter"
+col TXVAL    type=Char label="Trial Set Parameter Value"
+---
+S1 | TX | C1 | Control  | 1 | ARMCD   | Planned Arm Code           | 1
+S1 | TX | C1 | Control  | 2 | SPECIES | Species                    | RAT
+S1 | TX | L1 | Low Dose | 3 | ARMCD   | Planned Arm Code           | 3
+S1 | TX | L1 | Low Dose | 4 | SPGRPCD | Sponsor-Defined Group Code | 3
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | 1 | Control   | 1 | SCRN | Screening
+S1 | TA | 1 | Control   | 2 | CTRL | Vehicle Control
+S1 | TA | 2 | High Dose | 1 | SCRN | Screening
+S1 | TA | 2 | High Dose | 2 | HD   | 100 mg/kg
+---

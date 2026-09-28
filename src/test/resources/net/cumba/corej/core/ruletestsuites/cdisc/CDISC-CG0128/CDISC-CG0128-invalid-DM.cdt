@@ -1,0 +1,34 @@
+#!RuleTest
+#test CDISC-CG0128 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0128 (SDTMIG 3.2), Condition \"ARMCD not in TA.ARMCD\", Rule \"ARMCD in (SCRNFAIL, NOTASSGN)\". Partially Executable: the Check case-folds the exemption literals (status file P0-4), so no lower-case exemption value appears here. Row 2: ARMCD=XANLO is not a TA arm -> fires. Row 4: ARMCD=NOTTRT is not a TA arm and NOTTRT is NOT one of CG0128's two exemptions (it is a CG0124 ACTARMCD exemption only) -> fires. Rows 1 (PBO) and 3 (SCRNFAIL) silent. This S2 is also the S3 foreign discriminator (SKELETON-distinct-function hazard 3): a port reading ARMCD from DM instead of TA would put each row's own ARMCD in the set and never fire."
+#library standard=sdtmig version=3-2
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-002 ARMCD=XANLO
+#expectViolationAt row=4 USUBJID=01-004 ARMCD=NOTTRT
+dataset DM label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+---
+CDISCPILOT01 | DM | 01-001 | PBO      | Placebo
+CDISCPILOT01 | DM | 01-002 | XANLO    | Xanomeline Low
+CDISCPILOT01 | DM | 01-003 | SCRNFAIL | Screen Failure
+CDISCPILOT01 | DM | 01-004 | NOTTRT   | Not Treated
+---
+
+dataset TA label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+CDISCPILOT01 | TA | PBO   | Placebo         | 1 | SCRN | Screening
+CDISCPILOT01 | TA | PBO   | Placebo         | 2 | PBO  | Placebo
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 1 | SCRN | Screening
+CDISCPILOT01 | TA | XANHI | Xanomeline High | 2 | XANH | Xanomeline High
+---
