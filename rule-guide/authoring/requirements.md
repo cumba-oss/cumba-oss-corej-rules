@@ -177,24 +177,38 @@ facets are unmet keeps reporting exactly the reason it always did.
      All_Or_None, including "the rule runs when none of the variables is present") go into the SPEC
      and rule guide as confirmed semantics"), register entry CIT §2; stated from the engine's
      requirement gate as implemented, PLAN-case-insensitive-templates. -->
-These are the confirmed semantics of the requirement gate, exactly as it evaluates a rule against
-a dataset:
+These are the confirmed semantics of the requirement gate (owner, 2026-09-28; rulings register
+entry `CIT §2`), exactly as it evaluates a rule against a dataset:
 
 - **Order: `All`, then `Any`, then `None`, then `All_Or_None`.** The first unmet `All` entry, the
   first unmet `Any` group, the first *present* `None` entry or the first unmet `All_Or_None` group
   decides — its reason is the skip reason, and nothing after it is inspected.
 - **Every entry is an existence test, and every entry matches ignoring letter case.** A literal is
-  an exact name lookup; a `--` entry is resolved against the dataset's domain prefix first; a glob,
-  a `/regex/` and a [marker template](wildcards.md) such as `TRTxxP` are patterns, satisfied when
+  a name lookup. A `--` entry is first resolved against the dataset's variable prefix whenever it
+  has one, of any length: the domain code (`--SEQ` → `AESEQ`), nothing at all for a `SUPP` / `SQ`
+  dataset (`--QNAM` → `QNAM`), or an associated-persons dataset's suffix (`APMH`: `--SEQ` →
+  `MHSEQ`). Only a dataset with no domain to take a prefix from leaves it unresolved; it then
+  matches nothing in `All`, `Any` and `None`, and is undecidable in `All_Or_None`. A glob, a
+  `/regex/` and a [marker template](wildcards.md) such as `TRTxxP` are patterns, satisfied when
   **at least one** column matches them in full (`trt01p` and `TRT02P` both satisfy `TRTxxP`).
-- **A template entry binds nothing.** It asks whether *some* member of the family exists; it does
-  not choose or restrict the `xx` / `y` / `w` the check expands over. The other way round does
-  hold: when the check is itself a template, each expansion substitutes the same template in the
-  entries with the column it bound (`TRTxxP:N` becomes `TRT01P:N`).
+- **A template entry never chooses the expansion.** It asks whether *some* member of the family
+  exists; it does not choose or restrict the `xx` / `y` / `w` the check expands over. The other
+  way round does hold: when the check is itself a template, each expansion rewrites the entries
+  (all four facets) from its own binding before they are evaluated:
+  - an unqualified entry is rewritten only when it is the very template the check names — it
+    becomes the column that expansion bound (`TRTxxP:N` becomes `TRT01P:N`); any other
+    unqualified template entry keeps its "at least one member" meaning;
+  - a qualified entry is rewritten when the check names the same template, and otherwise whenever
+    the binding supplies every marker it carries: a check over `TRTxxP` with
+    `All: [ADSL.TRTxxPN]` requires `ADSL.TRT02PN` for its `xx = 02` expansion — `ADSL.TRT01PN`
+    does not satisfy it. A qualified entry whose markers the binding does not supply, or whose
+    variable half is a glob or `/regex/`, stays as written.
 - **`All`** — every entry must have at least one match, otherwise the rule is skipped, naming the
   first entry that has none.
-- **`Any`** — evaluated per group, the groups ANDed; a group is met by its first present entry and
-  unmet only when every entry in it is absent (the skip names the group and its position).
+- **`Any`** — evaluated per group, the groups ANDed; a group is met by its first satisfied entry
+  and unmet only when none of its entries is satisfied — each one absent, present with the wrong
+  type (a [type suffix](#demanding-a-type-as-well-as-presence)), or undecidable (the skip names
+  the group and its position).
 - **`None`** — the rule is skipped when any entry is present (a literal that exists, or a pattern
   that some column matches). **When none of the listed variables is present, the requirement is
   met and the rule runs.** That is why a negated family test belongs here (see
@@ -206,8 +220,17 @@ a dataset:
 - **Qualified entries (`DS.VAR`)** keep every semantic above on their variable half and look in
   that dataset. In `All` and `Any` the dataset must exist **and** carry the variable — an absent
   dataset skips the rule, naming the dataset. In `None` an absent dataset excludes nothing: the
-  requirement is met. When the run cannot resolve datasets at all, a qualified entry is
-  undecidable and skips the rule in every facet, `None` included.
+  requirement is met. Both are subject to the supplemental-qualifier pivot below. When the run
+  cannot resolve datasets at all, a qualified entry is undecidable and skips the rule in every
+  facet, `None` included.
+- **Supplemental qualifiers count.** A qualified entry whose variable half is a plain name (not a
+  glob, `/regex/` or template) is also found as a supplemental qualifier: a row of
+  `SUPP<dataset>` — `SUPPAE` for `AE.AETRTEM`, the entry's *own* dataset's supplement, not the
+  supplement of the dataset the rule runs on — whose `QNAM` names the variable, in any letter
+  case. It is looked for **before** a missing dataset counts as unavailable: `All: [AE.AETRTEM]`
+  in a study with no `AE` but a `SUPPAE` row `QNAM = AETRTEM` is **met** and the rule runs, and
+  `None: [AE.AETRTEM]` **skips** the rule whenever `SUPPAE` carries that `QNAM`, with or without
+  `AE`. A type suffix on such an entry is checked against `SUPPAE`'s `QVAL` type.
 - **A type suffix** (`:N` / `:C`, on `All` and `Any` only) makes a present column of the wrong
   type a mismatch of its own; see [below](#demanding-a-type-as-well-as-presence).
 
@@ -222,6 +245,7 @@ The same vocabulary on all four facets:
 | `SUPPAE.QNAM` | a **qualified** entry — that column in *that* dataset |
 | `AE*` | a glob |
 | `/^AE.*DTC$/` | a regular expression |
+| `TRTxxP` | a [marker template](wildcards.md) — at least one column of the family (`TRT01P`, `trt02p`, …) |
 
 Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) — `AESTDY:N`,
 `DM.AGE:N`, `"/^AE.*DTC$/:C"` — on the `All` and `Any` facets, and on those two only.
@@ -230,11 +254,13 @@ Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) �
      future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
      CIT §1. -->
 > ⭐ **Every entry matches a column name ignoring letter case** — a literal, a `--` placeholder, a
-> qualified name, a glob, a `/regex/` and a [marker template](wildcards.md) such as `TRTxxP` alike:
+> qualified name (and a supplemental qualifier's `QNAM`), a glob, a `/regex/` and a
+> [marker template](wildcards.md) such as `TRTxxP` alike:
 > `trt01p` in a SAS dataset satisfies `TRTxxP` and `TRT01P` equally, and the rule then reads it
 > under its actual name. Write entries in the CDISC upper-case spelling regardless; never rely on
-> case to tell two columns apart. ⛔ This is a decision, not a default: if the case rule is ever
-> revised, it is revised for every surface at once — never for one kind of entry alone.
+> case to tell two columns apart. ⛔ This is a decision, not a default (owner, 2026-09-28; rulings
+> register entry `CIT §1`): if the case rule is ever revised, it is revised for every surface at
+> once — never for one kind of entry alone.
 
 A qualified entry is how you require a column in a dataset other than the one the rule is running
 on — usually one you are about to [join](joins.md).
