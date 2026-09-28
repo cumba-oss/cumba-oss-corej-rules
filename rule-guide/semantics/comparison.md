@@ -229,10 +229,14 @@ case.
 > `prefix(varname(), 2) not in $domain_list and prefix(upper(varname()), 2) not in $domain_list` —
 > so a cell that names a column in exactly the column's own spelling (an all-lowercase study) still
 > matches. The naming rules (`varname() =~ /.*[a-z]/`, `varname() !~ /^[A-Z0-9_]+$/` and kin) test
-> the letter case or the characters of the name on purpose and are never folded. The
-> `varname() !~ /[a-z]/` of `CDISC-AD0018` / `AD0709` / `PMDA-AD0018` is **not** a naming rule: it
-> is the template carve-out of ruling `M2-D15`, which recognises an index-template name such as
-> `CRITy` by its lower-case marker; it is not folded either.
+> the letter case or the characters of the name on purpose and are never folded. A template
+> carve-out is different: the label rules `CDISC-AD0018` / `AD0709` / `PMDA-AD0018` skip a variable
+> whose name contains an index (ruling `M2-D15`), and they recognise it on the **library** name the
+> column resolved to — `var_name("LIBRARY") !~ /[a-z]/`, where a template keeps its lower-case
+> index (`TRTxxP`, `CRITy`) — never on the dataset's own spelling, which a lowercase study spells
+> in lower case throughout. A library name is the standard's spelling, not the data's, so testing
+> it needs no fold; where the rule also pairs the two names it does so case-insensitively,
+> `equalsIgnoreCase(varname(), var_name("LIBRARY"))`.
 
 ### Dates — ask for one, and you get one
 

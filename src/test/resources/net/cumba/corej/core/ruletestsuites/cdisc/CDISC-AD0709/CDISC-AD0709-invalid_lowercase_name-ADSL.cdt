@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0709 expect=violation domain=ADSL
+#note "CR709 (ADaM Conformance Rules v5.0, ADaMIG 1.2/1.3): the label of a standard ADaM variable must match the ADaMIG label, and the variable is standard by its NAME, whatever the case the dataset spells it in (owner 2026-09-28: these rules check case insensitive). An all-lowercase ADSL: studyid resolves to the Library's STUDYID and carries 'Study Id' instead of 'Study Identifier' -> one violation; usubjid's label matches. The template exclusion keys on the Library name (STUDYID has no index), so the lowercase data name no longer hides the variable."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL USUBJID name=USUBJID label="Unique Subject Identifier"
+#expectViolationCount 1
+#expectViolationAt variable_name=studyid library_variable_label="Study Identifier" variable_label="Study Id"
+dataset ADSL
+col studyid type=Char label="Study Id"
+col usubjid type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | 01-701-1015
+---

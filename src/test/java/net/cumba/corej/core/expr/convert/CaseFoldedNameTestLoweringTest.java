@@ -68,16 +68,19 @@ class CaseFoldedNameTestLoweringTest
     private static final Set<String> UNFOLDED = Set.of(
             // naming rules: the subject IS the letter case / characters of the name
             "CDISC-AD0014", "CDISC-AD0015", "CDISC-SEND-0030", "PMDA-AD0013",
-            // the lower-case wildcard-index carve-out (ruling M2-D15): varname() !~ /[a-z]/
-            "CDISC-AD0018", "CDISC-AD0709", "PMDA-AD0018",
+            // (CDISC-AD0018 / CDISC-AD0709 / PMDA-AD0018 left 2026-09-28: their carve-out tests
+            // the LIBRARY name, var_name("LIBRARY") !~ /[a-z]/, which isName does not count)
             // no letter in the pattern: varname() !~ /[0-9]/
             "CDISC-AD0708");
 
     /** Unfolded name tests paired with their folded twin against the same exact cell list. */
     private static final Set<String> TWO_SIDED_NAME_TESTS = Set.of("CDISC-CG0349");
 
-    /** Name membership / equality probes deliberately NOT folded (M2-D15 carve-out family). */
-    private static final Set<String> UNFOLDED_MEMBERSHIP = Set.of("PMDA-AD0018");
+    /**
+     * Name membership / equality probes deliberately NOT folded. Empty since 2026-09-28:
+     * PMDA-AD0018 compares {@code equalsIgnoreCase(varname(), var_name("LIBRARY"))}.
+     */
+    private static final Set<String> UNFOLDED_MEMBERSHIP = Set.of();
 
     /** Exact cells compared with a folded name-list binding and with its unfolded source. */
     private static final Set<String> TWO_SIDED_CELL_PROBES = Set.of("CDISC-CG0370", "FDA-SD0075",
@@ -146,10 +149,24 @@ class CaseFoldedNameTestLoweringTest
     }
 
 
+    /**
+     * A DATA-side name source: {@code varname()} or {@code var_name(level)} for any level but
+     * LIBRARY. {@code var_name("LIBRARY")} is the name the standard publishes, in the standard's
+     * own spelling (a template keeps its lower-case index, TRTxxP), so testing it is no data-name
+     * test and needs no fold.
+     */
     private static boolean isName(Expr e)
     {
         return e instanceof Expr.Call c && (("varname".equals(c.name()) && c.args().isEmpty())
-                || "var_name".equals(c.name()));
+                || ("var_name".equals(c.name()) && !isLibraryName(c)));
+    }
+
+
+    private static boolean isLibraryName(Expr.Call c)
+    {
+        return c.args().size() == 1 && c.args().get(0) instanceof Expr.Lit l
+                && l.kind() == Expr.LitKind.STRING
+                && "LIBRARY".equalsIgnoreCase((String) l.value());
     }
 
 
@@ -561,6 +578,19 @@ class CaseFoldedNameTestLoweringTest
         Expr bare = mixed.tests.stream().filter(s -> s.fold() == null).findFirst().orElseThrow()
                 .node();
         assertNotEquals(stripFold(folded), bare);
+        // a LIBRARY-name test (CDISC-AD0018 after 2026-09-28) is no data-name test; the data-name
+        // spellings of the same leaf are still found, unfolded
+        assertEquals(0, census(List.of("var_name(\"LIBRARY\") !~ /[a-z]/"), Map.of()).tests.size());
+        for (String dataName : List.of("varname() !~ /[a-z]/", "var_name(\"DATA\") !~ /[a-z]/",
+                "var_name(\"DEFINE\") =~ /[a-z]/"))
+        {
+            Census c = census(List.of(dataName), Map.of());
+            assertEquals(1, c.tests.size(), dataName);
+            assertNull(c.tests.get(0).fold(), dataName);
+        }
+        Census probe = census(List.of("varname() == var_name(\"LIBRARY\")"), Map.of());
+        assertEquals(1, probe.members.size());
+        assertNull(probe.members.get(0).fold(), "the data side is still an unfolded probe");
     }
 
 

@@ -855,7 +855,9 @@ scalar spellings are `upper(varname()) in $required_variables` (the membership s
 list too) and `equalsIgnoreCase(varname(), var_name("LIBRARY"))`; a name **test** is
 `ends_with(upper(varname()), "DTC")` / `upper(varname()) =~ /^ANL\d\dFL$/`. A `QNAM` / `IDVAR`
 **cell** is a value and is not folded — it compares exactly, as every string does. The naming rules
-(`varname() !~ /[a-z]/` and kin) test the letter case of the name itself and are never folded.
+(`varname() =~ /.*[a-z]/`, `varname() !~ /^[A-Z0-9_]+$/` and kin) test the letter case of the name itself and are
+never folded; a template carve-out tests the **library** name instead, `var_name("LIBRARY") !~ /[a-z]/`, which
+needs no fold.
 
 
 ## Numbers and arithmetic

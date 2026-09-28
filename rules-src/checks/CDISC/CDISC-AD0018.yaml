@@ -12,9 +12,9 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    varname() !~ /[a-z]/ and not empty(var_label("LIBRARY")) and not contains(var_label("LIBRARY"),
-    "*") and not contains(var_label("LIBRARY"), "...") and not contains(var_label("LIBRARY"), "{")
-    and var_label("DATA") != var_label("LIBRARY")
+    var_name("LIBRARY") !~ /[a-z]/ and not empty(var_label("LIBRARY")) and not
+    contains(var_label("LIBRARY"), "*") and not contains(var_label("LIBRARY"), "...") and not
+    contains(var_label("LIBRARY"), "{") and var_label("DATA") != var_label("LIBRARY")
 Outcome:
   Message: "Labels for ADaM variables do not match the standard labels for ADaM variables\
     \ listed in the implementation guide that cannot be modified (with the exception\

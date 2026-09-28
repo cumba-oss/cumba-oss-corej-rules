@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0018 expect=noViolation domain=ADSL
+#note "CR18 (ADaM Conformance Rules v5.0, ADaMIG 1.0): an all-lowercase ADSL whose labels equal the ADaMIG labels. studyid and usubjid resolve to the Library's STUDYID and USUBJID and are judged; both labels match -> silent. The negative twin of -invalid_lowercase_name."
+#library standard=adamig version=1-0
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL USUBJID name=USUBJID label="Unique Subject Identifier"
+#expectViolationCount 0
+dataset ADSL
+col studyid type=Char label="Study Identifier"
+col usubjid type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | 01-701-1015
+---

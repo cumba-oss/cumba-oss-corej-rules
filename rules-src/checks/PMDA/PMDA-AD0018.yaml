@@ -19,9 +19,10 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    varname() == var_name("LIBRARY") and varname() !~ /[a-z]/ and not empty(var_label("LIBRARY"))
-    and not contains(var_label("LIBRARY"), "*") and not contains(var_label("LIBRARY"), "...") and
-    not contains(var_label("LIBRARY"), "{") and var_label("DATA") != var_label("LIBRARY")
+    equalsIgnoreCase(varname(), var_name("LIBRARY")) and var_name("LIBRARY") !~ /[a-z]/ and not
+    empty(var_label("LIBRARY")) and not contains(var_label("LIBRARY"), "*") and not
+    contains(var_label("LIBRARY"), "...") and not contains(var_label("LIBRARY"), "{") and
+    var_label("DATA") != var_label("LIBRARY")
 Outcome:
   Message: "The variable label in the dataset does not match the variable label described\
     \ in ADaM."
