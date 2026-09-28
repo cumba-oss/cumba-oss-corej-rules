@@ -3712,41 +3712,44 @@ Check:
 
 ### get_codelist_attributes
 
-`get_codelist_attributes(…)` → **value**
+`get_codelist_attributes(name, version, ct_attribute=)` → **value** (a list)
 
-Requested attribute of the target's bound codelist(s)
+The values of one CT-package attribute (e.g. `"Term CCODE"`) for every CT package the rows name. Per
+row, the package is derived from the target and the version: `name = "CDISC"` or `"CDISC CT"` with
+`version = 2024-09-27` names `sdtmct-2024-09-27` under an SDTM standard (`adamct-…` / `sendct-…`
+under ADaM / SEND); any other target names `<target>-<version>`; a blank version names none. The
+answer is the order-preserving union over all rows — **one list for the dataset**.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `ct_attribute` | string | no | Which CT package attribute to extract |
-| `version` | string | no | Column holding the per-row CT package version |
+| `name` | any | yes | The target: the column naming the CT dictionary (`TSVCDREF`) |
+| `version` | any | yes | The column holding the per-row CT version (`TSVCDVER`) |
+| `ct_attribute` | string | yes | Which CT-package attribute to extract, e.g. `"Term CCODE"` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since PLAN-binding-expressions (wave 0 of the operations→functions
+programme): the version column is the second positional argument — a column reference, **not** the
+quoted `version="TSVCDVER"` of the retired operation, which would now be the string literal
+`"TSVCDVER"`. It is an **aggregate**: it folds every row of the dataset whichever row reads it, and
+it is computed once per rule and dataset. It needs the CDISC Library.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$VALID_TERM_CODES"
-  expression: 'get_codelist_attributes(TSVCDREF, ct_attribute="Term CCODE", version="TSVCDVER")'
+  expression: 'get_codelist_attributes(TSVCDREF, TSVCDVER, ct_attribute="Term CCODE")'
 Check:
-  expression: 'TSVALCD not in $VALID_TERM_CODES'
+  expression: 'prefix(TSVCDREF, 5) == "CDISC" and not empty($VALID_TERM_CODES) and TSVALCD not in $VALID_TERM_CODES'
 ```
 
-**Minimal — required parameters only**
+(`CDISC-CG0288`.) The call may also be written directly as the right-hand side of `in` / `not in`
+— the verdict is the binding's.
 
-```yaml
-Bindings:
-- name: "$term_codes"
-  expression: 'get_codelist_attributes(TSVCDREF)'
-Check:
-  expression: 'TSVALCD not in $term_codes'
-```
-
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
-
+**When there is nothing to answer** — the rule is **SKIPPED**, never passed: with no CDISC Library
+(*"Rule skipped — no Library access"*), and when the Library knows none of the packages the rows
+name, or the dataset has no rows (*"Rule skipped — library returned no data for
+get_codelist_attributes"*). It never answers an empty list, so `not empty(...)` cannot quietly read
+`false`.
 
 ### library_available
 

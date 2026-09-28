@@ -597,7 +597,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`codelist_terms(…)`](functions.md#codelist_terms) | value | CT terms of the bound codelist (library CT) |
 | [`dictionary_available(…)`](functions.md#dictionary_available) | boolean | The operation form of the availability gate |
 | [`dictionary_has_decode(…)`](functions.md#dictionary_has_decode) | value | Any-decode presence (also a per-record function, ); code lookup case-sensitive by default, `case_sensitive=false` folds it |
-| [`get_codelist_attributes(…)`](functions.md#get_codelist_attributes) | value | Requested attribute of the target's bound codelist(s) |
+| [`get_codelist_attributes(name, version, ct_attribute=)`](functions.md#get_codelist_attributes) | value | One CT-package attribute (e.g. `"Term CCODE"`) over every package the rows name — a list for the dataset; SKIPPED without a usable Library answer |
 | [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a library-dependent operation; a not-met Precondition ⇒ SKIPPED |
 | [`valid_codelist_dates(…)`](functions.md#valid_codelist_dates) | value | Published CT-package dates for the standard |
 | [`valid_external_dictionary_code(name, external_dictionary_type=)`](functions.md#valid_external_dictionary_code) | value | Dictionary code validity; same evaluator and `case_sensitive` semantics as `_value` |

@@ -1,8 +1,10 @@
 # Bindings
 
 <!-- Grounded: Binding.java — name + expression only, the JsonAnySetter rejects every other key
-     loud (id:, operator:, group:, level:, filter:, …); the expression is a single
-     function call; a binding with no expression is filed on the loadError channel. -->
+     loud (id:, operator:, group:, level:, filter:, …); a binding with no expression is filed on
+     the loadError channel. Since PLAN-binding-expressions (W0): the expression is ANY expression —
+     a single operation call keeps the operation path (BindingRouting), everything else is a
+     compiled binding (CompiledBinding / BindingValue). -->
 
 A binding gives a name to a sub-result, so the check can refer to it instead of restating it.
 
@@ -35,8 +37,38 @@ Bindings:
 **`name`** is the `$`-variable the check will use. Name it for what it *is*, as a noun —
 `$subject_count`, `$first_visit_date` — not for how it is computed.
 
-**`expression`** is a single **function call**. Its parameters are keyword arguments inside the
-call; there are no sibling keys.
+**`expression`** is **any expression** the Check could contain: a function or operation call, a
+column, arithmetic, a comparison, a list literal. Parameters are keyword arguments inside the call;
+there are no sibling keys.
+
+```yaml
+Bindings:
+- name: "$term_upper"                 # a function
+  expression: 'upper(AETERM)'
+- name: "$age"                        # a column of a declared join, per row
+  expression: 'DM.AGE'
+- name: "$limit"                      # arithmetic over another binding
+  expression: '$n - 1'
+- name: "$in_dm"                      # a condition — read it as `$in_dm == true` / `== false`
+  expression: 'USUBJID in distinct(USUBJID, domain="DM")'
+- name: "$allowed"                    # a list literal — read it with `in` / `not in`
+  expression: '["MILD", "MODERATE", "SEVERE"]'
+```
+
+A binding's **level** follows its expression: `upper(AETERM)` has a value per row (reported at the
+finding's row), `record_count() + 0` or a list literal has one value for the dataset. Three rules
+hold whatever the expression:
+
+- **A name is declared once.** A second binding with the same `name` is a load error.
+- **A binding reads only earlier bindings.** Reading a later one, or itself, is a load error.
+- **An operation reads only dataset-level values.** An operation call — declared or written inline
+  — that reads a per-row binding (`minus($a, subtract=$per_row)`) is a load error: an operation's
+  arguments have no row to pick the value at.
+
+A **list** binding (a list literal, or a list-valued function such as `get_codelist_attributes`) is
+read with `in` / `not in`, `empty(…)` or by an operation; comparing it with `==` / `!=` / `<` … is a
+load error, exactly as comparing a column with an inline list is. A list literal holds plain
+literals of one kind: numbers, or strings, never both, and never a column.
 
 
 ## ⛔ Everything else is rejected, loudly
@@ -103,8 +135,10 @@ Bindings:
   expression: "AESEV"
 ```
 
-**When you mean a condition, not a value.** Bindings name *values*. A reusable sub-condition
-belongs in a [composite check](the-check.md#composite-conditions-all-any-not).
+**When the condition is used once.** A binding can name a condition, and a condition used in
+several places reads better under a name. Used once, it is clearer written in the Check; a reusable
+sub-condition that combines others belongs in a
+[composite check](the-check.md#composite-conditions-all-any-not).
 
 > **A binding is worth its name when the name is worth reading.** If you cannot name the result
 > as a noun a reviewer would recognise, the check is probably clearer without it.
