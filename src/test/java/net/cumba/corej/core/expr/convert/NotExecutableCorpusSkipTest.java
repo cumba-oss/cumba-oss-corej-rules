@@ -46,9 +46,9 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * <p>
  * The byte-identity of the <em>shipped</em> corpora is the separate concern of
- * {@link NativeCorpusRoundTripTest} and {@code RulesFixtureSyncTest}: zero rules are currently
- * {@code Not Executable}, so those must be unaffected. That is the gate; this is the proof the skip
- * does anything at all.
+ * {@link NativeCorpusRoundTripTest} (its former partner {@code RulesFixtureSyncTest} is retired,
+ * see {@code RETIRED-CROSS-REPO-GUARDS.md}): zero rules are currently {@code Not Executable}, so it
+ * must be unaffected. That is the gate; this is the proof the skip does anything at all.
  * </p>
  */
 class NotExecutableCorpusSkipTest

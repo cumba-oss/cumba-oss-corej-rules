@@ -16,9 +16,17 @@ and no build checks out both — so unlike the `MetadataProvider` delegation gua
 anything alone.
 
 **What is no longer checked:** that `cumba-corej`'s rule fixtures still match
-this corpus. Rebuilding them is `scripts/build-core-fixtures.py`, and a drift now
-shows up only as an engine test pinning a rule this corpus no longer contains.
-It belongs to the cross-repo sync work that the retirement plan defers (§10).
+this corpus — and since 2026-09-28 there is nothing left to check. The engine's
+copy itself was retired by `PLAN-engine-fixture-join-key-drift` (meta repo
+`plans/`): the fixture tree and `FixtureCorpusIntegrityTest` were deleted from
+both engine twins, the engine tests that only asserted a rule's verdict went with
+them, and the engine's mechanism tests now carry hand-written inline rules that are
+not copies of corpus rules. The generator that rebuilt the copy,
+`scripts/build-core-fixtures.py` (stage 1 of `scripts/regen-rules-corpus.sh`), was
+deleted from this repo in the same plan. A rule's verdict is now proven only here,
+by its `.cdt` scenarios. ⚑ Until the retirement a drift showed up only as an engine
+test pinning a rule this corpus no longer contained — it happened twice
+(2026-09-23, 2026-09-25) with nothing red.
 
 ## `PlanStatusHeaderGuardTest`
 

@@ -42,11 +42,13 @@ import org.junit.jupiter.api.Test;
  *
  * <ul>
  * <li>{@link CorpusPaths} itself — it is the definition.
- * <li>The <b>source</b> trees, which did not move: {@code rules-src}, {@code rules-define-src}, and
- * the committed engine fixtures under {@code src/test/resources/fixtures/rules}. ⚑
- * {@code rules-org} — the archived upstream CDISC release — was a fourth until the 2026-09
+ * <li>The <b>source</b> trees, which did not move: {@code rules-src} and {@code rules-define-src}.
+ * ⚑ {@code rules-org} — the archived upstream CDISC release — was a third until the 2026-09
  * CORE-family retirement deleted it; it was the CORE family's fallback statement of intent and had
- * no other consumer.
+ * no other consumer. ⚑ The committed engine fixtures under
+ * {@code src/test/resources/fixtures/rules} were another until PLAN-engine-fixture-join-key-drift
+ * (2026-09-28) retired that copy of corpus rules from the engine repo; nothing here names it any
+ * more, so it is no longer allowed.
  * <li>Prose: javadoc and comments may name {@code rules/} freely. Only code is checked.
  * </ul>
  */
@@ -74,7 +76,7 @@ class CorpusPathAnchoringGuardTest
 
     /** Source directories, which did not move and must not be flagged. */
     private static final Pattern SOURCE_TREES = Pattern
-            .compile("rules-src|rules-define-src|fixtures/rules|rulespec|\"fixtures\"");
+            .compile("rules-src|rules-define-src|rulespec|\"fixtures\"");
 
     /**
      * The one file allowed to name the generated directories in code.
