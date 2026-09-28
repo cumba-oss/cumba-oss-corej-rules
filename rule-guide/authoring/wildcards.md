@@ -52,6 +52,46 @@ The one shape that constrains beyond the grammar is a bare lower bound — `{xx:
 > ⛔ **A token key that appears in no wildcard in the rule is a load error.** If you bound `y` and
 > the rule's variables use `xx`, the rule fails to load rather than quietly bounding nothing.
 
+## A presence template needs a positive anchor
+
+A wildcard inside a presence test — `var_exists("TRTxxP")` — does not ask *"is any `TRTxxP`
+present?"*. It makes the rule a **template**: the engine runs it once per matching column
+(`TRT01P`, `TRT02P`, …), and on a dataset where **no** column matches it does not run the rule at
+all — it reports it **skipped**.
+
+That is harmless when the rule also tests a template **positively**:
+
+```yaml
+Check:
+  expression: 'var_exists("TRTxxAN") and not var_exists("TRTxxA")'
+```
+
+With no `TRTxxAN` the condition is false anyway, so the skip loses nothing; with `TRT01AN` present
+the rule runs for `xx = 01` and asks about `TRT01A`. The positive test is the rule's **anchor**.
+
+It is fatal when **every** presence template is negated. `not var_exists("TRTxxP")` is true exactly
+when no `TRTxxP` exists — the one dataset the engine skips — and false whenever one does. Such a
+rule can never report anything.
+
+When the question really is *"is any member of the family present?"*, name the family's **first
+instance** instead of the template. ADaM numbers `xx` from `01` and `y` from `1`, so a dataset
+carrying any member carries the first:
+
+| instead of | write |
+|---|---|
+| `not var_exists("TRTxxP")` | `not var_exists("TRT01P")` |
+| `not var_exists("TRTPGy")` | `not var_exists("TRTPG1")` |
+| `not var_exists("TRxxPGy")` | `not var_exists("TR01PG1")` |
+
+With no template left, remove the rule's `wildcards` block as well — a bound on a token no name
+uses is a load error (above).
+
+> ⛔ **`WildcardUniversalAbsenceLintTest` fails the corpus build** on any rule whose presence
+> templates are all negated — through `not`, `var_not_exists` and `not (… or …)` alike. It is the
+> reason this is a rule and not advice: `CDISC-AD0581`, which tests fourteen treatment variables
+> for absence, spelled eight of them as templates and was skipped on exactly the datasets it
+> exists to report.
+
 ## Pairing templates: `wildcardExclude` and `wildcardPairCatalogue`
 
 Some ADaM rules are about **pairs** of variables that share a root — a numeric `*N` and its
