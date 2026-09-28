@@ -163,13 +163,15 @@ same record for the same reason (it has a `src/main/`, but only `resources/` and
 `dist/` in it), where it names four rather than five — this repo additionally has
 `ErrPrn` unarmed.
 
-### ⚠ The build needs the CDISC pickle metadata cache
+### ⚠ The build needs the CDISC pickle corpus — as the seed of the metadata store
 
-Eight tests read Python-engine `.pkl` metadata straight from a cache directory
-(`CDISC_PICKLE_CACHE_DIR` / `-Dcdisc.pickle.cache.dir`). Without it they **fail rather
-than skip** — `PickleProviderGuardTest` hard-fails by design, and three execution specs
-silently flip `EXECUTED` → `SKIPPED`, which would invalidate every `expected_status` pin
-if it were tolerated.
+`MetadataStoreFixture` seeds the unified metadata store (`target/metadata-store/store.zip`)
+once per JVM from the pickle corpus named by `CDISC_PICKLE_CACHE_DIR` /
+`-Dcdisc.pickle.cache.dir`; no test reads a `.pkl` file directly. Without it the tests that
+resolve library metadata through the store **fail rather than skip** —
+`LibraryProviderGuardTest` hard-fails by design, and the execution specs that need a
+library silently flip `EXECUTED` → `SKIPPED`, which would invalidate every
+`expected_status` pin if it were tolerated.
 
 CI seeds it from the **public** upstream; both workflows carry the restore / fetch / save
 steps. To run the full suite locally:

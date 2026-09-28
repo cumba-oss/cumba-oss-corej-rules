@@ -84,13 +84,13 @@ jobs:
       # before any mutation work happens.
       MAVEN_CI_GATES: -Dmaven.compiler.failOnWarning=true -Dspotless.check=true -Dpmd.failOnViolation=true -Dspotbugs.failOnError=true
 
-      # CDISC pickle metadata cache (restore/fetch below, save at the end of the
-      # job). The parity suite reads .pkl files straight from this directory
-      # (PickleCache.CACHE_DIR_ENV). Without it 8 tests fail, not skip:
-      # PickleProviderGuardTest hard-fails by design, PickleMetadataReaderTest (3),
-      # StudyValidationServicePickleTest, and the three FDA/PMDA-SD9999 specs flip
-      # EXECUTED -> SKIPPED. The locator's only built-in default is a dev-host path
-      # no runner carries, so CI must supply it.
+      # CDISC pickle corpus (restore/fetch below, save at the end of the job). It is
+      # the SEED of the unified metadata store: MetadataStoreFixture seeds the store
+      # once per JVM from this directory (PickleCache.CACHE_DIR_ENV); no test reads a
+      # .pkl file directly. Without it the tests that resolve library metadata
+      # through the store fail, not skip: LibraryProviderGuardTest hard-fails by
+      # design, and the FDA/PMDA-SD9999 specs flip EXECUTED -> SKIPPED.
+      # PickleCacheLocator has NO built-in default, so CI must supply it.
       # JOB level, not per-step: Pitest forks its own test runs and must see it too.
       # A literal path outside the checkout - `~` would not expand here, and Java
       # reads the value verbatim.
