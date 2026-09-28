@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0148 expect=violation domain=ADLB
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej CdiscAd0148IntegrationTest.fractionalDouble_fires. PARAMN 1.5 and 2.7 are populated and not integers -> one violation per record."
+#library standard=adamig version=1-0
+#expectViolationCount 2
+#expectViolationAt row=1 PARAMN=1.5
+#expectViolationAt row=2 PARAMN=2.7
+dataset ADLB
+col USUBJID type=Char
+col PARAMN  type=Num
+col PARAMCD type=Char
+---
+S1 | 1.5 | P1
+S1 | 2.7 | P1

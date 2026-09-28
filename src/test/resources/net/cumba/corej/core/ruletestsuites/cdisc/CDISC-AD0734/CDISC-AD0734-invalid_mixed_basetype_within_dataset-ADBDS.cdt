@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0734 expect=violation domain=ADBDS
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej CdiscAd0734IntegrationTest.mixed_populationAndUnpopulationCoexist_oneViolation. BASETYPE is populated on records 1 and 3 and empty on record 2 -> the dataset-level check fires once."
+#library standard=adamig version=1-1
+#expectViolationCount 1
+dataset ADBDS
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASETYPE type=Char
+---
+S01 | PARAM1 | BASE1
+S01 | PARAM2 |
+S02 | PARAM1 | BASE1

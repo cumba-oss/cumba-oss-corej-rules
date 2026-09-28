@@ -195,7 +195,15 @@ class ScenarioFixtureCoverageRatchetTest
     // ⭐ 507 -> 502 the same day (review round 1, F7): CDISC-CG0601 / CG0602 / CG0603 and
     // CDISC-SEND-0198 / -0339, whose §3b declaration changed when they run, gained valid, invalid
     // and skipped scenarios. Re-measured by zeroing (502 read back).
-    private static final int MAX_UNCOVERED = 502;
+    // ⭐ 502 -> 493 on 2026-09-28 (PLAN-engine-fixture-join-key-drift phase 1): the engine's
+    // generated copy of corpus rules was retired, and the eight rules whose verdict only an engine
+    // test proved gained their first scenario (one invalid + one valid each) — CDISC-AD0059,
+    // AD0102, AD0103, AD0131, AD0148, AD0734, CDISC-SEND-0272 and -0326. Measured by zeroing and
+    // reading 493 back, NOT the 494 the plan's arithmetic predicted: 502 was already carrying one
+    // row of slack from an earlier corpus movement. CDISC-AD0581 moves nothing here — it was
+    // already covered (by a skipped scenario), and its planned invalid scenario was kept out
+    // because the released rule SKIPS on its own violation case (the plan's findings).
+    private static final int MAX_UNCOVERED = 493;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus

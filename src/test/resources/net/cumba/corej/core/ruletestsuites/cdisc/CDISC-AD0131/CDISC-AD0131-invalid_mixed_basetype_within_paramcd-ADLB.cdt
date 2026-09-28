@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0131 expect=violation domain=ADLB
+#note "PLAN-engine-fixture-join-key-drift: ported from cumba-corej CdiscAd0131And0735IntegrationTest.cdiscAd0131_mixedBasetype_fires. Within PARAMCD=GLUC BASETYPE is X on one record and empty on the other -> one violation for that group; ALB is consistent."
+#library standard=adamig version=1-2
+#expectViolationCount 1
+dataset ADLB
+col USUBJID  type=Char
+col PARAMCD  type=Char
+col BASETYPE type=Char
+---
+S1 | GLUC | X
+S2 | GLUC |
+S3 | ALB  | Y
+S4 | ALB  | Y
