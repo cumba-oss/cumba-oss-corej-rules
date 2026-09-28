@@ -68,6 +68,8 @@ public final class SpecRunner
             String engineStatusMessage,
             /* The spec's declared expectation; null ⇒ EXECUTED. */
             @Nullable RuleExecutionStatus expectedStatus,
+            /* The spec's declared status message; null ⇒ not asserted. */
+            @Nullable String expectedStatusMessage,
             /*
              * Classified failure reasons (ViolationNormaliser.ErrorReason names), sorted and
              * de-duplicated. Compared against expectedErrors by errorsMatch(); NOT the same thing
@@ -90,6 +92,17 @@ public final class SpecRunner
         public boolean statusMatches()
         {
             return orExecuted(expectedStatus) == orExecuted(engineStatus);
+        }
+
+
+        /**
+         * The status-message channel: when the spec declares {@code expected_status_message}, the
+         * engine's status message must equal it exactly; an undeclared message asserts nothing.
+         */
+        public boolean statusMessageMatches()
+        {
+            return expectedStatusMessage == null
+                    || expectedStatusMessage.equals(engineStatusMessage);
         }
 
 
@@ -121,7 +134,7 @@ public final class SpecRunner
 
         public boolean passed()
         {
-            return violationsMatch() && statusMatches() && errorsMatch();
+            return violationsMatch() && statusMatches() && statusMessageMatches() && errorsMatch();
         }
 
 
@@ -147,6 +160,11 @@ public final class SpecRunner
                 // Worded identically to the Python lane's format_diff.
                 sb.append("\n  status: expected=").append(orExecuted(expectedStatus))
                         .append(" observed=").append(orExecuted(engineStatus));
+            }
+            if (!statusMessageMatches())
+            {
+                sb.append("\n  status message: expected=").append(expectedStatusMessage)
+                        .append(" observed=").append(engineStatusMessage);
             }
             if (!errorsMatch())
             {
@@ -321,7 +339,7 @@ public final class SpecRunner
                     expectedErrorsSkip, missingSkip, unexpectedSkip, RuleExecutionStatus.SKIPPED,
                     "Rule skipped — " + scopeSkipReason + " (primary dataset '" + primaryDomain
                             + "')",
-                    spec.expectedStatus(),
+                    spec.expectedStatus(), spec.expectedStatusMessage(),
                     // ...and no Check evaluated means no failure reason either. A scope skip is
                     // SKIPPED, never ERROR, so the errors channel is empty by construction here.
                     List.of());
@@ -373,7 +391,7 @@ public final class SpecRunner
         // messages ride along only so formatDiff can show them.
         return new SpecResult(spec.name(), observed, observedErrors, expected, expectedErrors,
                 missing, unexpected, result.getStatus(), result.getStatusMessage(),
-                spec.expectedStatus(), observedReasons);
+                spec.expectedStatus(), spec.expectedStatusMessage(), observedReasons);
     }
 
 

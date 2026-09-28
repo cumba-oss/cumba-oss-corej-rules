@@ -739,6 +739,11 @@ most recent additions.
   (partner found by the unique-concept-set fallback in
   `ExprCompiler.resolvePartner`). Pin both, or the exact-set location check fails.
 
+  An undeclared variable has an empty `codelist-codes` map, so CT2003 never
+  fires — that is also why an `expect=skipped` is *not* reachable for it: its
+  skip gate is a **null Library provider**, and every `fda` / `pmda` scenario
+  must declare `#library standard=…`.
+
 - **`codelist-term-ccodes`** declares one codelist's **term submission value →
   NCI concept id ("C-code")** map — the term-conceptId channel of
   `MetadataProvider.getCodelist`, which is what
@@ -783,12 +788,10 @@ most recent additions.
 
   ⚠ An undeclared package or attribute answers an **empty** list, and the
   function refuses an empty answer: the rule is `skipped`, never silently
-  passed. That is the `expect=skipped` shape to pin, alongside the null-Library
-  skip.
-
-  An undeclared variable has an empty map, so it never fires — that is also why an
-  `expect=skipped` is *not* reachable here: the skip gate is a **null Library
-  provider**, and every `fda` / `pmda` scenario must declare `#library standard=…`.
+  passed. So — unlike `codelist-codes` — `expect=skipped` IS reachable here
+  with a Library present, and `CDISC-CG0288` pins both SKIP arms: no `#library`
+  line at all (no Library provider) and a `#library` that lacks the package the
+  rows name.
 
 - **`model-class-variables`** (EC-85) declares the SDTM model's variable table
   for *one general observation **class*** — what

@@ -50,7 +50,16 @@ class SpecRunnerStatusTest
         // Trailing List.of() = observedReasons: this fixture exercises the STATUS channel, so the
         // errors channel is held empty-vs-empty (matching) and never masks a status assertion.
         return new SpecRunner.SpecResult("unit", List.of(), List.of(), List.of(), List.of(),
-                aMissing, NO_DIFF, aEngineStatus, null, aExpectedStatus, List.of());
+                aMissing, NO_DIFF, aEngineStatus, null, aExpectedStatus, null, List.of());
+    }
+
+
+    private static SpecRunner.SpecResult messageResult(String aEngineMessage,
+            String aExpectedMessage)
+    {
+        return new SpecRunner.SpecResult("unit", List.of(), List.of(), List.of(), List.of(),
+                NO_DIFF, NO_DIFF, RuleExecutionStatus.SKIPPED, aEngineMessage,
+                RuleExecutionStatus.SKIPPED, aExpectedMessage, List.of());
     }
 
 
@@ -222,6 +231,42 @@ class SpecRunnerStatusTest
     }
 
     // --- the load contract -----------------------------------------------------------
+
+    // --- the status-message channel (PLAN-binding-expressions review round 1, T1) ----------
+
+
+    @Test
+    void anUndeclaredStatusMessageAssertsNothing()
+    {
+        assertTrue(messageResult("Rule skipped — no Library access", null).passed());
+        assertTrue(messageResult(null, null).statusMessageMatches());
+    }
+
+
+    @Test
+    void aDeclaredStatusMessageIsComparedExactly()
+    {
+        String gate = "Rule skipped — no Library access";
+        String signal = "Rule skipped — library returned no data for get_codelist_attributes";
+        assertTrue(messageResult(gate, gate).passed());
+        SpecRunner.SpecResult other = messageResult(signal, gate);
+        assertTrue(other.statusMatches(), "both SKIPPED — only the message tells them apart");
+        assertFalse(other.statusMessageMatches());
+        assertFalse(other.passed());
+        assertTrue(other.formatDiff().contains("status message: expected=" + gate),
+                other.formatDiff());
+        assertFalse(messageResult(null, gate).statusMessageMatches());
+    }
+
+
+    @Test
+    void theStatusMessageKeyLoads(@TempDir Path tmp) throws IOException
+    {
+        assertEquals("Rule skipped — no Library access", load(tmp,
+                "expected_status: SKIPPED\nexpected_status_message: Rule skipped — no Library access\n")
+                        .expectedStatusMessage());
+        assertEquals(null, load(tmp, "").expectedStatusMessage());
+    }
 
 
     @Test

@@ -1,7 +1,7 @@
 name: CDISC-CG0288
 kind: rule
 description: |
-  Record-Data + Operation port. CDISC-CG0288: in TS, when TSVCDREF starts with "CDISC"
+  Record-Data port. CDISC-CG0288: in TS, when TSVCDREF starts with "CDISC"
   and a valid CDISC CT version is named in TSVCDVER, TSVALCD must be a code present in
   that CT version. The registry function `get_codelist_attributes` (Term CCODE; an Operation
   until PLAN-binding-expressions wave 0 ported it, a COMPILED list-valued binding since) resolves
@@ -9,6 +9,10 @@ description: |
   TS row sets TSVCDREF=CDISC, TSVCDVER=2024-09-27, TSVALCD=C000000 (not a real CDISC
   code), so the record fires: prefix matches, $VALID_TERM_CODES is non-empty, and
   TSVALCD is not contained by it.
+  A MedDRA row with a blank TSVCDVER is listed FIRST: it resolves no CT package and the
+  prefix guard leaves it alone, so exactly the CDISC row fires — and the rule EXECUTES
+  rather than ERRORs, which it did while the dataset-level fold re-ran the aggregate over
+  row 0 alone (review round 1, H1).
 python_source: rules-sdtmig-3-4.json (CORE-001080)
 rule:
   coreId: CDISC-CG0288
@@ -16,6 +20,11 @@ datasets:
   TS:
     row_key: [STUDYID, TSSEQ, TSPARMCD]
     rows:
+      # Row 0 resolves NO CT package (a MedDRA row with a blank TSVCDVER), deliberately FIRST:
+      # $VALID_TERM_CODES is an aggregate over the whole table, and the dataset-level leaf
+      # `not empty($VALID_TERM_CODES)` is folded once over a single synthetic row — the binding
+      # must still answer the union of ALL rows (PLAN-binding-expressions review round 1, H1).
+      - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: INDIC, TSVAL: HYPERTENSION, TSVCDREF: MedDRA, TSVCDVER: '', TSVALCD: '10020772'}
       - {STUDYID: S1, DOMAIN: TS, TSSEQ: 1, TSPARMCD: SPECIES, TSVAL: HUMAN, TSVCDREF: CDISC, TSVCDVER: '2024-09-27', TSVALCD: C000000}
 config:
   standard: sdtmig

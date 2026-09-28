@@ -5,7 +5,10 @@ description: |
   compiled binding, with NO Library provider: `domain_is_custom() == false` is not a single top-level
   OperationType call, so it compiles, and the provider gate must still see the nested operation
   (`ProviderNeeds.ofExpr` reads an inline operation call by its `OperationType`). The rule is
-  SKIPPED, exactly as the same call declared as its own binding would be.
+  SKIPPED, exactly as the same call declared as its own binding would be — and the status
+  MESSAGE is pinned to the provider gate's "no Library access" (review round 1, T1/T2), so the
+  spec cannot pass through the other SKIP layer. The Check reads `$standard == true`; the bare
+  `$standard` it used to read could not compile.
 
   No Library provider: `adamig`, no `library_mocks` (see W0-BINDING-NESTED-PROVIDER).
 
@@ -22,7 +25,7 @@ rule:
   - name: "$standard"
     expression: 'domain_is_custom() == false'
   Check:
-    expression: '$standard and empty(AETERM)'
+    expression: '$standard == true and empty(AETERM)'
   Outcome:
     Message: AETERM is empty in a standard domain.
     Output_Variables: [AETERM]
@@ -35,5 +38,6 @@ config:
   standard: adamig
   standard_version: '1.3'
 expected_status: SKIPPED
+expected_status_message: Rule skipped — no Library access
 expected_violations: []
 expected_errors: []

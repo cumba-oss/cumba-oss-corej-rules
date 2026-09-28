@@ -5,7 +5,11 @@ description: |
   binding, with NO Library provider: `get_codelist_attributes` carries the LIBRARY provider
   capability (§5.2), and `ProviderNeeds.ofBindings` finds it inside
   `not empty(get_codelist_attributes(...))`. The rule is SKIPPED — never a silent PASS, which is
-  what `not empty([])` would otherwise answer.
+  what `not empty([])` would otherwise answer. The status MESSAGE is pinned: it is the
+  provider gate's "no Library access", not the unusable-answer signal's "library returned no
+  data for …" — the two SKIP layers are told apart (review round 1, T1). The Check reads the
+  condition binding as `$has_codes == true`; a bare `$b` is not a condition, so the earlier
+  spelling could not compile and was SKIPPED only because the gate ran first.
 
   No Library provider: the spec runs under `adamig` with no `library_mocks`, for which the harness
   builds none (`SpecRunner.libraryProviderFor`: SDTM family only), exactly the
@@ -24,7 +28,7 @@ rule:
   - name: "$has_codes"
     expression: 'not empty(get_codelist_attributes(TSVCDREF, TSVCDVER, ct_attribute="Term CCODE"))'
   Check:
-    expression: '$has_codes and TSVALCD == "C000000"'
+    expression: '$has_codes == true and TSVALCD == "C000000"'
   Outcome:
     Message: TSVALCD is not a term code.
     Output_Variables: [TSVALCD]
@@ -37,5 +41,6 @@ config:
   standard: adamig
   standard_version: '1.3'
 expected_status: SKIPPED
+expected_status_message: Rule skipped — no Library access
 expected_violations: []
 expected_errors: []

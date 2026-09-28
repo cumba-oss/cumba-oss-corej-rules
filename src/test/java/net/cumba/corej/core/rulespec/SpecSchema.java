@@ -41,6 +41,13 @@ public record SpecSchema(String name, Kind kind, String description, String pyth
          */
         @JsonAlias("expected_status") RuleExecutionStatus expectedStatus,
         /*
+         * The rule-level status MESSAGE this lane is expected to produce, compared exactly when
+         * declared and ignored when absent (PLAN-binding-expressions review round 1, T1). Two
+         * SKIPPED specs can differ only in WHICH gate skipped them — "no Library access" versus
+         * "library returned no data for …" — and the status channel alone cannot tell them apart.
+         */
+        String expectedStatusMessage,
+        /*
          * Provenance of a fully inline pinned rule (D1/D4, PLAN-parity-java-lane-native-corpus):
          * the spec's {@code rule:} was derived once from the named corpus rule and does not track
          * it. {@code PinnedSpecSyncGuardTest} fingerprints the source file and fails when it

@@ -44,7 +44,7 @@ class ExpectedErrorsTest
     {
         return new SpecRunner.SpecResult("synthetic", List.of(), List.of(), List.of(),
                 expectedErrors, java.util.Set.of(), java.util.Set.of(),
-                RuleExecutionStatus.EXECUTED, null, null, observedReasons);
+                RuleExecutionStatus.EXECUTED, null, null, null, observedReasons);
     }
 
     @Nested

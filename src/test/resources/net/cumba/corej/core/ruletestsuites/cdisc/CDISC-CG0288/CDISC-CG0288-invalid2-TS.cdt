@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0288 expect=violation domain=TS
+#note "ROW 0 RESOLVES NO CT PACKAGE (a MEDDRA row with a blank TSVCDVER), row 1 is the CDISC row whose TSVALCD C000000 is not in sdtmct-2024-09-27's Term CCODE set -> fires once, on row 1. $VALID_TERM_CODES is an AGGREGATE over the whole table: the dataset-level leaf not empty($VALID_TERM_CODES) is folded once over a single synthetic row, and the binding must still answer the union of ALL rows, never row 0's. Before the fix (PLAN-binding-expressions review round 1, H1) the fold re-ran the function over row 0 only, found no package and ERRORed the rule."
+#library standard=sdtmig version=3-4
+#library codelist-attributes sdtmct-2024-09-27 "Term CCODE" C49488 C66731
+#expectViolationCount 1
+#expectViolationAt TSVALCD=C000000
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+col TSVCDREF type=Char
+col TSVCDVER type=Char
+col TSVALCD  type=Char
+---
+S1 | TS | 1 | INDIC   | HYPERTENSION | MEDDRA |            | 10020772
+S1 | TS | 2 | SPECIES | HUMAN        | CDISC  | 2024-09-27 | C000000
