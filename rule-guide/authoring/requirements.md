@@ -171,6 +171,46 @@ facets are unmet keeps reporting exactly the reason it always did.
 > and its reasons are in [Joins — Declare the key](joins.md#-declare-the-key--required-for-every-keyed-join).
 > The engine never applies it on its own: a rule without the declaration simply runs.
 
+## How the four facets are evaluated
+
+<!-- Confirmed semantics — owner, 2026-09-28 ("Requirements-template semantics (All / Any / None /
+     All_Or_None, including "the rule runs when none of the variables is present") go into the SPEC
+     and rule guide as confirmed semantics"), register entry CIT §2; stated from the engine's
+     requirement gate as implemented, PLAN-case-insensitive-templates. -->
+These are the confirmed semantics of the requirement gate, exactly as it evaluates a rule against
+a dataset:
+
+- **Order: `All`, then `Any`, then `None`, then `All_Or_None`.** The first unmet `All` entry, the
+  first unmet `Any` group, the first *present* `None` entry or the first unmet `All_Or_None` group
+  decides — its reason is the skip reason, and nothing after it is inspected.
+- **Every entry is an existence test, and every entry matches ignoring letter case.** A literal is
+  an exact name lookup; a `--` entry is resolved against the dataset's domain prefix first; a glob,
+  a `/regex/` and a [marker template](wildcards.md) such as `TRTxxP` are patterns, satisfied when
+  **at least one** column matches them in full (`trt01p` and `TRT02P` both satisfy `TRTxxP`).
+- **A template entry binds nothing.** It asks whether *some* member of the family exists; it does
+  not choose or restrict the `xx` / `y` / `w` the check expands over. The other way round does
+  hold: when the check is itself a template, each expansion substitutes the same template in the
+  entries with the column it bound (`TRTxxP:N` becomes `TRT01P:N`).
+- **`All`** — every entry must have at least one match, otherwise the rule is skipped, naming the
+  first entry that has none.
+- **`Any`** — evaluated per group, the groups ANDed; a group is met by its first present entry and
+  unmet only when every entry in it is absent (the skip names the group and its position).
+- **`None`** — the rule is skipped when any entry is present (a literal that exists, or a pattern
+  that some column matches). **When none of the listed variables is present, the requirement is
+  met and the rule runs.** That is why a negated family test belongs here (see
+  [Wildcards](wildcards.md#a-presence-template-needs-a-positive-anchor)).
+- **`All_Or_None`** — evaluated per group, the groups ANDed; a group is met when every entry is
+  present or none is, and a partly present group skips the rule, naming both halves. Pattern
+  entries are compared *resolved* (the same concrete names on every side); an entry that cannot
+  be decided skips the group rather than counting as absent.
+- **Qualified entries (`DS.VAR`)** keep every semantic above on their variable half and look in
+  that dataset. In `All` and `Any` the dataset must exist **and** carry the variable — an absent
+  dataset skips the rule, naming the dataset. In `None` an absent dataset excludes nothing: the
+  requirement is met. When the run cannot resolve datasets at all, a qualified entry is
+  undecidable and skips the rule in every facet, `None` included.
+- **A type suffix** (`:N` / `:C`, on `All` and `Any` only) makes a present column of the wrong
+  type a mismatch of its own; see [below](#demanding-a-type-as-well-as-presence).
+
 ## What an entry may be
 
 The same vocabulary on all four facets:
