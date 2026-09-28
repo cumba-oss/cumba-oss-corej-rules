@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0124 expect=noViolation domain=DM
-#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0124 (SDTMIG 3.2), Condition \"ACTARMCD not in TA.ARMCD\", Rule \"ACTARMCD in (SCRNFAIL, NOTASSGN, NOTTRT, UNPLAN)\"; exemption literals are the sheet's exact upper-case values. Every ACTARMCD is either an ARMCD TA defines (PBO, XANHI) or one of the four exemption values -> no row meets the Condition without meeting the Rule. No blank ACTARMCD and no lower-case exemption literal (neither is decided by the sheet text)."
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0124 (SDTMIG 3.2), Condition \"ACTARMCD not in TA.ARMCD\", Rule \"ACTARMCD in (SCRNFAIL, NOTASSGN, NOTTRT, UNPLAN)\"; exemption literals are the sheet's exact upper-case values. Every ACTARMCD is either an ARMCD TA defines (PBO, XANHI) or one of the four exemption values -> no row meets the Condition without meeting the Rule. No blank ACTARMCD (a null is not decided by the sheet text). No lower-case exemption literal either, but for a different reason: the Check compares upper(ACTARMCD), and that case-folding is the RULED idiom (PLAN-port-core-expression-improvements Q1(a), owner 2026-09-22; CHANGE-arm-upper-alignment.tsv), so a lower-case exemption value is decided (exempt) -- it is simply not this scenario's subject."
 #library standard=sdtmig version=3-2
 #expectViolationCount 0
 dataset DM label="Demographics"

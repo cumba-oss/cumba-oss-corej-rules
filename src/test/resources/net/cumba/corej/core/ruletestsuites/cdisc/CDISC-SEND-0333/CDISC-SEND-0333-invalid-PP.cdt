@@ -1,9 +1,9 @@
 #!RuleTest
 #test CDISC-SEND-0333 expect=violation domain=PP
-#note "Authority: SEND Conformance Rules v5.0 SEND333 (Condition: PC records contribute to a single time concentration profile in PP; Rule: PCNOMDY & PCTPTREF = PPNOMDY & PPTPTREF). Partially Executable (underreporting): the Check tests the PP pair against the study-wide set of PC pairs, not against the pair of that profile own PC records; here every silent PP row pairs with its OWN subject profile, so the unchecked association is not violated (plan §2.4). PCNOMDY / PPNOMDY are declared Num. Row 2's pair (14, Day 14 Dose) is the pair of no PC record at all, so no PC profile can have it -> fires. Row 1's (1, Day 1 Dose) is the pair of S1-001's own PC profile."
+#note "Authority: SEND Conformance Rules v5.0 SEND333 (Condition: PC records contribute to a single time concentration profile in PP; Rule: PCNOMDY & PCTPTREF = PPNOMDY & PPTPTREF). Partially Executable (underreporting): the Check tests the PP pair against the study-wide set of PC pairs, not against the pair of that profile own PC records; here every silent PP row pairs with its OWN subject profile, so the unchecked association is not violated (plan §2.4). PCNOMDY / PPNOMDY are declared Num. Each subject has one PC profile and one PP profile, so the PC records of a subject contribute to that subject's PP profile and the Condition holds for every row. Row 2 (S1-002) summarises S1-002's own PC profile, whose records carry the pair (28, Day 28 Dose), but reports (14, Day 14 Dose), the pair of no PC record at all -> fires. Row 1's (1, Day 1 Dose) is the pair of S1-001's own PC profile -> silent."
 #library standard=sendig version=3-1-1
 #expectViolationCount 1
-#expectViolationAt row=2 USUBJID=S1-001 PPNOMDY=14 PPTPTREF="Day 14 Dose"
+#expectViolationAt row=2 USUBJID=S1-002 PPNOMDY=14 PPTPTREF="Day 14 Dose"
 dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"
@@ -14,7 +14,7 @@ col PPNOMDY  type=Num  label="Nominal Study Day for Tabulations"
 col PPTPTREF type=Char label="Time Point Reference"
 ---
 S1 | PP | S1-001 | 1 | CMAX | 1  | Day 1 Dose
-S1 | PP | S1-001 | 2 | CMAX | 14 | Day 14 Dose
+S1 | PP | S1-002 | 1 | CMAX | 14 | Day 14 Dose
 ---
 
 dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
@@ -27,6 +27,8 @@ col PCNOMDY  type=Num  label="Nominal Study Day for Tabulations"
 col PCTPTREF type=Char label="Time Point Reference"
 col PCTPTNUM type=Num  label="Planned Time Point Number"
 ---
-S1 | PC | S1-001 | 1 | DRUGX | 1 | Day 1 Dose | 1
-S1 | PC | S1-001 | 2 | DRUGX | 1 | Day 1 Dose | 2
+S1 | PC | S1-001 | 1 | DRUGX | 1  | Day 1 Dose  | 1
+S1 | PC | S1-001 | 2 | DRUGX | 1  | Day 1 Dose  | 2
+S1 | PC | S1-002 | 1 | DRUGX | 28 | Day 28 Dose | 1
+S1 | PC | S1-002 | 2 | DRUGX | 28 | Day 28 Dose | 2
 ---
