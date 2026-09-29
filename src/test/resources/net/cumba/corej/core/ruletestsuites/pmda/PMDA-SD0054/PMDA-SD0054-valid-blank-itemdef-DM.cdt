@@ -1,0 +1,11 @@
+#!RuleTest
+#test PMDA-SD0054 expect=noViolation domain=DM
+#note "The Define-XML sidecar declares STUDYID, DOMAIN and USUBJID for DM (all present in the dataset) plus one ItemDef with a BLANK Name and one with no Name. Neither names a column, so the Define provider skips both (register NNL 1) and define_variable_names() is exactly [STUDYID, DOMAIN, USUBJID] -> contains_all holds -> no violation. Before the fix the blank name entered the list as a present empty name and the rule fired with $missing_define_variables holding that empty name."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD0054-blank-itemdef-define.xml
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001
