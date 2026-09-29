@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0460 expect=violation domain=AE
+# Rule:Description: Raise an error when the High Level Term (--HLT) is not on the MedDRA primary system organ class hierarchy path.
+#note "PLAN-function-surface-wave1 review round 1 (lane 2 L3 / lane 3 M3): the rule's Check reads ONLY the binding ($x == false), so its Sensitivity is derived from the binding's column parameters. Rows 1 and 3 are both off-path (Headaches NEC under Gastrointestinal disorders; Nausea and vomiting symptoms under Nervous system disorders) and must each fire — TWO findings, never one. A rule that derives no Sensitivity is treated as non-row-based and collapses its per-row BitSet to ONE finding; that is the latent regression this scenario pins (the engine twin is GroupedPredicatesTest.bindingOnlyCheckDerivesRecordSensitivityAndReportsEveryRow). Row 2 is on-path and must stay quiet."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 2
+#expectViolationAt row=1
+#expectViolationAt row=3
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLT type=Char label="High Level Term"
+col AESOC type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | Headaches NEC | Gastrointestinal disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | Headaches NEC | Nervous system disorders
+CDISCPILOT01 | AE | 01-701-1015 | 3 | Nausea and vomiting symptoms | Nervous system disorders
+---

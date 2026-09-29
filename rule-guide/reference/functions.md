@@ -1501,7 +1501,7 @@ Check:
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `ordering` | column | yes | The column that orders the group (`SESEQ`); numeric when both sides are numbers, else textual; a missing value ranks lowest |
+| `ordering` | column | yes | The column that orders the group (`SESEQ`); numeric when both sides are numbers, else textual; a missing value ranks lowest, two missing markers by their value byte. ⚠ On a **character** column that mixes numeric-looking and textual values (`3`, `10`, `2x`) the ranking is not a total order and the answer depends on row order — order by a numeric column, as both shipped sites do |
 | `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
@@ -3773,7 +3773,7 @@ Code↔decode pairing against an external dictionary: `true` on a row whose code
 | `name` | column | yes | The code column (`TSVALCD`, `--STRESC`) |
 | `external_dictionary_term_variable` | column | yes | The decode / term column to pair with the code (`TSVAL`, `--RESCAT`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"unii"`, `"snomed"`, `"medrt"`, `"neoplasm"`) |
-| `case_sensitive` | boolean | no | Whether the comparison folds case; default `true` |
+| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
 
 Both column parameters are **column references**; a quoted name (`external_dictionary_term_variable="TSVAL"`) is a string literal and fails to load, and a call without the term column fails to load. The dictionary type must be a string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. (Until wave 1 of the operation→function programme this was an operation taking `external_dictionary_term_variable="TSVAL"` as a quoted string.)
 
@@ -3811,7 +3811,7 @@ Hierarchy ancestor test against an external dictionary: `true` on a row whose ch
 | `name` | column | yes | The child term column (`--HLT`, `--HLGT`) |
 | `dictionary_parent` | column | yes | The candidate ancestor column (`--SOC`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`) |
-| `case_sensitive` | boolean | no | Whether the comparison folds case; default `true` |
+| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
 
 Both column parameters are **column references**: the `--` in `--HLT` / `--SOC` is resolved like any other variable name, and a quoted name (`dictionary_parent="--SOC"`) is a string literal and fails to load. The dictionary type must be a string literal; a rule whose dictionary is not loaded reports **SKIPPED** before any row is read.
 

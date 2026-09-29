@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0460 expect=violation domain=AE
 # Rule:Description: Raise an error when the High Level Term (--HLT) is not on the MedDRA primary system organ class hierarchy path.
-#note "EC-36 pin: the rule's dictionary_parent is the template --SOC. Until EC-36 it was copied verbatim, so evalValidExternalDictionaryHierarchy looked up a column literally named '--SOC', missed, and returned null — the rule reported EXECUTED with 0 findings, a false 'checked and clean'. It now resolves to AESOC. Row 1's HLT 'Headaches NEC' sits under 'Nervous system disorders', so the 'Gastrointestinal disorders' SOC is off-path and must fire. Both operands carry the MedDRA preferred case, so the miss is the hierarchy path itself and not a case mismatch (C1 repair)."
+#note "EC-36 pin: the rule's dictionary_parent is the template --SOC. Until EC-36 the retired operation evaluator copied it verbatim, looked up a column literally named '--SOC', missed, and returned null — the rule reported EXECUTED with 0 findings, a false 'checked and clean'. Since wave 1 of the operation→function programme dictionary_parent is a typed column parameter of valid_external_dictionary_hierarchy, resolved to AESOC by the shared parameter path (the hand-written arm is unrepresentable). Row 1's HLT 'Headaches NEC' sits under 'Nervous system disorders', so the 'Gastrointestinal disorders' SOC is off-path and must fire. Both operands carry the MedDRA preferred case, so the miss is the hierarchy path itself and not a case mismatch (C1 repair)."
 #library standard=sdtmig version=3-4
 #dictionaries dummy
 #expectViolationCount 1

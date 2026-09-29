@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0006 expect=noViolation domain=AE
-#note "PLAN-function-surface-wave1 phase 2 (a2): DM is present and joined, but carries no RFSTDTC column. D4 / D34 #3-#4: the absent joined reference is a constant column of its type default, so is_complete_date_part(DM.RFSTDTC) is false on every row and the rule runs (noViolation asserts an EXECUTE, so this cannot pass on a SKIP) without firing. AEDY is deliberately wrong so that a reference read from anywhere else would fire."
+#note "PLAN-function-surface-wave1 phase 2 (a2): DM is present and joined, but carries no RFSTDTC column. D4 / D34 #3-#4: the absent joined reference is a constant column of its type default, so is_complete_date_part(DM.RFSTDTC) is false on every row and the rule runs (noViolation asserts an EXECUTE, so this cannot pass on a SKIP) without firing. AEDY=99 is not the study day of AEDTC against any date in this scenario, so the silence is D4's, not a coincidental agreement — but nothing here carries a second reference date, so this scenario cannot tell a fallback apart from the absent-column silence; FDA-SD1381-valid_rfxstdtc_absent-MB.cdt is the one that can."
 dataset AE label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

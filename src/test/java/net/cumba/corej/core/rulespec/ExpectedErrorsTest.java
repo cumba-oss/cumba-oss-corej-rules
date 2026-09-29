@@ -308,7 +308,8 @@ class ExpectedErrorsTest
                 // which is precisely the silent gap this test exists to close. STAGE_B arrives
                 // with D104e.
                 "LOAD_ERROR", "RELREC_KEY_EXPANSION", "NO_NATIVE_CHECK_EXPR",
-                "INVALID_SPLIT_DOMAIN", "COLUMN_TYPE_MISMATCH", "STAGE_B", "OTHER"
+                "INVALID_SPLIT_DOMAIN", "COLUMN_TYPE_MISMATCH", "STAGE_B", "UNGATED_PROVIDER_REACH",
+                "OTHER"
         })
         void everyTokenNameIsAValidEnumConstant(String token)
         {
@@ -319,7 +320,7 @@ class ExpectedErrorsTest
 
 
         @Test
-        void theVocabularyHasExactlySevenTokens()
+        void theVocabularyHasExactlyEightTokens()
         {
             // Widened 4 → 5 by Fix #358: INVALID_SPLIT_DOMAIN covers the split-domain
             // union-failure ERROR (ruling 1 of PLAN-match-datasets-split-union.md).
@@ -335,7 +336,13 @@ class ExpectedErrorsTest
             // RuleRunner's seventh ERROR site, the phase-4 stage-B bind gate. Its population is
             // zero today; the branch is proved reachable by StageBErrorReasonReachabilityTest
             // rather than justified by a comment claiming it cannot happen.
-            Assertions.assertEquals(7, ViolationNormaliser.ErrorReason.values().length,
+            // Widened 7 -> 8 on 2026-09-29 by PLAN-function-surface-wave1 review round 1:
+            // UNGATED_PROVIDER_REACH covers RuleRunner's eighth ERROR site, the D-W1-3 (vii)
+            // tripwire (a dictionary function reached past its provider gate), given its own
+            // catch so it no longer shares COLUMN_TYPE_MISMATCH's. Its population is zero by
+            // construction; the branch is proved reachable by
+            // UngatedProviderReachErrorReasonReachabilityTest with the ENGINE's own message.
+            Assertions.assertEquals(8, ViolationNormaliser.ErrorReason.values().length,
                     "A new ErrorReason means a new classification branch and, most likely, a new "
                             + "RuleRunner ERROR site — update EngineContract below before widening "
                             + "this, and add a classify() case or it silently buckets as OTHER.");

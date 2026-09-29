@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1381 expect=noViolation domain=MB
-#note "PLAN-function-surface-wave1 phase 2 (a2) on a parameterised-reference rule: DM is joined but has no RFXSTDTC column (it does carry RFSTDTC, which the rule must NOT fall back to). The absent joined reference is its type default (D4 / D34 #3-#4), is_complete_date(DM.RFXSTDTC) is false, and the rule EXECUTES without firing. MBXDY=15 is the value RFSTDTC would give, so a fallback to RFSTDTC would still not fire and a fallback to any other date would."
+#note "PLAN-function-surface-wave1 phase 2 (a2) on a parameterised-reference rule: DM is joined but has no RFXSTDTC column (it does carry RFSTDTC, which the rule must NOT fall back to). The absent joined reference is its type default (D4 / D34 #3-#4), is_complete_date(DM.RFXSTDTC) is false, and the rule EXECUTES without firing. MBXDY=99, where RFSTDTC (2023-06-01) would give day 15: a fallback to RFSTDTC — the retired operation's default — would FIRE here, so this scenario's silence proves the reference was not read from RFSTDTC."
 #library standard=sendig version=ar-1-0
 dataset MB class=FINDINGS
 col STUDYID type=Char label="Study Identifier"

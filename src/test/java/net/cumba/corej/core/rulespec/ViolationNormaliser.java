@@ -254,6 +254,14 @@ public final class ViolationNormaliser
          */
         STAGE_B,
         /**
+         * A provider-backed registry function was <b>reached</b> although its provider gate should
+         * have SKIPPED the rule before any row was read — {@code PLAN-function-surface-wave1}
+         * D-W1-3 (vii), the {@code UngatedProviderReachException} tripwire (RuleRunner's eighth
+         * ERROR site). A gate hole, never a data condition: the rule reports ERROR instead of a
+         * silent {@code false} on every row.
+         */
+        UNGATED_PROVIDER_REACH,
+        /**
          * An {@code ERROR} this classifier does not recognise — including a null status message.
          */
         OTHER
@@ -306,6 +314,17 @@ public final class ViolationNormaliser
      * visible divergence — rather than a silent misclassification.
      */
     static final String STAGE_B_MESSAGE_PREFIX = "stage B: ";
+
+    /**
+     * Verbatim copy of the fixed tail every {@code UngatedProviderReachException} message ends with
+     * (its constructor, one builder site, pinned there by {@code EngineErrorMessageContractTest
+     * .theUngatedProviderReachSuffixIsStillTheEngineSWording}).
+     * <p>
+     * ⚠ Matched by <b>suffix</b>: the head names the function and the missing provider or the type
+     * and its state, so there is no fixed string to compare. A reworded tail degrades to
+     * {@link ErrorReason#OTHER} — a visible divergence — rather than a silent misclassification.
+     */
+    static final String UNGATED_PROVIDER_REACH_MESSAGE_SUFFIX = " — the provider gate should have skipped this rule before any row was read";
 
     /**
      * Classifies an execution result into the closed {@link ErrorReason} vocabulary and returns the
@@ -370,6 +389,10 @@ public final class ViolationNormaliser
         if (statusMessage.startsWith(STAGE_B_MESSAGE_PREFIX))
         {
             return ErrorReason.STAGE_B;
+        }
+        if (statusMessage.endsWith(UNGATED_PROVIDER_REACH_MESSAGE_SUFFIX))
+        {
+            return ErrorReason.UNGATED_PROVIDER_REACH;
         }
         // Checked last: a load error's text is authored, so it could in principle collide with a
         // fixed engine message. Preferring the fixed messages keeps the classification stable.
