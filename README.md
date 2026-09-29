@@ -53,11 +53,11 @@ tag returns the same bytes.
 
 | Path | What it is |
 |---|---|
-| `rules-src/checks/` | The authored rule corpus — 3 308 YAML checks across the `CDISC`, `FDA`, `PMDA` and `DRAFT` families |
+| `rules-src/checks/` | The authored rule corpus — 3 443 YAML checks across the `CDISC`, `FDA`, `PMDA` and `DRAFT` families |
 | `rules-define-src/` | 409 authored Define-XML conformance rules |
-| `rulespec/specs/` | 531 rule-execution specs, run by `RuleExecutionSpecTest` |
+| `rulespec/specs/` | 987 rule-execution specs, run by `RuleExecutionSpecTest` |
 | `schema/rule-format.schema.json` | Machine-readable schema every generated rule package is validated against |
-| `src/test/resources/.../ruletestsuites/` | 7 704 `.cdt` scenario fixtures |
+| `src/test/resources/.../ruletestsuites/` | 9 091 `.cdt` scenario fixtures |
 
 **The generated corpus is not committed.** `mvn install` generates 47 rule packages into
 `target/rules/` and 4 Define-XML packages into `target/rules-define/`, each beside a
@@ -102,8 +102,8 @@ own work. What is not shipped is the packaged CORE rule family.
 
 Consequences you will see in the code:
 
-- 47 generated packages here, against 58 internally — the 11 CORE-family packages are
-  absent. Of the 47, **32 are released** (the other 15 are the DRAFT family, see above).
+- 47 generated packages here, the same number as internally, where the 11 CORE-family
+  packages have since been retired too. Of the 47, **32 are released** (the other 15 are the DRAFT family, see above).
 - Corpus-size floors that asserted the **full** internal corpus were removed from the
   package-generation validators rather than lowered, because this subset deliberately is
   not that corpus. A subset-safe non-vacuity check (`packages > 0`) was kept, so an
