@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD0061 expect=noViolation domain=DM
+#note "The Define-XML sidecar declares DM and AE (both present in the study) plus a third ItemGroupDef WITHOUT a Name. A nameless ItemGroupDef names no dataset, so the Define provider skips it (register NNL 1) and define_dataset_names() is exactly [DM, AE] -> contains_all holds -> no violation. Before the fix the nameless entry entered the list as a null, folded to the empty name, and the rule fired with $missing_datasets = []."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD0061-nameless-define.xml
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | S1-001 | HEADACHE
