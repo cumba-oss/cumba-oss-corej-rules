@@ -150,7 +150,7 @@ Check:
   expression: 'empty(coalesce(AEDECOD, AETERM))'
 ```
 
-**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`.
+**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`. A plain missing, and an absent numeric column, count as the identity `.`: `coalesce(.A, «missing» .)` is `MIS`; an absent character column reads `""` and contributes no identity.
 
 
 ### ds_exists
@@ -1005,7 +1005,7 @@ The example above is the complete call.
 
 `round(x)` → **value**
 
-The value rounded to the nearest integer, halves away from zero
+The value rounded to the nearest integer, a half rounded up toward +∞ (`round(-2.5)` is `-2`)
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -1161,7 +1161,7 @@ Check:
 
 **When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. A comparison against it does not fire; `empty()` on it does.
 
-**Missing and empty** — A missing date or reference yields **that missing value**, decided before the dates are parsed: `dy(.A, "2020")` is `.A`, and `dy(.A, .B)` is the plain missing (rulings register `D85c` / `D86a`). Only present but incomplete or unparsable dates give the plain missing (`MIS`).
+**Missing and empty** — A missing date or reference yields **that missing value**, decided before the dates are parsed: with `X` = `.A`, `dy(X, R)` is `.A` whatever present value `R` holds (even an incomplete date), and with `X` = `.A`, `R` = `.B` it is the plain missing (rulings register `D85c` / `D86a`). Only present but incomplete or unparsable dates give the plain missing (`MIS`).
 
 
 ### earliest_possible

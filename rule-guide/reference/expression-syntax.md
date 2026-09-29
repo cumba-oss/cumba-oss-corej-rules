@@ -470,7 +470,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`is_integer(x)`](functions.md#is_integer) | boolean | True when the value is a finite whole number. A negated spelling `is_not_integer(x)` exists; prefer `not is_integer(x)`. |
 | [`is_numeric(x)`](functions.md#is_numeric) | boolean | True when the value is a decimal number; there is no `is_not_numeric` — write `not is_numeric(x)` |
 | [`minus($a, $b)`](functions.md#minus) | value | The set difference of two lists — the members of `$a` not in `$b` |
-| [`round(x)`](functions.md#round) | value | The value rounded to the nearest integer, halves away from zero |
+| [`round(x)`](functions.md#round) | value | The value rounded to the nearest integer, a half rounded up toward +∞ (`round(-2.5)` is `-2`) |
 
 ### Dates and times
 

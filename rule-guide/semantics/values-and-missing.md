@@ -155,16 +155,18 @@ concat(.A, .B)      →  .           (two different identities collapse to the p
 coalesce(.A, "")    →  .A          (every operand skipped: the missing they carry)
 ```
 
-Every value function hands a missing input's **own** missing value through (rulings register `D85c`,
-identity kept; two or more distinct identities among the operands of one call collapse to the plain
-missing, `D86a`). That holds for the string functions — `upper` / `lower`, `trim`, `normalize_space`,
+Every value function that computes from its input's value hands a missing input's **own** missing
+value through (rulings register `D85c`, identity kept; two or more distinct identities among the
+operands of one call collapse to the plain missing, `D86a`). That holds for the string functions — `upper` / `lower`, `trim`, `normalize_space`,
 `prefix` / `suffix`, `substring`, `concat` (register `D36`) — and for the others: `len`, `char`,
 `num`, `abs` / `round` / `floor` / `ceil`, `year` / `month` / `day`, `earliest_possible` /
 `latest_possible`, `coalesce` (once every operand is skipped), `split_by`, `dy` and `colref`. Only a
 computed no-result is the plain missing: `substring` with a start past the end, `num("abc")`,
 `char("")`, `year("")`, a `dy` whose dates are present but incomplete. A comparison sees the
 difference — `abs(A) == abs(B)` is **false** when `A` is `.A` and `B` is `.B`, and a report prints
-`.A`, not `.`.
+`.A`, not `.`. The exceptions count rather than compute: `count` / `size` answer `0` for a missing.
+The `vlm_*` accessors are not yet covered — they answer the plain missing both for a missing cell and
+for "no value-level match".
 
 It matches **no** regular expression, including one that matches the empty string. It equals no
 string literal, including `""`, including inside a membership list.
