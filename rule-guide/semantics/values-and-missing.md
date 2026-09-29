@@ -165,8 +165,8 @@ computed no-result is the plain missing: `substring` with a start past the end, 
 `char("")`, `year("")`, a `dy` whose dates are present but incomplete. A comparison sees the
 difference — `abs(A) == abs(B)` is **false** when `A` is `.A` and `B` is `.B`, and a report prints
 `.A`, not `.`. The exceptions count rather than compute: `count` / `size` answer `0` for a missing.
-The `vlm_*` accessors are not yet covered — they answer the plain missing both for a missing cell and
-for "no value-level match".
+`vlm_value_length` is not yet covered — it answers the plain missing both for a missing target cell and
+for "no value-level match"; the other `vlm_*` value accessors read value-level metadata, not the cell.
 
 It matches **no** regular expression, including one that matches the empty string. It equals no
 string literal, including `""`, including inside a membership list.
