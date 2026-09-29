@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0006 expect=noViolation domain=AE
+#note "PLAN-function-surface-wave1 phase 2 (a2): DM is present and joined, but carries no RFSTDTC column. D4 / D34 #3-#4: the absent joined reference is a constant column of its type default, so is_complete_date_part(DM.RFSTDTC) is false on every row and the rule runs (noViolation asserts an EXECUTE, so this cannot pass on a SKIP) without firing. AEDY is deliberately wrong so that a reference read from anywhere else would fire."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-05 | 99
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD type=Char label="Planned Arm Code"
+---
+CDISCPILOT01 | DM | 01-701-1015 | A
+---

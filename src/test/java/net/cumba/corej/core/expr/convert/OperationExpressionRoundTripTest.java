@@ -35,7 +35,7 @@ class OperationExpressionRoundTripTest
      * package per standard version it declares). An exact pin, both directions: a new compiled
      * binding must be counted here, and a compiled binding the routing stopped seeing reds too.
      */
-    private static final int EXPECTED_COMPILED_BINDINGS = 255;
+    private static final int EXPECTED_COMPILED_BINDINGS = 396;
 
     /**
      * The rules those compiled bindings belong to. 3 → 120 on 2026-09-28
@@ -45,14 +45,25 @@ class OperationExpressionRoundTripTest
      * 255 the same day (phase 3c + review round 2, CIT §3): the owner's formula applied to BOTH
      * sides — the same 23 rules fold their reference list too ({@code $y_upper: upper($y)}), and
      * CG0370 / FDA-SD0075 / PMDA-SD0075 fold the referenced dataset's column list
-     * ({@code $rdomain_variables_upper}); measured, both corpora.
+     * ({@code $rdomain_variables_upper}); measured, both corpora. Wave 1 phase 2 adds the 17
+     * {@code dy} rules: {@code dy(--DTC, DM.RFSTDTC)} is a registry function since the port, so
+     * every one of their bindings is compiled (327 = 255 + the 17 rules' package copies); phase 3
+     * adds the 13 dictionary rules of valid_external_dictionary_code_term_pair / _hierarchy (387 =
+     * 327 + their 60 package copies).
      */
-    private static final Set<String> EXPECTED_COMPILED_RULES = Set.of("CDISC-CG0288",
-            "CDISC-AD9704", "CDISC-CG0014", "CDISC-CG0016", "CDISC-CG0219", "CDISC-CG0330",
-            "CDISC-CG0370", "FDA-SD0075", "PMDA-SD0075", "CDISC-CG0664", "CDISC-SEND-0012",
-            "CDISC-SEND-0013", "CDISC-SEND-0048", "CDISC-SEND-0393", "FDA-SD0054", "FDA-SD0056",
-            "FDA-SD0057", "FDA-SD1079", "FDA-SD1299", "FDA-SE0056", "FDA-SE0057", "PMDA-AD0047",
-            "PMDA-SD0054", "PMDA-SD0056", "PMDA-SD0057", "PMDA-SD1079", "PMDA-SD1299");
+    private static final Set<String> EXPECTED_COMPILED_RULES = Set.of("CDISC-AD0131",
+            "CDISC-AD0735", "CDISC-AD9704", "CDISC-CG0006", "CDISC-CG0014", "CDISC-CG0016",
+            "CDISC-CG0219", "CDISC-CG0220", "CDISC-CG0222", "CDISC-CG0288", "CDISC-CG0330",
+            "CDISC-CG0370", "CDISC-CG0460", "CDISC-CG0461", "CDISC-CG0664", "CDISC-SEND-0012",
+            "CDISC-SEND-0013", "CDISC-SEND-0048", "CDISC-SEND-0073", "CDISC-SEND-0074",
+            "CDISC-SEND-0127", "CDISC-SEND-0283", "CDISC-SEND-0393", "FDA-SD0054", "FDA-SD0056",
+            "FDA-SD0057", "FDA-SD0075", "FDA-SD1079", "FDA-SD1086", "FDA-SD1090", "FDA-SD1094",
+            "FDA-SD1299", "FDA-SD1381", "FDA-SD1382", "FDA-SD1383", "FDA-SD1384", "FDA-SD1385",
+            "FDA-SD1386", "FDA-SD2252", "FDA-SD2255", "FDA-SD2259", "FDA-SD2262", "FDA-SD2265",
+            "FDA-SD2269", "FDA-SE0056", "FDA-SE0057", "FDA-SE2229", "PMDA-AD0047", "PMDA-SD0054",
+            "PMDA-SD0056", "PMDA-SD0057", "PMDA-SD0075", "PMDA-SD1079", "PMDA-SD1086",
+            "PMDA-SD1090", "PMDA-SD1094", "PMDA-SD1299", "PMDA-SD2252", "PMDA-SD2255",
+            "PMDA-SD2262", "PMDA-SD2265");
 
     @Test
     void everyShippedOperationRoundTrips() throws Exception
@@ -152,31 +163,6 @@ class OperationExpressionRoundTripTest
         reauthored.setExpression(expression);
         Operation normalized = OperationExpressionParser.normalize(reauthored);
         assertEquals(orig, normalized, "list-filter round-trip mismatch for `" + expression + "`");
-    }
-
-
-    @Test
-    void ec23_qualifyingAnyPopulatedRoundTrips()
-    {
-        // EC-23: the has_mixed_emptiness_within_group row-qualifier kwarg must survive the
-        // print/parse round-trip (printed as a bareword list `qualifying_any_populated=[BASE,
-        // BASEC]`, parsed back to the same List).
-        Operation orig = new Operation();
-        orig.setId("$mixed");
-        orig.setOperator("has_mixed_emptiness_within_group");
-        orig.setName("SHIFT1");
-        orig.setGroup(List.of("USUBJID", "PARAMCD"));
-        orig.setQualifyingAnyPopulated(List.of("BASE", "BASEC"));
-
-        String expression = OperationExpressionPrinter.print(orig);
-        assertTrue(expression.contains("qualifying_any_populated=[BASE, BASEC]"),
-                "printed form must carry the qualifier list, got `" + expression + "`");
-
-        Operation reauthored = new Operation();
-        reauthored.setId(orig.getId());
-        reauthored.setExpression(expression);
-        Operation normalized = OperationExpressionParser.normalize(reauthored);
-        assertEquals(orig, normalized, "qualifier round-trip mismatch for `" + expression + "`");
     }
 
 
@@ -308,7 +294,10 @@ class OperationExpressionRoundTripTest
             f.set(op, sentinelFor(f));
             fields.add(f);
         }
-        assertTrue(fields.size() >= 30,
+        // The floor moved 30 -> 28 in wave 1 (PLAN-function-surface-wave1 D-W1-6): ordering,
+        // qualifying_any_populated, external_dictionary_term_variable and dictionary_parent were
+        // deleted with the callables that read them. Re-derive if a later wave deletes more.
+        assertTrue(fields.size() >= 28,
                 "expected the full Operation field set, saw " + fields.size());
 
         String printed = OperationExpressionPrinter.print(op);

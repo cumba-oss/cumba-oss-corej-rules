@@ -269,17 +269,6 @@ class RulePackageLoaderExpressionJsonTest
 
 
     @Test
-    void constantOperationQuotesName() throws IOException
-    {
-        JsonNode node = expressionTree("""
-                {"Core":{"Id":"T-0012","Status":"Draft","Version":"1"},
-                 "Bindings":[{"name":"$C","expression":"constant(\\"5\\")"}],
-                 "Check":{"expression":"var_not_exists(ADSL)"}}""");
-        assertEquals("constant(\"5\")", node.get("Bindings").get(0).get("expression").asText());
-    }
-
-
-    @Test
     void operationWithFilterRoundTrips() throws IOException
     {
         JsonNode node = expressionTree(

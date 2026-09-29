@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-CG0006 expect=violation domain=AE
+#note "PLAN-function-surface-wave1 phase 2 (b), the sensitivity arm of FINDING-dy-binding-vs-check-disagree: DM carries the subject TWICE with different RFSTDTC (2020-01-01 and 2020-01-05). The inner Match_Datasets join on USUBJID row-multiplies the one AE record into two copies (D32), each carrying its own DM record. AEDY=10 is correct against the first DM row (2020-01-10 is day 10 from 2020-01-01). The ported dy(--DTC, DM.RFSTDTC) reads the SAME matched DM record the Check reads through DM.RFSTDTC, so the copy paired with the first row agrees (no fire) and the copy paired with the second row computes day 6 and fires: ONE finding. Pre-port (measured at the go, recorded in the plan's status file) the operation's last-non-missing-wins subject map gave day 6 to BOTH copies: TWO findings, the binding and the Check disagreeing on which DM row they read."
+#expectViolationCount 1
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2020-01-10 | 10
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-01
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-05
+---

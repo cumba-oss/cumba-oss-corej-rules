@@ -74,8 +74,8 @@ class ShippedRulesUnresolvedWildcardCorpusTest
                 {"rules": {"probe": {
                   "Core": {"Id": "PROBE-UOW"},
                   "Bindings": [{"name": "$last",
-                      "expression": "is_last_in_group(group=[USUBJID], ordering=\\"--SEQ\\")"}],
-                  "Check": {"expression": "$last == true"}
+                      "expression": "date_diff_days(SESTDTC, reference=\\"--SEQ\\")"}],
+                  "Check": {"expression": "$last > 0"}
                 }}}
                 """);
         Rule probe = pkg.getRules().values().iterator().next();

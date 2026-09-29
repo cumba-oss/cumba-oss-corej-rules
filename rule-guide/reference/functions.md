@@ -21,7 +21,7 @@ check built from ordinary functions ignores rows with missing data by constructi
 not what you want, test for it with `empty(x)` explicitly.
 
 **Functions that reach outside the row have one more failure mode**, and it is not an error.
-`record_count(domain="DS")`, `distinct(X, domain="TA")`, `supp_qnam_value(…)`,
+`record_count(domain="DS")`, `distinct(X, domain="TA")`, `supp_qnam_present(…)`,
 `ts_parameter_value(…)`, the library and Define-XML lookups — each names something by string that
 may not be there: an absent dataset, a filter no row satisfies, a group no row falls in, a name
 the library holds nothing under.
@@ -1120,25 +1120,26 @@ expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 
 ### dy
 
-`dy(name, …)` → **value**
+`dy(name, reference)` → **value**
 
-The study day of a record's date relative to `DM.RFSTDTC`; there is no day 0
+The SDTM study day of a record's date relative to a reference date; there is no day 0
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `reference` | string | no | The date to measure from |
+| `name` | column | yes | The record's date column (`--DTC`, `--STDTC`, `--ENDTC`) |
+| `reference` | column | yes | The reference date, read through the rule's declared join: `DM.RFSTDTC`, `DM.RFXSTDTC` or `DM.RFCSTDTC` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+Both arguments are **column references**. The reference is read per row through the `Match_Datasets` join the rule declares (`DM` on `USUBJID`), so on a subject that `DM` carries twice every row copy the join makes reads its own `DM` record — the same one the Check reads through `DM.RFSTDTC`. A quoted name (`reference="RFXSTDTC"`) is a string literal, never a column, and fails to load; so does a call with one argument. (Until wave 1 of the operation→function programme `dy(--DTC)` was an operation that read `DM` itself and defaulted its reference to `RFSTDTC`.)
 
 **Example**
 
 ```yaml
+Match_Datasets:
+- Name: "DM"
+  Keys: ["USUBJID"]
 Bindings:
 - name: "$value_xstdy_algorithm"
-  expression: 'dy(--STDTC, reference="RFXSTDTC")'
+  expression: 'dy(--STDTC, DM.RFXSTDTC)'
 Check:
   expression: 'not empty(--XSTDY) and is_complete_date(--STDTC) and is_complete_date(DM.RFXSTDTC) and --XSTDY != $value_xstdy_algorithm'
 ```
@@ -1146,14 +1147,17 @@ Check:
 **Minimal — required parameters only**
 
 ```yaml
+Match_Datasets:
+- Name: "DM"
+  Keys: ["USUBJID"]
 Bindings:
 - name: "$value_dy_algorithm"
-  expression: 'dy(--DTC)'
+  expression: 'dy(--DTC, DM.RFSTDTC)'
 Check:
   expression: 'not empty(--DY) and is_complete_date_part(--DTC) and is_complete_date_part(DM.RFSTDTC) and --DY != $value_dy_algorithm'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. A comparison against it does not fire; `empty()` on it does.
 
 
 ### earliest_possible
@@ -1383,33 +1387,6 @@ expression: 'year(BRTHDTC) < 1900'
 
 ## Aggregates over rows and groups
 
-### constant
-
-`constant(name)` → **value**
-
-The literal value given as `name`, broadcast to every row
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$threshold"
-  expression: 'constant("5")'
-Check:
-  expression: 'num(--STRESN) > num($threshold)'
-```
-
-The example above is the complete call — this function takes no arguments beyond its optional target.
-
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
-
 ### distinct
 
 `distinct(name, …)` → **value**
@@ -1481,19 +1458,18 @@ Check:
 
 ### has_mixed_emptiness_within_group
 
-`has_mixed_emptiness_within_group(name, group=)` → **value**
+`has_mixed_emptiness_within_group(name, group=, qualifying_any_populated=, keep_missings=)` → **boolean**
 
-True for a row whose group has both populated and empty values of `name`
+`true` on every row of a group in which the subject column is populated on some rows and unpopulated on others
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `qualifying_any_populated` | list<string> | no | Whether one populated value is enough to qualify the group |
+| `name` | column | yes | The column whose emptiness is tallied (`BASETYPE`) |
+| `group` | list of columns | no | Columns whose combined value defines a group; none, or none present, is one whole-table group |
+| `qualifying_any_populated` | list of columns | no | Rows on which none of these columns is populated are out of scope (EC-23); an all-absent list qualifies no row |
+| `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group (default `true`, the fold) or dropped; requires a non-empty `group` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+Column parameters are **column references** — a quoted name is a string literal and fails to load — and an absent group column is dropped from the key (EC-44). An absent subject column is all-unpopulated, so no group is mixed (EC-45). The group key is compared by identity (`4.9999999999994` and `5.0` are two groups, `-0.0` and `0.0` one). (Until wave 1 of the operation→function programme this was an operation; the spelling is unchanged.)
 
 **Example**
 
@@ -1515,47 +1491,33 @@ Check:
   expression: '$basetype_mixed == true'
 ```
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
+**When there is nothing to answer** — **`false`** — a row in no group, or in a group that is not mixed, is `false`. It is not unknown.
 
 ### is_last_in_group
 
-`is_last_in_group(group=, ordering=)` → **value**
+`is_last_in_group(ordering=, group=, keep_missings=)` → **boolean**
 
-True on the last row of each group under `ordering=`
+`true` on every row whose ordering value is identical to its group's maximum — the last record of the group
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `ordering` | string | no | Sort keys deciding row order inside the group |
+| `ordering` | column | yes | The column that orders the group (`SESEQ`); numeric when both sides are numbers, else textual; a missing value ranks lowest |
+| `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing |
+| `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+It takes **no target**: it reads only `ordering` and `group`. Both are **column references** — `ordering="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$is_last_se"
-  expression: 'is_last_in_group(ordering="SESEQ", group=[USUBJID], keep_missings=false)'
+  expression: 'is_last_in_group(ordering=SESEQ, group=[USUBJID], keep_missings=false)'
 Check:
-  expression: '$is_last_se == true and date(SEENDTC) > DS.DSSTDTC'
+  expression: '$is_last_se == true and date(SEENDTC) != date(DS.DSSTDTC)'
 ```
 
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$is_last_visit"
-  expression: 'is_last_in_group(group=[USUBJID])'
-Check:
-  expression: '$is_last_visit == true and empty(VISITDY)'
-```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
+**When there is nothing to answer** — **`false`** — a row that is not the last of its group, a row dropped for a missing group key, or every row when the ordering column or every group column is absent. It is not unknown.
 
 ### max
 
@@ -1786,41 +1748,6 @@ Check:
 **When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
 
 
-### row_min
-
-`row_min(name=/names=, …)` → **value**
-
-The smallest of the named columns, per row
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `name_pattern` | regex | no | A regular expression over column names |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$trxx_min"
-  expression: 'row_min(name_pattern="^TR(0[1-9]|[1-9][0-9])SDT$")'
-Check:
-  expression: 'not empty(TRTSDT) and not empty($trxx_min) and TRTSDT != $trxx_min'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$dt_min"
-  expression: 'row_min([TR01SDT, TR02SDT])'
-Check:
-  expression: 'not empty(TRTSDT) and TRTSDT != $dt_min'
-```
-
-
 ### tuple
 
 `tuple(c1, c2, …)` → **value**
@@ -1883,33 +1810,6 @@ Check:
 ```
 
 **When there is nothing to answer** — **`0`** — a real count of nothing, not an absence of an answer. So `$n == 0` and `$n <= 1` **fire**.
-
-
-### variable_value_count
-
-`variable_value_count(name, …)` → **value**
-
-How many times each value of the column occurs
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$value_census"
-  expression: 'variable_value_count(--TESTCD)'
-Check:
-  expression: 'not empty($value_census)'
-```
-
-The example above is the complete call — this function takes no arguments beyond its optional target.
-
 
 
 ## Uniqueness and consistency
@@ -2256,29 +2156,6 @@ Bindings:
   expression: 'dataset_class_from_library()'
 Check:
   expression: 'starts_with(ds_name("DATA"), "AD") and empty($dataset_class)'
-```
-
-The example above is the complete call — this function takes no arguments beyond its optional target.
-
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
-
-### dataset_domain
-
-`dataset_domain(…)` → **value**
-
-The current dataset's domain as a declared operation
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-expression: 'len(dataset_domain) > 2 or len(dataset_domain) < 2'
 ```
 
 The example above is the complete call — this function takes no arguments beyond its optional target.
@@ -3705,26 +3582,20 @@ Check:
 
 ### dictionary_available
 
-`dictionary_available(…)` → **boolean**
+`dictionary_available(type)` → **boolean**
 
-The operation form of the availability gate
+The external-dictionary availability gate: `true` on every row when a dictionary of the named type is loaded for the run, else `false`. The loader injects it as a Precondition for every inline `valid_external_dictionary_*` call, so a rule whose dictionary is not supplied SKIPs instead of passing; a declared (`$`-bound) dictionary function needs no gate, because the runner skips the rule from the function's own dictionary need. (The `dictionary_available(external_dictionary_type=…)` **operation** form was deleted by wave 1 of the operation→function programme; only this builtin remains.)
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+| `type` | string | yes | Which external dictionary to test for, e.g. `"meddra"` |
 
 **Example**
 
 ```yaml
-Check:
-  expression: 'dictionary_available(external_dictionary_type="meddra")'
+Precondition:
+  expression: 'dictionary_available("meddra")'
 ```
-
-The example above is the complete call.
 
 **When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
 
@@ -3893,26 +3764,25 @@ Check:
 
 ### valid_external_dictionary_code_term_pair
 
-`valid_external_dictionary_code_term_pair(name, dictionary_term=, external_dictionary_type=)` → **value**
+`valid_external_dictionary_code_term_pair(name, external_dictionary_term_variable, external_dictionary_type=, case_sensitive=)` → **boolean**
 
-Code↔decode pairing; code AND decode case-sensitive by default, `case_sensitive=false` folds both
+Code↔decode pairing against an external dictionary: `true` on a row whose code (the first column) decodes to the term (the second column) in the named dictionary; a blank code or a blank term is `true` (completeness is another rule's concern). Code and decode compare case-sensitively by default; `case_sensitive=false` folds both.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-| `external_dictionary_term_variable` | string | no | The column holding the decode to pair with the code |
-| `case_sensitive` | boolean | no | Whether the comparison folds case |
+| `name` | column | yes | The code column (`TSVALCD`, `--STRESC`) |
+| `external_dictionary_term_variable` | column | yes | The decode / term column to pair with the code (`TSVAL`, `--RESCAT`) |
+| `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"unii"`, `"snomed"`, `"medrt"`, `"neoplasm"`) |
+| `case_sensitive` | boolean | no | Whether the comparison folds case; default `true` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+Both column parameters are **column references**; a quoted name (`external_dictionary_term_variable="TSVAL"`) is a string literal and fails to load, and a call without the term column fails to load. The dictionary type must be a string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. (Until wave 1 of the operation→function programme this was an operation taking `external_dictionary_term_variable="TSVAL"` as a quoted string.)
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$neoplasm_aligned"
-  expression: 'valid_external_dictionary_code_term_pair(--STRESC, external_dictionary_type="neoplasm", external_dictionary_term_variable="--RESCAT")'
+  expression: 'valid_external_dictionary_code_term_pair(--STRESC, --RESCAT, external_dictionary_type="neoplasm")'
 Check:
   expression: '--RESCAT in ["BENIGN", "MALIGNANT"] and $neoplasm_aligned == false'
 ```
@@ -3922,36 +3792,35 @@ Check:
 ```yaml
 Bindings:
 - name: "$comptrt_pair_valid"
-  expression: 'valid_external_dictionary_code_term_pair(TSVALCD, external_dictionary_type="unii", external_dictionary_term_variable="TSVAL")'
+  expression: 'valid_external_dictionary_code_term_pair(TSVALCD, TSVAL, external_dictionary_type="unii")'
 Check:
   expression: 'TSPARMCD == "COMPTRT" and $comptrt_pair_valid == false'
 ```
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
+**When the dictionary is not loaded** — the rule **SKIPs** (the reason names the type and its state). The function has no silent default: reached without its dictionary it reports a rule ERROR, never `false`.
 
 
 ### valid_external_dictionary_hierarchy
 
-`valid_external_dictionary_hierarchy(…)` → **value**
+`valid_external_dictionary_hierarchy(name, dictionary_parent, external_dictionary_type=, case_sensitive=)` → **boolean**
 
-Hierarchy ancestor test (also a per-record function, ); operands case-sensitive by default, `case_sensitive=false` folds both
+Hierarchy ancestor test against an external dictionary: `true` on a row whose child term (the first column) lies on the hierarchy path of the parent term (the second column); a blank child or a blank parent is `true`. Operands compare case-sensitively by default; `case_sensitive=false` folds both.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-| `dictionary_parent` | string | no | The ancestor term the value must sit under |
-| `case_sensitive` | boolean | no | Whether the comparison folds case |
+| `name` | column | yes | The child term column (`--HLT`, `--HLGT`) |
+| `dictionary_parent` | column | yes | The candidate ancestor column (`--SOC`) |
+| `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`) |
+| `case_sensitive` | boolean | no | Whether the comparison folds case; default `true` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+Both column parameters are **column references**: the `--` in `--HLT` / `--SOC` is resolved like any other variable name, and a quoted name (`dictionary_parent="--SOC"`) is a string literal and fails to load. The dictionary type must be a string literal; a rule whose dictionary is not loaded reports **SKIPPED** before any row is read.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$hlgt_on_path"
-  expression: 'valid_external_dictionary_hierarchy(--HLGT, external_dictionary_type="meddra", dictionary_parent="--SOC")'
+  expression: 'valid_external_dictionary_hierarchy(--HLGT, --SOC, external_dictionary_type="meddra")'
 Check:
   expression: '$hlgt_on_path == false'
 ```
@@ -3961,12 +3830,12 @@ Check:
 ```yaml
 Bindings:
 - name: "$hlt_on_path"
-  expression: 'valid_external_dictionary_hierarchy(--HLT, external_dictionary_type="meddra", dictionary_parent="--SOC")'
+  expression: 'valid_external_dictionary_hierarchy(--HLT, --SOC, external_dictionary_type="meddra")'
 Check:
   expression: '$hlt_on_path == false'
 ```
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
+**When the dictionary is not loaded** — the rule **SKIPs**. Reached without its dictionary the function reports a rule ERROR, never `false`.
 
 
 ### valid_external_dictionary_value
@@ -4047,44 +3916,6 @@ Check:
 ```
 
 **When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
-
-### supp_qnam_value
-
-`supp_qnam_value(name)` → **value**
-
-Per-record: the matching SUPP `QVAL`
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `key_value` | string | no | The value that attribute must have |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$aetrtem"
-  expression: 'supp_qnam_value(QVAL, domain="SUPPAE", key_value="AETRTEM")'
-Check:
-  expression: '$aetrtem != "Y"'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$aetrtem"
-  expression: 'supp_qnam_value(domain="SUPPAE", key_value="AETRTEM")'
-Check:
-  expression: '$aetrtem != "Y"'
-```
-
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
 
 
 ### ts_parameter_value

@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0127 expect=violation domain=SE
+#note "PLAN-function-surface-wave1 D-W1-2, tie population (c): subject 001 has two SE rows whose SESEQ is MISSING. D34 #5 ranks a missing value lowest, and two identical missings are identical, so every row of the group ties at the maximum and every row is the last Element; both SEENDTC values differ from DSSTDTC 2020-01-15: TWO findings. keep_missings=false governs the GROUP key (USUBJID, populated), never the ordering value. Pre-port (measured at the go) the all-missing group read false on every row: ZERO findings."
+#library standard=sendig version=3-0
+#expectViolationCount 2
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 |  | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 |  | TRT | 2020-01-10 | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | 2020-01-15
+---

@@ -53,41 +53,6 @@ class OperationExpressionPrinterTest
 
 
     @Test
-    void dyReferenceKwargRendered()
-    {
-        // T6: a dy operation with a `reference` prints the reference-date column as a quoted kwarg
-        // and round-trips back through the parser.
-        Operation op = new Operation();
-        op.setOperator("dy");
-        op.setName("--DTC");
-        op.setReference("RFXSTDTC");
-        assertRoundTrip(op, "dy(--DTC, reference=\"RFXSTDTC\")");
-    }
-
-
-    @Test
-    void dyBareOmitsReferenceKwarg()
-    {
-        // Regression guard: a dy operation with no reference must print without the kwarg, keeping
-        // every pre-existing dy rule byte-identical.
-        Operation op = new Operation();
-        op.setOperator("dy");
-        op.setName("--STDTC");
-        assertRoundTrip(op, "dy(--STDTC)");
-    }
-
-
-    @Test
-    void constantNameQuoted()
-    {
-        Operation op = new Operation();
-        op.setOperator("constant");
-        op.setName("Y");
-        assertRoundTrip(op, "constant(\"Y\")");
-    }
-
-
-    @Test
     void lowercaseMetadataNameQuoted()
     {
         Operation op = new Operation();

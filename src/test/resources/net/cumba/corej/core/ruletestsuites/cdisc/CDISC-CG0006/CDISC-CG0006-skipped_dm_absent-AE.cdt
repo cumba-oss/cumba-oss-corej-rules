@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0006 expect=skipped domain=AE
+#note "PLAN-function-surface-wave1 phase 2 (a1): the study has no DM dataset. The rule declares All_Or_None [USUBJID, DM.USUBJID] (the join-key authoring gate), so with USUBJID present and DM.USUBJID absent the rule SKIPs by requirement before dy(--DTC, DM.RFSTDTC) is evaluated. AEDY is deliberately wrong on row 1 so that an EXECUTE would be visible as a finding, never as a silent pass."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-05 | 99
+---

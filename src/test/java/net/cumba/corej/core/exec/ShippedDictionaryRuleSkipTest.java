@@ -11,7 +11,6 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.metadata.RuntimeDictionaryProvider;
 import net.cumba.corej.core.metadata.ValueMapDictionary;
-import net.cumba.corej.core.model.Operation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.datatable.IDataTable;
@@ -131,7 +130,11 @@ class ShippedDictionaryRuleSkipTest
     {
         // The premise the whole defect rested on, asserted rather than assumed: these rules have
         // no Precondition of their own, the loader injected none (it only gates INLINED calls),
-        // and the dictionary operation is DECLARED with an external_dictionary_type.
+        // and the dictionary need is DECLARED in a binding that names its type. Read through
+        // ProviderNeeds, the one reader of both keys (PLAN-function-surface-wave1 D-W1-3):
+        // PMDA-SD0008 / SD2260 still bind an OperationType call, PMDA-SD2265 binds the ported
+        // valid_external_dictionary_code_term_pair FUNCTION, whose provider capability names its
+        // type — one binding each, one typed dictionary need each.
         for (String coreId : new String[]
         {
                 "PMDA-SD0008", "PMDA-SD2260", "PMDA-SD2265"
@@ -141,14 +144,16 @@ class ShippedDictionaryRuleSkipTest
             assertNull(r.getPrecondition(), coreId + " has no Precondition in the shipped corpus");
             assertNull(r.getInjectedPreconditionGates(),
                     coreId + " got no injected availability gate at load");
-            assertNotNull(r.getOperations(), coreId + " declares its dictionary operation");
-            assertEquals(1, r.getOperations().size(), coreId + " declares exactly one operation");
-            Operation op = r.getOperations().get(0);
-            assertTrue(OperationExecutor.isDictionaryDependent(op.getOperationType()),
-                    coreId + " declares a dictionary-dependent operation");
-            assertNotNull(op.getExternalDictionaryType(),
-                    coreId + " names the dictionary type it needs");
+            assertEquals(1, r.bindingOrder().size(), coreId + " declares exactly one binding");
+            ProviderNeeds needs = ProviderNeeds.ofBindings(r);
+            assertTrue(needs.dictionary(), coreId + " declares a dictionary-dependent binding");
+            assertEquals(1, needs.dictionaryTypes().size(),
+                    coreId + " names the one dictionary type it needs: " + needs);
         }
+        assertTrue(
+                shippedRule("PMDA-SD2265").getCompiledBindings() != null
+                        && !shippedRule("PMDA-SD2265").getCompiledBindings().isEmpty(),
+                "PMDA-SD2265's binding is the ported function, a COMPILED binding");
     }
 
 

@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0222 expect=noViolation domain=AE
+#note "AEENDTC and DM.RFSTDTC are complete dates and AEENDY matches the study day algorithm (2013-12-30 precedes RFSTDTC 2014-01-02 by three days and is day -3, there being no day 0; 2014-01-09 is day 8), so the rule does not fire."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+col AEENDY type=Num label="Study Day of End of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2013-12-30 | -3
+CDISCPILOT01 | AE | 01-701-1015 | 2 | 2014-01-09 | 8
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+---

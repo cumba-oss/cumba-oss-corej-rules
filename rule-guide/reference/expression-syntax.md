@@ -23,9 +23,10 @@
        operand-kind MATCHED_FLAG     -> "Operands", row "matched flag"
        operand-kind OPERATION_REF    -> "Operands", row "binding result"
        operand-kind BUILTIN          -> "Operands", row "builtin"
-     Every other token appears verbatim: 162 callables — the UNION of the inventory's `function`
-     (68) + `boolean-call` (26) + `compiler-call` (15) + `operation` (55) rows, which is 162 not
-     164 because `record_count` and `dictionary_available` appear in two categories each. All are
+     Every other token appears verbatim: 157 callables — the UNION of the inventory's `function`
+     (72) + `boolean-call` (28) + `compiler-call` (15) + `operation` (43) rows, which is 157 not
+     158 because `record_count` appears in two categories (wave 1 deleted the `dictionary_available`
+     operation, so the gate builtin no longer has an operation twin). All are
      presented as ONE surface: OperationDescriptors gives every OperationType a FunctionDescriptor
      of the same shape the registry uses, which is what retired the Operation field bag as an
      AUTHORING model (phase 6b, D16/D17/D19a). `Operation` is now an executor-internal
@@ -475,7 +476,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`date_diff_days(name, reference, …)`](functions.md#date_diff_days) | value | Days between a record's date and a reference date, with an optional `offset` |
 | [`date_overlaps(a, b)`](functions.md#date_overlaps) | boolean | True when the two date ranges share at least one possible instant |
 | [`day(x)`](functions.md#day) | value | The day component of an ISO value, or missing |
-| [`dy(name, …)`](functions.md#dy) | value | The study day of a record's date relative to `DM.RFSTDTC`; there is no day 0 |
+| [`dy(name, reference)`](functions.md#dy) | value | The SDTM study day of a record's date relative to a reference date read through the declared join; no day 0 |
 | [`earliest_possible(x)`](functions.md#earliest_possible) | value | The earliest instant an incomplete value could denote |
 | [`interval_uncertainty_precision_mismatch(name, delimiter=)`](functions.md#interval_uncertainty_precision_mismatch) | value | True when the two halves of an ISO `a/b` interval are stated at different precisions |
 | [`is_complete_date(x)`](functions.md#is_complete_date) | boolean | True when every date component is present |
@@ -493,21 +494,18 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 | function | returns | what it does |
 |---|---|---|
-| [`constant(name)`](functions.md#constant) | value | The literal value given as `name`, broadcast to every row |
 | [`distinct(name, …)`](functions.md#distinct) | value | The set of distinct values of a column; with a list target, the set of row tuples |
 | [`empty_within_except_last_row(name, group, ordering=, keep_missings=)`](functions.md#empty_within_except_last_row) | boolean | True when a row other than the ordered-last one is unpopulated |
-| [`has_mixed_emptiness_within_group(name, group=)`](functions.md#has_mixed_emptiness_within_group) | value | True for a row whose group has both populated and empty values of `name` |
-| [`is_last_in_group(group=, ordering=)`](functions.md#is_last_in_group) | value | True on the last row of each group under `ordering=` |
+| [`has_mixed_emptiness_within_group(name, group=, qualifying_any_populated=, keep_missings=)`](functions.md#has_mixed_emptiness_within_group) | boolean | Per row: the group mixes populated and unpopulated values of the subject column; column references, key identity, KEEP-missing default |
+| [`is_last_in_group(ordering=, group=, keep_missings=)`](functions.md#is_last_in_group) | boolean | Per row: the row's ordering value is identical to its group's maximum (every tied row is last); no target, column references, DROP-missing default |
 | [`max(name, …)`](functions.md#max) | value | The largest value of a column, over the dataset or per group |
 | [`max_date(name, …)`](functions.md#max_date) | value | The latest date in a column; a value that cannot be positioned yields no value |
 | [`min_date(name, …)`](functions.md#min_date) | value | The earliest date in a column; a value that cannot be positioned yields no value |
 | [`present_on_multiple_rows_within(name, within=)`](functions.md#present_on_multiple_rows_within) | boolean | True for every member of a group that has two or more rows |
 | [`record_count(…)`](functions.md#record_count) | value | The number of rows; with `group=`, the count for each row's group |
 | [`row_max(name=/names=, …)`](functions.md#row_max) | value | The largest of the named columns, per row |
-| [`row_min(name=/names=, …)`](functions.md#row_min) | value | The smallest of the named columns, per row |
 | [`tuple(c1, c2, …)`](functions.md#tuple) | value | Builds a composite key from two to six columns, for whole-tuple membership |
 | [`variable_count(name_pattern=…)`](functions.md#variable_count) | value | The number of columns whose name matches `name_pattern=` |
-| [`variable_value_count(name, …)`](functions.md#variable_value_count) | value | How many times each value of the column occurs |
 
 ### Uniqueness and consistency
 
@@ -536,7 +534,6 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`dataset_class_from_library(…)`](functions.md#dataset_class_from_library) | value | The current table's library observation class |
-| [`dataset_domain(…)`](functions.md#dataset_domain) | value | The current dataset's domain as a declared operation |
 | [`dataset_names()`](functions.md#dataset_names) | value | The names of every dataset in the study, as a list |
 | [`domain_is_custom(…)`](functions.md#domain_is_custom) | value | Library classification gate; boolean |
 | [`ds_class([x,] level)`](functions.md#ds_class) | value | The dataset's observation class; available at every level |
@@ -614,14 +611,14 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`codelist_terms(…)`](functions.md#codelist_terms) | value | CT terms of the bound codelist (library CT) |
-| [`dictionary_available(…)`](functions.md#dictionary_available) | boolean | The operation form of the availability gate |
+| [`dictionary_available(type)`](functions.md#dictionary_available) | boolean | The external-dictionary availability gate the loader injects for an inline dictionary call (the operation form was deleted by wave 1) |
 | [`dictionary_has_decode(…)`](functions.md#dictionary_has_decode) | value | Any-decode presence (also a per-record function, ); code lookup case-sensitive by default, `case_sensitive=false` folds it |
 | [`get_codelist_attributes(name, version, ct_attribute=)`](functions.md#get_codelist_attributes) | value | One CT-package attribute (e.g. `"Term CCODE"`) over every package the rows name — a list for the dataset; SKIPPED without a usable Library answer |
 | [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a library-dependent operation; a not-met Precondition ⇒ SKIPPED |
 | [`valid_codelist_dates(…)`](functions.md#valid_codelist_dates) | value | Published CT-package dates for the standard |
 | [`valid_external_dictionary_code(name, external_dictionary_type=)`](functions.md#valid_external_dictionary_code) | value | Dictionary code validity; same evaluator and `case_sensitive` semantics as `_value` |
-| [`valid_external_dictionary_code_term_pair(name, dictionary_term=, external_dictionary_type=)`](functions.md#valid_external_dictionary_code_term_pair) | value | Code↔decode pairing; code AND decode case-sensitive by default, `case_sensitive=false` folds both |
-| [`valid_external_dictionary_hierarchy(…)`](functions.md#valid_external_dictionary_hierarchy) | value | Hierarchy ancestor test (also a per-record function, ); operands case-sensitive by default, `case_sensitive=false` folds both |
+| [`valid_external_dictionary_code_term_pair(name, external_dictionary_term_variable, external_dictionary_type=, case_sensitive=)`](functions.md#valid_external_dictionary_code_term_pair) | boolean | Code↔decode pairing against an external dictionary, both columns as references; case-sensitive by default, `case_sensitive=false` folds both |
+| [`valid_external_dictionary_hierarchy(name, dictionary_parent, external_dictionary_type=, case_sensitive=)`](functions.md#valid_external_dictionary_hierarchy) | boolean | Hierarchy ancestor test against an external dictionary, both columns as references; case-sensitive by default, `case_sensitive=false` folds both |
 | [`valid_external_dictionary_value(name, external_dictionary_type=)`](functions.md#valid_external_dictionary_value) | value | Dictionary term validity; gated by `dictionary_available`; case-SENSITIVE by default — `case_sensitive=false` opts into folded membership |
 
 ### Supplemental qualifiers and trial summary
@@ -629,7 +626,6 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`supp_qnam_present(name)`](functions.md#supp_qnam_present) | value | Per-record: a matching SUPP QNAM row exists |
-| [`supp_qnam_value(name)`](functions.md#supp_qnam_value) | value | Per-record: the matching SUPP `QVAL` |
 | [`ts_parameter_value(key_value=, …)`](functions.md#ts_parameter_value) | value | TS/TX parameter scalar lookup (first matching row's value) |
 
 ### Values and references

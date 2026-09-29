@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-SEND-0127 expect=violation domain=SE
+#note "PLAN-function-surface-wave1 D-W1-2, tie population (a): DS carries TWO dispositions for subject 001, so the inner Match_Datasets join row-multiplies each SE record (D32) and the last Element (SESEQ=2) exists as two identical copies, each paired with its own DS record. Both copies are the last row of the group (their ordering value is identical to the group's maximum, GroupKey identity), and SEENDTC 2020-01-20 differs from both DSSTDTC values, so the rule fires on both copies: TWO findings, the answer the invalid_two_subjects scenario's note already claims. Pre-port (measured at the go) the tied copies shared one result key, the second overwrote the first with false, and the rule reported ZERO findings."
+#library standard=sendig version=3-0
+#expectViolationCount 2
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | REMOVED FROM STUDY | 2020-01-15
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | 2020-01-18
+---
