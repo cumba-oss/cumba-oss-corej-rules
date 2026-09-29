@@ -1501,11 +1501,11 @@ Check:
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `ordering` | column | yes | The column that orders the group (`SESEQ`); numeric when both sides are numbers, else textual; a missing value ranks lowest, two missing markers by their value byte. ⚠ On a **character** column that mixes numeric-looking and textual values (`3`, `10`, `2x`) the ranking is not a total order and the answer depends on row order — order by a numeric column, as both shipped sites do |
+| `ordering` | column | yes | The column that orders the group (`SESEQ`). It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ `ordering` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet |
 | `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
-It takes **no target**: it reads only `ordering` and `group`. Both are **column references** — `ordering="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
+It takes **no target**: it reads only `ordering` and `group`. Both are **column references** — `ordering="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
 
 **Example**
 

@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0460 expect=violation domain=AE
 # Rule:Description: Raise an error when the High Level Term (--HLT) is not on the MedDRA primary system organ class hierarchy path.
-#note "PLAN-function-surface-wave1 review round 1 (lane 2 L3 / lane 3 M3): the rule's Check reads ONLY the binding ($x == false), so its Sensitivity is derived from the binding's column parameters. Rows 1 and 3 are both off-path (Headaches NEC under Gastrointestinal disorders; Nausea and vomiting symptoms under Nervous system disorders) and must each fire — TWO findings, never one. A rule that derives no Sensitivity is treated as non-row-based and collapses its per-row BitSet to ONE finding; that is the latent regression this scenario pins (the engine twin is GroupedPredicatesTest.bindingOnlyCheckDerivesRecordSensitivityAndReportsEveryRow). Row 2 is on-path and must stay quiet."
+#note "PLAN-function-surface-wave1 review round 1 (lane 2 L3): a MULTI-FINDING pin for a Check that reads only its binding ($x == false). Rows 1 and 3 are both off-path (Headaches NEC under Gastrointestinal disorders; Nausea and vomiting symptoms under Nervous system disorders) and must each fire — TWO findings, never one; row 2 is on-path and must stay quiet. It does NOT reach the M3 classifier arm (review round 2 L-3): the binding passes its columns POSITIONALLY (--HLT, --SOC), so the Sensitivity comes from the positional reading. The keyword-only classification (M3) is pinned in the engine by GroupedPredicatesTest.bindingOnlyCheckDerivesRecordSensitivityAndReportsEveryRow / operandPositionCheckDerivesRecordSensitivityAndReportsEveryRow and RuleClassifierTest.KeywordColumnOperands."
 #library standard=sdtmig version=3-4
 #dictionaries dummy
 #expectViolationCount 2

@@ -12,7 +12,7 @@ import net.cumba.corej.core.expr.typed.ForeignDatasetInventory;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.rulespec.ViolationNormaliser;
 import net.cumba.datatable.IDataTable;
-import net.cumba.datatable.testkit.MockTable;
+import net.cumba.datatable.testkit.SyntheticDataTable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -60,7 +60,10 @@ class StageBErrorReasonReachabilityTest
     @Test
     void anUnresolvedWildcardBindErrorClassifiesAsStageB()
     {
-        IDataTable table = MockTable.of().name("AE").col("AEOCCUR", "N").build();
+        IDataTable table = new SyntheticDataTable("AE", List.of("AEOCCUR"), new String[]
+        {
+                "N"
+        }, 1);
         Rule rule = exprRule("TEST-STAGEB-1", "--OCCUR != \"N\"");
 
         RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-1", null,
@@ -88,7 +91,10 @@ class StageBErrorReasonReachabilityTest
         // `<D>._matched_`. Each declares its joined dataset, so production takes the SKIP branch —
         // this drives the branch behind it, with an undeclared flag and a run that resolves
         // nothing.
-        IDataTable table = MockTable.of().name("ADSL").col("USUBJID", "001").build();
+        IDataTable table = new SyntheticDataTable("ADSL", List.of("USUBJID"), new String[]
+        {
+                "001"
+        }, 1);
         Rule rule = exprRule("TEST-STAGEB-2", "not DM._matched_");
 
         RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-2", null,
@@ -112,7 +118,10 @@ class StageBErrorReasonReachabilityTest
         // The control that makes the two above mean something: the gate is not firing on
         // everything, so STAGE_B is a classification of a real condition rather than of the
         // instrument.
-        IDataTable table = MockTable.of().name("AE").col("AEOCCUR", "N").build();
+        IDataTable table = new SyntheticDataTable("AE", List.of("AEOCCUR"), new String[]
+        {
+                "N"
+        }, 1);
         Rule rule = exprRule("TEST-STAGEB-3", "AEOCCUR != \"N\"");
 
         RuleExecutionResult result = RuleRunner.stageBGate(rule, table, true, "TEST-STAGEB-3", null,

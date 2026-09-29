@@ -12,7 +12,7 @@ import net.cumba.corej.core.expr.eval.UngatedProviderReachException;
 import net.cumba.corej.core.expr.eval.Vector;
 import net.cumba.corej.core.rulespec.ViolationNormaliser;
 import net.cumba.datatable.IDataTable;
-import net.cumba.datatable.testkit.MockTable;
+import net.cumba.datatable.testkit.SyntheticDataTable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,8 +38,10 @@ class UngatedProviderReachErrorReasonReachabilityTest
     @Test
     void aDictionaryFunctionReachedWithoutItsProviderClassifiesAsUngatedProviderReach()
     {
-        IDataTable ts = MockTable.of().name("TS").col("TSVALCD", "R16CO5Y76E")
-                .col("TSVAL", "ASPIRIN").build();
+        IDataTable ts = new SyntheticDataTable("TS", List.of("TSVALCD", "TSVAL"), new String[]
+        {
+                "R16CO5Y76E", "ASPIRIN"
+        }, 1);
         EvalRun run = EvalRun.fullRange(EvaluationContext.builder().table(ts).build());
         List<Vector> args = Arrays.asList(ConstVector.of("R16CO5Y76E"), ConstVector.of("ASPIRIN"),
                 ConstVector.of("unii"), null);
