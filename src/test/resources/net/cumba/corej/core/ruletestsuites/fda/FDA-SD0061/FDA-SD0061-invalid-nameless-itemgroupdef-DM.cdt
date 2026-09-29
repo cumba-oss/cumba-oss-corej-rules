@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD0061 expect=violation domain=DM
+#note "The violation side of the nameless-ItemGroupDef fixture: the Define-XML sidecar declares DM and AE plus a third ItemGroupDef WITHOUT a Name, and the study submits only DM. The nameless entry is skipped (register NNL 1), but the skip must not swallow a real finding: AE is referenced in the define and absent from the study -> fires once, and $missing_datasets is exactly [AE] - no empty name beside it."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD0061-nameless-define.xml
+#expectViolationCount 1
+#expectViolationAt "$missing_datasets"="[AE]"
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | DM | S1-001

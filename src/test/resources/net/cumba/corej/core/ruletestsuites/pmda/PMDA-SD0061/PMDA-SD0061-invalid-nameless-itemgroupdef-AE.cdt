@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD0061 expect=violation domain=AE
+#note "The violation side of the nameless-ItemGroupDef fixture: the Define-XML sidecar declares AE and DM plus a third ItemGroupDef WITHOUT a Name, and the study submits only AE. The nameless entry is skipped (register NNL 1), but the skip must not swallow a real finding: DM is referenced in the define and absent from the study -> fires once, and $missing_datasets is exactly [DM] - no empty name beside it."
+#library standard=sdtmig version=3-4
+#define-xml PMDA-SD0061-nameless-define.xml
+#expectViolationCount 1
+#expectViolationAt "$missing_datasets"="[DM]"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | S1-001 | HEADACHE
