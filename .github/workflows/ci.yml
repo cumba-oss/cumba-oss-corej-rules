@@ -342,7 +342,7 @@ jobs:
       # successful fetch still saves when a later gate went red.
       - name: Save CDISC pickle cache
         uses: actions/cache/save@v6
-        if: ${{ always() && steps.pickle-fetch.conclusion == 'success' }}
+        if: ${{ always() && github.event_name == 'push' && steps.pickle-fetch.conclusion == 'success' }}
         with:
           path: ${{ env.CDISC_PICKLE_CACHE_DIR }}
           key: ${{ runner.os }}-cdisc-pickles-${{ env.CDISC_PICKLE_REF }}
