@@ -220,6 +220,10 @@ any `--STRESN`, says nothing and reads as a misunderstanding.
 > missing value then behaves by the missing-value rules — so an unguarded conversion does not
 > fail, it quietly changes which rows the comparison selects.
 
+**Missing and empty** — A genuinely missing input yields **that missing value**, identity kept:
+`num(.A)` is `.A` (rulings register `D85c`), so `abs(num(X))` keeps `X`'s `.A` as well. `""` and
+text that is not a number yield the plain missing (`MIS`).
+
 **`date` and `time` are *interpretive*.** The temporal value's carrier is the ISO string itself,
 so partial precision survives the conversion instead of being flattened into a number. That is
 what lets a partial date stay partial through a comparison.

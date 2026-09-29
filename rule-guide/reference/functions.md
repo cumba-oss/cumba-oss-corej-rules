@@ -150,7 +150,7 @@ Check:
   expression: 'empty(coalesce(AEDECOD, AETERM))'
 ```
 
-**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing.
+**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`.
 
 
 ### ds_exists
@@ -529,7 +529,7 @@ Length of the value in characters; `len("") = 0`. Also spelled `length`.
 expression: 'len(ETCD) > 8'
 ```
 
-**Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **missing**, not 0. An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
+**Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **that missing value**, not 0 — identity kept (`len(.A)` is `.A`, rulings register `D85c`). An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
 
 ### lower
 
@@ -666,6 +666,8 @@ Splits the value on a literal delimiter into a list of tokens
 ```yaml
 expression: 'not contains_all(var_codelist_coded_values("LIBRARY"), split_by(value(), ";"))` (`CDISC-SEND-0049`)'
 ```
+
+**Missing and empty** — A missing `x` yields **that missing value** — a single value, not a list (rulings register `D85c`); `""` yields the plain missing (`MIS`). Either way there are no tokens, so a membership test over it does not fire.
 
 ### starts_with
 
@@ -870,7 +872,7 @@ The absolute value of a number
 expression: 'abs(num(BASE) - num(AVAL)) > 0.001'
 ```
 
-**Missing and empty** — A non-numeric or empty input yields **missing**.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`abs(.A)` is `.A`, rulings register `D85c`) — also through `num`: `abs(num(X))` keeps `X`'s `.A`. A non-numeric or empty input yields the plain missing (`MIS`).
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
@@ -910,7 +912,7 @@ The smallest integer not less than `x`
 expression: 'ceil(ADY)'
 ```
 
-**Missing and empty** — A non-numeric or empty input yields **missing**.
+**Missing and empty** — As [`abs`](#abs): a missing input yields **that missing value**, identity kept (rulings register `D85c`); a non-numeric or empty input yields the plain missing (`MIS`).
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
@@ -930,7 +932,7 @@ The largest integer not greater than `x`
 expression: 'floor(ADY)'
 ```
 
-**Missing and empty** — A non-numeric or empty input yields **missing**.
+**Missing and empty** — As [`abs`](#abs): a missing input yields **that missing value**, identity kept (rulings register `D85c`); a non-numeric or empty input yields the plain missing (`MIS`).
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
@@ -1015,7 +1017,7 @@ The value rounded to the nearest integer, halves away from zero
 expression: 'round(AGE) == AGE'
 ```
 
-**Missing and empty** — A non-numeric or empty input yields **missing**.
+**Missing and empty** — As [`abs`](#abs): a missing input yields **that missing value**, identity kept (rulings register `D85c`); a non-numeric or empty input yields the plain missing (`MIS`).
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
@@ -1116,7 +1118,7 @@ The day component of an ISO value, or missing
 expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 ```
 
-**Missing and empty** — `""` and a missing input yield **missing** — neither carries a date component.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`day(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
 ### dy
 
@@ -1159,6 +1161,8 @@ Check:
 
 **When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. A comparison against it does not fire; `empty()` on it does.
 
+**Missing and empty** — A missing date or reference yields **that missing value**, decided before the dates are parsed: `dy(.A, "2020")` is `.A`, and `dy(.A, .B)` is the plain missing (rulings register `D85c` / `D86a`). Only present but incomplete or unparsable dates give the plain missing (`MIS`).
+
 
 ### earliest_possible
 
@@ -1175,6 +1179,8 @@ The earliest instant an incomplete value could denote
 ```yaml
 expression: 'not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= date(earliest_possible(DM.RFSTDTC))'
 ```
+
+**Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D85c`). `""`, and a value that cannot be placed on the calendar, yield the plain missing (`MIS`) — never a sentinel date.
 
 ### interval_uncertainty_precision_mismatch
 
@@ -1314,6 +1320,8 @@ Check:
   expression: 'date(earliest_possible(--STDTC)) > latest_possible(--ENDTC)'
 ```
 
+**Missing and empty** — As [`earliest_possible`](#earliest_possible): a missing input yields **that missing value**, identity kept (rulings register `D85c`); `""` and an unplaceable value yield the plain missing (`MIS`).
+
 ### month
 
 `month(x)` → **value**
@@ -1330,7 +1338,7 @@ The month component of an ISO value, or missing
 expression: 'is_complete_date(AESTDTC) and month(AESTDTC) > 12'
 ```
 
-**Missing and empty** — `""` and a missing input yield **missing** — neither carries a date component.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`month(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
 ### time_contains
 
@@ -1382,7 +1390,7 @@ The year component of an ISO value, or missing
 expression: 'year(BRTHDTC) < 1900'
 ```
 
-**Missing and empty** — `""` and a missing input yield **missing** — neither carries a date component.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`year(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
 
 ## Aggregates over rows and groups
@@ -3976,7 +3984,7 @@ The first character of the value as its numeric code point
 expression: 'not empty(PARAMCD) and not between(char(PARAMCD), char("A"), char("Z"))'
 ```
 
-**Missing and empty** — Both a missing input and `""` yield **missing** — there is no first character to take.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`char(.A)` is `.A`, rulings register `D85c`); `""` has no first character to take and yields the plain missing (`MIS`).
 
 ### colref
 
@@ -3994,7 +4002,7 @@ The value of the column *named by* `x`'s value — a two-hop dereference
 expression: 'not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(IDVAR))'
 ```
 
-**Missing and empty** — A named-but-absent column yields **missing**; an empty or non-string first hop is returned as it is.
+**Missing and empty** — A named-but-absent column yields its type default (`""`, or the plain missing when the rule expects a number); an empty or non-string first hop is returned as it is. A missing first hop, or a missing cell in the named column, yields **that missing value**, identity kept (rulings register `D85c`).
 
 ### value
 

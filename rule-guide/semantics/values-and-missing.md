@@ -145,16 +145,26 @@ Pass one to a function and you do not get a default — you get a missing value 
 
 ```
 len(<missing>)      →  missing, not 0
+len(.A)             →  .A          (the SAME missing — identity kept)
 upper(<missing>)    →  missing
 upper(.A)           →  .A          (the SAME missing — identity kept)
+abs(.A)             →  .A
+num(.A)             →  .A          (so abs(num(X)) keeps X's .A too)
 concat(.A, "x")     →  .A          (one missing operand poisons the result)
 concat(.A, .B)      →  .           (two different identities collapse to the plain missing)
+coalesce(.A, "")    →  .A          (every operand skipped: the missing they carry)
 ```
 
-The string functions — `upper` / `lower`, `trim`, `normalize_space`, `prefix` / `suffix`, `substring`,
-`concat` — hand a missing input's **own** missing value through (rulings register `D36`, identity per
-`D85c` / `D86a`). Only a computed no-result, such as `substring` with a start past the end, is the plain
-missing.
+Every value function hands a missing input's **own** missing value through (rulings register `D85c`,
+identity kept; two or more distinct identities among the operands of one call collapse to the plain
+missing, `D86a`). That holds for the string functions — `upper` / `lower`, `trim`, `normalize_space`,
+`prefix` / `suffix`, `substring`, `concat` (register `D36`) — and for the others: `len`, `char`,
+`num`, `abs` / `round` / `floor` / `ceil`, `year` / `month` / `day`, `earliest_possible` /
+`latest_possible`, `coalesce` (once every operand is skipped), `split_by`, `dy` and `colref`. Only a
+computed no-result is the plain missing: `substring` with a start past the end, `num("abc")`,
+`char("")`, `year("")`, a `dy` whose dates are present but incomplete. A comparison sees the
+difference — `abs(A) == abs(B)` is **false** when `A` is `.A` and `B` is `.B`, and a report prints
+`.A`, not `.`.
 
 It matches **no** regular expression, including one that matches the empty string. It equals no
 string literal, including `""`, including inside a membership list.
