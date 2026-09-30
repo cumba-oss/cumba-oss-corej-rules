@@ -166,22 +166,47 @@ Where a wildcard expands a *name*, `Expansion` repeats the whole check over a *s
 
 ```yaml
 Expansion:
-- token: "&VAR"
+- token: "&VAR&"
   over: "all_variables"
 ```
 
-**`token`** is the placeholder the check uses. **`over`** names where the set comes from:
+**`token`** is the placeholder the check uses, written `&NAME&` — an `&`, upper-case letters and
+digits starting with a letter, and a **closing `&`**. In the `Check` it is written bare, like any
+column name: `not empty(&VAR&)`, `ADSL.&VAR&`. **`over`** names where the set comes from:
 
 | `over` | the set |
 |---|---|
 | `all_variables` | **every column of the dataset under validation** |
 | `all_numeric_variables` | every numeric column of it |
 | `all_character_variables` | every character column of it |
-| `shared_variables` | variables shared across the datasets in play |
-| `domain_from_variable` | the domains named by a variable's values |
+| `shared_variables` | the variables the dataset under validation shares **by name** with the dataset named by `with` |
+| `domain_from_variable` | the text at the token's position in each column name matching `pattern` — the domain code of a `<XX>SEQ`-style reference |
 
-**`with`**, **`pattern`** and **`known_domain_only`** narrow it further — an explicit list, a name
-pattern, and a restriction to domains the standard knows.
+**`with`**, **`pattern`** and **`known_domain_only`** belong to those last two — the foreign
+dataset, the column-name shape (which must contain the token exactly once), and a restriction to
+domains the standard knows. The three `all_*` sources take none of them.
+
+### Why the closing `&`
+
+The closing `&` is where the token **ends**, so a token can be glued to the text around it. The
+shipped `CDISC-AD0898` checks a parent `<XX>SEQ` column in the parent domain:
+
+```yaml
+Expansion:
+- token: "&DOM&"
+  over: "domain_from_variable"
+  pattern: "&DOM&SEQ"
+  known_domain_only: true
+Check:
+  expression: var_exists(&DOM&.&DOM&SEQ) and empty(&DOM&.&DOM&SEQ)
+```
+
+`&DOM&SEQ` is the token `&DOM&` followed by the literal `SEQ`; for `&DOM&` = `AE` the rule becomes
+`var_exists(AE.AESEQ) and empty(AE.AESEQ)`. Without the delimiter the same text, `&DOMSEQ`, reads
+like a token of its own — which it never was — and the name could only be written inside
+backticks. That undelimited spelling is retired: in a rule declaring `Expansion:`, an
+unterminated `&DOM` is a load error, and on any rule an `&X&` the rule does not declare is one
+too. Put a space between a token and the operator `&&` (`&A& && &B&`); `&A&&B&` does not lex.
 
 ### The token substitutes inside string literals too
 
@@ -191,14 +216,18 @@ value:
 
 ```yaml
 Expansion:
-- token: "&VAR"
+- token: "&VAR&"
   over: "all_character_variables"
 Check:
-  expression: 'var_length("&VAR") > 200'
+  expression: 'var_length("&VAR&") > 200'
 ```
 
-⚠ Substitution is scoped to the token, never a global text replace — a string literal that merely
-*contains* the token's characters is not rewritten.
+⚠ **A string literal that contains the token IS rewritten** — that is exactly what makes
+`var_length("&VAR&")` work: every occurrence of a *declared* token is replaced, in names and in
+quoted text alike. Substitution is still scoped to the token, never a global text replace: only the
+complete `&NAME&` the rule declares is replaced, and the rest of the literal is left alone. A
+metadata accessor's name operand must stay a string literal: the bare `&VAR&` is a column
+*reference*, so `var_length(&VAR&)` means something else and does not compile.
 
 ### ⛔ `over: all_*` and the variable cursor are mutually exclusive
 

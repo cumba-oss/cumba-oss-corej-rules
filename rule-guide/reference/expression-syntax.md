@@ -6,7 +6,7 @@
      Operation surface, and every former operation is a function of the same name.
      Grammar and precedence: CheckExpressionParser.java (or > and > not > comparison > sum >
      product > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
-     && and || accepted). Types: ExprType.java (6 value types + 2 parameter-only; `missing` is a
+     bare &NAME& expansion tokens inside a name (grammar: ExpansionTokens), && and || accepted). Types: ExprType.java (6 value types + 2 parameter-only; `missing` is a
      bottom inhabiting every type, `unknown` is stage-A's not-yet-known).
      The six comparison tokens: ExprCompiler.comparisonMarkers() = CONVERSIONS {num,date,time}
      u TAGS {date_part,time_part} u STR_MARKER {str}. None is a FunctionRegistry entry; they are
@@ -78,6 +78,7 @@ AESTDTC          # plain — a column of the dataset the rule is running on
 DM.RFSTDTC       # qualified — a column of a joined dataset
 --STDTC          # wildcarded — a name resolved per dataset
 `ODD NAME`       # backtick-quoted — a name that would not otherwise lex
+&DOM&.&DOM&SEQ   # templated — an expansion token, replaced before the rule runs
 ```
 
 The differences are about **naming**, not about what the operand is:
@@ -92,6 +93,14 @@ capture letter `xx` / `zz` / `y` / `w` — is resolved against the dataset in ha
 `AESTDTC` on `AE`. See [Wildcards and expansion](../authoring/wildcards.md).
 
 The two combine: a qualified name may carry a wildcard.
+
+**An expansion token says which name, too — by substitution.** A rule that declares
+`Expansion:` may write its token, `&NAME&` (`NAME` upper-case letters and digits, starting with a
+letter, the closing `&` mandatory), bare inside any name: `&VAR&`, `ADSL.&VAR&`,
+`&DOM&.&DOM&SEQ`. The engine emits one concrete rule per binding with the token replaced, so the
+template itself never runs. The closing `&` is where the token ends: `&DOM&SEQ` is `&DOM&`
+followed by `SEQ`. An unterminated `&DOM` or a lower-case `&dom&` does not lex. See
+[Wildcards and expansion](../authoring/wildcards.md#expansion--repeating-the-check-over-a-set-of-variables).
 
 > **A name is not a string.** `AESTDTC` unquoted is a column; `"AESTDTC"` quoted is the text. A
 > few functions take a *name* rather than a value — see
@@ -251,6 +260,9 @@ or a comparison family.
 | `not` | negation |
 
 Prefer the word forms; `&&` and `||` are accepted and nothing in the corpus uses them.
+
+> ⚠ **Keep `&&` apart from an expansion token.** `&A&&B&` and `COL&&&A&` do not lex — *"separate
+> an expansion token from '&' / '&&' by a space"*. Write `&A& && &B&`, or better `&A& and &B&`.
 
 #### Their operands must already be boolean
 

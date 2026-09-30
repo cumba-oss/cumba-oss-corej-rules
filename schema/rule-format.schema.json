@@ -289,10 +289,10 @@
       "required": ["token", "over"],
       "additionalProperties": false,
       "properties": {
-        "token": { "type": "string", "description": "The exact string substituted wherever it occurs in the rule body. Author-chosen; must carry a non-alphanumeric sigil so it can never collide with a CDISC variable name (R-5.17)." },
-        "over": { "enum": ["shared_variables", "domain_from_variable"], "description": "The binding source. Closed and extensible: a third source costs one new value here plus its resolver in TokenExpander." },
+        "token": { "type": "string", "pattern": "^&[A-Z][A-Z0-9]*&$", "description": "The token substituted wherever it occurs in the rule's rewritten surfaces (Check, Bindings, Description, Outcome.Message, Output_Variables, Match_Datasets, Grouping). Form &NAME& with NAME = [A-Z][A-Z0-9]* - the closing & is mandatory (&DOM&, &VAR&), so a token can never collide with a CDISC variable name and never runs into the text after it (&DOM&SEQ is the token &DOM& followed by SEQ). A Check writes it bare (var_exists(&DOM&.&DOM&SEQ)); separate it from & / && by a space. Declared once per rule; a rule may carry no undeclared &X& token and, when it declares Expansion, no unterminated &X (loader gates G1-G3, R-5.17)." },
+        "over": { "enum": ["shared_variables", "domain_from_variable", "all_variables", "all_numeric_variables", "all_character_variables"], "description": "The binding source. shared_variables needs with, domain_from_variable needs pattern; the three all_* sources (every column, the numeric ones, the character ones of the dataset under validation) take neither. Closed and extensible: a new source costs one new value here plus its resolver in TokenExpander." },
         "with": { "type": ["string", "null"], "description": "shared_variables only - the foreign dataset whose variables are intersected with the dataset under validation." },
-        "pattern": { "type": ["string", "null"], "description": "domain_from_variable only - the column-name shape the token appears in; the token position is the capture. Must contain the token." },
+        "pattern": { "type": ["string", "null"], "description": "domain_from_variable only - the column-name shape the token appears in; the token position is the capture. Must contain the token exactly once." },
         "known_domain_only": { "type": ["boolean", "null"], "description": "domain_from_variable only - keep only captures the library attests as dataset names. This is what excludes ADaM's own ASEQ / SRCSEQ / RECSEQ." }
       }
     },

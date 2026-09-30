@@ -107,11 +107,12 @@ wildcards:
 wildcardExclude: ["SUPP"]
 wildcardPairCatalogue: true
 Expansion:                 # ⛔ mutually exclusive with the varname() / value() cursor
-- token: "&VAR"
+- token: "&VAR&"           # &NAME&, closing & mandatory; bare in the Check: ADSL.&VAR&
   over: "all_variables"    # or all_numeric_variables / all_character_variables /
-  with: ["AESTDTC", "AEENDTC"]        # shared_variables / domain_from_variable
-  pattern: "--DTC"
-  known_domain_only: true
+                           #    shared_variables / domain_from_variable
+  with: "ADSL"             # shared_variables only: the dataset to share names with
+  pattern: "&VAR&SEQ"      # domain_from_variable only: holds the token exactly once
+  known_domain_only: true  # domain_from_variable only
 
 # ---- Result --------------------------------------------------------------
 Outcome:
@@ -269,9 +270,11 @@ own or are dropped.
 a variable name (`--`, `xx`, `y`, `w`, `zz`) may expand — `wildcards` per token with `min` and
 `max` lengths, `wildcardExclude` by prefix, `wildcardPairCatalogue` to pair related expansions.
 
-**`Expansion`** repeats the check over a set of variables: `token` names the placeholder, `over`
-selects the source — `all_variables` and its numeric / character variants, `shared_variables`,
-`domain_from_variable` — and `with`, `pattern` and `known_domain_only` narrow it. ⛔ `over: all_*`
+**`Expansion`** repeats the check over a set of variables: `token` names the placeholder —
+`&NAME&`, the closing `&` mandatory, written bare wherever the check uses it — `over` selects the
+source — `all_variables` and its numeric / character variants, `shared_variables`,
+`domain_from_variable` — and `with` (for `shared_variables`) or `pattern` and `known_domain_only`
+(for `domain_from_variable`) parameterise it; the `all_*` sources take none of them. ⛔ `over: all_*`
 and the `varname()` / `value()` cursor are mutually exclusive; a rule using both is rejected.
 
 → [The check](../authoring/the-check.md) · [Bindings](../authoring/bindings.md) ·

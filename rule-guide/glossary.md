@@ -43,8 +43,9 @@ must exist, datasets that must be present. Unmet, the rule is **skipped**.
 **Skipped** — the rule deliberately did not run. Distinct from running and finding nothing, and
 distinct again from erroring; the engine states the reason.
 
-**Expansion** — one authored rule standing for many concrete ones, via a token in a variable
-name. The expansion happens before the check runs, once per resolved name.
+**Expansion** — one authored rule standing for many concrete ones, via a declared token
+(`&NAME&`, e.g. `&DOM&`, closing `&` mandatory) written bare in a variable name. The expansion
+happens before the check runs, once per binding of the token.
 → [Wildcards and expansion](authoring/wildcards.md)
 
 **Wildcard** — `--` in an SDTM variable name, standing for the domain prefix (`--STDTC` in `AE`

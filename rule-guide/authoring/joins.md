@@ -105,7 +105,7 @@ Match_Datasets:
   to declare — and no `All_Or_None` group may name a `Child` key, unless an ordinary entry of the
   same rule also keys on it (a `DM` join sharing `USUBJID` carries `[USUBJID, DM.USUBJID]`).
 - **A joined dataset absent from the study skips the rule of an ordinary keyed entry** (one
-  carrying a key group); `Child` entries, `&DOM` templates and keyless joins are not affected.
+  carrying a key group); `Child` entries, `&DOM&` templates and keyless joins are not affected.
   The group's qualified half (`DM.USUBJID`) is then absent while the primary's bare key is
   present, so the group is only partly present —
   the rule cannot be answered, and non-executability is not a finding. If the joined dataset's
@@ -116,7 +116,7 @@ Match_Datasets:
   `DM.RPATHCD` goes in `All` **as well** — whichever position the key has. The gate demands `All`
   only for a first key, but a group alone lets a study that lacks `RPATHCD` on **both** sides run,
   and there the rule [errors](#when-a-qualified-key-cannot-be-resolved) instead of skipping.
-- **Expansion-template keys** (`&DOM`, `&DOMSEQ`) cannot be declared — loader gate R6 bars a
+- **Expansion-template keys** (`&DOM&`, `&DOM&SEQ`) cannot be declared — loader gate R6 bars a
   token from `Requirements` — so only a literal first key goes in `All`.
 
 The corpus is held to this by `JoinKeyDeclarationLintTest`, and **every package by the loader**
