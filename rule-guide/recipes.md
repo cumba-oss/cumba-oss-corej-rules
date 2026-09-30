@@ -219,8 +219,9 @@ the pool part, which `earliest_date` skips — so the rule reads exactly as befo
 study, with one exception: the pool read compares `POOLID` between EX and POOLDEF, and `USUBJID`
 between POOLDEF and the rule's dataset, and a key whose column type differs between the two (Char
 against Num) makes the rule **ERROR**, never a silent non-match. A CSV or XLSX study can meet this
-without any pooling: an all-blank EX `POOLID` column is read as Char, and a POOLDEF whose `POOLID`
-values look numeric is read as Num.
+without any pooling, because there the type is inferred from the data and a column blank in every
+row reads as Char from CSV but as Num from XLSX — e.g. an empty EX `POOLID` in an XLSX study beside
+character POOLDEF pool IDs such as `POOL1` (or, from CSV, beside numeric-looking ones).
 
 When the subject's own EX records or any one of its pools give an undeterminable extreme (a partial
 or unreadable date) while another part can be determined, the parts that can be determined decide

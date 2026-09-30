@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0205 expect=executionError domain=TF
-#note "PLAN-scalar-date-extremes: S14 / GKI Q2: EX carries POOLID as Char (all blank, as a CSV or XLSX provider types an all-blank column) and POOLDEF carries POOLID as Num, so the POOLDEF read's POOLID key pair differs in kind and the rule ERRORs instead of matching nothing. Green only after the rules read POOLDEF (red-before: the pre-plan rules never read POOLDEF and executed)."
+#note "PLAN-scalar-date-extremes: S14 / GKI Q2: EX carries POOLID as Char (all blank, as a CSV provider types a column blank in every row; an XLSX provider types it Num instead, which ERRORs beside character POOLDEF pool IDs) and POOLDEF carries POOLID as Num, so the POOLDEF read's POOLID key pair differs in kind and the rule ERRORs instead of matching nothing. Green only after the rules read POOLDEF (red-before: the pre-plan rules never read POOLDEF and executed)."
 #library standard=sendig version=3-1-1
 #expect-execution-error "key column POOLID is Character in EX"
 dataset TF class=FINDINGS label="Tumor Findings"
