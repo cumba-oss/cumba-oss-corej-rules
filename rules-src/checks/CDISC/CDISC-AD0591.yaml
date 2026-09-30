@@ -8,7 +8,7 @@ Description: "Raise an error when, for the same subject, a variable's value does
 Executability: "Fully Executable"
 ExecutabilityHint:
   Category: "fully executable"
-  Detail: "Declared-token template. The Expansion block binds &VAR to every variable\
+  Detail: "Declared-token template. The Expansion block binds &VAR& to every variable\
     \ this dataset shares by name with ADSL, and the engine emits one concrete rule\
     \ per shared variable, each comparing that variable against ADSL's after an inner\
     \ join on STUDYID / USUBJID — the CDISC-CG0218 / PMDA-AD0208 shape. The join keys\
@@ -42,16 +42,16 @@ Match_Datasets:
   - "USUBJID"
 Check:
   expression: >-
-    not empty(`&VAR`) and not empty(`ADSL.&VAR`) and var_exists(`&VAR`) and var_exists(`ADSL.&VAR`)
-    and `&VAR` != `ADSL.&VAR`
+    not empty(&VAR&) and not empty(ADSL.&VAR&) and var_exists(&VAR&) and var_exists(ADSL.&VAR&) and
+    &VAR& != ADSL.&VAR&
 Outcome:
   Message: "For this subject, this variable's value does not match the value of the\
     \ identically named variable in ADSL."
   Output_Variables:
-  - "&VAR"
-  - "ADSL.&VAR"
+  - "&VAR&"
+  - "ADSL.&VAR&"
 Expansion:
-- token: "&VAR"
+- token: "&VAR&"
   over: "shared_variables"
   with: "ADSL"
 Source:

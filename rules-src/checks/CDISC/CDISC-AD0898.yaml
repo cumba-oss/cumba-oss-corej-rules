@@ -7,9 +7,9 @@ Description: "Raise an error when an ADaM record's STUDYID, USUBJID, and --SEQ c
 Executability: "Fully Executable"
 ExecutabilityHint:
   Category: "fully executable"
-  Detail: "Declared-token template. The Expansion block binds &DOM to the prefix of\
-    \ every column matching &DOMSEQ, and the engine emits one concrete rule per such\
-    \ column, each left-joining the dataset to that parent SDTM domain on STUDYID\
+  Detail: "Declared-token template. The Expansion block binds &DOM& to the prefix\
+    \ of every column matching &DOM&SEQ, and the engine emits one concrete rule per\
+    \ such column, each left-joining the dataset to that parent SDTM domain on STUDYID\
     \ / USUBJID / --SEQ and firing on the unmatched records — the CDISC-AD0053 / PMDA-AD0258\
     \ shape, which those two rules author by hand for a pinned AE. known_domain_only\
     \ keeps only prefixes the library attests as dataset names, which is what excludes\
@@ -26,24 +26,24 @@ Requirements:
     All:
     - "STUDYID"
 Match_Datasets:
-- Name: "&DOM"
+- Name: "&DOM&"
   Keys:
   - "STUDYID"
   - "USUBJID"
-  - "&DOMSEQ"
+  - "&DOM&SEQ"
   Join_Type: "left"
 Check:
   expression: >-
-    var_exists(`&DOM.&DOMSEQ`) and empty(`&DOM.&DOMSEQ`)
+    var_exists(&DOM&.&DOM&SEQ) and empty(&DOM&.&DOM&SEQ)
 Outcome:
   Message: "The ADaM --SEQ value is not present in the parent SDTM domain's --SEQ."
   Output_Variables:
-  - "&DOMSEQ"
-  - "&DOM.&DOMSEQ"
+  - "&DOM&SEQ"
+  - "&DOM&.&DOM&SEQ"
 Expansion:
-- token: "&DOM"
+- token: "&DOM&"
   over: "domain_from_variable"
-  pattern: "&DOMSEQ"
+  pattern: "&DOM&SEQ"
   known_domain_only: true
 Source:
   Class: "ALL"
