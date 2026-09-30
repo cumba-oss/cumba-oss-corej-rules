@@ -205,12 +205,12 @@ so only known-against-known conflicts are reported early; the rest are settled a
 
 ### Conversions and comparison modes
 
-Six tokens are written like calls but are **not functions** — none is in the function registry.
-The compiler recognises them in comparison position, and they fall into three groups that behave
+Six call-shaped tokens decide how a value is read or compared, in two groups that behave
 differently.
 
-**Conversions — `num` · `date` · `time`.** A conversion is a property of the **value**: it means
-the same thing wherever it is written, and it produces a real converted value.
+**Conversions — `num` · `str` · `date` · `time`.** These are ordinary registered
+[functions](#values-and-references) (since 2026-09-30). A conversion is a property of the
+**value**: it means the same thing wherever it is written, and it produces a real converted value.
 
 ```yaml
 # --STRESC is the CHARACTER standardised result; --STRESN is its numeric twin.
@@ -237,7 +237,9 @@ text that is not a number yield the plain missing (`MIS`).
 so partial precision survives the conversion instead of being flattened into a number. That is
 what lets a partial date stay partial through a comparison.
 
-**Comparison modes — `date_part` · `time_part`.** These do not convert anything. They select
+**Comparison modes — `date_part` · `time_part`.** These are written like calls but are **not
+functions** — neither is in the function registry; the compiler recognises them in comparison
+position. They do not convert anything. They select
 *how* the comparison is performed — it reads the full operands and compares the requested part —
 and they are erased once that choice is made.
 
@@ -245,8 +247,10 @@ and they are erased once that choice is made.
 expression: 'date_part(AESTDTC) == date_part(AEENDTC)'
 ```
 
-**`str`** is a third thing again: it selects type-insensitive equality, rather than a conversion
-or a comparison family.
+**`str` renders a value as text** — a cell's own text, a computed number in plain notation — so
+`str(A) == str(B)` is an ordinary string equality of two converted values, whatever the two
+columns' types. (Until 2026-09-30 `str` was a comparison marker that selected type-insensitive
+equality; the function answers the same.)
 
 > **Use one whenever the operands' own types do not already make the intended reading
 > unambiguous** — and prefer a conversion to a mode where both would express the requirement,
@@ -609,9 +613,8 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 |---|---|---|
 | [`define_dataset_names()`](functions.md#define_dataset_names) | value | The dataset names the Define-XML declares, upper-cased, as a list; needs the Define-XML |
 | [`define_key_variables()`](functions.md#define_key_variables) | value | The Define-XML key variables of the domain, as a list; SKIPPED when it declares none |
-| `define_variable_decode_matches` | value | Operand form of the decode matcher |
+| [`define_variable_decode_matches([x])`](functions.md#define_variable_decode_matches) | value | Whether the record's code and decode agree at variable level, per the Define-XML |
 | [`define_variable_names()`](functions.md#define_variable_names) | value | The Define-XML ItemDef names of the domain, as a list; needs the Define-XML |
-| `library_variable_code_pair_matches` | value | Operand form of the CT pair predicate |
 | [`vlm_codelist_coded_codes(X)`](functions.md#vlm_codelist_coded_codes) | value | The codes of the codelist bound by the value-level match, as a list |
 | [`vlm_codelist_coded_values(X)`](functions.md#vlm_codelist_coded_values) | value | The submission values of the codelist bound by the value-level match, as a list |
 | [`vlm_codelist_extensible(X)`](functions.md#vlm_codelist_extensible) | value | Whether the codelist bound by the value-level match is extensible |
@@ -632,6 +635,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`dictionary_has_decode(name, external_dictionary_type=)`](functions.md#dictionary_has_decode) | boolean | Any-decode presence per record; code lookup case-sensitive by default, `case_sensitive=false` folds it |
 | [`get_codelist_attributes(name, version, ct_attribute=)`](functions.md#get_codelist_attributes) | value | One CT-package attribute (e.g. `"Term CCODE"`) over every package the rows name — a list for the dataset; SKIPPED without a usable Library answer |
 | [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a call that needs the CDISC Library; a not-met Precondition ⇒ SKIPPED |
+| [`library_variable_code_pair_matches([x])`](functions.md#library_variable_code_pair_matches) | value | Whether the record's code and its paired decode map to the same CDISC CT term |
 | [`valid_codelist_dates(ct_package_types=)`](functions.md#valid_codelist_dates) | value | The published CT-package dates of the applicable package families, as a list |
 | [`valid_external_dictionary_code(name, external_dictionary_type=, dictionary_term_type=)`](functions.md#valid_external_dictionary_code) | boolean | Dictionary code validity per record; one function with `_value` under two names |
 | [`valid_external_dictionary_code_term_pair(name, external_dictionary_term_variable, external_dictionary_type=, case_sensitive=)`](functions.md#valid_external_dictionary_code_term_pair) | boolean | Code↔decode pairing against an external dictionary, both columns as references; case-sensitive by default, `case_sensitive=false` folds both |
@@ -650,11 +654,13 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 |---|---|---|
 | [`char(x)`](functions.md#char) | value | The first character of the value as its numeric code point |
 | [`colref(x)`](functions.md#colref) | value | The value of the column *named by* `x` — bare or `DS.X`, typed; a list of names gives a list of values |
+| [`date(x)`](functions.md#date) | date | The value as an ISO-8601 date, partial precision kept; makes a comparison temporal |
 | [`find_vars(entry)`](functions.md#find_vars) | list | The names of the columns one `Requirements.Variables` entry selects (template, glob, `DS./regex/`, literal) |
 | [`lpad(x, width, fill)`](functions.md#lpad) | text | `x` left-padded to `width`, never truncated |
 | [`num(x)`](functions.md#num) | number | The value as a number |
 | [`printf(format, args…)`](functions.md#printf) | text | Root-locale formatting: `%s %d %f %e %x %%` |
 | [`str(x)`](functions.md#str) | text | The value as text |
+| [`time(x)`](functions.md#time) | time | The value as an ISO-8601 time of day, partial precision kept; makes a comparison temporal |
 | [`value()`](functions.md#value) | value | The value of the variable currently being iterated, for this row |
 | [`varname()`](functions.md#varname) | value | The name of the variable currently being iterated |
 

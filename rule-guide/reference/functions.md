@@ -1,7 +1,10 @@
 # Function reference
 
-<!-- Parameter names, types, required flags and return kinds are dumped from the engine's own
-     descriptors (FunctionRegistry, CompilerDispatchedCalls, MetadataAttribute). -->
+<!-- Maintained by hand. The parameter tables were first dumped from the engine's descriptors
+     (FunctionRegistry, CompilerDispatchedCalls, MetadataAttribute) and are now edited here.
+     FunctionReferenceRosterTest (cumba-corej-rules) holds this page to the registry: every name
+     registered in FunctionRegistry needs a `### <name>` section or a backticked mention
+     (`name` or `name(`) on this page, or the build reds. -->
 
 One section per function: what it does, every parameter with its type, and a worked example.
 The summary tables are in [Expression syntax](expression-syntax.md#functions).
@@ -252,7 +255,12 @@ expression: 'empty(AGE)'
 
 `var_exists(x)` → **boolean**
 
-True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))` — per row; a missing name fires for neither polarity). A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
+True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))`). A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
+
+A written name (a literal or a column reference) is one fact for the whole dataset. A **computed**
+name is tested **per row** — the rule runs at record level — and resolves exactly as the written
+name would (the dataset through the run's resolver, the SUPP QNAM pivot included). A computed name
+that starts with `--` is not specialised to the domain: it answers as any absent name.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -263,6 +271,9 @@ True when the named column exists; accepts a `--` wildcard, a dotted cross-datas
 ```yaml
 expression: 'var_exists("AWU")'
 ```
+
+**Missing and empty** — A computed name that is missing (or a value that is not text) fires for
+**neither** polarity: `var_exists(…)` and `not var_exists(…)` are both false on that row.
 
 ### var_is_null
 
@@ -3355,6 +3366,32 @@ The example above is the complete call.
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: a Define-XML that declares no key variables for the domain leaves a uniqueness check with no key to test, so the answer is *Define-XML not available* (*"Rule skipped — Define-XML returned no data for define_key_variables"*) rather than an empty key set that would make `is_unique_set` vacuous.
 
 
+### define_variable_decode_matches
+
+`define_variable_decode_matches([x])` → **value**
+
+Whether the record's code and decode agree at variable level, per the Define-XML: the current
+variable is the **code** variable, its ItemDef codelist supplies the coded-value → decode map, and
+the record's decode partner (the code name without its trailing `N`, `NUM` or `CD` — `AVISITN` →
+`AVISIT`, `VISITNUM` → `VISIT`, `PARAMCD` → `PARAM`) must hold the decode of the record's coded
+value. The variable-level twin of [`vlm_decode_matches`](#vlm_decode_matches). Written as the
+operand `define_variable_decode_matches` in a `Value Check against Define XML Variable` rule.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
+
+**Example**
+
+```yaml
+expression: 'not empty(value()) and define_variable_decode_matches(variable_name) == false'
+```
+
+**When there is nothing to answer** — No decision, so the row does not fire: an empty code value, a
+variable whose codelist carries no decodes, a decode partner that cannot be resolved, or a code value
+that is not a term of the codelist (an out-of-codelist value is another rule's concern). Without a
+Define-XML the rule is SKIPPED.
+
 ### define_variable_names
 
 `define_variable_names()` → **value (a list)**
@@ -3751,6 +3788,30 @@ get_codelist_attributes"*). It never answers an empty list, so `not empty(...)` 
 
 Takes no arguments.
 
+### library_variable_code_pair_matches
+
+`library_variable_code_pair_matches([x])` → **value**
+
+Whether the record's code and its paired decode map to the **same** CDISC CT term: the current
+variable is the code variable (e.g. `--TESTCD`), its decode partner follows the CDISC convention
+(drop the trailing `CD` — `--TEST`), and each value is mapped to its term's concept id (C-code)
+through its own variable's bound codelist; `true` when the two concept ids are equal. Written as the
+operand `library_variable_code_pair_matches` in a `Value Check against Library Metadata` rule.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
+
+**Example**
+
+```yaml
+expression: 'not empty(value()) and library_variable_code_pair_matches(variable_name) == false'
+```
+
+**When there is nothing to answer** — No decision, so the row does not fire: an empty code value, a
+decode variable that cannot be derived or is absent, or either value not a term of its codelist.
+Without the CDISC Library the rule is SKIPPED.
+
 ### valid_codelist_dates
 
 `valid_codelist_dates(ct_package_types=)` → **value (a list)**
@@ -4047,6 +4108,43 @@ a list keeps a missing member as a member (`DCF Q4`). ⚠ Through a binding the 
 binding reference's, which carries no kind — so `$x < 3` over `$x: colref("X")` defaults to `""`,
 exactly as `$x: X` does.
 
+**Names.** A name matches its column whatever its case, and so does the absent default:
+`colref("zz")` and `colref("ZZ")` answer alike. A **written** `--` name (`colref("--SEQ")`) is
+specialised to the domain like any written name; a name **computed** per row that starts with
+`--` names no column and takes the absent default. `colref("DS._matched_")` is a rule error —
+the join-match flag is a condition, never a value — exactly as `DS._matched_` written as a value is.
+
+**In a membership test.** On the right of `in`, a list of names is a per-row set:
+`TRTA in colref(find_vars("ADSL.TRTxxA"))`, or through a binding, `$vars: find_vars("ADSL.TRTxxA")`
+and then `TRTA in colref($vars)` (a binding holding one name is a one-member set). On the left,
+`colref(find_vars(…)) in [...]` compares element by element and holds when **any** member is in
+the set — as a list-valued metadata accessor does on the left.
+
+### date
+
+`date(x)` → **date**
+
+The value read as an ISO-8601 date or datetime. Nothing is flattened: the ISO text itself is the
+carrier, so a partial date (`2012-06`) stays partial. Written on either side of a comparison it
+makes the comparison **temporal** — the [hull rule](../semantics/comparison.md#dates-and-times--the-hull-rule):
+a partial date is the range of instants it could denote. A `date(…)` probe against a written-out
+list compares dates too: `date(--DTC) in [date("2020-01-01")]`.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The ISO-8601 value — a column, a string literal or a binding |
+
+**Example**
+
+```yaml
+expression: 'not empty(DVSTDTC) and date(DVSTDTC) < date(DM.RFICDTC)'
+```
+
+**Missing and empty** — A missing input yields **that missing value**. A value that cannot be read
+as a date at any precision — `""`, malformed text — is not an error: every comparison over it
+answers false ([Junk answers false](../semantics/comparison.md#junk-answers-false)), so guard it with
+`is_valid_date(…)` or `not empty(…)` when that is not what you want.
+
 ### find_vars
 
 `find_vars(entry)` → **list** of column names
@@ -4056,8 +4154,8 @@ selects — the same entry grammar and the same matcher: a template (`"ADSL.TRTx
 two digits, `y` one or more, `w` one), a glob (`"TRT*P"`), a regex over the variable name with the
 qualifier outside the slashes (`"ADSL./TRT[0-9]+PN/"`), or a literal name (an existence test).
 Unqualified entries read the dataset under validation; a qualified entry reads the joined dataset's
-real columns (never a SUPP qualifier). The names come in the dataset's column order, spelled
-`DS.COLUMN`; `colref` dereferences them. It never expands the rule, so
+real columns (never a SUPP qualifier). The names come in the dataset's column order — **bare**
+(`TRT01P`) for an unqualified entry, `DS.COLUMN` for a qualified one; `colref` dereferences them. It never expands the rule, so
 `count(find_vars("TRTxxP")) == 0` asks "is no `TRTxxP` present?" and the rule **runs** either way.
 
 | parameter | type | required | description |
@@ -4076,6 +4174,11 @@ error); a type suffix (`:N`), a qualifier written inside the regex (`"/ADSL.TRT�
 
 **Missing and empty** — A missing entry yields a missing result (so `not empty(find_vars(X))` does
 not fire on it); `""` selects nothing (`[]`).
+
+**When there is nothing to answer** — `[]`: for a qualifier the rule does not declare in
+`Match_Datasets` or a dataset the run was not given (the loader also reports an undeclared
+qualifier, as it does for a written `DS.X`), and for a computed entry that starts with `--` (only a
+written entry is specialised to the domain).
 
 ### lpad
 
@@ -4096,7 +4199,12 @@ is returned unchanged — never truncated.
 expression: 'lpad(str(APERIOD), 2, "0") == "01"'
 ```
 
+⛔ **Load errors.** A written `width` that is negative, not a whole number or above 32767, and a
+written `fill` that is not exactly one character, fail the rule at load.
+
 **Missing and empty** — A missing `x` yields **that missing value**; `""` pads to `width` fills.
+When `width` or `fill` comes from the data, a missing, negative or non-whole `width`, a `width`
+above 32767, or a `fill` that is not exactly one character yields the plain missing (`MIS`).
 
 ### num
 
@@ -4124,7 +4232,9 @@ and `""`, yield the plain missing (`MIS`).
 
 Formats its arguments, always in the root locale (`%.1f` of 1.5 is `1.5` on every machine).
 Supported: `%s %d %f %e %x %%`, the flags `0 - + space`, a width and a precision. `%d` / `%x` take
-a whole number; `%s` renders through `str`.
+a whole number — judged with the engine's 12-digit tolerance, so a stored `2.0000000000001` counts as
+`2` — and format the nearest whole number; `%f` / `%e` format the number as stored; `%s` renders
+through `str`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -4138,19 +4248,23 @@ expression: 'printf("%02d", APERIOD) == "01"'
 ```
 
 ⛔ **Load errors.** A computed format, any other conversion (`%n`, `%t…`, `%1$s`), a number of
-arguments that differs from the conversions, and a string literal at a numeric conversion fail the
-rule at load.
+arguments that differs from the conversions, a string literal at a numeric conversion (`%d %f %e
+%x`), and a written number that is not whole at `%d` / `%x` (`printf("%d", 1.5)`) fail the rule at
+load.
 
-**Missing and empty** — A missing argument makes the result **that missing value**. `%d` of a
-value that is not a whole number (`1.5`, or text) yields the plain missing — never a truncated
-`1`, unlike the `${APERIOD:%02d}` template, which keeps its truncation.
+**Missing and empty** — A missing argument makes the result **that missing value** (two different
+missing arguments give the plain missing). `%d` / `%x` of a value that is not a whole number (`1.5`,
+or text) yields the plain missing — never a truncated `1`, unlike the `${APERIOD:%02d}` template,
+which keeps its truncation — and so does a negative value at `%x` (no two's complement).
 
 ### str
 
 `str(x)` → **text**
 
-The value as text: a numeric cell's text (no `.0` on a whole number, never scientific, a large
-integer exact), a character value as it is. `str(A) == str(B)` compares two values as text, whatever
+The value as text — a cell's own text: a floating-point cell's cleaned plain text (the engine's
+12-digit numeric cleaning; no `.0` on a whole number, never scientific), an integer cell's exact
+digits (a large integer stays exact), a character value as it is. A computed number (`str(AGE +
+1)`) is written in the same plain notation. `str(A) == str(B)` compares two values as text, whatever
 their column types.
 
 | parameter | type | required | description |
@@ -4164,6 +4278,27 @@ expression: 'str(IDVARVAL) != str(colref(IDVAR))'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept.
+
+### time
+
+`time(x)` → **time**
+
+The value read as an ISO-8601 time of day, partial precision retained — `time` mirrors
+[`date`](#date): written on either side of a comparison it makes the comparison temporal, under the
+same hull rule on times of day.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The ISO-8601 time — a column, a string literal or a binding |
+
+**Example**
+
+```yaml
+expression: 'not empty(QVAL) and time(QVAL) < time("06:00")'
+```
+
+**Missing and empty** — As for [`date`](#date): a missing input yields **that missing value**; a
+value that cannot be read as a time answers false in every comparison.
 
 ### value
 

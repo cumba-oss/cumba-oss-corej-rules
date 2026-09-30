@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0581 expect=violation domain=ADLBC
+# Rule:Description: None of TRTP, TRTPGy, TRTA, and TRTAGy are present and none of the character treatment variables in ADSL defined in the IG are present
+#note "Only TRT1P is present: a one-digit index is no member of the TRTxxP family (xx is exactly two digits, the IG's 01-99), so count(find_vars('TRTxxP')) == 0 holds and, with none of the other 13 treatment variables present, the rule fires once for the dataset (PLAN-dynamic-column-functions review round 1, lane B L8 — pins the template's width, the narrowing the ${*} digit run would not have)."
+#expectViolationCount 1
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col TRT1P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | X
+---

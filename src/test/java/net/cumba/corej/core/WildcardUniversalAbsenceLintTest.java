@@ -186,12 +186,14 @@ class WildcardUniversalAbsenceLintTest
                 + " rule(s) test every presence template only in negated form. The engine expands"
                 + " a template once per matching column and SKIPS the rule when none matches —"
                 + " exactly the case a negated presence test is written to catch — so such a rule"
-                + " can never fire (engine gap G4). Fix, when the negated templates are top-level"
-                + " conjuncts of a single-level Check: move them into Requirements.Variables.None"
-                + " as the same templates (TRTxxP — a template entry, like every column-name"
-                + " match, ignores letter case, R-5.31) and drop them from"
-                + " the Check; None skips the rule when ANY member is present. Under an or, None"
-                + " is not equivalent. Name the first instance (TRT01P for TRTxxP) only"
+                + " can never fire (engine gap G4). Fix (R-5.31): test the family with"
+                + " count(find_vars(\"TRTxxP\")) == 0 in the Check instead of"
+                + " not var_exists(\"TRTxxP\") — find_vars matches the template against the"
+                + " dataset's columns (ignoring letter case, like every column-name match) and"
+                + " answers [] when none is present, so the rule RUNS and fires, or passes when a"
+                + " member is present. (The former fix, Requirements.Variables.None, SKIPS a"
+                + " dataset carrying a member of the family, where the rule should run and pass.)"
+                + " Name the first instance (TRT01P for TRTxxP) only"
                 + " where the IG guarantees the family starts at 01/1 in that dataset class (ADSL;"
                 + " not BDS, which copies variables selectively). If the rule really tests a member"
                 + " per index, add the positive anchor it has"
@@ -245,6 +247,14 @@ class WildcardUniversalAbsenceLintTest
                 "var_exists(\\\"TRTxxP\\\") == false and not var_exists(\\\"TRTxxA\\\")");
         assertEquals(Set.of("T-UNKNOWN TRTxxP"), unknown.unknownSites);
         assertTrue(unknown.flagged.isEmpty(), unknown.flagged::toString);
+
+        // (e) the R-5.31 fix itself (PLAN-dynamic-column-functions §2.8): a family tested through
+        // count(find_vars("<template>")) == 0 is no presence template at all — the rule runs
+        // whether or not a member is present — so it is neither flagged nor counted.
+        Census findVars = censusOfRule("T-FV",
+                "not var_exists(\\\"TRTP\\\") and count(find_vars(\\\"TRTxxP\\\")) == 0");
+        assertTrue(findVars.flagged.isEmpty(), findVars.flagged::toString);
+        assertTrue(findVars.templateRules.isEmpty(), findVars.templateRules::toString);
     }
 
 

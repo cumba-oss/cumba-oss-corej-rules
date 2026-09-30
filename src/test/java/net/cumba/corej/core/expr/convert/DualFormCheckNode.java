@@ -646,7 +646,8 @@ public final class DualFormCheckNode
      * {@code _find_vars_presence_leaf} ({@code PLAN-dynamic-column-functions} §2.8, owner Q13:
      * {@code CDISC-AD0581} asks "is no {@code TRTxxP} present?" with {@code find_vars} instead of a
      * {@code Requirements.Variables.None} entry). A lint VIEW of the name read and its polarity, so
-     * the leaf-derived lints stay sighted on the rule; anything else stays unlowerable.
+     * the leaf-derived lints stay sighted on the rule; anything else — a qualified or a
+     * {@code /regex/} entry included ({@link #unqualifiedName}) — stays unlowerable.
      *
      * @return the leaf, or {@code null} when {@code b} is not that shape
      */
@@ -657,8 +658,8 @@ public final class DualFormCheckNode
                 || !(count.args().get(0) instanceof Expr.Call fv) || !"find_vars".equals(fv.name())
                 || fv.args().size() != 1 || !fv.kwargs().isEmpty()
                 || !(fv.args().get(0) instanceof Expr.Lit entry)
-                || entry.kind() != Expr.LitKind.STRING || !(b.right() instanceof Expr.Lit zero)
-                || zero.kind() != Expr.LitKind.NUMBER
+                || entry.kind() != Expr.LitKind.STRING || !unqualifiedName(entry)
+                || !(b.right() instanceof Expr.Lit zero) || zero.kind() != Expr.LitKind.NUMBER
                 || Double.compare(((Number) zero.value()).doubleValue(), 0.0d) != 0)
         {
             return null;
@@ -677,6 +678,20 @@ public final class DualFormCheckNode
         out.put("name", String.valueOf(entry.value()));
         out.put("operator", op);
         return out;
+    }
+
+
+    /**
+     * Whether a {@code find_vars} entry is an UNQUALIFIED, non-regex name or template — the only
+     * entries a legacy presence leaf could spell (review round 1, lane B L3): a qualified
+     * {@code DS.X} entry or a {@code /regex/} has no {@code var_exists} leaf equivalent, so it
+     * stays unlowerable, loudly, like every other unmodelled shape. Mirrors {@code check_expr.py}'s
+     * {@code _find_vars_presence_leaf}.
+     */
+    private static boolean unqualifiedName(Expr.Lit entry)
+    {
+        String text = String.valueOf(entry.value());
+        return !text.isEmpty() && text.indexOf('.') < 0 && text.charAt(0) != '/';
     }
 
 
