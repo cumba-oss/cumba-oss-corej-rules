@@ -42,8 +42,12 @@ class FunctionReferenceRosterTest
     /** A floor, not a count: the registry held 164 names on 2026-09-30. */
     private static final int MIN_REGISTERED = 150;
 
-    /** A floor on the page's {@code ###} sections. */
-    private static final int MIN_SECTIONS = 130;
+    /**
+     * A floor on the page's {@code ### name} sections: 167 measured 2026-09-30, the floor a little
+     * below it so an edit that merges a couple of sections does not red, while a page read as
+     * mostly empty (or a heading pattern that stopped matching) does.
+     */
+    private static final int MIN_SECTIONS = 160;
 
     /**
      * The registered names documented inside ANOTHER function's section — alias → primary. Measured
@@ -179,6 +183,17 @@ class FunctionReferenceRosterTest
                 "`removed(");
         assertEquals(Set.of("upcase"), undocumented(withoutUpcase, List.of("upcase", "lower")),
                 "removing an alias's mention from its primary's section must report it");
+        // Section-scoped (review round 3): `length` is also named in other sections
+        // (has_equal_length, substring, …); removing it from its PRIMARY's section alone must
+        // report it — a mention elsewhere does not count for an alias.
+        Map<String, String> sections = sections(doc);
+        String lenSection = sections.get("len");
+        String withoutLengthInLen = doc.replace(lenSection,
+                lenSection.replace("`length`", "`removed`").replace("`length(", "`removed("));
+        assertTrue(doc.replace(lenSection, "").contains("`length`"),
+                "the control needs `length` named OUTSIDE len's section too");
+        assertEquals(Set.of("length"), undocumented(withoutLengthInLen, List.of("length", "len")),
+                "an alias mentioned only outside its primary's section is undocumented");
     }
 
 

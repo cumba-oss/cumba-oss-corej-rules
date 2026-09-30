@@ -4116,6 +4116,12 @@ the rule — the join-match flag is a condition, never a value — exactly as `D
 a value does; a name computed per row that spells the flag names no column. A dataset qualifier
 matches the rule's `Match_Datasets` name whatever its case (`colref("adsl.TRT01A")` reads `ADSL`).
 
+**In a `Match_Datasets` Filter.** A **written** name — `colref("AESEV")`, or a list of written
+names — is checked like the plain name: a column the filtered dataset does not carry fails the rule
+unless the rule declares it in `Requirements.Variables` (then the rule is skipped), and a written
+`colref("DM.SEX")` is refused like `DM.SEX` — a filter sees only its own dataset's columns. A name
+computed per row cannot be checked before the run.
+
 **Real columns only.** `colref` reads the dataset's own columns (with a `Child: true` parent's
 merged in) and the joined datasets' columns — **not** a SUPP qualifier merged in by the SUPP merge,
 which the written bare name does read. Whether it should is an open owner question
@@ -4128,7 +4134,8 @@ and then `TRTA in colref($vars)` (a binding holding one name is a one-member set
 the set — as a list-valued metadata accessor does on the left. `colref($x)` decides row by row: a
 row whose binding holds a list is compared as above; any other row is an ordinary value, compared
 as the written name would be (numerically against a number list, as dates against `date(…)`
-members). An absent member of a list is `""`, like an absent column anywhere.
+members). An absent member of a list takes the absent default like any `colref` read: `""`,
+unless the name is expected to be a number elsewhere in the rule (then the plain missing).
 
 ### date
 
