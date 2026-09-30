@@ -16,7 +16,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.MatchDataset;
-import net.cumba.corej.core.model.Operation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import org.jspecify.annotations.Nullable;
@@ -42,12 +41,11 @@ import org.junit.jupiter.api.Test;
  * checked too, and a rule that is re-authored simply leaves. A hand-listed pair would rot on the
  * first rename.
  *
- * <h2>The view</h2> The <b>shipped</b> corpus, after {@code RulePackageLoader} has normalised it:
- * an operation's {@code domain="SV"} is a {@link Operation#getDomain()} field by then (not text in
- * an expression), and the {@code Check} is the parsed expression, read through
- * {@link CheckExprUnits}' v1-vocabulary units (phase 7 retired the operator-leaf view). ⚠ Reading
- * the authored YAML instead would miss nothing today but would test a different artefact from the
- * one a run executes.
+ * <h2>The view</h2> The <b>shipped</b> corpus, after {@code RulePackageLoader} has normalised it: a
+ * binding's {@code domain="SV"} is a parsed keyword argument by then (not text in an expression),
+ * and the {@code Check} is the parsed expression, read through {@link CheckExprUnits}'
+ * v1-vocabulary units (phase 7 retired the operator-leaf view). ⚠ Reading the authored YAML instead
+ * would miss nothing today but would test a different artefact from the one a run executes.
  */
 class LeftJoinPositiveTestCoverageLintTest
 {
@@ -537,26 +535,6 @@ class LeftJoinPositiveTestCoverageLintTest
                         CheckExprUnits.compiledBindingDatasets(rule, binding.name(), false)
                                 .forEach(d -> covered.add(d.toUpperCase(Locale.ROOT)));
                     }
-                }
-            }
-        }
-        if (rule.getOperations() == null)
-        {
-            return covered;
-        }
-        for (Operation op : rule.getOperations())
-        {
-            if (op == null || op.getDomain() == null || op.getDomain().isEmpty()
-                    || op.getId() == null)
-            {
-                continue;
-            }
-            for (CheckExprUnits.Unit unit : units)
-            {
-                if (NOT_CONTAINED.equals(unit.operator())
-                        && op.getId().equals(valueText(unit.value())))
-                {
-                    covered.add(op.getDomain().toUpperCase(Locale.ROOT));
                 }
             }
         }

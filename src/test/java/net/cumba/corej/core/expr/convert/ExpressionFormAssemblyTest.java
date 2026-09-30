@@ -152,7 +152,7 @@ class ExpressionFormAssemblyTest
                         Files.readString(src.resolve("checks").resolve(EXPR_ID + ".yaml"), UTF_8)),
                 Rule.class);
 
-        net.cumba.corej.core.RulePackageLoader.normalizeOperations(expr);
+        net.cumba.corej.core.RulePackageLoader.materialiseBindings(expr);
         RuleClassifier.Derived<Sensitivity> exprSens = RuleClassifier.deriveSensitivity(expr);
         assertNotNull(exprSens.value(), "the expression rule must derive: " + exprSens.rationale());
     }

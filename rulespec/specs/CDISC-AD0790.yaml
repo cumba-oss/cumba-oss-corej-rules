@@ -38,7 +38,7 @@ description: |
 python_source: rules-adamig-1-3.json (CDISC-AD0790)
 pinned_from:
   core_id: CDISC-AD0790
-  rules_src_sha256: 24240fc417f92202961449f289d550954b3eff6865b6c783ee4c66f3c8a952c9
+  rules_src_sha256: 2962a2dd559bab7e421bc689aec840fc107f256c8364089b0bdd919ddb17d1a9
 rule:
   Core:
     Id: CDISC-AD0790
@@ -53,7 +53,7 @@ rule:
       - BASIC DATA STRUCTURE
   Bindings:
   - name: $baseline_ayind
-    expression: 'max("A1IND", group=[USUBJID, PARAMCD, BASETYPE], filter=filter(ABLFL="Y"))'
+    expression: 'max(A1IND, group=[USUBJID, PARAMCD, BASETYPE], filter=(ABLFL=="Y"))'
   Check:
     expression: 'not empty(BASETYPE) and not empty(B1IND) and B1IND != $baseline_ayind'
   Outcome:
@@ -101,7 +101,6 @@ expected_violations:
   output_variables:
     $baseline_ayind: NORMAL
     A1IND: LOW
-    ABLFL:
     B1IND: LOW
     BASETYPE: PRE
     PARAMCD: HGB
@@ -110,9 +109,8 @@ expected_violations:
   row_key: {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1}
   status: SUCCESS
   output_variables:
-    $baseline_ayind:
+    $baseline_ayind: '.'
     A1IND: HIGH
-    ABLFL:
     B1IND: HIGH
     BASETYPE: PRE
     PARAMCD: HGB

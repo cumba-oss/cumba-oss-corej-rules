@@ -21,9 +21,9 @@ import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleClassifier;
+import net.cumba.corej.core.expr.eval.BindingDomains;
 import net.cumba.corej.core.expr.eval.Domain;
 import net.cumba.corej.core.expr.eval.DomainScan;
-import net.cumba.corej.core.expr.eval.OperationKinds;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.model.Sensitivity;
@@ -204,7 +204,7 @@ class CrossCorpusDerivationTest
                 Rule.class);
         // 7b: an external binder materialises the Bindings itself — without this the classifier
         // sees no operations at all and a `$`-consuming Check derives RECORD.
-        RulePackageLoader.normalizeOperations(src);
+        RulePackageLoader.materialiseBindings(src);
         assertDerives(id + " [rules-src]", src, expectedDomain, authoredSensitivity);
 
         // Form 2 — rules/ native expression, single-use operations inlined into the Check. The
@@ -458,7 +458,7 @@ class CrossCorpusDerivationTest
     {
         assertNotNull(rule.getCheck(), label + " has no Check");
         Domain domain = DomainScan.infer(CheckExprUnits.toExpr(rule.getCheck()),
-                OperationKinds.forRule(rule));
+                BindingDomains.forRule(rule));
         assertEquals(expectedDomain, domain.label(), label + " inferred domain");
         RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier.deriveSensitivity(rule);
         assertEquals(authoredSensitivity, sensitivity.value(),

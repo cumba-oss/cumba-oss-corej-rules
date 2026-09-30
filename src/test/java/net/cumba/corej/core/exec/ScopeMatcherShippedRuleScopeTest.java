@@ -197,7 +197,7 @@ class ScopeMatcherShippedRuleScopeTest
      */
     private static String engineBase(String datasetName)
     {
-        return OperationExecutor.unsplitNameFromData(dataset(datasetName));
+        return DatasetIdentity.unsplitNameFromData(dataset(datasetName));
     }
 
 

@@ -91,7 +91,7 @@ public final class DerivedFieldStripper
             JsonNode node = YAML.readTree(text);
             Rule rule = YAML.treeToValue(node, Rule.class);
             // 7b: materialise the Bindings before deriving (normalizeOperations javadoc).
-            net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
+            net.cumba.corej.core.RulePackageLoader.materialiseBindings(rule);
             String coreId = node.path("Core").path("Id").asText("<unknown>");
 
             RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier

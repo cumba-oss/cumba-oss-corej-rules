@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-0274.1 expect=violation domain=SUPPBW
+#note "QNAM=BWORRES equals a variable name defined in the SENDIG (variable_names(): the union over every domain, staged through #library standard-variable-names) -> fires; QNAM=BWXTRA is defined nowhere -> silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library standard-variable-names STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWORRES
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=BWORRES
+dataset SUPPBW class=RELATIONSHIP label="Supplemental Qualifiers for BW"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QLABEL  type=Char label="Qualifier Variable Label"
+col QVAL    type=Char label="Data Value"
+---
+S1 | BW | 001 | BWSEQ | 1 | BWORRES | Result | 250
+S1 | BW | 001 | BWSEQ | 1 | BWXTRA | Extra | Y
+---

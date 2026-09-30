@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0330 expect=violation domain=PC
-#note "SUPPPC is PRESENT but carries no CALCN-family QNAM row at all, so supp_qnam_present finds nothing and returns the empty per-parent-row GroupedResult whose default is false. Row 1 is BLQ with $calcn_present false -> FIRES; row 2 is a numeric result and out of scope. Verdict-identical before and after M3-D5 (no PCCALCN and no CALCN row exists either way), and PCSTRESN is deliberately EMPTY on the firing row so the sheet's still-unimplemented `PCSTRESN = null` conjunct would not change it either."
+#note "SUPPPC is PRESENT but carries no CALCN-family QNAM row at all, so the declared SUPP merge (Supp_Merge, default true) delivers no PCCALCN and the name is an absent column, all-missing. Row 1 is BLQ with empty(PCCALCN) -> FIRES; row 2 is a numeric result and out of scope. (Until runbook W2a the retired supp_qnam_present operation answered the same verdict through its empty per-parent-row default of false.) Verdict-identical before and after M3-D5 (no PCCALCN and no CALCN row exists either way), and PCSTRESN is deliberately EMPTY on the firing row so the sheet's still-unimplemented `PCSTRESN = null` conjunct would not change it either."
 #library standard=sendig version=3-1-1
 #expectViolationCount 1
 #expectViolationAt row=1 PCSEQ=1

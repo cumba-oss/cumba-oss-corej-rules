@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0464 expect=violation domain=XX
+#note "Authority: SDTM and SDTMIG Conformance Rules CDISC-CG0464 (Condition: custom domain present; Rule: a custom EVENTS-class domain includes the topic variable --TERM). XX is class=EVENTS and declared a custom domain (#library custom-domain XX); it carries no XXTERM -> one dataset-level violation. W4b (PLAN-scalar-metadata-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+#expectViolationCount 1
+dataset XX class=EVENTS label="Custom EVENTS"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XXSEQ   type=Num  label="Sequence Number"
+---
+S1 | XX | 001 | 1

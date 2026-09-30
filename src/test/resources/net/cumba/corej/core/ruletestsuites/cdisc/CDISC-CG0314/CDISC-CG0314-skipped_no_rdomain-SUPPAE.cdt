@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0314 expect=skipped domain=SUPPAE
+#note "The SUPP dataset carries NO RDOMAIN column, so no parent domain can be resolved for any row: get_parent_model_column_order answers nothing usable and the rule SKIPs (never a PASS over an empty list). With RDOMAIN=AE the same rows fire. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library model-column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM AEDECOD
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QLABEL  type=Char label="Qualifier Variable Label"
+col QVAL    type=Char label="Data Value"
+---
+S1 | 001 | AESEQ | 1 | AETERM | Reported term | X
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---

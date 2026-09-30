@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0096 expect=noViolation domain=CM
+#note "PLAN-per-row-functions phase 0, D4 (absent column = a constant, D34 #3/#4) for dictionary_has_decode: CM carries CMDECOD (the requirement) but no CMTRT. The rule RUNS; the absent code column reads blank, a blank holds no decode (false) -> no finding although CMDECOD is empty. Pre-port: null for the absent column, no row fired - the same verdict."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 |

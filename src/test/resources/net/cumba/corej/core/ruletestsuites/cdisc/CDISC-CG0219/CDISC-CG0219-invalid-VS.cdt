@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0219 expect=violation domain=VS
+#note "The FINDINGS dataset VS carries no Timing variable: the SDTM Model Timing variables of VS (VSDTC, VSDY, from get_model_filtered_variables(key_name=role, key_value=Timing)) share no element with the dataset columns -> fires once for the dataset. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library dataset-class VS FINDINGS
+#library model-variables VS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VSSEQ:Identifier VSTESTCD:Topic "VSORRES:Result Qualifier" VSDTC:Timing VSDY:Timing
+#expectViolationCount 1
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | VS | 001 | 1 | SYSBP | 120

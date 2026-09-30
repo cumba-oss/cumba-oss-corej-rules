@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0056 expect=violation domain=MA
+#note "MASPEC=BLOOD/BRAIN: a combined-tissue value whose token BRAIN is not a submission value of the SPEC codelist (codelist_terms: BLOOD, LIVER, KIDNEY) -> fires; BLOOD/LIVER and the single-tissue LIVER stay silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library dataset-class MA FINDINGS
+#library codelist-terms SPEC BLOOD LIVER KIDNEY
+#expectViolationCount 1
+#expectViolationAt row=1 MASPEC=BLOOD/BRAIN
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASPEC   type=Char label="Specimen Material Type"
+---
+S1 | MA | 001 | 1 | GROSS | BLOOD/BRAIN
+S1 | MA | 001 | 2 | GROSS | BLOOD/LIVER
+S1 | MA | 001 | 3 | GROSS | LIVER

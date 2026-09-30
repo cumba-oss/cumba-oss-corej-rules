@@ -19,9 +19,8 @@ Grouping:
   - "USUBJID"
 Bindings:
 - name: "$scheduled_subjects"
-  expression: "distinct(USUBJID, domain=\"DS\", filter=filter(DSDECOD=[\"TERMINAL\
-    \ SACRIFICE\", \"INTERIM SACRIFICE\", \"RECOVERY SACRIFICE\", \"NON-MORIBUND SACRIFICE\"\
-    ]))"
+  expression: "distinct(USUBJID, domain=\"DS\", filter=(DSDECOD in [\"TERMINAL SACRIFICE\"\
+    , \"INTERIM SACRIFICE\", \"RECOVERY SACRIFICE\", \"NON-MORIBUND SACRIFICE\"]))"
 Check:
   expression: >-
     USUBJID in $scheduled_subjects

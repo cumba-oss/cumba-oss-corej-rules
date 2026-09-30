@@ -16,8 +16,8 @@ Requirements:
     - "DSSCAT"
 Bindings:
 - name: "$disposition_event_count"
-  expression: "record_count(DSCAT, domain=\"DS\", group=[USUBJID, EPOCH], filter=filter(DSCAT=\"\
-    DISPOSITION EVENT\"))"
+  expression: "record_count(domain=\"DS\", group=[USUBJID, EPOCH], filter=(DSCAT ==\
+    \ \"DISPOSITION EVENT\"))"
 Check:
   expression: >-
     $disposition_event_count > 1 and DSSCAT == "STUDY TREATMENT" and not is_unique_set([DSSCAT,

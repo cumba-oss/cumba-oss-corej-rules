@@ -23,7 +23,6 @@ import net.cumba.corej.core.expr.BuiltinRegistry;
 import net.cumba.corej.core.expr.convert.DualFormCheckNode;
 import net.cumba.corej.core.expr.convert.RuleStorageAssembler;
 import net.cumba.corej.core.model.Executability;
-import net.cumba.corej.core.model.OperationType;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Sensitivity;
 import net.cumba.corej.core.model.VariableUniverse;
@@ -61,22 +60,15 @@ import net.cumba.corej.core.model.VariableUniverse;
  * improvement: it is the same tree {@code rules-legacy} was written from, without the five
  * Python-facing degradations, and it is built rather than read, so it cannot go stale against
  * {@code rules-src}. Every Variable_Universe and Sensitivity count below is taken here, and so is
- * the operation-operator census — with {@code Sensitivity} derived by this census itself
+ * the Check-operator census — with {@code Sensitivity} derived by this census itself
  * ({@link RuleClassifier#deriveSensitivity}) wherever it is not authored: since
  * {@code PLAN-retire-corpus-transforms.md} phase 1 the assembler only <em>validates</em> the
  * derivation and no longer writes the derived value into the node.</li>
  * <li>{@code rules/rules-*.json} — the <b>native / expression</b> corpus, the same fan-out with the
  * Check lowered to an expression string. It carries {@code Sensitivity} only on the override set,
- * so it can only contribute view sizes and the operation census is not taken from it. ⚠ It
- * <em>does</em> carry the operation bindings ({@code Bindings:} since phase 7b): until
- * {@code plans/done/PLAN-operations-no-inline.md} (D31, 2026-08-08) {@code OperationInliner} folded
- * most operations into the Check and this javadoc said "no {@code Operations} field at all".
- * Measured after the change, {@code rules/} declares operations on 795 distinct rules, which need
- * not match the assembled view: the retired {@code OperationInliner} / {@code NonEmptyGuardInliner}
- * corpus passes used to act between the two (both retired by
- * {@code PLAN-retire-corpus-transforms.md}; the views are now byte-aligned on {@code Check} but
- * still differ in assembly), which is why the census still names its view rather than merging
- * them.</li>
+ * so it can only contribute view sizes. It carries the same {@code Bindings:} as the assembled view
+ * (byte-aligned on {@code Check} since {@code PLAN-retire-corpus-transforms.md}, still differing in
+ * assembly), which is why the census still names its view rather than merging them.</li>
  * </ul>
  * <p>
  * A "distinct" count in this census means distinct {@code Core.Id} across all packages of a view; a
@@ -224,7 +216,7 @@ public final class RuleDocCensus
      * means {@code Data}, full stop ({@link VariableUniverse}).
      */
     public record CensusRule(String id, String variableUniverse, String sensitivity,
-            String executability, Set<String> checkOperators, Set<String> operationOperators)
+            String executability, Set<String> checkOperators)
     {
     }
 
@@ -351,39 +343,11 @@ public final class RuleDocCensus
         // expression form and contributes no operators.
         JsonNode check = DualFormCheckNode.lowerOrNull(rule.path("Check"));
         collectCheckOperators(check != null ? check : rule.path("Check"), checkOps);
-        Set<String> opOps = new TreeSet<>();
-        for (JsonNode op : rule.path("Bindings"))
-        {
-            String o = op.path("operator").asText("");
-            if (o.isEmpty())
-            {
-                // Form B (PLAN-retire-corpus-transforms phase 8): the operator is the leading
-                // function name of the expression. Without this arm the operation census went
-                // quietly empty on the migrated corpus — the same silent degradation the plan
-                // named for lint-rules.py and generate-inventory.py.
-                String expression = op.path("expression").asText("");
-                int paren = expression.indexOf('(');
-                // PLAN-binding-expressions C6: only an OPERATION-call binding has an operator.
-                // A compiled binding (upper(AETERM), a registry function, arithmetic) is not an
-                // operation — its leading name would census as an operator that does not exist.
-                // The predicate is the engine's own routing, never a copy of it.
-                if (paren > 0 && net.cumba.corej.core.expr.convert.BindingRouting
-                        .routesToOperation(expression))
-                {
-                    o = expression.substring(0, paren).trim();
-                }
-            }
-            if (!o.isEmpty())
-            {
-                opOps.add(o);
-            }
-        }
         String universe = rule.hasNonNull("Variable_Universe") ? text(rule, "Variable_Universe")
                 : VariableUniverse.DATA.getJsonValue();
         String sensitivity = rule.hasNonNull("Sensitivity") ? text(rule, "Sensitivity")
                 : derivedSensitivity(rule);
-        return new CensusRule(id, universe, sensitivity, text(rule, "Executability"), checkOps,
-                opOps);
+        return new CensusRule(id, universe, sensitivity, text(rule, "Executability"), checkOps);
     }
 
 
@@ -406,7 +370,7 @@ public final class RuleDocCensus
         }
         // 7b: an external binder materialises the Bindings itself, or the classifier derives
         // over a rule with no operations (a `$`-consuming Check then reads RECORD).
-        net.cumba.corej.core.RulePackageLoader.normalizeOperations(bound);
+        net.cumba.corej.core.RulePackageLoader.materialiseBindings(bound);
         RuleClassifier.Derived<Sensitivity> derived = RuleClassifier.deriveSensitivity(bound);
         Sensitivity value = derived.value();
         return value != null ? value.getJsonValue() : "(absent)";
@@ -417,10 +381,11 @@ public final class RuleDocCensus
      * Collects every leaf {@code operator} under a {@code Check} tree.
      *
      * <p>
-     * Deliberately restricted to the {@code Check} subtree: {@code Operations} entries also carry
-     * an {@code operator} field, drawn from an entirely different vocabulary
-     * ({@link OperationType}), and folding the two together is exactly the kind of silent
-     * mis-attribution this census exists to stop.
+     * Deliberately restricted to the {@code Check} subtree: a {@code Bindings} entry is an
+     * expression whose leading function name is a registry function, not a Check operator, and
+     * folding the two together is exactly the kind of silent mis-attribution this census exists to
+     * stop. (Until runbook W8 the bindings' operation vocabulary was a census section of its own,
+     * C.6; there is no operation vocabulary any more.)
      * </p>
      */
     private static void collectCheckOperators(JsonNode node, Set<String> out)
@@ -481,7 +446,6 @@ public final class RuleDocCensus
         renderSensitivity(b, s);
         renderExecutability(b, s);
         renderReferencePackage(b, s);
-        renderOperationTypes(b, s);
         renderBuiltins(b, handWritten);
 
         return b.append(END_MARKER).toString();
@@ -518,14 +482,9 @@ public final class RuleDocCensus
         b.append(".\n\n");
         b.append("⚠ `rules-src` carries `Sensitivity` only on the documented override set — it is"
                 + " derived at load time — and so does `rules/`. Every Variable_Universe /"
-                + " Sensitivity / operation-operator count below is therefore taken from the"
+                + " Sensitivity count below is therefore taken from the"
                 + " **assembled** packages, projected to distinct `Core.Id`, with the census"
-                + " running the same `Sensitivity` derivation the assembler validates."
-                + " ⚠ `rules/` *does* carry"
-                + " the operation bindings (`Bindings:` since phase 7b; inlining stopped on"
-                + " 2026-08-08), but not the same set —"
-                + " assembly still adds the derived Requirements flags — so"
-                + " their operation counts are not interchangeable.\n\n");
+                + " running the same `Sensitivity` derivation the assembler validates.\n\n");
     }
 
 
@@ -536,8 +495,7 @@ public final class RuleDocCensus
                 + " counts as `Data` — absent means `Data`, never a derivation. \"Check operators\""
                 + " is the number of distinct Check operators used by the rules of that"
                 + " universe, counted on the instruments' lowered legacy view"
-                + " (`DualFormCheckNode`); the operation-binding vocabulary is counted"
-                + " separately, in C.6.\n\n");
+                + " (`DualFormCheckNode`).\n\n");
         b.append("| Constant | JSON value | Rules | Check operators |\n");
         b.append("|----------|------------|------:|----------------:|\n");
         Map<String, Integer> counts = new TreeMap<>();
@@ -657,65 +615,6 @@ public final class RuleDocCensus
                     .append(exec.getOrDefault(v.getJsonValue(), 0)).append(" |\n");
         }
         b.append('\n');
-    }
-
-
-    private static void renderOperationTypes(StringBuilder b, Snapshot s)
-    {
-        b.append("### C.6 `OperationType` — enum roster and corpus usage\n\n");
-        b.append(
-                "View: **assembled packages, distinct `Core.Id`**. \"Rules\" counts rules declaring"
-                        + " at least one binding whose operation is that `operator` — the leading"
-                        + " function name of its `expression`. Since"
-                        + " PLAN-retire-corpus-transforms the shipped `rules/` bindings are the"
-                        + " authored ones verbatim (Form B; the block is `Bindings:` since phase"
-                        + " 7b), so the populations coincide — this"
-                        + " table is taken from the assembled view as always, and now reads on"
-                        + " `rules/` too.\n\n");
-        Map<String, Integer> used = new TreeMap<>();
-        for (CensusRule r : s.assembledDistinct().values())
-        {
-            r.operationOperators().forEach(o -> used.merge(o, 1, Integer::sum));
-        }
-        b.append("| Constant | `operator` | Empty result | Rules |\n");
-        b.append("|----------|------------|--------------|------:|\n");
-        int unused = 0;
-        for (OperationType t : OperationType.values())
-        {
-            int n = used.getOrDefault(t.getJsonValue(), 0);
-            if (n == 0)
-            {
-                unused++;
-            }
-            b.append("| `").append(t.name()).append("` | `").append(t.getJsonValue())
-                    .append("` | `").append(t.getEmptyResult().name()).append("` | ").append(n)
-                    .append(" |\n");
-        }
-        long withOperations = s.assembledDistinct().values().stream()
-                .filter(r -> !r.operationOperators().isEmpty()).count();
-        b.append("| **total** | **").append(OperationType.values().length)
-                .append(" constants** | | **").append(withOperations)
-                .append("** rules with ≥1 operation |\n\n");
-        b.append("⚠ The **Rules** column does not sum to that total: a rule declaring two"
-                + " operations of different types is counted in both rows.\n\n");
-        b.append("Declared but unused by the shipped corpus: **").append(unused).append("**.\n\n");
-        List<String> unknown = used.keySet().stream().filter(o -> OperationType.fromJson(o) == null)
-                .toList();
-        b.append("Corpus `operator` values with **no** `OperationType` constant (")
-                .append(unknown.size()).append("): ");
-        b.append(unknown.isEmpty() ? "none.\n\n"
-                : String.join(", ", unknown.stream().map(o -> "`" + o + "`").toList())
-                        + ". These are deliberate: they are lowered to a per-row native value"
-                        + " function (`SplitByInliner`) rather than executed as operations, so"
-                        + " they carry no grouped-result contract and therefore no constant. See"
-                        + " `RuleClassifier`'s usage-view note.\n\n");
-        b.append("⚠ `variable_exists` is **not** in that list any more, and its row above does"
-                + " **not** mean the operator decides a verdict: it regained an `OperationType` as"
-                + " the *reporting* carriage of the `var_exists(X)` check function, so a rule can"
-                + " name its `$`-id in `Outcome.Output_Variables` and have a value materialise"
-                + " there. The verdict still comes from the function — see"
-                + " `plans/done/PLAN-retired-operators-as-operations.md`. The count in its row is the"
-                + " assembled view.\n\n");
     }
 
 

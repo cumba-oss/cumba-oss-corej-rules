@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0084 expect=violation domain=ADSL
+#note "Combined review of runbook W2-W8, XCUT H1 (red-before on the pre-fix engine: 0 findings). The rows' maxima DIFFER: row 1's is 21000 (equal to its TRTEDT, clean), row 2's is 21500 (its TRTEDT 21000 is not the max: fires). With $trxx_max read from row 0 for every row, row 2 compared 21000 against 21000 and was silent, and any finding would have reported row 0's maximum. The pin asserts the row AND the reported per-row maximum."
+#library standard=adamig version=1-3
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-002 "$trxx_max"=21500
+dataset ADSL structure=ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTEDT   type=Num
+col TR01EDT  type=Num
+col TR02EDT  type=Num
+---
+S1 | 01-001 | 21000 | 21000 | 20990
+S1 | 01-002 | 21000 | 21500 | 20990
+---

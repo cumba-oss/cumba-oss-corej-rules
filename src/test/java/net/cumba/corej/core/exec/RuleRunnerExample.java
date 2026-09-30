@@ -3,14 +3,17 @@ package net.cumba.corej.core.exec;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.datatable.IDataTable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Simple examples showing how to run CDISC CORE rules against data tables.
@@ -46,8 +49,11 @@ public final class RuleRunnerExample
         Rule rule = Objects.requireNonNull(pkg.getRules(), "rule package has no rules").values()
                 .iterator().next();
 
-        // 3. Execute — no DatasetResolver needed for single-table rules
-        RuleExecutionResult result = Objects.requireNonNull(RuleRunnerCalls.execute(rule, aeTable),
+        // 3. Execute — the study is this one table: an inventory of it, so a rule that
+        // enumerates the study (dataset_names(), study_domains(), …) answers honestly. A resolver
+        // that cannot enumerate the study makes those functions fail loud (wave 4, D-W4-5).
+        RuleExecutionResult result = Objects.requireNonNull(
+                RuleRunnerCalls.execute(rule, aeTable, TableInventory.of(aeTable)),
                 "single-table execute returned no result");
 
         // 4. Inspect results
@@ -94,7 +100,7 @@ public final class RuleRunnerExample
             // the name, so a SUPP/AP letter-suffix split such as SUPPLBHM resolves to SUPPLBH
             // (7 characters) instead of the data-derived SUPPLB (6), and a rule scoped
             // Include: ["SUPP--"] is then silently skipped for it. The engine's own path
-            // (DatasetRuleResolver) passes OperationExecutor.unsplitNameFromData(table) to the
+            // (DatasetRuleResolver) passes DatasetIdentity.unsplitNameFromData(table) to the
             // three-argument ScopeMatcher.describeDomainMismatch and does not have this gap;
             // real callers with a table in hand should do the same.
             if (ScopeMatcher.describeDomainMismatch(rule, domainName,
@@ -107,7 +113,7 @@ public final class RuleRunnerExample
             // templates — a `--` rule executed with NO domain context now errors loudly instead
             // of silently reading nothing.
             RuleExecutionResult result = Objects.requireNonNull(
-                    RuleRunnerCalls.execute(rule, table, _ -> null, domainName),
+                    RuleRunnerCalls.execute(rule, table, TableInventory.of(table), domainName),
                     "single-table execute returned no result");
 
             if (result.hasViolations())
@@ -136,12 +142,15 @@ public final class RuleRunnerExample
         throws IOException
     {
 
-        // 1. Build a resolver from domain name → table
+        // 1. Build a resolver from domain name → table. It carries the study INVENTORY
+        // (DatasetResolver.WithInventory): the functions that enumerate the study —
+        // dataset_names(), study_domains(), split_sibling_length_mismatch() — read it, and fail
+        // loud on a resolver that cannot enumerate (wave 4, D-W4-5).
         Map<String, IDataTable> datasets = new HashMap<>();
         datasets.put("AE", aeTable);
         datasets.put("DM", dmTable);
         datasets.put("VS", vsTable);
-        DatasetResolver resolver = datasets::get;
+        DatasetResolver resolver = new TableInventory(datasets);
 
         // 2. Load rules
         RulePackage pkg = RulePackageLoader.loadCombined(Path.of(RULES_SDTMIG_3_4_PATH));
@@ -171,4 +180,38 @@ public final class RuleRunnerExample
         }
     }
 
+    /**
+     * The study as a map of tables — the smallest {@link DatasetResolver.WithInventory}: what the
+     * data browser and the CLI hand the engine, in miniature.
+     */
+    static final class TableInventory implements DatasetResolver.WithInventory
+    {
+
+        private final Map<String, IDataTable> tables;
+
+        TableInventory(Map<String, IDataTable> aTables)
+        {
+            tables = new LinkedHashMap<>(aTables);
+        }
+
+
+        static TableInventory of(IDataTable aTable)
+        {
+            return new TableInventory(Map.of(aTable.getMetaData().getName(), aTable));
+        }
+
+
+        @Override
+        public Set<String> availableDatasets()
+        {
+            return tables.keySet();
+        }
+
+
+        @Override
+        public @Nullable IDataTable resolve(String aName)
+        {
+            return tables.get(aName);
+        }
+    }
 }

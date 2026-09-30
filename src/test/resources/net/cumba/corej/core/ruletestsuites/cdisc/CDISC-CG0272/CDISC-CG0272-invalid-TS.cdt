@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0272 expect=violation domain=TS
+#note "TS carries HLTSUBJI = Y (the study-wide count of such records is 1), and the TDIGRP record says 'PATIENTS' instead of 'HEALTHY SUBJECTS' -> the TDIGRP row fires. Written FIRST for runbook W6 (PLAN-record-count-function phase 0, scenarios-first on the pre-port engine): the rule had no scenario."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=TDIGRP TSVAL=PATIENTS
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | HLTSUBJI | Healthy Subject Indicator | Y
+CDISCPILOT01 | TS | 2 | TDIGRP | Diagnosis Group | PATIENTS
+CDISCPILOT01 | TS | 3 | SPONSOR | Clinical Study Sponsor | ACME

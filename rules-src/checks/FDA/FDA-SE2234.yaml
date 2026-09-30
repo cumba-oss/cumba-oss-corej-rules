@@ -15,21 +15,16 @@ Requirements:
   Variables:
     All:
     - "PCSTRESC"
-Bindings:
-- name: "$calcn_present"
-  expression: "supp_qnam_present(domain=\"SUPPPC\", key_value=\"PCCALCN\")"
-- name: "$study_datasets"
-  expression: "dataset_names()"
 Check:
   expression: >-
-    PCSTRESC in ["BLQ", "BQL"] and (not shares_elements_with($study_datasets, keys=[SUPPPC]) or
-    $calcn_present == false)
+    PCSTRESC in ["BLQ", "BQL"] and empty(PCCALCN)
 Outcome:
   Message: "PCSTRESC is below the limit of quantification (BLQ/BQL) but no SUPPPC\
     \ record with QNAM='PCCALCN' provides the numeric interpretation for that PC record."
   Output_Variables:
   - "PCTESTCD"
   - "PCSTRESC"
+  - "PCCALCN"
 Source:
   FDA_Validator_Rule_Message: "No record for --CALCN when --STRESC is below LOQ"
   FDA_Validator_Rule_Description: "A numeric interpretation for calculations record\

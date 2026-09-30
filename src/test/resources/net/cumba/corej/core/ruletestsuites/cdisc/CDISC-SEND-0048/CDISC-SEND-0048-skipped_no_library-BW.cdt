@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-SEND-0048 expect=skipped domain=BW
+#note "NO #library line at all: get_column_order_from_library needs the CDISC Library -> the rule SKIPs (its own not empty($column_order_from_library) guard never sees an empty list). The body is the invalid one. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | 250 | BW

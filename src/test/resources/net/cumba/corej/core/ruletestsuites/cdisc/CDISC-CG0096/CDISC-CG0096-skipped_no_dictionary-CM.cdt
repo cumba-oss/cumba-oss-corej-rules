@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0096 expect=skipped domain=CM
+#note "PLAN-per-row-functions: the no-dictionary SKIP pin of CDISC-CG0096 (whodrug, dictionary_has_decode - the one whodrug decode-presence rule; K4-DICT). Violating-shaped data (row 1's CMTRT has a decode in the dummy WHODrug and CMDECOD is empty) but #dictionaries is DELIBERATELY ABSENT, so the rule MUST report SKIPPED, never a false PASS. Red under the W3 S3a/S3b sabotage by design."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col CMSEQ   type=Num
+col CMTRT   type=Char
+col CMDECOD type=Char
+---
+S01 | CM | 001 | 1 | ASPIRIN TABLETS |
+S01 | CM | 001 | 2 | HERBAL REMEDY XYZ |

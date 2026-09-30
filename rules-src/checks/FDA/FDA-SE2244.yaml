@@ -18,18 +18,10 @@ Requirements:
     All:
     - "--STRESC"
     - "--ORRES"
-Bindings:
-- name: "$resmod_cl"
-  expression: "supp_qnam_present(domain=\"SUPPCL\", key_value=\"CLRESMOD\")"
-- name: "$resmod_ma"
-  expression: "supp_qnam_present(domain=\"SUPPMA\", key_value=\"MARESMOD\")"
-- name: "$resmod_mi"
-  expression: "supp_qnam_present(domain=\"SUPPMI\", key_value=\"MIRESMOD\")"
 Check:
   expression: >-
     --STRESC == --ORRES and --STRESC not in ["NORMAL", "UNREMARKABLE"] and (not empty(--SEV) or not
-    empty(--CHRON) or not empty(--DISTR) or $resmod_cl == true or $resmod_ma == true or $resmod_mi
-    == true)
+    empty(--CHRON) or not empty(--DISTR) or not empty(--RESMOD))
 Outcome:
   Message: "--STRESC is identical to --ORRES although a modifier qualifier (--SEV,\
     \ --CHRON, --DISTR) or a supplemental --RESMOD record is populated and --STRESC\
@@ -41,6 +33,7 @@ Outcome:
   - "--CHRON"
   - "--DISTR"
   - "--SEV"
+  - "--RESMOD"
 Source:
   FDA_Validator_Rule_Message: "--STRESC is the same as --ORRES when --STRESC is not\
     \ 'NORMAL' or 'UNREMARKABLE' and a Qualifier variable is populated"

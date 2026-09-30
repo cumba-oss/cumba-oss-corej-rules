@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0095 expect=violation domain=SUPPTA
+#note "PLAN-per-row-functions phase 0: a record whose RDOMAIN is BLANK. The rule requires the RDOMAIN column (present here), so it runs; on the blank row referenced_domain_class has no domain to classify and answers no class, which is not a general-observation class, and a blank is neither DM nor SV -> fires on row 2. Row 1 references DM, exempt by the Check -> quiet. Pre-port the operation skipped the blank row and the row read the grouped default \"\"; the port hands the row's own blank through - the same verdict, pinned before the port. (The harness's map-backed library cannot classify a referenced domain at all - it does not implement getDatasetClass - so the general-observation-class QUIET path is pinned by the engine unit test and the findings snapshot's FDA-SD0095-A rows, not by a .cdt.)"
+#library standard=sdtmig version=3-3
+#library dataset-class DM "SPECIAL PURPOSE"
+#expectViolationCount 1
+#expectViolationAt row=2 RDOMAIN=
+dataset SUPPTA class=RELATIONSHIP label="Supplemental Qualifiers for TA"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QVAL    type=Char label="Data Value"
+---
+S1 | DM | 001 | RACEOTH | Other race
+S1 |    | 001 | XXNOTE  | Extra info

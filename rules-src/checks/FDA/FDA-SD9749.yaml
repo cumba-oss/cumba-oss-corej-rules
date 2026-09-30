@@ -29,9 +29,9 @@ Grouping:
   - "USUBJID"
 Bindings:
 - name: "$ae_fatal_usubjid"
-  expression: "distinct(USUBJID, domain=\"AE\", filter=filter(AEOUT=\"FATAL\"))"
+  expression: "distinct(USUBJID, domain=\"AE\", filter=(AEOUT == \"FATAL\"))"
 - name: "$ae_sdth_usubjid"
-  expression: "distinct(USUBJID, domain=\"AE\", filter=filter(AESDTH=\"Y\"))"
+  expression: "distinct(USUBJID, domain=\"AE\", filter=(AESDTH == \"Y\"))"
 Check:
   expression: >-
     DM.DTHFL == "Y" and USUBJID not in $ae_fatal_usubjid and USUBJID not in $ae_sdth_usubjid

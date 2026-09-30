@@ -15,8 +15,8 @@ Requirements:
     - "EXSTDTC"
 Bindings:
 - name: "$exp_end"
-  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
-    EXPENDTC\")"
+  expression: "read_value(TSVAL, domain=TS, filter=(TSPARMCD==\"EXPENDTC\"), mode=\"\
+    FIRST\")"
 Check:
   expression: >-
     not empty(EXSTDTC) and not empty($exp_end) and date(EXSTDTC) > date($exp_end)

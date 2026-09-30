@@ -1,7 +1,7 @@
 # Function reference
 
 <!-- Parameter names, types, required flags and return kinds are dumped from the engine's own
-     descriptors (FunctionRegistry, OperationDescriptors, MetadataAttribute). -->
+     descriptors (FunctionRegistry, CompilerDispatchedCalls, MetadataAttribute). -->
 
 One section per function: what it does, every parameter with its type, and a worked example.
 The summary tables are in [Expression syntax](expression-syntax.md#functions).
@@ -21,8 +21,7 @@ check built from ordinary functions ignores rows with missing data by constructi
 not what you want, test for it with `empty(x)` explicitly.
 
 **Functions that reach outside the row have one more failure mode**, and it is not an error.
-`record_count(domain="DS")`, `distinct(X, domain="TA")`, `supp_qnam_present(…)`,
-`ts_parameter_value(…)`, the library and Define-XML lookups — each names something by string that
+`record_count(domain="DS")`, `distinct(X, domain="TA")`, `read_value(…, domain=TS)`, the library and Define-XML lookups — each names something that
 may not be there: an absent dataset, a filter no row satisfies, a group no row falls in, a name
 the library holds nothing under.
 
@@ -37,19 +36,19 @@ library lookups are exceptions and SKIP the rule instead; their section says so.
 > down. If the rule should not run at all when a dataset is missing, that is
 > [`Requirements.Datasets`](../authoring/requirements.md), not something the function decides.
 
-## The target of an operation: one column, a list, or a computed value
+## The target of `distinct`: one column, or a list of columns
 
-An operation takes **at most one positional argument** — its target. More than one is a load
-error naming the operator. What that single argument *is* decides which parameter it binds:
+`distinct` is the one function whose single positional argument decides the **shape** of its
+answer (runbook W7, `PLAN-distinct-function`; the retired operation surface's one-positional rule
+survives only here). What that argument *is* decides what the function collects:
 
-| you write | binds | meaning |
+| you write | collects | meaning |
 |---|---|---|
-| `distinct(ARMCD, …)` | `name` | one column |
-| `distinct([ARMCD, ARM], …)` | `names` | a list of columns |
-| `max(BASE / 2, …)` | a computed target | an expression, evaluated per row |
+| `distinct(ARMCD, …)` | the column's distinct **values** | one column, or a value expression over the target dataset (`distinct(upper(ARM), …)`) |
+| `distinct([ARMCD, ARM], …)` | the distinct **row tuples** | a list of columns |
 
-Both named forms are also spellable as keywords — `name=ARMCD`, `names=[ARMCD, ARM]` — but the
-positional spelling is what the corpus uses throughout.
+There is no `name=` / `names=` keyword spelling: the positional argument is the target, and a
+quoted name is a string literal that fails to load.
 
 ### A list target yields row tuples
 
@@ -88,10 +87,10 @@ description; comparing the **pair** does not.
 > can never match.
 
 Other parameters take a list in the same literal form: `is_unique_set([USUBJID, --SEQ])`,
-`row_max([TR01EDT, TR02EDT])`, `contains_all(source, keys=[ARMCD])`,
-`is_sorted_by(target, by=[asc("VISITNUM")])`.
+`contains_all(source, keys=[ARMCD])`,
+`is_sorted_by(target, by=[asc(VISITNUM)])`.
 
-> ⚠ **This one-positional rule is specific to operations.** An ordinary function takes as many
+> ⚠ **This one-positional rule is specific to `distinct`.** An ordinary function takes as many
 > positional arguments as it declares parameters — `substring(AETERM, 1, 3)` — as described under
 > [Arguments](expression-syntax.md#arguments).
 
@@ -218,80 +217,6 @@ True when the column exists but no row in the dataset populates it
 ```yaml
 expression: 'varname() in $expected_variables and var_is_null(varname())'
 ```
-
-### variable_exists
-
-`variable_exists(name)` → **value**
-
-Whether the named column exists, as a value for reporting
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$TRTSDTM_EXISTS"
-  expression: 'variable_exists(TRTSDTM)'
-Check:
-  expression: '$TRTSDT_EXISTS == false and $TRTSDTM_EXISTS == false'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$MIDS_EXISTS"
-  expression: 'variable_exists(MIDS)'
-Check:
-  expression: '$MIDS_EXISTS == true and not ds_exists("TM")'
-```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
-
-### variable_is_null
-
-`variable_is_null(name)` → **value**
-
-Whether the column is unpopulated across the dataset, as a value for reporting
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$species_null"
-  expression: 'variable_is_null(SPECIES)'
-Check:
-  expression: '$species_null == true and empty($ts_species)'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$strain_null"
-  expression: 'variable_is_null(STRAIN)'
-Check:
-  expression: '$strain_null == true and empty($ts_strain)'
-```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
-
 
 ## Text
 
@@ -974,18 +899,16 @@ expression: 'is_numeric(--DOSTXT)'
 
 ### minus
 
-`minus($a, $b)` → **value**
+`minus(value, subtract=)` → **value (a list)**
 
-The set difference of two lists — the members of `$a` not in `$b`
+The set difference of two lists — the members of `value` that are not in `subtract`, in `value`'s order.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `subtract` | string | no | The list to subtract |
-| `value` | list<string> | no | The value to compare against |
+| `value` | list | yes | The minuend — a `$`-binding holding a dataset-level list, or a list literal of string literals (`["AGEU", "SDESIGN"]`) |
+| `subtract` | list | yes | The subtrahend — a `$`-binding holding a dataset-level list, or a list literal of string literals |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). Both operands are **dataset-level** lists — the answer of another list function, or a list literal; a `$`-binding that is computed per row (`distinct(…, group=[…])`, a per-variable value) is refused at load (*"the list function minus(…) … cannot read the per-row or per-variable binding"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load. It is an **aggregate**: one list for the dataset. Members compare as set elements: a text against a text, a missing value by its identity, and a row tuple (from `distinct([A, B], …)`) **structurally**, component by component — never by its printed form.
 
 **Example**
 
@@ -997,9 +920,18 @@ Check:
   expression: 'not empty($untraceable)'
 ```
 
-The example above is the complete call.
+**Minimal — required parameters only**
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+```yaml
+Bindings:
+- name: "$missing"
+  expression: 'minus(value=["AGEU", "SDESIGN"], subtract=$present)'
+Check:
+  expression: 'not empty($missing)'
+```
+
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. An empty minuend answers the empty set without reading `subtract`.
+
 
 ### round
 
@@ -1043,46 +975,41 @@ expression: 'date_contains(date(RFSTDTC), date(AESTDTC))'
 
 ### date_diff_days
 
-`date_diff_days(name, reference, …)` → **value**
+`date_diff_days(name, reference)` → **value**
 
-Days between a record's date and a reference date, with an optional `offset`
+The calendar days from a reference date to a record's date — `date − reference`, with **no** `+1` (unlike `dy`)
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `missing_values` | string | no | How a missing input affects the result |
-| `reference` | string | no | The date to measure from |
-| `offset` | string | no | Days to add to the difference |
-| `reference_extreme` | string | no | Which extreme of the reference group to measure against |
-| `minuend_domain` | string | no | The dataset holding the date to subtract from |
-| `minuend_match` | list<string> | no | Columns matching this record to a row of the minuend dataset |
+| `name` | column | yes | The record's date column (`--DTC`, `--STDTC`, `--ENDTC`), or a column read through a declared join (`PM.PMDTC`) |
+| `reference` | value | yes | The date to measure from: a column of the record, a column read through the rule's declared join, or a **named aggregation** — `min_date(…)` / `max_date(…)` over another dataset |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+Both arguments are read **per record**. A reference that is the earliest (or latest) date of a group in another dataset is written as that aggregation, `min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])` — its `domain=`, `group=`, `filter=`, `keep_missings=` and `missing_values=` belong to [`min_date`](#min_date) / [`max_date`](#max_date), never to `date_diff_days`. An offset is plain arithmetic (`date_diff_days(…) + 1`). A date read from a *matched record of another dataset* is a declared join and a dotted `name` (`Match_Datasets` on the matching keys, then `PM.PMDTC`). A quoted name (`"--DTC"`) is a string literal, never a column, and fails to load. (Until runbook W2b this was an operation with `domain=`, `group=`, `reference="…"`, `offset=`, `reference_extreme=`, `missing_values=`, `minuend_domain=` and `minuend_match=` keywords; each is now spelled as above, and each is a load error on `date_diff_days`.)
 
 **Example**
 
 ```yaml
+Match_Datasets:
+- Name: "SJ"
+  Keys: ["USUBJID", "RPHASE"]
 Bindings:
 - name: "$rpref_day"
-  expression: 'date_diff_days(--ENDTC, domain="SJ", reference="SJSTDTC", offset="RPRFDY", reference_extreme="min", group=[USUBJID, RPHASE])'
+  expression: 'date_diff_days(--ENDTC, min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE]))'
 Check:
   expression: 'is_complete_date(--ENDTC) and not empty(--RPENDY) and --RPENDY != $rpref_day'
 ```
 
-**Minimal — required parameters only**
+**With an offset**
 
 ```yaml
 Bindings:
 - name: "$days_from_first_dose"
-  expression: 'date_diff_days(--DTC, domain="EX", reference="EXSTDTC", offset="1", group=[USUBJID])'
+  expression: 'date_diff_days(--DTC, min_date(EXSTDTC, domain="EX", group=[USUBJID])) + 1'
 Check:
   expression: 'is_complete_date(--DTC) and not empty(TFDETECT) and TFDETECT != $days_from_first_dose'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, a column is absent, or the aggregation has no answer for the record's group (no group, an absent dataset, an [indeterminate](#max_date) extreme). A missing input's own missing is handed through. `empty()` on it is true, and a populated column compared with `!=` against it **fires**: a derived day whose inputs cannot support it is reported, not skipped (EC-45) — declare the reference dataset's columns in `Requirements` if the rule should not run without them.
 
 
 ### date_overlaps
@@ -1184,17 +1111,16 @@ expression: 'not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= date(earli
 
 ### interval_uncertainty_precision_mismatch
 
-`interval_uncertainty_precision_mismatch(name, delimiter=)` → **value**
+`interval_uncertainty_precision_mismatch(name, delimiter=)` → **boolean**
 
-True when the two halves of an ISO `a/b` interval are stated at different precisions
+True on a row whose ISO 8601 interval of uncertainty (`a/b`) states its two halves at different precisions. Each half is measured after its timezone offset and fractional seconds are stripped, so an offset on one side only is not a precision difference. A value without the delimiter, a blank half, and a blank or missing value are `false`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `delimiter` | string | no | The literal string to split on |
+| `name` | column | yes | The interval column (`--DTC`, `--STDTC`, `--ENDTC`) |
+| `delimiter` | string | no | The separator between the halves; default `"/"`. Read per row, so any expression of string type may supply it; a missing or empty one is `"/"` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`name` is a **column reference**; a quoted name (`"LBDTC"`) is a string literal and fails to load. An absent column is a column of blanks, so the rule runs and fires on no row. (Until wave 3 of the operation→function programme this was an operation.)
 
 **Example**
 
@@ -1211,13 +1137,10 @@ Check:
 ```yaml
 Bindings:
 - name: "$interval_mismatch_dtc"
-  expression: 'interval_uncertainty_precision_mismatch(--DTC, delimiter="/")'
+  expression: 'interval_uncertainty_precision_mismatch(--DTC)'
 Check:
   expression: '$interval_mismatch_dtc == true'
 ```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
 
 ### is_complete_date
 
@@ -1397,43 +1320,83 @@ expression: 'year(BRTHDTC) < 1900'
 
 ### distinct
 
-`distinct(name, …)` → **value**
+`distinct(name, domain=, filter=, group=, keep_missings=)` → **value (a list)**
 
-The set of distinct values of a column; with a list target, the set of row tuples
+The distinct values of a column, or the distinct row tuples over a list of columns — a registry
+function since runbook W7 (`PLAN-distinct-function`), on the grouped cross-dataset plan `max` /
+`max_date` / `min_date` (W5) and `record_count` (W6) established. Without `group=` it is **one list
+for the dataset**; with `group=` (a column target only) it is each row's group's list, read per row
+of the evaluated dataset. The answer is a **set by content and a list by carrier**: membership is
+what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `contains($per_row,
+"Y")`, `contains_all($a, $b)`, `minus($a, subtract=$b)`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `filter` | boolean | no | Restricts which rows the function sees |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `value_is_reference` | boolean | no | Whether the target column holds column *names* rather than values |
+| `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load |
+| `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
+| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently) |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group). Requires `group=` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+**What is a value.** A present, non-blank cell contributes its **text** — a numeric cell renders
+as it does in a report (`2`, never `2.0`) and the probe side compares as `==` does, so a numeric
+`VISITNUM` meets the text member `2`. A missing cell and a blank `""` are **not** members: the set
+of `[S1, "", missing]` is `[S1]`, and a missing probe is a member of nothing. A **tuple** keeps
+more: a present component as its text, a **missing component as that missing** (it is not `""`,
+not `"."`, not `0` — `(missing, "Day 0")` is not `(0, "Day 0")`), an absent column as its type's
+default (`""`; the missing for a column the rule expects numeric), and an `IDVARVAL` component as
+its SUPP-- / RELREC join token (`" 1"`, `"01"`, `"1.0"` and `"+1"` are the token `1`), so a
+`tuple(USUBJID, AESEQ)` probe meets it. Two tuples are equal component by component, never by
+their printed form.
 
-**Example**
+**Example — a value set across datasets**
 
 ```yaml
 Bindings:
 - name: "$scheduled_subjects"
-  expression: 'distinct(USUBJID, domain="DS", filter=filter(DSDECOD=["TERMINAL SACRIFICE", "INTERIM SACRIFICE", "RECOVERY SACRIFICE", "NON-MORIBUND SACRIFICE"]))'
+  expression: 'distinct(USUBJID, domain="DS", filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE", "RECOVERY SACRIFICE", "NON-MORIBUND SACRIFICE"]))'
 Check:
   expression: 'USUBJID in $scheduled_subjects'
 ```
 
-**Minimal — required parameters only**
+**A tuple set**
+
+```yaml
+Bindings:
+- name: "$ta_arm_pairs"
+  expression: 'distinct([ARMCD, ARM], domain="TA")'
+Check:
+  expression: 'not empty(ARM) and not empty(ARMCD) and tuple(ARMCD, ARM) not in $ta_arm_pairs'
+```
+
+**Grouped, read per row**
+
+```yaml
+Bindings:
+- name: "$sv_visitnum"
+  expression: 'distinct(VISITNUM, domain="SV", group=[USUBJID])'
+Check:
+  expression: 'not empty(VISITNUM) and VISITNUM not in $sv_visitnum'
+```
+
+**Minimal — the dataset's own column**
 
 ```yaml
 Bindings:
 - name: "$domain_list"
   expression: 'distinct(DOMAIN)'
 Check:
-  expression: '$domain_is_custom == true and varname() not in ["STUDYID", "DOMAIN", "USUBJID", "POOLID", "SPDEVID", "VISIT", "VISITNUM", "VISITDY", "ELEMENT", "TAETORD", "EPOCH", "NHOID", "FOCID", "SPTOBID", "STOCONID", "IGDCMPID", "MIDS", "RELMIDS", "MIDSDTC", "RSUBJID", "RDEVID", "SREL", "APID"] and prefix(varname(), 2) not in $domain_list'
+  expression: '$domain_is_custom == true and prefix(varname(), 2) not in $domain_list'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty list**: an absent `domain` dataset, an absent
+target column, a group no kept row reaches, a row of the evaluated dataset whose group the target
+dataset does not have. `X in $s` is then vacuously false; `X not in $s` is vacuously true and
+**fires** — the closed-world reading the operation always had.
+
+**Missing and empty** — Always present — a list, never missing. (The former
+`distinct(IDVAR, value_is_reference=true)`, which never read `IDVAR`, is
+[`referenced_dataset_variables(RDOMAIN)`](#referenced_dataset_variables).)
 
 
 ### empty_within_except_last_row
@@ -1453,14 +1416,14 @@ True when a row other than the ordered-last one is unpopulated
 
 ```yaml
 Check:
-  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering="AESEQ", keep_missings=false)'
+  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering=AESEQ, keep_missings=false)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering="AESEQ")'
+  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering=AESEQ)'
 ```
 
 
@@ -1529,32 +1492,39 @@ Check:
 
 ### max
 
-`max(name, …)` → **value**
+`max(name, group=, domain=, filter=, keep_missings=)` → **value**
 
-The largest value of a column, over the dataset or per group
+The largest value of a column **per group**, broadcast to every row of the group — a registry
+function since runbook W5 (`PLAN-grouped-aggregate-functions`), the pilot of the grouped
+cross-dataset plan `record_count` and `distinct` follow.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `filter` | boolean | no | Restricts which rows the function sees |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides) |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+**Ranking by type.** Candidates are the populated cells (a missing, empty or whitespace-only cell
+is no candidate). A numeric column ranks numerically; a character column ranks as **text** —
+`"9"` is above `"10"`, and `"3"` and `"3.0"` are two different values (a string is a string,
+`D-W1-2a`). The answer is the winning **cell**, with the column's own type, so a comparison against
+it is numeric for a numeric column and textual for a character one. Numeric order of a character
+grade is spelled `max(num(ATOXGR), …)`. (A group whose candidates are all positionable ISO dates
+takes the date rule of `max_date`; `max` is not the function for dates — author `max_date`.)
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$baseline_ayind"
-  expression: 'max("AyIND", group=[USUBJID, PARAMCD, BASETYPE, SPDEVID], filter=filter(ABLFL="Y"))'
+  expression: 'max(AyIND, group=[USUBJID, PARAMCD, BASETYPE, SPDEVID], filter=(ABLFL=="Y"))'
 Check:
   expression: 'var_exists("BASETYPE") and not empty(ByIND) and ByIND != $baseline_ayind'
 ```
 
-**Minimal — required parameters only**
+**Another dataset**
 
 ```yaml
 Bindings:
@@ -1564,26 +1534,30 @@ Check:
   expression: 'USUBJID in $ds_usubjid and not empty(--DY) and not empty($max_ds_dsstdy) and --DY != $max_ds_dsstdy'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — for a group with no candidate (all cells
+missing or blank, or a filter that keeps no row), and for a row of the evaluated dataset whose key
+has no group (a subject with no `DS` row; an absent `domain` dataset). A comparison against it
+does not fire; `empty()` on it does. A group whose inputs are all missing carries their missing
+identity.
 
 
 ### max_date
 
-`max_date(name, …)` → **value**
+`max_date(name, group=, domain=, filter=, keep_missings=, missing_values=)` → **value**
 
-The latest date in a column; a value that cannot be positioned yields no value
+The latest date in a column **per group**, broadcast to every row of the group; a value that
+cannot be positioned yields no value. A registry function since runbook W5; the parameters are
+`max`'s, plus:
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `filter` | boolean | no | Restricts which rows the function sees |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `missing_values` | string | no | How a missing input affects the result |
+| `missing_values` | `"skip"` · `"indeterminate"` | no | How a missing input affects the result: skipped (the default), or making the group's extreme undeterminable (EC-51). `"indeterminate"` may only be consumed by a negative-polarity comparison (`!=`); a positive one (`<`, `==`, …) is a load error, because it would read "no value" as "no violation" |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+**Determinability (EC-46).** The extreme is answered only when a fully determined candidate wins
+against every possible completion of every other candidate: `max{2012-06, 2012-06-15}` has no
+answer (the partial could be the 30th), `max{2012-06, 2012-06-30}` is `2012-06-30`. A present
+value that cannot be positioned (`UNK`, a masked day) makes the group's extreme undeterminable.
+The answer is the winning cell's own text.
 
 **Example**
 
@@ -1605,33 +1579,25 @@ Check:
   expression: 'SSSTRESC == "DEAD" and date(SSDTC) < $max_ds_dsstdtc'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — an undeterminable group, a group with no
+candidate, and a row of the evaluated dataset whose key has no group. A comparison against it does
+not fire; `empty()` on it does.
 
 
 ### min_date
 
-`min_date(name, …)` → **value**
+`min_date(name, group=, domain=, filter=, keep_missings=, missing_values=)` → **value**
 
-The earliest date in a column; a value that cannot be positioned yields no value
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `filter` | boolean | no | Restricts which rows the function sees |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `missing_values` | string | no | How a missing input affects the result |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+The earliest date in a column per group — the same contract as `max_date`, in the other direction
+(`min{2012-06, 2012-06-01}` is `2012-06-01`; `min{2012-06, 2012-06-02}` has no answer, the
+partial could be the 1st).
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$min_ds_dsstdtc"
-  expression: 'min_date(DSSTDTC, domain="DS", group=[USUBJID], filter=filter(DSDECOD="INFORMED CONSENT OBTAINED"))'
+  expression: 'min_date(DSSTDTC, domain="DS", group=[USUBJID], filter=(DSDECOD=="INFORMED CONSENT OBTAINED"))'
 Check:
   expression: 'not empty(DSSTDTC) and DSDECOD == "INFORMED CONSENT OBTAINED" and present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == date(DSSTDTC) and $min_ds_dsstdtc != date(DM.RFICDTC)'
 ```
@@ -1646,7 +1612,7 @@ Check:
   expression: 'DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and date(DSSTDTC) == $min_ds_dsstdtc and not empty(DM.RFICDTC) and date(DM.RFICDTC) != $min_ds_dsstdtc'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing**, as for `max_date`.
 
 
 ### present_on_multiple_rows_within
@@ -1678,33 +1644,46 @@ Check:
 
 ### record_count
 
-`record_count(…)` → **value**
+`record_count(domain=, filter=, group=, keep_missings=, regex=)` → **value**
 
-The number of rows; with `group=`, the count for each row's group
+The number of rows of a dataset — a registry function since runbook W6 (`PLAN-record-count-function`),
+on the grouped cross-dataset plan `max` / `max_date` / `min_date` established (runbook W5). Without
+`group=` it is **one value for the dataset**; with `group=` it is the count of each row's group,
+read per row of the evaluated dataset. The bare `record_count()` is the dataset's row count.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `filter` | boolean | no | Restricts which rows the function sees |
-| `group` | list of columns | no | Columns whose combined value defines a group |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `regex` | regex | no | A regular expression, written as a **string** literal |
+| `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `filter` | boolean over the target dataset's columns | no | Which rows are counted, in parentheses: `filter=(TSPARMCD == "INDIC")`, `filter=(TSPARMCD == "INTTYPE" and TSVAL in ["DRUG", "BIOLOGIC"])`, `filter=(starts_with(QNAM, "RACE"))`, `filter=(not empty(AEACN))`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
+| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the count is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be a `$`-reference to a dataset-level **list of column names** (`group=[USUBJID, --TESTCD, $TIMING_VARIABLES]`), spliced in place |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
+| `regex` | regex | no | A regular expression, written as a **string** literal, applied to the group columns the way `is_unique_set`'s `regex=` is: a group column whose first populated value matches is grouped by each value's first match (`"^\\d{4}-\\d{2}-\\d{2}"` collapses a date-time to its date); a column whose first value does not match is left as it is |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+**No target.** `record_count` counts rows, never a column: the former positional target
+(`record_count(TSPARMCD, filter=…)`) was never read and is a load error now — name the column in
+`filter=(…)` or `group=[…]`.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$inttype_pharm_count"
-  expression: 'record_count(filter=filter(TSPARMCD="INTTYPE", TSVAL=["DRUG", "BIOLOGIC", "VACCINE", "DIETARY SUPPLEMENT", "COMBINATION PRODUCT"]))'
+  expression: 'record_count(filter=(TSPARMCD == "INTTYPE" and TSVAL in ["DRUG", "BIOLOGIC", "VACCINE", "DIETARY SUPPLEMENT", "COMBINATION PRODUCT"]))'
 Check:
   expression: '$stype_interventional_count >= 1 and $inttype_pharm_count >= 1 and $pclas_count == 0'
 ```
 
-**Minimal — required parameters only**
+**Grouped, over another dataset**
+
+```yaml
+Bindings:
+- name: "$dv_count"
+  expression: 'record_count(domain="DV", group=[USUBJID])'
+Check:
+  expression: 'DSDECOD == "PROTOCOL DEVIATION" and $dv_count == 0'
+```
+
+**Minimal — the row count**
 
 ```yaml
 Bindings:
@@ -1714,24 +1693,24 @@ Check:
   expression: '$bt_pop > 0 and $bt_pop < $bt_total'
 ```
 
-**When there is nothing to answer** — **`0`** — a real count of nothing, not an absence of an answer. So `$n == 0` and `$n <= 1` **fire**.
+**When there is nothing to answer** — **`0`** — a real count of nothing, not an absence of an answer: a
+group no row of the filter reaches, a row of the evaluated dataset whose group the counted dataset
+does not have, and a `domain` dataset the study lacks all read `0`. So `$n == 0` and `$n <= 1` **fire**.
 
-**Missing and empty** — Always present — a row count, never missing.
+**Missing and empty** — Always present — a count, never missing.
 
 
 ### row_max
 
-`row_max(name=/names=, …)` → **value**
+`row_max(name_pattern=)` → **value**
 
-The largest of the named columns, per row
+The largest populated value, per row, among the columns whose names match a regular expression.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `name_pattern` | regex | no | A regular expression over column names |
+| `name_pattern` | string | yes | A regular expression over column names, matched in full and in any letter case. A static string literal — anything else, or a pattern that does not compile, fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`row_max` takes **no column target**: the pattern chooses the columns (`row_max(TRTEDT, name_pattern=…)` fails to load). Blank and missing cells are not candidates. The candidates rank **by the matched columns' declared type**, decided once for the dataset, never per row: a set of Num columns ranks numerically; a set of Char columns as text — with the ISO 8601 date rule when every candidate is a date that can be placed on the calendar (an extreme that cannot be determined, such as `2012-06` against `2012-06-15`, has no answer). A matched column with no candidate on any row takes no part in that decision — a CSV or Excel file delivers an all-blank `TR02EDT` as a Char column, and beside a numeric `TR01EDT` it is ignored rather than a mix. When Num **and** Char columns both carry values, the rule **errors** (a column-type mismatch): the two have no common order. A text value is never read as a number: CHAR `"9"` is larger than CHAR `"12"`; convert with `num(…)` for numeric order. On a tie the first candidate in column order wins. The winning cell is returned as it is, type and all.
 
 **Example**
 
@@ -1743,18 +1722,9 @@ Check:
   expression: 'not empty(TRTEDT) and not empty($trxx_max) and TRTEDT != $trxx_max'
 ```
 
-**Minimal — required parameters only**
+The example above is the complete call.
 
-```yaml
-Bindings:
-- name: "$dt_max"
-  expression: 'row_max([TR01EDT, TR02EDT])'
-Check:
-  expression: 'not empty(TRTEDT) and TRTEDT != $dt_max'
-```
-
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
-
+**When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks, an undeterminable date extreme, or a dataset with no matching column answers the plain missing. `empty()` on it is true, so guard with `not empty($x)` as the example does. (Until wave 3 of the operation→function programme this was an operation; it also accepted `name` / `names`, which it never read.)
 
 ### tuple
 
@@ -1785,17 +1755,20 @@ Check:
 
 ### variable_count
 
-`variable_count(name_pattern=…)` → **value**
+`variable_count(name | name_pattern=)` → **value**
 
-The number of columns whose name matches `name_pattern=`
+A count of variables, in one of three forms — give the template **or** the pattern, never both (a load error: two counts under one name):
+
+- `variable_count(name_pattern="^.+FL$")` — the columns of the current dataset whose names match the regular expression (full match, letter case ignored);
+- `variable_count("--LNKGRP")` — **study-wide**: the datasets of the study whose own `--` resolution of the template exists (`AELNKGRP`, `CMLNKGRP`, …), a split dataset family counted once;
+- `variable_count()` — the number of columns of the current dataset.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `name_pattern` | regex | no | A regular expression over column names |
+| `name` | string | no | A `--` variable-name template, resolved per dataset of the study |
+| `name_pattern` | regex | no | A regular expression over the current dataset's column names |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. The template is a **string** (`"--LNKGRP"`): it names a column of every dataset, not of the current one, so a bare `--LNKGRP` fails to load. An invalid `name_pattern` fails to load (the retired operation counted 0, silently). The study-wide form reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation counted the current dataset only).
 
 **Example**
 
@@ -1812,29 +1785,26 @@ Check:
 ```yaml
 Bindings:
 - name: "$variable_count"
-  expression: 'variable_count(--LNKID)'
+  expression: 'variable_count("--LNKID")'
 Check:
   expression: 'var_exists("--LNKID") and $variable_count < 2'
 ```
 
 **When there is nothing to answer** — **`0`** — a real count of nothing, not an absence of an answer. So `$n == 0` and `$n <= 1` **fire**.
 
-
 ## Uniqueness and consistency
-
-**When there is nothing to answer** — **`0`** — a real count of nothing, not an absence of an answer. So `$n == 0` and `$n <= 1` **fire**.
 
 ### has_multiple_values_for
 
-`has_multiple_values_for(name, key, within=, include_empty=)` → **boolean**
+`has_multiple_values_for(name, key, within=, keep_missings=, include_empty=)` → **boolean**
 
 True when one `key` maps to more than one `name` — a functional-dependency violation; a blank key or value is excluded unless `include_empty=true`
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
-| `key` | any | yes | The column whose value acts as the key |
-| `within` | any | no | Columns that partition the rows |
+| `name` | column reference (bare, or a `--`prefix reference) | yes | The column to read — a quoted literal is a load error |
+| `key` | column reference (bare, or a `--`prefix reference) | yes | The column whose value acts as the key — a quoted literal is a load error |
+| `within` | column reference or list of column references (bare, or `--`prefix) | no | Columns that partition the rows, read **by keyword only** — a positional third argument (`has_multiple_values_for(A, B, USUBJID)`) is a load error since runbook W8 (it used to be bound and silently ignored), and so is a quoted literal |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 | `include_empty` | boolean | no | Whether a blank key or value takes part |
 
@@ -1863,7 +1833,7 @@ True on every row when the column has at most one distinct value
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
+| `name` | column reference (bare, or a `--`prefix reference) | yes | The column to read — a quoted literal is a load error |
 
 **Example**
 
@@ -2047,14 +2017,14 @@ True when a following record in the group matches under `relation=`; authored un
 
 ```yaml
 Check:
-  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering="--SEQ", relation="<=", keep_missings=false)'
+  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering=--SEQ, relation="<=", keep_missings=false)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering="--SEQ")'
+  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering=--SEQ)'
 ```
 
 **Missing and empty** — `""` is compared literally, not treated as absent.
@@ -2079,29 +2049,30 @@ expression: 'not is_ordered_subset_of($column_order_from_dataset, $model_column_
 
 ### is_sorted_by
 
-`is_sorted_by(target, by=[asc("col")[, nulls=]], within=)` → **boolean**
+`is_sorted_by(target, by=[asc(col)[, nulls=]], within=)` → **boolean**
 
 True when the target is sorted by `by=`; authored under `not`, it fires the whole unsorted group
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `target` | any | yes | The column the function is about |
-| `by` | list of columns | yes | Sort keys |
-| `within` | any | no | Columns that partition the rows |
+| `target` | column reference (bare, or a `--`prefix reference) | yes | The column the function is about — a quoted literal is a load error |
+| `by` | list of `asc(COL)` / `desc(COL)` descriptors | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. The `asc`/`desc` direction itself is declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator |
+| `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped) |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
+| `nulls` | `"first"` \| `"last"` kwarg on a `by=[…]` descriptor | no | `asc(COL, nulls="first")` — declarative only: the native evaluator (`ExprCompiler.compileTargetIsNotSortedBy`) reads the descriptor's column names and nothing else, so `nulls=` (default `"last"`) has no runtime effect today; documented for the authoring surface, not as a behavioural guarantee |
 
 **Example**
 
 ```yaml
 Check:
-  expression: 'not is_sorted_by(VISITNUM, by=[asc("VISITNUM")], within=[USUBJID], keep_missings=false)'
+  expression: 'not is_sorted_by(VISITNUM, by=[asc(VISITNUM)], within=[USUBJID], keep_missings=false)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'not is_sorted_by(VISITNUM, by=[asc("VISITNUM")])'
+  expression: 'not is_sorted_by(VISITNUM, by=[asc(VISITNUM)])'
 ```
 
 **Missing and empty** — `keep_missings=` decides whether a row with a missing sort key stays in its group.
@@ -2140,21 +2111,15 @@ Check:
 ```
 
 
-
 ## Dataset and domain metadata
 
 ### dataset_class_from_library
 
-`dataset_class_from_library(…)` → **value**
+`dataset_class_from_library()` → **value**
 
-The current table's library observation class
+The CDISC Library's class name of the current dataset's domain (e.g. `"BASIC DATA STRUCTURE"`), looked up by the dataset's domain code.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Under the Define-XML fallback for an unreachable Library, a blank class means the define could not answer and the rule is **SKIPPED** too. (`ds_class("LIBRARY")` is not the same question: its tiered lookup answers where this one does not.)
 
 **Example**
 
@@ -2166,22 +2131,17 @@ Check:
   expression: 'starts_with(ds_name("DATA"), "AD") and empty($dataset_class)'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
 **When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
 
 ### dataset_names
 
-`dataset_names()` → **value**
+`dataset_names()` → **value (a list)**
 
-The names of every dataset in the study, as a list
+The names of every dataset in the study, upper-cased, as a list — split members as themselves (`LBCH`, not `LB`; that is [`study_domains()`](#study_domains)'s question), `SUPP--` and `RELREC` included.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -2193,22 +2153,18 @@ Check:
   expression: 'not shares_elements_with($study_datasets, keys=[SUPPAE]) or $aetrtem_count < 1'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
 **When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
 
+
 ### domain_is_custom
 
-`domain_is_custom(…)` → **value**
+`domain_is_custom()` → **value (boolean)**
 
-Library classification gate; boolean
+Whether the CDISC Library declares the current dataset's domain a **custom** (sponsor) domain, looked up by the dataset's domain code: `true` or `false`.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). ⚠ A Library that could not be consulted SKIPs the rule **even under the Define-XML fallback**: `false` ("not custom") is the answer that lets a rule fire, and a define cannot tell a custom domain — "custom" means "not in the standard", and the standard is what is missing.
 
 **Example**
 
@@ -2217,12 +2173,12 @@ Bindings:
 - name: "$domain_is_custom"
   expression: 'domain_is_custom()'
 Check:
-  expression: '$domain_is_custom == true and varname() not in ["STUDYID", "DOMAIN", "USUBJID", "POOLID", "SPDEVID", "VISIT", "VISITNUM", "VISITDY", "ELEMENT", "TAETORD", "EPOCH", "NHOID", "FOCID", "SPTOBID", "STOCONID", "IGDCMPID", "MIDS", "RELMIDS", "MIDSDTC", "RSUBJID", "RDEVID", "SREL", "APID"] and prefix(varname(), 2) not in $domain_list'
+  expression: '$domain_is_custom == true and not var_exists("--TESTCD")'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
+**When there is nothing to answer** — it always answers, `true` or `false`; a Library that cannot answer SKIPs the rule instead.
 
 ### ds_class
 
@@ -2313,14 +2269,13 @@ expression: 'ds_structure("DEFINE")'
 
 `extract_metadata(name)` → **value**
 
-Scalar dataset-metadata attribute of the current table
+One dataset-metadata value of the current dataset, named by its key: `"dataset_name"`, `"dataset_label"`, `"dataset_size"` (bytes of the parsed file), `"dataset_location"` / `"filename"` (the source file's name), or any other key the dataset's reader publishes (`"file_format"`, …).
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
+| `name` | string | yes | The metadata key |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load.
 
 **Example**
 
@@ -2332,31 +2287,61 @@ Check:
   expression: '$dataset_location =~ /[A-Z]/'
 ```
 
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$file_format"
-  expression: 'extract_metadata("file_format")'
-Check:
-  expression: 'not empty($file_format) and $file_format != "XPORT"'
-```
+The example above is the complete call.
 
 **When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
 
+### referenced_dataset_variables
+
+`referenced_dataset_variables(name)` → **value (a list)**
+
+The variable names of the dataset **named in a column value**, per row — the list a SUPP-- / CO /
+RELREC record's `RDOMAIN` refers to, so a Check tests the row's `IDVAR` against *its* referenced
+dataset's columns, never a flat union over every referenced domain. A registry function since
+runbook W7 (`PLAN-distinct-function`), replacing `distinct(IDVAR, value_is_reference=true)`,
+which never read its target.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | column | yes | The column naming a dataset (`RDOMAIN`) |
+
+`name` is a **column reference** and is required — the former implicit `RDOMAIN` read is spelled
+out. Per row the answer is the column-name list of every dataset member whose domain is the value
+(a split family unions its members, in declaration order), in the datasets' own spelling —
+`upper($vars)` folds the list element by element. A missing or blank value, or a value no dataset
+carries, answers the **empty list**. The function reads the study's own datasets, never the CDISC
+Library.
+
+**Example**
+
+```yaml
+Bindings:
+- name: "$rdomain_variables"
+  expression: 'referenced_dataset_variables(RDOMAIN)'
+- name: "$rdomain_variables_upper"
+  expression: 'upper($rdomain_variables)'
+Check:
+  expression: 'var_exists("RDOMAIN") and not empty(IDVAR) and IDVAR not in $rdomain_variables and IDVAR not in $rdomain_variables_upper'
+```
+
+The example above is the complete call.
+
+**When there is nothing to answer** — **the empty list** — no dataset of that name, a blank or
+missing `RDOMAIN`: `IDVAR not in $rdomain_variables` **fires**, `IDVAR in` does not.
+
+**Missing and empty** — Always present — a list, never missing.
 
 ### referenced_domain_class
 
 `referenced_domain_class(name)` → **value**
 
-Classifies the domain **named in a column value**
+The CDISC Library observation class of the domain **named in a column value**, per row — upper-cased (`EVENTS`, `FINDINGS ABOUT`, …) whatever the Library's own spelling, or `""` when the Library cannot classify the domain.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
+| `name` | column | yes | The column naming a domain (`RDOMAIN`) |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`name` is a **column reference** and is required — the former `RDOMAIN` default is gone. A missing cell answers that missing value. The function needs the CDISC Library: with none configured, or one that could not be consulted, the rule reports **SKIPPED**. (Until wave 3 of the operation→function programme this was an operation.)
 
 **Example**
 
@@ -2368,22 +2353,17 @@ Check:
   expression: '$rdomain_class not in ["EVENTS", "INTERVENTIONS", "FINDINGS", "FINDINGS ABOUT"] and RDOMAIN != "DM" and RDOMAIN != "SV"'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **`""`** — the closed-world reading: the source holds nothing under that name. So a `!=` against a literal **fires**.
+**When there is nothing to answer** — **`""`** — the closed-world reading: the Library holds no class for that domain. So a `not in` / `!=` against a class literal **fires**.
 
 ### split_sibling_length_mismatch
 
-`split_sibling_length_mismatch()` → **value**
+`split_sibling_length_mismatch()` → **value (a list)**
 
-Split-family declared-length disagreement (library-independent)
+The variables whose declared column length differs across the current dataset's split-family members (every dataset whose data-driven unsplit name equals the current one's), as a list — library-independent.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `split_sibling_length_mismatch(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -2395,22 +2375,18 @@ Check:
   expression: 'varname() in $len_mismatch'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. A dataset that is not split, and a family whose shared variables all agree, answer it.
+
 
 ### standard_domains
 
-`standard_domains()` → **value**
+`standard_domains()` → **value (a list)**
 
-The domain codes the standard publishes, as a list
+The domain codes the standard publishes, as a list.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `standard_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2422,22 +2398,18 @@ Check:
   expression: 'not empty(SRCDOM) and SRCDOM not in $sdtm_domains'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: a Library that publishes no dataset names for the standard is *library not available* (*"Rule skipped — library returned no data for standard_domains"*).
+
 
 ### study_domains
 
-`study_domains()` → **value**
+`study_domains()` → **value (a list)**
 
-The domain codes present in the study, as a list
+The distinct data-driven SDTM domain codes across the study — the `DOMAIN` cell of each dataset, not its member name — as a list: a split `LB` (`lbch` / `lbhe`) contributes one `LB`, which is what an `RDOMAIN` of `LB` matches; the no-domain datasets (`SUPP--`, `RELREC`) contribute `""`.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `study_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -2449,35 +2421,33 @@ Check:
   expression: 'not empty(RDOMAIN) and RDOMAIN not in $study_domains'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
 
 
 ## Variable metadata
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
-
 ### column_series_metadata
 
-`column_series_metadata(name_pattern=, …)` → **value**
+`column_series_metadata([name,] name_pattern=, min_length=)` → **value (boolean)**
 
-Enumerated-series completeness / continuation verdict
+Whether a numbered column series (`COVAL1..n`) is **incomplete**: its members are the columns whose names match `name_pattern` (by their trailing number) plus the optional un-numbered base column `name` as member 0. `true` (the check fires) when the present numbers are not contiguous from the lowest to the highest, or when `min_length` is given and a member other than the last declares a length below it; `false` with fewer than two members.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `name_pattern` | regex | no | A regular expression over column names |
-| `min_length` | number | no | Shortest series the check applies to |
+| `name` | string | no | The un-numbered base column's name |
+| `name_pattern` | regex | yes | A regular expression over column names |
+| `min_length` | number | no | The length every non-terminal member must reach |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. The base column is named by a **string** (`"COVAL"`) — its metadata is read, not its values — so a bare `COVAL` fails to load; an invalid `name_pattern` or a non-integer `min_length` fails to load too.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$coval_series_incomplete"
-  expression: 'column_series_metadata(COVAL, name_pattern="^COVAL\\d+$", min_length=200)'
+  expression: 'column_series_metadata("COVAL", name_pattern="^COVAL\\d+$", min_length=200)'
 Check:
   expression: '$coval_series_incomplete == true'
 ```
@@ -2487,27 +2457,25 @@ Check:
 ```yaml
 Bindings:
 - name: "$coval_series"
-  expression: 'column_series_metadata(COVAL)'
+  expression: 'column_series_metadata(name_pattern="^COVAL\\d+$")'
 Check:
   expression: '$coval_series == true'
 ```
 
 **When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
 
-
 ### cross_dataset_variable_metadata
 
-`cross_dataset_variable_metadata(…)` → **value**
+`cross_dataset_variable_metadata(name, domain=)` → **value (per variable)**
 
-Per-variable metadata from another dataset (`VariableMetadataResult`)
+Per variable of the current dataset, one metadata attribute — `"label"`, `"data_type"` (`Char` / `Num`), `"length"` or `"format"` — of the **same-named variable in another dataset**: the one `domain=` names, or with `domain="*"` the first dataset of the study that carries the variable (shortest name first, then alphabetical — so an SDTM domain wins over an ADaM dataset), the current dataset excluded by its name.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
+| `name` | string | yes | The attribute: `label`, `data_type`, `length` or `format` |
+| `domain` | string | yes | The dataset to read from, or `"*"` for the whole study |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. Its one value is the whole **per-variable** answer, which the rule reads variable by variable: a Check comparing `var_label("DATA") != $x` runs once per variable and sees that variable's value (reported in the finding too). It is read **only through a binding** — written inline in a Check it fails to load. `domain` is a **string**, since `"*"` is a pattern, not a dataset; an attribute outside the four fails to load (the retired operation answered nothing, silently).
 
 **Example**
 
@@ -2529,21 +2497,15 @@ Check:
   expression: 'not empty($sdtm_label) and var_label("DATA") != $sdtm_label'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
-
+**When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. A comparison against it does not fire; `empty()` on it does.
 
 ### duplicate_label_variables
 
-`duplicate_label_variables()` → **value**
+`duplicate_label_variables()` → **value (a list)**
 
-Variables sharing a declared label
+The variables of the current dataset whose declared label is shared by another of its columns, as a list; a blank label is never a duplicate.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `duplicate_label_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
 
 **Example**
 
@@ -2555,22 +2517,18 @@ Check:
   expression: 'varname() in $dup_labels'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Every label unique answers it.
+
 
 ### expected_variables
 
-`expected_variables(…)` → **value**
+`expected_variables()` → **value (a list)**
 
-The variables the CDISC Library marks Expected for this dataset, as a list
+The variables the CDISC Library marks Expected for this dataset, as a list — for an ADaM dataset, the expected variables of its detected data structure(s), naming templates substituted against the dataset's own columns.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `expected_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2582,22 +2540,18 @@ Check:
   expression: 'not contains_all($dataset_variables, $expected_variables)'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. ⚠ Two exceptions SKIP the rule instead: an ADaM dataset for which the declared product publishes no data structure (*"Rule skipped — library returned no data for expected_variables"*), and the Define-XML fallback for an unreachable Library answering nothing.
+
 
 ### get_column_order_from_dataset
 
-`get_column_order_from_dataset(…)` → **value**
+`get_column_order_from_dataset()` → **value (a list)**
 
-The dataset's own column order, as a list of names
+The dataset's own column names in declaration order, in the dataset's own spelling, as a list — the "actual" side of a presence or ordering check.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_dataset(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
 
 **Example**
 
@@ -2609,22 +2563,18 @@ Check:
   expression: 'not shares_elements_with($dataset_variables, $timing_variables)'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. (A dataset with no columns is the only way to get it.)
+
 
 ### get_column_order_from_library
 
-`get_column_order_from_library(…)` → **value**
+`get_column_order_from_library()` → **value (a list)**
 
-The column order the CDISC Library publishes for this dataset, as a list
+The column order the CDISC Library publishes for this dataset, as a list — the IG-defined variable order for the dataset's domain, the "expected" side of an ordering check.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_library(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2636,24 +2586,23 @@ Check:
   expression: 'upper(varname()) not in $library_variables'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is mapped to *library not available*. To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is *library not available* (*"Rule skipped — library returned no data for get_column_order_from_library"*). To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
+
 
 ### get_dataset_filtered_variables
 
-`get_dataset_filtered_variables(key_name=, key_value=)` → **value**
+`get_dataset_filtered_variables(key_name=, key_value=)` → **value (a list)**
 
-Library variables of the current dataset filtered by metadata, intersected with present columns
+Library variables of the current dataset filtered by metadata, intersected with the columns present — the IG-resolved list for the dataset's domain, keeping the variables whose attribute `key_name=` has the value `key_value=`; without a filter, the whole intersected list.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `key_name` | string | no | The metadata attribute to filter on |
-| `key_value` | string | no | The value that attribute must have |
+| `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
+| `key_value` | string | no | The value that attribute must have — a static string literal, compared exactly |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a model-only walk, `role` on an ADaM dataset) is legal and logs a WARNING, because servability is a per-dataset fact.
 
 **Example**
 
@@ -2675,23 +2624,18 @@ Check:
   expression: 'varname() in $expected_variables and var_is_null(varname())'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead.
 
 
 ### get_model_column_order
 
-`get_model_column_order(…)` → **value**
+`get_model_column_order()` → **value (a list)**
 
-The column order of the standard's model, as a list
+The column order of the standard's model for the dataset's observation class, as a list.
 
 It is the **pure SDTM model walk** for the dataset's observation class: the IG's own dataset variables are never merged in. Where an IG runs ahead of the model version it links to, a variable the IG defines for the dataset is therefore **absent** from this list (60 of them at SENDIG 3.0, 5 at SDTMIG 3.3, none at SDTMIG 3.4). `FDA-SD0058` binds it next to the IG list from [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) and reports such a variable at `WARNING`, a variable in neither list at `ERROR`.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_column_order(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2703,27 +2647,26 @@ Check:
   expression: 'varname() not in $model_order and varname() not in $library_order and varname() not in $events_vars and varname() not in $interventions_vars and varname() not in $findings_vars and varname() not in $findings_about_vars'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty model list is mapped to *library not available*, so `varname() not in $s` never fans out over every column.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty model list is *library not available* (*"Rule skipped — library returned no data for get_model_column_order"*), so `varname() not in $s` never fans out over every column.
 
 **A domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM/CM/FA/MH) — is walked under exactly the observation class the **scope matcher** gives the dataset (the study's declared class, the product, the curated domain map — these three keyed by the `DOMAIN` value, or by the dataset name when there is no `DOMAIN` column — then the topic-variable sniff of the dataset's own columns, which needs a `DOMAIN` column; and for an `AP--` dataset, finally its parent domain's class), so the class a rule is scoped by and the class its model list comes from are one class. Only a dataset no class tier places — a code the curated map does not know whose columns show no topic variable the sniff recognises (e.g. SDTMIG-MD's DI and DR), or an `AP--` dataset whose parent domain is not in the study, which the scope matcher places nowhere either — or one whose class the linked model has no variables for, resolves an empty list — and then the rule is skipped. [`get_model_filtered_variables()`](#get_model_filtered_variables) and [`get_parent_model_column_order()`](#get_parent_model_column_order) read this same walk. [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) and [`natural_key_variables()`](#natural_key_variables) read the IG-merged walk, which for such a domain is this one when its class is a general-observation class (Events, Interventions, Findings, Findings About) — and the **empty set** when its class is special-purpose, trial-design or relationship (e.g. CO, TS or RELREC in a SENDIG-AR 1.0 run; an `AP--` dataset keeps only its associated-persons identifiers): the IG-merged walk has no model dataset to fall back to. Where this lookup skips, the filtered lookups answer the empty set. [`get_column_order_from_library()`](#get_column_order_from_library) stays keyed by the domain name: the IG has no column order for such a domain, so it skips.
 
+
 ### get_model_filtered_variables
 
-`get_model_filtered_variables(key_name=, key_value=, model_class=)` → **value**
+`get_model_filtered_variables(key_name=, key_value=, model_class=)` → **value (a list)**
 
-Model variables filtered by metadata. `model_class=` (, coreJ-only) walks the **named** general-observation class's model table
+Model variables filtered by metadata, **not** intersected with the dataset's columns — the model-level set itself. `model_class=` walks the **named** general-observation class's model table instead of the dataset's own class.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `key_name` | string | no | The metadata attribute to filter on |
-| `key_value` | string | no | The value that attribute must have |
-| `model_class` | string | no | The general-observation class whose model table to walk |
+| `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
+| `key_value` | string | no | The value that attribute must have — a static string literal, compared exactly |
+| `model_class` | string | no | The general-observation class whose model table to walk — a static string literal; `Events`, `Interventions`, `Findings`, `Findings About` in any letter case and spacing (`"EVENTS"`, `" Findings About "`), any other spelling fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal and logs a WARNING — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk.
 
 **Example**
 
@@ -2745,48 +2688,43 @@ Check:
   expression: 'varname() not in $model_order and varname() not in $library_order and (varname() in $events_vars or varname() in $interventions_vars or varname() in $findings_vars or varname() in $findings_about_vars)'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead. ⚠ With `model_class=`, a class the linked model has no variables for is *library not available* and the rule is **SKIPPED** (*"Rule skipped — library returned no data for get_model_filtered_variables"*) — the dataset's own-class walk answers the empty set, the named-class walk does not.
 
 
 ### get_parent_model_column_order
 
-`get_parent_model_column_order(…)` → **value**
+`get_parent_model_column_order(name)` → **value (a list, per row)**
 
-The column order of the parent model, as a list
+The model column order of the **parent domain named in a column value**, per row — for a `SUPP--` dataset, the SDTM model variables of the domain each row's `RDOMAIN` names, so `QNAM in $model_variables` asks whether the qualifier duplicates a parent variable.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
+| `name` | column | yes | The column holding the parent domain code (`RDOMAIN`) — a column reference; a quoted name fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`); the retired operation took no argument and always read `RDOMAIN`, so `get_parent_model_column_order()` fails to load — name the column. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Unlike the other list functions it answers **per row**: each row reads the list of the parent its own cell names (the lists are computed once per distinct parent). ⭐ **A split parent resolves** (fixed in wave 4, defect D2): when the parent domain is submitted as split members (`LBCH` + `LBHE` for `RDOMAIN = LB`), the list is the union of the members' model column orders, in member-name order (members sorted by dataset name, `LBCH` before `LBHE`), so the list is the same on every run; a dataset named exactly like the parent is used alone when it exists, and a study dataset that cannot be opened is never a member and does not stop the parent resolving — the retired operation looked for a dataset literally named `LB`, found none, and answered nothing for every such row.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$model_variables"
-  expression: 'get_parent_model_column_order()'
+  expression: 'get_parent_model_column_order(RDOMAIN)'
 Check:
   expression: 'QNAM in $model_variables'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: when no row's parent domain resolves a model list, the operation answers *library not available*.
+**When there is nothing to answer** — a row whose cell is blank, or names a parent no dataset of the study carries, reads **the empty set** (`QNAM in $s` is false; `not in` fires). ⚠ The rule is **SKIPPED**, an exception to the totality rule above, when **no** row's parent resolves a model list (*"Rule skipped — library returned no data for get_parent_model_column_order"*), and when a resolved parent's model list is *library not available* (no product declared, or the Library unreachable) — as [`get_model_column_order()`](#get_model_column_order) skips for its own dataset.
+
 
 ### natural_key_variables
 
-`natural_key_variables()` → **value**
+`natural_key_variables()` → **value (a list)**
 
-Natural-key-forming role variables present in the dataset
+The natural-key-forming role variables present in the dataset — the Library variables of the dataset's domain whose role is Timing, Record Qualifier, Variable Qualifier, Result Qualifier, Synonym Qualifier or Grouping Qualifier, intersected with the columns present.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `natural_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2798,22 +2736,18 @@ Check:
   expression: 'not is_unique_set([USUBJID, --TESTCD, $natural_key])'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead.
+
 
 ### required_variables
 
-`required_variables(…)` → **value**
+`required_variables()` → **value (a list)**
 
-The variables the CDISC Library marks Required for this dataset, as a list
+The variables the CDISC Library marks Required (`Req`) for this dataset, as a list — for an ADaM dataset, the required variables of its detected data structure(s), naming templates substituted against the dataset's own columns.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `required_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -2825,9 +2759,10 @@ Check:
   expression: 'varname() in $required_variables and empty(value())'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. ⚠ Two exceptions SKIP the rule instead: an ADaM dataset for which the declared product publishes no data structure (*"Rule skipped — library returned no data for required_variables"*), and the Define-XML fallback for an unreachable Library answering nothing.
+
 
 ### var_ccode
 
@@ -3196,16 +3131,11 @@ expression: 'var_type("DATA") != "Num"'
 
 ### variable_names
 
-`variable_names()` → **value**
+`variable_names()` → **value (a list)**
 
-The current dataset's variable-name list
+Every variable name the standard publishes, across all of its datasets, as a list — the standard's whole variable vocabulary, not the current dataset's.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3217,26 +3147,20 @@ Check:
   expression: 'QNAM in $variable_names'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: a Library that publishes no variable names for the standard is *library not available* (*"Rule skipped — library returned no data for variable_names"*).
 
 
 ## Define-XML and value-level metadata
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
-
 ### define_dataset_names
 
-`define_dataset_names()` → **value**
+`define_dataset_names()` → **value (a list)**
 
-Define-XML dataset names; requires DEFINE
+The dataset names the Define-XML declares, upper-cased, as a list.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -3248,22 +3172,18 @@ Check:
   expression: 'not contains_all($study_datasets, $define_datasets)'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
 **When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
 
+
 ### define_key_variables
 
-`define_key_variables()` → **value**
+`define_key_variables()` → **value (a list)**
 
-Define-XML key variables for the domain
+The key variables the Define-XML declares for the current dataset's domain, in key order, as a list.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -3275,22 +3195,18 @@ Check:
   expression: 'not is_unique_set([STUDYID, $define_key_variables])'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: a Define-XML that declares no key variables for the domain leaves a uniqueness check with no key to test, so the answer is *Define-XML not available* (*"Rule skipped — Define-XML returned no data for define_key_variables"*) rather than an empty key set that would make `is_unique_set` vacuous.
+
 
 ### define_variable_names
 
-`define_variable_names()` → **value**
+`define_variable_names()` → **value (a list)**
 
-Define-XML ItemDef names for the domain
+The Define-XML ItemDef names for the current dataset's domain, in Define order, as a list.
 
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -3302,9 +3218,10 @@ Check:
   expression: 'not contains_all($dataset_variables, $define_variables)'
 ```
 
-The example above is the complete call — this function takes no arguments beyond its optional target.
+The example above is the complete call.
 
 **When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+
 
 ### vlm_codelist_coded_codes
 
@@ -3546,31 +3463,28 @@ Check:
 ```
 
 
-
 ## Controlled terminology and dictionaries
 
 ### codelist_terms
 
-`codelist_terms(…)` → **value**
+`codelist_terms(codelists=, level=, returntype=)` → **value (a list)**
 
-CT terms of the bound codelist (library CT)
+The terms of the named CT codelists, in the representation `level=` / `returntype=` select, as one de-duplicated list in Library order.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `codelists` | list of columns | no | Which codelists to read |
-| `level` | level | no | Which metadata to read — `DATA`, `DEFINE` or `LIBRARY` |
-| `returntype` | string | no | Which attribute of a term to return |
+| `codelists` | list of strings | yes | Which codelists to read, by codelist short name, as a list of string literals — `["DOMAIN"]`, `["ND"]`; several are unioned in order |
+| `level` | string | yes | `"term"` reads the terms of each codelist; `"codelist"` reads the codelist's own entry. Any other value fails to load |
+| `returntype` | string | no | Which attribute to return: `"value"` (submission value), `"code"` (NCI concept id, the C-code) or `"pref_term"` (NCI preferred term). Any other value fails to load. Absent: `code` at `level="term"`, `value` at `level="codelist"` |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `codelist_terms(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals — a bare `codelists=[DOMAIN]` names the `DOMAIN` column and fails to load, naming the quoted spelling. The six `level` × `returntype` shapes: `term`/`value` the terms' submission values · `term`/`code` their C-codes · `term`/`pref_term` their preferred terms · `codelist`/`value` the codelist's own submission value · `codelist`/`code` its C-code · `codelist`/`pref_term` its preferred term. ⚠ Compare the representation the other operand really carries: a codelist compared against 2-character submission values wants `"value"`, one compared against `C…` codes wants `"code"`.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$sndigver_terms"
-  expression: 'codelist_terms(codelists=[SNDIGVER], level="term", returntype="value")'
+  expression: 'codelist_terms(codelists=["SNDIGVER"], level="term", returntype="value")'
 Check:
   expression: 'TSPARMCD == "SNDIGVER" and not empty(TSVAL) and TSVAL not in $sndigver_terms'
 ```
@@ -3579,13 +3493,13 @@ Check:
 
 ```yaml
 Bindings:
-- name: "$nd_terms"
-  expression: 'codelist_terms(codelists=[ND], level="term", returntype="value")'
+- name: "$domain_codes"
+  expression: 'codelist_terms(codelists=["DOMAIN"], level="term")'
 Check:
-  expression: 'not empty(--STAT) and --STAT not in $nd_terms'
+  expression: 'not empty(DOMAIN) and DOMAIN not in $domain_codes'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: when the named codelists resolve no term in the selected representation — a codelist the Library does not hold, or a shape the metadata store cannot serve — the answer is *library not available* (*"Rule skipped — library returned no data for codelist_terms"*), never an empty list a `not in` would fire over.
 
 
 ### dictionary_available
@@ -3609,41 +3523,29 @@ Precondition:
 
 ### dictionary_has_decode
 
-`dictionary_has_decode(…)` → **value**
+`dictionary_has_decode(name, external_dictionary_type=, case_sensitive=)` → **boolean**
 
-Any-decode presence (also a per-record function, ); code lookup case-sensitive by default, `case_sensitive=false` folds it
+Decode presence against an external dictionary: `true` on a row whose code has **any** decode in the named dictionary (its code↔decode pairs or attribute tables). A blank or missing code has none (`false`). The code lookup is case-sensitive by default; `case_sensitive=false` folds it.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-| `case_sensitive` | boolean | no | Whether the comparison folds case |
+| `name` | column | yes | The code column (`CMTRT`) |
+| `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"whodrug"`) |
+| `case_sensitive` | boolean | no | Default `true`; only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`name` is a **column reference**; a quoted name fails to load, and an absent column answers `false` on every row. The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$cmtrt_has_decode"
-  expression: 'dictionary_has_decode(CMTRT, external_dictionary_type="whodrug", case_sensitive=false)'
-Check:
-  expression: '$cmtrt_has_decode == false'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$cmtrt_has_decode"
   expression: 'dictionary_has_decode(CMTRT, external_dictionary_type="whodrug")'
 Check:
-  expression: '$cmtrt_has_decode == false'
+  expression: '$cmtrt_has_decode == true and empty(CMDECOD)'
 ```
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
+The example above is the complete call.
 
 ### get_codelist_attributes
 
@@ -3690,30 +3592,28 @@ get_codelist_attributes"*). It never answers an empty list, so `not empty(...)` 
 
 `library_available()` → **boolean**
 
-`RulePackageLoader` injects this gate at load for a library-dependent operation; a not-met Precondition ⇒ SKIPPED
+`RulePackageLoader` injects this gate at load for a call that needs the CDISC Library; a not-met Precondition ⇒ SKIPPED
 
 Takes no arguments.
 
 ### valid_codelist_dates
 
-`valid_codelist_dates(…)` → **value**
+`valid_codelist_dates(ct_package_types=)` → **value (a list)**
 
-Published CT-package dates for the standard
+The publication dates of the CT packages the Library publishes for the applicable package types (`sdtmct-2023-10-26` → `2023-10-26`), sorted, as a list.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `ct_package_types` | list<string> | no | Overrides the CT package types for the standard |
+| `ct_package_types` | list of strings | no | The CT package families to consider, as a list of string literals — `["SDTM"]`, `["SDTM", "ADAM"]` (a family maps to its package type by lower-casing and appending `ct`). Omitted: the families of the rule's standard — `sdtmig` ⇒ SDTM CT, `sendig` ⇒ SEND CT, `cdashig` ⇒ CDASH CT, `adamig` ⇒ SDTM + ADaM CT, `usdm` ⇒ DDF + SDTM CT |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `valid_codelist_dates(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The list is read once per call and must be a list literal of string literals — a bare `[SDTM]` names a column and fails to load, naming the quoted spelling.
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$valid_dates"
-  expression: 'valid_codelist_dates(ct_package_types=[SDTM])'
+  expression: 'valid_codelist_dates(ct_package_types=["SDTM"])'
 Check:
   expression: 'TSVCDREF == "CDISC" and TSVCDVER not in $valid_dates'
 ```
@@ -3728,24 +3628,23 @@ Check:
   expression: 'TSVCDVER not in $valid_dates'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. A Library that publishes no CT package, or none of the applicable families, answers the empty set — so `TSVCDVER not in $valid_dates` **fires** on every populated version. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead.
 
 
 ### valid_external_dictionary_code
 
-`valid_external_dictionary_code(name, external_dictionary_type=)` → **value**
+`valid_external_dictionary_code(name, external_dictionary_type=, dictionary_term_type=, case_sensitive=)` → **boolean**
 
-Dictionary code validity; same evaluator and `case_sensitive` semantics as `_value`
+Code validity against an external dictionary: `true` on a row whose value is a member of the named dictionary at the level `dictionary_term_type` names (e.g. `"PTCD"`, `"LLTCD"`, `"UNII"`, `"SNOMEDCD"`, `"MEDRTCD"`, `"LOINC"`). A blank or missing value is `true` — completeness is another rule's concern. By default the value must match the dictionary's **preferred case**; `case_sensitive=false` accepts any case. `valid_external_dictionary_code` and `valid_external_dictionary_value` are **one function under two names**: the level alone decides whether terms or codes are checked.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-| `dictionary_term_type` | string | no | Which term type in the dictionary to check |
-| `case_sensitive` | boolean | no | Whether the comparison folds case |
+| `name` | column | yes | The column holding the value to check |
+| `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`, `"whodrug"`, `"unii"`, `"snomed"`, `"medrt"`, `"loinc"`) |
+| `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Default `true` (the preferred case); `case_sensitive=false` accepts any case. Must be a boolean literal — anything else fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
 **Example**
 
@@ -3766,9 +3665,6 @@ Bindings:
 Check:
   expression: 'TSPARMCD == "COMPTRT" and $comptrt_srs_code == false'
 ```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
 
 ### valid_external_dictionary_code_term_pair
 
@@ -3848,19 +3744,18 @@ Check:
 
 ### valid_external_dictionary_value
 
-`valid_external_dictionary_value(name, external_dictionary_type=)` → **value**
+`valid_external_dictionary_value(name, external_dictionary_type=, dictionary_term_type=, case_sensitive=)` → **boolean**
 
-Dictionary term validity; gated by `dictionary_available`; case-SENSITIVE by default — `case_sensitive=false` opts into folded membership
+Term validity against an external dictionary: `true` on a row whose value is a member of the named dictionary at the level `dictionary_term_type` names (e.g. `"PT"`, `"LLT"`, `"SOC"`, `"SRS"`, `"SNOMED"`, `"MEDRT"`). A blank or missing value is `true` — completeness is another rule's concern. By default the value must match the dictionary's **preferred case**; `case_sensitive=false` accepts any case. `valid_external_dictionary_value` and `valid_external_dictionary_code` are **one function under two names**: the level alone decides whether terms or codes are checked.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `external_dictionary_type` | string | no | Which external dictionary to check against |
-| `dictionary_term_type` | string | no | Which term type in the dictionary to check |
-| `case_sensitive` | boolean | no | Whether the comparison folds case |
+| `name` | column | yes | The column holding the value to check |
+| `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`, `"whodrug"`, `"unii"`, `"snomed"`, `"medrt"`, `"loinc"`) |
+| `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Default `true` (the preferred case); `case_sensitive=false` accepts any case. Must be a boolean literal — anything else fails to load |
 
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
 **Example**
 
@@ -3882,88 +3777,59 @@ Check:
   expression: 'TSPARMCD == "COMPTRT" and $comptrt_srs_term == false'
 ```
 
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
-
 
 ## Supplemental qualifiers and trial summary
 
-### supp_qnam_present
+### read_value
 
-`supp_qnam_present(name)` → **value**
+`read_value(name, domain=, filter=, mode=, group=, keep_missings=)` → **value**
 
-Per-record: a matching SUPP QNAM row exists
-
-| parameter | type | required | description |
-|---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `key_value` | string | no | The value that attribute must have |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
-
-**Example**
-
-```yaml
-Bindings:
-- name: "$resmod_mi"
-  expression: 'supp_qnam_present(domain="SUPPMI", key_value="MIRESMOD")'
-Check:
-  expression: '--STRESC == --ORRES and --STRESC not in ["NORMAL", "UNREMARKABLE"] and (not empty(--SEV) or not empty(--CHRON) or not empty(--DISTR) or $resmod_cl == true or $resmod_ma == true or $resmod_mi == true)'
-```
-
-**Minimal — required parameters only**
-
-```yaml
-Bindings:
-- name: "$calcn_present"
-  expression: 'supp_qnam_present(domain="SUPPPC", key_value="PCCALCN")'
-Check:
-  expression: '(PCSTRESC == "BLQ" or PCSTRESC == "ALQ") and $calcn_present == false'
-```
-
-**When there is nothing to answer** — **`false`** — the predicate was evaluated and did not hold. It is not unknown.
-
-
-### ts_parameter_value
-
-`ts_parameter_value(key_value=, …)` → **value**
-
-TS/TX parameter scalar lookup (first matching row's value)
+One value of another dataset, read once per rule execution and broadcast to every row: the `name`
+column of `domain`, taken from the rows a `filter` over that dataset's own columns selects, by the
+`mode` the author names. Replaced `ts_parameter_value` (runbook W2a): the TS/TX parameter lookup is
+`read_value(TSVAL, domain=TS, filter=(TSPARMCD == "SPECIES"), mode="FIRST")`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | no | The column to read |
-| `names` | list of columns | no | The columns to read, as a list |
-| `domain` | string | no | The dataset to read from |
-| `key_name` | string | no | The metadata attribute to filter on |
-| `key_value` | string | no | The value that attribute must have |
-
-This operation takes **at most one positional argument**, its target: a scalar binds `name`, a list literal binds `names` and yields row **tuples**, an expression is a computed target. Give one, never both — see [The target of an operation](#the-target-of-an-operation-one-column-a-list-or-a-computed-value).
+| `name` | column of `domain` | yes | The column to read — bare, never quoted, never dotted, never `--` |
+| `domain` | dataset reference | yes | The dataset to read from: `TS` or `"TS"` (both spellings name the dataset) |
+| `filter` | boolean over `domain`'s columns | no | Which rows qualify, in parentheses: `filter=(TSPARMCD == "SPECIES")`. Only columns of `domain` — a dotted, `$` or `--` reference is a load error. Absent ⇒ every row |
+| `mode` | `"FIRST"` · `"ONLY"` · `"MIN"` · `"MAX"` | yes | Which qualifying row answers: the first in dataset order; exactly one (a second qualifying row is a rule **ERROR**); the smallest / largest `name` by the engine's one ordering (a missing below every value, numbers numerically, text as text) |
+| `group` | list of columns of `domain` | no | Per-group reading (runbook W5): the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default |
+| `keep_missings` | boolean | no | With `group`: whether a row with a missing group key stays in its group (default `true`) |
 
 **Example**
 
 ```yaml
 Bindings:
 - name: "$exp_start"
-  expression: 'ts_parameter_value(TSVAL, domain="TS", key_name="TSPARMCD", key_value="EXPSTDTC")'
+  expression: 'read_value(TSVAL, domain=TS, filter=(TSPARMCD == "EXPSTDTC"), mode="FIRST")'
 Check:
   expression: 'not empty(EXSTDTC) and date(EXSTDTC) < date($exp_start)'
 ```
 
-**Minimal — required parameters only**
+**Two datasets, one key each**
 
 ```yaml
 Bindings:
-- name: "$ts_strain"
-  expression: 'ts_parameter_value(TSVAL, domain="TS", key_name="TSPARMCD", key_value="STRAIN")'
+- name: "$ts_species"
+  expression: 'read_value(TSVAL, domain=TS, filter=(TSPARMCD == "SPECIES"), mode="FIRST")'
+- name: "$tx_species"
+  expression: 'read_value(TXVAL, domain=TX, filter=(TXPARMCD == "SPECIES"), mode="FIRST")'
 Check:
-  expression: '$strain_null == true and empty($ts_strain)'
+  expression: 'empty(SPECIES) and empty($ts_species) and empty($tx_species)'
 ```
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — the column's **type default**, never an error: `""` for a
+character column, missing for a numeric one — so `empty($x)` is true and a comparison against it does
+not fire. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
+`name` the dataset does not carry; the rule executes (it does not skip). A qualifying row whose
+`name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more
+qualifying rows report the rule as ERROR (`… — ONLY asserts exactly one qualifying row`), because the
+rule asserted a single row and the data says otherwise.
 
+⚠ `read_value` cannot express *presence* — a no-match answers the type default (D13), never an
+error, whether or not `group=` is given.
 
 
 ## Values and references

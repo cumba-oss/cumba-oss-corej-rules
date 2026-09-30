@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0274.1 expect=noViolation domain=SUPPBW
+#note "No QNAM collides with a standard variable name -> no violation. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library standard-variable-names STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWORRES
+dataset SUPPBW class=RELATIONSHIP label="Supplemental Qualifiers for BW"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QLABEL  type=Char label="Qualifier Variable Label"
+col QVAL    type=Char label="Data Value"
+---
+S1 | BW | 001 | BWSEQ | 1 | BWXTRA | Extra | Y
+---

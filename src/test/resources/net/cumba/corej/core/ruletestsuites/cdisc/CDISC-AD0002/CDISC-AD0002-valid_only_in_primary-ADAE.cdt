@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0002 expect=noViolation domain=ADAE
+#note "The domain=\"*\" scan never compares a variable against its OWN dataset: AEXFL lives only in the primary ADAE, so no other dataset supplies a label and the rule cannot fire (the primary is excluded, not matched against itself). W4b (PLAN-scalar-metadata-functions phase 0, scenarios-first on the pre-port engine)."
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AEXFL type=Char label="Only Here Flag"
+---
+CDISCPILOT01 | 01-701-1015 | Y
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | 01-701-1015
+---

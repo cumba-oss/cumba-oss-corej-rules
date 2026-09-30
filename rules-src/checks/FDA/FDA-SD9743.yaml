@@ -15,11 +15,9 @@ Requirements:
     - "TSPARMCD"
 Bindings:
 - name: "$age_count"
-  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGE\"\
-    ))"
+  expression: "record_count(domain=\"TS\", filter=(TSPARMCD == \"AGE\"))"
 - name: "$agetxt_count"
-  expression: "record_count(TSPARMCD, domain=\"TS\", filter=filter(TSPARMCD=\"AGETXT\"\
-    ))"
+  expression: "record_count(domain=\"TS\", filter=(TSPARMCD == \"AGETXT\"))"
 Check:
   expression: >-
     (TSPARMCD == "AGE" or TSPARMCD == "AGETXT") and $age_count >= 1 and $agetxt_count >= 1 and not

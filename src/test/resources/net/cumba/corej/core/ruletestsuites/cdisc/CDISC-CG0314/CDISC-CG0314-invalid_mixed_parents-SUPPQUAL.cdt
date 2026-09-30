@@ -1,0 +1,43 @@
+#!RuleTest
+#test CDISC-CG0314 expect=violation domain=SUPPQUAL
+#note "A single SUPPQUAL carrying several parents: each row is checked against ITS OWN parent's model column order (a per-row list). Row 1 (RDOMAIN=AE, QNAM=AETERM) fires; row 2 (RDOMAIN=DM, QNAM=AETERM) does not - AETERM is no DM variable; row 3 (RDOMAIN=DM, QNAM=ARM) fires; row 4 (RDOMAIN=ZZ, no such dataset) resolves no parent and stays silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library model-column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM AEDECOD
+#library model-column-order DM STUDYID DOMAIN USUBJID ARM ARMCD
+#expectViolationCount 2
+#expectViolationAt row=1 QNAM=AETERM
+#expectViolationAt row=3 QNAM=ARM
+dataset SUPPQUAL class=RELATIONSHIP label="Supplemental Qualifiers for QUAL"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QLABEL  type=Char label="Qualifier Variable Label"
+col QVAL    type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AETERM | Reported term | X
+S1 | DM | 001 |       |   | AETERM | Reported term | X
+S1 | DM | 001 |       |   | ARM    | Arm | X
+S1 | ZZ | 001 |       |   | AETERM | Reported term | X
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | PLACEBO
+---

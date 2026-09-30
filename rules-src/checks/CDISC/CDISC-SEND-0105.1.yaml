@@ -15,11 +15,11 @@ Grouping:
   - "STUDYID"
 Bindings:
 - name: "$ts_species"
-  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
-    SPECIES\")"
+  expression: "read_value(TSVAL, domain=TS, filter=(TSPARMCD==\"SPECIES\"), mode=\"\
+    FIRST\")"
 - name: "$tx_species"
-  expression: "ts_parameter_value(TXVAL, domain=\"TX\", key_name=\"TXPARMCD\", key_value=\"\
-    SPECIES\")"
+  expression: "read_value(TXVAL, domain=TX, filter=(TXPARMCD==\"SPECIES\"), mode=\"\
+    FIRST\")"
 Check:
   expression: >-
     empty(SPECIES) and empty($ts_species) and empty($tx_species)

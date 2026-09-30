@@ -10,14 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.expr.ast.Expr;
+import net.cumba.corej.core.expr.eval.BindingDomains;
 import net.cumba.corej.core.expr.eval.DomainScan;
-import net.cumba.corej.core.expr.eval.OperationKinds;
+import net.cumba.corej.core.model.CompiledBinding;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 
@@ -26,7 +28,10 @@ import net.cumba.corej.core.model.RulePackage;
  * that rule's <b>derived</b> {@code Sensitivity} and the evaluation <b>domain</b>
  * {@link DomainScan} infers from its Check ({@code PLAN-leaf-scope-domain-inference.md} §3.2 —
  * re-grounded 2026-08-22, owner ruling Q11: the census is that plan's phase-3 equivalence gate, so
- * a rule whose inferred domain moves is named here exactly as a re-typed rule once was).
+ * a rule whose inferred domain moves is named here exactly as a re-typed rule once was), plus the
+ * installed domain of <b>each binding</b> (combined review XCUT M3 — a binding is evaluated under
+ * its own domain, so a per-binding re-routing must move the census even when the Check's join does
+ * not).
  *
  * <h2>Why this exists — it is measured, not suspected</h2>
  * <p>
@@ -107,13 +112,22 @@ public final class RoutingCensus
 {
 
     /** The column header, recorded in the artifact's banner. */
-    public static final String COLUMNS = "Core.Id\tSensitivity\tDomain";
+    public static final String COLUMNS = "Core.Id\tSensitivity\tDomain\tBindings";
 
     /** Prefix of the artifact's banner lines. Everything else is a data row. */
     public static final String COMMENT = "#";
 
     /** Rendered in place of a field the derivation left unset. */
     public static final String ABSENT = "(absent)";
+
+    /** The {@code Bindings} field of a rule that declares no binding. */
+    public static final String NO_BINDINGS = "(none)";
+
+    /** Separates the {@code $name=Domain} entries of the {@code Bindings} field. */
+    public static final String BINDING_SEPARATOR = ";";
+
+    /** How many tab-separated fields a data row carries — the length of {@link #COLUMNS}. */
+    private static final int FIELDS = COLUMNS.split("\t", -1).length;
 
     private RoutingCensus()
     {
@@ -154,8 +168,16 @@ public final class RoutingCensus
      *            {@code {VAR}}, {@code {ROW}} or {@code {VAR,ROW}} (§3.2 of
      *            {@code PLAN-leaf-scope-domain-inference.md}); {@link #ABSENT} when the Check has
      *            no expression surface at all
+     * @param bindings
+     *            every compiled binding's installed evaluation domain
+     *            ({@code CompiledBinding.domain()}, what {@code RuleRunner} evaluates the binding
+     *            under), rendered {@code $name={ROW}} in authored order and joined by
+     *            {@link #BINDING_SEPARATOR}; {@link #NO_BINDINGS} for a rule that declares none. ⭐
+     *            Combined review XCUT M3: the census recorded only the Check's joined domain, so a
+     *            per-binding re-routing (XCUT H1's whole class — a binding moving between
+     *            {@code {}} and {@code {ROW}} while the Check's join stays put) moved nothing here.
      */
-    public record Row(String sensitivity, String domain)
+    public record Row(String sensitivity, String domain, String bindings)
     {
     }
 
@@ -228,7 +250,30 @@ public final class RoutingCensus
     {
         return new Row(
                 rule.getSensitivity() == null ? ABSENT : rule.getSensitivity().getJsonValue(),
-                domainOf(rule));
+                domainOf(rule), bindingsOf(rule));
+    }
+
+
+    /**
+     * The {@code Bindings} field of a loaded rule: each compiled binding's installed domain, in
+     * authored order ({@link Rule#bindingOrder()}), e.g. {@code $a={};$b={ROW}} — or
+     * {@link #NO_BINDINGS}. A binding the loader left without a domain renders {@link #ABSENT},
+     * never a guess.
+     */
+    static String bindingsOf(Rule rule)
+    {
+        List<CompiledBinding> bindings = rule.bindingOrder();
+        if (bindings.isEmpty())
+        {
+            return NO_BINDINGS;
+        }
+        StringJoiner joined = new StringJoiner(BINDING_SEPARATOR);
+        for (CompiledBinding binding : bindings)
+        {
+            net.cumba.corej.core.expr.eval.Domain domain = binding.domain();
+            joined.add(binding.name() + "=" + (domain == null ? ABSENT : domain.label()));
+        }
+        return joined.toString();
     }
 
 
@@ -259,7 +304,7 @@ public final class RoutingCensus
                 expr = null;
             }
         }
-        return expr == null ? ABSENT : DomainScan.infer(expr, OperationKinds.forRule(rule)).label();
+        return expr == null ? ABSENT : DomainScan.infer(expr, BindingDomains.forRule(rule)).label();
     }
 
     // ---------------------------------------------------------------- diffing
@@ -290,17 +335,19 @@ public final class RoutingCensus
             if (e == null)
             {
                 out.add(id + ": NEW — derives Sensitivity \"" + a.sensitivity() + "\", Domain "
-                        + a.domain());
+                        + a.domain() + ", Bindings " + a.bindings());
             }
             else if (a == null)
             {
                 out.add(id + ": GONE — the committed census has it as Sensitivity \""
-                        + e.sensitivity() + "\", Domain " + e.domain());
+                        + e.sensitivity() + "\", Domain " + e.domain() + ", Bindings "
+                        + e.bindings());
             }
             else if (!e.equals(a))
             {
                 out.add(id + ":" + field("Sensitivity", e.sensitivity(), a.sensitivity())
-                        + field("Domain", e.domain(), a.domain()));
+                        + field("Domain", e.domain(), a.domain())
+                        + field("Bindings", e.bindings(), a.bindings()));
             }
         }
         return out;
@@ -346,6 +393,11 @@ public final class RoutingCensus
                 "# FindingScope of every finding it emits (PLAN-leaf-scope-domain-inference.md).\n");
         b.append("# Sensitivity decides the finding multiplicity.\n");
         b.append(
+                "# Bindings is each compiled binding's installed domain, $name={ROW} in authored\n");
+        b.append(
+                "# order joined by ';' — (none) without bindings — which decides the cursor the\n");
+        b.append("# binding is evaluated under, independently of the Check's joined Domain.\n");
+        b.append(
                 "# The .cdt scenarios do not cover that routing — wave-34 lane B measured 75 of\n");
         b.append("# 75 re-routed rules producing zero reds (Fix #231). This file is the pin.\n");
         b.append("#\n");
@@ -360,7 +412,8 @@ public final class RoutingCensus
         for (Map.Entry<String, Row> e : s.rules().entrySet())
         {
             b.append(e.getKey()).append('\t').append(e.getValue().sensitivity()).append('\t')
-                    .append(e.getValue().domain()).append('\n');
+                    .append(e.getValue().domain()).append('\t').append(e.getValue().bindings())
+                    .append('\n');
         }
         return b.toString();
     }
@@ -370,7 +423,7 @@ public final class RoutingCensus
      * Parses a rendered artifact back into rows.
      *
      * @throws IllegalArgumentException
-     *             on a row that is not exactly three tab-separated fields, or on a duplicate id — a
+     *             on a row that is not exactly four tab-separated fields, or on a duplicate id — a
      *             truncated or hand-merged artifact must fail loudly rather than pin half a corpus.
      */
     public static SortedMap<String, Row> parse(String text)
@@ -385,13 +438,13 @@ public final class RoutingCensus
                 continue;
             }
             String[] fields = line.split("\t", -1);
-            if (fields.length != 3)
+            if (fields.length != FIELDS)
             {
                 throw new IllegalArgumentException("routing-census.tsv line " + lineNumber + ": "
-                        + "expected 3 tab-separated fields (" + COLUMNS + "), found "
+                        + "expected " + FIELDS + " tab-separated fields (" + COLUMNS + "), found "
                         + fields.length + ": " + line);
             }
-            if (rows.put(fields[0], new Row(fields[1], fields[2])) != null)
+            if (rows.put(fields[0], new Row(fields[1], fields[2], fields[3])) != null)
             {
                 throw new IllegalArgumentException("routing-census.tsv line " + lineNumber + ": "
                         + "duplicate Core.Id " + fields[0]);

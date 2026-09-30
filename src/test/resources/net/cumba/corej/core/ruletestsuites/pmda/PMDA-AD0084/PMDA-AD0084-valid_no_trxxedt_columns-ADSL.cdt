@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0084 expect=noViolation domain=ADSL
-#note "dataset ADSL with STUDYID/USUBJID/TRTEDT only - the name_pattern matches NO column, evalRowExtreme returns null, $trxx_max is absent on every row -> `not empty($trxx_max)` false -> noViolation WITH execution (row_max is not library-dependent; no skip arm). *** RISKY CALL: if this reports SKIPPED instead, escalate to stage R with the surefire output - do not edit the fixture. ***"
+#note "dataset ADSL with STUDYID/USUBJID/TRTEDT only - the name_pattern matches NO column, so row_max answers the computed missing on every row -> `not empty($trxx_max)` false -> noViolation WITH execution (row_max is not library-dependent; there is no skip arm, so a SKIPPED here would be a defect)."
 #library standard=adamig version=1-3
 dataset ADSL structure=ADSL
 col STUDYID type=Char

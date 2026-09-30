@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0562 expect=noViolation domain=VS
+#note "D1 (W6) agreement guard: two SYSBP records on the same date at different times, VSREPNUM 1 and 2. The binding's count at date granularity is 2 (> 1), and the Check's is_unique_set at the SAME granularity finds the repetition numbers unique -> nothing fires. Green before and after the port (before: the count was 1 per datetime); it pins that the binding and the Check read the timing window through one regex."
+#library standard=sdtmig version=3-4
+#library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing VSREPNUM:Qualifier DOMAIN:Identifier
+dataset VS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ type=Num label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSDTC type=Char label="Date/Time of Measurements"
+col VSREPNUM type=Char label="Repetition Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 2014-01-01T08:00 | 1
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 2014-01-01T09:00 | 2
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0048 expect=violation domain=BW
+#note "BWORRES is declared before BWTESTCD, contradicting the SENDIG order (get_column_order_from_library: ... BWTESTCD BWORRES) -> the dataset order is not an ordered subset -> fires once for the dataset. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library column-order BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWORRES
+#expectViolationCount 1
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | 250 | BW

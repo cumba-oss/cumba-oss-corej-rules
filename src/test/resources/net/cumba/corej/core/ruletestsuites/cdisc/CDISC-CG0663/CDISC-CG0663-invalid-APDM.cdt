@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0663 expect=violation domain=APDM
+#note "DOMAIN=APZZ: 4 characters beginning with AP but its suffix ZZ is not a published SDTM domain code (codelist_terms of the DOMAIN codelist: AE, DM, LB) -> fires once (DOMAIN is dataset-constant, so the derived Sensitivity is Dataset). W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library codelist-terms DOMAIN AE DM LB
+#expectViolationCount 1
+#expectViolationAt row=1 DOMAIN=APZZ
+dataset APDM label="Associated Persons Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+---
+S1 | APZZ | AP001

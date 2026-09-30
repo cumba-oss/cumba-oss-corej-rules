@@ -113,7 +113,7 @@ dataset <name> [class=<class>] [structure=<structure>] [subclass=<subclass>] [la
 
 `extract_metadata("dataset_location")` / `("filename")` do **not** read the
 table-metadata map — they read the table's URI
-(`OperationExecutor.evalExtractMetadata` → `fileNameFromUri(meta.getTableURI())`,
+(`ScalarMetadataFunctions.extractMetadata` → `fileNameFromUri(meta.getTableURI())`,
 last path segment, percent-decoded, original casing). A `.cdt` table is built by
 `OverlayDataTable.empty(...)`, which sets name / label / row count and nothing
 else, so without `uri=` that accessor is `null` on every scenario and a file-name
@@ -199,7 +199,7 @@ The declaration is honoured **end to end**: the scenario pre-gate in
   that declares `structure=` / `subclass=` **and has neither block** is rejected with an
   authoring error, because there is nothing to decorate: every availability gate in the
   engine is a bare `provider != null` test (`library_available()` reads
-  `ctx.getLibraryProvider() != null`, and the operand / operation skips test the same
+  `ctx.getLibraryProvider() != null`, and the operand / function skips test the same
   reference), so occupying an empty slot would silently switch that level's self-skips
   off and a library-dependent rule would execute instead of reporting "no Library
   access". Add `#define standard=<std> version=<ver>` — the right carrier for a pure
@@ -328,7 +328,7 @@ void CDISC_AD0117_invalid() {
 }
 ```
 
-For rules whose `Operations` look up the current dataset by name (e.g.,
+For rules whose bindings look up the current dataset by name (e.g.,
 baseline-lookup rules like CDISC-AD0181), use the self-resolver variant so
 the loaded table is registered under its own domain name:
 
@@ -763,9 +763,8 @@ most recent additions.
 
   A codelist declared on none of the codelist channels has **no**
   `getCodelist` view: every `codelist_terms` shape other than
-  `(level="term", returntype="value")` then degrades to
-  `LIBRARY_NOT_AVAILABLE` and the rule SKIPs (the engine's honest-degradation
-  contract). A codelist declared with terms but no ccodes yields an **empty**
+  `(level="term", returntype="value")` then degrades to an unusable
+  answer and the rule SKIPs (the engine's honest-degradation contract). A codelist declared with terms but no ccodes yields an **empty**
   `(term, code)` projection — also a SKIP — exactly like a real library that
   does not model the field.
 
@@ -796,16 +795,16 @@ most recent additions.
 - **`model-class-variables`** (EC-85) declares the SDTM model's variable table
   for *one general observation **class*** — what
   `MetadataProvider.getModelVariablesForClass(class)` serves, and the input of a
-  `get_model_filtered_variables` operation that carries `model_class:`. The map
+  `get_model_filtered_variables(…, model_class=…)` call. The map
   is **class-keyed** (`EVENTS`, `INTERVENTIONS`, `FINDINGS`, `FINDINGS ABOUT`,
   case-folded) where `model-variables` is **domain-keyed**; the two never read
   each other. Names are declared **unsubstituted** (`--TERM`) exactly like
-  `model-variables`, and the executor substitutes the *scenario dataset's*
+  `model-variables`, and the function substitutes the *scenario dataset's*
   prefix — so an `EVENTS` table asked from `BW` answers `BWTERM`. A
   `FINDINGS ABOUT` table must be declared in full (the production resolver's
   FINDINGS splice is not replayed by the harness). Declaring a class twice
   replaces its list. A class the scenario does **not** declare is served empty,
-  which the operation turns into *library not available* — the rule is
+  which the function turns into *library not available* — the rule is
   **skipped**, never evaluated against an empty set — so a class-selecting rule
   with no `model-class-variables` line pins `expect=skipped`:
 

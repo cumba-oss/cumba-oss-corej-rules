@@ -1,13 +1,10 @@
 package net.cumba.corej.core;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.DomainScope;
-import net.cumba.corej.core.model.Operation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Scope;
 import org.jspecify.annotations.Nullable;
@@ -98,13 +95,14 @@ public final class IntentAbsenceOptOut
 {
 
     /**
-     * {@code Operations} operators that yield a <b>nullity boolean</b>, so that {@code $id == true}
-     * is an emptiness assertion about the operation's operand rather than an ordinary value
-     * comparison. Deliberately a closed, tiny set: widening it silently widens the opt-out, and
-     * every id exempted here escapes the SKIP semantics unadjudicated. Only
-     * {@code variable_is_null} qualifies today (2 occurrences corpus-wide).
+     * The registry function that yields a <b>nullity boolean</b>, so that {@code $id == true} is an
+     * emptiness assertion about its operand rather than an ordinary value comparison (runbook W2a
+     * re-spelled the two {@code variable_is_null} operation sites as {@code var_is_null(X)}
+     * compiled bindings; the operation set went with the carrier in W8). Deliberately a closed,
+     * tiny set: widening it silently widens the opt-out, and every id exempted here escapes the
+     * SKIP semantics unadjudicated.
      */
-    private static final Set<String> NULL_FLAG_OPERATIONS = Set.of("variable_is_null");
+    private static final Set<String> NULL_FLAG_FUNCTIONS = Set.of("var_is_null");
 
     private IntentAbsenceOptOut()
     {
@@ -138,7 +136,6 @@ public final class IntentAbsenceOptOut
             return null;
         }
 
-        Map<String, Operation> operations = operationsById(rule);
         Set<String> own = ownDomains(rule);
 
         Set<String> foreign = new TreeSet<>();
@@ -148,7 +145,7 @@ public final class IntentAbsenceOptOut
             String name = absentTolerantEmptinessName(conjunct);
             if (name == null)
             {
-                name = emptinessName(conjunct, operations, rule);
+                name = emptinessName(conjunct, rule);
             }
             if (name == null)
             {
@@ -157,7 +154,7 @@ public final class IntentAbsenceOptOut
                 // absent-tolerant emptiness spelling handled above.
                 return null;
             }
-            String dataset = datasetOf(name, operations, rule);
+            String dataset = datasetOf(name, rule);
             if (dataset != null && !own.contains(dataset))
             {
                 foreign.add(dataset);
@@ -184,25 +181,6 @@ public final class IntentAbsenceOptOut
             return rule.getCore().getId();
         }
         return rule.getId() != null ? rule.getId() : "<no-id>";
-    }
-
-
-    /** {@code Operations} keyed by {@code $}-id; entries without an id are dropped. */
-    private static Map<String, Operation> operationsById(Rule rule)
-    {
-        Map<String, Operation> byId = new LinkedHashMap<>();
-        List<Operation> operations = rule.getOperations();
-        if (operations != null)
-        {
-            for (Operation operation : operations)
-            {
-                if (operation.getId() != null)
-                {
-                    byId.put(operation.getId(), operation);
-                }
-            }
-        }
-        return byId;
     }
 
 
@@ -311,8 +289,7 @@ public final class IntentAbsenceOptOut
      * derived flag {@code $flag == true} where {@code $flag} is a {@code variable_is_null}
      * operation. {@code null} for every other shape.
      */
-    private static @Nullable String emptinessName(Expr conjunct, Map<String, Operation> ops,
-            Rule rule)
+    private static @Nullable String emptinessName(Expr conjunct, Rule rule)
     {
         String direct = directEmptyName(conjunct);
         if (direct != null)
@@ -326,17 +303,23 @@ public final class IntentAbsenceOptOut
                 && b.right() instanceof Expr.Lit lit && lit.kind() == Expr.LitKind.BOOL
                 && Boolean.TRUE.equals(lit.value()))
         {
-            Operation operation = ops.get(ref.name());
-            if (operation != null && NULL_FLAG_OPERATIONS.contains(operation.getOperator()))
-            {
-                return ref.name();
-            }
             // PLAN-binding-expressions C4: a COMPILED flag answers through its expression — a
             // `$flag: empty(X)` binding read `$flag == true` is the emptiness probe of X.
             net.cumba.corej.core.model.CompiledBinding compiled = rule.compiledBinding(ref.name());
             if (compiled != null)
             {
-                return directEmptyName(compiled.expression());
+                String compiledDirect = directEmptyName(compiled.expression());
+                if (compiledDirect != null)
+                {
+                    return compiledDirect;
+                }
+                // Runbook W2a: `$flag: var_is_null(X)` is the compiled form of the retired
+                // variable_is_null operation (CDISC-SEND-0105 / -0106), the same nullity flag.
+                if (compiled.expression() instanceof Expr.Call c
+                        && NULL_FLAG_FUNCTIONS.contains(c.name()))
+                {
+                    return singleArgName(c);
+                }
             }
         }
         return null;
@@ -367,7 +350,7 @@ public final class IntentAbsenceOptOut
      * any of today's four matches uses.
      * </p>
      */
-    private static @Nullable String datasetOf(String name, Map<String, Operation> ops, Rule rule)
+    private static @Nullable String datasetOf(String name, Rule rule)
     {
         if (name.startsWith("$") && rule.compiledBinding(name) != null)
         {
@@ -379,14 +362,7 @@ public final class IntentAbsenceOptOut
         }
         if (name.startsWith("$"))
         {
-            Operation operation = ops.get(name);
-            String domain = operation == null ? null : operation.getDomain();
-            if (domain == null)
-            {
-                return null;
-            }
-            String trimmed = domain.trim();
-            return trimmed.isEmpty() ? null : trimmed;
+            return null; // a `$`-name no compiled binding defines reads no dataset
         }
         int dot = name.indexOf('.');
         return dot > 0 ? name.substring(0, dot) : null;

@@ -231,28 +231,6 @@ class RulePackageLoaderExpressionJsonTest
     }
 
 
-    /**
-     * Phase 7b: a field-form operation record can only exist <em>programmatically</em> (the
-     * executor-internal carrier, e.g. a specialised rule) — the rendering still turns it back into
-     * the authored {@code Bindings} shape.
-     */
-    @Test
-    void programmaticFieldFormOperationConvertsToExpression() throws IOException
-    {
-        Rule rule = new Rule();
-        net.cumba.corej.core.model.Operation op = new net.cumba.corej.core.model.Operation();
-        op.setId("$VAR");
-        op.setOperator("variable_count");
-        op.setName("--LNKGRP");
-        rule.setOperations(java.util.List.of(op));
-        JsonNode node = MAPPER.readTree(RulePackageExpressionJson.toExpressionJson(rule));
-        JsonNode entry = node.get("Bindings").get(0);
-        assertEquals("$VAR", entry.get("name").asText());
-        assertEquals("variable_count(--LNKGRP)", entry.get("expression").asText());
-        assertFalse(entry.has("operator"));
-    }
-
-
     @Test
     void expressionFormOperationRoundTrips() throws IOException
     {
@@ -260,10 +238,10 @@ class RulePackageLoaderExpressionJsonTest
         // reproduce the original function-call text.
         JsonNode node = expressionTree("""
                 {"Core":{"Id":"T-0011","Status":"Draft","Version":"1"},
-                 "Bindings":[{"name":"$VAR","expression":"variable_count(--LNKGRP)"}],
+                 "Bindings":[{"name":"$VAR","expression":"distinct(--STDTC)"}],
                  "Check":{"expression":"var_not_exists(ADSL)"}}""");
         JsonNode op = node.get("Bindings").get(0);
-        assertEquals("variable_count(--LNKGRP)", op.get("expression").asText());
+        assertEquals("distinct(--STDTC)", op.get("expression").asText());
         assertFalse(op.has("operator"));
     }
 

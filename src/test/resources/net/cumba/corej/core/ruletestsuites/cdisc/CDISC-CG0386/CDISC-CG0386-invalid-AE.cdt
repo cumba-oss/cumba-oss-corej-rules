@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0386 expect=violation domain=AE
+#note "PLAN-per-row-functions phase 0 (first scenario for CDISC-CG0386): AEBDSYCD=1234567 on row 2 is not a System Organ Class code (the body-system code validates at the SOCCD level) of the (dummy) MedDRA dictionary at the SOCCD level -> fires. Row 1 carries a valid SOCCD (10029205); row 3's missing AEBDSYCD is a completeness concern of another rule -> no fire (a blank is valid). Executing pin written against the pre-port engine."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2 AEBDSYCD=1234567
+dataset AE class=EVENTS
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AEBDSYCD type=Num
+---
+001 | 1 | Headache | 10029205
+001 | 2 | Nausea   | 1234567
+002 | 1 | Headache | .

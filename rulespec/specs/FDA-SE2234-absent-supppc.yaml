@@ -13,6 +13,10 @@ description: |
   publishes the operator's DECLARED `EmptyResult` instead of an unclassified null. The
   VERDICT is unchanged — same rows, same status; only the rendered $-value moves. The fork
   still reports "no value", so this is a filed java-only divergence, not a regression.
+  ⚠ RE-CAPTURED 2026-09-29 for runbook W2a (PLAN-operation-replacements §2.3): supp_qnam_present
+  is deleted; the Check reads `empty(PCCALCN)` through the declared SUPP merge, and with no SUPPPC
+  in the study PCCALCN is an absent column (all-missing, EC-43 §6). Same rows, same status; the
+  $calcn_present value is gone from the reported values, and an absent column is not reported.
 python_source: rules-sendig FDA-SE2234
 rule:
   coreId: FDA-SE2234
@@ -34,7 +38,6 @@ expected_violations:
     row_key: {PCSEQ: 1, STUDYID: S1, USUBJID: '001'}
     status: SUCCESS
     output_variables:
-      $calcn_present: 'false'
       PCSTRESC: BLQ
       PCTESTCD: DRUGX
 expected_errors: []

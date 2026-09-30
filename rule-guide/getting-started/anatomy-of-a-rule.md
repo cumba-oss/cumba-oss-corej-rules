@@ -33,7 +33,7 @@ A rule file answers six questions, in this order:
 | group | the question it answers | blocks |
 |---|---|---|
 | **[Identity](#identity)** | what is this rule? | `Core` · `Description` · `Executability` · `ExecutabilityHint` |
-| **[Applicability](#applicability)** | what does it run on? | `Scope` · `Requirements` · `Variable_Universe` · `skipIfLibraryDefined` |
+| **[Applicability](#applicability)** | what does it run on? | `Scope` · `Requirements` · `Variable_Universe` · `skipIfLibraryDefined` · `Supp_Merge` |
 | **[Execution](#execution)** | what does it compute? | `Precondition` · `Bindings` · `Check` · `Match_Datasets` · `Grouping` · `wildcards` · `wildcardExclude` · `wildcardPairCatalogue` · `Expansion` |
 | **[Result](#result)** | what does it report? | `Outcome` · `Severity` · `Sensitivity` |
 | **[Provenance](#provenance)** | why does it exist? | `Source` · `Source_Proposed` |
@@ -86,7 +86,7 @@ Precondition:
   expression: 'DOMAIN == "TS"'
 Bindings:
 - name: "$variable_count"
-  expression: "variable_count(--LNKID)"
+  expression: "variable_count(\"--LNKID\")"
 Check:
   expression: >-
     TSPARMCD == "AGEMAX" and not empty(TSVAL) and invalid_duration(TSVAL, negative=false)
@@ -213,6 +213,12 @@ the rule is about what was *promised* rather than what was delivered.
 
 **`skipIfLibraryDefined`** — when `true`, the rule stands down if the CDISC Library already
 enforces the same thing, so a finding is not raised twice by two authorities.
+
+**`Supp_Merge`** — the declared SUPP merge, on by default: the rule reads a `SUPP<domain>`
+qualifier as a value of the parent record (`empty(PCCALCN)`, `var_exists("PCCALCN")`), and a
+requirement naming one — bare, or qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset
+delivers it; a qualifier is never a variable of the domain for the variable-inventory checks. Write `Supp_Merge: false` only for a rule that must read the raw
+domain file (see [Requirements](../authoring/requirements.md#supp_merge)).
 
 → [Scope](../authoring/scope.md) · [Requirements](../authoring/requirements.md)
 

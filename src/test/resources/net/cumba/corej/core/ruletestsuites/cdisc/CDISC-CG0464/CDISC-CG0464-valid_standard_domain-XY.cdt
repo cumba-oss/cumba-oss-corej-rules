@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0464 expect=noViolation domain=XY
+#note "XY is class=EVENTS but NOT declared custom (the Library's custom-domain list names only XX): domain_is_custom answers false, so a missing XYTERM does not fire. W4b (PLAN-scalar-metadata-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+#library custom-domain XX
+dataset XY class=EVENTS label="Standard EVENTS"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XYSEQ   type=Num  label="Sequence Number"
+---
+S1 | XY | 001 | 1

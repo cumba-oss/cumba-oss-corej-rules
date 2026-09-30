@@ -14,17 +14,15 @@ Requirements:
   Variables:
     All:
     - "PCSTRESC"
-Bindings:
-- name: "$calcn_present"
-  expression: "supp_qnam_present(domain=\"SUPPPC\", key_value=\"PCCALCN\")"
 Check:
   expression: >-
-    (PCSTRESC == "BLQ" or PCSTRESC == "ALQ") and $calcn_present == false
+    (PCSTRESC == "BLQ" or PCSTRESC == "ALQ") and empty(PCCALCN)
 Outcome:
   Message: "PCSTRESC is outside the limit of quantitation (BLQ or ALQ) but no SUPPPC\
     \ record with QNAM='PCCALCN' provides the numeric interpretation for that PC record."
   Output_Variables:
   - "PCSTRESC"
+  - "PCCALCN"
 Source:
   Class: "FND"
   Domain: "PC, SUPPPC"

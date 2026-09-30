@@ -12,10 +12,10 @@ Scope:
     - "AC"
 Bindings:
 - name: "$cat_count"
-  expression: "record_count(filter=filter(ACPARMCD=\"CAGTCAT\", ACVAL=\"RADIOLOGICAL/NUCLEAR\"\
+  expression: "record_count(filter=(ACPARMCD == \"CAGTCAT\" and ACVAL == \"RADIOLOGICAL/NUCLEAR\"\
     ))"
 - name: "$parm_count"
-  expression: "record_count(filter=filter(ACPARMCD=\"RNASRC\"))"
+  expression: "record_count(filter=(ACPARMCD == \"RNASRC\"))"
 Check:
   expression: >-
     $cat_count >= 1 and $parm_count < 1

@@ -14,13 +14,13 @@ Scope:
     - "TS"
 Bindings:
 - name: "$stype_interventional_count"
-  expression: "record_count(filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"INTERVENTIONAL\"\
+  expression: "record_count(filter=(TSPARMCD == \"STYPE\" and TSVAL == \"INTERVENTIONAL\"\
     ))"
 - name: "$inttype_pharm_count"
-  expression: "record_count(filter=filter(TSPARMCD=\"INTTYPE\", TSVAL=[\"DRUG\", \"\
-    BIOLOGIC\", \"VACCINE\", \"DIETARY SUPPLEMENT\", \"COMBINATION PRODUCT\"]))"
+  expression: "record_count(filter=(TSPARMCD == \"INTTYPE\" and TSVAL in [\"DRUG\"\
+    , \"BIOLOGIC\", \"VACCINE\", \"DIETARY SUPPLEMENT\", \"COMBINATION PRODUCT\"]))"
 - name: "$pclas_count"
-  expression: "record_count(filter=filter(TSPARMCD=\"PCLAS\"))"
+  expression: "record_count(filter=(TSPARMCD == \"PCLAS\"))"
 Check:
   expression: >-
     $stype_interventional_count >= 1 and $inttype_pharm_count >= 1 and $pclas_count == 0

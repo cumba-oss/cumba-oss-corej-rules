@@ -44,8 +44,8 @@ Match_Datasets:
   Name: "EX"
 Bindings:
 - name: "$days_from_first_dose"
-  expression: "date_diff_days(--DTC, domain=\"EX\", reference=\"EXSTDTC\", offset=\"\
-    1\", group=[USUBJID])"
+  expression: "date_diff_days(--DTC, min_date(EXSTDTC, domain=\"EX\", group=[USUBJID]))\
+    \ + 1"
 Check:
   expression: >-
     is_complete_date(--DTC) and not empty(TFDETECT) and TFDETECT != $days_from_first_dose

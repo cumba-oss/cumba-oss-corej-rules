@@ -1,13 +1,14 @@
 name: CDISC-AD0084
 kind: rule
 description: |
-  EC-8 (P7) — CDISC-AD0084 re-authored to the `row_max` Operation form.
+  EC-8 (P7) — CDISC-AD0084 authored with `row_max` (a registry function since wave 3 of the
+  operation→function programme, PLAN-per-row-functions).
   TRTEDT must equal the maximum of all TRxxEDT (xx = 01-99) variables on the record.
-  The Operation `row_max(name_pattern="^TR(0[1-9]|[1-9][0-9])EDT$")` reduces the matched
-  TRxxEDT columns to the per-row maximum ($trxx_max), skipping blanks; the Check fires when
-  TRTEDT is populated, $trxx_max is populated, and TRTEDT != $trxx_max. Both engines share the
-  row_max op (values compare lexicographically on the ISO date strings — same precision), so the
-  lanes agree.
+  `row_max(name_pattern="^TR(0[1-9]|[1-9][0-9])EDT$")` reduces the matched TRxxEDT columns to
+  the per-row maximum ($trxx_max), skipping blanks; the Check fires when TRTEDT is populated,
+  $trxx_max is populated, and TRTEDT != $trxx_max. The values here are CHAR ISO dates, so they
+  rank as text under the date rule (a value ranks by its own type; same precision, so the
+  calendar and text orders agree).
     row 001  TRTEDT=2026-03-01, max(TRxxEDT)=2026-03-01  -> equal, no fire
     row 002  TRTEDT=2026-02-01, max(TRxxEDT)=2026-03-01  -> not equal, fires
     row 003  TRTEDT='' (guard), no fire

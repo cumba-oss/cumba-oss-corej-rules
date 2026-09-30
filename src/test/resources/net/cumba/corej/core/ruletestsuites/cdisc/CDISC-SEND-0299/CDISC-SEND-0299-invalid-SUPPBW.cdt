@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0299 expect=violation domain=SUPPBW
+#note "QXTRA is present in SUPPBW but is not defined for that domain in the SENDIG (get_column_order_from_library) -> fires on that variable only. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library column-order SUPPBW STUDYID RDOMAIN USUBJID IDVAR IDVARVAL QNAM QLABEL QVAL QORIG QEVAL
+#expectViolationCount 1
+#expectViolationAt variable_name=QXTRA
+dataset SUPPBW
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QXTRA    type=Char label="Sponsor Defined"
+---
+S1 | BW | 001 | BWSEQ | 1 | BWXTRA | Extra | Y | X

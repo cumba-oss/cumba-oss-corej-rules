@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-CG0374 expect=noViolation domain=RELREC
+#note "RDOMAIN=AE is a domain present in the study; the blank RDOMAIN row is excluded by the not empty(RDOMAIN) guard -> no violation. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AESEQ | 1 | ONE | R1
+S1 |    | 001 | AESEQ | 1 | ONE | R2
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | PLACEBO
+---

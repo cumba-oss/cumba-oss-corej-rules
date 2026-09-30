@@ -31,7 +31,7 @@ description: |
 python_source: rules-adamig-1-3.json (CDISC-AD0702)
 pinned_from:
   core_id: CDISC-AD0702
-  rules_src_sha256: 94826abfb244c295f5c3111842ac0ea2bb518636d83a2b84ea961b98f59889ee
+  rules_src_sha256: cca64bcea437f06bf4be9ff909d508b98676795d30bd8f7f0acf93058d676bb8
 rule:
   Core:
     Id: CDISC-AD0702
@@ -46,7 +46,7 @@ rule:
       - MEDICAL DEVICE BASIC DATA STRUCTURE
   Bindings:
   - name: $baseline_a1ind
-    expression: 'max("A1IND", group=[USUBJID, PARAMCD, BASETYPE, SPDEVID], filter=filter(ABLFL="Y"))'
+    expression: 'max(A1IND, group=[USUBJID, PARAMCD, BASETYPE, SPDEVID], filter=(ABLFL=="Y"))'
   Check:
     expression: 'var_exists("BASETYPE") and not empty(B1IND) and B1IND != $baseline_a1ind'
   Outcome:
@@ -95,21 +95,17 @@ expected_violations:
   output_variables:
     $baseline_a1ind: NORMAL
     A1IND: LOW
-    ABLFL:
     B1IND: LOW
     BASETYPE: PRE
     PARAMCD: HGB
-    SPDEVID: D2
 - rule_id: CDISC-AD0702
   dataset: ADXD
   row_key: {STUDYID: S1, USUBJID: '003', SPDEVID: D1, PARAMCD: HGB, BASETYPE: PRE, AVISITN: 1}
   status: SUCCESS
   output_variables:
-    $baseline_a1ind:
+    $baseline_a1ind: '.'
     A1IND: LOW
-    ABLFL:
     B1IND: LOW
     BASETYPE: PRE
     PARAMCD: HGB
-    SPDEVID: D1
 expected_errors: []

@@ -10,6 +10,13 @@ description: |
   EX by USUBJID) and adds the +1 offset. Check fires when a populated TFDETECT differs from that
   computed interval.
 
+  Runbook W2b (PLAN-operation-replacements §8) retired Mode 3 (minuend_domain / minuend_match):
+  the SPID-matched PM record is a DECLARED sided join (Match_Datasets PM on USUBJID and
+  TFSPID = PMSPID, with the keys in Requirements as every keyed join declares them), the minuend
+  is PM.PMDTC read through it, the per-subject earliest EXSTDTC is a named
+  min_date(EXSTDTC, domain="EX", group=[USUBJID]) and the +1 offset is arithmetic. Same rows,
+  same finding.
+
   Rows:
     - 1001/M1: PMDTC 2020-01-20, min EXSTDTC 2020-01-05 -> (15)+1 = 16, TFDETECT 16 -> no fire
     - 1002/M2: PMDTC 2020-02-11, min EXSTDTC 2020-02-01 -> (10)+1 = 11, TFDETECT 99 -> FIRE
@@ -26,13 +33,13 @@ rule:
   Requirements:
     Variables:
       All: [USUBJID]
-      All_Or_None: [[USUBJID, EX.USUBJID]]
+      All_Or_None: [[USUBJID, PM.USUBJID], [TFSPID, PM.PMSPID]]
   Match_Datasets:
-    - Name: EX
-      Keys: [USUBJID]
+    - Name: PM
+      Keys: [USUBJID, {left: TFSPID, right: PMSPID}]
   Bindings:
   - name: "$days"
-    expression: 'date_diff_days(PMDTC, domain="EX", reference="EXSTDTC", offset="1", minuend_domain="PM", minuend_match=[USUBJID, "--SPID"], group=[USUBJID])'
+    expression: 'date_diff_days(PM.PMDTC, min_date(EXSTDTC, domain="EX", group=[USUBJID])) + 1'
   Check:
     expression: 'not empty(TFDETECT) and TFDETECT != $days'
   Outcome:

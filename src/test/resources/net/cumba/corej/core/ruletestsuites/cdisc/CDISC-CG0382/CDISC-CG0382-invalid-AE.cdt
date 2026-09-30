@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0382 expect=violation domain=AE
+#note "PLAN-per-row-functions phase 0 (first scenario for CDISC-CG0382): AEHLTCD=1234567 on row 2 is not a High Level Term code of the (dummy) MedDRA dictionary at the HLTCD level -> fires. Row 1 carries a valid HLTCD (10019231); row 3's missing AEHLTCD is a completeness concern of another rule -> no fire (a blank is valid). Executing pin written against the pre-port engine."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 AESEQ=2 AEHLTCD=1234567
+dataset AE class=EVENTS
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AEHLTCD type=Num
+---
+001 | 1 | Headache | 10019231
+001 | 2 | Nausea   | 1234567
+002 | 1 | Headache | .

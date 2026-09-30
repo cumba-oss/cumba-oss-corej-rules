@@ -14,7 +14,7 @@ Scope:
     - "ADVERSE EVENT"
 Bindings:
 - name: "$ae_aeacn_pop"
-  expression: "record_count(AEACN, domain=\"AE\", filter=filter(AEACN=\"&\"))"
+  expression: "record_count(domain=\"AE\", filter=(not empty(AEACN)))"
 Check:
   expression: >-
     $ae_aeacn_pop > 0 and not var_exists("AEACN")

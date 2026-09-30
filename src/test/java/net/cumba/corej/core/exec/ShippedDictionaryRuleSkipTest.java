@@ -131,10 +131,11 @@ class ShippedDictionaryRuleSkipTest
         // The premise the whole defect rested on, asserted rather than assumed: these rules have
         // no Precondition of their own, the loader injected none (it only gates INLINED calls),
         // and the dictionary need is DECLARED in a binding that names its type. Read through
-        // ProviderNeeds, the one reader of both keys (PLAN-function-surface-wave1 D-W1-3):
-        // PMDA-SD0008 / SD2260 still bind an OperationType call, PMDA-SD2265 binds the ported
-        // valid_external_dictionary_code_term_pair FUNCTION, whose provider capability names its
-        // type — one binding each, one typed dictionary need each.
+        // ProviderNeeds, the one reader of both keys (PLAN-function-surface-wave1 D-W1-3): all
+        // three bind a registry FUNCTION whose provider capability names its type —
+        // valid_external_dictionary_value (PMDA-SD0008, SD2260; wave 3, PLAN-per-row-functions)
+        // and valid_external_dictionary_code_term_pair (PMDA-SD2265; wave 1) — one binding each,
+        // one typed dictionary need each.
         for (String coreId : new String[]
         {
                 "PMDA-SD0008", "PMDA-SD2260", "PMDA-SD2265"
@@ -150,10 +151,16 @@ class ShippedDictionaryRuleSkipTest
             assertEquals(1, needs.dictionaryTypes().size(),
                     coreId + " names the one dictionary type it needs: " + needs);
         }
-        assertTrue(
-                shippedRule("PMDA-SD2265").getCompiledBindings() != null
-                        && !shippedRule("PMDA-SD2265").getCompiledBindings().isEmpty(),
-                "PMDA-SD2265's binding is the ported function, a COMPILED binding");
+        for (String coreId : new String[]
+        {
+                "PMDA-SD0008", "PMDA-SD2260", "PMDA-SD2265"
+        })
+        {
+            assertTrue(
+                    shippedRule(coreId).getCompiledBindings() != null
+                            && !shippedRule(coreId).getCompiledBindings().isEmpty(),
+                    coreId + "'s binding is a ported function, a COMPILED binding");
+        }
     }
 
 

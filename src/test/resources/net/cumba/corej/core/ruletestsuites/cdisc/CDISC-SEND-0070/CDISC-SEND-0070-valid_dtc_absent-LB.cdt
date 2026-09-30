@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0070 expect=noViolation domain=LB
+#note "PLAN-per-row-functions phase 0, D4 (absent column = a constant, D34 #3/#4) for interval_uncertainty_precision_mismatch: LB carries no LBDTC column (only a precision-mismatching LBSTDTC, the -A sibling's state). The rule RUNS; the absent --DTC reads blank on every row, a blank carries no interval -> no finding. Pre-port: null for the absent column, no row fired - the same verdict."
+#library standard=sendig version=3-1-1
+#expectViolationCount 0
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Test Short Name"
+col LBSTDTC  type=Char label="Start Date/Time of Specimen Collection"
+---
+S1 | LB | 001 | 1 | ALB | 2023-01-15/2023-01

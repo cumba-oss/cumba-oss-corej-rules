@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0365 expect=noViolation domain=PY
+#note "PYSTRESC holds a term of the PYFINDRS codelist (or the record does not qualify) -> no violation. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig-dart version=1-2
+#library codelist-terms PYFINDRS PREGNANT "NOT PREGNANT"
+dataset PY
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PYSEQ    type=Num  label="Sequence Number"
+col PYTESTCD type=Char label="Pregnancy Findings Test Short Name"
+col PYSTRESC type=Char label="Character Result/Finding in Std Format"
+col PYRESCAT type=Char label="Result Category"
+---
+S1 | PY | 001 | 2 | PREGSTAT | PREGNANT | NORMAL
+S1 | PY | 001 | 3 | OTHER | MAYBE | NORMAL

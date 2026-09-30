@@ -18,8 +18,8 @@ Requirements:
     - "AESMIE"
 Bindings:
 - name: "$suppae_aesosp_keys"
-  expression: "distinct([USUBJID, IDVARVAL], domain=\"SUPPAE\", filter=filter(RDOMAIN=\"\
-    AE\", IDVAR=\"AESEQ\", QNAM=\"AESOSP\"))"
+  expression: "distinct([USUBJID, IDVARVAL], domain=\"SUPPAE\", filter=(RDOMAIN ==\
+    \ \"AE\" and IDVAR == \"AESEQ\" and QNAM == \"AESOSP\"))"
 Check:
   expression: >-
     AESMIE == "Y" and tuple(USUBJID, AESEQ) not in $suppae_aesosp_keys

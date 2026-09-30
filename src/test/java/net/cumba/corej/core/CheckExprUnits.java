@@ -250,6 +250,13 @@ public final class CheckExprUnits
             {
                 out.add((String) lit.value());
             }
+            else if (call.kwargs().get("domain") instanceof Expr.Ref ref
+                    && ref.kind() == net.cumba.corej.core.expr.OperandKind.COLUMN)
+            {
+                // D10 (runbook W2a): `domain=TS` is the bare dataset reference — read_value's
+                // authored form; the same dataset the quoted spelling names.
+                out.add(ref.name());
+            }
             call.args().forEach(a -> collectDatasets(a, dotted, out));
             call.kwargs().values().forEach(a -> collectDatasets(a, dotted, out));
         }

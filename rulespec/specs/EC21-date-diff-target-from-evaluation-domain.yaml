@@ -19,6 +19,11 @@ description: |
        former host was wrong.
   Same pattern as EC18-date-diff-mode3-sided, which is inline for the same reason.
 
+  Runbook W2b (PLAN-operation-replacements §8): the operation's Mode 2 is written as a named
+  aggregation, min_date(EXSTDTC, domain="EX", group=[USUBJID]), and its offset="1" as `+ 1`. The
+  EC-21 claim holds by construction: `--DTC` is date_diff_days' own argument, read on the
+  evaluation record, and a `--` inside the domain= aggregate would be a load error.
+
   Rows:
     - 1001: TFDTC 2020-01-20, min EXSTDTC 2020-01-05 -> computed 16, TFDETECT 16 -> no fire
     - 1002: TFDTC 2020-02-11, min EXSTDTC 2020-02-01 -> computed 11, TFDETECT 99 -> FIRE
@@ -42,7 +47,7 @@ rule:
       Keys: [USUBJID]
   Bindings:
   - name: "$days_from_first_dose"
-    expression: 'date_diff_days(--DTC, domain="EX", reference="EXSTDTC", offset="1", group=[USUBJID])'
+    expression: 'date_diff_days(--DTC, min_date(EXSTDTC, domain="EX", group=[USUBJID])) + 1'
   Check:
     expression: 'is_complete_date(--DTC) and not empty(TFDETECT) and TFDETECT != $days_from_first_dose'
   Outcome:

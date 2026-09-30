@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0400 expect=violation domain=LB
+#note "PLAN-per-row-functions phase 0 (first scenario for CDISC-CG0400): LBLOINC=9999-9 on row 2 is not a code of the (dummy) LOINC dictionary -> fires. Row 1 is a valid LOINC code; row 3 is blank (no fire). Executing pin written against the pre-port engine."
+#library standard=sdtmig version=3-4
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 LBSEQ=2 LBLOINC=9999-9
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBLOINC  type=Char
+---
+S01 | LB | 001 | 1 | GLUCF | 1558-6
+S01 | LB | 001 | 2 | GLUC  | 9999-9
+S01 | LB | 002 | 1 | ALB   |

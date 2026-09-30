@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-SEND-0274 expect=noViolation domain=SUPPBW
+#note "No QNAM equals a variable name of the parent BW's model column order -> no violation; a blank RDOMAIN row resolves no parent and stays silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-0
+#library model-column-order BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWORRES
+dataset SUPPBW class=RELATIONSHIP label="Supplemental Qualifiers for BW"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR   type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM    type=Char label="Qualifier Variable Name"
+col QLABEL  type=Char label="Qualifier Variable Label"
+col QVAL    type=Char label="Data Value"
+---
+S1 | BW | 001 | BWSEQ | 1 | BWXTRA | Extra | Y
+S1 |    | 001 | BWSEQ | 1 | BWTESTCD | Reported term | X
+---
+
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | BW
+---

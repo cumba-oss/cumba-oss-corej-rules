@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.RuleClassifier;
+import net.cumba.corej.core.expr.eval.BindingDomains;
 import net.cumba.corej.core.expr.eval.DomainScan;
-import net.cumba.corej.core.expr.eval.OperationKinds;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Sensitivity;
 import org.jspecify.annotations.Nullable;
@@ -196,7 +196,7 @@ class DerivedFieldEquivalenceTest
         {
             Rule rule = YAML.readValue(Files.readString(file, StandardCharsets.UTF_8), Rule.class);
             // 7b: materialise the Bindings before deriving (normalizeOperations javadoc).
-            RulePackageLoader.normalizeOperations(rule);
+            RulePackageLoader.materialiseBindings(rule);
             if (rule.getSensitivity() != null || rule.getCheck() == null)
             {
                 // The documented override set: not a clause-1 fixture, it is clause 2's.
@@ -206,7 +206,7 @@ class DerivedFieldEquivalenceTest
             try
             {
                 domain = DomainScan
-                        .infer(CheckExprUnits.toExpr(rule.getCheck()), OperationKinds.forRule(rule))
+                        .infer(CheckExprUnits.toExpr(rule.getCheck()), BindingDomains.forRule(rule))
                         .label();
             }
             catch (net.cumba.corej.core.expr.ExpressionException _)
@@ -258,7 +258,7 @@ class DerivedFieldEquivalenceTest
         assertNotNull(rule.getCheck(), "fixture must carry a Check");
         assertEquals(domain,
                 DomainScan
-                        .infer(CheckExprUnits.toExpr(rule.getCheck()), OperationKinds.forRule(rule))
+                        .infer(CheckExprUnits.toExpr(rule.getCheck()), BindingDomains.forRule(rule))
                         .label(),
                 "the fixture really is the routing class it was selected for");
         RulePackageLoader.deriveOmittedFields(rule);
@@ -426,7 +426,7 @@ class DerivedFieldEquivalenceTest
             }
             Rule authoredRule = YAML
                     .readValue(Files.readString(found.get(0), StandardCharsets.UTF_8), Rule.class);
-            RulePackageLoader.normalizeOperations(authoredRule);
+            RulePackageLoader.materialiseBindings(authoredRule);
             Sensitivity authored = authoredRule.getSensitivity();
             if (authored == null)
             {

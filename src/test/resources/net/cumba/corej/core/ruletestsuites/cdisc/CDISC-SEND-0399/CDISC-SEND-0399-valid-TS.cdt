@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0399 expect=noViolation domain=TS
+#note "TSVAL holds a term of the SNDIGVER codelist (or the record does not qualify) -> no violation. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig-dart version=1-2
+#library codelist-terms SNDIGVER "SEND IG 3.1" "SEND IG 3.1.1"
+dataset TS
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 2 | SNDIGVER | SEND IG 3.1.1
+S1 | TS | 3 | SSTYP | 3.1.1

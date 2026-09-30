@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-0297 expect=violation domain=DM
+#note "DMXTRA is present in DM but is not defined for that domain in the SENDIG (get_column_order_from_library) -> fires on that variable only. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1
+#library column-order DM STUDYID DOMAIN USUBJID SUBJID SEX
+#expectViolationCount 1
+#expectViolationAt variable_name=DMXTRA
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+col DMXTRA  type=Char label="Sponsor Defined"
+---
+S1 | DM | 001 | M | X

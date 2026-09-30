@@ -52,7 +52,7 @@ loud mistakes catch themselves.
       can *all* be false on valid data. `not (A < B)` is not `A >= B`.
 - [ ] **A date compared without `date()`.** An untagged comparison over ISO strings compiles to
       the numeric-only plain comparison and fires on the empty set.
-- [ ] **An operation with nothing to answer.** An absent `domain=`, a filter no row satisfies —
+- [ ] **A function with nothing to answer.** An absent `domain=`, a filter no row satisfies —
       the answer is a value, not a skip. `record_count` answers `0`, so `$n == 0` **fires**.
 
 ## It is written the way the corpus is

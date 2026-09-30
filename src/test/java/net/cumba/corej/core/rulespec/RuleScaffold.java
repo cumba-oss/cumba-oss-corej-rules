@@ -39,10 +39,11 @@ import net.cumba.corej.core.model.Rule;
  * inside {@link #buildExplicit} for {@code kind: rule} only, {@code normalizeOperations} and
  * {@code deriveOmittedFields} — and <b>omits 6</b>: {@code removeParkedRules},
  * {@code validateOperandSubstitution}, {@code validateEnumFields},
- * {@code validateOperationReferences}, {@code validateUnresolvedOperationWildcards} and
- * {@code injectInlineOperationGates}. A {@code kind: check_operator} spec gets only <b>3</b>
- * passes, because the two {@code buildExplicit} passes never run for it. (The census named three
- * omissions and never asserted a total; any "omits-three" summary elsewhere is a lossy paraphrase.)
+ * {@code validateOperationReferences}, {@code validateUnresolvedOperationWildcards} (retired with
+ * its last guarded field, runbook W2b) and {@code injectInlineOperationGates}. A
+ * {@code kind: check_operator} spec gets only <b>3</b> passes, because the two
+ * {@code buildExplicit} passes never run for it. (The census named three omissions and never
+ * asserted a total; any "omits-three" summary elsewhere is a lossy paraphrase.)
  *
  * <p>
  * What each omission costs a spec's fidelity to production, sharpest first:
@@ -214,7 +215,7 @@ public final class RuleScaffold
         // RulePackageLoader. Without this pass every such operation looks operator-less and
         // silently resolves null — the rule fires nothing and the miss would be attributed to
         // the engine rather than to the loading path.
-        RulePackageLoader.normalizeOperations(rule);
+        RulePackageLoader.materialiseBindings(rule);
         // The loader also derives Sensitivity when a spec's rule omits it (the shipped native
         // corpus is stripped since the Phase-3 regen, so this runs for every coreId-resolved
         // spec; the documented overrides keep their authored Sensitivity). Without this the Java

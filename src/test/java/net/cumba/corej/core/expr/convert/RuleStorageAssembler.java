@@ -406,7 +406,7 @@ public final class RuleStorageAssembler
         // 7b: materialise the Bindings before deriving — an external binder must run this itself
         // (RulePackageLoader.normalizeOperations javadoc); without it the classifier derives over
         // a rule with no operations and the gate would judge a different rule than ships.
-        net.cumba.corej.core.RulePackageLoader.normalizeOperations(rule);
+        net.cumba.corej.core.RulePackageLoader.materialiseBindings(rule);
         String coreId = check.path("Core").path("Id").asText("<unknown>");
         RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier.deriveSensitivity(rule);
         if (sensitivity.confidence() == RuleClassifier.Confidence.NONE)

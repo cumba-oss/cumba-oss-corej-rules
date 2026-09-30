@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0084 expect=violation domain=ADSL
+#note "Combined review of runbook W2-W8, round 2 H2 (red-before on engine 7617784: the rule ERRORed with a row_max column-type mismatch, no finding). A CSV or Excel ADSL delivers an all-blank TR02EDT as a Char column (the provider types a column Num only on numeric evidence). A matched column with no value on any row takes no part in row_max's type decision, so the Num TR01EDT decides: row 1 max 22010 != TRTEDT 22000 (fires), row 2 equal (clean)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-001 "$trxx_max"=22010
+dataset ADSL
+col STUDYID  type=Char
+col USUBJID  type=Char
+col TRTEDT   type=Num
+col TR01EDT  type=Num
+col TR02EDT  type=Char
+---
+S1 | 01-001 | 22000 | 22010 |
+S1 | 01-002 | 22010 | 22010 |

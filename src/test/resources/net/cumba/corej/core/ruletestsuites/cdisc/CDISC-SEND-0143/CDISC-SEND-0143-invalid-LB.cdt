@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0143 expect=violation domain=LB
+#note "LBSTAT=ND is populated with a value that is not a term of the ND codelist (codelist_terms: NOT DONE) -> fires; the NOT DONE row and the blank row stay silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library dataset-class LB FINDINGS
+#library codelist-terms ND "NOT DONE"
+#expectViolationCount 1
+#expectViolationAt row=1 LBSTAT=ND
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | GLUC | ND
+S1 | LB | 001 | 2 | GLUC | NOT DONE
+S1 | LB | 001 | 3 | GLUC |

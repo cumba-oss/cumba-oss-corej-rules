@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0013 expect=violation domain=BW
+#note "BWDTC is Expected for BW in the SENDIG (expected_variables) but the dataset does not carry it -> fires once for the dataset; $missing_expected_variables = [BWDTC] (the minus chain over the upper-cased column list). W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library expected-variables BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWDTC
+#expectViolationCount 1
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+---
+S1 | BW | 001 | 1 | BW

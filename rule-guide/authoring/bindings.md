@@ -2,16 +2,17 @@
 
 <!-- Grounded: Binding.java — name + expression only, the JsonAnySetter rejects every other key
      loud (id:, operator:, group:, level:, filter:, …); a binding with no expression is filed on
-     the loadError channel. Since PLAN-binding-expressions (W0): the expression is ANY expression —
-     a single operation call keeps the operation path (BindingRouting), everything else is a
-     compiled binding (CompiledBinding / BindingValue). -->
+     the loadError channel. Since PLAN-binding-expressions (W0): the expression is ANY expression,
+     and since runbook W8 EVERY binding is a compiled binding — RulePackageLoader.materialiseBindings
+     parses it once (CompiledBinding), and it is evaluated lazily in the reading context
+     (BindingValue). -->
 
 A binding gives a name to a sub-result, so the check can refer to it instead of restating it.
 
 ```yaml
 Bindings:
 - name: "$variable_count"
-  expression: "variable_count(--LNKID)"
+  expression: "variable_count(\"--LNKID\")"
 Check:
   expression: 'var_exists("--LNKID") and $variable_count < 2'
 ```
@@ -31,13 +32,13 @@ A binding is exactly two keys:
 ```yaml
 Bindings:
 - name: "$disposition_event_count"
-  expression: 'record_count(DSCAT, domain="DS", filter=filter(DSCAT="DISPOSITION EVENT"))'
+  expression: 'record_count(domain="DS", filter=(DSCAT == "DISPOSITION EVENT"))'
 ```
 
 **`name`** is the `$`-variable the check will use. Name it for what it *is*, as a noun —
 `$subject_count`, `$first_visit_date` — not for how it is computed.
 
-**`expression`** is **any expression** the Check could contain: a function or operation call, a
+**`expression`** is **any expression** the Check could contain: a function call, a
 column, arithmetic, a comparison, a list literal. Parameters are keyword arguments inside the call;
 there are no sibling keys.
 
@@ -61,12 +62,12 @@ hold whatever the expression:
 
 - **A name is declared once.** A second binding with the same `name` is a load error.
 - **A binding reads only earlier bindings.** Reading a later one, or itself, is a load error.
-- **An operation reads only dataset-level values.** An operation call — declared or written inline
-  — that reads a per-row binding (`minus($a, subtract=$per_row)`) is a load error: an operation's
-  arguments have no row to pick the value at.
+- **A set difference reads only dataset-level lists.** `minus` — written in the Check or in a
+  binding — that reads a per-row binding (`minus($a, subtract=$per_row)`) is a load error: its
+  operands have no row to pick the value at.
 
 A **list** binding (a list literal, or a list-valued function such as `get_codelist_attributes`) is
-read with `in` / `not in`, `empty(…)` or by an operation; comparing it with `==` / `!=` / `<` … is a
+read with `in` / `not in`, `empty(…)` or by a list function such as `minus`; comparing it with `==` / `!=` / `<` … is a
 load error, exactly as comparing a column with an inline list is. A list literal holds plain
 literals of one kind: numbers, or strings, never both, and never a column.
 
@@ -92,12 +93,12 @@ what you wrote, the rule runs, and it under-reports in silence.
 ```yaml
 # ⛔ load error — filter is not a sibling key
 - name: "$n"
-  expression: "record_count(DSCAT)"
+  expression: "record_count()"
   filter: 'DSCAT == "DISPOSITION EVENT"'
 
 # ✅ the parameter belongs in the call
 - name: "$n"
-  expression: 'record_count(DSCAT, filter=filter(DSCAT="DISPOSITION EVENT"))'
+  expression: 'record_count(filter=(DSCAT == "DISPOSITION EVENT"))'
 ```
 
 A binding with no `expression` at all is also rejected, and the rule is reported as failing to

@@ -262,6 +262,13 @@ public final class ViolationNormaliser
          */
         UNGATED_PROVIDER_REACH,
         /**
+         * {@code read_value(…, mode="ONLY")} matched more than one row of its dataset — the rule
+         * asserted a single row and the data says otherwise (owner D13; runbook W2a,
+         * {@code PLAN-operation-replacements} §2.2, {@code ReadValueAmbiguityException},
+         * RuleRunner's ninth ERROR site). A data condition the rule chose to make loud.
+         */
+        READ_VALUE_AMBIGUOUS,
+        /**
          * An {@code ERROR} this classifier does not recognise — including a null status message.
          */
         OTHER
@@ -325,6 +332,13 @@ public final class ViolationNormaliser
      * {@link ErrorReason#OTHER} — a visible divergence — rather than a silent misclassification.
      */
     static final String UNGATED_PROVIDER_REACH_MESSAGE_SUFFIX = " — the provider gate should have skipped this rule before any row was read";
+
+    /**
+     * The fixed tail of {@code ReadValueAmbiguityException}'s message (runbook W2a); the head names
+     * the column, the dataset and the match count. Pinned by
+     * {@code EngineErrorMessageContractTest.theReadValueAmbiguitySuffixIsStillTheEngineSWording}.
+     */
+    static final String READ_VALUE_AMBIGUOUS_MESSAGE_SUFFIX = " — ONLY asserts exactly one qualifying row";
 
     /**
      * Classifies an execution result into the closed {@link ErrorReason} vocabulary and returns the
@@ -393,6 +407,10 @@ public final class ViolationNormaliser
         if (statusMessage.endsWith(UNGATED_PROVIDER_REACH_MESSAGE_SUFFIX))
         {
             return ErrorReason.UNGATED_PROVIDER_REACH;
+        }
+        if (statusMessage.endsWith(READ_VALUE_AMBIGUOUS_MESSAGE_SUFFIX))
+        {
+            return ErrorReason.READ_VALUE_AMBIGUOUS;
         }
         // Checked last: a load error's text is authored, so it could in principle collide with a
         // fixed engine message. Preferring the fixed messages keeps the classification stable.

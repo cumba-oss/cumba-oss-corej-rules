@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0143 expect=noViolation domain=DS
+#note "W5 phase 0, non-firing counterpart of the invalid sibling: P2 (consent row earliest, RFICDTC equal) and P3 (a RANDOMIZED row precedes the consent row, so the consent row is not the subject's earliest DSSTDTC and the Check does not reach the RFICDTC comparison). Non-vacuous: P3's RFICDTC differs from the consent date, so a min_date that ignored the RANDOMIZED row (or grouped over the wrong subject) would fire here."
+#library standard=sdtmig version=3-4
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | P2 | 1 | INFORMED CONSENT OBTAINED | 2026-01-01
+S1 | DS | P2 | 2 | RANDOMIZED                | 2026-01-10
+S1 | DS | P3 | 1 | RANDOMIZED                | 2025-12-20
+S1 | DS | P3 | 2 | INFORMED CONSENT OBTAINED | 2026-01-01
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFICDTC type=Char label="Date/Time of Informed Consent"
+---
+S1 | DM | P2 | 2026-01-01
+S1 | DM | P3 | 2026-03-15
+---

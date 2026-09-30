@@ -38,5 +38,11 @@ expected_violations:
     dataset: ADSL
     row_key: {STUDYID: null, USUBJID: null}
     status: SUCCESS
-    output_variables: {}
+    # RE-CAPTURED 2026-09-29 for runbook W2a (PLAN-operation-replacements phase 3): the two
+    # variable_exists operations are var_exists("…") bindings. On this ZERO-row ADSL a
+    # dataset-level binding hands over no first value, so each renders null where the operation
+    # result used to be absent from the map. Same (dataset-level) finding, same status.
+    output_variables:
+      $TRTSDTM_EXISTS: null
+      $TRTSDT_EXISTS: null
 expected_errors: []

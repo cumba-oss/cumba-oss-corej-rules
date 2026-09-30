@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-AD0084 expect=violation domain=ADSL
-#note "Row 1: row_max over the two TRxxEDT cells = 22010 != TRTEDT 22000 -> fires. Row 2: TRTEDT equals the max -> clean. The $trxx_max GroupedResult is keyed by the matched columns' VALUES and both rows share the same tuple - same stored extreme (22010), correct for both. All values Num -> numeric extreme branch + numeric !=."
+#note "Row 1: row_max over the two TRxxEDT cells = 22010 != TRTEDT 22000 -> fires. Row 2: TRTEDT equals the max -> clean. $trxx_max is a per-row value (row_max reads the row cursor): each row answers its own maximum, here 22010 on both. Every matched column is Num, so the numeric branch is taken - decided once for the dataset from the declared types - and != compares numerically."
 #library standard=adamig version=1-3
 #expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-001

@@ -342,7 +342,12 @@ class ExpectedErrorsTest
             // catch so it no longer shares COLUMN_TYPE_MISMATCH's. Its population is zero by
             // construction; the branch is proved reachable by
             // UngatedProviderReachErrorReasonReachabilityTest with the ENGINE's own message.
-            Assertions.assertEquals(8, ViolationNormaliser.ErrorReason.values().length,
+            // Widened 8 -> 9 on 2026-09-29 by runbook W2a (PLAN-operation-replacements §2.2):
+            // READ_VALUE_AMBIGUOUS covers RuleRunner's ninth ERROR site, read_value(…,
+            // mode="ONLY") matching several rows (owner D13), its own catch. Its population is
+            // zero (every shipped site authors mode="FIRST"); the branch is proved reachable by
+            // ReadValueAmbiguityErrorReasonReachabilityTest with the ENGINE's own message.
+            Assertions.assertEquals(9, ViolationNormaliser.ErrorReason.values().length,
                     "A new ErrorReason means a new classification branch and, most likely, a new "
                             + "RuleRunner ERROR site — update EngineContract below before widening "
                             + "this, and add a classify() case or it silently buckets as OTHER.");

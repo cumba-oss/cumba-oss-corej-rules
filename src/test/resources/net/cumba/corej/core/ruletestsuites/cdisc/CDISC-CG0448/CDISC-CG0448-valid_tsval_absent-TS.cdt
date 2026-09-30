@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0448 expect=noViolation domain=TS
+#note "PLAN-per-row-functions phase 0, D4 (absent column = a constant, D34 #3/#4) for valid_external_dictionary_value: TS carries no TSVAL column. The rule requires only TSPARMCD, so it RUNS; the absent term column reads blank on every row, and a blank is valid -> no finding. Pre-port: null for the absent column, no row fired - the same verdict."
+#library standard=sdtmig version=3-3
+#dictionaries dummy
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVALCD  type=Char
+---
+S01 | TS | 1 | INDIC | 99999999

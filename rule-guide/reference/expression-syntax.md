@@ -1,8 +1,9 @@
 # Expression syntax
 
 <!-- The rosters in this document are the complete inventory generated from the engine's own
-     registries (FunctionRegistry, CompilerDispatchedCalls, OperationDescriptors, OperationType,
-     MetadataAttribute, BuiltinRegistry, the sealed Expr AST) — 285 tokens.
+     registries (FunctionRegistry, CompilerDispatchedCalls, MetadataAttribute, BuiltinRegistry,
+     the sealed Expr AST) — 276 tokens. There is no operation category: runbook W8 deleted the
+     Operation surface, and every former operation is a function of the same name.
      Grammar and precedence: CheckExpressionParser.java (or > and > not > comparison > sum >
      product > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
      && and || accepted). Types: ExprType.java (6 value types + 2 parameter-only; `missing` is a
@@ -23,15 +24,11 @@
        operand-kind MATCHED_FLAG     -> "Operands", row "matched flag"
        operand-kind OPERATION_REF    -> "Operands", row "binding result"
        operand-kind BUILTIN          -> "Operands", row "builtin"
-     Every other token appears verbatim: 157 callables — the UNION of the inventory's `function`
-     (72) + `boolean-call` (28) + `compiler-call` (15) + `operation` (43) rows, which is 157 not
-     158 because `record_count` appears in two categories (wave 1 deleted the `dictionary_available`
-     operation, so the gate builtin no longer has an operation twin). All are
-     presented as ONE surface: OperationDescriptors gives every OperationType a FunctionDescriptor
-     of the same shape the registry uses, which is what retired the Operation field bag as an
-     AUTHORING model (phase 6b, D16/D17/D19a). `Operation` is now an executor-internal
-     bound-argument record only. Plus 26 metadata-accessors, 64 builtin-operands,
-     14 binary-operators, 6 comparison-markers.
+     Every other token appears verbatim: the callables — the UNION of the inventory's `function`,
+     `boolean-call` and `compiler-call` rows (106 + 28 + 21; the figures are the generated
+     inventory's). All are presented as ONE surface: every callable carries a FunctionDescriptor
+     in FunctionRegistry — a compiler-dispatched one (CompilerDispatchedCalls) with `fn == null`.
+     Plus 26 metadata-accessors, 64 builtin-operands, 14 binary-operators, 6 comparison-markers.
 
      ⚠ The inventory's three callable categories are a DISPATCH split, not an authoring one, and
      the split the TSV names is itself stale: `HARDCODED_BOOLEAN_CALLS` is RETIRED. Every
@@ -331,7 +328,7 @@ VISITNUM in [1, 2, 3]              # NUMERIC membership
   error.
 - A **mixed** list literal — a number and a string together — is a **load error**.
 - A **dynamic set** — the thing on the *right* being a `$`-binding, a `${*}` wildcard, an inline
-  function call (`X in distinct(SV.VISITNUM, group=[USUBJID])`) or a per-row grouped result — is
+  function call (`X in distinct(VISITNUM, domain=SV, group=[USUBJID])`) or a per-row grouped result — is
   always **textual** and is not type-checked. Its contents are not statically known, so no
   classification is possible.
 
@@ -426,8 +423,6 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`empty(x)`](functions.md#empty) | boolean | True when the value is missing or `""`. Also spelled `is_missing`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. |
 | [`var_exists(x)`](functions.md#var_exists) | boolean | True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot and a `${…}` substitution. A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`. |
 | [`var_is_null(x)`](functions.md#var_is_null) | boolean | True when the column exists but no row in the dataset populates it |
-| [`variable_exists(name)`](functions.md#variable_exists) | value | Whether the named column exists, as a value for reporting |
-| [`variable_is_null(name)`](functions.md#variable_is_null) | value | Whether the column is unpopulated across the dataset, as a value for reporting |
 
 ### Text
 
@@ -469,7 +464,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`floor(x)`](functions.md#floor) | value | The largest integer not greater than `x` |
 | [`is_integer(x)`](functions.md#is_integer) | boolean | True when the value is a finite whole number. A negated spelling `is_not_integer(x)` exists; prefer `not is_integer(x)`. |
 | [`is_numeric(x)`](functions.md#is_numeric) | boolean | True when the value is a decimal number; there is no `is_not_numeric` — write `not is_numeric(x)` |
-| [`minus($a, $b)`](functions.md#minus) | value | The set difference of two lists — the members of `$a` not in `$b` |
+| [`minus(value, subtract=)`](functions.md#minus) | value | The set difference of two dataset-level lists — the members of `value` not in `subtract`; a tuple member compares structurally |
 | [`round(x)`](functions.md#round) | value | The value rounded to the nearest integer, a half rounded up toward +∞ (`round(-2.5)` is `-2`) |
 
 ### Dates and times
@@ -477,12 +472,12 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`date_contains(outer, inner)`](functions.md#date_contains) | boolean | True when every instant `inner` could denote lies inside `outer`'s range |
-| [`date_diff_days(name, reference, …)`](functions.md#date_diff_days) | value | Days between a record's date and a reference date, with an optional `offset` |
+| [`date_diff_days(name, reference)`](functions.md#date_diff_days) | value | The days from a reference date to a record's date (no `+1`); a grouped reference is a named `min_date(…)` / `max_date(…)`, an offset is `+ n` |
 | [`date_overlaps(a, b)`](functions.md#date_overlaps) | boolean | True when the two date ranges share at least one possible instant |
 | [`day(x)`](functions.md#day) | value | The day component of an ISO value, or missing |
 | [`dy(name, reference)`](functions.md#dy) | value | The SDTM study day of a record's date relative to a reference date read through the declared join; no day 0 |
 | [`earliest_possible(x)`](functions.md#earliest_possible) | value | The earliest instant an incomplete value could denote |
-| [`interval_uncertainty_precision_mismatch(name, delimiter=)`](functions.md#interval_uncertainty_precision_mismatch) | value | True when the two halves of an ISO `a/b` interval are stated at different precisions |
+| [`interval_uncertainty_precision_mismatch(name, delimiter=)`](functions.md#interval_uncertainty_precision_mismatch) | boolean | True when the two halves of an ISO `a/b` interval of uncertainty are stated at different precisions |
 | [`is_complete_date(x)`](functions.md#is_complete_date) | boolean | True when every date component is present |
 | [`is_complete_date_part(x)`](functions.md#is_complete_date_part) | boolean | True when the leading `YYYY-MM-DD` portion is complete, ignoring any time. A negated spelling `is_not_complete_date_part(x)` exists; prefer `not is_complete_date_part(x)`. |
 | [`is_partial_date(x)`](functions.md#is_partial_date) | boolean | True when the value is calendar-valid but has missing components. Also spelled `is_incomplete_date`. |
@@ -498,7 +493,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 | function | returns | what it does |
 |---|---|---|
-| [`distinct(name, …)`](functions.md#distinct) | value | The set of distinct values of a column; with a list target, the set of row tuples |
+| [`distinct(name, domain=, filter=, group=, keep_missings=)`](functions.md#distinct) | value (a list) | The distinct values of a column, or the distinct row tuples of a list of columns — one list for the dataset, or each row's group's list with `group=` |
 | [`empty_within_except_last_row(name, group, ordering=, keep_missings=)`](functions.md#empty_within_except_last_row) | boolean | True when a row other than the ordered-last one is unpopulated |
 | [`has_mixed_emptiness_within_group(name, group=, qualifying_any_populated=, keep_missings=)`](functions.md#has_mixed_emptiness_within_group) | boolean | Per row: the group mixes populated and unpopulated values of the subject column; column references, key identity, KEEP-missing default |
 | [`is_last_in_group(ordering=, group=, keep_missings=)`](functions.md#is_last_in_group) | boolean | Per row: the row's ordering value is identical to its group's maximum (every tied row is last); no target, column references, DROP-missing default |
@@ -507,9 +502,9 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`min_date(name, …)`](functions.md#min_date) | value | The earliest date in a column; a value that cannot be positioned yields no value |
 | [`present_on_multiple_rows_within(name, within=)`](functions.md#present_on_multiple_rows_within) | boolean | True for every member of a group that has two or more rows |
 | [`record_count(…)`](functions.md#record_count) | value | The number of rows; with `group=`, the count for each row's group |
-| [`row_max(name=/names=, …)`](functions.md#row_max) | value | The largest of the named columns, per row |
+| [`row_max(name_pattern=)`](functions.md#row_max) | value | The largest populated value, per row, among the columns whose names match a regex; values rank by their own type |
 | [`tuple(c1, c2, …)`](functions.md#tuple) | value | Builds a composite key from two to six columns, for whole-tuple membership |
-| [`variable_count(name_pattern=…)`](functions.md#variable_count) | value | The number of columns whose name matches `name_pattern=` |
+| [`variable_count(name \| name_pattern=)`](functions.md#variable_count) | value | A count of variables: the current dataset's columns matching `name_pattern=`, or the study's datasets carrying the `"--"` template `name` |
 
 ### Uniqueness and consistency
 
@@ -530,43 +525,44 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`contains_all(source, keys=[…])`](functions.md#contains_all) | boolean | True when the source's distinct values include every value in `keys=`. A negated spelling `not_contains_all(source, keys=[…])` exists; prefer `not contains_all(source, keys=[…])`. |
 | [`has_next_corresponding_record(name, value, within=, ordering=, keep_missings=, relation=)`](functions.md#has_next_corresponding_record) | boolean | True when a following record in the group matches under `relation=`; authored under `not` |
 | [`is_ordered_subset_of(name, $b)`](functions.md#is_ordered_subset_of) | boolean | True when the column's values appear in `$b` in the same order. A negated spelling `is_not_ordered_subset_of(name, $b)` exists; prefer `not is_ordered_subset_of(name, $b)`. |
-| [`is_sorted_by(target, by=[asc("col")[, nulls=]], within=)`](functions.md#is_sorted_by) | boolean | True when the target is sorted by `by=`; authored under `not`, it fires the whole unsorted group |
+| [`is_sorted_by(target, by=[asc(col)[, nulls=]], within=)`](functions.md#is_sorted_by) | boolean | True when the target is sorted by `by=`; authored under `not`, it fires the whole unsorted group |
 | [`shares_elements_with($a, $b)`](functions.md#shares_elements_with) | boolean | True when the two lists have at least one member in common. A negated spelling `shares_no_elements_with($a, $b)` exists; prefer `not shares_elements_with($a, $b)`. |
 
 ### Dataset and domain metadata
 
 | function | returns | what it does |
 |---|---|---|
-| [`dataset_class_from_library(…)`](functions.md#dataset_class_from_library) | value | The current table's library observation class |
-| [`dataset_names()`](functions.md#dataset_names) | value | The names of every dataset in the study, as a list |
-| [`domain_is_custom(…)`](functions.md#domain_is_custom) | value | Library classification gate; boolean |
+| [`dataset_class_from_library()`](functions.md#dataset_class_from_library) | value | The CDISC Library's class name of the current dataset's domain |
+| [`dataset_names()`](functions.md#dataset_names) | value | The names of every dataset in the study, upper-cased, as a list (split members as themselves) |
+| [`domain_is_custom()`](functions.md#domain_is_custom) | value (boolean) | Whether the CDISC Library declares the current dataset's domain custom |
 | [`ds_class([x,] level)`](functions.md#ds_class) | value | The dataset's observation class; available at every level |
 | [`ds_domain("DATA")`](functions.md#ds_domain) | value | The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only |
 | [`ds_label([x,] level)`](functions.md#ds_label) | value | The dataset's label; available at every level |
 | [`ds_name([x,] level)`](functions.md#ds_name) | value | The dataset's name; available at every level |
 | [`ds_structure([x,] level)`](functions.md#ds_structure) | value | The dataset's ADaM data structure; `DEFINE` and `LIBRARY` only |
-| [`extract_metadata(name)`](functions.md#extract_metadata) | value | Scalar dataset-metadata attribute of the current table |
-| [`referenced_domain_class(name)`](functions.md#referenced_domain_class) | value | Classifies the domain **named in a column value** |
-| [`split_sibling_length_mismatch()`](functions.md#split_sibling_length_mismatch) | value | Split-family declared-length disagreement (library-independent) |
-| [`standard_domains()`](functions.md#standard_domains) | value | The domain codes the standard publishes, as a list |
-| [`study_domains()`](functions.md#study_domains) | value | The domain codes present in the study, as a list |
+| [`extract_metadata(name)`](functions.md#extract_metadata) | value | One dataset-metadata value of the current dataset, by its key |
+| [`referenced_dataset_variables(name)`](functions.md#referenced_dataset_variables) | value (a list) | The variable names of the dataset **named in a column value**, per row (the former `distinct(IDVAR, value_is_reference=true)`) |
+| [`referenced_domain_class(name)`](functions.md#referenced_domain_class) | value | The CDISC Library class of the domain **named in a column value**, per row |
+| [`split_sibling_length_mismatch()`](functions.md#split_sibling_length_mismatch) | value | The variables whose declared length differs across the dataset's split-family members, as a list (library-independent) |
+| [`standard_domains()`](functions.md#standard_domains) | value | The domain codes the standard publishes, as a list; SKIPPED when the Library publishes none |
+| [`study_domains()`](functions.md#study_domains) | value | The distinct `DOMAIN` codes present in the study, as a list (a split domain once; the no-domain datasets contribute `""`) |
 
 ### Variable metadata
 
 | function | returns | what it does |
 |---|---|---|
-| [`column_series_metadata(name_pattern=, …)`](functions.md#column_series_metadata) | value | Enumerated-series completeness / continuation verdict |
-| [`cross_dataset_variable_metadata(…)`](functions.md#cross_dataset_variable_metadata) | value | Per-variable metadata from another dataset (`VariableMetadataResult`) |
-| [`duplicate_label_variables()`](functions.md#duplicate_label_variables) | value | Variables sharing a declared label |
-| [`expected_variables(…)`](functions.md#expected_variables) | value | The variables the CDISC Library marks Expected for this dataset, as a list |
-| [`get_column_order_from_dataset(…)`](functions.md#get_column_order_from_dataset) | value | The dataset's own column order, as a list of names |
-| [`get_column_order_from_library(…)`](functions.md#get_column_order_from_library) | value | The column order the CDISC Library publishes for this dataset, as a list |
-| [`get_dataset_filtered_variables(key_name=, key_value=)`](functions.md#get_dataset_filtered_variables) | value | Library variables of the current dataset filtered by metadata, intersected with present columns |
-| [`get_model_column_order(…)`](functions.md#get_model_column_order) | value | The column order of the standard's model, as a list |
-| [`get_model_filtered_variables(key_name=, key_value=, model_class=)`](functions.md#get_model_filtered_variables) | value | Model variables filtered by metadata. `model_class=` (, coreJ-only) walks the **named** general-observation class's model table |
-| [`get_parent_model_column_order(…)`](functions.md#get_parent_model_column_order) | value | The column order of the parent model, as a list |
-| [`natural_key_variables()`](functions.md#natural_key_variables) | value | Natural-key-forming role variables present in the dataset |
-| [`required_variables(…)`](functions.md#required_variables) | value | The variables the CDISC Library marks Required for this dataset, as a list |
+| [`column_series_metadata([name,] name_pattern=, min_length=)`](functions.md#column_series_metadata) | value (boolean) | Whether a numbered column series (`COVAL1..n`) is incomplete |
+| [`cross_dataset_variable_metadata(name, domain=)`](functions.md#cross_dataset_variable_metadata) | value (per variable) | Per variable, one metadata attribute of the same-named variable in another dataset (or `"*"`) |
+| [`duplicate_label_variables()`](functions.md#duplicate_label_variables) | value | The dataset's variables whose declared label another of its columns shares, as a list |
+| [`expected_variables()`](functions.md#expected_variables) | value | The variables the CDISC Library marks Expected for this dataset, as a list |
+| [`get_column_order_from_dataset()`](functions.md#get_column_order_from_dataset) | value | The dataset's own column order, as a list of names |
+| [`get_column_order_from_library()`](functions.md#get_column_order_from_library) | value | The column order the CDISC Library publishes for this dataset, as a list; SKIPPED when it has none |
+| [`get_dataset_filtered_variables(key_name=, key_value=)`](functions.md#get_dataset_filtered_variables) | value | Library variables of the current dataset filtered by metadata (static string literals), intersected with present columns |
+| [`get_model_column_order()`](functions.md#get_model_column_order) | value | The column order of the standard's model for the dataset's class, as a list; SKIPPED when it has none |
+| [`get_model_filtered_variables(key_name=, key_value=, model_class=)`](functions.md#get_model_filtered_variables) | value | Model variables filtered by metadata (static string literals), not intersected; `model_class=` walks the **named** general-observation class's model table — SKIPPED when that class has no variables |
+| [`get_parent_model_column_order(name)`](functions.md#get_parent_model_column_order) | value | Per row, the model column order of the parent domain the column names (`RDOMAIN`); a split parent is the union of its members |
+| [`natural_key_variables()`](functions.md#natural_key_variables) | value | The natural-key-forming role variables present in the dataset, as a list |
+| [`required_variables()`](functions.md#required_variables) | value | The variables the CDISC Library marks Required for this dataset, as a list |
 | [`var_ccode(x, "DEFINE")`](functions.md#var_ccode) | value | The NCI C-code of the bound codelist; `DEFINE` and `LIBRARY` only |
 | [`var_codelist([x,] level)`](functions.md#var_codelist) | value | The name of the codelist bound to the variable; `DEFINE` and `LIBRARY` only |
 | [`var_codelist_coded_codes(x, level)`](functions.md#var_codelist_coded_codes) | value | The codes of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only |
@@ -588,16 +584,16 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`var_origin_type(x, "DEFINE")`](functions.md#var_origin_type) | value | The variable's Define-XML origin type — Collected, Derived and so on; `DEFINE` only |
 | [`var_role([x,] level)`](functions.md#var_role) | value | The variable's role — identifier, topic, qualifier and so on; `DEFINE` and `LIBRARY` only |
 | [`var_type([x,] level)`](functions.md#var_type) | value | The variable's data type; available at every level |
-| [`variable_names()`](functions.md#variable_names) | value | The current dataset's variable-name list |
+| [`variable_names()`](functions.md#variable_names) | value | Every variable name the standard publishes, as a list; SKIPPED when the Library publishes none |
 
 ### Define-XML and value-level metadata
 
 | function | returns | what it does |
 |---|---|---|
-| [`define_dataset_names()`](functions.md#define_dataset_names) | value | Define-XML dataset names; requires DEFINE |
-| [`define_key_variables()`](functions.md#define_key_variables) | value | Define-XML key variables for the domain |
+| [`define_dataset_names()`](functions.md#define_dataset_names) | value | The dataset names the Define-XML declares, upper-cased, as a list; needs the Define-XML |
+| [`define_key_variables()`](functions.md#define_key_variables) | value | The Define-XML key variables of the domain, as a list; SKIPPED when it declares none |
 | `define_variable_decode_matches` | value | Operand form of the decode matcher |
-| [`define_variable_names()`](functions.md#define_variable_names) | value | Define-XML ItemDef names for the domain |
+| [`define_variable_names()`](functions.md#define_variable_names) | value | The Define-XML ItemDef names of the domain, as a list; needs the Define-XML |
 | `library_variable_code_pair_matches` | value | Operand form of the CT pair predicate |
 | [`vlm_codelist_coded_codes(X)`](functions.md#vlm_codelist_coded_codes) | value | The codes of the codelist bound by the value-level match, as a list |
 | [`vlm_codelist_coded_values(X)`](functions.md#vlm_codelist_coded_values) | value | The submission values of the codelist bound by the value-level match, as a list |
@@ -614,23 +610,22 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 | function | returns | what it does |
 |---|---|---|
-| [`codelist_terms(…)`](functions.md#codelist_terms) | value | CT terms of the bound codelist (library CT) |
+| [`codelist_terms(codelists=, level=, returntype=)`](functions.md#codelist_terms) | value | The terms of the named CT codelists in the selected representation, as a list; SKIPPED when they resolve none |
 | [`dictionary_available(type)`](functions.md#dictionary_available) | boolean | The external-dictionary availability gate the loader injects for an inline dictionary call (the operation form was deleted by wave 1) |
-| [`dictionary_has_decode(…)`](functions.md#dictionary_has_decode) | value | Any-decode presence (also a per-record function, ); code lookup case-sensitive by default, `case_sensitive=false` folds it |
+| [`dictionary_has_decode(name, external_dictionary_type=)`](functions.md#dictionary_has_decode) | boolean | Any-decode presence per record; code lookup case-sensitive by default, `case_sensitive=false` folds it |
 | [`get_codelist_attributes(name, version, ct_attribute=)`](functions.md#get_codelist_attributes) | value | One CT-package attribute (e.g. `"Term CCODE"`) over every package the rows name — a list for the dataset; SKIPPED without a usable Library answer |
-| [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a library-dependent operation; a not-met Precondition ⇒ SKIPPED |
-| [`valid_codelist_dates(…)`](functions.md#valid_codelist_dates) | value | Published CT-package dates for the standard |
-| [`valid_external_dictionary_code(name, external_dictionary_type=)`](functions.md#valid_external_dictionary_code) | value | Dictionary code validity; same evaluator and `case_sensitive` semantics as `_value` |
+| [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a call that needs the CDISC Library; a not-met Precondition ⇒ SKIPPED |
+| [`valid_codelist_dates(ct_package_types=)`](functions.md#valid_codelist_dates) | value | The published CT-package dates of the applicable package families, as a list |
+| [`valid_external_dictionary_code(name, external_dictionary_type=, dictionary_term_type=)`](functions.md#valid_external_dictionary_code) | boolean | Dictionary code validity per record; one function with `_value` under two names |
 | [`valid_external_dictionary_code_term_pair(name, external_dictionary_term_variable, external_dictionary_type=, case_sensitive=)`](functions.md#valid_external_dictionary_code_term_pair) | boolean | Code↔decode pairing against an external dictionary, both columns as references; case-sensitive by default, `case_sensitive=false` folds both |
 | [`valid_external_dictionary_hierarchy(name, dictionary_parent, external_dictionary_type=, case_sensitive=)`](functions.md#valid_external_dictionary_hierarchy) | boolean | Hierarchy ancestor test against an external dictionary, both columns as references; case-sensitive by default, `case_sensitive=false` folds both |
-| [`valid_external_dictionary_value(name, external_dictionary_type=)`](functions.md#valid_external_dictionary_value) | value | Dictionary term validity; gated by `dictionary_available`; case-SENSITIVE by default — `case_sensitive=false` opts into folded membership |
+| [`valid_external_dictionary_value(name, external_dictionary_type=, dictionary_term_type=)`](functions.md#valid_external_dictionary_value) | boolean | Dictionary term validity per record; the rule SKIPs when the dictionary is not loaded; preferred case by default, `case_sensitive=false` accepts any case |
 
 ### Supplemental qualifiers and trial summary
 
 | function | returns | what it does |
 |---|---|---|
-| [`supp_qnam_present(name)`](functions.md#supp_qnam_present) | value | Per-record: a matching SUPP QNAM row exists |
-| [`ts_parameter_value(key_value=, …)`](functions.md#ts_parameter_value) | value | TS/TX parameter scalar lookup (first matching row's value) |
+| [`read_value(name, domain=, filter=, mode=)`](functions.md#read_value) | value | One value of another dataset: the `name` column of `domain`, from the rows `filter` selects, by `mode` (`FIRST` · `ONLY` · `MIN` · `MAX`); no match ⇒ the column's type default |
 
 ### Values and references
 

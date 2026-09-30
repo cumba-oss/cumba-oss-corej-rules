@@ -14,10 +14,10 @@ Scope:
     - "TS"
 Bindings:
 - name: "$interventional_count"
-  expression: "record_count(filter=filter(TSPARMCD=\"STYPE\", TSVAL=\"INTERVENTIONAL\"\
+  expression: "record_count(filter=(TSPARMCD == \"STYPE\" and TSVAL == \"INTERVENTIONAL\"\
     ))"
 - name: "$trt_count"
-  expression: "record_count(filter=filter(TSPARMCD=\"TRT\"))"
+  expression: "record_count(filter=(TSPARMCD == \"TRT\"))"
 Check:
   expression: >-
     $interventional_count > 0 and $trt_count == 0

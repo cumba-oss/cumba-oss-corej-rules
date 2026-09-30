@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-SD0095-A expect=skipped domain=SUPPXX
-#note "CORPUS-WIDE PIN of the REFERENCED_DOMAIN_CLASS absent-column skip: evalReferencedDomainClass returns LIBRARY_NOT_AVAILABLE when the RDOMAIN column is absent -> the rule is reported SKIPPED, a different verdict channel than the machine var_exists guard's execute-and-silent (the op-level skip wins because the operation is probed eagerly)."
+#note "CORPUS-WIDE PIN of the absent-RDOMAIN skip: the rule declares Requirements.Variables.All [RDOMAIN], so a SUPP dataset without the column is reported SKIPPED before any binding is read. (Until wave 3, PLAN-per-row-functions, the referenced_domain_class OPERATION also answered LIBRARY_NOT_AVAILABLE on an absent column; the registry function would read the absent column as a constant, which is why the requirement - present on all four SD0095 rules - is the pin's reason now.)"
 #library standard=sdtmig version=3-4
 dataset SUPPXX class=RELATIONSHIP label="Supplemental Qualifiers for XX"
 col STUDYID type=Char label="Study Identifier"

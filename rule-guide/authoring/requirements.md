@@ -405,6 +405,37 @@ sponsor does not receive the same finding twice from two authorities.
 
 Set it when your rule restates something the Library defines. Leave it absent otherwise.
 
+## `Supp_Merge`
+
+```yaml
+Supp_Merge: false
+```
+
+Every rule reads its dataset's **supplemental qualifiers as values of the parent record**: a bare
+name the domain does not carry resolves to the `SUPP<domain>` row that qualifies the record — the
+same subject (`USUBJID`) **and pool** (`POOLID`, each blank when absent), plus `IDVAR` = `IDVARVAL`.
+A blank `IDVAR` qualifies every record of the subject, or of the pool when `USUBJID` is blank and
+`POOLID` populated; a row naming neither a subject nor a pool qualifies nothing. SENDIG makes
+`USUBJID` and `POOLID` exclusive, so pooled records (blank `USUBJID`) never read another pool's
+qualifiers, and a domain without pools reads exactly as it would keyed on `USUBJID` alone. The
+merge serves the dataset the rule evaluates, never a dataset it reads through `domain=`: in
+`read_value(DSTERM, domain=DS, filter=…)` a `SUPPDS` qualifier is not a column of `DS`. On `PC`
+the check reads `PCCALCN` per record, `empty(PCCALCN)` is true for a record no `SUPPPC` row qualifies
+(or whose `QVAL` is blank), `var_exists("PCCALCN")` is true as soon as any `SUPPPC` row carries the
+name, the finding reports the qualifier's value, and a requirement naming the qualifier — bare, or
+qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset delivers it. That is the default,
+and it needs no key.
+
+A qualifier is **not a variable of the domain**: the variable-inventory checks (column order,
+variable count, lengths, the per-variable rules) see exactly the columns the domain file carries.
+Supplementals are the place for non-standard variables (owner, 2026-09-29), and a rule about the
+domain's variables must not report them.
+
+Write `Supp_Merge: false` only when the rule must see the raw dataset — a rule *about* the
+supplemental mechanism itself. It turns off both halves at once: the qualifier reads and the
+existence pivot, so the rule then reads and reports exactly what the domain file carries. The
+domain's own column always wins over a same-named qualifier; a `SUPP--` primary is never merged.
+
 ## Not yours to write
 
 ```

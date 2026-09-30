@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0562 expect=noViolation domain=VS
+#note "The $TIMING_VARIABLES splice with TWO elements (VSDTC and VISITNUM are both Timing): two SYSBP records on the same date but at VISITNUM 1 and 2, VSREPNUM empty on both. Spliced into group=[USUBJID, VSTESTCD, VSDTC, VISITNUM] they form two one-record groups -> nothing fires. A splice that dropped the second element (or the whole list) would put both records in one group and fire on the empty VSREPNUM. W6 phase 0, scenarios-first (green before and after: the splice keeps today's expandGroupRefs semantics)."
+#library standard=sdtmig version=3-4
+#library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing VISITNUM:Timing VSREPNUM:Qualifier DOMAIN:Identifier
+dataset VS label="Vital Signs"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VSSEQ type=Num label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSDTC type=Char label="Date/Time of Measurements"
+col VISITNUM type=Num label="Visit Number"
+col VSREPNUM type=Char label="Repetition Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 2014-01-01 | 1 |
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 2014-01-01 | 2 |
+---

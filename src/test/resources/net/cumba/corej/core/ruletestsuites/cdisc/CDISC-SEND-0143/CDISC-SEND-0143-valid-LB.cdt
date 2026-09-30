@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0143 expect=noViolation domain=LB
+#note "LBSTAT is NOT DONE or blank -> no violation. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig version=3-1-1
+#library dataset-class LB FINDINGS
+#library codelist-terms ND "NOT DONE"
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | 001 | 1 | GLUC | NOT DONE
+S1 | LB | 001 | 2 | GLUC |

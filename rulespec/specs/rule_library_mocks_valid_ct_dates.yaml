@@ -1,7 +1,9 @@
 name: rule_library_mocks_valid_ct_dates
 kind: rule
 description: |
-  M3 pilot: full rule that depends on library metadata via `valid_codelist_dates`.
+  M3 pilot: full rule that depends on library metadata via `valid_codelist_dates` (a registry
+  function since wave 4 of the operation→function programme, PLAN-list-functions; its
+  `ct_package_types=` is a list of string literals).
   Synthetic rule fires when TS.TSVCDVER is not one of the published SDTM CT package dates.
   Demonstrates the library_mocks adapter wiring on both engines.
 rule:
@@ -14,7 +16,7 @@ rule:
     Domains: {Include: [TS]}
   Bindings:
   - name: "$valid_dates"
-    expression: 'valid_codelist_dates(ct_package_types=[SDTM])'
+    expression: 'valid_codelist_dates(ct_package_types=["SDTM"])'
   Check:
     expression: 'TSVCDVER not in $valid_dates'
   Outcome:

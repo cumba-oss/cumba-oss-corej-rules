@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0281 expect=noViolation domain=TS
+#note "Two TRT records and no RANDQT: the rule asks for RANDQT only for a SINGLE investigational treatment ($trt_count == 1), so a count of 2 never fires. Pins the equality, not a >= 1. W6 phase 0, scenarios-first."
+#library standard=sdtmig version=3-3
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | TRT | Investigational Therapy or Treatment | DRUG A
+CDISCPILOT01 | TS | 2 | TRT | Investigational Therapy or Treatment | DRUG B

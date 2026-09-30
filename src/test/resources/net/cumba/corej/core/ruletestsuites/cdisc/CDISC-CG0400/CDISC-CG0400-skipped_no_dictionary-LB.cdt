@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0400 expect=skipped domain=LB
+#note "PLAN-per-row-functions phase 0: the no-dictionary SKIP pin of CDISC-CG0400 (loinc, K4-DICT). Violating-shaped data (LBLOINC=9999-9) but #dictionaries is DELIBERATELY ABSENT, so the rule MUST report SKIPPED, never a false PASS. Red under the W3 S3a/S3b sabotage by design."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBLOINC  type=Char
+---
+S01 | LB | 001 | 1 | GLUCF | 1558-6
+S01 | LB | 001 | 2 | GLUC  | 9999-9
+S01 | LB | 002 | 1 | ALB   |

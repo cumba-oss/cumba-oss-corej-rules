@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0351 expect=skipped domain=VS
+#note "NO #library line at all: get_model_column_order needs the CDISC Library, so the rule SKIPs rather than flagging every variable against an empty list (the FDA-SD0058 fan-out). The body is the invalid one. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSXTRA   type=Char label="Sponsor Defined"
+---
+S1 | VS | 001 | 1 | SYSBP | 120 | X

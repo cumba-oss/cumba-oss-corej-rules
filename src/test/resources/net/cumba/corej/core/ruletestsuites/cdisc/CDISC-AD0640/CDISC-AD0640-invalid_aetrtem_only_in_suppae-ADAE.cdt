@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-AD0640 expect=violation domain=ADAE
+# Rule:Description: Raise an error when SDTM SUPPAE contains a record with QNAM=AETRTEM for a subject but AETRTEM is not a column of the corresponding ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+#note "Written FIRST in runbook W2a (PLAN-operation-replacements phase 0), on the pre-change engine: the pivot this rule exists for (Fix #39) had no scenario. AETRTEM is NOT a literal AE column; it is delivered ONLY as a SUPPAE QNAM. The qualified requirement AE.AETRTEM is met through the SUPP pivot (OperatorRegistry.existsAsDottedDatasetColumn), ADAE lacks the column -> violation. Under Supp_Merge: true (the default) the pivot answers exactly as before; this scenario is the pin that the default moves nothing here."
+#expectViolationCount 1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+---

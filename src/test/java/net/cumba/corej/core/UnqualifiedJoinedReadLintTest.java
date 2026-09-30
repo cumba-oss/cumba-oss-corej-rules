@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import net.cumba.corej.core.exec.DatasetIdentity;
 import net.cumba.corej.core.exec.MetadataProvider;
-import net.cumba.corej.core.exec.OperationExecutor;
 import net.cumba.corej.core.exec.ScopeMatcher;
 import net.cumba.corej.core.exec.ScopeVariableEntry;
 import net.cumba.corej.core.expr.OperandKind;
@@ -735,7 +735,7 @@ class UnqualifiedJoinedReadLintTest
         assertFlags(rule("T-DASH", "[\"AE\"]", KEYED_DM, "[\"USUBJID\", \"--STDTC\"]", null, null,
                 DM_KEY, READ_RFSTDTC, null), "T-DASH\tRFSTDTC\tDM");
         // ... and where the expansion IS the read, it declares it: on a SUPP-- dataset the
-        // variable prefix is "" (OperationExecutor.variableWildcardPrefix), so `--RFSTDTC` is
+        // variable prefix is "" (DatasetIdentity.variableWildcardPrefix), so `--RFSTDTC` is
         // RFSTDTC
         String suppKeys = "[\"QNAM\", \"USUBJID\", \"--RFSTDTC\"]";
         Census dash = census(rule("T-DASH-SUPP", "[\"SUPPAE\"]", KEYED_DM, suppKeys, null, null,
@@ -1117,7 +1117,7 @@ class UnqualifiedJoinedReadLintTest
             {
                 for (LibraryDataset d : aScope)
                 {
-                    String prefix = OperationExecutor.variableWildcardPrefix(null, d.name());
+                    String prefix = DatasetIdentity.variableWildcardPrefix(null, d.name());
                     if ((prefix + variable.substring(2)).equals(aVariable))
                     {
                         return true;

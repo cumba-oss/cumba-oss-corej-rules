@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -915,8 +916,14 @@ class NativeCorpusFullCoverageTest
         {
             SyntheticDataTable table = SyntheticDataTable.withNumeric("DM", List.copyOf(columns),
                     numeric, 5);
-            DatasetResolver resolver = foreign.isEmpty() ? _ -> null
-                    : new SyntheticInventory(foreign, numeric);
+            // The study is the primary plus every joined dataset — ALWAYS an inventory: the
+            // functions that enumerate the study (dataset_names(), study_domains(),
+            // split_sibling_length_mismatch()) fail loud on a resolver that cannot (wave 4,
+            // D-W4-5), and a bare `_ -> null` used to make their 55 rules THROW here.
+            Map<String, Set<String>> study = new LinkedHashMap<>();
+            study.put("DM", new LinkedHashSet<>(columns));
+            study.putAll(foreign);
+            DatasetResolver resolver = new SyntheticInventory(study, numeric);
             RuleExecutionResult res = RuleRunnerCalls.execute(aRule, table, resolver, "DM",
                     aProvider, null, aProvider);
             String msg = res.getStatusMessage();
@@ -1011,7 +1018,7 @@ class NativeCorpusFullCoverageTest
      */
     private static Map<String, Set<String>> foreignColumns(Rule aRule)
     {
-        Map<String, Set<String>> out = new java.util.LinkedHashMap<>();
+        Map<String, Set<String>> out = new LinkedHashMap<>();
         if (aRule.getMatchDatasets() != null)
         {
             for (MatchDataset md : aRule.getMatchDatasets())

@@ -101,6 +101,10 @@
             { "type": "null" }
           ]
         },
+        "Supp_Merge": {
+          "type": ["boolean", "null"],
+          "description": "The declared SUPP merge (owner P-Q1, 2026-09-28; PLAN-operation-replacements): true (the default when absent) lets a bare name the parent dataset does not carry read its SUPP<domain> qualifier per record (by value and by existence; never a variable of the parent for the variable-inventory checks) and keeps the dotted existence pivot; false evaluates the raw dataset and answers both pivots false."
+        },
         "ExecutabilityHint": {
           "type": ["object", "null"],
           "description": "The actionable 'how' beside Executability, never in place of it. Closed to the two keys the engine binds (PLAN-rule-unknown-keys-gate); every carrier is an object, so the string form this schema used to admit is gone.",
@@ -130,7 +134,7 @@
           "$ref": "#/$defs/check",
           "readOnly": true,
           "$comment": "Deliberately the PLAIN check, never checkOrLevels: a Precondition is a property of the rule, not of a level. It is evaluated ONCE, before any level runs.",
-          "description": "ENGINE-INTERNAL, not an authorable field (owner ruling Q3, loader gate R8). It carries machine-emitted dependency-availability gates - library_available() / dictionary_available(<type>) / available(<call>) - which RulePackageLoader injects at load and OperationInliner bakes into the shipped packages offline. It is declared here because this schema validates the assembled rules/ view, where such a term is legitimate; deleting the definition would red every dictionary-gated package. An AUTHORED Precondition in rules-src/checks fails to load - see rule-check.schema.json, which does not declare the field."
+          "description": "ENGINE-INTERNAL, not an authorable field (owner ruling Q3, loader gate R8). It carries machine-emitted dependency-availability gates - library_available() / dictionary_available(<type>) / available(<call>) - which RulePackageLoader injects at load (the offline converter that once baked them into the shipped packages is gone). It is declared here because this schema validates the assembled rules/ view, where such a term is legitimate; deleting the definition would red every dictionary-gated package. An AUTHORED Precondition in rules-src/checks fails to load - see rule-check.schema.json, which does not declare the field."
         },
         "Outcome": {
           "type": "object",
@@ -145,7 +149,7 @@
           }
         },
         "Bindings": {
-          "description": "Phase 7b (owner rulings 2026-09-17): the operation bindings, each entry exactly name + expression. The retired Operations:/id:/field-form spellings are load errors; see rule-check.schema.json for the authored-source twin of this definition.",
+          "description": "Phase 7b (owner rulings 2026-09-17): the bindings, each entry exactly name + expression. The retired Operations:/id:/field-form spellings are load errors; see rule-check.schema.json for the authored-source twin of this definition.",
           "type": ["array", "null"],
           "items": { "$ref": "#/$defs/binding" }
         },
@@ -277,7 +281,7 @@
       "additionalProperties": false,
       "properties": {
         "name": { "type": ["string", "null"], "description": "The $-variable the binding defines." },
-        "expression": { "type": "string", "description": "A single operation function call." }
+        "expression": { "type": "string", "description": "Any expression of the expression language, compiled like the Check (a compiled binding)." }
       }
     },
     "expansion": {

@@ -11,10 +11,10 @@ Scope:
     - "DM"
 Bindings:
 - name: "$species_null"
-  expression: "variable_is_null(SPECIES)"
+  expression: "var_is_null(SPECIES)"
 - name: "$ts_species"
-  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
-    SPECIES\")"
+  expression: "read_value(TSVAL, domain=TS, filter=(TSPARMCD==\"SPECIES\"), mode=\"\
+    FIRST\")"
 Check:
   expression: >-
     $species_null == true and empty($ts_species)

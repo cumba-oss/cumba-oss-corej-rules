@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0002 expect=violation domain=ADAE
+#note "The self-exclusion of the domain=\"*\" scan is keyed by the primary's DATASET NAME (ADAE), not by its domain code: this ADAE carries a DOMAIN column holding AE, so its domain code is AE. Excluding by the domain code would skip the SDTM AE and match AESEQ against ADAE's own label (no finding); excluding by name compares it against AE's label -> one violation. W4b (PLAN-scalar-metadata-functions phase 0, scenarios-first on the pre-port engine)."
+#expectViolationCount 1
+#expectViolationAt variable_label="Sequence Number MODIFIED" variable_name=AESEQ
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number MODIFIED"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+---

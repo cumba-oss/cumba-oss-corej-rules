@@ -6,7 +6,10 @@ description: |
   Operations compute the USUBJID sets of AEOUT=FATAL / AESDTH=Y records
   ($ae_fatal_usubjid / $ae_sdth_usubjid). Fires when DM.DTHFL=Y but the subject
   is in neither set. Java-canonically the grouping variable is not decorated
-  into output_variables (python-lane baseline entry).
+  into output_variables (python-lane baseline entry). Re-captured for runbook W7
+  (PLAN-distinct-function): the AEOUT / AESDTH filter keys the distinct OPERATION
+  derived into the reported set leave it — the function derives its target only
+  (W0 R16), and the rule does not author them; same row, value and status.
 python_source: rules-sdtmig-3-4.json (CORE-001078)
 rule:
   coreId: FDA-SD9749
@@ -34,7 +37,5 @@ expected_violations:
     output_variables:
       $ae_fatal_usubjid: '[]'
       $ae_sdth_usubjid: '[]'
-      AEOUT: 'RECOVERED'
-      AESDTH: 'N'
       DM.DTHFL: Y
 expected_errors: []

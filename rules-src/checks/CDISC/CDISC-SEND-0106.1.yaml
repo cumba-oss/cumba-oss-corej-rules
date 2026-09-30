@@ -15,11 +15,11 @@ Grouping:
   - "STUDYID"
 Bindings:
 - name: "$ts_strain"
-  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
-    STRAIN\")"
+  expression: "read_value(TSVAL, domain=TS, filter=(TSPARMCD==\"STRAIN\"), mode=\"\
+    FIRST\")"
 - name: "$tx_strain"
-  expression: "ts_parameter_value(TXVAL, domain=\"TX\", key_name=\"TXPARMCD\", key_value=\"\
-    STRAIN\")"
+  expression: "read_value(TXVAL, domain=TX, filter=(TXPARMCD==\"STRAIN\"), mode=\"\
+    FIRST\")"
 Check:
   expression: >-
     empty(STRAIN) and empty($ts_strain) and empty($tx_strain)

@@ -1,0 +1,34 @@
+#!RuleTest
+#test FDA-SE2234 expect=violation domain=PC
+#note "Combined review of runbook W2-W8, W2 H2 (red-before on the pre-fix engine: 0 findings). A subject-level SUPPPC row (blank IDVAR) with BOTH USUBJID and POOLID blank names neither a subject nor a pool and qualifies nothing. The pivot used to read it as the qualifier of subject '' and so of EVERY pooled record, silencing both BLQ records."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 POOLID=P1
+#expectViolationAt row=2 POOLID=P2
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC |  | P1 | 1 | DRUGX | BLQ |
+S1 | PC |  | P2 | 1 | DRUGX | BLQ |
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col POOLID   type=Char label="Pool Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | PC |  |  |  |  | PCCALCN | Numeric Interpretation for Calculations | 0.05
+---

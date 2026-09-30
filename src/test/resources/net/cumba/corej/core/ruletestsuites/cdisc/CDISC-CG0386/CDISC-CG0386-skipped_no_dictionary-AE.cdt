@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0386 expect=skipped domain=AE
+#note "PLAN-per-row-functions phase 0: the no-dictionary SKIP pin of CDISC-CG0386 (K4-DICT). Violating-shaped data (AEBDSYCD=1234567 on row 2) but #dictionaries is DELIBERATELY ABSENT, so the rule MUST report SKIPPED, never a false PASS and never a finding. Red under the W3 S3a/S3b sabotage by design."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS
+col USUBJID type=Char
+col AESEQ   type=Num
+col AEDECOD type=Char
+col AEBDSYCD type=Num
+---
+001 | 1 | Headache | 10029205
+001 | 2 | Nausea   | 1234567
+002 | 1 | Headache | .

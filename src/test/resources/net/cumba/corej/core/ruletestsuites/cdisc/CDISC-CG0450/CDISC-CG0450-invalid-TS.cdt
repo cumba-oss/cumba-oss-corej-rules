@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0450 expect=violation domain=TS
+#note "PLAN-per-row-functions phase 0 (first scenario for CDISC-CG0450): row 2's TSVAL=PARACETAMOL under TSPARMCD=TRT is not a UNII preferred substance name (SRS level) of the (dummy) unii dictionary -> fires. Row 1 is valid (ASPIRIN); row 3 carries the same invalid value under AGEMAX (outside the rule's TSPARMCD condition); row 4's blank TSVAL is a completeness concern of another rule -> no fire. Executing pin written against the pre-port engine."
+#library standard=sdtmig version=3-3
+#dictionaries dummy
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=2 TSPARMCD=TRT TSVAL=PARACETAMOL
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | TRT | ASPIRIN
+S01 | TS | 2 | TRT | PARACETAMOL
+S01 | TS | 3 | AGEMAX | PARACETAMOL
+S01 | TS | 4 | TRT |

@@ -15,7 +15,6 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.ScopeVariableEntry;
 import net.cumba.corej.core.model.MatchDataset;
-import net.cumba.corej.core.model.Operation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.core.model.VariableRequirement;
@@ -299,7 +298,7 @@ class QualifiedScopeVariableLintTest
 
     /**
      * Upper-cased dataset names the rule itself declares — every {@code Match_Datasets.Name} plus
-     * every {@code Operations} {@code domain:}.
+     * every dataset a compiled binding reads.
      */
     private static Set<String> declaredDatasets(Rule rule)
     {
@@ -311,20 +310,6 @@ class QualifiedScopeVariableLintTest
                 if (md != null && md.getName() != null)
                 {
                     names.add(md.getName().toUpperCase(Locale.ROOT));
-                }
-            }
-        }
-        if (rule.getOperations() != null)
-        {
-            for (Operation op : rule.getOperations())
-            {
-                if (op != null && op.getDomain() != null && !op.getDomain().isEmpty())
-                {
-                    names.add(op.getDomain().toUpperCase(Locale.ROOT));
-                }
-                if (op != null && op.getMinuendDomain() != null && !op.getMinuendDomain().isEmpty())
-                {
-                    names.add(op.getMinuendDomain().toUpperCase(Locale.ROOT));
                 }
             }
         }

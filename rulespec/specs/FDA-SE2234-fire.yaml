@@ -28,7 +28,11 @@ expected_violations:
     dataset: PC
     row_key: {PCSEQ: 2, STUDYID: S1, USUBJID: '001'}
     status: SUCCESS
+    # RE-CAPTURED 2026-09-29 for runbook W2a (PLAN-operation-replacements §2.3): supp_qnam_present
+    # is deleted; the Check reads empty(PCCALCN) through the declared SUPP merge. SUPPPC delivers
+    # PCCALCN (a QNAM row exists, for PCSEQ=1), and the unqualified PCSEQ=2 record reads the present
+    # blank, rendered null as every blank cell is. Same row, same status.
     output_variables:
-      $calcn_present: 'false'
+      PCCALCN: null
       PCSTRESC: BQL
 expected_errors: []

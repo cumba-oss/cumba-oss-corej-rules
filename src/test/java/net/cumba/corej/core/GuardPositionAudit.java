@@ -1,15 +1,12 @@
 package net.cumba.corej.core;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.DomainScope;
 import net.cumba.corej.core.model.MatchDataset;
-import net.cumba.corej.core.model.Operation;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Scope;
 import org.jspecify.annotations.Nullable;
@@ -256,22 +253,20 @@ public final class GuardPositionAudit
             return List.of();
         }
         List<CheckExprUnits.Unit> units = CheckExprUnits.units(check);
-        Map<String, Operation> operations = operationsById(rule);
         Set<String> own = ownDomains(rule);
-        Set<String> guardable = requireRead ? guardable(rule, operations, units) : null;
+        Set<String> guardable = requireRead ? guardable(rule, units) : null;
         List<PresenceLeaf> out = new ArrayList<>();
         String ruleId = ruleId(rule);
         for (CheckExprUnits.Unit unit : units)
         {
-            record(rule, unit, ruleId, operations, own, guardable, out);
+            record(rule, unit, ruleId, own, guardable, out);
         }
-        return mitigate(rule, units, operations, own, out);
+        return mitigate(rule, units, own, out);
     }
 
 
-    private static void record(Rule rule, CheckExprUnits.Unit unit, String ruleId,
-            Map<String, Operation> operations, Set<String> own, @Nullable Set<String> guardable,
-            List<PresenceLeaf> out)
+    private static void record(Rule rule, CheckExprUnits.Unit unit, String ruleId, Set<String> own,
+            @Nullable Set<String> guardable, List<PresenceLeaf> out)
     {
         String operator = unit.operator();
         String name = unit.name();
@@ -286,7 +281,7 @@ public final class GuardPositionAudit
         }
         else if (COLUMN_PRESENCE.contains(operator))
         {
-            dataset = datasetOf(name, operations, rule);
+            dataset = datasetOf(name, rule);
         }
         else
         {
@@ -319,9 +314,9 @@ public final class GuardPositionAudit
      * </p>
      */
     private static List<PresenceLeaf> mitigate(Rule rule, List<CheckExprUnits.Unit> units,
-            Map<String, Operation> operations, Set<String> own, List<PresenceLeaf> leaves)
+            Set<String> own, List<PresenceLeaf> leaves)
     {
-        Set<String> dangerous = dangerousDatasets(rule, units, operations, own);
+        Set<String> dangerous = dangerousDatasets(rule, units, own);
         if (dangerous.isEmpty())
         {
             return List.copyOf(leaves);
@@ -361,7 +356,7 @@ public final class GuardPositionAudit
      * there yields an empty set and the membership test fires on every row.
      */
     private static Set<String> dangerousDatasets(Rule rule, List<CheckExprUnits.Unit> units,
-            Map<String, Operation> operations, Set<String> own)
+            Set<String> own)
     {
         Set<String> dangerous = new TreeSet<>();
         for (CheckExprUnits.Unit unit : units)
@@ -376,15 +371,8 @@ public final class GuardPositionAudit
                 {
                     continue;
                 }
-                Operation operation = operations.get(ref);
-                String domain = operation == null ? null : trimToNull(operation.getDomain());
-                if (domain != null && !"*".equals(domain) && !own.contains(domain))
-                {
-                    dangerous.add(domain);
-                }
                 // PLAN-binding-expressions C5: a COMPILED binding reading a dataset through a
-                // nested operation call (its domain=) floods on that dataset's absence the same
-                // way.
+                // nested call (its domain=) floods on that dataset's absence.
                 for (String read : CheckExprUnits.compiledBindingDatasets(rule, ref, false))
                 {
                     if (!"*".equals(read) && !own.contains(read))
@@ -463,8 +451,7 @@ public final class GuardPositionAudit
      * read is what separates the two.
      * </p>
      */
-    private static Set<String> guardable(Rule rule, Map<String, Operation> operations,
-            List<CheckExprUnits.Unit> units)
+    private static Set<String> guardable(Rule rule, List<CheckExprUnits.Unit> units)
     {
         Set<String> read = new TreeSet<>();
         List<MatchDataset> matches = rule.getMatchDatasets();
@@ -479,16 +466,28 @@ public final class GuardPositionAudit
                 }
             }
         }
-        for (Operation operation : operations.values())
-        {
-            String domain = trimToNull(operation.getDomain());
-            if (domain != null)
-            {
-                read.add(domain);
-            }
-        }
+        // A COMPILED binding reads a dataset through its call's domain= (PLAN-binding-expressions
+        // C5 already routes the presence-leaf resolution through compiledBindingDatasets).
+        read.addAll(compiledBindingDomains(rule));
         collectDottedPrefixes(units, read, true);
         return read;
+    }
+
+
+    /**
+     * The datasets every compiled binding of {@code rule} reads through a call's {@code domain=}.
+     */
+    private static Set<String> compiledBindingDomains(Rule rule)
+    {
+        Set<String> out = new TreeSet<>();
+        if (rule.getCompiledBindings() != null)
+        {
+            for (net.cumba.corej.core.model.CompiledBinding binding : rule.getCompiledBindings())
+            {
+                out.addAll(CheckExprUnits.compiledBindingDatasets(rule, binding.name(), false));
+            }
+        }
+        return out;
     }
 
 
@@ -504,15 +503,14 @@ public final class GuardPositionAudit
     public static List<String> operationOnlyDatasets(Rule rule)
     {
         Set<String> own = ownDomains(rule);
-        Map<String, Operation> operations = operationsById(rule);
 
         Set<String> viaOperations = new TreeSet<>();
-        for (Operation operation : operations.values())
+        // The surface reached through a compiled binding's domain= — no column-presence guard is
+        // writable for it, so it stays in bucket (c). ⚠ `domain="*"` is the every-dataset
+        // wildcard of cross_dataset_variable_metadata, not a dataset name: it cannot be absent.
+        for (String domain : compiledBindingDomains(rule))
         {
-            String domain = trimToNull(operation.getDomain());
-            // ⚠ `domain: "*"` is the every-dataset wildcard of cross_dataset_variable_metadata,
-            // not a dataset name. It cannot be absent, so it is not a guardable surface at all.
-            if (domain != null && !"*".equals(domain) && !own.contains(domain))
+            if (!"*".equals(domain) && !own.contains(domain))
             {
                 viaOperations.add(domain);
             }
@@ -602,8 +600,7 @@ public final class GuardPositionAudit
 
 
     /** The dataset a <b>column</b> name reads, or {@code null} when it is local. */
-    private static @Nullable String datasetOf(String name, Map<String, Operation> operations,
-            Rule rule)
+    private static @Nullable String datasetOf(String name, Rule rule)
     {
         if (name.startsWith("$") && rule.compiledBinding(name) != null)
         {
@@ -615,8 +612,7 @@ public final class GuardPositionAudit
         }
         if (name.startsWith("$"))
         {
-            Operation operation = operations.get(name);
-            return operation == null ? null : trimToNull(operation.getDomain());
+            return null; // a `$`-name no compiled binding defines reads no dataset
         }
         int dot = name.indexOf('.');
         return dot > 0 ? name.substring(0, dot) : null;
@@ -642,25 +638,6 @@ public final class GuardPositionAudit
             return rule.getCore().getId();
         }
         return rule.getId() != null ? rule.getId() : "<no-id>";
-    }
-
-
-    /** {@code Operations} keyed by {@code $}-id; entries without an id are dropped. */
-    private static Map<String, Operation> operationsById(Rule rule)
-    {
-        Map<String, Operation> byId = new LinkedHashMap<>();
-        List<Operation> operations = rule.getOperations();
-        if (operations != null)
-        {
-            for (Operation operation : operations)
-            {
-                if (operation.getId() != null)
-                {
-                    byId.put(operation.getId(), operation);
-                }
-            }
-        }
-        return byId;
     }
 
 

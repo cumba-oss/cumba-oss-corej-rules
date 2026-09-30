@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0448 expect=skipped domain=TS
+#note "PLAN-per-row-functions phase 0: the no-dictionary SKIP pin of CDISC-CG0448 (snomed, K4-DICT). Violating-shaped data (row 2) but #dictionaries is DELIBERATELY ABSENT, so the rule MUST report SKIPPED, never a false PASS and never a finding. Red under the W3 S3a/S3b sabotage by design."
+#library standard=sdtmig version=3-3
+dataset TS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col TSSEQ    type=Num
+col TSPARMCD type=Char
+col TSVAL    type=Char
+---
+S01 | TS | 1 | INDIC | Headache
+S01 | TS | 2 | INDIC | Migraine
+S01 | TS | 3 | AGEMAX | Migraine
+S01 | TS | 4 | INDIC |

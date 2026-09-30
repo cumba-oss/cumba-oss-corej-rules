@@ -10,9 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import net.cumba.corej.core.exec.DatasetIdentity;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
-import net.cumba.corej.core.exec.OperationExecutor;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.RuleExecutionStatus;
 import net.cumba.corej.core.exec.RuleRunnerCalls;
@@ -271,7 +271,7 @@ public final class SpecRunner
         // primary dataset's canonical base name, read from its DOMAIN/RDOMAIN columns, so a
         // letter-suffix split like FAAE (DOMAIN=FA) is recognised as a split of FA exactly as the
         // production DatasetRuleResolver path now does.
-        String primaryUnsplit = OperationExecutor.unsplitNameFromData(primaryTable);
+        String primaryUnsplit = DatasetIdentity.unsplitNameFromData(primaryTable);
         // ⭐ The CDISC DOMAIN CODE of the primary dataset — NOT its member name. Production derives
         // it once per dataset in LibraryValidator.validateDataset
         // (`CdiscDomainResolver.cdiscDomainOf(table)`, LibraryValidator.java:1063) and then uses
@@ -306,7 +306,7 @@ public final class SpecRunner
         // `ScopeMatcher.describeDomainMismatch(rule, domainName, unsplitName)` derives
         // `isSplit = !domainName.equals(unsplitName)`: its `domainName` parameter means the MEMBER
         // name (its javadoc: "the dataset name (e.g. \"DM\", \"FAAE\")"), while `unsplitName` is
-        // `OperationExecutor.unsplitNameFromData`.
+        // `DatasetIdentity.unsplitNameFromData`.
         //
         // ⚠ History worth keeping, because the conflation is easy to reintroduce: production USED
         // to hand `LibraryValidator`'s `cdiscDomain` (via `setDomainName`) to BOTH parameters.

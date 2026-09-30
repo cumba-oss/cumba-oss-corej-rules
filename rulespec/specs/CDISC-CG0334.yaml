@@ -2,7 +2,10 @@ name: CDISC-CG0334
 kind: rule
 description: |
   Wave 22 port — extract_metadata(dataset_name). SUPP--.RDOMAIN must match
-  the last 2 chars of the dataset_name via regex `.{4}(..).*`.
+  the last 2 chars of the dataset_name via regex `.{4}(..).*`. Since wave 4b
+  (PLAN-scalar-metadata-functions) extract_metadata is a registry function: its
+  "dataset_name" key is a string argument, no longer an operation target the output
+  deriver read as the dataset_name virtual, so the finding carries $dataset_name only.
 python_source: rules-sdtmig-3-4.json (CORE-000538)
 rule:
   coreId: CDISC-CG0334
@@ -28,5 +31,4 @@ expected_violations:
     output_variables:
       $dataset_name: 'SUPPAE'
       RDOMAIN: CM
-      dataset_name: 'SUPPAE'
 expected_errors: []

@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD0080 expect=noViolation domain=AE
+#note "W5 phase 0 (PLAN-grouped-aggregate-functions): the two one-sided key shapes the corpus did not stage. DS carries subject 002, which has no AE row (a foreign group with no primary row: unused, never an error or a phantom finding); AE carries subject 003, which has no DS row (a primary key with no foreign group: the binding is missing and the rule's own `not empty($max_ds_dsstdtc)` guard keeps it quiet). Subject 001 is the control whose AESTDTC precedes its DS maximum. Non-vacuous: 003's AESTDTC is later than every DS date in the file, so a broadcast that fell back to a dataset-wide maximum instead of a per-subject one would fire on it. GREEN on the pre-port engine."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+---
+S1 | AE | 001 | 1 | HEADACHE | 2023-05-15
+S1 | AE | 003 | 1 | NAUSEA   | 2023-12-31
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | RANDOMIZED | 2023-05-01
+S1 | DS | 001 | 2 | COMPLETED  | 2023-06-01
+S1 | DS | 002 | 1 | COMPLETED  | 2023-06-30
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0371 expect=violation domain=FM
+#note "FMSTRESC is populated with a value that is not a term of the NCDSEX codelist (codelist_terms) on the qualifying record -> fires; the conformant and the non-qualifying rows stay silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig-dart version=1-2
+#library codelist-terms NCDSEX M F
+#expectViolationCount 1
+#expectViolationAt row=1 FMSTRESC=MALE
+dataset FM
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FMSEQ    type=Num  label="Sequence Number"
+col FMTESTCD type=Char label="Fetal Measurement Test Short Name"
+col FMSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | FM | 001 | 1 | SEXFETAL | MALE
+S1 | FM | 001 | 2 | SEXFETAL | F
+S1 | FM | 001 | 3 | WEIGHT | MALE

@@ -1104,13 +1104,23 @@ public final class DualFormCheckNode
         {
             if (!(d instanceof Expr.Call dc)
                     || !("asc".equals(dc.name()) || "desc".equals(dc.name()))
-                    || dc.args().size() != 1 || !(dc.args().get(0) instanceof Expr.Lit col)
-                    || col.kind() != Expr.LitKind.STRING)
+                    || dc.args().size() != 1)
             {
-                throw unsupported("sort descriptor must be asc(\"col\") or desc(\"col\")");
+                throw unsupported("sort descriptor must be asc(col) or desc(col)");
+            }
+            Expr key = dc.args().get(0);
+            if (key instanceof Expr.Lit keyLit && keyLit.kind() == Expr.LitKind.STRING)
+            {
+                // Runbook W8 (PLAN-retire-operation-surface D-W8-6, runbook R1): the descriptor
+                // used to REQUIRE the quoted spelling; a quoted name is a string, never a column
+                // (mirrors the engine's ExprCompiler.groupOperandName / compileTargetIsNotSortedBy,
+                // which refuses the same shape with the same reasoning).
+                throw unsupported("sort descriptor " + dc.name() + "(\"" + keyLit.value()
+                        + "\") takes a column reference, not a string literal — write " + dc.name()
+                        + "(" + keyLit.value() + "); a quoted name is a string, never a column");
             }
             ObjectNode o = NODES.objectNode();
-            o.put("name", (String) col.value());
+            o.put("name", sortDescriptorColumnName(key));
             o.put("sort_order", dc.name());
             Expr nulls = dc.kwargs().get("nulls");
             o.put("null_position",
@@ -1138,6 +1148,25 @@ public final class DualFormCheckNode
             out.put("keep_missings", (Boolean) kl.value());
         }
         return out;
+    }
+
+
+    /**
+     * The raw name of an {@code is_sorted_by} sort-descriptor operand: a plain column reference, or
+     * a {@code --}-prefix domain wildcard — the same two shapes the engine's
+     * {@code ExprCompiler.groupOperandName} accepts for a group-operator operand. A string literal
+     * is refused above this call, with its own message; anything else declines here.
+     */
+    private static String sortDescriptorColumnName(Expr e)
+    {
+        if (e instanceof Expr.Ref r && (r.kind() == net.cumba.corej.core.expr.OperandKind.COLUMN
+                || (r.kind() == net.cumba.corej.core.expr.OperandKind.WILDCARD_COLUMN
+                        && r.name().startsWith("--") && r.name().indexOf('.') < 0)))
+        {
+            return r.name();
+        }
+        throw unsupported("sort descriptor operand must be a plain column or --prefix reference"
+                + " (got " + e.getClass().getSimpleName() + ")");
     }
 
 

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0345 expect=violation domain=TS
+#note "TWO SSTYP records in TS (the count is grouped by STUDYID) -> both SSTYP rows fire; the SPECIES row never does. W6 phase 0, scenarios-first: the rule had no scenario."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+#expectViolationAt row=1 TSPARMCD=SSTYP
+#expectViolationAt row=2 TSPARMCD=SSTYP
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+S1 | TS | 1 | SSTYP | Study Type | CARCINOGENICITY
+S1 | TS | 2 | SSTYP | Study Type | CARCINOGENICITY
+S1 | TS | 3 | SPECIES | Species | RAT

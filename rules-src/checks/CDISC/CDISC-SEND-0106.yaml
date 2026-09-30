@@ -12,10 +12,10 @@ Scope:
     - "DM"
 Bindings:
 - name: "$strain_null"
-  expression: "variable_is_null(STRAIN)"
+  expression: "var_is_null(STRAIN)"
 - name: "$ts_strain"
-  expression: "ts_parameter_value(TSVAL, domain=\"TS\", key_name=\"TSPARMCD\", key_value=\"\
-    STRAIN\")"
+  expression: "read_value(TSVAL, domain=TS, filter=(TSPARMCD==\"STRAIN\"), mode=\"\
+    FIRST\")"
 Check:
   expression: >-
     $strain_null == true and empty($ts_strain)

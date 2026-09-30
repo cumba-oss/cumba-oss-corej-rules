@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-SEND-0366 expect=violation domain=PY
+#note "PYRESCAT is populated with a value that is not a term of the PYRESCAT codelist (codelist_terms) on the qualifying record -> fires; the conformant and the non-qualifying rows stay silent. W4 (PLAN-list-functions phase 0, scenarios-first on the pre-port engine)."
+#library standard=sendig-dart version=1-2
+#library codelist-terms PYRESCAT NORMAL ABNORMAL
+#expectViolationCount 1
+#expectViolationAt row=1 PYRESCAT=UNKNOWN
+dataset PY
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PYSEQ    type=Num  label="Sequence Number"
+col PYTESTCD type=Char label="Pregnancy Findings Test Short Name"
+col PYSTRESC type=Char label="Character Result/Finding in Std Format"
+col PYRESCAT type=Char label="Result Category"
+---
+S1 | PY | 001 | 1 | PREGSTAT | PREGNANT | UNKNOWN
+S1 | PY | 001 | 2 | PREGSTAT | PREGNANT | NORMAL
+S1 | PY | 001 | 3 | OTHER | X | UNKNOWN

@@ -627,7 +627,7 @@ abstract class AbstractRuleTestSuitesFactory
         // their parent domain's scope.
         String mismatch = ScopeMatcher.describeDomainMismatch(aRule,
                 aPrimary.getMetaData().getName(),
-                net.cumba.corej.core.exec.OperationExecutor.unsplitNameFromData(aPrimary));
+                net.cumba.corej.core.exec.DatasetIdentity.unsplitNameFromData(aPrimary));
         if (mismatch != null)
         {
             return mismatch;
