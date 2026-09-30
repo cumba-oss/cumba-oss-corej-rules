@@ -987,20 +987,26 @@ The calendar days from a reference date to a record's date — `date − referen
 | `name` | column | yes | The record's date column (`--DTC`, `--STDTC`, `--ENDTC`), or a column read through a declared join (`PM.PMDTC`) |
 | `reference` | value | yes | The date to measure from: a column of the record, a column read through the rule's declared join, or a **named aggregation** — `min_date(…)` / `max_date(…)` over another dataset |
 
-Both arguments are read **per record**. A reference that is the earliest (or latest) date of a group in another dataset is written as that aggregation, `min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])` — its `domain=`, `group=`, `filter=`, `keep_missings=` and `missing_values=` belong to [`min_date`](#min_date) / [`max_date`](#max_date), never to `date_diff_days`. An offset is plain arithmetic (`date_diff_days(…) + 1`). A date read from a *matched record of another dataset* is a declared join and a dotted `name` (`Match_Datasets` on the matching keys, then `PM.PMDTC`). A quoted name (`"--DTC"`) is a string literal, never a column, and fails to load. (Until runbook W2b this was an operation with `domain=`, `group=`, `reference="…"`, `offset=`, `reference_extreme=`, `missing_values=`, `minuend_domain=` and `minuend_match=` keywords; each is now spelled as above, and each is a load error on `date_diff_days`.)
+Both arguments are read **per record**. A reference that is the earliest (or latest) date of a group in another dataset is written as that aggregation, `min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])` — its `domain=`, `group=`, `filter=`, `keep_missings=` and `missing_values=` belong to [`min_date`](#min_date) / [`max_date`](#max_date), never to `date_diff_days`. An offset is plain arithmetic — a constant (`date_diff_days(…) + 1`) or a value read from another dataset (`+ $rprfdy`). A date read from a *matched record of another dataset* is a declared join and a dotted `name` (`Match_Datasets` on the matching keys, then `PM.PMDTC`). A quoted name (`"--DTC"`) is a string literal, never a column, and fails to load. (Until runbook W2b this was an operation with `domain=`, `group=`, `reference="…"`, `offset=`, `reference_extreme=`, `missing_values=`, `minuend_domain=` and `minuend_match=` keywords; each is now spelled as above, and each is a load error on `date_diff_days`.)
 
 **Example**
 
 ```yaml
 Match_Datasets:
-- Name: "SJ"
-  Keys: ["USUBJID", "RPHASE"]
+- Name: "DM"
+  Keys: ["USUBJID"]
 Bindings:
+- name: "$sj_stages"
+  expression: 'record_count(domain="SJ", group=[USUBJID, RPHASE])'
+- name: "$rprfdy"
+  expression: 'read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX")'
 - name: "$rpref_day"
-  expression: 'date_diff_days(--ENDTC, min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE]))'
+  expression: 'date_diff_days(--ENDTC, min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])) + $rprfdy'
 Check:
-  expression: 'is_complete_date(--ENDTC) and not empty(--RPENDY) and --RPENDY != $rpref_day'
+  expression: 'is_complete_date(--ENDTC) and not empty(--RPENDY) and $sj_stages > 0 and not empty($rprfdy) and --RPENDY != $rpref_day'
 ```
+
+The repro-phase day of CDISC-SEND-0403: the reference is the earliest `SJSTDTC` of the record's `RPHASE`, and the offset is the phase's first day reference `RPRFDY` (0 or 1) of the subject's own path, read from `TP` through the qualified [`read_value`](#read_value) `group=` member `DM.RPATHCD` — the `RPATHCD` of the record's bound `DM` record. `$sj_stages > 0` and `not empty($rprfdy)` leave a record whose phase has no SJ stage or no TP offset unjudged.
 
 **With an offset**
 

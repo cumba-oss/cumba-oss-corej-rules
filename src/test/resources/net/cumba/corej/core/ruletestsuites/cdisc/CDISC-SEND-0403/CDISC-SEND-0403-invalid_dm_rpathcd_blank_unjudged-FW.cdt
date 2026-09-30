@@ -1,20 +1,20 @@
 #!RuleTest
-#test CDISC-SEND-0403 expect=violation domain=BW
+#test CDISC-SEND-0403 expect=violation domain=FW
 #note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), §6.2 case 5: subject 001's DM.RPATHCD is blank; the read keys on "" (KEEP, D11), no TP stage carries a blank RPATHCD, so $rprfdy is missing and 001 (day 99) is NOT judged. Sibling 002 on path A is reported. Red-before on the W2b rule: both fired."
 #library standard=sendig-dart version=1-2
 #expectViolationCount 1
-#expectViolationAt row=2 BWRPENDY=99
-dataset BW class=FINDINGS label="Body Weight"
+#expectViolationAt row=2 FWRPENDY=99
+dataset FW class=FINDINGS label="Food and Water Consumption"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"
 col USUBJID type=Char label="Unique Subject Identifier"
-col BWSEQ   type=Num  label="Sequence Number"
+col FWSEQ   type=Num  label="Sequence Number"
 col RPHASE  type=Char label="Repro Phase"
-col BWENDTC type=Char label="End Date/Time of Observation"
-col BWRPENDY type=Num  label="Repro Phase Day of End of Observation"
+col FWENDTC type=Char label="End Date/Time of Observation"
+col FWRPENDY type=Num  label="Repro Phase Day of End of Observation"
 ---
-S1 | BW | 001 | 1 | P1 | 2020-01-15 | 99
-S1 | BW | 002 | 2 | P1 | 2020-01-15 | 99
+S1 | FW | 001 | 1 | P1 | 2020-01-15 | 99
+S1 | FW | 002 | 2 | P1 | 2020-01-15 | 99
 ---
 dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
 col STUDYID type=Char label="Study Identifier"

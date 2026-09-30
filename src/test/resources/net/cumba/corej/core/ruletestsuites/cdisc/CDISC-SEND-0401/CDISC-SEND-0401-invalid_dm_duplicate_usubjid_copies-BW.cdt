@@ -3,7 +3,7 @@
 #note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), D-COPIES (D32 / D32a): DM carries subject 001 TWICE, on path A (RPRFDY 0) and path B (RPRFDY 1), so the DM join makes two copies of the one record and each copy reads its own path's offset. BWRPDY 14 is conformant on the A copy (14 + 0) and REPORTED on the B copy (expected 15): one finding, from the second copy of row 1. Red-before on the W2b rule (no DM join, offset-free): silent."
 #library standard=sendig-dart version=1-2
 #expectViolationCount 1
-#expectViolationAt row=1 BWRPDY=14
+#expectViolationAt row=1 BWRPDY=14 DM.RPATHCD=B "$rprfdy"=1
 dataset BW class=FINDINGS label="Body Weight"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

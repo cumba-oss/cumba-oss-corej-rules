@@ -1,21 +1,19 @@
 #!RuleTest
-#test CDISC-SEND-0403 expect=violation domain=BW
-#note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), D-SJ: the SJ entry is removed from Match_Datasets, so a record in a two-stage phase is judged ONCE. TP declares two stages of path A in P1 (RPRFDY 0 on both), SJ declares two stages for the subject (earliest 2020-01-01), and two records carry wrong days (99, 98) -> TWO findings, one per record. Red-before on the W2b rule: the (USUBJID, RPHASE) SJ join multiplied each record once per stage — 4."
+#test CDISC-SEND-0403 expect=violation domain=FW
+#note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), D-COPIES (D32 / D32a): DM carries subject 001 TWICE, on path A (RPRFDY 0) and path B (RPRFDY 1), so the DM join makes two copies of the one record and each copy reads its own path's offset. FWRPENDY 14 is conformant on the A copy (14 + 0) and REPORTED on the B copy (expected 15): one finding, from the second copy of row 1. Red-before on the W2b rule (no DM join, offset-free): silent."
 #library standard=sendig-dart version=1-2
-#expectViolationCount 2
-#expectViolationAt row=1 BWRPENDY=99
-#expectViolationAt row=2 BWRPENDY=98
-dataset BW class=FINDINGS label="Body Weight"
+#expectViolationCount 1
+#expectViolationAt row=1 FWRPENDY=14 DM.RPATHCD=B "$rprfdy"=1
+dataset FW class=FINDINGS label="Food and Water Consumption"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"
 col USUBJID type=Char label="Unique Subject Identifier"
-col BWSEQ   type=Num  label="Sequence Number"
+col FWSEQ   type=Num  label="Sequence Number"
 col RPHASE  type=Char label="Repro Phase"
-col BWENDTC type=Char label="End Date/Time of Observation"
-col BWRPENDY type=Num  label="Repro Phase Day of End of Observation"
+col FWENDTC type=Char label="End Date/Time of Observation"
+col FWRPENDY type=Num  label="Repro Phase Day of End of Observation"
 ---
-S1 | BW | 001 | 1 | P1 | 2020-01-15 | 99
-S1 | BW | 001 | 2 | P1 | 2020-01-15 | 98
+S1 | FW | 001 | 1 | P1 | 2020-01-15 | 14
 ---
 dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
 col STUDYID type=Char label="Study Identifier"
@@ -27,8 +25,7 @@ col RSTAGE  type=Char label="Repro Stage"
 col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
 col SJENDTC type=Char label="End Date/Time of Repro Stage"
 ---
-S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-10
-S1 | SJ | 001 | 2 | P1 | STAGE2 | 2020-01-11 | 2020-01-20
+S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-20
 ---
 dataset DM class="SPECIAL PURPOSE" label="Demographics"
 col STUDYID type=Char label="Study Identifier"
@@ -37,6 +34,7 @@ col USUBJID type=Char label="Unique Subject Identifier"
 col RPATHCD type=Char label="Planned Repro Path Code"
 ---
 S1 | DM | 001 | A
+S1 | DM | 001 | B
 ---
 dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
 col STUDYID  type=Char label="Study Identifier"
@@ -49,5 +47,5 @@ col RPHASE   type=Char label="Repro Phase"
 col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
 ---
 S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
-S1 | TP | A | 2 | STG2 | Stg2 | P1 | 0
+S1 | TP | B | 1 | STG1 | Stg1 | P1 | 1
 ---

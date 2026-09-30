@@ -3,7 +3,7 @@
 #note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), C2: each record reads ITS path's RPRFDY. Two paths share phase P1 — A with RPRFDY 0 (subject 001), B with RPRFDY 1 (subject 002) — and both records carry 15 (diff 14 + 1). 002 is conformant on path B; 001 is REPORTED (path A expects 14). Red-before on the W2b rule (offset-free, both expect 14): two findings. A grouped read keyed by RPHASE alone (the EC-44 trap) would answer MAX over both paths, 1, for both records and report neither."
 #library standard=sendig-dart version=1-2
 #expectViolationCount 1
-#expectViolationAt row=1 BWRPDY=15
+#expectViolationAt row=1 BWRPDY=15 DM.RPATHCD=A "$rprfdy"=0
 dataset BW class=FINDINGS label="Body Weight"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

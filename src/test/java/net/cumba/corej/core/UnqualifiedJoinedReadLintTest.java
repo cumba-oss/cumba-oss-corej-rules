@@ -136,16 +136,18 @@ class UnqualifiedJoinedReadLintTest
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
             "SEND", 142);
 
-    // SEND 6 -> 9 on 2026-09-30 (PLAN-rprfdy-offset-tp-join phase 4): CDISC-SEND-0401/0402/0403
-    // gained read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
-    // candidate collector counts the call's TARGET, RPRFDY, as a bare read of the primary
-    // (probed: undefined=[RPRFDY] per rule, in the one dart package whose scope resolves), which
-    // no scoped SPC/FND/EVT/INT dataset defines — RPRFDY is TP's, read through domain=. FLAGS
-    // stayed 0 and every register below is unchanged: a census move, not a bare joined read.
-    // ⚑ Filed (PLAN-rprfdy-offset-tp-join review): the collector treats a `domain=` registry
-    // call's target as a primary read, against W2a's D10 (a domain= call names no primary operand).
+    // SEND 6 -> 9 -> 6 on 2026-09-30 (PLAN-rprfdy-offset-tp-join). Phase 4 gave CDISC-SEND-0401/
+    // 0402/0403 read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
+    // engine's TypeExpectations walk recorded the call's TARGET, RPRFDY, as a bare read of the
+    // primary (probed: undefined=[RPRFDY] per rule, in the one dart package whose scope resolves).
+    // The defect was the engine's, not this collector's: TypeExpectations now reads a domain=-
+    // pinned call's target, filter= and domain= as the PINNED dataset's (W2a D10 / D13 Q4 /
+    // D-W7-16; a plain group= member stays a primary read), so the three rows left (review round
+    // 1, lane 3 M1 — cumba-corej 4c5743a). Probed after: the six SEND rows are FDA-SD0077
+    // [IDVARVAL, IDVAR, RDOMAIN], FDA-SD1012 [ETCD], FDA-SD1023 [VISIT, VISITNUM] (sendig/ar-1-0);
+    // ADaM and SDTM did not move. FLAGS stayed 0 and every register below is unchanged.
     private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 21,
-            "SEND", 9);
+            "SEND", 6);
 
     private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
             Map.entry("adam/adamig-1-0\t&DOM", 1), Map.entry("adam/adamig-1-1\t&DOM", 1),
