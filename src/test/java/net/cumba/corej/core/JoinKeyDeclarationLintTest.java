@@ -101,6 +101,10 @@ class JoinKeyDeclarationLintTest
      * floor: a new keyed rule moves one of these, and the failure asks you to confirm it was
      * authored with its declarations — which this test then checks.
      */
+    // ⭐ 197 stays 197 on 2026-09-30 (PLAN-rprfdy-offset-tp-join phase 4) — a count a RE-KEY
+    // conserves proves nothing on its own, so the IDENTITIES were re-derived: exactly the three
+    // SJ entries of CDISC-SEND-0401/0402/0403 (Keys [USUBJID, RPHASE]) left and exactly their
+    // three DM entries (Keys [USUBJID]) arrived (D-SJ / C2).
     private static final int EXPECTED_ORDINARY = 197;
 
     private static final int EXPECTED_CHILD = 11;
@@ -219,6 +223,36 @@ class JoinKeyDeclarationLintTest
         assertClean(merged);
         assertRedNaming(merged.replace(", \"AE.USUBJID\"", ""), "T-TWO-JOINS", "AE.USUBJID",
                 "no All_Or_None group");
+
+        // PLAN-rprfdy-offset-tp-join C1: a QUALIFIED key — TP joins on [DM.RPATHCD, RPHASE], the
+        // record side of the first component being the row's bound DM record. Its declaration is
+        // the same shape as any key's: DM.RPATHCD bare in All (it is the first key) and one group
+        // holding DM.RPATHCD and TP.RPATHCD (MatchDataset.getRightKeys() answers the unqualified
+        // name, so the loader's gate and this lint agree without a special arm). No corpus rule
+        // carries the shape yet; the fixture is what keeps the two from disagreeing about it.
+        String qualified = """
+                Core: {Id: "T-QUALIFIED"}
+                Requirements:
+                  Variables:
+                    All: ["USUBJID", "DM.RPATHCD", "RPHASE"]
+                    All_Or_None: [["USUBJID", "DM.USUBJID"], ["DM.RPATHCD", "TP.RPATHCD"], ["RPHASE", "TP.RPHASE"]]
+                Match_Datasets:
+                - Name: "DM"
+                  Keys: ["USUBJID"]
+                - Name: "TP"
+                  Keys: ["DM.RPATHCD", "RPHASE"]
+                """;
+        assertClean(qualified);
+        assertRedNaming(qualified.replace(", [\"DM.RPATHCD\", \"TP.RPATHCD\"]", ""), "T-QUALIFIED",
+                "DM.RPATHCD", "no All_Or_None group");
+        assertRedNaming(
+                qualified.replace("All: [\"USUBJID\", \"DM.RPATHCD\", \"RPHASE\"]",
+                        "All: [\"USUBJID\", \"RPHASE\"]"),
+                "T-QUALIFIED", "DM.RPATHCD", "first key");
+        assertRedNaming(
+                qualified.replace("[\"DM.RPATHCD\", \"TP.RPATHCD\"]",
+                        "[\"DM.RPATHCD\", \"TP.RPATHCD\", \"SJ.RPATHCD\"]"),
+                "T-QUALIFIED", "SJ.RPATHCD", "not a side of key DM.RPATHCD");
 
         String child = """
                 Core: {Id: "T-CHILD"}

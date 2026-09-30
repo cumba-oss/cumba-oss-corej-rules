@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-9443"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the stages of one repro phase (RPHASE) of one repro\
+  \ path (RPATHCD) in TP carry different populated values of the first phase day reference\
+  \ (RPRFDY)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "TP"
+Requirements:
+  Variables:
+    All:
+    - "RPATHCD"
+    - "RPHASE"
+    - "RPRFDY"
+Check:
+  expression: >-
+    has_multiple_values_for(RPRFDY, RPATHCD, within=[RPHASE])
+Outcome:
+  Message: "RPRFDY differs between the stages of one repro phase within the repro\
+    \ path; the phase has one first phase day reference."
+  Output_Variables:
+  - "RPATHCD"
+  - "RPHASE"
+  - "TPSTGORD"
+  - "RPRFDY"
+Source_Proposed:
+  Sheet_Issue: "#277"
+  Class: "TDM"
+  Domain: "TP"
+  Variable: "RPRFDY"
+  Plain_Text_Explanation: "RPRFDY is the protocol-defined first day of the Repro Phase\
+    \ (0 or 1) and applies to the whole phase of a path, so every stage of one RPHASE\
+    \ within one RPATHCD must carry the same value"
+  Condition: "Two or more TP records share RPATHCD and RPHASE"
+  Rule: "RPRFDY is the same across all records with the same RPATHCD and RPHASE"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+  - Name: "SENDIG-DART"
+    Version: "1.1"

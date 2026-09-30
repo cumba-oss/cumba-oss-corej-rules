@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0401 expect=violation domain=BW
-#note "Written FIRST in runbook W2a (PLAN-operation-replacements phase 0), on the pre-change engine. BWRPDY carries 15 - the value the sheet's algorithm yields on a path whose RPRFDY is 1 (14 + 1). The engine does not apply the RPRFDY offset (owner ruling EC-47 = (C), 2026-09-29; TP is reachable only through DM.RPATHCD, see PLAN-rprfdy-offset-tp-join), so the derived day is 14 and this record is REPORTED although it may be conformant for an RPRFDY=1 path. That is the documented over-reporting of the Partially Executable rule, pinned here so the limitation is visible rather than assumed. One SJ stage on purpose: the count-bearing fixture must not be multiplied by the (USUBJID, RPHASE) join."
+#note "Re-read by PLAN-rprfdy-offset-tp-join (phase 4, §8.1): DM and TP added (path A, RPRFDY 0), the SJ join removed from the rule (D-SJ) and the offset read again through DM.RPATHCD (C2). BWRPDY carries 15 on a path whose RPRFDY is 0: the derived day is 14 + 0 = 14, so the record is REPORTED — no longer the \"documented over-reporting\" of the offset-free W2a rule but a genuine off-by-one for an RPRFDY-0 path (the RPRFDY-1 twin, where 15 is conformant, is -valid_rprfdy_one_applied). One SJ stage; the count is no longer multiplied by any join."
 #library standard=sendig-dart version=1-2
 #expectViolationCount 1
 #expectViolationAt row=1 BWRPDY=15
@@ -27,4 +27,26 @@ col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
 col SJENDTC type=Char label="End Date/Time of Repro Stage"
 ---
 S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-20
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Planned Repro Path Code"
+---
+S1 | DM | 001 | A
+---
+
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
 ---

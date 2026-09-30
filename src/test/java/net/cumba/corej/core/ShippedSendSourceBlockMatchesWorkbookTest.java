@@ -199,7 +199,13 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
             "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9437", "CDISC-SEND-9438",
-            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441");
+            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441", "CDISC-SEND-9443");
+    // ⭐ Re-derived 2026-09-30, 8 -> 9 (PLAN-rprfdy-offset-tp-join phase 4, D-MINT):
+    // CDISC-SEND-9443,
+    // the TP RPRFDY-disagreement rule minted beside CDISC-SEND-0401/0402/0403 (which read a phase's
+    // RPRFDY by MAX), sheet issue #277 — a rowless mint with a Source_Proposed block and no Source,
+    // the CDISC-SEND-9437 / CDISC-CG9667 shape. RUN with -Dcdisc.docs.dir at that phase, as the
+    // guidelines' minting cost list requires (round-2 M1 of the plan).
     // ⭐ Re-derived 2026-09-19 twice, 8 -> 9 -> 8. Phase 4 added CDISC-SEND-9442 (the GENETOX arm
     // minted from CORE-009701, GVMETHOD not populated in GV); review round 1 took it back out,
     // because the premise behind it was FALSE and the instrument was to hand. Phase 4 filed the

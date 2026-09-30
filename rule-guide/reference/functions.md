@@ -1525,8 +1525,10 @@ is no candidate). A numeric column ranks numerically; a character column ranks a
 `"9"` is above `"10"`, and `"3"` and `"3.0"` are two different values (a string is a string,
 `D-W1-2a`). The answer is the winning **cell**, with the column's own type, so a comparison against
 it is numeric for a numeric column and textual for a character one. Numeric order of a character
-grade is spelled `max(num(ATOXGR), …)`. (A group whose candidates are all positionable ISO dates
-takes the date rule of `max_date`; `max` is not the function for dates — author `max_date`.)
+grade is spelled `max(num(ATOXGR), …)`. **Text is text** (owner K3, 2026-09-30: *"no special
+handling for special texts"*): a character value that looks like a date ranks as text like any
+other — `max` over `2024-01` and `2024-01-15` answers `2024-01-15` — and never takes the date rule;
+`max` is not the function for dates — author `max_date`, which is.
 
 **Example**
 
@@ -1729,7 +1731,7 @@ The largest populated value, per row, among the columns whose names match a regu
 |---|---|---|---|
 | `name_pattern` | string | yes | A regular expression over column names, matched in full and in any letter case. A static string literal — anything else, or a pattern that does not compile, fails to load |
 
-`row_max` takes **no column target**: the pattern chooses the columns (`row_max(TRTEDT, name_pattern=…)` fails to load). Blank and missing cells are not candidates. The candidates rank **by the matched columns' declared type**, decided once for the dataset, never per row: a set of Num columns ranks numerically; a set of Char columns as text — with the ISO 8601 date rule when every candidate is a date that can be placed on the calendar (an extreme that cannot be determined, such as `2012-06` against `2012-06-15`, has no answer). A matched column with no candidate on any row takes no part in that decision — a CSV or Excel file delivers an all-blank `TR02EDT` as a Char column, and beside a numeric `TR01EDT` it is ignored rather than a mix. When Num **and** Char columns both carry values, the rule **errors** (a column-type mismatch): the two have no common order. A text value is never read as a number: CHAR `"9"` is larger than CHAR `"12"`; convert with `num(…)` for numeric order. On a tie the first candidate in column order wins. The winning cell is returned as it is, type and all.
+`row_max` takes **no column target**: the pattern chooses the columns (`row_max(TRTEDT, name_pattern=…)` fails to load). Blank and missing cells are not candidates. The candidates rank **by the matched columns' declared type**, decided once for the dataset, never per row: a set of Num columns ranks numerically; a set of Char columns as text — **text is text** (owner K3, 2026-09-30): a date-looking value ranks as text like any other, so `2012-06` against `2012-06-15` answers `2012-06-15`, never the date rule (`max_date` is the date function). A matched column with no candidate on any row takes no part in that decision — a CSV or Excel file delivers an all-blank `TR02EDT` as a Char column, and beside a numeric `TR01EDT` it is ignored rather than a mix. When Num **and** Char columns both carry values, the rule **errors** (a column-type mismatch): the two have no common order. A text value is never read as a number: CHAR `"9"` is larger than CHAR `"12"`; convert with `num(…)` for numeric order. On a tie the first candidate in column order wins. The winning cell is returned as it is, type and all.
 
 **Example**
 

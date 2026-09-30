@@ -136,8 +136,16 @@ class UnqualifiedJoinedReadLintTest
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
             "SEND", 142);
 
+    // SEND 6 -> 9 on 2026-09-30 (PLAN-rprfdy-offset-tp-join phase 4): CDISC-SEND-0401/0402/0403
+    // gained read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
+    // candidate collector counts the call's TARGET, RPRFDY, as a bare read of the primary
+    // (probed: undefined=[RPRFDY] per rule, in the one dart package whose scope resolves), which
+    // no scoped SPC/FND/EVT/INT dataset defines — RPRFDY is TP's, read through domain=. FLAGS
+    // stayed 0 and every register below is unchanged: a census move, not a bare joined read.
+    // ⚑ Filed (PLAN-rprfdy-offset-tp-join review): the collector treats a `domain=` registry
+    // call's target as a primary read, against W2a's D10 (a domain= call names no primary operand).
     private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 21,
-            "SEND", 6);
+            "SEND", 9);
 
     private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
             Map.entry("adam/adamig-1-0\t&DOM", 1), Map.entry("adam/adamig-1-1\t&DOM", 1),
@@ -145,9 +153,14 @@ class UnqualifiedJoinedReadLintTest
             Map.entry("sendig/ar-1-0\tRELREC (no variables)", 1),
             Map.entry("sendig/ar-1-0\tSV (no variables)", 1),
             Map.entry("sendig/ar-1-0\tTA (no variables)", 1),
-            Map.entry("sendig/ar-1-0\tTE (no variables)", 1), Map.entry("sendig/dart-1-2\tDM", 2),
-            Map.entry("sendig/dart-1-2\tDS", 1), Map.entry("sendig/dart-1-2\tRELREC", 2),
-            Map.entry("sendig/dart-1-2\tSJ", 3));
+            Map.entry("sendig/ar-1-0\tTE (no variables)", 1),
+            // sendig/dart-1-2 DM 2 -> 5 and SJ 3 -> gone on 2026-09-30 (PLAN-rprfdy-offset-tp-join
+            // phase 4, D-SJ): CDISC-SEND-0401/0402/0403 replaced their SJ Match_Datasets entry by a
+            // DM entry (Keys [USUBJID]). The store has no SENDIG-DART 1.2 product, so under that
+            // package the lint cannot judge those three joins (as it could not judge the three SJ
+            // joins before) — they are examined under dart-1-1, where FLAGS stayed 0.
+            Map.entry("sendig/dart-1-2\tDM", 5), Map.entry("sendig/dart-1-2\tDS", 1),
+            Map.entry("sendig/dart-1-2\tRELREC", 2));
 
     private static final Set<String> EXPECTED_EMPTY = Set.of(
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",

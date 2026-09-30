@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0330 expect=skipped domain=PC
+#note "Owner 2026-09-30: \"SEND-0330 without SUPPPC: a is agreed\" — the rule declares Requirements.Datasets [SUPPPC], so a study without SUPPPC SKIPS the rule exactly as it did before runbook W2a (whose SUPP pivot made the absent SUPPPC read as an all-missing PCCALCN and FIRE on every BLQ/ALQ record). Row 1 is BLQ with no SUPPPC anywhere, so the record WOULD fire if judged (measured on HEAD before the rule change: 1 finding) — the skip is not vacuous. A present SUPPPC without a CALCN row is the other shape and still fires (-invalid_blq_no_supp_qualifier)."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ |
+S1 | PC | 001 | 2 | DRUGX | 4.1 | 4.1
+---

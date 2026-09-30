@@ -5,17 +5,9 @@ Core:
 Description: "Raise an error when, within a reproductive phase (RPHASE), the collection\
   \ date (--DTC) is a complete date and the reproductive-phase day (--RPDY) is populated\
   \ but does not equal the date portion of --DTC minus the date portion of the earliest\
-  \ phase start date (earliest SJSTDTC within the subject's RPHASE)."
-Executability: "Partially Executable"
-ExecutabilityHint:
-  Category: "partially executable"
-  Detail: "The RPRFDY offset of the sheet's algorithm is NOT applied: RPRFDY is a\
-    \ TP (Trial Paths) variable, reached only through DM.RPATHCD, and the engine cannot\
-    \ follow that two-hop join yet (owner ruling EC-47 = (C), 2026-09-29; the join\
-    \ is PLAN-rprfdy-offset-tp-join). The reproductive-phase day is derived as date(--DTC)\
-    \ minus the earliest SJSTDTC within the subject's RPHASE, which is exact for a\
-    \ path whose RPRFDY is 0 and off by one day for a path whose RPRFDY is 1 — such\
-    \ a path is then over- and under-reported by one day in both directions."
+  \ phase start date (earliest SJSTDTC within the subject's RPHASE) plus RPRFDY (the\
+  \ path's first phase day reference, read from TP through DM.RPATHCD)."
+Executability: "Fully Executable"
 Scope:
   Classes:
     Include:
@@ -28,32 +20,45 @@ Requirements:
     All:
     - "--DTC"
     - "--RPDY"
-    - "SJ.SJSTDTC"
     - "USUBJID"
+    - "SJ.SJSTDTC"
+    - "SJ.USUBJID"
+    - "DM.RPATHCD"
+    - "TP.RPATHCD"
+    - "TP.RPRFDY:N"
     All_Or_None:
     - - "USUBJID"
-      - "SJ.USUBJID"
+      - "DM.USUBJID"
     - - "RPHASE"
       - "SJ.RPHASE"
+      - "TP.RPHASE"
 Match_Datasets:
 - Keys:
   - "USUBJID"
-  - "RPHASE"
-  Name: "SJ"
+  Name: "DM"
 Bindings:
+- name: "$sj_stages"
+  expression: "record_count(domain=\"SJ\", group=[USUBJID, RPHASE])"
+- name: "$rprfdy"
+  expression: "read_value(RPRFDY, domain=\"TP\", group=[DM.RPATHCD, RPHASE], mode=\"\
+    MAX\")"
 - name: "$rpref_day"
   expression: "date_diff_days(--DTC, min_date(SJSTDTC, domain=\"SJ\", group=[USUBJID,\
-    \ RPHASE]))"
+    \ RPHASE])) + $rprfdy"
 Check:
   expression: >-
-    is_complete_date(--DTC) and not empty(--RPDY) and --RPDY != $rpref_day
+    is_complete_date(--DTC) and not empty(--RPDY) and $sj_stages > 0 and not empty($rprfdy) and
+    --RPDY != $rpref_day
 Outcome:
   Message: "--RPDY does not equal the reproductive-phase day derived from --DTC, the\
-    \ earliest SJSTDTC within the RPHASE."
+    \ earliest SJSTDTC within the RPHASE, plus RPRFDY (the path's first phase day\
+    \ reference, from TP through DM.RPATHCD)."
   Output_Variables:
   - "$rpref_day"
+  - "$rprfdy"
   - "--DTC"
   - "--RPDY"
+  - "DM.RPATHCD"
 Source:
   Class: "SPC, FND, EVT, INT"
   Domain: "All"

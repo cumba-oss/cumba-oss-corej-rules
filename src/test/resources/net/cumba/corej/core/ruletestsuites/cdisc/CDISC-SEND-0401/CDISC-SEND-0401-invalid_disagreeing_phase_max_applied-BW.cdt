@@ -1,0 +1,53 @@
+#!RuleTest
+#test CDISC-SEND-0401 expect=violation domain=BW
+#note "PLAN-rprfdy-offset-tp-join: the RPRFDY offset is applied again, read from TP through DM.RPATHCD by read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX") (owner EC-47 option B, C2, D-SJ, D-GUARD (b)), Q2a as refined (decision 3): a phase whose stages DISAGREE on RPRFDY is judged with the MAXIMUM. Path A's P1 stages carry 0 and 1; record 001 carries diff + 0 = 14, record 002 carries diff + 1 = 15. With MAX = 1 the expected day is 15: 001 is REPORTED, 002 silent. The TP disagreement itself is CDISC-SEND-9443's finding. Red-before on the W2b rule (offset-free): 002 fired instead of 001."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=1 BWRPDY=14
+dataset BW class=FINDINGS label="Body Weight"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col BWSEQ   type=Num  label="Sequence Number"
+col RPHASE  type=Char label="Repro Phase"
+col BWDTC   type=Char label="Date/Time of Collection"
+col BWRPDY  type=Num  label="Repro Phase Day of Collection"
+---
+S1 | BW | 001 | 1 | P1 | 2020-01-15 | 14
+S1 | BW | 002 | 2 | P1 | 2020-01-15 | 15
+---
+dataset SJ class="SPECIAL PURPOSE" label="Subject Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col RPHASE  type=Char label="Repro Phase"
+col RSTAGE  type=Char label="Repro Stage"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-20
+S1 | SJ | 002 | 2 | P1 | STAGE1 | 2020-01-01 | 2020-01-20
+---
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Planned Repro Path Code"
+---
+S1 | DM | 001 | A
+S1 | DM | 002 | A
+---
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
+S1 | TP | A | 2 | STG2 | Stg2 | P1 | 1
+---

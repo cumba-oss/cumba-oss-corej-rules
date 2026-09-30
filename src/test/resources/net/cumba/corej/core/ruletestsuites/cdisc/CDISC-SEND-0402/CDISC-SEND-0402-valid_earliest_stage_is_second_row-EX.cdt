@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0402 expect=noViolation domain=EX
-#note "Written FIRST in runbook W2b (PLAN-operation-replacements §8, date_diff_days composed from min_date), on the pre-change engine. The earliest SJSTDTC of the phase is on the SECOND SJ row (STAGE2 row first, 2020-01-11; STAGE1 row second, 2020-01-01), so a reference taken from the first row in file order would give 4 and fire. EXSTDTC 2020-01-15 minus the earliest 2020-01-01 is 14, which EXRPSTDY carries -> silent. Pins that the reference is the group's minimum, not its first record, across the move from the operation's grouped subtrahend to min_date(SJSTDTC, domain=SJ, group=[USUBJID, RPHASE])."
+#note "Re-read by PLAN-rprfdy-offset-tp-join (phase 4, §8.1): DM and TP added (path A, RPRFDY 0), the SJ join removed from the rule (D-SJ) and the offset read again through DM.RPATHCD (C2). The earliest SJSTDTC of the phase is on the SECOND SJ row (STAGE2 row first, 2020-01-11; STAGE1 row second, 2020-01-01), so a reference taken from the first row in file order would give 4 and fire. EXSTDTC 2020-01-15 minus the earliest 2020-01-01 is 14, RPRFDY 0 adds nothing, EXRPSTDY carries 14 -> silent. Pins that the reference is the group's minimum, not its first record."
 #library standard=sendig-dart version=1-2
 dataset EX class=INTERVENTIONS label="Exposure"
 col STUDYID type=Char label="Study Identifier"
@@ -26,4 +26,26 @@ col SJENDTC type=Char label="End Date/Time of Repro Stage"
 ---
 S1 | SJ | 001 | 2 | P1 | STAGE2 | 2020-01-11 | 2020-01-20
 S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-10
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Planned Repro Path Code"
+---
+S1 | DM | 001 | A
+---
+
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
 ---

@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0401 expect=violation domain=BW
-#note "Written FIRST in runbook W2b (PLAN-operation-replacements §8), on the pre-change engine: the EC-45 carry. The phase's only SJSTDTC is the partial date 2020-01, so there is no complete reference date and the derived day has no value; BWRPDY is populated (14), and a populated day whose inputs cannot support it is REPORTED, not skipped (EC-45: nothing skips). The composed form must keep this answer through min_date's no-result (a present but short candidate) and date_diff_days' missing hand-through. One SJ stage: the count-bearing fixture is not multiplied by the (USUBJID, RPHASE) join."
+#note "Re-read by PLAN-rprfdy-offset-tp-join (phase 4, §8.1): DM and TP added (path A, RPRFDY 0), the SJ join removed from the rule (D-SJ) and the offset read again through DM.RPATHCD (C2). The EC-45 carry, kept under D-GUARD (b): the phase's only SJSTDTC is the partial date 2020-01, so min_date has no answer, $rpref_day is missing (+ 0 keeps it missing, D85c) and the populated BWRPDY 14 is REPORTED, not skipped — nothing skips (EC-45). The two narrow guards ($sj_stages > 0: the subject HAS a stage; not empty($rprfdy): the offset 0 IS known) both hold, so this pin survives; a literal not empty($rpref_day) guard (D-GUARD (a)) would have silenced exactly this record."
 #library standard=sendig-dart version=1-2
 #expectViolationCount 1
 #expectViolationAt row=1 BWRPDY=14
@@ -27,4 +27,26 @@ col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
 col SJENDTC type=Char label="End Date/Time of Repro Stage"
 ---
 S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01 | 2020-01-20
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Planned Repro Path Code"
+---
+S1 | DM | 001 | A
+---
+
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
 ---

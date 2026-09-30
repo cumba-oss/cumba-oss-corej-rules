@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0403 expect=noViolation domain=BW
-#note "THE DISCRIMINATING CASE OF SHEET ISSUE #130 (M3-D25, Fix #311) - the conformant record that fired before the move. Sheet rows 1792-1793's Rule cell anchors --RPENDY on the phase END ('latest SJENDTC'); the SAME rows' Cited Guidance defines the family's one algorithm on the phase START ('SJSTDTC is the earliest stage start date for any given phase') and closes 'This also applies to the --RPSTDY and --RPENDY'. The siblings CDISC-SEND-0401 and -0402 follow the guidance; only 0403 was end-anchored, which made every observation inside a phase yield zero or a negative day and broke the family's shared origin. SJ declares two stages in RPHASE P1: earliest SJSTDTC 2020-01-01, latest SJENDTC 2020-01-20. BWENDTC 2020-01-15 minus the phase START gives 14, which is what BWRPENDY carries -> silent. Under the shipped end-anchored rule the expected value was -5 and this conformant record FIRED. The silence here pins the anchor UNIQUELY: reference SJENDTC with max gives -5, SJENDTC with min gives 5, and SJSTDTC with max (the later stage, 2020-01-11) gives 4 - all three would fire on BWRPENDY=14, so only reference=SJSTDTC + reference_extreme=min is green. Two SJ stages are declared for exactly that reason; a noViolation verdict is immune to the Match_Datasets (USUBJID, RPHASE) join multiplying the BW record once per stage, which is why the count-bearing mirror -invalid_end_anchored_day-BW declares only one. ⚠ ARITHMETIC PINNED HERE IS OFFSET-FREE: the RPRFDY offset is not applied — owner ruling EC-47 = (C) on 2026-09-29 (runbook W2a) dropped it from the rule, which is Partially Executable with an ExecutabilityHint saying so; the TP join that would restore it is PLAN-rprfdy-offset-tp-join. No dataset here declares TP, RPATHCD or RPRFDY."
+#note "Re-read by PLAN-rprfdy-offset-tp-join (phase 4, §8.1): DM and TP added (path A, RPRFDY 0), the SJ join removed from the rule (D-SJ) and the offset read again through DM.RPATHCD (C2). THE DISCRIMINATING CASE OF SHEET ISSUE #130 (M3-D25, Fix #311) — the conformant record that fired before the move. Sheet rows 1792-1793's Rule cell anchors --RPENDY on the phase END ('latest SJENDTC'); the SAME rows' Cited Guidance defines the family's one algorithm on the phase START and closes 'This also applies to the --RPSTDY and --RPENDY'. SJ declares two stages in P1: earliest SJSTDTC 2020-01-01, latest SJENDTC 2020-01-20. BWENDTC 2020-01-15 minus the phase START is 14, RPRFDY 0 adds nothing, BWRPENDY carries 14 -> silent; the end-anchored rule expected -5 and fired. The silence pins the anchor uniquely (SJENDTC max -5, SJENDTC min 5, SJSTDTC max 4 would all fire on 14). The two SJ stages no longer multiply anything (D-SJ)."
 #library standard=sendig-dart version=1-2
 dataset BW class=FINDINGS label="Body Weight"
 col STUDYID  type=Char label="Study Identifier"
@@ -26,4 +26,26 @@ col SJENDTC type=Char label="End Date/Time of Repro Stage"
 ---
 S1 | SJ | 001 | 1 | P1 | STAGE1 | 2020-01-01 | 2020-01-10
 S1 | SJ | 001 | 2 | P1 | STAGE2 | 2020-01-11 | 2020-01-20
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RPATHCD type=Char label="Planned Repro Path Code"
+---
+S1 | DM | 001 | A
+---
+
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
 ---

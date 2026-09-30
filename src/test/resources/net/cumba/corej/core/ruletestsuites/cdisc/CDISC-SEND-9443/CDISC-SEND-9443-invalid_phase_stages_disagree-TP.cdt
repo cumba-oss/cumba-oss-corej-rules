@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-9443 expect=violation domain=TP
+#note "CDISC-SEND-9443 (minted by PLAN-rprfdy-offset-tp-join, D-MINT; sheet issue #277): within one repro phase (RPHASE) of one repro path (RPATHCD), TP's stages carry ONE first phase day reference — has_multiple_values_for(RPRFDY, RPATHCD, within=[RPHASE]) flags every populated stage row of a (path, phase) that maps to two or more RPRFDY values. Path A's two P1 stages carry 0 and 1 -> BOTH rows reported (the functional dependency flags every participating row of the key)."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 2
+#expectViolationAt row=1 RPRFDY=0
+#expectViolationAt row=2 RPRFDY=1
+dataset TP class="TRIAL DESIGN" label="Trial Repro Paths"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RPATHCD  type=Char label="Planned Repro Path Code"
+col TPSTGORD type=Num  label="Order of Repro Stage within Repro Path"
+col RSTGCD   type=Char label="Repro Stage Code"
+col RSTAGE   type=Char label="Description of Repro Stage"
+col RPHASE   type=Char label="Repro Phase"
+col RPRFDY   type=Num  label="Repro Phase Start Reference Day"
+---
+S1 | TP | A | 1 | STG1 | Stg1 | P1 | 0
+S1 | TP | A | 2 | STG2 | Stg2 | P1 | 1
+---
