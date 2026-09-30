@@ -12,9 +12,13 @@ ExecutabilityHint:
   Category: "partially executable"
   Detail: "EX rows recorded per pool (POOLID, USUBJID blank) are read through POOLDEF\
     \ for every pool the subject belongs to; when the latest EXENDTC or the latest\
-    \ EXSTDTC of the subject's own EX records or of its pools cannot be determined\
+    \ EXSTDTC of the subject's own EX records or of any of its pools cannot be determined\
     \ (a partial or unreadable date, or a blank EXENDTC within a pool's or the subject's\
-    \ own records) while the other can, the one that can is taken as RFXENDTC's reference."
+    \ own records) while another can, the latest of those that can is taken as RFXENDTC's\
+    \ reference, so the rule may be silent where the latest over all of them would\
+    \ be reported. A POOLID typed differently in EX and POOLDEF, or a USUBJID typed\
+    \ differently in DM and POOLDEF (Char against Num; in a CSV or XLSX study an all-blank\
+    \ EX POOLID beside a numeric-looking POOLDEF POOLID), makes the rule ERROR."
 Scope:
   Domains:
     Include:

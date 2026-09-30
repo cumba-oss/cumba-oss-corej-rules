@@ -216,9 +216,17 @@ POOLDEF row with a blank `POOLID` would take the whole study's first dose as its
 
 A subject in no pool, a pool with no EX row and a study without POOLDEF all answer *missing* for
 the pool part, which `earliest_date` skips — so the rule reads exactly as before on a non-pooled
-study. When one part is undeterminable (a partial date) and the other is not, the determinate one
-is taken (`PLAN-scalar-date-extremes` SDE D2): the rule may then be silent where the exact union
-would have reported, never the reverse.
+study, with one exception: the pool read compares `POOLID` between EX and POOLDEF, and `USUBJID`
+between POOLDEF and the rule's dataset, and a key whose column type differs between the two (Char
+against Num) makes the rule **ERROR**, never a silent non-match. A CSV or XLSX study can meet this
+without any pooling: an all-blank EX `POOLID` column is read as Char, and a POOLDEF whose `POOLID`
+values look numeric is read as Num.
+
+When the subject's own EX records or any one of its pools give an undeterminable extreme (a partial
+or unreadable date) while another part can be determined, the parts that can be determined decide
+(`PLAN-scalar-date-extremes` SDE D2) — between two pools too, since the outer aggregate skips the
+undeterminable pool as `earliest_date` skips an undeterminable part. The rule may then be silent
+where the exact union of all those EX records would have reported, never the reverse.
 
 → [`earliest_date`](reference/functions.md#earliest_date) · [`min_date`](reference/functions.md#min_date)
 

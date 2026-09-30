@@ -1154,7 +1154,7 @@ Check:
   expression: 'not empty(--DY) and is_complete_date_part(--DTC) and is_complete_date_part(DM.RFSTDTC) and --DY != $value_dy_algorithm'
 ```
 
-**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
 
 **Missing and empty** — A missing date or reference yields **that missing value**, decided before the dates are parsed: with `X` = `.A`, `dy(X, R)` is `.A` whatever present value `R` holds (even an incomplete date), and with `X` = `.A`, `R` = `.B` it is the plain missing (rulings register `D85c` / `D86a`). Only present but incomplete or unparsable dates give the plain missing (`MIS`).
 
@@ -1170,7 +1170,7 @@ The earlier of two dates — exactly what [`min_date`](#min_date) answers over a
 | `a` | date | yes | The first date — a column, a `date(…)` conversion, or a date-valued binding such as a `min_date(…)` result. Positional, or by name (`a=`) |
 | `b` | date | yes | The second date, likewise. Positional, or by name (`b=`) |
 
-Exactly two arguments; more than two nest (`earliest_date(a, earliest_date(b, c))`), which is exact for determinate operands but not the three-way extreme once an inner pair is undeterminable. A string literal argument is a type finding — write `earliest_date(date("2012-06"), date("2012-06-01"))`. The result is a **date**, so it meets `date(X) != …` and `date(X) == …` as a date. There is no `missing_values=` parameter: a per-part `indeterminate` belongs on the grouped call that feeds it.
+Exactly two arguments; more than two nest (`earliest_date(a, earliest_date(b, c))`), which is exact for determinate operands but not the three-way extreme once an inner pair is undeterminable. A string literal argument is a type finding — write `earliest_date(date("2012-06"), date("2012-06-01"))`. The result is a **date**, so it meets `date(X) != …` and `date(X) == …` as a date. A **numeric** argument is not refused: a number is never a complete calendar date, so it never wins — beside a date it makes the answer undeterminable (no answer), exactly as it would inside `min_date`. When the two arguments differ in column type (a numeric `EXSTDTC` read from an Excel serial beside a character one), the answer is typed as text, which only a character date or a missing can be. A numeric column passed directly as an argument is **observed** as a numeric date read, not an error — the same observe-only treatment `date()` over a numeric column has (`D55`). There is no `missing_values=` parameter: a per-part `indeterminate` belongs on the grouped call that feeds it.
 
 **Determinability (EC-46)** — as `min_date`: the determined candidate that reaches every possible completion of the other wins, and its own cell is the answer. `earliest_date(date("2012-06"), date("2012-06-01"))` is `2012-06-01`; `earliest_date(date("2012-06"), date("2012-06-02"))` has no answer (the partial could be the 1st); two partials have no answer; a present value that cannot be positioned (`UNK`, `2020-02-30`) makes the answer undeterminable. On equal text `a` wins.
 
@@ -1679,7 +1679,7 @@ Check:
 
 **When there is nothing to answer** — **missing** — for a group with no candidate (all cells
 missing or blank, or a filter that keeps no row), and for a row of the evaluated dataset whose key
-has no group (a subject with no `DS` row; an absent `domain` dataset). `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does. A group whose inputs are all missing carries their missing
+has no group (a subject with no `DS` row; an absent `domain` dataset). `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true. A group whose inputs are all missing carries their missing
 identity.
 
 
@@ -1725,7 +1725,7 @@ Check:
 ```
 
 **When there is nothing to answer** — **missing** — an undeterminable group, a group with no
-candidate, and a row of the evaluated dataset whose key has no group. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
+candidate, and a row of the evaluated dataset whose key has no group. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
 
 
 ### min_date
@@ -2288,7 +2288,7 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
 
 ### dataset_names
 
@@ -2444,7 +2444,7 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
 
 ### referenced_dataset_variables
 
@@ -2652,7 +2652,7 @@ Check:
   expression: 'not empty($sdtm_label) and var_label("DATA") != $sdtm_label'
 ```
 
-**When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
+**When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
 
 ### duplicate_label_variables
 
@@ -3976,8 +3976,11 @@ Check:
 ```
 
 **When there is nothing to answer** — the column's **type default**, never an error: `""` for a
-character column, missing for a numeric one — so `empty($x)` is true, `!=` against it fires and
-the other comparisons do not. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
+character column, missing for a numeric one — so `empty($x)` is true either way. The character
+default `""` is an ordinary empty text: `$x == ""` is true, and `!=` against a present literal
+(`$x != "RAT"`) is true. The numeric default is a missing: `!=` against it fires (rulings register
+`D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest
+value (`D34 #5`): `X > $x` and `$x < X` fire, `X < $x` does not. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
 `name` the dataset does not carry; the rule executes (it does not skip). A qualifying row whose
 `name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more
 qualifying rows report the rule as ERROR (`… — ONLY asserts exactly one qualifying row`), because the

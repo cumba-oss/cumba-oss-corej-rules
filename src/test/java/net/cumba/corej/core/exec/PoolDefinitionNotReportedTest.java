@@ -29,6 +29,15 @@ import org.junit.jupiter.api.Test;
  * packages carry the rules too.
  *
  * <p>
+ * ⚠ <b>One exclusion, deliberate:</b> the DRAFT TIG package ({@code rules-draft-tig-1-0}) lists
+ * {@code tig/1-0/send} among its primary standards but is <b>not</b> read — the predicate is a
+ * {@code sendig*} primary standard, and TIG's is {@code tig/…}. It is safe to leave out: its seven
+ * rules are DRAFT (generated and tested, never released), none of the four pool readers is among
+ * them, and none reads or tests POOLDEF (measured 2026-09-30 over {@code target/rules}). A TIG
+ * package that ever ships SEND rules re-opens this; the population ratchet below stays 18.
+ * </p>
+ *
+ * <p>
  * Two guards keep the assertion from passing vacuously: a <b>positive control</b> — a synthetic
  * package holding one bare-presence rule on POOLDEF must put POOLDEF into
  * {@link AbsentDatasetSkip#reportedDatasets} (else the instrument is blind and the corpus assertion

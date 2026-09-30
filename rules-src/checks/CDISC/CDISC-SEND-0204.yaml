@@ -30,8 +30,12 @@ ExecutabilityHint:
     \ a subject without a DS record, or whose DSSTDTC is not a complete date, is not\
     \ judged; EX rows recorded per pool (POOLID, USUBJID blank) are read through POOLDEF\
     \ for every pool the subject belongs to; when the earliest EXSTDTC of the subject's\
-    \ own EX records or of its pools cannot be determined (a partial or unreadable\
-    \ date) while the other can, the one that can is taken as the first dose."
+    \ own EX records or of any of its pools cannot be determined (a partial or unreadable\
+    \ date) while another can, the earliest of those that can is taken as the first\
+    \ dose, so the rule may be silent where the earliest over all of them would be\
+    \ reported. A POOLID typed differently in EX and POOLDEF, or a USUBJID typed differently\
+    \ in TF and POOLDEF (Char against Num; in a CSV or XLSX study an all-blank EX\
+    \ POOLID beside a numeric-looking POOLDEF POOLID), makes the rule ERROR."
 Scope:
   Domains:
     Include:
@@ -78,9 +82,10 @@ Check:
     TFSPID) not in $cl_masses and tuple(USUBJID, TFSPID) not in $pm_masses and tuple(USUBJID,
     TFSPID) in $ma_masses and TFDETECT != $days_to_disposition
 Outcome:
-  Message: "TFDETECT does not equal (DSSTDTC - earliest EXSTDTC) + 1 for a tumor first\
-    \ detected at necropsy (its TFSPID matches an MA record and no CL or PM record\
-    \ of the subject)."
+  Message: "TFDETECT does not equal (DSSTDTC - the earliest EXSTDTC of the subject's\
+    \ own EX records and of the EX records of every pool POOLDEF assigns it to) +\
+    \ 1 for a tumor first detected at necropsy (its TFSPID matches an MA record and\
+    \ no CL or PM record of the subject)."
   Output_Variables:
   - "TFSPID"
   - "TFDETECT"
