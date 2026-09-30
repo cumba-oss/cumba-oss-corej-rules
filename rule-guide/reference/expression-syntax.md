@@ -625,7 +625,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 | function | returns | what it does |
 |---|---|---|
-| [`read_value(name, domain=, filter=, mode=)`](functions.md#read_value) | value | One value of another dataset: the `name` column of `domain`, from the rows `filter` selects, by `mode` (`FIRST` · `ONLY` · `MIN` · `MAX`); no match ⇒ the column's type default |
+| [`read_value(name, domain=, filter=, mode=, group=, keep_missings=)`](functions.md#read_value) | value | One value of another dataset: the `name` column of `domain`, from the rows `filter` selects, by `mode` (`FIRST` · `ONLY` · `MIN` · `MAX`) — per group of `domain` with `group=`; no match ⇒ the column's type default |
 
 ### Values and references
 

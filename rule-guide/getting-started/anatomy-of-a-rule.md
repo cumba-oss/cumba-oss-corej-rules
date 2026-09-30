@@ -215,9 +215,13 @@ the rule is about what was *promised* rather than what was delivered.
 enforces the same thing, so a finding is not raised twice by two authorities.
 
 **`Supp_Merge`** — the declared SUPP merge, on by default: the rule reads a `SUPP<domain>`
-qualifier as a value of the parent record (`empty(PCCALCN)`, `var_exists("PCCALCN")`), and a
+qualifier as a value of the parent record (`empty(PCCALCN)`, `var_exists("PCCALCN")`) — the
+`SUPP--` row keyed on the same subject **and pool** (`USUBJID`, `POOLID`, each blank when absent)
+plus `IDVAR` = `IDVARVAL` — and a
 requirement naming one — bare, or qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset
-delivers it; a qualifier is never a variable of the domain for the variable-inventory checks. Write `Supp_Merge: false` only for a rule that must read the raw
+delivers it; a qualifier is never a variable of the domain for the variable-inventory checks. The
+merge serves the dataset under evaluation only — never a dataset read through `domain=`
+(`read_value`, `distinct`, …), and never a `SUPP--` primary. Write `Supp_Merge: false` only for a rule that must read the raw
 domain file (see [Requirements](../authoring/requirements.md#supp_merge)).
 
 → [Scope](../authoring/scope.md) · [Requirements](../authoring/requirements.md)

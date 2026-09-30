@@ -39,8 +39,8 @@ library lookups are exceptions and SKIP the rule instead; their section says so.
 ## The target of `distinct`: one column, or a list of columns
 
 `distinct` is the one function whose single positional argument decides the **shape** of its
-answer (runbook W7, `PLAN-distinct-function`; the retired operation surface's one-positional rule
-survives only here). What that argument *is* decides what the function collects:
+answer (runbook W7, `PLAN-distinct-function`; like every function that reads another dataset it
+takes that target as its only positional argument — see below). What that argument *is* decides what the function collects:
 
 | you write | collects | meaning |
 |---|---|---|
@@ -90,8 +90,11 @@ Other parameters take a list in the same literal form: `is_unique_set([USUBJID, 
 `contains_all(source, keys=[ARMCD])`,
 `is_sorted_by(target, by=[asc(VISITNUM)])`.
 
-> ⚠ **This one-positional rule is specific to `distinct`.** An ordinary function takes as many
-> positional arguments as it declares parameters — `substring(AETERM, 1, 3)` — as described under
+> ⚠ **The one-positional rule holds for the functions that read another dataset** — `distinct`,
+> `max`, `max_date`, `min_date` and `read_value` take their target as the only positional argument,
+> and `record_count` takes none; a further positional (`max_date(DSSTDTC, DS, group=[USUBJID])`) is
+> a load error naming the keyword spelling. An ordinary function takes as many positional
+> arguments as it declares parameters — `substring(AETERM, 1, 3)` — as described under
 > [Arguments](expression-syntax.md#arguments).
 
 ⛔ **A type mismatch is a rule ERROR, not a coercion.** Where a function requires a numeric
@@ -908,7 +911,7 @@ The set difference of two lists — the members of `value` that are not in `subt
 | `value` | list | yes | The minuend — a `$`-binding holding a dataset-level list, or a list literal of string literals (`["AGEU", "SDESIGN"]`) |
 | `subtract` | list | yes | The subtrahend — a `$`-binding holding a dataset-level list, or a list literal of string literals |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). Both operands are **dataset-level** lists — the answer of another list function, or a list literal; a `$`-binding that is computed per row (`distinct(…, group=[…])`, a per-variable value) is refused at load (*"the list function minus(…) … cannot read the per-row or per-variable binding"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load. It is an **aggregate**: one list for the dataset. Members compare as set elements: a text against a text, a missing value by its identity, and a row tuple (from `distinct([A, B], …)`) **structurally**, component by component — never by its printed form.
+A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). Both operands are **dataset-level** lists, and only two spellings are accepted: a `$`-binding holding one (typically the answer of another list function), or a list literal. Anything else written inline — a column, a call (even a list function), any other expression — is a load error (*"takes a dataset-level list — a $-binding of one or a list literal"*): an inline operand would be read once, at row 0, and stand for every row, so bind it and read the binding. A `$`-binding that is computed per row (`distinct(…, group=[…])`, a per-variable value) is refused at load too (*"the list function minus(…) … cannot read the per-row or per-variable binding"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load. It is an **aggregate**: one list for the dataset. Members compare as set elements: a text against a text, a missing value by its identity, and a row tuple (from `distinct([A, B], …)`) **structurally**, component by component — never by its printed form.
 
 **Example**
 
@@ -1333,7 +1336,7 @@ what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `c
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load |
-| `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently) |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group). Requires `group=` |
@@ -1393,6 +1396,12 @@ Check:
 target column, a group no kept row reaches, a row of the evaluated dataset whose group the target
 dataset does not have. `X in $s` is then vacuously false; `X not in $s` is vacuously true and
 **fires** — the closed-world reading the operation always had.
+
+⛔ **The group keys are type-checked even when there is nothing to collect.** A grouped call on
+another dataset compares its group columns' types with the evaluated dataset's; a character key on
+one side and a numeric key of the same name on the other makes the rule **ERROR** rather than
+silently match no row — also when the target column is absent from `domain` and every group's
+list would be empty.
 
 **Missing and empty** — Always present — a list, never missing. (The former
 `distinct(IDVAR, value_is_reference=true)`, which never read `IDVAR`, is
@@ -1502,9 +1511,14 @@ cross-dataset plan `record_count` and `distinct` follow.
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides) |
-| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
+
+**One positional argument.** The target is the only positional; every other argument is a keyword. A second
+positional (`max(DSSTDY, DS, group=[USUBJID])`) is a load error naming the keyword spelling
+(*"max takes one positional argument, its target; got 2 — write the others as keywords: …"*),
+never a silent binding to `domain`. The same holds for `max_date` and `min_date`.
 
 **Ranking by type.** Candidates are the populated cells (a missing, empty or whitespace-only cell
 is no candidate). A numeric column ranks numerically; a character column ranks as **text** —
@@ -1559,6 +1573,9 @@ answer (the partial could be the 30th), `max{2012-06, 2012-06-30}` is `2012-06-3
 value that cannot be positioned (`UNK`, a masked day) makes the group's extreme undeterminable.
 The answer is the winning cell's own text.
 
+**One positional argument**, as for `max`: `max_date(DSSTDTC, DS, group=[USUBJID])` is a load
+error naming the keyword spelling (`domain="DS"`), never a read of `DS`.
+
 **Example**
 
 ```yaml
@@ -1590,7 +1607,9 @@ not fire; `empty()` on it does.
 
 The earliest date in a column per group — the same contract as `max_date`, in the other direction
 (`min{2012-06, 2012-06-01}` is `2012-06-01`; `min{2012-06, 2012-06-02}` has no answer, the
-partial could be the 1st).
+partial could be the 1st). Its parameters, its `--` resolution in `domain=` and its **one positional
+argument** are `max_date`'s: `min_date(DSSTDTC, DS, group=[USUBJID])` is a load error naming the
+keyword spelling.
 
 **Example**
 
@@ -1653,7 +1672,7 @@ read per row of the evaluated dataset. The bare `record_count()` is the dataset'
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset |
+| `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are counted, in parentheses: `filter=(TSPARMCD == "INDIC")`, `filter=(TSPARMCD == "INTTYPE" and TSVAL in ["DRUG", "BIOLOGIC"])`, `filter=(starts_with(QNAM, "RACE"))`, `filter=(not empty(AEACN))`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the count is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be a `$`-reference to a dataset-level **list of column names** (`group=[USUBJID, --TESTCD, $TIMING_VARIABLES]`), spliced in place |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
@@ -3792,7 +3811,7 @@ column of `domain`, taken from the rows a `filter` over that dataset's own colum
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of `domain` | yes | The column to read — bare, never quoted, never dotted, never `--` |
-| `domain` | dataset reference | yes | The dataset to read from: `TS` or `"TS"` (both spellings name the dataset) |
+| `domain` | dataset reference | yes | The dataset to read from: `TS` or `"TS"` (both spellings name the dataset). A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do. The dataset is read **raw**: the declared SUPP merge (`Supp_Merge`) serves the dataset under evaluation only, so a `SUPP--` qualifier is never a column of `domain` — neither as `name` nor in `filter` |
 | `filter` | boolean over `domain`'s columns | no | Which rows qualify, in parentheses: `filter=(TSPARMCD == "SPECIES")`. Only columns of `domain` — a dotted, `$` or `--` reference is a load error. Absent ⇒ every row |
 | `mode` | `"FIRST"` · `"ONLY"` · `"MIN"` · `"MAX"` | yes | Which qualifying row answers: the first in dataset order; exactly one (a second qualifying row is a rule **ERROR**); the smallest / largest `name` by the engine's one ordering (a missing below every value, numbers numerically, text as text) |
 | `group` | list of columns of `domain` | no | Per-group reading (runbook W5): the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default |
