@@ -133,8 +133,14 @@ class UnqualifiedJoinedReadLintTest
     // phase 2c), re-measured in its review-fix round (lane GF) after CDISC-AD0592's
     // Output_Variables fix. EXACT — see the assertion messages for what may move each one.
 
+    // SEND 142 -> 152 on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): CDISC-SEND-0204 and
+    // CDISC-SEND-0205 were un-parked and join DS on USUBJID; each is examined in five of its six
+    // packages (sendig 3.0 / 3.1 / 3.1.1, genetox-1-0, dart-1-2). Their bare reads are TF's own
+    // (USUBJID, TFSPID, TFDETECT); the one DS read is qualified (DS.DSSTDTC). FLAGS stayed 0 and
+    // CANDIDATES did not move. The sixth package, dart-1-1, selects no library dataset for TF and
+    // is named in R-EMPTY; under dart-1-2 the DS join is counted in R-UNRES (DS 1 -> 3).
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
-            "SEND", 142);
+            "SEND", 152);
 
     // SEND 6 -> 9 -> 6 on 2026-09-30 (PLAN-rprfdy-offset-tp-join). Phase 4 gave CDISC-SEND-0401/
     // 0402/0403 read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
@@ -161,10 +167,16 @@ class UnqualifiedJoinedReadLintTest
             // DM entry (Keys [USUBJID]). The store has no SENDIG-DART 1.2 product, so under that
             // package the lint cannot judge those three joins (as it could not judge the three SJ
             // joins before) — they are examined under dart-1-1, where FLAGS stayed 0.
-            Map.entry("sendig/dart-1-2\tDM", 5), Map.entry("sendig/dart-1-2\tDS", 1),
+            // DS 1 -> 3 on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): the un-parked
+            // CDISC-SEND-0204 / 0205 join DS, and under this package the join cannot be judged.
+            Map.entry("sendig/dart-1-2\tDM", 5), Map.entry("sendig/dart-1-2\tDS", 3),
             Map.entry("sendig/dart-1-2\tRELREC", 2));
 
+    // + the two dart-1-1 rows on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): the un-parked
+    // CDISC-SEND-0204 / 0205 are scoped to TF, which the SENDIG-DART 1.1 library does not define.
     private static final Set<String> EXPECTED_EMPTY = Set.of(
+            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204",
+            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
             "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");

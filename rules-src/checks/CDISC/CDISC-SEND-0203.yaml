@@ -8,18 +8,23 @@ Description: "Raise an error when the tumor-detection interval (TFDETECT) is pop
 Executability: "Not Executable"
 ExecutabilityHint:
   Category: "not executable"
-  Detail: "Parked: the engine cannot express this rule's Source formula. The formula\
-    \ is TFDETECT = (PMDTC - EXSTDTC) + 1, a two-hop foreign date subtraction — the\
-    \ minuend comes from PM and the subtrahend from EX, neither of them the TF dataset\
-    \ being validated. date_diff_days reaches ONE foreign dataset, so the shipped\
-    \ implementation silently substituted the local TF.--DTC for PMDTC; that is a\
-    \ different assertion, not an approximation of this one. The Source's detection-method\
-    \ Condition (tumor was detected as a palpable mass) is a cross-domain relationship\
-    \ test and is not implemented at all, so the four rules CDISC-SEND-0202 to 0205\
-    \ shared one byte-identical Check and reported four identical findings per offending\
-    \ record. Un-parking needs (1) two-hop foreign date arithmetic — the parked EC-47\
-    \ gap, PLAN-date-diff-foreign-offset.md, register section 48 — and (2) a cross-domain\
-    \ detection-method condition, which EC-47 does not cover."
+  Detail: "Parked: the detection method is expressible, the detection date is not.\
+    \ The link is readable: SENDIG TF Assumption 5 (SENDIG 3.0 Assumption 4) makes\
+    \ the mass identifier in --SPID consistent across CL, PM, MA, MI and TF, so a\
+    \ TF record whose USUBJID and TFSPID are also a PM mass (PMSPID) was detected\
+    \ as a palpable mass, as CDISC-SEND-0204 and CDISC-SEND-0205 read it. The formula\
+    \ is TFDETECT = (PMDTC - EXSTDTC) + 1, where PMDTC is the date of the PM observation\
+    \ of THAT mass, and the engine cannot read it (engine feature F1): it needs a\
+    \ grouped read of PM keyed by USUBJID and the mass identifier, whose key column\
+    \ is named differently on the two sides (TFSPID here, PMSPID in PM), and a --SPID\
+    \ group member is refused under domain=; a keyed Match_Datasets join on PM instead\
+    \ multiplies each TF record by the mass's PM observations with nothing to aggregate\
+    \ them to the earliest PMDTC. The split between CDISC-SEND-0202 and CDISC-SEND-0203\
+    \ needs the same read (R4): a mass that is both a clinical sign and a palpable\
+    \ mass was first detected in the domain holding the earlier date, ties to CL,\
+    \ so the two rules must compare CLDTC with PMDTC before either applies. The parked\
+    \ Check is the old stand-in, the local --DTC for PMDTC with EX joined, and must\
+    \ not be un-parked as it stands."
 Scope:
   Domains:
     Include:

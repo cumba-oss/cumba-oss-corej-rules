@@ -64,13 +64,13 @@ class RuleSrcExpressionWriterCorpusTest
     private static final int MIN_AUTHORED = 3400;
 
     /**
-     * The six parked rules (§2): converted in place, still parked. {@code CDISC-SEND-0202} &ndash;
-     * {@code 0205} are parked on EC-47; {@code DRAFT-900027} was authored
-     * {@code Executability: "Not Executable"} with an {@code ExecutabilityHint} (no operator
-     * detects an imputed date) &mdash; added 2026-08-22. {@code CDISC-CG0328} is parked as the
-     * {@code R-5.26} duplicate of {@code CDISC-CG0329} (owner ruling D-8, 2026-09-12): both ship
-     * the identical check into the same three packages, so one is parked and the lower-numbered
-     * sheet row stays documented in {@code rules-src}.
+     * The six parked rules (§2): converted in place, still parked. {@code CDISC-SEND-0202} and
+     * {@code 0203} are parked on engine feature F1 (their Hint names it); {@code DRAFT-900027} was
+     * authored {@code Executability: "Not Executable"} with an {@code ExecutabilityHint} (no
+     * operator detects an imputed date) &mdash; added 2026-08-22. {@code CDISC-CG0328} is parked as
+     * the {@code R-5.26} duplicate of {@code CDISC-CG0329} (owner ruling D-8, 2026-09-12): both
+     * ship the identical check into the same three packages, so one is parked and the
+     * lower-numbered sheet row stays documented in {@code rules-src}.
      */
     // ⚑ 6 -> 26 on 2026-09-14 (F-1, owner rulings D-8 + D-18): twenty R-5.26 duplicates
     // parked across twenty pairs. ⛔ In NINE of them the survivor is the LOWER number, because
@@ -88,12 +88,15 @@ class RuleSrcExpressionWriterCorpusTest
     // R-5.26 duplicate of CDISC-CG0118 — the third contrapositive pair in the ARM/ACTARM family,
     // after CG0120/CG0121 and CG0126/CG0128 took the same treatment on 2026-09-14. A
     // Condition-implies-Rule pair and its contrapositive are violated on exactly the same rows.
+    // ⭐ 25 -> 23 on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): CDISC-SEND-0204 and
+    // CDISC-SEND-0205 UN-PARKED — Partially Executable, the detection method read from the --SPID
+    // link and the detection date from DS.DSSTDTC. Their siblings 0202 / 0203 stay parked. An
+    // EXACT set equality, so no headroom applied.
     private static final Set<String> PARKED = Set.of("CDISC-CG0091", "CDISC-CG0117", "CDISC-CG0120",
             "CDISC-CG0126", "CDISC-CG0158", "CDISC-CG0254", "CDISC-CG0328", "CDISC-CG0361",
             "CDISC-CG0622", "CDISC-CG0626", "CDISC-CG0630", "CDISC-CG0635", "CDISC-CG0636",
             "CDISC-CG0640", "CDISC-CG0642", "CDISC-CG0643", "CDISC-CG0644", "CDISC-SEND-0202",
-            "CDISC-SEND-0203", "CDISC-SEND-0204", "CDISC-SEND-0205", "CDISC-SEND-0268",
-            "DRAFT-900027", "FDA-SD0063", "PMDA-SD0063");
+            "CDISC-SEND-0203", "CDISC-SEND-0268", "DRAFT-900027", "FDA-SD0063", "PMDA-SD0063");
 
     /**
      * Ordinary authored-text pins for the three formerly-curated expressions. ⚠ These are, and
