@@ -1,9 +1,10 @@
 #!RuleTest
 #test CDISC-SEND-0205 expect=violation domain=TF
-#note "PLAN-send-tfdetect-pathology-unpark: Row 1 (001, M1) is also a PM palpable mass -> detected in life, CDISC-SEND-0203's case, NOT judged here though TFDETECT 50 is wrong. Row 2 (002, M2) is linked to no CL, PM or MA record -> REPORTED. Near-miss: PM holds M2 for subject 001, which must not link subject 002's M2. Red-before: the rule was parked (Executability Not Executable), so the scenario failed with the rule not a member of the sendig 3.1.1 package."
+#note "PLAN-send-tfdetect-pathology-unpark: Row 1 (001, M1) is a PM palpable mass and in no CL or MA record (PM is its ONLY link) -> detected in life, CDISC-SEND-0203's case, NOT judged here though TFDETECT 50 is wrong, and the silence is owed to the PM test alone (review M1: row 1 was MA-linked too, so the MA test silenced it and the PM test was untested). Row 2 (002, M2) is linked to no CL, PM or MA record -> REPORTED. Near-misses: PM holds M2 for subject 001, which must not link subject 002's M2 (the link is per subject); subject 003 IS in PM, but under another PMSPID (M8), so its M3 is not PM-linked and is still judged -> REPORTED (the link is per mass, not per subject; review L1). Red-before (review fix, TF-2): with the 'not in $pm_masses' term deleted, row 1 fired (3 findings, expected 2); with the PM link read per subject only (USUBJID not in a PM subject set) row 3 went silent (fired 1, expected 2). When first written (TF-1) the rule was parked (Executability Not Executable), so the scenario failed with the rule not a member of the sendig 3.1.1 package."
 #library standard=sendig version=3-1-1
-#expectViolationCount 1
+#expectViolationCount 2
 #expectViolationAt row=2 TFSPID=M2
+#expectViolationAt row=3 TFSPID=M3
 dataset TF class=FINDINGS label="Tumor Findings"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"
@@ -15,6 +16,7 @@ col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
 ---
 S1 | TF | 001 | 1 | M1 | TUMEXAM | 50
 S1 | TF | 002 | 2 | M2 | TUMEXAM | 50
+S1 | TF | 003 | 3 | M3 | TUMEXAM | 50
 ---
 dataset DS class=EVENTS label="Disposition"
 col STUDYID type=Char label="Study Identifier"
@@ -27,6 +29,7 @@ col DSSTDTC type=Char label="Date/Time of Disposition"
 ---
 S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
 S1 | DS | 002 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
+S1 | DS | 003 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
 ---
 dataset EX class=INTERVENTIONS label="Exposure"
 col STUDYID type=Char label="Study Identifier"
@@ -38,6 +41,7 @@ col EXSTDTC type=Char label="Start Date/Time of Treatment"
 ---
 S1 | EX | 001 | 1 | DRUG A | 2020-01-01
 S1 | EX | 002 | 2 | DRUG A | 2020-01-01
+S1 | EX | 003 | 3 | DRUG A | 2020-01-01
 ---
 dataset MA class=FINDINGS label="Macroscopic Findings"
 col STUDYID  type=Char label="Study Identifier"
@@ -48,7 +52,7 @@ col MASPID   type=Char label="Sponsor-Defined Identifier"
 col MATESTCD type=Char label="Macroscopic Examination Short Name"
 col MAORRES  type=Char label="Result or Finding in Original Units"
 ---
-S1 | MA | 001 | 1 | M1 | GROSPATH | MASS
+S1 | MA | 001 | 1 | M9 | GROSPATH | MASS
 S1 | MA | 002 | 2 | M9 | GROSPATH | MASS
 ---
 dataset PM class=FINDINGS label="Palpable Masses"
@@ -63,4 +67,5 @@ col PMDTC    type=Char label="Date/Time of Observation"
 ---
 S1 | PM | 001 | 1 | M1 | LENGTH | 10 | 2020-02-19
 S1 | PM | 001 | 2 | M2 | LENGTH | 10 | 2020-02-19
+S1 | PM | 003 | 3 | M8 | LENGTH | 10 | 2020-02-19
 ---

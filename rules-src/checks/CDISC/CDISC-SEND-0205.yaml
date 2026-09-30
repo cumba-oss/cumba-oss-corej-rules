@@ -20,10 +20,15 @@ ExecutabilityHint:
     \ is not judged, because its detection method cannot be determined; a mass linked\
     \ to CL, PM or MA only through RELREC, not by --SPID, is not seen, so it is judged\
     \ by the wrong one of CDISC-SEND-0204 and CDISC-SEND-0205, or judged at all where\
-    \ a missed CL or PM link means it was detected in life; a study whose CL, PM or\
-    \ MA dataset lacks its --SPID column skips the rule, because the link to that\
-    \ domain cannot be read for any record; a subject without a DS record, or whose\
-    \ DSSTDTC is not a complete date, is not judged."
+    \ a missed CL or PM link means it was detected in life; a study whose CL or PM\
+    \ dataset lacks its --SPID column skips the rule, because the link to that domain\
+    \ cannot be read for any record and a tumor detected in life is dated differently;\
+    \ an MA dataset without MASPID links no record, so CDISC-SEND-0204 finds no tumor\
+    \ first detected at necropsy and CDISC-SEND-0205 judges those tumors by the same\
+    \ formula, a necropsy finding then being reported under CDISC-SEND-0205's id;\
+    \ a subject without a DS record, or whose DSSTDTC is not a complete date, is not\
+    \ judged; EX dosing recorded per pool (POOLID, USUBJID blank) is not read: such\
+    \ a subject has no first dose and its records are reported."
 Scope:
   Domains:
     Include:
@@ -44,8 +49,6 @@ Requirements:
       - "CL.CLSPID"
     - - "PM.USUBJID"
       - "PM.PMSPID"
-    - - "MA.USUBJID"
-      - "MA.MASPID"
 Match_Datasets:
 - Keys:
   - "USUBJID"
