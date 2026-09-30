@@ -285,6 +285,12 @@ class WildcardUniversalAbsenceLintTest
         Census census = new Census();
         RulePackage pkg = RulePackageLoader.loadFromString(json);
         assertEquals(1, pkg.getRules().size(), json);
+        // Review round 2: a shape that fails to LOAD has no Check to walk, and an empty census
+        // would pass every "not flagged" assertion vacuously — so every fixture must load clean.
+        Rule loaded = pkg.getRules().get(anId);
+        org.junit.jupiter.api.Assertions.assertNotNull(loaded, json);
+        org.junit.jupiter.api.Assertions.assertNull(loaded.getLoadError(),
+                () -> anId + " must load clean: " + loaded.getLoadError());
         addPackage(census, pkg);
         return census;
     }

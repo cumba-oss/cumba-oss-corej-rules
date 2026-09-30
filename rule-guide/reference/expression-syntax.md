@@ -422,7 +422,7 @@ Date columns *are* character, so a regex reads their raw ISO text — which make
 
 ## Functions
 
-**One surface: 188 functions.** Every one is written the same way — `name(args)` — and every one is
+**One surface.** Every function is written the same way — `name(args)` — and every one is
 declared with an ordered, typed parameter list.
 
 The signature names every parameter; `[, x]` marks an optional one and `…` a keyword-argument tail

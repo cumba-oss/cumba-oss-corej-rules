@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -17,18 +19,21 @@ import org.junit.jupiter.api.Test;
 
 /**
  * ⭐ The function reference ({@code rule-guide/reference/functions.md}) is held to the engine's
- * {@link FunctionRegistry}: every registered name must have a {@code ### name} section or be named
- * in backticks there ({@code `name`} or {@code `name(}, how an alias or a negated spelling is
- * documented inside its primary's section). The page is maintained by hand, so without this a newly
- * registered function is invisible to authors while every gate stays green —
- * {@code PLAN-dynamic-column-functions} review round 1 (lane C F7) found {@code date}, {@code time}
- * and two metadata accessors undocumented that way.
+ * {@link FunctionRegistry}: every registered name must have its own {@code ### name} section — or
+ * be one of the {@link #ALIASES} (a negated or alternative spelling), each of which must be named
+ * in backticks ({@code `name`} / {@code `name(}) INSIDE its primary's section. The page is
+ * maintained by hand, so without this a newly registered function is invisible to authors while
+ * every gate stays green — {@code PLAN-dynamic-column-functions} review round 1 (lane C F7) found
+ * {@code date}, {@code time} and two metadata accessors undocumented that way. Review round 2 (L1):
+ * "a backticked mention anywhere" was too weak — {@code length} was "documented" by a parameter row
+ * of {@code substring} — so a mention counts only for a listed alias, only in its primary's
+ * section.
  *
  * <p>
- * Non-vacuity, checked on every run: the registry and the page each carry a floor of names (a
- * registry or page read as empty cannot pass), a fabricated name is NOT found, and the matcher run
- * over the page with one real function's heading and mentions removed reports that function missing
- * — so the check can fail, and fails on exactly what it claims to check.
+ * Non-vacuity, checked on every run: the registry and the page each carry a floor of names, every
+ * alias entry is itself registered and its primary has a section (a stale map cannot pass), a
+ * fabricated name is reported, and the check run over the page with one real function's heading
+ * removed — or one alias's mention removed from its primary's section — reports exactly that name.
  * </p>
  */
 class FunctionReferenceRosterTest
@@ -38,7 +43,30 @@ class FunctionReferenceRosterTest
     private static final int MIN_REGISTERED = 150;
 
     /** A floor on the page's {@code ###} sections. */
-    private static final int MIN_SECTIONS = 150;
+    private static final int MIN_SECTIONS = 130;
+
+    /**
+     * The registered names documented inside ANOTHER function's section — alias → primary. Measured
+     * 2026-09-30: 23, every one a negated or alternative spelling its primary's section names.
+     */
+    static final Map<String, String> ALIASES = Map.ofEntries(
+            Map.entry("does_not_contain", "contains"), Map.entry("ds_not_exists", "ds_exists"),
+            Map.entry("has_not_equal_length", "has_equal_length"),
+            Map.entry("invalid_date", "is_valid_date"),
+            Map.entry("invalid_duration", "is_valid_duration"),
+            Map.entry("is_incomplete_date", "is_partial_date"), Map.entry("is_missing", "empty"),
+            Map.entry("is_not_complete_date_part", "is_complete_date_part"),
+            Map.entry("is_not_integer", "is_integer"),
+            Map.entry("is_not_ordered_subset_of", "is_ordered_subset_of"),
+            Map.entry("is_not_unique_relationship", "is_unique_relationship"),
+            Map.entry("is_not_unique_set", "is_unique_set"),
+            Map.entry("is_not_unique_value", "is_unique_value"), Map.entry("is_present", "empty"),
+            Map.entry("length", "len"), Map.entry("lowcase", "lower"),
+            Map.entry("non_empty", "empty"), Map.entry("not_contains_all", "contains_all"),
+            Map.entry("present", "empty"),
+            Map.entry("shares_no_elements_with", "shares_elements_with"),
+            Map.entry("size", "count"), Map.entry("upcase", "upper"),
+            Map.entry("var_not_exists", "var_exists"));
 
     private static Path page()
     {
@@ -46,21 +74,51 @@ class FunctionReferenceRosterTest
     }
 
 
-    /** Whether {@code doc} documents {@code name}: a heading, or a backticked mention. */
-    static boolean documents(String doc, String name)
+    /** The page's {@code ### name} sections: name → the section's text (up to the next heading). */
+    static Map<String, String> sections(String doc)
     {
-        String q = Pattern.quote(name);
-        return Pattern.compile("(?m)^### " + q + "\\s*$").matcher(doc).find()
-                || Pattern.compile("`" + q + "(`|\\()").matcher(doc).find();
+        Map<String, String> out = new LinkedHashMap<>();
+        String current = null;
+        StringBuilder text = new StringBuilder();
+        for (String line : doc.split("\n", -1))
+        {
+            java.util.regex.Matcher heading = HEADING.matcher(line);
+            if (heading.matches() || line.startsWith("## "))
+            {
+                if (current != null)
+                {
+                    out.put(current, text.toString());
+                }
+                current = heading.matches() ? heading.group(1) : null;
+                text.setLength(0);
+            }
+            else
+            {
+                text.append(line).append('\n');
+            }
+        }
+        if (current != null)
+        {
+            out.put(current, text.toString());
+        }
+        return out;
     }
 
 
     private static Set<String> undocumented(String doc, List<String> names)
     {
+        Map<String, String> sections = sections(doc);
         Set<String> missing = new TreeSet<>();
         for (String name : names)
         {
-            if (!documents(doc, name))
+            if (sections.containsKey(name))
+            {
+                continue;
+            }
+            String primary = ALIASES.get(name);
+            String home = primary == null ? null : sections.get(primary);
+            if (home == null
+                    || !Pattern.compile("`" + Pattern.quote(name) + "(`|\\()").matcher(home).find())
             {
                 missing.add(name);
             }
@@ -73,21 +131,39 @@ class FunctionReferenceRosterTest
     void everyRegisteredFunctionIsDocumented() throws IOException
     {
         String doc = Files.readString(page());
-        List<String> names = FunctionRegistry.all().stream().map(FunctionDescriptor::name)
-                .distinct().sorted().toList();
+        List<String> names = registered();
         assertTrue(names.size() >= MIN_REGISTERED, "the registry lists " + names.size()
                 + " functions, below the floor " + MIN_REGISTERED);
-        long sections = doc.lines().filter(l -> l.startsWith("### ")).count();
-        assertTrue(sections >= MIN_SECTIONS,
-                "functions.md has " + sections + " ### sections, below the floor " + MIN_SECTIONS);
+        Map<String, String> sections = sections(doc);
+        assertTrue(sections.size() >= MIN_SECTIONS, "functions.md has " + sections.size()
+                + " ### sections, below the floor " + MIN_SECTIONS);
         assertEquals(Set.of(), undocumented(doc, names),
-                "registered functions with neither a `### name` section nor a backticked mention in "
-                        + page() + " — document them (a section, or an alias mention in the"
-                        + " primary's section)");
+                "registered functions with neither their own `### name` section nor (as a listed"
+                        + " alias) a backticked mention inside their primary's section in "
+                        + page());
     }
 
 
-    /** The instrument can fail: a fabricated name, and a real one with its mentions removed. */
+    /**
+     * The alias map stays true: every alias is registered, sectionless, with a documented primary.
+     */
+    @Test
+    void theAliasMapNamesRegisteredSectionlessFunctions() throws IOException
+    {
+        Map<String, String> sections = sections(Files.readString(page()));
+        List<String> names = registered();
+        ALIASES.forEach((alias, primary) ->
+        {
+            assertTrue(names.contains(alias), "stale alias entry, not registered: " + alias);
+            assertTrue(!sections.containsKey(alias),
+                    alias + " now has its own section — drop it from ALIASES");
+            assertTrue(sections.containsKey(primary),
+                    alias + "'s primary has no section: " + primary);
+        });
+    }
+
+
+    /** The instrument can fail: a fabricated name, a removed heading, a removed alias mention. */
     @Test
     void theRosterCheckSeesAMissingFunction() throws IOException
     {
@@ -95,9 +171,22 @@ class FunctionReferenceRosterTest
         assertEquals(Set.of("zz_no_such_function"),
                 undocumented(doc, List.of("zz_no_such_function", "printf")),
                 "a fabricated name must be reported, a documented one not");
-        String withoutLpad = doc.replaceAll("(?m)^### lpad\\s*$", "### removed")
-                .replace("`lpad(", "`removed(").replace("`lpad`", "`removed`");
+        String withoutLpad = doc.replaceAll("(?m)^### lpad\\s*$", "### removed");
         assertEquals(Set.of("lpad"), undocumented(withoutLpad, List.of("lpad", "printf")),
-                "removing lpad's heading and mentions must make it undocumented");
+                "removing lpad's heading must make it undocumented — a mention elsewhere does not"
+                        + " count for a non-alias");
+        String withoutUpcase = doc.replace("`upcase`", "`removed`").replace("`upcase(",
+                "`removed(");
+        assertEquals(Set.of("upcase"), undocumented(withoutUpcase, List.of("upcase", "lower")),
+                "removing an alias's mention from its primary's section must report it");
     }
+
+
+    private static List<String> registered()
+    {
+        return FunctionRegistry.all().stream().map(FunctionDescriptor::name).distinct().sorted()
+                .toList();
+    }
+
+    private static final Pattern HEADING = Pattern.compile("^### (\\S+)\\s*$");
 }

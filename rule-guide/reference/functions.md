@@ -4111,14 +4111,24 @@ exactly as `$x: X` does.
 **Names.** A name matches its column whatever its case, and so does the absent default:
 `colref("zz")` and `colref("ZZ")` answer alike. A **written** `--` name (`colref("--SEQ")`) is
 specialised to the domain like any written name; a name **computed** per row that starts with
-`--` names no column and takes the absent default. `colref("DS._matched_")` is a rule error —
-the join-match flag is a condition, never a value — exactly as `DS._matched_` written as a value is.
+`--` names no column and takes the absent default. A **written** `colref("DS._matched_")` fails
+the rule — the join-match flag is a condition, never a value — exactly as `DS._matched_` written as
+a value does; a name computed per row that spells the flag names no column. A dataset qualifier
+matches the rule's `Match_Datasets` name whatever its case (`colref("adsl.TRT01A")` reads `ADSL`).
+
+**Real columns only.** `colref` reads the dataset's own columns (with a `Child: true` parent's
+merged in) and the joined datasets' columns — **not** a SUPP qualifier merged in by the SUPP merge,
+which the written bare name does read. Whether it should is an open owner question
+(`PLAN-dynamic-column-functions` F1); today's behaviour is pinned by a test so a change is visible.
 
 **In a membership test.** On the right of `in`, a list of names is a per-row set:
 `TRTA in colref(find_vars("ADSL.TRTxxA"))`, or through a binding, `$vars: find_vars("ADSL.TRTxxA")`
 and then `TRTA in colref($vars)` (a binding holding one name is a one-member set). On the left,
 `colref(find_vars(…)) in [...]` compares element by element and holds when **any** member is in
-the set — as a list-valued metadata accessor does on the left.
+the set — as a list-valued metadata accessor does on the left. `colref($x)` decides row by row: a
+row whose binding holds a list is compared as above; any other row is an ordinary value, compared
+as the written name would be (numerically against a number list, as dates against `date(…)`
+members). An absent member of a list is `""`, like an absent column anywhere.
 
 ### date
 
@@ -4154,7 +4164,8 @@ selects — the same entry grammar and the same matcher: a template (`"ADSL.TRTx
 two digits, `y` one or more, `w` one), a glob (`"TRT*P"`), a regex over the variable name with the
 qualifier outside the slashes (`"ADSL./TRT[0-9]+PN/"`), or a literal name (an existence test).
 Unqualified entries read the dataset under validation; a qualified entry reads the joined dataset's
-real columns (never a SUPP qualifier). The names come in the dataset's column order — **bare**
+real columns (never a SUPP qualifier), its qualifier matched to the rule's `Match_Datasets` name
+whatever its case. The names come in the dataset's column order — **bare**
 (`TRT01P`) for an unqualified entry, `DS.COLUMN` for a qualified one; `colref` dereferences them. It never expands the rule, so
 `count(find_vars("TRTxxP")) == 0` asks "is no `TRTxxP` present?" and the rule **runs** either way.
 
@@ -4200,7 +4211,8 @@ expression: 'lpad(str(APERIOD), 2, "0") == "01"'
 ```
 
 ⛔ **Load errors.** A written `width` that is negative, not a whole number or above 32767, and a
-written `fill` that is not exactly one character, fail the rule at load.
+written `fill` that is not exactly one character (a number too, by its text: `lpad(X, 3, 0)` is
+fine, `lpad(X, 3, 10)` is not), fail the rule at load.
 
 **Missing and empty** — A missing `x` yields **that missing value**; `""` pads to `width` fills.
 When `width` or `fill` comes from the data, a missing, negative or non-whole `width`, a `width`
