@@ -117,6 +117,10 @@ class CsvLoadedAdslAd0084Test
                 "CONTROL FAILED: a text \".\" beside a numeric TRxxEDT no longer ERRORs, so the "
                         + "main arm's green no longer proves the unquoted '.' is missing; status="
                         + result.getStatus());
+        String cause = String.valueOf(result.getStatusMessage());
+        assertTrue(cause.contains("column-type mismatch"),
+                "CONTROL FAILED: the rule ERRORs, but not on the column-type mismatch the control "
+                        + "exists to reproduce, so it proves nothing about the '.' cell: " + cause);
     }
 
 
