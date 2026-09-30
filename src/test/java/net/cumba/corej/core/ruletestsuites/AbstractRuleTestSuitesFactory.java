@@ -507,7 +507,9 @@ abstract class AbstractRuleTestSuitesFactory
         // and that sentence is the whole point of the mechanism: never a silent zero-expansion.
         case WildcardExpander.ExpansionResult.NoMatch(String reason) -> new EvalOutcome(false,
                 false, false, List.of(), 0, false, "SKIPPED: " + reason);
-        case WildcardExpander.ExpansionResult.Expanded(List<Rule> concrete) ->
+        // A partially dropped expansion (a token surviving substitution, a join key the fixture
+        // lacks) is the resolver's audit concern; the scenario runner executes what survived.
+        case WildcardExpander.ExpansionResult.Expanded(List<Rule> concrete, _) ->
         {
             boolean violated = false;
             boolean executed = false;

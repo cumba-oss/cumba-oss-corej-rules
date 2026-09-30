@@ -165,6 +165,30 @@ class RuleFormatSchemaTest
 
 
     /**
+     * {@code PLAN-expansion-token-delimiters} S10 (review (c) L7): the schema's {@code token}
+     * pattern is {@code ^&[A-Z][A-Z0-9]*&$}, so the retired undelimited spelling and its other
+     * near-misses are rejected one step before the loader's gate G1 — and the valid form passes, so
+     * the pattern cannot have quietly closed over everything.
+     */
+    @Test
+    void anUndelimitedExpansionTokenIsRejectedBySchema() throws Exception
+    {
+        Schema schema = schema();
+        String shape = "{\"rules\":{\"T-0001\":{\"Check\":{\"expression\":\"not empty(AGE)\"},"
+                + "\"Expansion\":[{\"token\":\"%s\",\"over\":\"shared_variables\","
+                + "\"with\":\"ADSL\"}]}}}";
+        assertTrue(schema.validate(MAPPER.readTree(shape.formatted("&V&"))).isEmpty(),
+                "the delimited token validates: "
+                        + schema.validate(MAPPER.readTree(shape.formatted("&V&"))));
+        for (String bad : List.of("&V", "V&", "&v&", "V", "&V_1&", "&1V&", "&&"))
+        {
+            assertFalse(schema.validate(MAPPER.readTree(shape.formatted(bad))).isEmpty(),
+                    "token '" + bad + "' must be rejected by the schema");
+        }
+    }
+
+
+    /**
      * ⭐ The schema-side negative control ({@code PLAN-rule-unknown-keys-gate} &#167;7.3, review
      * C1): one unknown key planted under every closed object of the packaged format must be
      * rejected, and the clean twin of each plant must validate — so a closure that quietly reopened

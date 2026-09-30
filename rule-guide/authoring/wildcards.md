@@ -179,7 +179,7 @@ column name: `not empty(&VAR&)`, `ADSL.&VAR&`. **`over`** names where the set co
 | `all_variables` | **every column of the dataset under validation** |
 | `all_numeric_variables` | every numeric column of it |
 | `all_character_variables` | every character column of it |
-| `shared_variables` | the variables the dataset under validation shares **by name** with the dataset named by `with` |
+| `shared_variables` | the variables the dataset under validation shares **by name** with the dataset named by `with`, minus the rule's own `Match_Datasets` keys for that dataset (a merged key compared with itself can never differ) |
 | `domain_from_variable` | the text at the token's position in each column name matching `pattern` — the domain code of a `<XX>SEQ`-style reference |
 
 **`with`**, **`pattern`** and **`known_domain_only`** belong to those last two — the foreign
@@ -207,6 +207,15 @@ like a token of its own — which it never was — and the name could only be wr
 backticks. That undelimited spelling is retired: in a rule declaring `Expansion:`, an
 unterminated `&DOM` is a load error, and on any rule an `&X&` the rule does not declare is one
 too. Put a space between a token and the operator `&&` (`&A& && &B&`); `&A&&B&` does not lex.
+
+The gate reads every surface the expansion rewrites — a level's own `Message`, the `Description`
+and `Outcome.Message` included — so in a rule declaring `Expansion:` any `&` followed by a letter
+in that prose is refused too (`R&D`, `&lt;`: write `and`). A declared token may not appear in a
+`Scope` name list (`Domains`, `Datasets`, `Classes`, `Data_Structures`, `Subclasses`), because
+scope is matched before the rule expands, nor inside a `/regex/` literal, which is never
+substituted — both are load errors. An expansion the engine has to drop after binding (a token
+that survived substitution, a join key the dataset does not carry) is reported as a SKIPPED row
+naming the dropped expansion, whether every expansion was dropped or only some.
 
 ### The token substitutes inside string literals too
 

@@ -149,8 +149,7 @@ class ShippedExpansionTemplateTest
         Rule concrete = rules.get(0);
         assertEquals("CDISC-AD0898-AESEQ", concrete.effectiveId());
         // The expansion must bind &DOM& / &DOM&SEQ and change nothing else, so the expanded Check
-        // is
-        // the template's own text with the tokens substituted. ⚠ This used to be an equality
+        // is the template's own text with the tokens substituted. ⚠ This used to be an equality
         // against PMDA-AD0258's Check; see the class javadoc — that rule moved to the join match
         // flag under D118 and CDISC-AD0898 is the fifth, un-rewritten proxy carrier. Comparing the
         // parsed source keeps the assertion on what expansion actually owes.

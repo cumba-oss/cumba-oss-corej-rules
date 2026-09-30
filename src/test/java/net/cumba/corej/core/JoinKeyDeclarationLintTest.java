@@ -343,7 +343,7 @@ class JoinKeyDeclarationLintTest
                   Child: true
                   Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
                 - Name: "DM"
-                  Keys: [{left: "USUBJID", right: "&K"}]
+                  Keys: [{left: "USUBJID", right: "&K&"}]
                 """;
         assertRedNaming(childAndRightTemplate, "T-CHILD-RTPL", "USUBJID",
                 "named by an All_Or_None group");
