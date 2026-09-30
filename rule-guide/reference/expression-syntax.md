@@ -100,7 +100,9 @@ letter, the closing `&` mandatory), bare inside any name: `&VAR&`, `ADSL.&VAR&`,
 `&DOM&.&DOM&SEQ`. The engine emits one concrete rule per binding with the token replaced, so the
 template itself never runs. The closing `&` is where the token ends: `&DOM&SEQ` is `&DOM&`
 followed by `SEQ`. An unterminated `&DOM` or a lower-case `&dom&` does not lex, and a declared
-token inside a `/regex/` literal is a load error (a regex literal is never substituted). See
+token inside a `/regex/` literal in a `Check` level, the `Precondition` or a `Bindings` expression
+is a load error (a regex literal is never substituted; a `Match_Datasets` `Filter` is substituted
+as text). See
 [Wildcards and expansion](../authoring/wildcards.md#expansion--repeating-the-check-over-a-set-of-variables).
 
 > **A name is not a string.** `AESTDTC` unquoted is a column; `"AESTDTC"` quoted is the text. A
