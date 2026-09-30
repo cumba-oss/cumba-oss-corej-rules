@@ -186,7 +186,7 @@ class RuleFormatSchemaTest
                    "Match_Datasets":[{"Name":"DM","Keys":["USUBJID",{"left":"A","right":"B"}]}],
                    "Grouping":{"Variables":["USUBJID"]},
                    "wildcards":{"xx":{"min":1,"max":9}},
-                   "Expansion":[{"token":"&V","over":"shared_variables","with":"ADSL"}],
+                   "Expansion":[{"token":"&V&","over":"shared_variables","with":"ADSL"}],
                    "Outcome":{"Message":"m","Output_Variables":["AESEQ"]},
                    "Check":{"ERROR":{"expression":"a > b","Message":"e"}}}}}
                 """;

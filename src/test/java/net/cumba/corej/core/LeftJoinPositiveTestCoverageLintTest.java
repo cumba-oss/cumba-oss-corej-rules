@@ -114,7 +114,7 @@ class LeftJoinPositiveTestCoverageLintTest
      * Operators that ask about the <b>schema</b>, not the row: a joined column exists as a column
      * whether or not <em>this</em> row found a match, so an unmatched row cannot defeat them and
      * they are not the idiom either. Measured 2026-09-10: without this, `CDISC-AD0898`'s
-     * {@code var_exists(`&DOM.&DOMSEQ`) and empty(…)} was reported as a carrier — a template whose
+     * {@code var_exists(&DOM&.&DOM&SEQ) and empty(…)} was reported as a carrier — a template whose
      * own Check is the {@code empty} shape the §3 list sanctions.
      */
     private static final Set<String> ROW_INSENSITIVE = Set.of("var_exists", "ds_exists");
@@ -576,7 +576,7 @@ class LeftJoinPositiveTestCoverageLintTest
             {
                 continue;
             }
-            // ⚠ An expansion token (`&DOM`) is not a dataset name — it is substituted before the
+            // ⚠ An expansion token (`&DOM&`) is not a dataset name — it is substituted before the
             // rule runs, and the expansions are linted on their own. Loader gate R6 keeps tokens
             // out
             // of Requirements.Variables for the same family of reasons.

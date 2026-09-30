@@ -235,9 +235,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * <p>
      * ⚠⚠ Every builder here produces a <b>single</b> {@link OverlayDataTable} via
      * {@code virtualTable(domainName, …)}. A rule whose Check reads a column through a
-     * {@code Match_Datasets} join — {@code CDISC-AD0591}'s {@code ADSL.&VAR} against {@code &VAR} —
-     * therefore has <b>no representable invalid case</b>: the joined side cannot be populated, the
-     * comparison never has two operands, and the {@code _invalid} test fails while its
+     * {@code Match_Datasets} join — {@code CDISC-AD0591}'s {@code ADSL.&VAR&} against {@code &VAR&}
+     * — therefore has <b>no representable invalid case</b>: the joined side cannot be populated,
+     * the comparison never has two operands, and the {@code _invalid} test fails while its
      * {@code _valid} twin passes <b>vacuously</b>. The vacuous pass is the worse half.
      * </p>
      * <p>

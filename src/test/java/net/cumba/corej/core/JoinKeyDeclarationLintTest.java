@@ -60,7 +60,7 @@ import org.junit.jupiter.api.io.TempDir;
  * </tr>
  * <tr>
  * <td>expansion template ({@code &}-token name or key)</td>
- * <td>the first key bare in {@code All} when it is not a token; token keys and the {@code &DOM.}
+ * <td>the first key bare in {@code All} when it is not a token; token keys and the {@code &DOM&.}
  * half are exempt BY CONSTRUCTION — loader gate R6 bars an expansion token from
  * {@code Requirements.Variables}</td>
  * </tr>
@@ -306,8 +306,8 @@ class JoinKeyDeclarationLintTest
                 - Name: "SUPP--"
                   Child: true
                   Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
-                - Name: "&DOM"
-                  Keys: ["STUDYID", "USUBJID", "&DOMSEQ"]
+                - Name: "&DOM&"
+                  Keys: ["STUDYID", "USUBJID", "&DOM&SEQ"]
                 """;
         assertRedNaming(childAndTemplate, "T-CHILD-TPL", "USUBJID",
                 "named by an All_Or_None group");
@@ -354,8 +354,8 @@ class JoinKeyDeclarationLintTest
                   Variables:
                     All: ["STUDYID"]
                 Match_Datasets:
-                - Name: "&DOM"
-                  Keys: ["STUDYID", "USUBJID", "&DOMSEQ"]
+                - Name: "&DOM&"
+                  Keys: ["STUDYID", "USUBJID", "&DOM&SEQ"]
                 """;
         assertClean(template);
         assertRedNaming(template.replace("    All: [\"STUDYID\"]\n", ""), "T-TEMPLATE", "STUDYID",

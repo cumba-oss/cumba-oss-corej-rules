@@ -46,13 +46,13 @@ import org.junit.jupiter.api.Test;
  * {@code empty()}-proxy carriers ({@code CDISC-AD0053}, {@code CDISC-AD0256}, {@code PMDA-AD0258},
  * {@code PMDA-AD0053}) onto the phase-5b-J join match flag, so {@code PMDA-AD0258} now reads
  * {@code not AE._matched_} while {@code CDISC-AD0898} still templates
- * {@code var_exists(`&DOM.&DOMSEQ`) and empty(`&DOM.&DOMSEQ`)}. <b>CDISC-AD0898 is therefore the
+ * {@code var_exists(&DOM&.&DOM&SEQ) and empty(&DOM&.&DOM&SEQ)}. <b>CDISC-AD0898 is therefore the
  * FIFTH carrier of the retired proxy</b>, found by this very assertion going red — which is the
  * test doing its job. It was NOT rewritten with the other four: D118 closes the consumer rewrite at
  * four named rule ids, and D114's own precedent is that a further carrier is <em>flagged, not taken
  * under the standing go</em>. ⚑ Two things a follow-up must establish before it can be: whether an
  * expansion token is substituted inside a {@code MATCHED_FLAG} reference (spelled
- * {@code not `&DOM`._matched_}), and whether {@code Requirements.Variables.All} — which is what
+ * {@code not `&DOM&`._matched_}), and whether {@code Requirements.Variables.All} — which is what
  * makes the flag form skip cleanly on an absent parent — may carry a token at all (the loader's
  * R-gate forbids hoisting an expansion token into it, see {@code GuardPositionLintTest}'s
  * 2026-08-26 note). Until then the join shape stays the cross-rule pin and the Check is pinned
@@ -148,7 +148,8 @@ class ShippedExpansionTemplateTest
         assertEquals(1, rules.size(), "exactly one --SEQ column carries a known parent domain");
         Rule concrete = rules.get(0);
         assertEquals("CDISC-AD0898-AESEQ", concrete.effectiveId());
-        // The expansion must bind &DOM/&DOMSEQ and change nothing else, so the expanded Check is
+        // The expansion must bind &DOM& / &DOM&SEQ and change nothing else, so the expanded Check
+        // is
         // the template's own text with the tokens substituted. ⚠ This used to be an equality
         // against PMDA-AD0258's Check; see the class javadoc — that rule moved to the join match
         // flag under D118 and CDISC-AD0898 is the fifth, un-rewritten proxy carrier. Comparing the

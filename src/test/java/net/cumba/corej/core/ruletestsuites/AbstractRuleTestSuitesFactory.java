@@ -484,7 +484,7 @@ abstract class AbstractRuleTestSuitesFactory
         // here exactly as it does in DatasetRuleResolver. With the two-arg form an
         // Expansion-bearing
         // rule falls through as NotApplicable and the scenario silently executes the TEMPLATE —
-        // testing a column literally named '&VAR', which no fixture can have.
+        // testing a column literally named '&VAR&', which no fixture can have.
         TokenExpander.Context expansionContext = new TokenExpander.Context(
                 ScopeVariableSource.of(aResolver, aPrimary), aLibrary, aDomain);
         return switch (WildcardExpander.tryExpand(aRule, aPrimary.getMetaData(), expansionContext))

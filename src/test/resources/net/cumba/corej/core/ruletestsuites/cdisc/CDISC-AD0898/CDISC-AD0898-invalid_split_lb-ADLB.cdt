@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0898 expect=violation domain=ADLB
-#note "Fix #358 (PLAN-match-datasets-split-union.md): the parent LB ships SPLIT (LBCH/LBHE, DOMAIN=LB, no standalone LB). The expansion binds &DOM to LB (the prefix of LBSEQ); the Match_Datasets join and the Check-side dotted var_exists both resolve LB to the member UNION, so row 1 (LBSEQ=1, in LBCH) and row 2 (LBSEQ=9, in LBHE) match while row 3 (LBSEQ=7) matches NO member and fires. Before the union this rule was a silent no-op on split submissions: var_exists(`LB.LBSEQ`) resolved nothing and short-circuited to false."
+#note "Fix #358 (PLAN-match-datasets-split-union.md): the parent LB ships SPLIT (LBCH/LBHE, DOMAIN=LB, no standalone LB). The expansion binds &DOM& to LB (the prefix of LBSEQ); the Match_Datasets join and the Check-side dotted var_exists both resolve LB to the member UNION, so row 1 (LBSEQ=1, in LBCH) and row 2 (LBSEQ=9, in LBHE) match while row 3 (LBSEQ=7) matches NO member and fires. Before the union this rule was a silent no-op on split submissions: var_exists(`LB.LBSEQ`) resolved nothing and short-circuited to false."
 #library standard=adamig version=1-2
 #library standard-domains AE CM MH DM LB VS
 #expectViolationCount 1

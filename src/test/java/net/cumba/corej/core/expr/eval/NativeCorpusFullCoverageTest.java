@@ -967,7 +967,7 @@ class NativeCorpusFullCoverageTest
      * touched — a rule that had always skipped here for want of a declared column started to
      * evaluate, and that inflation hides exactly the slide {@link #RECORD_DATA_RECORDED_FLOOR}
      * exists to catch. Key columns are the sweep's whole footprint on this harness; an expansion
-     * token ({@code &DOMSEQ}) names no column and is left out.
+     * token ({@code &DOM&SEQ}) names no column and is left out.
      * </p>
      */
     private static void keyColumns(Rule aRule, Set<String> aColumns, Set<String> aNumeric)

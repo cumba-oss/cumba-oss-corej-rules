@@ -101,7 +101,7 @@ import org.junit.jupiter.api.Test;
  * dataset is named in R-EMPTY; a join target no product defines is counted in R-UNRES; a read no
  * static census resolves — an ADaM capture template inside an expression such as {@code TRTxxP}, a
  * {@code *} root, an {@code Output_Variables} template no library dataset publishes or the rule's
- * own Check binds, and an {@code Expansion} token read bare ({@code &VAR}, {@code &DOMSEQ}) — is
+ * own Check binds, and an {@code Expansion} token read bare ({@code &VAR&}, {@code &DOM&SEQ}) — is
  * named in R-CAPTURE (S2); a read the {@code Child: true} exclusion takes out is named in R-CHILD;
  * a joined read the rule declares for the primary is named in R-DECLARED. The three rule registers
  * are keyed by (rule, name) with the number of packages each was seen in, and every one is pinned
@@ -156,8 +156,8 @@ class UnqualifiedJoinedReadLintTest
             "SEND", 6);
 
     private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
-            Map.entry("adam/adamig-1-0\t&DOM", 1), Map.entry("adam/adamig-1-1\t&DOM", 1),
-            Map.entry("adam/adamig-1-2\t&DOM", 1), Map.entry("adam/adamig-1-3\t&DOM", 1),
+            Map.entry("adam/adamig-1-0\t&DOM&", 1), Map.entry("adam/adamig-1-1\t&DOM&", 1),
+            Map.entry("adam/adamig-1-2\t&DOM&", 1), Map.entry("adam/adamig-1-3\t&DOM&", 1),
             Map.entry("sendig/ar-1-0\tRELREC (no variables)", 1),
             Map.entry("sendig/ar-1-0\tSV (no variables)", 1),
             Map.entry("sendig/ar-1-0\tTA (no variables)", 1),
@@ -181,8 +181,8 @@ class UnqualifiedJoinedReadLintTest
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
             "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");
 
-    private static final Map<String, Integer> EXPECTED_CAPTURES = Map.of("CDISC-AD0591\t&VAR", 2,
-            "CDISC-AD0898\t&DOMSEQ", 4);
+    private static final Map<String, Integer> EXPECTED_CAPTURES = Map.of("CDISC-AD0591\t&VAR&", 2,
+            "CDISC-AD0898\t&DOM&SEQ", 4);
 
     private static final Map<String, Integer> EXPECTED_CHILD = Map.of("CDISC-CG0043\tAESMIE", 3,
             "FDA-SD1143\tAESMIE", 4);
@@ -878,11 +878,16 @@ class UnqualifiedJoinedReadLintTest
         assertEquals(Set.of("T-OVCAP\tQQxxZ"), unpublished.captures.keySet());
         assertEquals(Map.of(), unpublished.flags);
         // ... and an Expansion token read bare is counted wherever it is read, never dropped:
-        // &DOMSEQ only in the Check, &VAR only in Output_Variables, so each path has its own entry
+        // &DOM&SEQ only in the Check, &VAR& only in Output_Variables, so each path has its own
+        // entry. Both tokens are declared: an undeclared `&X&` is a G2 load error since
+        // PLAN-expansion-token-delimiters, and the loader is what this fixture goes through.
         Census expansion = census(rule("T-EXP", "[\"AE\"]", KEYED_DM, USUBJID, null, null, DM_KEY,
-                "not empty(`&DOMSEQ`) and `&DOMSEQ` != `DM.&DOMSEQ`", "[\"&VAR\", \"DM.&VAR\"]"));
-        assertEquals(Set.of("T-EXP\t&DOMSEQ", "T-EXP\t&VAR"), expansion.captures.keySet());
-        assertEquals(Set.of("synthetic"), expansion.captures.get("T-EXP\t&VAR"));
+                "not empty(&DOM&SEQ) and &DOM&SEQ != DM.&DOM&SEQ", "[\"&VAR&\", \"DM.&VAR&\"]",
+                "[{\"token\": \"&DOM&\", \"over\": \"domain_from_variable\","
+                        + " \"pattern\": \"&DOM&SEQ\"},"
+                        + " {\"token\": \"&VAR&\", \"over\": \"shared_variables\", \"with\": \"DM\"}]"));
+        assertEquals(Set.of("T-EXP\t&DOM&SEQ", "T-EXP\t&VAR&"), expansion.captures.keySet());
+        assertEquals(Set.of("synthetic"), expansion.captures.get("T-EXP\t&VAR&"));
     }
 
 
@@ -928,7 +933,18 @@ class UnqualifiedJoinedReadLintTest
             String aCheck, @Nullable String aOutputs)
         throws IOException
     {
+        return rule(aId, aDomains, aJoins, aAll, aAny, aNone, aAllOrNone, aCheck, aOutputs, null);
+    }
+
+
+    /** As above, with an {@code Expansion:} block (a JSON array) for the template arms. */
+    private static Rule rule(String aId, String aDomains, String aJoins, String aAll,
+            @Nullable String aAny, @Nullable String aNone, @Nullable String aAllOrNone,
+            String aCheck, @Nullable String aOutputs, @Nullable String aExpansion)
+        throws IOException
+    {
         String json = "{\"rules\": {\"r\": {\"Core\": {\"Id\": \"" + aId + "\"},"
+                + (aExpansion == null ? "" : "\"Expansion\": " + aExpansion + ",")
                 + "\"Scope\": {\"Domains\": {\"Include\": " + aDomains + "}},"
                 + "\"Requirements\": {\"Variables\": {\"All\": " + aAll
                 + (aAny == null ? "" : ", \"Any\": " + aAny)
@@ -1170,9 +1186,9 @@ class UnqualifiedJoinedReadLintTest
 
 
     /**
-     * A bare {@code Expansion} token read ({@code &VAR}, {@code &DOMSEQ}): the engine substitutes
+     * A bare {@code Expansion} token read ({@code &VAR&}, {@code &DOM&SEQ}): the engine substitutes
      * it per expansion, so no static census resolves it (counted in R-CAPTURE). A qualified
-     * {@code ADSL.&VAR} is not a bare read and is not counted.
+     * {@code ADSL.&VAR&} is not a bare read and is not counted.
      */
     private static boolean isExpansionToken(String aName)
     {
