@@ -125,10 +125,16 @@ public final class AbsentColumnExposureScan
      * retired v1 vocabulary having no type-insensitive-equality family, not about what {@code str}
      * wraps.
      * </p>
+     *
+     * <p>
+     * ⚑ 2026-09-30 ({@code PLAN-dynamic-column-functions} §2.1): {@code str} left the compiler's
+     * marker roster (it is a registered conversion now), so it is hand-listed here beside the other
+     * pure transforms — the scan still sees through it, and its population does not move.
+     * </p>
      */
     private static final Set<String> UNWRAPPABLE = java.util.stream.Stream
             .concat(net.cumba.corej.core.expr.eval.ExprCompiler.comparisonMarkers().stream(),
-                    java.util.stream.Stream.of("len", "length", "upper", "upcase", "lower",
+                    java.util.stream.Stream.of("str", "len", "length", "upper", "upcase", "lower",
                             "lowcase", "trim"))
             .collect(java.util.stream.Collectors.toUnmodifiableSet());
 

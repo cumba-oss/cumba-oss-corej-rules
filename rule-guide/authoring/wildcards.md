@@ -63,26 +63,31 @@ That is fatal when **every** presence template is negated. `not var_exists("TRTx
 exactly when no `TRTxxP` exists — the one dataset the engine skips — and false whenever one does.
 Such a rule can never report anything.
 
-### The fix: `Requirements.Variables.None`
+### The fix: `count(find_vars(…)) == 0`
 
-A negated template asks *"is no member of the family present?"*, and that is precisely what an
-entry in [`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present) answers:
-the rule is skipped when **any** matching column is present, and runs when none is. Move the
-negated templates there — the template itself is the entry — and keep only the literal names in
-the Check:
+A negated template asks *"is no member of the family present?"*. Ask exactly that, in the Check,
+with [`find_vars`](../reference/functions.md): it takes the template as a string — the same entry
+grammar as `Requirements.Variables` — and returns the names of the matching columns **without**
+making the rule a template. Keep the literal names as they are:
 
 ```yaml
-Requirements:
-  Variables:
-    None: ["TRTxxP", "TRTxxA", "TRTPGy"]
 Check:
-  expression: 'not var_exists("TRTP") and not var_exists("TRTA")'
+  expression: >-
+    not var_exists("TRTP") and not var_exists("TRTA") and
+    count(find_vars("TRTxxP")) == 0 and count(find_vars("TRTxxA")) == 0 and
+    count(find_vars("TRTPGy")) == 0
 ```
 
-On a dataset carrying `TRT02P` the rule is skipped — a treatment variable exists, so there is
-nothing to report. On a dataset carrying none of them it runs and reports. With no template left
-in the Check, remove the rule's `wildcards` block as well — a bound on a token no name uses is a
-load error (above).
+On a dataset carrying `TRT02P` the rule **runs and passes** — a treatment variable exists, so
+there is nothing to report. On a dataset carrying none of them it runs and reports. With no
+template left in a presence test, remove the rule's `wildcards` block as well — a bound on a token
+no name uses is a load error (above). `CDISC-AD0581` is the worked case (2026-09-30).
+
+> ⚑ **The former fix** put the templates into
+> [`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present). That **skips** the
+> rule on a dataset carrying `TRT02P` — it reports "could not check" where the rule's condition is
+> simply met, and it is exact only for a top-level conjunct of a single-level Check (under an `or`,
+> `None` skips the whole rule). Prefer `find_vars`.
 
 <!-- Owner ruling 2026-09-28 ("Case-insensitive everywhere"; "if it is to be revised in the
      future, than it must be revised everywhere"), PLAN-case-insensitive-templates, register entry
@@ -102,10 +107,6 @@ load error (above).
 > the **rule** (`upper(…)`, register entry `CIT §3`), never by the engine; a `QNAM` cell is a value
 > and compares exactly. That column names *should* be upper case is reported once, by the dedicated naming
 > rules, not by every rule skipping or misfiring.
-
-> ⚠ **The move is exact only when every negated template is a top-level conjunct** of a Check
-> with a single level, as above. Under an `or` it is not: `None` skips the whole rule, so
-> `not var_exists("TRTxxP") or AVAL > 100` would lose its `AVAL` branch.
 
 > ⚠ **Naming the first instance instead (`TRT01P` for `TRTxxP`) is exact only where the IG
 > guarantees the family starts at `01` / `1` in that dataset class** — ADSL. A BDS dataset copies
@@ -128,7 +129,8 @@ the rule runs for `xx = 01` and asks about `TRT01A`. The positive test is the ru
 > ⛔ **`WildcardUniversalAbsenceLintTest` fails the corpus build** on any rule whose presence
 > templates are **all** negated — through `not`, `var_not_exists` and `not (… or …)` alike.
 > `CDISC-AD0581`, which tests fourteen treatment variables for absence, spelled eight of them as
-> templates and was skipped on exactly the datasets it exists to report.
+> templates and was skipped on exactly the datasets it exists to report; it asks
+> `count(find_vars("TRTxxP")) == 0` and its siblings now.
 >
 > ⚠ **That is all it checks.** One positive presence template clears a rule, and two shapes still
 > lose findings past it: a marker bound **only** by a negated template while another marker has

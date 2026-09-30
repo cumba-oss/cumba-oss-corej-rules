@@ -205,6 +205,9 @@ class ScenarioFixtureCoverageRatchetTest
     // because the released rule SKIPS on its own violation case (the plan's findings). That
     // invalid scenario landed with PLAN-wildcard-universal-absence (the templates moved out of the
     // Check into Requirements.Variables.None); coverage is unchanged, AD0581 was already covered.
+    // (2026-09-30, PLAN-dynamic-column-functions Q13: the templates moved on into the Check as
+    // count(find_vars(…)) == 0 and AD0581's eleven skipped_* scenarios became valid_* — still
+    // covered, nothing moves here.)
     // ⭐ 493 -> 463 on 2026-09-28 (PLAN-distinct-scenarios-ahead phases 1-2): the thirty rules
     // whose distinct() read had no scenario at all gained their first .cdt suites (76 files) —
     // seventeen CG rules and thirteen SEND rules. Measured by setting the ratchet to 0 and reading

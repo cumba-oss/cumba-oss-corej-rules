@@ -11,21 +11,14 @@ Scope:
     Include:
     - "BASIC DATA STRUCTURE"
     - "MEDICAL DEVICE BASIC DATA STRUCTURE"
-Requirements:
-  Variables:
-    None:
-    - "TRTPGy"
-    - "TRTAGy"
-    - "TRTxxP"
-    - "TRTxxA"
-    - "TRxxPGy"
-    - "TRxxAGy"
-    - "TSEQPGy"
-    - "TSEQAGy"
 Check:
   expression: >-
     not var_exists("TRTP") and not var_exists("TRTA") and not var_exists("ARM") and not
-    var_exists("ACTARM") and not var_exists("TRTSEQP") and not var_exists("TRTSEQA")
+    var_exists("ACTARM") and not var_exists("TRTSEQP") and not var_exists("TRTSEQA") and
+    count(find_vars("TRTPGy")) == 0 and count(find_vars("TRTAGy")) == 0 and
+    count(find_vars("TRTxxP")) == 0 and count(find_vars("TRTxxA")) == 0 and
+    count(find_vars("TRxxPGy")) == 0 and count(find_vars("TRxxAGy")) == 0 and
+    count(find_vars("TSEQPGy")) == 0 and count(find_vars("TSEQAGy")) == 0
 Outcome:
   Message: "None of TRTP, TRTPGy, TRTA, TRTAGy, ARM, ACTARM, TRTxxP, TRTxxA, TRTSEQP,\
     \ TRTSEQA, TRxxPGy, TRxxAGy, TSEQPGy, or TSEQAGy are present, where xx is an integer\

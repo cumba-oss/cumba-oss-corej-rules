@@ -1626,8 +1626,13 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
          * absence is, and it is re-derived above. Do not put a standards list back.
          * </p>
          */
-        private static final Set<String> VALUE_TAGS = net.cumba.corej.core.expr.eval.ExprCompiler
-                .comparisonMarkers();
+        private static final Set<String> VALUE_TAGS = Stream
+                .concat(net.cumba.corej.core.expr.eval.ExprCompiler.comparisonMarkers().stream(),
+                        // ⚑ str left the compiler's marker roster on 2026-09-30
+                        // (PLAN-dynamic-column-functions §2.1: a registered conversion); it is
+                        // still a transparent wrapper for this harness, so it is kept explicitly.
+                        Stream.of("str"))
+                .collect(Collectors.toUnmodifiableSet());
 
         /** The value operand with a transparent type tag / conversion removed. */
         private static Expr stripValueTag(Expr value)

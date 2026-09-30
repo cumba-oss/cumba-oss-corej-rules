@@ -252,7 +252,7 @@ expression: 'empty(AGE)'
 
 `var_exists(x)` → **boolean**
 
-True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot and a `${…}` substitution. A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
+True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))` — per row; a missing name fires for neither polarity). A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -4012,13 +4012,18 @@ expression: 'not empty(PARAMCD) and not between(char(PARAMCD), char("A"), char("
 
 ### colref
 
-`colref(x)` → **value**
+`colref(x)` → **value**, or a **list** of values when `x` is a list of names
 
-The value of the column *named by* `x`'s value — a two-hop dereference
+The value of the column *named by* `x` — a dynamic column read. A bare name reads the dataset under
+validation (with the parent columns a `Child: true` entry merged in); `DS.X` reads the joined
+dataset `DS` exactly as the written `DS.X` does. The value keeps its column's type (an ADaM date
+stays a number). Over a list of names — `colref(find_vars("ADSL.TRTxxA"))` — it answers one value
+per name, in the list's order: `TRTA in colref(find_vars("ADSL.TRTxxA"))` is the function spelling
+of `TRTA in ADSL.TRT${*}A`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | any | yes | The value to read |
+| `x` | string, or list of strings | yes | The column name(s), per row |
 
 **Example**
 
@@ -4026,7 +4031,139 @@ The value of the column *named by* `x`'s value — a two-hop dereference
 expression: 'not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(IDVAR))'
 ```
 
-**Missing and empty** — A named-but-absent column yields its type default (`""`, or the plain missing when the rule expects a number); an empty or non-string first hop is returned as it is. A missing first hop, or a missing cell in the named column, yields **that missing value**, identity kept (rulings register `D85c`).
+```yaml
+Bindings:
+  - name: "$ap_sdt"
+    expression: colref(concat("ADSL.AP", printf("%02d", APERIOD), "SDT"))
+Check:
+  expression: not empty(APERSDT) and not empty($ap_sdt) and APERSDT != $ap_sdt
+```
+
+**Missing and empty** — A named-but-absent column takes the default the **written** name would
+take at the same position: the plain missing where the expression expects a number (`colref(…) <
+3`), `""` otherwise (rulings register `DCF Q14`). A missing `x` yields **that missing value**
+(`D85c`); a present `x` that is not text names no column and yields the plain missing (`DCF Q7`);
+a list keeps a missing member as a member (`DCF Q4`). ⚠ Through a binding the position is the
+binding reference's, which carries no kind — so `$x < 3` over `$x: colref("X")` defaults to `""`,
+exactly as `$x: X` does.
+
+### find_vars
+
+`find_vars(entry)` → **list** of column names
+
+The names of the columns one [`Requirements.Variables`](../authoring/requirements.md) entry
+selects — the same entry grammar and the same matcher: a template (`"ADSL.TRTxxPN"`: `xx`/`zz`
+two digits, `y` one or more, `w` one), a glob (`"TRT*P"`), a regex over the variable name with the
+qualifier outside the slashes (`"ADSL./TRT[0-9]+PN/"`), or a literal name (an existence test).
+Unqualified entries read the dataset under validation; a qualified entry reads the joined dataset's
+real columns (never a SUPP qualifier). The names come in the dataset's column order, spelled
+`DS.COLUMN`; `colref` dereferences them. It never expands the rule, so
+`count(find_vars("TRTxxP")) == 0` asks "is no `TRTxxP` present?" and the rule **runs** either way.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `entry` | string | yes | One `Requirements.Variables` entry |
+
+**Example**
+
+```yaml
+expression: 'not var_exists("TRTP") and count(find_vars("TRTxxP")) == 0'
+```
+
+⛔ **Load errors.** A `/regex/` entry must be a string literal (a computed one is an evaluation
+error); a type suffix (`:N`), a qualifier written inside the regex (`"/ADSL.TRT…/"` — write
+`"ADSL./TRT…/"`), a `--` in a qualified name and an invalid regex fail the rule at load.
+
+**Missing and empty** — A missing entry yields a missing result (so `not empty(find_vars(X))` does
+not fire on it); `""` selects nothing (`[]`).
+
+### lpad
+
+`lpad(x, width, fill)` → **text**
+
+`x` left-padded with `fill` (one character, default a space) to `width` characters. A longer `x`
+is returned unchanged — never truncated.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | string | yes | The text to pad |
+| `width` | number | yes | The target width, an integer ≥ 0 |
+| `fill` | string | no | The one-character fill, default `" "` |
+
+**Example**
+
+```yaml
+expression: 'lpad(str(APERIOD), 2, "0") == "01"'
+```
+
+**Missing and empty** — A missing `x` yields **that missing value**; `""` pads to `width` fills.
+
+### num
+
+`num(x)` → **number**
+
+The value as a number: a numeric cell as it is, text parsed as a number. It also selects numeric
+comparison: `num(QVAL) > 8` compares numerically where a character `QVAL > 8` is a type error.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The value to convert |
+
+**Example**
+
+```yaml
+expression: 'num(QVAL) > 8'
+```
+
+**Missing and empty** — A missing input yields **that missing value**; text that is not a number,
+and `""`, yield the plain missing (`MIS`).
+
+### printf
+
+`printf(format, args…)` → **text**
+
+Formats its arguments, always in the root locale (`%.1f` of 1.5 is `1.5` on every machine).
+Supported: `%s %d %f %e %x %%`, the flags `0 - + space`, a width and a precision. `%d` / `%x` take
+a whole number; `%s` renders through `str`.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `format` | string | yes | The format — a string literal |
+| `args` | any | one per conversion | The values |
+
+**Example**
+
+```yaml
+expression: 'printf("%02d", APERIOD) == "01"'
+```
+
+⛔ **Load errors.** A computed format, any other conversion (`%n`, `%t…`, `%1$s`), a number of
+arguments that differs from the conversions, and a string literal at a numeric conversion fail the
+rule at load.
+
+**Missing and empty** — A missing argument makes the result **that missing value**. `%d` of a
+value that is not a whole number (`1.5`, or text) yields the plain missing — never a truncated
+`1`, unlike the `${APERIOD:%02d}` template, which keeps its truncation.
+
+### str
+
+`str(x)` → **text**
+
+The value as text: a numeric cell's text (no `.0` on a whole number, never scientific, a large
+integer exact), a character value as it is. `str(A) == str(B)` compares two values as text, whatever
+their column types.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The value to convert |
+
+**Example**
+
+```yaml
+expression: 'str(IDVARVAL) != str(colref(IDVAR))'
+```
+
+**Missing and empty** — A missing input yields **that missing value**, identity kept.
 
 ### value
 

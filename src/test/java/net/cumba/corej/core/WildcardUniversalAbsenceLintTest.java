@@ -39,24 +39,29 @@ import org.junit.jupiter.api.Test;
  * column exists, which is exactly the case the engine skips; whenever a column does exist, the
  * negated test is false. Such a rule can never fire (engine gap G4). {@code CDISC-AD0581} had this
  * shape until {@code PLAN-wildcard-universal-absence} (meta repo) moved its eight templates into
- * {@code Requirements.Variables.None}.
+ * {@code Requirements.Variables.None}; {@code PLAN-dynamic-column-functions} (owner Q13,
+ * 2026-09-30) moved them on into the Check as {@code count(find_vars("TRTxxP")) == 0} and its
+ * siblings.
  * </p>
  *
  * <p>
- * <b>The fix.</b> A negated presence template asks <i>"is no member of the family present?"</i>,
- * and {@code Requirements.Variables.None} answers exactly that: an entry there skips the rule when
- * ANY matching column is present, and lets it run when none is. Keep the entry a template
+ * <b>The fix</b> (R-5.31, since 2026-09-30). A negated presence template asks <i>"is no member of
+ * the family present?"</i>, and {@code count(find_vars("TRTxxP")) == 0} asks exactly that, in the
+ * Check, without making the rule a template: {@code find_vars} returns the matching column names
+ * and never expands the rule, so a dataset carrying a member runs and PASSES instead of being
+ * skipped. ⚑ The former fix — the template as a {@code Requirements.Variables.None} entry — skipped
+ * such a dataset (a conformant dataset read "could not check"). Keep the entry a template
  * ({@code TRTxxP}): like every column-name match it ignores letter case (owner ruling 2026-09-28,
  * register {@code CIT §1}; R-5.31), so it also catches a lower-case {@code trt01p} — a
- * {@code /regex/} buys nothing here and is harder to read. Moving the templates to {@code None} is
- * exact only when every one of them is a top-level conjunct of a single-level Check
- * ({@code CDISC-AD0581}'s shape); under an {@code or}
- * ({@code not var_exists("TRTxxP") or AVAL > 100}) it is not, because {@code None} skips the whole
- * rule. Naming the family's first instance ({@code TRT01P} for {@code TRTxxP}) is exact only where
- * the IG guarantees the family is contiguous from {@code 01} / {@code 1} in that dataset class —
- * ADSL. A BDS dataset copies ADSL variables selectively, so a period-2 dataset may carry
- * {@code TRT02P} without {@code TRT01P}, and the first-instance form would report it falsely. The
- * rule-guide page {@code authoring/wildcards.md} states the authoring rule this lint enforces.
+ * {@code /regex/} buys nothing here and is harder to read. The former {@code None} move was exact
+ * only when every template was a top-level conjunct of a single-level Check; under an {@code or}
+ * ({@code not var_exists("TRTxxP") or AVAL > 100}) it was not, because {@code None} skips the whole
+ * rule — {@code find_vars} composes under {@code or} like any predicate. Naming the family's first
+ * instance ({@code TRT01P} for {@code TRTxxP}) is exact only where the IG guarantees the family is
+ * contiguous from {@code 01} / {@code 1} in that dataset class — ADSL. A BDS dataset copies ADSL
+ * variables selectively, so a period-2 dataset may carry {@code TRT02P} without {@code TRT01P}, and
+ * the first-instance form would report it falsely. The rule-guide page
+ * {@code authoring/wildcards.md} states the authoring rule this lint enforces.
  * </p>
  *
  * <p>
@@ -100,7 +105,9 @@ class WildcardUniversalAbsenceLintTest
      * new presence-template rule moves it, and the failure asks you to confirm the rule has a
      * positive anchor — which this test then checks. Measured 2026-09-28
      * (PLAN-wildcard-universal-absence): 141 before {@code CDISC-AD0581}'s templates moved out of
-     * its Check into {@code Requirements.Variables.None}, 140 after.
+     * its Check into {@code Requirements.Variables.None}, 140 after. Re-derived 2026-09-30
+     * (PLAN-dynamic-column-functions Q13): still 140 — AD0581's templates came back into its Check
+     * as {@code find_vars} entries, which are not presence calls and never anchor an expansion.
      */
     private static final int EXPECTED_PRESENCE_TEMPLATE_RULES = 140;
 

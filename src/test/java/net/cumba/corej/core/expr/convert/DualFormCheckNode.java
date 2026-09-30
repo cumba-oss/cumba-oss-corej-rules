@@ -354,16 +354,20 @@ public final class DualFormCheckNode
      * {@link #UNARY_WRAPPERS};</li>
      * <li>{@code num} — restored by the legacy-form pre-pass ({@link #stripNumConversions} /
      * {@code check_expr.py}'s {@code num} membership in {@code _UNARY_WRAPPERS});</li>
-     * <li>{@code time}/{@code str} — deliberately WITHOUT a legacy surface: the v1 vocabulary has
-     * no time or type-insensitive-equality operator family, so an expression carrying them (e.g.
-     * {@code CDISC-AD0044}'s {@code time(*TM)} value side) yields {@code null} — unlowerable,
-     * visibly, exactly as {@code scripts/lib/check_expr.py} answers; adding either here without the
-     * Python mirror would fork the committed pairs-index basis.</li>
+     * <li>{@code time} — deliberately WITHOUT a legacy surface: the v1 vocabulary has no time
+     * operator family, so an expression carrying it (e.g. {@code CDISC-AD0044}'s {@code time(*TM)}
+     * value side) yields {@code null} — unlowerable, visibly, exactly as
+     * {@code scripts/lib/check_expr.py} answers; adding it here without the Python mirror would
+     * fork the committed pairs-index basis.</li>
+     * <li>{@code str} — ⚑ no longer a compiler marker (PLAN-dynamic-column-functions §2.1, owner
+     * Q10, 2026-09-30: a registered conversion), so it left this set with the compiler's roster;
+     * its TEXT shape {@code str(X) ==/!= str(V)} is still handled below exactly as before (still
+     * without a legacy surface), so the pairs-index basis does not move.</li>
      * </ul>
      */
     static Set<String> acknowledgedComparisonMarkers()
     {
-        return Set.of("date", "date_part", "time_part", "num", "time", "str");
+        return Set.of("date", "date_part", "time_part", "num", "time");
     }
 
     private static final Set<String> FUNCTION_OPERATORS = Set.of("has_multiple_values_for",
@@ -636,8 +640,53 @@ public final class DualFormCheckNode
     }
 
 
+    /**
+     * {@code count(find_vars("<entry>")) == 0} (and {@code != 0} / {@code > 0}) as the legacy
+     * presence leaf over the entry — the Java mirror of {@code check_expr.py}'s
+     * {@code _find_vars_presence_leaf} ({@code PLAN-dynamic-column-functions} §2.8, owner Q13:
+     * {@code CDISC-AD0581} asks "is no {@code TRTxxP} present?" with {@code find_vars} instead of a
+     * {@code Requirements.Variables.None} entry). A lint VIEW of the name read and its polarity, so
+     * the leaf-derived lints stay sighted on the rule; anything else stays unlowerable.
+     *
+     * @return the leaf, or {@code null} when {@code b} is not that shape
+     */
+    private static @Nullable JsonNode findVarsPresenceLeaf(Expr.Binary b)
+    {
+        if (!(b.left() instanceof Expr.Call count) || !"count".equals(count.name())
+                || count.args().size() != 1 || !count.kwargs().isEmpty()
+                || !(count.args().get(0) instanceof Expr.Call fv) || !"find_vars".equals(fv.name())
+                || fv.args().size() != 1 || !fv.kwargs().isEmpty()
+                || !(fv.args().get(0) instanceof Expr.Lit entry)
+                || entry.kind() != Expr.LitKind.STRING || !(b.right() instanceof Expr.Lit zero)
+                || zero.kind() != Expr.LitKind.NUMBER
+                || Double.compare(((Number) zero.value()).doubleValue(), 0.0d) != 0)
+        {
+            return null;
+        }
+        String op = switch (b.op())
+        {
+        case EQ -> "var_not_exists";
+        case NEQ, GT -> "var_exists";
+        default -> null;
+        };
+        if (op == null)
+        {
+            return null;
+        }
+        ObjectNode out = NODES.objectNode();
+        out.put("name", String.valueOf(entry.value()));
+        out.put("operator", op);
+        return out;
+    }
+
+
     private static JsonNode lowerBinary(Expr.Binary b)
     {
+        JsonNode presence = findVarsPresenceLeaf(b);
+        if (presence != null)
+        {
+            return presence;
+        }
         if (b.op() == Expr.BinOp.MATCH || b.op() == Expr.BinOp.NMATCH)
         {
             Expr.Call affixOperand = affixCall(b.left());

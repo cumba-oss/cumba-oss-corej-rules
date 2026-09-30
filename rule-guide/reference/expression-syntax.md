@@ -436,7 +436,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`coalesce(a, b[, c])`](functions.md#coalesce) | value | The first operand that is neither missing nor `""` |
 | [`ds_exists(x)`](functions.md#ds_exists) | boolean | True when the named dataset is present in the run. A negated spelling `ds_not_exists(x)` exists; prefer `not ds_exists(x)`. |
 | [`empty(x)`](functions.md#empty) | boolean | True when the value is missing or `""`. Also spelled `is_missing`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. |
-| [`var_exists(x)`](functions.md#var_exists) | boolean | True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot and a `${…}` substitution. A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`. |
+| [`var_exists(x)`](functions.md#var_exists) | boolean | True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))` — per row; a missing name fires for neither polarity). A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`. |
 | [`var_is_null(x)`](functions.md#var_is_null) | boolean | True when the column exists but no row in the dataset populates it |
 
 ### Text
@@ -649,7 +649,12 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`char(x)`](functions.md#char) | value | The first character of the value as its numeric code point |
-| [`colref(x)`](functions.md#colref) | value | The value of the column *named by* `x`'s value — a two-hop dereference |
+| [`colref(x)`](functions.md#colref) | value | The value of the column *named by* `x` — bare or `DS.X`, typed; a list of names gives a list of values |
+| [`find_vars(entry)`](functions.md#find_vars) | list | The names of the columns one `Requirements.Variables` entry selects (template, glob, `DS./regex/`, literal) |
+| [`lpad(x, width, fill)`](functions.md#lpad) | text | `x` left-padded to `width`, never truncated |
+| [`num(x)`](functions.md#num) | number | The value as a number |
+| [`printf(format, args…)`](functions.md#printf) | text | Root-locale formatting: `%s %d %f %e %x %%` |
+| [`str(x)`](functions.md#str) | text | The value as text |
 | [`value()`](functions.md#value) | value | The value of the variable currently being iterated, for this row |
 | [`varname()`](functions.md#varname) | value | The name of the variable currently being iterated |
 

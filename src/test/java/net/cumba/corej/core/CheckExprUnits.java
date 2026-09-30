@@ -121,14 +121,16 @@ public final class CheckExprUnits
      * {@link #UNARY_WRAPPERS};</li>
      * <li>{@code num}/{@code time} — conversions with no v1 surface, read through tolerantly in
      * {@code operand()} (name resolves, strictness lost);</li>
-     * <li>{@code str} — deliberately unhandled: v1 had no type-insensitive-equality family, so a
-     * {@code str(X)}-wrapped operand stays a nameless unit exactly as it always classified — naming
-     * it would move the pinned lint populations.</li>
+     * <li>{@code str} — ⚑ no longer a compiler marker (PLAN-dynamic-column-functions §2.1, owner
+     * Q10, 2026-09-30: a registered conversion, {@code str(A) == str(B)} is plain string equality),
+     * so it left this set with the compiler's roster. The type-insensitive shape
+     * {@code str(X) ==/!= str(V)} is still classified below by its TEXT, unchanged, so no pinned
+     * lint population moves.</li>
      * </ul>
      */
     static Set<String> acknowledgedComparisonMarkers()
     {
-        return Set.of("date", "date_part", "time_part", "num", "time", "str");
+        return Set.of("date", "date_part", "time_part", "num", "time");
     }
 
     /**
