@@ -1154,10 +1154,42 @@ Check:
   expression: 'not empty(--DY) and is_complete_date_part(--DTC) and is_complete_date_part(DM.RFSTDTC) and --DY != $value_dy_algorithm'
 ```
 
-**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the date or the reference lacks a complete `yyyy-MM-dd` part, or a column is absent. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
 
 **Missing and empty** — A missing date or reference yields **that missing value**, decided before the dates are parsed: with `X` = `.A`, `dy(X, R)` is `.A` whatever present value `R` holds (even an incomplete date), and with `X` = `.A`, `R` = `.B` it is the plain missing (rulings register `D85c` / `D86a`). Only present but incomplete or unparsable dates give the plain missing (`MIS`).
 
+
+### earliest_date
+
+`earliest_date(a, b)` → **value**
+
+The earlier of two dates — exactly what [`min_date`](#min_date) answers over a group holding the two cells `a` and `b`: the same candidate rule and the same determinability rule, in the same accumulator, so the two can never drift. Written for a SEND subject's first dose, which is the earlier of the subject's own first dose and its pools' (recipe 9).
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `a` | date | yes | The first date — a column, a `date(…)` conversion, or a date-valued binding such as a `min_date(…)` result. Positional, or by name (`a=`) |
+| `b` | date | yes | The second date, likewise. Positional, or by name (`b=`) |
+
+Exactly two arguments; more than two nest (`earliest_date(a, earliest_date(b, c))`), which is exact for determinate operands but not the three-way extreme once an inner pair is undeterminable. A string literal argument is a type finding — write `earliest_date(date("2012-06"), date("2012-06-01"))`. The result is a **date**, so it meets `date(X) != …` and `date(X) == …` as a date. There is no `missing_values=` parameter: a per-part `indeterminate` belongs on the grouped call that feeds it.
+
+**Determinability (EC-46)** — as `min_date`: the determined candidate that reaches every possible completion of the other wins, and its own cell is the answer. `earliest_date(date("2012-06"), date("2012-06-01"))` is `2012-06-01`; `earliest_date(date("2012-06"), date("2012-06-02"))` has no answer (the partial could be the 1st); two partials have no answer; a present value that cannot be positioned (`UNK`, `2020-02-30`) makes the answer undeterminable. On equal text `a` wins.
+
+**Example**
+
+```yaml
+# CDISC-SEND-0305
+Bindings:
+- name: "$min_ex_exstdtc"
+  expression: 'min_date(EXSTDTC, domain="EX", group=[USUBJID])'
+- name: "$pool_min_exstdtc"
+  expression: 'min_date(min_date(EXSTDTC, domain="EX", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
+- name: "$first_exstdtc"
+  expression: 'earliest_date($min_ex_exstdtc, $pool_min_exstdtc)'
+Check:
+  expression: 'not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and date(RFXSTDTC) != $first_exstdtc'
+```
+
+**Missing and empty** — The extremes' candidate rule, **not** propagation: a missing argument (any identity) and a blank or whitespace-only argument are not candidates, and the other argument decides alone — `earliest_date(.A, date("2020-01-01"))` is `2020-01-01`. So a grouped extreme that has no answer (a subject in no pool, an undeterminable pool) is skipped and the other part is taken. Only when **both** arguments are missing is their identity carried: `.A` and `.A` give `.A`, two distinct identities give the plain missing (rulings register `D85c` / `D86a`). Any other case with no answer — two blanks, a missing beside a blank, an undeterminable pair — is the plain missing (`MIS`). `!=` against a missing answer fires (`D34a`); `empty()` on it is true.
 
 ### earliest_possible
 
@@ -1293,6 +1325,36 @@ expression: 'is_valid_duration(--ELTM)'
 ```
 
 **Missing and empty** — `""` is not a valid duration, so this is **false** for it.
+
+### latest_date
+
+`latest_date(a, b)` → **value**
+
+The later of two dates — exactly what [`max_date`](#max_date) answers over a group holding the two cells `a` and `b`, in the other direction from [`earliest_date`](#earliest_date), whose parameters, nesting, typing and missing rules it shares. Written for a SEND subject's last dose (`CDISC-SEND-0306`: the later of the subject's own latest `EXENDTC` and its pools').
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `a` | date | yes | The first date — a column, a `date(…)` conversion, or a date-valued binding. Positional, or by name (`a=`) |
+| `b` | date | yes | The second date, likewise. Positional, or by name (`b=`) |
+
+**Determinability (EC-46)** — as `max_date`: `latest_date(date("2012-06"), date("2012-06-30"))` is `2012-06-30`; `latest_date(date("2012-06"), date("2012-06-15"))` has no answer (the partial could be the 30th). A date beside a datetime of the same day answers the date, whose hull ends at the end of the day.
+
+**Example**
+
+```yaml
+# CDISC-SEND-0306
+Bindings:
+- name: "$latest_exendtc"
+  expression: 'max_date(EXENDTC, domain="EX", missing_values="indeterminate", group=[USUBJID])'
+- name: "$pool_latest_exendtc"
+  expression: 'max_date(max_date(EXENDTC, domain="EX", missing_values="indeterminate", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
+- name: "$last_exendtc"
+  expression: 'latest_date($latest_exendtc, $pool_latest_exendtc)'
+Check:
+  expression: 'not empty(RFXENDTC) and (USUBJID in $ex_subjects or $pool_ex_rows > 0) and date(RFXENDTC) != $last_exendtc and date(RFXENDTC) != $last_exstdtc'
+```
+
+**Missing and empty** — As [`earliest_date`](#earliest_date): a missing or blank argument is skipped and the other decides; both missing carry their identity (`.A` + `.A` is `.A`, `.A` + `.B` is `MIS`); any other no-answer is the plain missing, and `!=` against it fires.
 
 ### latest_possible
 
@@ -1617,8 +1679,7 @@ Check:
 
 **When there is nothing to answer** — **missing** — for a group with no candidate (all cells
 missing or blank, or a filter that keeps no row), and for a row of the evaluated dataset whose key
-has no group (a subject with no `DS` row; an absent `domain` dataset). A comparison against it
-does not fire; `empty()` on it does. A group whose inputs are all missing carries their missing
+has no group (a subject with no `DS` row; an absent `domain` dataset). `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does. A group whose inputs are all missing carries their missing
 identity.
 
 
@@ -1664,8 +1725,7 @@ Check:
 ```
 
 **When there is nothing to answer** — **missing** — an undeterminable group, a group with no
-candidate, and a row of the evaluated dataset whose key has no group. A comparison against it does
-not fire; `empty()` on it does.
+candidate, and a row of the evaluated dataset whose key has no group. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
 
 
 ### min_date
@@ -1699,6 +1759,15 @@ Check:
 ```
 
 **When there is nothing to answer** — **missing**, as for `max_date`.
+
+**An aggregate as another aggregate's target.** The target of `max_date` / `min_date` (and of `max`) may itself be a grouped aggregate over a third dataset, evaluated on that dataset and broadcast to the target table's rows before the outer extreme is taken. The shipped use is a SEND subject's first dose per pool: EX records a pool's dose once, on a row whose `POOLID` is set and whose `USUBJID` is blank, and POOLDEF maps each pool to its subjects (SENDIG 3.1.1 §6.1.1, §8.5.1), so
+
+```yaml
+- name: "$pool_first_dose"
+  expression: 'min_date(min_date(EXSTDTC, domain="EX", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
+```
+
+reads, per POOLDEF row, the earliest `EXSTDTC` of that row's pool, and then per subject the earliest over the subject's pools. Three answers to know: a subject in **two pools** reads the earlier pool; a pool with **no EX row** (an FW or LB pool, which POOLDEF also defines) has no answer and is skipped by the outer extreme; a study **without POOLDEF**, or an EX without `POOLID`, answers missing for every subject — which is what makes [`earliest_date`](#earliest_date)`($own, $pool)` fall back to the subject's own dose. ⚠ The inner call's `filter=(not empty(POOLID))` is **required**: with `POOLID` absent from EX, `group=[POOLID]` partitions nothing and every EX row is one block keyed blank, which a POOLDEF row with a blank `POOLID` would take as its pool's first dose (a non-blank `POOLID` matches nothing); and an own EX row with a blank `POOLID` must never match a POOLDEF row with a blank `POOLID`. The references inside the inner call (`EXSTDTC`, `POOLID`) are columns of **its** `domain=`, not of the outer target table.
 
 
 ### present_on_multiple_rows_within
@@ -2219,7 +2288,7 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
 
 ### dataset_names
 
@@ -2375,7 +2444,7 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing** — the calculation was not possible. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** — the calculation was not possible. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
 
 ### referenced_dataset_variables
 
@@ -2583,7 +2652,7 @@ Check:
   expression: 'not empty($sdtm_label) and var_label("DATA") != $sdtm_label'
 ```
 
-**When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. A comparison against it does not fire; `empty()` on it does.
+**When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); the other comparisons do not; `empty()` on it does.
 
 ### duplicate_label_variables
 
@@ -3907,8 +3976,8 @@ Check:
 ```
 
 **When there is nothing to answer** — the column's **type default**, never an error: `""` for a
-character column, missing for a numeric one — so `empty($x)` is true and a comparison against it does
-not fire. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
+character column, missing for a numeric one — so `empty($x)` is true, `!=` against it fires and
+the other comparisons do not. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
 `name` the dataset does not carry; the rule executes (it does not skip). A qualifying row whose
 `name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more
 qualifying rows report the rule as ERROR (`… — ONLY asserts exactly one qualifying row`), because the

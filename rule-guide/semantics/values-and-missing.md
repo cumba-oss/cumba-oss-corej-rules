@@ -164,7 +164,11 @@ operands of one call collapse to the plain missing, `D86a`). That holds for the 
 computed no-result is the plain missing: `substring` with a start past the end, `num("abc")`,
 `char("")`, `year("")`, a `dy` whose dates are present but incomplete. A comparison sees the
 difference — `abs(A) == abs(B)` is **false** when `A` is `.A` and `B` is `.B`, and a report prints
-`.A`, not `.`. The exceptions count rather than compute: `count` / `size` answer `0` for a missing.
+`.A`, not `.`. The exceptions count rather than compute: `count` / `size` answer `0` for a missing. And the two
+date extremes `earliest_date` / `latest_date` follow the **extremes'** candidate rule, like
+`min_date` / `max_date` over a group: a missing (or blank) argument is **skipped** and the other
+argument decides alone — `earliest_date(.A, date("2020-01-01"))` is `2020-01-01` — and an identity
+is carried only when **both** are missing (`.A` + `.A` is `.A`; `.A` + `.B` is the plain missing).
 `vlm_value_length` is not yet covered — it answers the plain missing both for a missing target cell and
 for "no value-level match"; the other `vlm_*` value accessors read value-level metadata, not the cell.
 

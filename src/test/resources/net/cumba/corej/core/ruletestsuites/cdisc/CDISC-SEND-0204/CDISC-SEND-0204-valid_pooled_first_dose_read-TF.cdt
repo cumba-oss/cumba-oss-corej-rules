@@ -1,9 +1,7 @@
 #!RuleTest
-#test CDISC-SEND-0205 expect=violation domain=TF
-#note "PLAN-send-tfdetect-pathology-unpark: review M2, the behaviour that SHIPS, pinned: subject 001 was dosed as a member of pool P1 (POOLDEF), so its only EX record carries POOLID P1 and a blank USUBJID. EX dosing recorded per pool is not read (no corpus rule reads it for a first dose; the ExecutabilityHint names the gap): the subject has no first dose, and its TFDETECT 100, right had the pool's 2020-01-01 dose been counted, is REPORTED (EC-45: an underivable TFDETECT is reported, never silent). Subject 002, dosed individually, carries the right 100 -> silent. Both records are linked to no CL, PM or MA record. Red-before (TF-2): with a subject-has-EX guard added (USUBJID in distinct(USUBJID, domain=EX), the CDISC-SEND-0305 shape), row 1 went silent (no violation)."
+#test CDISC-SEND-0204 expect=noViolation domain=TF
+#note "PLAN-scalar-date-extremes: RENAMED from invalid_pooled_ex_reported with the expectation FLIPPED (the only pre-existing expectation this plan edits). Subject 001 was dosed as a member of pool P1 (POOLDEF), so its only EX record carries POOLID P1 and a blank USUBJID. EX rows recorded per pool (POOLID set, USUBJID blank) are read through POOLDEF for every pool the subject belongs to (SENDIG 3.1.1 6.1.1 p.57 EX is one record per subject OR POOL; 8.5.1 p.233 POOLDEF is one record per subject per pool), and the first dose is earliest_date(own, pool). 001's first dose is the pool's 2020-01-01, so its TFDETECT 100 is right -> silent; 002 (dosed individually, 2020-01-01, TFDETECT 100) silent. Red-before (measured on the pre-plan rules): 001 had no first dose and was REPORTED (EC-45)."
 #library standard=sendig version=3-1-1
-#expectViolationCount 1
-#expectViolationAt row=1 TFSPID=M1
 dataset TF class=FINDINGS label="Tumor Findings"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"
@@ -49,8 +47,8 @@ col MASPID   type=Char label="Sponsor-Defined Identifier"
 col MATESTCD type=Char label="Macroscopic Examination Short Name"
 col MAORRES  type=Char label="Result or Finding in Original Units"
 ---
-S1 | MA | 001 | 1 | M9 | GROSPATH | MASS
-S1 | MA | 002 | 2 | M9 | GROSPATH | MASS
+S1 | MA | 001 | 1 | M1 | GROSPATH | MASS
+S1 | MA | 002 | 2 | M2 | GROSPATH | MASS
 ---
 dataset POOLDEF label="Pool Definition"
 col STUDYID type=Char label="Study Identifier"

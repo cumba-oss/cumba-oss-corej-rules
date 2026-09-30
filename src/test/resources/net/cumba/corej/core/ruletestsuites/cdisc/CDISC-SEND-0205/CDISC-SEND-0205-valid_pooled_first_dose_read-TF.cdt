@@ -1,0 +1,59 @@
+#!RuleTest
+#test CDISC-SEND-0205 expect=noViolation domain=TF
+#note "PLAN-scalar-date-extremes: RENAMED from invalid_pooled_ex_reported with the expectation FLIPPED (the only pre-existing expectation this plan edits). Subject 001 was dosed as a member of pool P1 (POOLDEF), so its only EX record carries POOLID P1 and a blank USUBJID. EX rows recorded per pool (POOLID set, USUBJID blank) are read through POOLDEF for every pool the subject belongs to (SENDIG 3.1.1 6.1.1 p.57 EX is one record per subject OR POOL; 8.5.1 p.233 POOLDEF is one record per subject per pool), and the first dose is earliest_date(own, pool). 001's first dose is the pool's 2020-01-01, so its TFDETECT 100 is right -> silent; 002 (dosed individually, 2020-01-01, TFDETECT 100) silent. Red-before (measured on the pre-plan rules): 001 had no first dose and was REPORTED (EC-45)."
+#library standard=sendig version=3-1-1
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFSPID   type=Char label="Sponsor-Defined Identifier"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | M1 | TUMEXAM | 100
+S1 | TF | 002 | 2 | M2 | TUMEXAM | 100
+---
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Date/Time of Disposition"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
+---
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+S1 | EX |  | P1 | 1 | DRUG A | 2020-01-01
+S1 | EX | 002 |  | 2 | DRUG A | 2020-01-01
+---
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MASPID   type=Char label="Sponsor-Defined Identifier"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | MA | 001 | 1 | M9 | GROSPATH | MASS
+S1 | MA | 002 | 2 | M9 | GROSPATH | MASS
+---
+dataset POOLDEF label="Pool Definition"
+col STUDYID type=Char label="Study Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+S1 | P1 | 001
+---

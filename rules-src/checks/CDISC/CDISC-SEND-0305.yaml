@@ -3,9 +3,15 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when the Subject Reference Start Date/Time of Study Treatment\
-  \ (RFXSTDTC) is populated but does not equal the earliest Exposure Start Date/Time\
-  \ (EXSTDTC) in the EX domain for that subject."
+  \ (RFXSTDTC) is populated but does not equal the earliest EXSTDTC of the subject's\
+  \ own EX records and of the EX records of every pool POOLDEF assigns it to."
 Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "EX rows recorded per pool (POOLID, USUBJID blank) are read through POOLDEF\
+    \ for every pool the subject belongs to; when the earliest EXSTDTC of the subject's\
+    \ own EX records or of its pools cannot be determined (a partial or unreadable\
+    \ date) while the other can, the one that can is taken as RFXSTDTC's reference."
 Scope:
   Domains:
     Include:
@@ -19,16 +25,28 @@ Bindings:
   expression: "distinct(USUBJID, domain=\"EX\")"
 - name: "$min_ex_exstdtc"
   expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+- name: "$pool_min_exstdtc"
+  expression: "min_date(min_date(EXSTDTC, domain=\"EX\", group=[POOLID], filter=(not\
+    \ empty(POOLID))), domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$pool_ex_rows"
+  expression: "max(record_count(domain=\"EX\", group=[POOLID], filter=(not empty(POOLID))),\
+    \ domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$first_exstdtc"
+  expression: "earliest_date($min_ex_exstdtc, $pool_min_exstdtc)"
 Check:
   expression: >-
-    not empty(RFXSTDTC) and USUBJID in $ex_usubjid and date(RFXSTDTC) != $min_ex_exstdtc
+    not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and date(RFXSTDTC) !=
+    $first_exstdtc
 Outcome:
-  Message: "RFXSTDTC is populated but does not equal the earliest value of EXSTDTC\
-    \ in the EX dataset for the subject."
+  Message: "RFXSTDTC is populated but does not equal the earliest EXSTDTC of the subject's\
+    \ own EX records and of the EX records of every pool POOLDEF assigns it to."
   Output_Variables:
   - "RFXSTDTC"
+  - "$first_exstdtc"
   - "$min_ex_exstdtc"
+  - "$pool_min_exstdtc"
   - "$ex_usubjid"
+  - "$pool_ex_rows"
 Source:
   Class: "SPC"
   Domain: "DM"

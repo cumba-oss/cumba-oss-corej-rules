@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-SEND-0306 expect=noViolation domain=DM
+#note "PLAN-scalar-date-extremes: New baseline, non-pooled: RFXENDTC 2020-01-10 equals the own latest EXENDTC (2020-01-05 and 2020-01-10) -> silent."
+#library standard=sendig version=3-1-1
+dataset DM label=Demographics
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+S1 | DM | 001 | 2020-01-10
+---
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | 001 |  | 1 | DRUG A | 2020-01-01 | 2020-01-05
+S1 | EX | 001 |  | 2 | DRUG A | 2020-01-06 | 2020-01-10
+---

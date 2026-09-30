@@ -211,8 +211,10 @@ too. Put a space between a token and the operator `&&` (`&A& && &B&`); `&A&&B&` 
 The gate reads every surface the expansion rewrites — a level's own `Message`, the `Description`
 and `Outcome.Message` included — so in a rule declaring `Expansion:` any `&`+letter that does not
 start a complete declared token is refused in that prose too (`R&D`, `&lt;`: write `and`). A
-declared token may not appear in a `Scope` name list (`Domains`, `Datasets`, `Classes`,
-`Data_Structures`, `Subclasses`), because scope is matched before the rule expands, nor inside a
+declared token may not appear in a variable requirement (`Requirements.Variables`), in the
+dataset requirement (`Requirements.Datasets`) or in a `Scope` name list (`Domains`, `Datasets`,
+`Classes`, `Data_Structures`, `Subclasses`), because all three are matched before the rule
+expands, nor inside a
 `/regex/` literal in a `Check` level, the `Precondition` or a `Bindings` expression, which is never
 substituted (a `Match_Datasets` `Filter` is substituted as text) — both are load errors. An expansion the engine has to drop after binding (a token
 that survived substitution, a join key the dataset does not carry) is reported as a SKIPPED row

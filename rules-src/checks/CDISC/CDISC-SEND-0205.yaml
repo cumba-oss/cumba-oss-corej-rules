@@ -6,8 +6,9 @@ Description: "Raise an error when a tumor record's mass identifier (TFSPID) is p
   \ and linked by --SPID to no clinical sign (CL), palpable mass (PM) or macroscopic\
   \ finding (MA) record of the same subject, so the tumor was first detected at histopathology\
   \ (MI), and its populated TFDETECT does not equal the number of days from the earliest\
-  \ dose date (earliest EXSTDTC for the subject) to the subject's disposition date\
-  \ (DS.DSSTDTC, a complete date), plus one (first dose day = day 1)."
+  \ dose date (earliest EXSTDTC of the subject's own EX records and of its pools'\
+  \ (POOLDEF)) to the subject's disposition date (DS.DSSTDTC, a complete date), plus\
+  \ one (first dose day = day 1)."
 Executability: "Partially Executable"
 ExecutabilityHint:
   Category: "partially executable"
@@ -27,8 +28,10 @@ ExecutabilityHint:
     \ first detected at necropsy and CDISC-SEND-0205 judges those tumors by the same\
     \ formula, a necropsy finding then being reported under CDISC-SEND-0205's id;\
     \ a subject without a DS record, or whose DSSTDTC is not a complete date, is not\
-    \ judged; EX rows recorded per pool (POOLID, USUBJID blank) are not read: a subject\
-    \ dosed only that way has no first dose and its judged records are reported."
+    \ judged; EX rows recorded per pool (POOLID, USUBJID blank) are read through POOLDEF\
+    \ for every pool the subject belongs to; when the earliest EXSTDTC of the subject's\
+    \ own EX records or of its pools cannot be determined (a partial or unreadable\
+    \ date) while the other can, the one that can is taken as the first dose."
 Scope:
   Domains:
     Include:
@@ -60,11 +63,15 @@ Bindings:
   expression: "distinct([USUBJID, PMSPID], domain=\"PM\", filter=(not empty(PMSPID)))"
 - name: "$ma_masses"
   expression: "distinct([USUBJID, MASPID], domain=\"MA\", filter=(not empty(MASPID)))"
-- name: "$first_dose"
+- name: "$own_first_dose"
   expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+- name: "$pool_first_dose"
+  expression: "min_date(min_date(EXSTDTC, domain=\"EX\", group=[POOLID], filter=(not\
+    \ empty(POOLID))), domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$first_dose"
+  expression: "earliest_date($own_first_dose, $pool_first_dose)"
 - name: "$days_to_disposition"
-  expression: "date_diff_days(DS.DSSTDTC, min_date(EXSTDTC, domain=\"EX\", group=[USUBJID]))\
-    \ + 1"
+  expression: "date_diff_days(DS.DSSTDTC, $first_dose) + 1"
 Check:
   expression: >-
     not empty(TFSPID) and not empty(TFDETECT) and is_complete_date(DS.DSSTDTC) and tuple(USUBJID,
@@ -80,6 +87,8 @@ Outcome:
   - "DS.DSSTDTC"
   - "$first_dose"
   - "$days_to_disposition"
+  - "$own_first_dose"
+  - "$pool_first_dose"
 Source:
   Class: "FND"
   Domain: "TF"

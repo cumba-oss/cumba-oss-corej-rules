@@ -491,6 +491,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`date_overlaps(a, b)`](functions.md#date_overlaps) | boolean | True when the two date ranges share at least one possible instant |
 | [`day(x)`](functions.md#day) | value | The day component of an ISO value, or missing |
 | [`dy(name, reference)`](functions.md#dy) | value | The SDTM study day of a record's date relative to a reference date read through the declared join; no day 0 |
+| [`earliest_date(a, b)`](functions.md#earliest_date) | value | The earlier of two dates, with `min_date`'s candidate and determinability rules; a missing or blank argument is skipped |
 | [`earliest_possible(x)`](functions.md#earliest_possible) | value | The earliest instant an incomplete value could denote |
 | [`interval_uncertainty_precision_mismatch(name, delimiter=)`](functions.md#interval_uncertainty_precision_mismatch) | boolean | True when the two halves of an ISO `a/b` interval of uncertainty are stated at different precisions |
 | [`is_complete_date(x)`](functions.md#is_complete_date) | boolean | True when every date component is present |
@@ -498,6 +499,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`is_partial_date(x)`](functions.md#is_partial_date) | boolean | True when the value is calendar-valid but has missing components. Also spelled `is_incomplete_date`. |
 | [`is_valid_date(x)`](functions.md#is_valid_date) | boolean | True when the value is a calendar-valid ISO date at any precision. A negated spelling `invalid_date(x)` exists; prefer `not is_valid_date(x)`. |
 | [`is_valid_duration(x)`](functions.md#is_valid_duration) | boolean | True when the value is a valid ISO-8601 duration. A negated spelling `invalid_duration(x[, negative=])` exists; prefer `not is_valid_duration(x)`. `negative=` decides whether a negative duration counts. |
+| [`latest_date(a, b)`](functions.md#latest_date) | value | The later of two dates, with `max_date`'s candidate and determinability rules; a missing or blank argument is skipped |
 | [`latest_possible(x)`](functions.md#latest_possible) | value | The latest instant an incomplete value could denote |
 | [`month(x)`](functions.md#month) | value | The month component of an ISO value, or missing |
 | [`time_contains(outer, inner)`](functions.md#time_contains) | boolean | True when every time-of-day `inner` could denote lies inside `outer`'s range |

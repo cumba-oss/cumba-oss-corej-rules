@@ -1,9 +1,7 @@
 #!RuleTest
-#test CDISC-SEND-0204 expect=violation domain=TF
-#note "PLAN-send-tfdetect-pathology-unpark: review M2, the behaviour that SHIPS, pinned: subject 001 was dosed as a member of pool P1 (POOLDEF), so its only EX record carries POOLID P1 and a blank USUBJID. EX dosing recorded per pool is not read (no corpus rule reads it for a first dose; the ExecutabilityHint names the gap): the subject has no first dose, and its TFDETECT 100, right had the pool's 2020-01-01 dose been counted, is REPORTED (EC-45: an underivable TFDETECT is reported, never silent). Subject 002, dosed individually, carries the right 100 -> silent. Both records are MA-linked (in MA, not in CL or PM). Red-before (TF-2): with a subject-has-EX guard added (USUBJID in distinct(USUBJID, domain=EX), the CDISC-SEND-0305 shape), row 1 went silent (no violation)."
+#test CDISC-SEND-0204 expect=noViolation domain=TF
+#note "PLAN-scalar-date-extremes: Subject 001 is pool-only in TWO pools (SENDIG 3.1.1 4.2.3 p.23: a subject can be in multiple pools): P1 dosed 2020-01-03, P2 dosed 2020-01-01. The earlier pool decides, TFDETECT 100 right -> silent. Red-before: no first dose, reported."
 #library standard=sendig version=3-1-1
-#expectViolationCount 1
-#expectViolationAt row=1 TFSPID=M1
 dataset TF class=FINDINGS label="Tumor Findings"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"
@@ -14,7 +12,6 @@ col TFTESTCD type=Char label="Tumor Findings Test Short Name"
 col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
 ---
 S1 | TF | 001 | 1 | M1 | TUMEXAM | 100
-S1 | TF | 002 | 2 | M2 | TUMEXAM | 100
 ---
 dataset DS class=EVENTS label="Disposition"
 col STUDYID type=Char label="Study Identifier"
@@ -26,7 +23,6 @@ col DSDECOD type=Char label="Standardized Disposition Term"
 col DSSTDTC type=Char label="Date/Time of Disposition"
 ---
 S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
-S1 | DS | 002 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
 ---
 dataset EX class=INTERVENTIONS label="Exposure"
 col STUDYID type=Char label="Study Identifier"
@@ -37,8 +33,8 @@ col EXSEQ   type=Num  label="Sequence Number"
 col EXTRT   type=Char label="Name of Treatment"
 col EXSTDTC type=Char label="Start Date/Time of Treatment"
 ---
-S1 | EX |  | P1 | 1 | DRUG A | 2020-01-01
-S1 | EX | 002 |  | 2 | DRUG A | 2020-01-01
+S1 | EX |  | P1 | 1 | DRUG A | 2020-01-03
+S1 | EX |  | P2 | 2 | DRUG A | 2020-01-01
 ---
 dataset MA class=FINDINGS label="Macroscopic Findings"
 col STUDYID  type=Char label="Study Identifier"
@@ -50,7 +46,6 @@ col MATESTCD type=Char label="Macroscopic Examination Short Name"
 col MAORRES  type=Char label="Result or Finding in Original Units"
 ---
 S1 | MA | 001 | 1 | M1 | GROSPATH | MASS
-S1 | MA | 002 | 2 | M2 | GROSPATH | MASS
 ---
 dataset POOLDEF label="Pool Definition"
 col STUDYID type=Char label="Study Identifier"
@@ -58,4 +53,5 @@ col POOLID  type=Char label="Pool Identifier"
 col USUBJID type=Char label="Unique Subject Identifier"
 ---
 S1 | P1 | 001
+S1 | P2 | 001
 ---

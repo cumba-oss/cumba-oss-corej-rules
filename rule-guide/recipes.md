@@ -15,7 +15,7 @@
      names this very rule as "filed, not fixed". The recipe-5 warning stays: nothing in the
      engine rejects a repeated key and no scenario can catch one. -->
 
-Eight shapes that cover most of what a new rule needs to say. Each one is a real shipped rule,
+Nine shapes that cover most of what a new rule needs to say. Each one is a real shipped rule,
 named so you can go and read the original.
 
 Read [The check](authoring/the-check.md) first if you have not — these are patterns, not a
@@ -179,6 +179,48 @@ Two ways to deal with it, and they are not interchangeable:
 | `var_exists(X) and …` in the check | only one branch needs it, or the rule must still judge the other datasets |
 
 → [Absent columns](semantics/absent-columns.md) · [Requirements](authoring/requirements.md)
+
+## 9 — A SEND subject's first or last dose, pools included
+
+```yaml
+# CDISC-SEND-0305
+Bindings:
+- name: "$ex_usubjid"
+  expression: 'distinct(USUBJID, domain="EX")'
+- name: "$min_ex_exstdtc"
+  expression: 'min_date(EXSTDTC, domain="EX", group=[USUBJID])'
+- name: "$pool_min_exstdtc"
+  expression: 'min_date(min_date(EXSTDTC, domain="EX", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
+- name: "$pool_ex_rows"
+  expression: 'max(record_count(domain="EX", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
+- name: "$first_exstdtc"
+  expression: 'earliest_date($min_ex_exstdtc, $pool_min_exstdtc)'
+Check:
+  expression: >-
+    not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and date(RFXSTDTC) != $first_exstdtc
+```
+
+SEND records a dose given to a group-housed pool **once per pool**: the EX row carries `POOLID` and a
+blank `USUBJID`, and POOLDEF maps each pool to its subjects (a subject can be in several pools). A
+subject's first dose is therefore the **earlier** of its own first dose and its pools' — three
+bindings: the own extreme, the pool extreme (an aggregate over EX per pool, read per POOLDEF row
+and aggregated again per subject), and `earliest_date` over the two. A last dose is the same shape
+with `max_date` and `latest_date` (`CDISC-SEND-0306`). "Is the subject dosed at all" is
+`$pool_ex_rows > 0`, a **count** of the pools' EX rows — never `not empty($pool_min_exstdtc)`, so
+that a pool dosed with a blank date is still judged (and reported for its underivable reference).
+
+⚠ The pool binding's `filter=(not empty(POOLID))` is **required**, not a tidy-up: with `POOLID`
+absent from EX, `group=[POOLID]` partitions nothing, every EX row is one block keyed blank, and a
+POOLDEF row with a blank `POOLID` would take the whole study's first dose as its pool's (a non-blank
+`POOLID` matches nothing); and an own EX row with a blank `POOLID` must match no POOLDEF row.
+
+A subject in no pool, a pool with no EX row and a study without POOLDEF all answer *missing* for
+the pool part, which `earliest_date` skips — so the rule reads exactly as before on a non-pooled
+study. When one part is undeterminable (a partial date) and the other is not, the determinate one
+is taken (`PLAN-scalar-date-extremes` SDE D2): the rule may then be silent where the exact union
+would have reported, never the reverse.
+
+→ [`earliest_date`](reference/functions.md#earliest_date) · [`min_date`](reference/functions.md#min_date)
 
 ## Assembling a rule from a recipe
 

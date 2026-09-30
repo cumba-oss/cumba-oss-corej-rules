@@ -5,8 +5,16 @@ Core:
 Description: "Raise an error when the Date/Time of Last Study Treatment (RFXENDTC)\
   \ is populated for a subject with Exposure (EX) records but equals neither the latest\
   \ End Date/Time of Treatment (EXENDTC) nor the latest Start Date/Time of Treatment\
-  \ (EXSTDTC) for that subject."
+  \ (EXSTDTC) for that subject, over the subject's own EX records and the EX records\
+  \ of every pool POOLDEF assigns it to."
 Executability: "Partially Executable - Possible Underreporting"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "EX rows recorded per pool (POOLID, USUBJID blank) are read through POOLDEF\
+    \ for every pool the subject belongs to; when the latest EXENDTC or the latest\
+    \ EXSTDTC of the subject's own EX records or of its pools cannot be determined\
+    \ (a partial or unreadable date, or a blank EXENDTC within a pool's or the subject's\
+    \ own records) while the other can, the one that can is taken as RFXENDTC's reference."
 Scope:
   Domains:
     Include:
@@ -24,18 +32,37 @@ Bindings:
     \ group=[USUBJID])"
 - name: "$latest_exstdtc"
   expression: "max_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+- name: "$pool_latest_exendtc"
+  expression: "max_date(max_date(EXENDTC, domain=\"EX\", missing_values=\"indeterminate\"\
+    , group=[POOLID], filter=(not empty(POOLID))), domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$pool_latest_exstdtc"
+  expression: "max_date(max_date(EXSTDTC, domain=\"EX\", group=[POOLID], filter=(not\
+    \ empty(POOLID))), domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$pool_ex_rows"
+  expression: "max(record_count(domain=\"EX\", group=[POOLID], filter=(not empty(POOLID))),\
+    \ domain=\"POOLDEF\", group=[USUBJID])"
+- name: "$last_exendtc"
+  expression: "latest_date($latest_exendtc, $pool_latest_exendtc)"
+- name: "$last_exstdtc"
+  expression: "latest_date($latest_exstdtc, $pool_latest_exstdtc)"
 Check:
   expression: >-
-    not empty(RFXENDTC) and USUBJID in $ex_subjects and date(RFXENDTC) != $latest_exendtc and
-    date(RFXENDTC) != $latest_exstdtc
+    not empty(RFXENDTC) and (USUBJID in $ex_subjects or $pool_ex_rows > 0) and date(RFXENDTC) !=
+    $last_exendtc and date(RFXENDTC) != $last_exstdtc
 Outcome:
   Message: "RFXENDTC is populated but does not equal the latest EXENDTC or the latest\
-    \ EXSTDTC in the EX dataset for the subject."
+    \ EXSTDTC over the subject's own EX records and the EX records of every pool POOLDEF\
+    \ assigns it to."
   Output_Variables:
   - "RFXENDTC"
+  - "$last_exendtc"
+  - "$last_exstdtc"
   - "$latest_exendtc"
   - "$latest_exstdtc"
+  - "$pool_latest_exendtc"
+  - "$pool_latest_exstdtc"
   - "$ex_subjects"
+  - "$pool_ex_rows"
 Source:
   Class: "SPC"
   Domain: "DM"
