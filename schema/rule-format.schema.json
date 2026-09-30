@@ -164,12 +164,12 @@
         },
         "Grouping_Variables": {
           "type": ["array", "null"],
-          "description": "The flat, legacy spelling of the rule-level grouping key. Still accepted by the Java loader, and the only spelling the Python-facing rules-legacy/ view carries (LegacyGroupingDegrader flattens the block back to it). Mutually exclusive with Grouping - declaring both is a load error.",
+          "description": "The flat, older spelling of the rule-level grouping key, equivalent to a Grouping block with only Variables (it cannot carry keep_missings). Its members are Grouping.Variables members, qualified ones included. Mutually exclusive with Grouping - declaring both is a load error.",
           "items": { "type": "string" }
         },
         "Grouping": {
           "type": ["object", "null"],
-          "description": "Fix #180 - the rule-level grouping block: the grouping key plus its keep_missings disposition. Java-only: the Python reference engine has no channel for keep_missings, so the legacy view is degraded back to the flat Grouping_Variables and the parameter is dropped. Mutually exclusive with Grouping_Variables.",
+          "description": "Fix #180 - the rule-level grouping block: the grouping key plus its keep_missings disposition (absent = drop a group whose key carries a blank or missing value). A Variables member may be qualified, DS.VAR: the VAR of the row's bound DS record, DS an ordinary inner Match_Datasets entry of the rule; unresolvable at run time it is a rule ERROR, never dropped (PLAN-rprfdy-offset-tp-join C3; rule-guide authoring/grouping.md). Mutually exclusive with Grouping_Variables.",
           "additionalProperties": false,
           "properties": {
             "Variables": {
@@ -300,7 +300,7 @@
       "type": "object",
       "properties": {
         "Name": { "type": ["string", "null"] },
-        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string" }, { "type": "object", "required": ["left", "right"], "additionalProperties": false, "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
+        "Keys": { "type": ["array", "null"], "items": { "oneOf": [ { "type": "string", "description": "A key column both sides carry, or a qualified DS.VAR: the record side is the VAR of the row's bound DS record (DS an EARLIER ordinary inner entry of the same rule), the joined side is VAR unqualified (PLAN-rprfdy-offset-tp-join C1; rule-guide authoring/joins.md). A qualified key is a bare string only - never inside {left, right}." }, { "type": "object", "required": ["left", "right"], "additionalProperties": false, "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] } },
         "Child": { "type": ["boolean", "null"] },
         "keep_missings": { "type": ["boolean", "null"] },
         "Join_Type": { "type": ["string", "null"] },

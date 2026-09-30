@@ -3,7 +3,9 @@
 <!-- Grounded: GroupingSpec.java — Variables (ordered, -- resolved at execution time),
      keep_missings (null = engine default = DROP at the rule-level surface; the intended
      direction is true), the deliberate PascalCase/snake_case split, the flat
-     Grouping_Variables: alias and the load error when both shapes are declared. -->
+     Grouping_Variables: alias and the load error when both shapes are declared;
+     RuleRunner.executeGroupedQualified + RulePackageLoader.checkQualifiedGroupMembers — a
+     qualified member, PLAN-rprfdy-offset-tp-join C3. -->
 
 `Grouping` changes the **unit of evaluation** from the row to the group.
 
@@ -32,6 +34,48 @@ placeholder is resolved against the dataset in hand, exactly as elsewhere.
 
 > **Order the key from coarse to fine.** `["USUBJID", "PARAMCD"]` reads as *"per subject, per
 > parameter"*, which is how the requirement was almost certainly stated.
+
+## A qualified member — grouping by a joined value
+
+A grouping key can be a value the rule reads **through a join**. Written qualified, it names the
+`Match_Datasets` entry it comes from:
+
+```yaml
+Match_Datasets:
+- Name: "DM"
+  Keys: ["USUBJID"]
+Grouping:
+  Variables: ["DM.RPATHCD", "RPHASE"]
+```
+
+Each evaluated row is grouped by the `RPATHCD` of **its own bound `DM` record** and its own
+`RPHASE` — per trial path, per repro phase, although the primary dataset carries no `RPATHCD`.
+
+- **The qualifier names an entry of the same rule** that is an ordinary keyed join (not
+  `Child: true`, not `RELREC`, not `SUPP--` / `SQ`, no `--` template name, with `Keys`) and
+  **`inner`** — `Join_Type: "inner"` or none. Anything else, and a qualifier naming no entry, is a
+  **load error**. So is a `--` or `&` wildcard inside a qualified member. The flat
+  `Grouping_Variables` form takes the same members under the same rules.
+- **It is a key component like any other.** [`keep_missings`](#keep_missings--rows-whose-key-is-missing)
+  applies to it: by default a group whose key carries a blank or missing value — a blank
+  `DM.RPATHCD` included — is dropped; with `keep_missings: true` it stays, and `""` and each
+  missing value form groups of their own.
+- **It is never dropped.** A plain grouping column the dataset lacks partitions nothing and is left
+  out of the key. A qualified one the rule cannot read — no `DM` dataset in the study, or `DM`
+  without `RPATHCD` — makes the rule **stop with an error**; declare `DM.RPATHCD` in
+  [`Requirements.Variables.All`](requirements.md) and such a study **skips** it instead.
+- **The finding carries it.** A group's reported key and its unit include the joined value, so two
+  paths' groups report two keys.
+- **Copies are records.** If the join is not one-to-one per record — `DM` carrying a subject twice,
+  on two paths — the join copies the record first, and each copy lands in the group of its **own**
+  `DM` record. Groups are then judged over the copies.
+- ⚠ **Findings come in first-appearance order** — a group is visited at its first row. The set of
+  findings is the one a plain grouping would give; their order, and so which are kept once the
+  per-rule cap is reached, can differ.
+
+The same qualified spelling joins a key through an earlier entry in
+[`Match_Datasets`](joins.md#a-qualified-key--joining-through-an-earlier-entry) and keys a grouped
+function's [`group=`](../reference/functions.md#qualified-group-members).
 
 ## `keep_missings` — rows whose key is missing
 
@@ -88,7 +132,9 @@ allows a rule to set the parameter with no variables at all — meaningless, and
 check excludes it. Grouping changes the question's unit, not its population.
 
 **It does not make a rule cross-dataset.** Groups are formed within the dataset in hand. To reach
-another dataset, [join](joins.md) it.
+another dataset, [join](joins.md) it — a joined value can then be a grouping key, written
+[qualified](#a-qualified-member--grouping-by-a-joined-value); the groups are still formed over the
+evaluated rows.
 
 ---
 

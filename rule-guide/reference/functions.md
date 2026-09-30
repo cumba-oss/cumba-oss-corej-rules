@@ -104,6 +104,65 @@ general rules — including which operators gate — are in
 [Comparison](../semantics/comparison.md).
 
 
+## Qualified `group=` members
+
+The grouped functions that read another dataset — [`read_value`](#read_value), [`max`](#max),
+[`max_date`](#max_date), [`min_date`](#min_date), [`record_count`](#record_count) and
+[`distinct`](#distinct) — accept a **qualified** `group=` member. It keys the record's side of the
+group through a join the rule declares:
+
+```yaml
+Match_Datasets:
+- Name: "DM"
+  Keys: ["USUBJID"]
+Bindings:
+- name: "$rprfdy"
+  expression: 'read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX")'
+```
+
+`TP` is grouped by its own `RPATHCD` and `RPHASE`. A record of the evaluated dataset (say `BW`,
+which has no `RPATHCD`) reads the group of the `RPATHCD` of **its bound `DM` record** and its own
+`RPHASE`. The qualified name says where the record's value comes from; the **unqualified** name is
+the same variable on the grouped side. There is no sided spelling: `DM.RPATHCD` groups on
+`RPATHCD`.
+
+- **`domain=` is required.** Without it there is no other side — the evaluated dataset would be
+  grouped by a value it does not carry — and the call is a load error. To group the evaluated rows
+  by a joined value, use the rule-level
+  [`Grouping`](../authoring/grouping.md#a-qualified-member--grouping-by-a-joined-value).
+- **The qualifier names a `Match_Datasets` entry of the rule** that is an ordinary keyed join (not
+  `Child: true`, not `RELREC`, not `SUPP--` / `SQ`, no `--` template name, with `Keys`) and
+  **`inner`** — `Join_Type: "inner"` or none. Anything else, and a qualifier naming no entry, is a
+  load error — in every `Check` level and every binding.
+- **Load errors besides:** a `--` wildcard inside a qualified member (`DM.--SEQ`), and a qualified
+  member together with `record_count`'s `regex=` (the regex normalises the grouped dataset's key
+  values; the record's value comes from another dataset). A qualified name spliced into `group=`
+  from a `$` list is not judged at load, so it **errors the rule** when it runs — write it in the
+  `group=` list itself. A compiler-dispatched group operator such as
+  [`has_multiple_values_for`](#has_multiple_values_for) has no other side at all: a dotted member
+  of its `within=` is refused.
+- **The answer contract is the function's own.** Only the key is read differently. A record whose
+  key has no group reads the function's no-group answer — the type default for `read_value`,
+  missing for `max` / `max_date` / `min_date`, `0` for `record_count`, the empty list for
+  `distinct`. A blank `DM.RPATHCD` is a key like any other (`keep_missings` defaults to `true`): it
+  reads the grouped dataset's blank-`RPATHCD` group if there is one, else the no-group answer.
+- **Types are checked against the source.** The grouped column's type is compared with the
+  **source** column's (`DM.RPATHCD`), not with the evaluated dataset's; a character key on one side
+  and a numeric one on the other makes the rule ERROR.
+- **It is never dropped.** A plain group column absent from a dataset partitions nothing; a
+  qualified member the rule cannot read makes it **ERROR** — no `DM` dataset in the study, `DM`
+  without `RPATHCD`, or a grouped dataset that lacks `RPATHCD` (it needs the same variable,
+  unqualified). That holds even when the grouped dataset has no rows. Declare `DM.RPATHCD` and
+  `TP.RPATHCD` in [`Requirements.Variables.All`](../authoring/requirements.md) and such a study
+  **skips** the rule instead.
+- **Copies are judged separately.** The `DM` join runs before any binding. If it is not one-to-one
+  per record — `DM` carrying a subject twice, on two paths — each copy of the record reads the group
+  of **its own** `DM` record, and the two copies may read two different values. Join on a key that
+  makes the source one-to-one if the record should be judged once.
+
+The same convention keys a [`Match_Datasets` join through an earlier entry](../authoring/joins.md#a-qualified-key--joining-through-an-earlier-entry).
+
+
 ## Presence and emptiness
 
 ### available
@@ -1344,7 +1403,7 @@ what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `c
 | `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load |
 | `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
-| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently) |
+| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group). Requires `group=` |
 
 **What is a value.** A present, non-blank cell contributes its **text** — a numeric cell renders
@@ -1516,7 +1575,7 @@ cross-dataset plan `record_count` and `distinct` follow.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
-| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides) |
+| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
@@ -1682,7 +1741,7 @@ read per row of the evaluated dataset. The bare `record_count()` is the dataset'
 |---|---|---|---|
 | `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are counted, in parentheses: `filter=(TSPARMCD == "INDIC")`, `filter=(TSPARMCD == "INTTYPE" and TSVAL in ["DRUG", "BIOLOGIC"])`, `filter=(starts_with(QNAM, "RACE"))`, `filter=(not empty(AEACN))`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
-| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the count is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be a `$`-reference to a dataset-level **list of column names** (`group=[USUBJID, --TESTCD, $TIMING_VARIABLES]`), spliced in place |
+| `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the count is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be a `$`-reference to a dataset-level **list of column names** (`group=[USUBJID, --TESTCD, $TIMING_VARIABLES]`), spliced in place. A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` — never spliced, and never beside `regex=` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
 | `regex` | regex | no | A regular expression, written as a **string** literal, applied to the group columns the way `is_unique_set`'s `regex=` is: a group column whose first populated value matches is grouped by each value's first match (`"^\\d{4}-\\d{2}-\\d{2}"` collapses a date-time to its date); a column whose first value does not match is left as it is |
 
@@ -3822,7 +3881,7 @@ column of `domain`, taken from the rows a `filter` over that dataset's own colum
 | `domain` | dataset reference | yes | The dataset to read from: `TS` or `"TS"` (both spellings name the dataset). A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do. The dataset is read **raw**: the declared SUPP merge (`Supp_Merge`) serves the dataset under evaluation only, so a `SUPP--` qualifier is never a column of `domain` — neither as `name` nor in `filter` |
 | `filter` | boolean over `domain`'s columns | no | Which rows qualify, in parentheses: `filter=(TSPARMCD == "SPECIES")`. Only columns of `domain` — a dotted, `$` or `--` reference is a load error. Absent ⇒ every row |
 | `mode` | `"FIRST"` · `"ONLY"` · `"MIN"` · `"MAX"` | yes | Which qualifying row answers: the first in dataset order; exactly one (a second qualifying row is a rule **ERROR**); the smallest / largest `name` by the engine's one ordering (a missing below every value, numbers numerically, text as text) |
-| `group` | list of columns of `domain` | no | Per-group reading (runbook W5): the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default |
+| `group` | list of columns of `domain` | no | Per-group reading (runbook W5): the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default. A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`): the record reads the group of its bound `DM` record's value |
 | `keep_missings` | boolean | no | With `group`: whether a row with a missing group key stays in its group (default `true`) |
 
 **Example**

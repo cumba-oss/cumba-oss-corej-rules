@@ -4,7 +4,9 @@
      Join_Type, Filter + its right-side-only / D89 skip contract), JoinType.java (json values
      "inner" / "left"), ChildMatchPreMerger.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
      resolution, child-wins on column collision), RelrecRowExpander.java (forward RELREC, inner
-     semantics, one row per matched pair). `_matched_` usage measured in the corpus (8 authored checks at 2026-09-22: four whole-check
+     semantics, one row per matched pair), KeyMatchRowExpander.keySpec + RulePackageLoader
+     .checkQualifiedKeys / qualifiedSourceError + UnresolvedQualifiedKeyException (a qualified
+     key, PLAN-rprfdy-offset-tp-join C1). `_matched_` usage measured in the corpus (8 authored checks at 2026-09-22: four whole-check
      `not X._matched_` rules and the four unplanned-visit cascade carriers that use it as a tier
      discriminator). -->
 
@@ -48,6 +50,9 @@ Keys:
 ```
 
 `left` is the primary dataset, `right` is the joined one. The two forms mix freely in one list.
+
+When the value to join on lives in a dataset the rule **already joins**, not in the primary, write
+it [qualified](#a-qualified-key--joining-through-an-earlier-entry): `Keys: ["DM.RPATHCD", "RPHASE"]`.
 
 **`Join_Type`** is `inner` or `left`, lowercase.
 
@@ -106,6 +111,11 @@ Match_Datasets:
   the rule cannot be answered, and non-executability is not a finding. If the joined dataset's
   **absence must itself be reported**, that is a separate dataset-presence rule (e.g.
   `not ds_exists("TA")`), not something the joining rule can say.
+- **A [qualified key](#a-qualified-key--joining-through-an-earlier-entry)** (`DM.RPATHCD` on the
+  `TP` entry) is declared under its qualified name: the group is `[DM.RPATHCD, TP.RPATHCD]`, and
+  `DM.RPATHCD` goes in `All` **as well** — whichever position the key has. The gate demands `All`
+  only for a first key, but a group alone lets a study that lacks `RPATHCD` on **both** sides run,
+  and there the rule [errors](#when-a-qualified-key-cannot-be-resolved) instead of skipping.
 - **Expansion-template keys** (`&DOM`, `&DOMSEQ`) cannot be declared — loader gate R6 bars a
   token from `Requirements` — so only a literal first key goes in `All`.
 
@@ -250,6 +260,76 @@ element, an empty object, or a non-string name is rejected at load.
 the standard `IDVAR` / `IDVARVAL` names, which are the same on both sides by construction, and its
 merge reads the left names only — so a sided declaration there would be silently ignored. It is a
 load error instead.
+
+## A qualified key — joining through an earlier entry
+
+Some keys are not in the primary dataset at all. A `BW` record reaches its trial path through its
+subject: `TP` has no `USUBJID`, and the subject's path `RPATHCD` lives in `DM`. Join `DM` first,
+then key `TP` on the **qualified** `DM.RPATHCD`:
+
+```yaml
+Requirements:
+  Variables:
+    All: ["USUBJID", "DM.RPATHCD", "RPHASE"]
+    All_Or_None:
+    - ["USUBJID", "DM.USUBJID"]
+    - ["DM.RPATHCD", "TP.RPATHCD"]
+    - ["RPHASE", "TP.RPHASE"]
+Match_Datasets:
+- Name: "DM"
+  Keys: ["USUBJID"]
+- Name: "TP"
+  Keys: ["DM.RPATHCD", "RPHASE"]
+Check:
+  expression: 'TP.RPRFDY == 1'
+```
+
+**The qualified name says where the record's side of the key comes from**: `DM.RPATHCD` is the
+`RPATHCD` of the row's bound `DM` record. The joined dataset is matched on the **same variable,
+unqualified** — `TP.RPATHCD`. There is no `{left, right}` to write: `DM.RPATHCD` joins on
+`RPATHCD`.
+
+- **The qualifier names an EARLIER entry of the same rule** — never the entry itself, never a later
+  one: the source must be bound before this join runs. That entry must be an ordinary keyed join
+  (not `Child: true`, not `RELREC`, not `SUPP--` / `SQ`, no `--` template name, with `Keys`) and
+  **`inner`** — `Join_Type: "inner"` or none. A `left` source is refused: an unmatched row has no
+  `DM` record to read the key from, and an empty key is not an answer. Anything else is a **load
+  error** naming the rule and the key.
+- **The entry carrying the key is an ordinary one too** — a qualified key on a `Child`, `RELREC` or
+  `SUPP--` entry, or a template, is a load error.
+- **A bare string only.** A dotted name inside a sided element (`{ left: "DM.RPATHCD", right:
+  "RPATHCD" }`) is a load error naming the bare spelling. Neither half may carry a `--` or `&`
+  wildcard: the two sides resolve against different datasets, so name the column.
+- **It expands rows like any other join.** The join is n-to-m: a record whose phase has three `TP`
+  stages becomes three rows. And each row reads **its own** bound `DM` record — if `DM` carries a
+  subject twice, on two paths, the record is copied by the `DM` join and each copy joins its own
+  path's stages.
+- **Everything else is as on any entry**: `Join_Type`, [`Filter`](#filter--narrow-the-other-side-before-matching),
+  `TP._matched_`, `keep_missings` for a blank source value (a missing `DM.RPATHCD` never pairs with
+  an empty `TP.RPATHCD`), and `Join_As_String`. The key-type check compares the **source** column
+  with the joined one — a character `DM.RPATHCD` against a numeric `TP.RPATHCD` stops the rule with
+  an error naming both.
+
+### When a qualified key cannot be resolved
+
+A plain key absent on one side contributes an empty value, and absent on both sides it is dropped
+(see [Declare the key](#-declare-the-key--required-for-every-keyed-join)). **Neither applies to a
+qualified key.** Dropping it would join `TP` on `RPHASE` alone — every path's stages, the wrong
+answer with nothing to say so. So the rule **stops with an error** when:
+
+- the study has no dataset for the source entry (no `DM`),
+- the source dataset lacks the column (`DM` without `RPATHCD`),
+- the joined dataset lacks it (`TP` without `RPATHCD` — it needs the same variable, unqualified).
+
+Declared as [above](#-declare-the-key--required-for-every-keyed-join) — `DM.RPATHCD` in `All` and
+the pair `[DM.RPATHCD, TP.RPATHCD]` — each of these **skips** the rule instead. The error is what an
+undeclared or group-only declaration gets: a group alone is satisfied by a study lacking
+`RPATHCD` on both sides, and that study reaches the join.
+
+⚑ The same qualified spelling works in a grouped function's
+[`group=`](../reference/functions.md#qualified-group-members) and in the rule-level
+[`Grouping`](grouping.md#a-qualified-member--grouping-by-a-joined-value), under the same
+convention.
 
 ## Did it match? — `_matched_`
 
@@ -408,6 +488,7 @@ Three behaviours worth knowing before you use it:
 | my primary dataset points at a parent row | `Child: true` |
 | the two sides type the key differently | fix the data, or `Requirements.Variables` on **both** sides, or `Join_As_String: true` |
 | walk RELREC relationships | `Name: "RELREC"`, no `Keys` |
+| the key lives in a dataset the rule already joins | a [qualified key](#a-qualified-key--joining-through-an-earlier-entry) on a later entry |
 
 > ⚠ **A join changes what an unqualified name means in only one respect: nothing.** Unqualified
 > names keep referring to the primary dataset even after a join. If you mean the joined side,
