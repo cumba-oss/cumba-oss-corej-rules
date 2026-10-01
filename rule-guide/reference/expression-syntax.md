@@ -250,7 +250,9 @@ expression: 'date_part(AESTDTC) == date_part(AEENDTC)'
 **`str` renders a value as text** — a cell's own text, a computed number in plain notation — so
 `str(A) == str(B)` is an ordinary string equality of two converted values, whatever the two
 columns' types. (Until 2026-09-30 `str` was a comparison marker that selected type-insensitive
-equality; the function answers the same.)
+equality; the function answers the same on every column operand — a number written inside `str` on
+the left side, which the marker read as `"3.0"` and the function reads as `"3"`, is an open owner
+question, `PLAN-dynamic-column-functions` F3.)
 
 > **Use one whenever the operands' own types do not already make the intended reading
 > unambiguous** — and prefer a conversion to a mode where both would express the requirement,

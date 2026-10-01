@@ -4283,8 +4283,11 @@ which keeps its truncation — and so does a negative value at `%x` (no two's co
 The value as text — a cell's own text: a floating-point cell's cleaned plain text (the engine's
 12-digit numeric cleaning; no `.0` on a whole number, never scientific), an integer cell's exact
 digits (a large integer stays exact), a character value as it is. A computed number (`str(AGE +
-1)`) is written in the same plain notation. `str(A) == str(B)` compares two values as text, whatever
-their column types.
+1)`) is written in the same plain notation, and so is a written number (`str(3.0)` is `"3"`).
+`str(A) == str(B)` compares two values as text, whatever their column types. ⚑ Until 2026-09-30
+that comparison read a number written on its **left** side as `"3.0"`; whether the new plain
+notation stands there is an open owner question (`PLAN-dynamic-column-functions` F3) — no shipped
+rule writes a number inside `str`.
 
 | parameter | type | required | description |
 |---|---|---|---|
