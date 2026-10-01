@@ -2617,7 +2617,9 @@
                 ⛔ Never published: maven.deploy.skip stays true. The corpora ship as release
                 assets on Gitea/GitHub only (owner, 2026-10-01).
 
-                Declared AFTER maven-assembly-plugin: both run at package, in pom order.
+                Declared after maven-assembly-plugin for readability; the order is not load-bearing:
+                attach-artifact only registers the File (no existence check), which is read at
+                install, after every package-phase mojo. A zip that was never written fails there.
             -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
