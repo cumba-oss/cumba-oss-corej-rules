@@ -43,6 +43,17 @@
         <revision>0.6.0-SNAPSHOT</revision>
 
         <!--
+            Reproducible corpus zips (PLAN-corpus-from-gitea D9). Without a fixed timestamp
+            maven-assembly-plugin stamps every entry with its file's mtime and keeps
+            filesystem order, so the same tag built on Gitea and on GitHub shipped the same
+            rules as different bytes (different sha256), and a bundle could pin only one
+            host's hash. With it, identical content gives identical bytes on every host and
+            every run: a constant on purpose, never a commit or build time. It is what lets
+            the OSS twins later fetch the corpus from the host that builds them with one hash.
+        -->
+        <project.build.outputTimestamp>2026-10-01T00:00:00Z</project.build.outputTimestamp>
+
+        <!--
             ⛔ THIS REPOSITORY PUBLISHES NO MAVEN ARTIFACTS ANYWHERE.
         
             lib/ has no src/main, so its jar is empty; the deliverable is the rule
