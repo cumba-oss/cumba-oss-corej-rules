@@ -69,7 +69,12 @@ hold whatever the expression:
 A **list** binding (a list literal, or a list-valued function such as `get_codelist_attributes`) is
 read with `in` / `not in`, `empty(…)` or by a list function such as `minus`; comparing it with `==` / `!=` / `<` … is a
 load error, exactly as comparing a column with an inline list is. A list literal holds plain
-literals of one kind: numbers, or strings, never both, and never a column.
+literals of one kind: numbers, or strings, never both, and never a column. Nor does it hold a
+binding: `AETERM in ["A", $codes]` is a load error — the `$codes` element would be read as the text
+`"$codes"` and never match — so write `$codes` alone as the operand, or spell the values. The one
+place a `$` stands inside a list is a splice of **column names** into
+[`record_count`](../reference/functions.md#record_count)'s `group=` or
+[`is_unique_set`](../reference/functions.md#is_unique_set)'s members.
 
 
 ## ⛔ Everything else is rejected, loudly

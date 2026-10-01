@@ -6,7 +6,7 @@
      Operation surface, and every former operation is a function of the same name.
      Grammar and precedence: CheckExpressionParser.java (or > and > not > comparison > sum >
      product > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
-     bare &NAME& expansion tokens inside a name (grammar: ExpansionTokens), && and || accepted). Types: ExprType.java (6 value types + 2 parameter-only; `missing` is a
+     bare &NAME& expansion tokens inside a name (grammar: ExpansionTokens), && and || accepted). Types: ExprType.java (6 value types + 3 parameter-only; `missing` is a
      bottom inhabiting every type, `unknown` is stage-A's not-yet-known).
      The six comparison tokens: ExprCompiler.comparisonMarkers() = CONVERSIONS {num,date,time}
      u TAGS {date_part,time_part} u STR_MARKER {str}. None is a FunctionRegistry entry; they are
@@ -145,7 +145,7 @@ A value the engine supplies directly, without a call — see
 | number | `18`, `-3.5` | |
 | boolean | `true`, `false` | |
 | regex | `/^AE.*$/` | between slashes |
-| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in` |
+| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=` and [`is_unique_set`](functions.md#is_unique_set)'s members |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
 > that is how the source sheets write SQL-ish prose — but a `Check` expression that uses them is
@@ -162,7 +162,7 @@ Six types a **value** can have:
 | `boolean` | true / false |
 | `date` | an ISO-8601 calendar value, **partial precision retained** |
 | `time` | a time of day, partial precision retained |
-| `regex` | a pattern — **literal only**: never computed, never stored in a column |
+| `regex` | a pattern — **literal only**: never computed, never stored in a column. Written `/…/`; a computed regex fails the load. The one place a `"…"` string literal is a regex is `record_count`'s `regex=` |
 
 Plus `list<T>` and `set<T>` for the collection-valued positions: a list is ordered and may repeat,
 a set is not and may not.
@@ -175,18 +175,39 @@ comparison can do.
 > does not silently parse it. If you mean the numeric reading of text, say so with `num(…)`; if
 > you mean the text reading, `str(…)`.
 
+### Type errors are load errors
+
+When both sides of a conflict are **known when the rule loads**, the rule fails to load and reports
+**ERROR** — in every `Check` level, in the `Precondition` and in every binding (since 2026-10-01):
+a wrongly typed argument at any function parameter; comparison operands of different types
+(`len(AETERM) > "200"`); arithmetic on a string; a `Check` or `Precondition` — or an `and` / `or` /
+`not` operand — that is not a condition; a single value as the right operand of `in`; `date(5)`;
+a string literal given to `earliest_date` / `latest_date`; `colref(3)`; a computed regex. The
+message names the place and quotes the expression:
+
+```text
+stage A: PARAMETER_TYPE: Check (ERROR): comparison operands disagree: number > string (len(AETERM) > "200")
+```
+
+The place is `Check (<level>)`, `Precondition` or `binding $name`. A conflict that depends on the
+data — a column's type — is settled per dataset instead (below, `unknown`). A date against a
+string has its own rule — see [Comparison](../semantics/comparison.md#dates-and-times--the-hull-rule).
+
+
 ### Parameter-only types
 
-Two more types exist, and you will only ever meet them in an **argument position**. No column
+Three more types exist, and you will only ever meet them in an **argument position**. No column
 holds one, and no expression computes one:
 
 | type | is | where you see it |
 |---|---|---|
 | `column-reference` | a **name**, not the value behind it | a function that takes a column rather than its contents |
+| `dataset-reference` | a **dataset name**, written bare (`domain=DM`) or quoted (`domain="DM"`) | the `domain=` of the grouped functions and `read_value` |
 | `metadata-level` | the closed set `DATA` · `DEFINE` · `LIBRARY` | a parameter selecting which metadata to read |
 
 **`column-reference` is deliberately not a string.** A bare column operand, a backtick-quoted
-name and `varname()` all have this type. In a value position it dereferences implicitly — and to
+name and `varname()` all have this type, and a quoted `"AETERM"` at a column parameter is a load
+error, not a convenience. In a value position it dereferences implicitly — and to
 `unknown`, because which type the cell holds is a per-dataset fact the engine can only settle once
 it has the dataset.
 

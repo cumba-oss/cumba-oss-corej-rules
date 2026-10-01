@@ -160,7 +160,11 @@ Check:
   expression: 'invalid_duration(TSVAL, negative=false)'
 ```
 
-It takes exactly the same forms as a check — `expression`, `all`, `any`, `not`.
+It takes exactly the same forms as a check — `expression`, `all`, `any`, `not` — and it is
+type-checked at load exactly as the check is: a Precondition that is not a condition, or a wrongly
+typed argument inside it, fails the rule's load with a message naming it
+(`stage A: PARAMETER_TYPE: Precondition: …`). A rule expanded from a wildcard or a token keeps its
+Precondition.
 
 ### Precondition, requirement, or conjunct?
 
