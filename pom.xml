@@ -205,6 +205,7 @@
         <plugin.jacoco-maven-plugin.version>0.8.15</plugin.jacoco-maven-plugin.version>
         <plugin.maven-enforcer-plugin.version>3.6.3</plugin.maven-enforcer-plugin.version>
         <plugin.maven-assembly-plugin.version>3.8.0</plugin.maven-assembly-plugin.version>
+        <plugin.build-helper-maven-plugin.version>3.6.2</plugin.build-helper-maven-plugin.version>
         <plugin.pitest-maven-plugin.version>1.30.0</plugin.pitest-maven-plugin.version>
         <plugin.pitest-junit5-plugin.version>1.2.3</plugin.pitest-junit5-plugin.version>
         <plugin.pitest-history.version>0.1.2</plugin.pitest-history.version>
@@ -2570,6 +2571,10 @@
                 <version>${plugin.maven-assembly-plugin.version}</version>
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
+                    <!-- Attached below, each under its own classifier: with appendAssemblyId=false
+                         both executions attached as the ONE classifier-less zip, and the second
+                         replaced the first. -->
+                    <attach>false</attach>
                 </configuration>
                 <executions>
                     <execution>
@@ -2592,6 +2597,50 @@
                             <descriptors>
                                 <descriptor>src/assembly/rules-define.xml</descriptor>
                             </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                The two corpora as Maven artifacts, each under its OWN classifier:
+                net.cumba:cumba-oss-corej-rules:<v>:zip:rules and …:zip:rules-define.
+
+                ⚠ Until 2026-10-01 both assembly executions attached as the one classifier-less
+                zip (appendAssemblyId=false), the second replacing the first: an installed
+                cumba-oss-corej-rules-<v>.zip held ONLY the Define-XML corpus, so the data corpus could not be
+                resolved by coordinates at all. Nothing consumed it then; the data browser's
+                `corpus-from-build` profile does now (PLAN-local-release-build-corpus).
+
+                The files on disk keep their readable names (cumba-oss-corej-rules-<v>.zip,
+                cumba-oss-corej-rules-define-<v>.zip), which the release job uploads by glob.
+                ⛔ Never published: maven.deploy.skip stays true. The corpora ship as release
+                assets on Gitea/GitHub only (owner, 2026-10-01).
+
+                Declared AFTER maven-assembly-plugin: both run at package, in pom order.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${plugin.build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-rule-corpora</id>
+                        <phase>package</phase>
+                        <goals><goal>attach-artifact</goal></goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/cumba-oss-corej-rules-${project.version}.zip</file>
+                                    <type>zip</type>
+                                    <classifier>rules</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.build.directory}/cumba-oss-corej-rules-define-${project.version}.zip</file>
+                                    <type>zip</type>
+                                    <classifier>rules-define</classifier>
+                                </artifact>
+                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
