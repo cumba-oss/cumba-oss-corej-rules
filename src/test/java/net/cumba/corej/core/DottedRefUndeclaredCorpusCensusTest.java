@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 import net.cumba.corej.core.expr.typed.StageAChecker;
 import net.cumba.corej.core.expr.typed.StageAErrorKind;
 import net.cumba.corej.core.expr.typed.StageAFinding;
+import net.cumba.corej.core.expr.typed.StageAReport;
+import net.cumba.corej.core.model.Rule;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -87,21 +89,22 @@ class DottedRefUndeclaredCorpusCensusTest
         Set<String> found = new TreeSet<>();
         AtomicInteger observed = new AtomicInteger();
         Thread self = Thread.currentThread();
-        StageAChecker.setObserver((rule, report) ->
-        {
-            if (Thread.currentThread() != self)
-            {
-                return; // another test class loading rules in parallel
-            }
-            observed.incrementAndGet();
-            for (StageAFinding f : report.findings())
-            {
-                if (f.kind() == StageAErrorKind.DOTTED_REF_UNDECLARED)
+        java.util.function.BiConsumer<Rule, StageAReport> previous = StageAChecker
+                .setObserver((rule, report) ->
                 {
-                    found.add(key(String.valueOf(rule.effectiveId()), f));
-                }
-            }
-        });
+                    if (Thread.currentThread() != self)
+                    {
+                        return; // another test class loading rules in parallel
+                    }
+                    observed.incrementAndGet();
+                    for (StageAFinding f : report.findings())
+                    {
+                        if (f.kind() == StageAErrorKind.DOTTED_REF_UNDECLARED)
+                        {
+                            found.add(key(String.valueOf(rule.effectiveId()), f));
+                        }
+                    }
+                });
         try
         {
             // NON-VACUITY: the collector sees a known undeclared qualifier on BOTH arms — the
@@ -132,7 +135,9 @@ class DottedRefUndeclaredCorpusCensusTest
         }
         finally
         {
-            StageAChecker.setObserver(null);
+            // restore, never clear: a reset blinds every later observer in the JVM
+            // (PLAN-stage-a-parameter-type-arming review r1 tests 5 — it blinded that plan's probe)
+            StageAChecker.setObserver(previous);
         }
         assertTrue(observed.get() >= OBSERVED_FLOOR,
                 "rule checks observed over the corpus: " + observed.get());

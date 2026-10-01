@@ -638,14 +638,14 @@ True when the first `n` characters match the regex, anchored; without `n`, the w
 
 ```yaml
 Check:
-  expression: 'not prefix_matches(--TESTCD, "^[A-Z]+$", 4)'
+  expression: 'not prefix_matches(--TESTCD, /^[A-Z]+$/, 4)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'not prefix_matches(USUBJID, "^[0-9]+$")'
+  expression: 'not prefix_matches(USUBJID, /^[0-9]+$/)'
 ```
 
 **Missing and empty** — A missing value matches **no** pattern, including one that would match an empty string.
@@ -757,14 +757,14 @@ True when the last `n` characters match the regex, anchored; without `n`, the wh
 
 ```yaml
 Check:
-  expression: 'not suffix_matches(--DTC, "^[0-9]{2}$", 2)'
+  expression: 'not suffix_matches(--DTC, /^[0-9]{2}$/, 2)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'not suffix_matches(VISIT, "^WEEK.*$")'
+  expression: 'not suffix_matches(VISIT, /^WEEK.*$/)'
 ```
 
 **Missing and empty** — A missing value matches **no** pattern, including one that would match an empty string.
