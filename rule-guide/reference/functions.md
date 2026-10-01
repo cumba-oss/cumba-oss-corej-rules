@@ -141,7 +141,8 @@ the same variable on the grouped side. There is no sided spelling: `DM.RPATHCD` 
   member together with `record_count`'s `regex=` (the regex normalises the grouped dataset's key
   values; the record's value comes from another dataset). A qualified name spliced into `group=`
   from a `$` list is not judged at load, so it **errors the rule** when it runs — write it in the
-  `group=` list itself. A compiler-dispatched group operator such as
+  `group=` list itself. So does a `$` member whose binding holds neither a list of names nor a
+  single name. A compiler-dispatched group operator such as
   [`has_multiple_values_for`](#has_multiple_values_for) has no other side at all: a dotted member
   of its `within=` is refused.
 - **The answer contract is the function's own.** Only the key is read differently. A record whose
@@ -255,7 +256,7 @@ expression: 'empty(AGE)'
 
 `var_exists(x)` → **boolean**
 
-True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))`). A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
+True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))`). The column part of a dotted string matches in any letter case (`var_exists("ADSL.trt01p")` finds `TRT01P`); the dataset qualifier is matched as written. A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
 
 A written name (a literal or a column reference) is one fact for the whole dataset. A **computed**
 name is tested **per row** — the rule runs at record level — and resolves exactly as the written
@@ -280,6 +281,8 @@ expression: 'var_exists("AWU")'
 `var_is_null(x)` → **boolean**
 
 True when the column exists but no row in the dataset populates it
+
+A qualified name (`var_is_null(DM.DTHDTC)`, or the string `"DM.DTHDTC"`) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.DTHDTC` reads it — an unmatched row reads the column's type default, and an absent column or an undeclared join the absent default. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `true`, silently.)
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -558,6 +561,8 @@ with [`upper`](#upper)'s list form (rulings register `CIT §3`).
 `max_value_length([name])` → **value**
 
 The longest value stored in the column, across all rows
+
+A qualified name (`max_value_length(DM.ARM)`, or the string form) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.ARM` reads it. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `0`, silently.)
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2087,7 +2092,7 @@ Check:
 
 `is_unique_set([V1, V2, …])` → **boolean**
 
-True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component.
+True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component. A member is a column of the dataset under evaluation, written bare. A `$` member splices a dataset-level binding exactly as [`record_count`](#record_count)'s `group=` does — a list of names element by element, a single name as one member; a binding holding anything else, or a **qualified** name, makes the rule **ERROR** when it runs (until 2026-10-01 such a member was dropped silently as absent).
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2352,6 +2357,8 @@ The example above is the complete call.
 
 The dataset's observation class; available at every level
 
+At `DATA` it takes no argument: the DATA-level class is the evaluated dataset's, so `ds_class("DM", "DATA")` fails to load — write `ds_class("DATA")`, or read another dataset's class at `DEFINE` / `LIBRARY`.
+
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
@@ -2368,6 +2375,8 @@ expression: 'not empty(ds_class("DEFINE"))'
 `ds_domain("DATA")` → **value**
 
 The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only
+
+At `DATA` an argument names the dataset read (`ds_domain("DM", "DATA")`), resolved through the study's datasets like every dataset-naming read; a dataset the study lacks answers a missing. (Until 2026-10-01 the argument was ignored at `DATA` and the evaluated dataset answered.)
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2386,6 +2395,8 @@ expression: 'ds_domain("DATA") == "AE"'
 
 The dataset's label; available at every level
 
+At `DATA` an argument names the dataset read (`ds_label("DM", "DATA")`), resolved through the study's datasets like every dataset-naming read; a dataset the study lacks answers a missing. (Until 2026-10-01 the argument was ignored at `DATA` and the evaluated dataset answered.)
+
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
@@ -2402,6 +2413,8 @@ expression: 'ds_label("DATA") != "Device-level Analysis Dataset"'
 `ds_name([x,] level)` → **value**
 
 The dataset's name; available at every level
+
+At `DATA` an argument names the dataset read (`ds_name("DM", "DATA")`), resolved through the study's datasets like every dataset-naming read; a dataset the study lacks answers a missing. (Until 2026-10-01 the argument was ignored at `DATA` and the evaluated dataset answered.)
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2593,6 +2606,14 @@ The example above is the complete call.
 
 
 ## Variable metadata
+
+The `var_*` accessors read the metadata of a variable **of the dataset under evaluation**, so the
+name they take is written **bare**: a qualified literal (`var_label("DM.AGE", "DATA")`,
+`var_core("DM.AGE", "LIBRARY")`) fails to load at every level, naming the bare spelling. Another
+dataset's DATA-level label, type, length or format is read with `dataset=`
+(`var_label("AGE", "DATA", dataset="DM")`), whose variable name matches in any letter case.
+(Until 2026-10-01 a qualified literal was looked up verbatim and answered a missing — at `LIBRARY`
+a false finding on every row of `var_core("DM.AGE", "LIBRARY") != "Req"`.)
 
 ### column_series_metadata
 
@@ -3319,6 +3340,11 @@ The example above is the complete call.
 
 
 ## Define-XML and value-level metadata
+
+The `vlm_*` accessors read the value-level metadata of a column **of the dataset under
+evaluation**, its `WhereClause` judged on the evaluated row. A qualified name (`vlm_length(DM.AGE)`,
+or the string form) fails to load, naming the bare spelling: a joined dataset's value-level
+metadata is not served. (Until 2026-10-01 it never matched a value-level definition, silently.)
 
 ### define_dataset_names
 
