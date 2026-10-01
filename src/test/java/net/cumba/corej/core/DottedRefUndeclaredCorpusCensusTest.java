@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,18 +43,25 @@ class DottedRefUndeclaredCorpusCensusTest
 {
 
     /**
-     * The recorded pairs. ⚠ CDISC-AD0640–0645 (QNU N17, measured 2026-10-01): a dataset-level
-     * {@code not var_exists("X")} whose {@code Output_Variables} names {@code AE.X} with no
-     * {@code Match_Datasets} — the entry is omitted from every finding at run time. Recorded, not
-     * fixed: the respelling (drop the entry, or report the variable another way) is a corpus edit
-     * outside the plan that filed it.
+     * The recorded pairs — EMPTY since T2 r1: CDISC-AD0640–0645 (QNU N17, measured 2026-10-01)
+     * named {@code AE.X} in {@code Output_Variables} with no {@code Match_Datasets}, an entry
+     * omitted from every finding at run time; the six lines were deleted (the bare {@code X} stays,
+     * and reported nothing less — no finding moved). The Output_Variables arm is kept covered by
+     * the control below.
      */
-    private static final Set<String> EXPECTED = Set.of("CDISC-AD0640 | AE.AETRTEM",
-            "CDISC-AD0641 | AE.AESTDY", "CDISC-AD0642 | AE.AEENDY", "CDISC-AD0643 | AE.AEDUR",
-            "CDISC-AD0644 | AE.AESEV", "CDISC-AD0645 | AE.AETOXGR");
+    private static final Set<String> EXPECTED = Set.of();
 
-    /** Floor of rule checks the observer must see over the whole corpus (measured far above). */
-    private static final int OBSERVED_FLOOR = 3000;
+    /**
+     * The generated corpus has EXACTLY this many packages (T2 r1: a floor of 30 let a corpus that
+     * lost a third of its packages pass).
+     */
+    private static final int PACKAGE_COUNT = 47;
+
+    /**
+     * Floor of rule checks the observer must see over the whole corpus — one per loaded rule;
+     * measured 12 852 at corej a4a8711 / rules c5363e27, the floor just below it (T2 r1).
+     */
+    private static final int OBSERVED_FLOOR = 12_000;
 
     private static final Pattern NAME = Pattern
             .compile("^(?:Output_Variables entry |the column name )?(\\S+) ");
@@ -75,7 +83,7 @@ class DottedRefUndeclaredCorpusCensusTest
             packages = files.filter(p -> p.getFileName().toString().startsWith("rules-")
                     && p.toString().endsWith(".json")).sorted().toList();
         }
-        assertTrue(packages.size() >= 30, "the generated corpus is present: " + packages.size());
+        assertEquals(PACKAGE_COUNT, packages.size(), "the generated corpus is complete");
         Set<String> found = new TreeSet<>();
         AtomicInteger observed = new AtomicInteger();
         Thread self = Thread.currentThread();
@@ -96,19 +104,31 @@ class DottedRefUndeclaredCorpusCensusTest
         });
         try
         {
-            // NON-VACUITY: the collector sees a known undeclared qualifier.
+            // NON-VACUITY: the collector sees a known undeclared qualifier on BOTH arms — the
+            // Check (DM.AGE) and an Output_Variables entry (Q.S); with the recorded set empty the
+            // output arm would otherwise be covered by nothing (T2 r1).
             RulePackageLoader.loadFromString("{\"rules\":{\"R\":{\"Core\":{\"Id\":\"T-N25-CTRL\"},"
                     + "\"Sensitivity\":\"Record\",\"Check\":{\"expression\":\"DM.AGE > 30\"},"
-                    + "\"Outcome\":{\"Message\":\"m\",\"Output_Variables\":[\"STUDYID\"]}}}}");
-            assertEquals(Set.of("T-N25-CTRL | DM.AGE"), found,
-                    "the control must be seen — else the census below proves nothing");
+                    + "\"Outcome\":{\"Message\":\"m\",\"Output_Variables\":[\"STUDYID\",\"Q.S\"]}}}}");
+            assertEquals(Set.of("T-N25-CTRL | DM.AGE", "T-N25-CTRL | Q.S"), found,
+                    "the control must be seen on both arms — else the census below proves nothing");
             found.clear();
             int controlObserved = observed.getAndSet(0);
             assertEquals(1, controlObserved, "one rule, one observation");
+            List<String> loadErrors = new ArrayList<>();
             for (Path pkg : packages)
             {
-                RulePackageLoader.load(pkg);
+                for (var rule : RulePackageLoader.load(pkg).getRules().values())
+                {
+                    if (rule.getLoadError() != null)
+                    {
+                        loadErrors.add(rule.effectiveId() + ": " + rule.getLoadError());
+                    }
+                }
             }
+            assertEquals(List.of(), loadErrors,
+                    "a rule parked with a load error is never Stage-A observed, so the census"
+                            + " would silently skip it");
         }
         finally
         {
