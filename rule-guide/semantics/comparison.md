@@ -273,9 +273,13 @@ Two consequences to read together:
 
 - a partial `2020-01` is a **span**, not a point, so it does not match a day inside it — the same
   answer the comparison gives;
-- ⛔ **mixing the two is a load error, not a reinterpretation**: `date(--DTC) in ["2020-01-01"]`
-  is refused with *"membership must not mix date/time and string operands"*. Convert the members —
-  `[date("2020-01-01")]` — the same way you would convert the right-hand side of a comparison.
+- ⚠ **mixing the two is NOT refused at load today, and it is a reinterpretation**: the stage-A
+  kind that sees the pair (`MIXED_DATE_STRING_COMPARISON`) is observe-only, so
+  `date(--DTC) in ["2020-01-01"]` loads, and its string members are read as **dates** — it answers
+  exactly as `in [date("2020-01-01")]` does (a `2020-01-01T10:00` matches; measured 2026-10-01).
+  Write the conversion anyway — `[date("2020-01-01")]`, the same way you would convert the
+  right-hand side of a comparison: it is the spelling SPEC §5.2 reserves, and the one that stays
+  legal once the kind is armed.
 
 ## Regular expressions
 
