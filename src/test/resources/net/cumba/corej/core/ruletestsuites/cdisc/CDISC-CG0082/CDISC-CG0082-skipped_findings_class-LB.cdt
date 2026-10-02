@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0082 expect=skipped domain=LB
+#note "LB is a FINDINGS-class dataset: Scope.Classes.Include [EVENTS] rejects it -> skipped. The data would otherwise fire: both LBBODSYS and LBBDSYCD are columns (Requirements pass), and the record has LBBODSYS populated with LBBDSYCD blank."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBBODSYS type=Char
+col LBBDSYCD type=Num
+---
+S1 | LB | 001 | 1 | ALT | Hepatobiliary disorders | .
+---

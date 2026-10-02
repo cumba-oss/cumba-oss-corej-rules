@@ -1,0 +1,66 @@
+Core:
+  Id: "CDISC-CG0013-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in the Demographics (DM) dataset\
+  \ is neither in the SDTM Model list of allowed variables for DM nor one of the additional\
+  \ variables the IG permits in DM: VISITNUM, VISIT, VISITDY and DMXFN."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Bindings:
+- name: "$allowed_variables"
+  expression: "get_model_column_order()"
+Check:
+  expression: >-
+    upper(varname()) not in $allowed_variables and upper(varname()) not in ["VISITNUM", "VISIT",
+    "VISITDY", "DMXFN"]
+Outcome:
+  Message: "Variable is not in the SDTM Model list of allowed variables for DM and\
+    \ is not one of the additional variables the IG permits in DM (VISITNUM, VISIT,\
+    \ VISITDY, DMXFN)."
+  Output_Variables:
+  - "variable_name"
+  - "$allowed_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "GEN"
+  Condition: "Dataset is DM; SDTMIG DM assumption 8 permits only VISITNUM, VISIT,\
+    \ VISITDY and DMXFN in addition"
+  Rule: "Variable = Model List of Allowed Variables for the domain, or a variable\
+    \ the IG permits adding to it"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable = Model List of Allowed Variables for Observation Class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"

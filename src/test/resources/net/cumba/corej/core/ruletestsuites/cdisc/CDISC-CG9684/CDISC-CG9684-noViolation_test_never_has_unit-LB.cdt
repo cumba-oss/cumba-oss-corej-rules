@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG9684 expect=noViolation domain=LB
+#note "PH and SPGRAV are numeric and never carry LBORRESU on any record: no record shows the test has units, so nothing fires. Units being applicable at all is CDISC-CG0425's question (via --ORRESU), not this rule's."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSPEC   type=Char label="Specimen Type"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+---
+S1 | LB | 001 | 1 | PH     | URINE | 6.5   |
+S1 | LB | 002 | 1 | PH     | URINE | 7.0   |
+S1 | LB | 001 | 2 | SPGRAV | URINE | 1.015 |
+---

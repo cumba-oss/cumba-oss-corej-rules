@@ -1,0 +1,136 @@
+Core:
+  Id: "PMDA-SD0058-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in the SE/SV dataset is not listed\
+  \ in the SDTM model list of allowed variables for the observation class and is not\
+  \ one of the identifiers --SEQ, --GRPID, --REFID, --SPID and the Timing variables\
+  \ except the time-point variables, which the IG permits adding to SE/SV."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "SE"
+    - "SV"
+Bindings:
+- name: "$allowed_variables"
+  expression: "get_model_column_order()"
+- name: "$timing_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
+    , model_class=\"Findings\")"
+- name: "$identifier_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Identifier\"\
+    , model_class=\"Findings\")"
+Check:
+  expression: >-
+    upper(varname()) not in $allowed_variables and not (upper(varname()) in $timing_variables and
+    upper(varname()) !~ /^..(TPT|TPTNUM|ELTM|TPTREF|RFTDTC)$/) and not (upper(varname()) in
+    $identifier_variables and upper(varname()) =~ /^..(SEQ|GRPID|REFID|SPID)$/)
+Outcome:
+  Message: "Variable is present in the dataset but is not listed in the SDTM model\
+    \ list for the observation class, and is not one of the identifiers --SEQ, --GRPID,\
+    \ --REFID, --SPID and the Timing variables except the time-point variables, which\
+    \ the IG permits adding to SE/SV."
+  Output_Variables:
+  - "variable_name"
+  - "$allowed_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "SE, SV"
+  Variable: "GEN"
+  Condition: "Dataset is SE or SV; SDTMIG SE/SV assumptions permit adding --SEQ (SV),\
+    \ --GRPID, --REFID, --SPID and Timing variables except the time-point variables"
+  Rule: "Variable = SDTM Model list for the observation class, or a variable the IG\
+    \ permits adding to the domain"
+Source:
+  Message: "Variable appears in dataset, but is not in SDTM model"
+  Description: "Only variables listed in SDTM model should appear in a dataset. New\
+    \ sponsor defined variables must not be added, and existing variables must not\
+    \ be renamed or modified."
+  Domains: "ALL"
+  Severity: "Error"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "6.0"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "PMDA Validation Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "6.0"
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"

@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0332 expect=noViolation domain=AE1
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "AE1 carries DOMAIN QS, so its prefix AE is not its OWN domain - but dataset AE carries DOMAIN AE, so AE is a domain present in the study and the rule does not fire. This separates the study-wide check the rule text states from an own-DOMAIN comparison (prefix(dataset_name, 2) != DOMAIN), which would fire here."
+dataset AE1 label="Split dataset whose prefix is another dataset's domain"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | QS | 01-701-1015
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | AE | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

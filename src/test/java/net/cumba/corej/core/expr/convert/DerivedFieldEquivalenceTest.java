@@ -170,7 +170,15 @@ class DerivedFieldEquivalenceTest
             // reporting the absence once — so authored == derived would red the disagree
             // clause below (CDISC-CG0031-A/CG0033-A precedent, routing Record/{ROW}). Kept
             // in step with CrossCorpusDerivationTest, the shipped-corpus half.
-            "CDISC-SEND-9439");
+            "CDISC-SEND-9439",
+            // +1 on 2026-10-02 (rule round 2026-10-02, owner): CDISC-CG9685, the --BDSYCD presence
+            // sister of CDISC-CG0082 - same rationale as the --STRESU set: one dataset-level fact
+            // (the column is absent) witnessed by a per-record leaf (not empty(--BODSYS)), so the
+            // derivation reads Record and would multiply one finding by the populated rows.
+            // Kept in step with the twin roster in the other test class.
+            "CDISC-CG9685",
+            // PMDA arm of CDISC-CG9685, same day and rationale.
+            "PMDA-SD9750");
 
     /**
      * One {@code rules-src} fixture per evaluation domain ({@code {}}, {@code {VAR}},

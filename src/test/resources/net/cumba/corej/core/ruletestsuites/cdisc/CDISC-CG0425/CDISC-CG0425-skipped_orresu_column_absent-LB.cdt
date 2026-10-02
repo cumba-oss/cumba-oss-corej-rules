@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0425 expect=skipped domain=LB
+#note "LBORRESU column absent. Whether units are applicable is decided by --ORRESU (owner, 2026-10-02), so without the column the rule cannot tell and Requirements.Variables.All [--STRESU, --STRESC, --ORRESU] skips it with the reason named. Were --ORRESU dropped from the gate, the rule would run with the absent column read as all-missing, not empty(--ORRESU) would be false on every row, and this scenario would report noViolation instead of skipped. That difference is what it pins."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | 7.2 |
+S1 | LB | 001 | 2 | ALB  | 40  | g/L
+---

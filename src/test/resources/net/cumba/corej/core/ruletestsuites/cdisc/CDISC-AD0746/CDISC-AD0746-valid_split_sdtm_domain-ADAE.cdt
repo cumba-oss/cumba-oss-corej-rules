@@ -1,0 +1,32 @@
+#!RuleTest
+#test CDISC-AD0746 expect=noViolation domain=ADAE
+# Rule:Description: SRCDOM has a value that is not an SDTM domain name, ADaM dataset name, or null
+#note "SRCDOM = LB names the SDTM domain LB, which is submitted only as splits (LBCH, LBHE; DOMAIN LB) with no dataset named LB. The domain is present, so no violation. Until 2026-10-02 the rule compared SRCDOM with dataset_names() only and fired here."
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADAE structure=BDS
+col SRCDOM type=Char
+---
+LB
+---
+
+dataset LBCH
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+---
+STUDY01 | LB
+---
+
+dataset LBHE
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+---
+STUDY01 | LB
+---
+
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+---
+STUDY01
+---

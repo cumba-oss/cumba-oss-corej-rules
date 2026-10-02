@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-CG0425 expect=violation domain=LB
-#note "Both columns present (the Requirements.Variables.All [--STRESU, --STRESC] gate is satisfied): row 1 has a numeric LBSTRESC with LBSTRESU present-but-empty -> fires. Row 2: unit populated -> clean. Row 3: non-numeric result -> the regex arm is false -> clean."
+#note "All three columns present (the Requirements.Variables.All [--STRESU, --STRESC, --ORRESU] gate is satisfied): row 1 has a numeric LBSTRESC and an original unit (LBORRESU mg/dL), so units apply, and LBSTRESU is present-but-empty -> fires. Row 2: unit populated -> clean. Row 3: non-numeric result -> the regex arm is false -> clean."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 #expectViolationAt row=1 LBSTRESC=7.2 LBSTRESU=
@@ -12,7 +12,8 @@ col LBSEQ    type=Num  label="Sequence Number"
 col LBTESTCD type=Char label="Lab Test or Examination Short Name"
 col LBSTRESC type=Char label="Character Result/Finding in Std Format"
 col LBSTRESU type=Char label="Standard Units"
+col LBORRESU type=Char label="Original Units"
 ---
-S1 | LB | 001 | 1 | GLUC  | 7.2      |
-S1 | LB | 001 | 2 | ALB   | 40       | g/L
-S1 | LB | 001 | 3 | HBSAG | NEGATIVE |
+S1 | LB | 001 | 1 | GLUC  | 7.2      | | mg/dL
+S1 | LB | 001 | 2 | ALB   | 40       | g/L | g/dL
+S1 | LB | 001 | 3 | HBSAG | NEGATIVE | |

@@ -24,15 +24,22 @@ Match_Datasets:
 - Keys:
   - "USUBJID"
   Name: "SE"
+Bindings:
+- name: "$first_element_start"
+  expression: "min_date(SESTDTC, domain=\"SE\", group=[USUBJID])"
 Check:
   ERROR:
     expression: >-
-      date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) <= date(SE.SEENDTC) and EPOCH != SE.EPOCH
+      date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) < date(SE.SEENDTC) and EPOCH != SE.EPOCH
+      and (SVSTDTC !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ or SVSTDTC != SE.SESTDTC or date(SE.SESTDTC) <=
+      date($first_element_start))
   INFO:
     expression: >-
       not empty(earliest_possible(SE.SESTDTC)) and not empty(earliest_possible(SVSTDTC)) and
       date(earliest_possible(SE.SESTDTC)) <= latest_possible(SVSTDTC) and
-      date(earliest_possible(SVSTDTC)) <= latest_possible(SE.SEENDTC) and EPOCH != SE.EPOCH
+      date(earliest_possible(SVSTDTC)) < latest_possible(SE.SEENDTC) and EPOCH != SE.EPOCH and
+      (SVSTDTC !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ or SVSTDTC != SE.SESTDTC or date(SE.SESTDTC) <=
+      date($first_element_start))
     Message: "EPOCH in SV does not match EPOCH of an SE element whose date range may contain\
       \ the visit start date (partial date/time precision leaves the containment undetermined)."
 Outcome:
@@ -44,6 +51,7 @@ Outcome:
   - "SE.SESTDTC"
   - "SE.SEENDTC"
   - "SE.EPOCH"
+  - "!$first_element_start"
 Source:
   Class: "SPC"
   Domain: "SV"

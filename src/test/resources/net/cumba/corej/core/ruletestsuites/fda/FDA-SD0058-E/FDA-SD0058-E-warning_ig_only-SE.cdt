@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD0058-E expect=violation domain=SE
+#note "Same dataset as FDA-SD0058-E-error_sponsor_variable-SE, plus an IG list (served through domain-variables, read by get_dataset_filtered_variables) that carries SESTDY. SESTDY is not in the SEND SE model list, and this sibling grants nothing -> WARNING instead of the ERROR that scenario pins. Discriminating: the only difference between the two scenarios is the IG list, so the pair goes red if the levels are collapsed or the IG list stops being read."
+#library standard=sendig version=3-1
+#library model-column-order SE STUDYID DOMAIN USUBJID SESEQ ETCD ELEMENT SESTDTC SEENDTC SEUPDES
+#library domain-variables SE STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier SESEQ:Identifier ETCD:Topic "ELEMENT:Synonym Qualifier" SESTDTC:Timing SEENDTC:Timing "SEUPDES:Synonym Qualifier" SESTDY:Timing
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=SESTDY
+dataset SE
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SESEQ type=Num
+col ETCD type=Char
+col SESTDTC type=Char
+col SEENDTC type=Char
+col SESTDY type=Char
+---
+S1 | SE | 001 | 1 | SCRN | 2012-07-06 | 2012-07-09 | 1
+---

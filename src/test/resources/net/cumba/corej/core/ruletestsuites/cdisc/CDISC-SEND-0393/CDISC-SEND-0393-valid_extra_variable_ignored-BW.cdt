@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0393 expect=noViolation domain=BW
+#note "BWCUSTOM is not in the model list. The order is judged only over the variables the model list knows (owner, 2026-10-02), so it is ignored here; whether it is allowed at all is CG0013 / SD0058's business. Before the change the first unknown variable ended the ordered-subset walk and the rule fired for an order that is correct."
+#library standard=sendig-dart version=1-2
+#library model-column-order BW STUDYID DOMAIN USUBJID BWSEQ BWGRPID BWTESTCD BWTEST BWCAT BWPOS BWORRES BWORRESU
+dataset BW class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col BWSEQ    type=Num
+col BWTESTCD type=Char
+col BWCUSTOM type=Char
+col BWTEST   type=Char
+col BWORRES  type=Char
+---
+S1 | BW | 001 | 1 | X1 | X | Test | 1
+---

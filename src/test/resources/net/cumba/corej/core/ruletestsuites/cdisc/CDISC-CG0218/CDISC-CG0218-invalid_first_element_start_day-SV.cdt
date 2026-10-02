@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0218 expect=violation domain=SV
+#runLevel Info
+#note "Review finding 2026-10-02: 2012-07-06 is the start of the subject's FIRST element (SCREENING) - no earlier element ends there, so it is not a transition day and the element in progress at the start of the visit is determinable: SCREENING. EPOCH TREATMENT is reported against it. The date-only exclusion applies only where an element starts after the subject's first one ($first_element_start = min_date(SESTDTC, SE, group=[USUBJID])); without that conjunct this visit would go silent."
+#expectViolationCount 1
+#expectViolationAt row=1 severity=ERROR
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | SCRN | 2012-07-06 | TREATMENT
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06 | 2012-07-09 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09 | 2012-08-20 | TREATMENT
+---

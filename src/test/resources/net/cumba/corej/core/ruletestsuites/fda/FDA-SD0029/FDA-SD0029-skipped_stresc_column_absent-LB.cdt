@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0029 expect=skipped domain=LB
+#note "dataset LB without the LBSTRESC column; LBSTRESU and LBORRESU are present, LBORRESU populated and LBSTRESU empty on both rows. Requirements.Variables.All [--STRESU, --STRESC, --ORRESU] gates the rule out -> auditable skip naming the absent variable. Discriminating for the All gate's --STRESC member only (not for the verdict): without it the absent LBSTRESC reads as a constant missing value, 'not empty(--STRESC)' is false on every record and the rule would answer noViolation instead of skipped."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRESU type=Char label="Original Units"
+col LBSTRESU type=Char label="Standard Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | mg/dL |
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | g/dL  |
+---

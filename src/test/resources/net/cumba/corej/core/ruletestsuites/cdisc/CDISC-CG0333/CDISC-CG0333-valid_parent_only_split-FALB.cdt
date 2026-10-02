@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0333 expect=noViolation domain=FALB
+# Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
+#note "The parent LB of FALB is submitted ONLY as a split (LBCH, DOMAIN LB) with no unsplit LB dataset, which SDTMIG 4.1.7 allows. The domain LB is therefore present and the rule does not fire. Until 2026-10-02 the rule compared the suffix with dataset_names() (member names: FALB, LBCH, DM) and fired here; the same defect was fixed in CDISC-CG0332."
+dataset FALB label="Findings About Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | FA | 01-701-1015
+---
+
+dataset LBCH label="Laboratory Test Results - Chemistry"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

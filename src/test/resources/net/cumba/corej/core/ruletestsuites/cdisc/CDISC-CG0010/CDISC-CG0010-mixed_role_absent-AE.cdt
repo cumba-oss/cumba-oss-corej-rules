@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0010 expect=violation domain=AE
+#note "Owner, 2026-10-02: a define ItemRef WITHOUT a Role attribute specifies no role, so there is nothing to compare and CG0010 stays silent for it (USUBJID and AESEV here, both role-less). AEXTRA does specify Role=Timing against the library's Identifier and still fires, so exactly 1 finding. Before the not empty(var_role(DEFINE)) guard the role-less items compared as a mismatch: on the PhUSE pilot data that was 7 of CG0010's 12 findings (DS.VISIT, QSREASND in six QS splits). CDISC-SEND-0009.1 already carried this guard."
+#library standard=sdtmig version=3-4
+#library variable-metadata AE AESEV name=AESEV role=Timing
+#library variable-metadata AE AEXTRA name=AEXTRA role=Identifier
+#library variable-metadata AE USUBJID name=USUBJID role=Identifier
+#define-xml CDISC-CG0010-no-role-define.xml
+#expectViolationCount 1
+#expectViolationAt define_variable_name=AEXTRA define_variable_role=Timing
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AESEV   type=Char
+---
+S1 | AE | 001 | 1 | MILD

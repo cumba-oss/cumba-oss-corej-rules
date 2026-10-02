@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0082 expect=skipped domain=AE
+#note "AEBDSYCD present (and blank) but AEBODSYS is not a column: Requirements.Variables.All [--BODSYS, --BDSYCD] skips the record rule. Discriminating for the All gate's --BODSYS member only (not for the verdict): without it the absent AEBODSYS reads as a constant missing value, the check is false on every record and the rule would answer noViolation instead of skipped."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEBDSYCD type=Num
+---
+S1 | AE | 001 | 1 | HEADACHE | .
+---

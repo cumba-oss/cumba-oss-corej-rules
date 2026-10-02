@@ -1,0 +1,465 @@
+Core:
+  Id: "FDA-SD0058-B"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in the DM dataset is in neither\
+  \ the SDTM model list of allowed variables for the observation class nor the IG\
+  \ variable list for the dataset, and is not one of VISITNUM, VISIT, VISITDY and\
+  \ DMXFN, which the IG permits adding to DM. Raise a warning when the IG defines\
+  \ the variable for the dataset but the SDTM model version the IG links to does not\
+  \ list it."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Bindings:
+- name: "$model_variables"
+  expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
+Check:
+  ERROR:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables and
+      upper(varname()) not in ["VISITNUM", "VISIT", "VISITDY", "DMXFN"]
+    Message: "Variable is in neither the SDTM model list for the observation class nor\
+      \ the IG variable list for the dataset, and is not one of VISITNUM, VISIT, VISITDY\
+      \ and DMXFN, which the IG permits adding to DM."
+  WARNING:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) in $ig_variables
+    Message: "Variable is defined by the IG for this dataset but is not in the SDTM model\
+      \ list of allowed variables for the observation class of the model version the IG\
+      \ links to."
+Outcome:
+  Message: "Variable is present in the dataset but is not listed in the SDTM model\
+    \ list of allowed variables for the observation class."
+  Output_Variables:
+  - "variable_name"
+  - "$model_variables"
+  - "$ig_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "GEN"
+  Condition: "Dataset is DM; SDTMIG DM assumption 8 permits only VISITNUM, VISIT,\
+    \ VISITDY and DMXFN in addition"
+  Rule: "Variable = SDTM Model list for the observation class, or a variable the IG\
+    \ permits adding to the domain"
+Source:
+  FDA_Validator_Rule_Message: "Variable appears in dataset, but is not in SDTM model"
+  FDA_Validator_Rule_Description: "Only variables listed in SDTM model should appear\
+    \ in a dataset. New sponsor defined variables must not be added, and existing\
+    \ variables must not be renamed or modified."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0564"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0566"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0567"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0002"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0030"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0032"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0270"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0564"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0566"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0567"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0002"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0030"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0032"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0270"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0564"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0566"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0567"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0002"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0030"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0032"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0270"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0564"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0566"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0567"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0002"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0030"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0032"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0270"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0542"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0564"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0565"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0566"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0567"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0002"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0010"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0030"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0031"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0032"
+        Version: "2"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0268"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0269"
+        Version: "1"
+      Version: "2.0"
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0270"
+        Version: "1"
+      Version: "2.0"

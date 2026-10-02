@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0332 expect=skipped domain=XYZ1
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "XYZ1 has a four-character name that matches the split-name regex and its prefix XY is no domain in the study, so the check WOULD fire if it ran. It has no DOMAIN column, so its data-derived base is its own name: it is not a split, and `include_split_datasets: true` keeps it out of scope. This is the scenario that reds if the flag is dropped."
+dataset XYZ1 label="Four-character non-split dataset without DOMAIN"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

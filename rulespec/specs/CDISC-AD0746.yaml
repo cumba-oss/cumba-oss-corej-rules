@@ -3,8 +3,9 @@ kind: rule
 description: |
   Wave C1 port — T2-Op (Operations without Match_Datasets).
   CDISC-AD0746: SRCDOM must be an SDTM domain name, ADaM dataset name, or
-  null. Uses Operation `dataset_names` to collect the list of study
-  datasets and checks SRCDOM via `is_not_contained_by $datasets`.
+  null. Checks upper(SRCDOM) against both study_domains() (the SDTM
+  DOMAIN values, so a split domain counts) and dataset_names() (the ADaM
+  dataset names, which have no DOMAIN column).
 
   Scope covers BASIC DATA STRUCTURE, MEDICAL DEVICE BASIC DATA STRUCTURE,
   OCCURRENCE DATA STRUCTURE, and MEDICAL DEVICE OCCURRENCE DATA STRUCTURE;
@@ -20,11 +21,11 @@ datasets:
     column_types:
       AVISITN: LONG
     rows:
-      # ok — SRCDOM='LB' is in {ADLB, LB}
+      # ok — SRCDOM='LB' is a study domain (and a dataset name)
       - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, SRCDOM: 'LB'}
       # ok — SRCDOM empty (null-treated — non_empty fails)
       - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, SRCDOM: ''}
-      # bad — SRCDOM='BOGUS' not in {ADLB, LB}
+      # bad — SRCDOM='BOGUS' is neither a study domain nor a dataset name
       - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, SRCDOM: 'BOGUS'}
   LB:
     row_key: [STUDYID, USUBJID, LBSEQ]

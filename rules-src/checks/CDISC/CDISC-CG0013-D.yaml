@@ -1,0 +1,63 @@
+Core:
+  Id: "CDISC-CG0013-D"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in the Comments (CO) dataset\
+  \ is neither in the SDTM Model list of allowed variables for CO nor an Identifier\
+  \ or Timing variable, which SDTMIG 3.3 and 3.4 permit adding to CO."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Bindings:
+- name: "$allowed_variables"
+  expression: "get_model_column_order()"
+- name: "$timing_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
+    , model_class=\"Findings\")"
+- name: "$identifier_variables"
+  expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Identifier\"\
+    , model_class=\"Findings\")"
+Check:
+  expression: >-
+    upper(varname()) not in $allowed_variables and upper(varname()) not in $timing_variables and
+    upper(varname()) not in $identifier_variables
+Outcome:
+  Message: "Variable is not in the SDTM Model list of allowed variables for CO and\
+    \ is not an Identifier or Timing variable, which the IG permits adding to CO."
+  Output_Variables:
+  - "variable_name"
+  - "$allowed_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "GEN"
+  Condition: "Dataset is CO; SDTMIG 3.3/3.4 CO assumptions permit adding any Identifier\
+    \ and Timing variables"
+  Rule: "Variable = Model List of Allowed Variables for the domain, or a variable\
+    \ the IG permits adding to it"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable = Model List of Allowed Variables for Observation Class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
+  - Name: "SDTMIG"
+    Version: "3.3"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"

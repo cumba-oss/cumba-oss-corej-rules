@@ -87,13 +87,17 @@ class CaseFoldedNameTestLoweringTest
             "PMDA-SD0075");
 
     /** Measured 2026-09-28 (both corpora identical); exact, like the Python suite's pins. */
-    private static final int EXPECTED_FOLDED_RULES = 112;
+    // 2026-10-02 (rule round 2026-10-02): 112 -> 115 rules / 191 -> 197 sites, and membership
+    // 48 -> 61 rules / 68 -> 114 sites - the round added upper() folds (CG0332/CG0333 prefix and
+    // suffix, CG0425/CG9672/SD0029/SD9715 none, AD0746 upper(SRCDOM), the CG0013/SD0058 siblings
+    // upper(varname()) membership). Re-derived from a run, not nudged.
+    private static final int EXPECTED_FOLDED_RULES = 115;
 
-    private static final int EXPECTED_FOLDED_SITES = 191;
+    private static final int EXPECTED_FOLDED_SITES = 197;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 48;
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 61;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 68;
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 114;
 
     private static final Set<String> PREDICATES = Set.of("ends_with", "starts_with", "contains",
             "does_not_contain", "prefix_matches", "suffix_matches");

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0330 expect=noViolation domain=SV
+#note "EPOCH is permitted in SV (SV Assumption 11) but not in the SV model list. It is ignored for the order check, and the model variables around it are in model order, so nothing fires. On the PhUSE pilot data this was a false CG0330 finding."
+#library standard=sdtmig version=3-3
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+dataset SV
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VISITNUM type=Num
+col VISIT    type=Char
+col VISITDY  type=Char
+col EPOCH    type=Char
+col SVSTDTC  type=Char
+col SVENDTC  type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 1 | TREATMENT | 2012-07-09 | 2012-07-09
+---

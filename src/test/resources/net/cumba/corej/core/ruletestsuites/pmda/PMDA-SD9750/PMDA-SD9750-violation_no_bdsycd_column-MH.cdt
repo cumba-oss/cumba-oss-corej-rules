@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD9750 expect=violation domain=MH
+#note "MHBDSYCD column absent while MHBODSYS is populated on two records -> fires ONCE for the dataset (Sensitivity: Dataset), never once per populated record. Two populated rows make the count discriminating: a record-level reading would report 2. The first row is the one PMDA-SD1461-skipped_bdsycd_column_absent-MH carries."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset MH
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MHSEQ    type=Num
+col MHBODSYS type=Char
+---
+S1 | MH | 001 | 1 | INFECTIONS
+S1 | MH | 001 | 2 | Respiratory, thoracic and mediastinal disorders
+---

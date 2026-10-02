@@ -13,19 +13,20 @@ Scope:
     - "RELSUB"
     - "SUPP--"
     - "SQ--"
+    include_split_datasets: true
 Bindings:
-- name: "$list_dataset_names"
-  expression: "dataset_names()"
+- name: "$study_domains"
+  expression: "study_domains()"
 Check:
   expression: >-
-    ds_name("DATA") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ and prefix(dataset_name, 2) not in ["AP",
-    "FA"] and prefix(dataset_name, 2) not in $list_dataset_names
+    ds_name("DATA") =~ /(?i)^(?!AP|FA)[A-Z]{2}[A-Z0-9]{1,2}$/ and upper(prefix(ds_name("DATA"), 2))
+    not in $study_domains
 Outcome:
   Message: "The first two characters of the split dataset name do not match a domain\
     \ present in the study."
   Output_Variables:
   - "dataset_name"
-  - "$list_dataset_names"
+  - "$study_domains"
 Source:
   Class: "ALL"
   Domain: "NOT(RELREC, RELSUB, SUPP--)"

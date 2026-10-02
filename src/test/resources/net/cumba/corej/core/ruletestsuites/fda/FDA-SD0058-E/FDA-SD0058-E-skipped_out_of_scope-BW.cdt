@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0058-E expect=skipped domain=BW
+#note "Scope.Domains.Include is CO, DM and SE only, so BW is out of FDA-SD0058-E scope: SEND BW is checked by the parent FDA-SD0058. BWCUSTOM is a sponsor variable in no model list and no IG list, so the check would report it at ERROR if the Include scope were dropped."
+#library standard=sendig version=3-1
+#library model-column-order BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWTEST BWORRES
+dataset BW
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col BWSEQ type=Num
+col BWTESTCD type=Char
+col BWTEST type=Char
+col BWORRES type=Char
+col BWCUSTOM type=Char
+---
+S1 | BW | 001 | 1 | BW | Body Weight | 250 | X
+---

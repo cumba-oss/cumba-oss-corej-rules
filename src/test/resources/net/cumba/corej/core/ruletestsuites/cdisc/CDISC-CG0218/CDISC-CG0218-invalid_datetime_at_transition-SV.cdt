@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0218 expect=violation domain=SV
+#runLevel Info
+#note "The transition-day exclusion is date-only: the visit starts at 2012-07-09T10:00, exactly the SESTDTC of TREATMENT (and the exclusive SEENDTC of SCREENING), so TREATMENT was in progress at the start of the visit and EPOCH SCREENING is reported against it at ERROR. The 'SVSTDTC == SE.SESTDTC' exclusion must NOT apply here, because SVSTDTC carries a time. Discriminating: if the exclusion's date-only regex were dropped (or widened to datetimes), the equal SVSTDTC/SESTDTC would silence this finding. SCREENING does not contain the visit, its end being exclusive (10:00 < 10:00 is false)."
+#expectViolationCount 1
+#expectViolationAt row=1 severity=ERROR VISITNUM=2 SE.EPOCH=TREATMENT
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | DAY 1 | 2012-07-09T10:00 | SCREENING
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06T09:00 | 2012-07-09T10:00 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09T10:00 | 2012-08-20T12:00 | TREATMENT
+---

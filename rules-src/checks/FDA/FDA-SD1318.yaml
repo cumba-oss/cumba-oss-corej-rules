@@ -22,12 +22,9 @@ Bindings:
     PROTOCOL DEVIATION\"))"
 - name: "$dv_count"
   expression: "record_count(domain=\"DV\", group=[USUBJID])"
-- name: "$study_datasets"
-  expression: "dataset_names()"
 Check:
   expression: >-
-    ($ds_pv_count >= 1 or $ds_pd_count >= 1) and (not shares_elements_with($study_datasets,
-    keys=[DV]) or $dv_count < 1)
+    ($ds_pv_count >= 1 or $ds_pd_count >= 1) and $dv_count < 1
 Outcome:
   Message: "Subject has a DS record with DSDECOD equal to 'PROTOCOL VIOLATION' or\
     \ 'PROTOCOL DEVIATION' but no supportive record exists in the DV (Protocol Deviations)\

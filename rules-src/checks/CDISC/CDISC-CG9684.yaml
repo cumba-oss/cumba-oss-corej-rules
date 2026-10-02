@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG9684"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a numeric Result or Finding in Original Units (--ORRES)\
+  \ is populated and Original Units (--ORRESU) is empty, although --ORRESU is populated\
+  \ on another record of the same test (same --TESTCD, --OBJ, --TSTDTL, --CAT, --SCAT,\
+  \ --SPEC and --METHOD)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--ORRES"
+    - "--ORRESU"
+    - "--TESTCD"
+Bindings:
+- name: "$units_for_test"
+  expression: "record_count(group=[--TESTCD, --OBJ, --TSTDTL, --CAT, --SCAT, --SPEC,\
+    \ --METHOD], filter=(not empty(--ORRESU)))"
+Check:
+  expression: >-
+    not empty(--ORRES) and --ORRES =~ /^-?[0-9]+(\\.[0-9]+)?$/ and empty(--ORRESU) and
+    $units_for_test >= 1
+Outcome:
+  Message: "--ORRESU is empty for a numeric --ORRES although the same test carries\
+    \ --ORRESU on another record."
+  Output_Variables:
+  - "--TESTCD"
+  - "--ORRES"
+  - "--ORRESU"
+  - "$units_for_test"
+Source_Proposed:
+  Sheet_Issue: "#279"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--ORRESU"
+  Condition: "--ORRES ^= null and numeric, and --ORRESU ^= null on another record\
+    \ of the same test"
+  Rule: "--ORRESU ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

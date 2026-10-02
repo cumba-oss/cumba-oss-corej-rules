@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD0058-A expect=violation domain=SV
+#note "SVCUSTOM is neither in the model list for SV nor an identifier or timing variable the IG permits adding, so it is reported as before."
+#library standard=sdtmig version=3-4
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#expectViolationCount 1
+#expectViolationAt variable_name=SVCUSTOM
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col SVCUSTOM type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | X
+---

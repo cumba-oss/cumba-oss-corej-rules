@@ -139,13 +139,10 @@ class RuleSrcExpressionWriterCorpusTest
             "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
                     + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
             "CDISC-CG0332",
-            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z0-9]{1,2}$/ "
-                    + "and prefix(dataset_name, 2) not in [\"AP\", \"FA\"] "
-                    + "and prefix(dataset_name, 2) not in $list_dataset_names",
-            "CDISC-CG0333",
-            "ds_name(\"DATA\") =~ /^[A-Za-z]{2}[A-Za-z]{1,2}$/ "
-                    + "and prefix(dataset_name, 2) == \"FA\" "
-                    + "and suffix(dataset_name, 2) not in $list_dataset_names");
+            "ds_name(\"DATA\") =~ /(?i)^(?!AP|FA)[A-Z]{2}[A-Z0-9]{1,2}$/ "
+                    + "and upper(prefix(ds_name(\"DATA\"), 2)) not in $study_domains",
+            "CDISC-CG0333", "ds_name(\"DATA\") =~ /(?i)^FA[A-Z]{1,2}$/ "
+                    + "and upper(suffix(ds_name(\"DATA\"), 2)) not in $study_domains");
 
     /**
      * The carriers of the retired {@code does_not_equal_string_part} leaf-signature rewrite; their

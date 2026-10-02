@@ -55,7 +55,13 @@ import org.junit.jupiter.api.Test;
 class DualFormUnlowerableCensusTest
 {
 
-    private static final int EXPECTED_UNLOWERABLE = 79;
+    /**
+     * 79 &rarr; 81 on 2026-10-02 (rule round 2026-10-02, owner review): {@code CDISC-CG0332} and
+     * {@code CDISC-CG0333} moved to a case-insensitive name regex with
+     * {@code upper(prefix|suffix(ds_name("DATA"), 2)) not in $study_domains} and are now kept in
+     * expression form. Same move in the Python pin (66 &rarr; 68). Re-derived from a run.
+     */
+    private static final int EXPECTED_UNLOWERABLE = 81;
 
     private static final List<String> FAMILIES = List.of("CDISC", "FDA", "PMDA");
 

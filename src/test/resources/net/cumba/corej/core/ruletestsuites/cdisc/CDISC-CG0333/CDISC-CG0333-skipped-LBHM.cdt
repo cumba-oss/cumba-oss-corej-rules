@@ -1,7 +1,7 @@
 #!RuleTest
-#test CDISC-CG0333 expect=noViolation domain=LBHM
+#test CDISC-CG0333 expect=skipped domain=LBHM
 # Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
-#note "In-scope no-violation control, added when `include_split_datasets: true` became a CONJUNCTIVE gate (match Include AND be a split) — it replaces the discrimination previously carried by -valid-DM, which is now legitimately out of scope because DM is not a split. LBHM carries DOMAIN=LB, so its data-derived base is LB and LBHM != LB makes it a genuine split; `Include: [ALL]` matches, so the rule really executes. The `prefix_equal_to 2 = FA` conjunct is then false (the prefix is LB), so the `all` block cannot fire -> no violation. This is the FA-prefix discrimination the rule needs, now exercised on a dataset the rule actually reaches."
+#note "Verdict changed noViolation -> skipped on 2026-10-02: CDISC-CG0333 is now scoped to Findings About datasets only (Domains.Include: [FA] + include_split_datasets: true, owner). LBHM is a split of LB (DOMAIN LB), its data-derived base LB is not FA, so it is out of scope before the check is reached. Until then the rule was scoped to ALL splits and this scenario was the in-scope control for the FA-prefix conjunct."
 dataset LBHM label="Laboratory Test Results split by category"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

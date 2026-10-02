@@ -9,21 +9,21 @@ Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
-    - "ALL"
+    - "FA"
     include_split_datasets: true
 Bindings:
-- name: "$list_dataset_names"
-  expression: "dataset_names()"
+- name: "$study_domains"
+  expression: "study_domains()"
 Check:
   expression: >-
-    ds_name("DATA") =~ /^[A-Za-z]{2}[A-Za-z]{1,2}$/ and prefix(dataset_name, 2) == "FA" and
-    suffix(dataset_name, 2) not in $list_dataset_names
+    ds_name("DATA") =~ /(?i)^FA[A-Z]{1,2}$/ and upper(suffix(ds_name("DATA"), 2)) not in
+    $study_domains
 Outcome:
   Message: "The parent domain code in the Findings About split dataset name does not\
     \ match a domain present in the study."
   Output_Variables:
   - "dataset_name"
-  - "$list_dataset_names"
+  - "$study_domains"
 Source:
   Class: "ALL"
   Domain: "ALL"

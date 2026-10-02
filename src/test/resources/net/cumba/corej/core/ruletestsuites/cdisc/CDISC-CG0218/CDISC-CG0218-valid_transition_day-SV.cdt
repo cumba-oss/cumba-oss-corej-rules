@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-CG0218 expect=noViolation domain=SV
+#runLevel Info
+#note "SE Assumption 10: the SEENDTC of one element is the SESTDTC of the next, so 2012-07-09 is both the end of SCREENING and the start of TREATMENT. The visit on that day carries TREATMENT, the epoch in progress at the start of the visit (SV Assumption 11). The element end is exclusive (owner, 2026-10-02), so only TREATMENT contains the visit and nothing fires, at ERROR or at INFO. With an inclusive end both elements contained it and SCREENING fired: every one of the 363 CG0218 findings on the PhUSE pilot data had this shape."
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | DAY 1 | 2012-07-09 | TREATMENT
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06 | 2012-07-09 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09 | 2012-08-20 | TREATMENT
+---

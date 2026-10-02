@@ -2,8 +2,7 @@ Core:
   Id: "CDISC-CG0082"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when --BODSYS is populated but --BDSYCD is missing or\
-  \ not present."
+Description: "Raise an error when --BODSYS is populated but --BDSYCD is empty."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -13,11 +12,12 @@ Requirements:
   Variables:
     All:
     - "--BODSYS"
+    - "--BDSYCD"
 Check:
   expression: >-
     not empty(--BODSYS) and empty(--BDSYCD)
 Outcome:
-  Message: "--BDSYCD is missing or not present when --BODSYS is populated."
+  Message: "--BDSYCD is empty when --BODSYS is populated."
   Output_Variables:
   - "--BODSYS"
   - "--BDSYCD"

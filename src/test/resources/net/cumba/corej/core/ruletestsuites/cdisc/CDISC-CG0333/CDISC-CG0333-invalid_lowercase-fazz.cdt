@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0333 expect=violation domain=fazz
+# Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
+#note "Dataset names match case-insensitively (owner, 2026-10-01). The lowercase Findings About split fazz matches (?i)^FA[A-Z]{1,2}$ and its parent ZZ is no domain in the study, so the rule fires. Before the 2026-10-02 change the condition prefix(dataset_name, 2) == \"FA\" was false for fa and the rule never examined it."
+#expectViolationCount 1
+dataset fazz label="Findings About split, lowercase member name, absent parent"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | FA | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

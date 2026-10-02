@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0058-D expect=noViolation domain=CO
+#note "SDTMIG 3.3/3.4 CO assumptions: any Identifier and Timing variables may be added to CO. COGRPID (Identifier) and EPOCH (Timing) are present; the would-generally-not-be-used list (which includes --GRPID) is guidance, not a prohibition, so nothing is reported."
+#library standard=sdtmig version=3-4
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COGRPID type=Char
+col EPOCH type=Char
+---
+S1 | CO | 001 | 1 | Comment | G1 | TREATMENT
+---

@@ -162,7 +162,15 @@ class CrossCorpusDerivationTest
             // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
             // are record-level by design and deliberately absent. Kept in step with
             // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-SEND-9439");
+            "CDISC-SEND-9439",
+            // +1 on 2026-10-02 (rule round 2026-10-02, owner): CDISC-CG9685, the --BDSYCD presence
+            // sister of CDISC-CG0082 - same rationale as the --STRESU set: one dataset-level fact
+            // (the column is absent) witnessed by a per-record leaf (not empty(--BODSYS)), so the
+            // derivation reads Record and would multiply one finding by the populated rows.
+            // Kept in step with the twin roster in the other test class.
+            "CDISC-CG9685",
+            // PMDA arm of CDISC-CG9685, same day and rationale.
+            "PMDA-SD9750");
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}

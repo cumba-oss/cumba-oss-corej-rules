@@ -3,7 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when a numeric Character Result/Finding in Standard\
-  \ Format (--STRESC) is populated but Standard Units (--STRESU) is empty."
+  \ Format (--STRESC) is populated and Original Units (--ORRESU) is populated, but\
+  \ Standard Units (--STRESU) is empty."
 Severity: "Warning"
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
@@ -15,13 +16,17 @@ Requirements:
     All:
     - "--STRESU"
     - "--STRESC"
+    - "--ORRESU"
 Check:
   expression: >-
-    not empty(--STRESC) and --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/ and empty(--STRESU)
+    not empty(--STRESC) and --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/ and not empty(--ORRESU) and
+    empty(--STRESU)
 Outcome:
-  Message: "--STRESU is empty when a numeric --STRESC is provided."
+  Message: "--STRESU is empty when a numeric --STRESC is provided and --ORRESU is\
+    \ populated."
   Output_Variables:
   - "--STRESC"
+  - "--ORRESU"
   - "--STRESU"
 Source:
   Class: "FND"

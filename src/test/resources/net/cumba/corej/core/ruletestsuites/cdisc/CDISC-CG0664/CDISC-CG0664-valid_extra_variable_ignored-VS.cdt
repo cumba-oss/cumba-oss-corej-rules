@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0664 expect=noViolation domain=VS
+#note "VSCUSTOM is not in the model list. The order is judged only over the variables the model list knows (owner, 2026-10-02), so it is ignored here; whether it is allowed at all is CG0013 / SD0058's business. Before the change the first unknown variable ended the ordered-subset walk and the rule fired for an order that is correct."
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSGRPID VSTESTCD VSTEST VSCAT VSPOS VSORRES VSORRESU
+dataset VS class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col VSSEQ    type=Num
+col VSTESTCD type=Char
+col VSCUSTOM type=Char
+col VSTEST   type=Char
+col VSORRES  type=Char
+---
+S1 | VS | 001 | 1 | X1 | X | Test | 1
+---

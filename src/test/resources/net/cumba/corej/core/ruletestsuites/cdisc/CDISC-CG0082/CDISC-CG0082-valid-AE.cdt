@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0082 expect=noViolation domain=AE
+#note "Every populated AEBODSYS has its AEBDSYCD; a record with neither is not this rule's business."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEBODSYS type=Char
+col AEBDSYCD type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Nervous system disorders | 10029205
+S1 | AE | 002 | 1 | RASH | |
+---

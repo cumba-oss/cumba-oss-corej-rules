@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD9715 expect=violation domain=FA
-#note "Pins the FINDINGS ABOUT class entry, which the FDA sheet names explicitly ('FINDINGS, FINDINGS ABOUT') and the CDISC sister cannot carry - the CDISC workbook's Class vocabulary has no Findings-About code. FA carries the full FASTRESC/FASTRESN/FASTRESU set (FASTRESU is Permissible), so the same absence is reachable here."
+#note "Pins the FINDINGS ABOUT class entry, which the FDA sheet names explicitly ('FINDINGS, FINDINGS ABOUT') and the CDISC sister cannot carry - the CDISC workbook's Class vocabulary has no Findings-About code. FA carries the full FASTRESC/FASTRESN/FASTRESU set (FASTRESU is Permissible), so the same absence is reachable here. The rows are a measured diameter with an original unit (FAORRESU cm), so units apply."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 dataset FA class="FINDINGS ABOUT" label="Findings About Events or Interventions"
@@ -11,6 +11,7 @@ col FASEQ    type=Num  label="Sequence Number"
 col FATESTCD type=Char label="Findings About Test Short Name"
 col FAOBJ    type=Char label="Object of the Observation"
 col FASTRESC type=Char label="Character Result/Finding in Std Format"
+col FAORRESU type=Char label="Original Units"
 ---
-CDISCPILOT01 | FA | 01-701-1015 | 1 | SEV | RASH | 3
-CDISCPILOT01 | FA | 01-701-1015 | 2 | SEV | NAUSEA | 2
+CDISCPILOT01 | FA | 01-701-1015 | 1 | DIAM | RASH | 3 | cm
+CDISCPILOT01 | FA | 01-701-1015 | 2 | DIAM | RASH | 2 | cm

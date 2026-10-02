@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1461 expect=skipped domain=MH
+#note "FLIPPED violation -> skipped on 2026-10-02 (owner, rule round 2026-10-02): PMDA-SD1461 now gates on Requirements.Variables.All [--BODSYS, --BDSYCD] (R-4.11c, verdict 2-1, shared with CDISC-CG0082). With MHBDSYCD absent the record rule is skipped instead of reading the absent column as all-missing and reporting one finding per populated MHBODSYS record; the absence is reported ONCE per dataset by the sister PMDA-SD9750 (PMDA-SD9750-violation_no_bdsycd_column-MH pins the same shape, with a second populated row to show the once-per-dataset reading). This is not the silencing the earlier history warned about: the defect is still reported, by the rule built to report a missing column. History: Fix #331 (2026-08-22) had flipped this noViolation -> violation when the machine var_exists guard was retired."
+#library standard=sdtmig version=3-4
+dataset MH
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col MHSEQ    type=Num
+col MHBODSYS type=Char
+---
+S1 | MH | 001 | 1 | INFECTIONS

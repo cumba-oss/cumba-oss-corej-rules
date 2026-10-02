@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0029 expect=skipped domain=LB
+#note "dataset LB without the LBSTRESC column; LBSTRESU and LBORRESU are present, LBORRESU populated and LBSTRESU empty on row 1. Requirements.Variables.All [--STRESU, --STRESC, --ORRESU] gates the rule out -> auditable skip naming the absent variable. Discriminating for the All gate's --STRESC member only (not for the verdict): without it the absent LBSTRESC reads as a constant missing value, 'not empty(--STRESC)' is false on every record and the rule would answer noViolation instead of skipped."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBORRESU type=Char label="Original Units"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC  | mg/dL |
+S1 | LB | 001 | 2 | HBSAG |       |
+---

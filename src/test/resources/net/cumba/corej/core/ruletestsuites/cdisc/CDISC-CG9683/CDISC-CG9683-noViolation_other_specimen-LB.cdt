@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG9683 expect=noViolation domain=LB
+#note "GLUC carries LBSTRESU in SERUM but is reported without a unit in URINE. --SPEC is part of the test key (the FDA/PMDA-SD0007 key), so the two specimens are different tests and nothing fires; keyed on --TESTCD alone, row 2 would be a false finding."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSPEC   type=Char label="Specimen Type"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESU type=Char label="Standard Units"
+---
+S1 | LB | 001 | 1 | GLUC | SERUM | 5.5 | mmol/L
+S1 | LB | 001 | 2 | GLUC | URINE | 0   |
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0058-C expect=violation domain=CO
+#note "COVAL1 is in the IG list for CO (served through domain-variables, read by get_dataset_filtered_variables) but not in the model list, and it is not in the closed SDTMIG 3.2 CO Assumption 6 list -> WARNING, never ERROR. Discriminating: with the IG list removed, the ERROR level reports COVAL1, so this scenario goes red on the severity pin if the levels are collapsed or the IG list stops being read."
+#library standard=sdtmig version=3-2
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#library domain-variables CO STUDYID:Identifier DOMAIN:Identifier RDOMAIN:Identifier USUBJID:Identifier COSEQ:Identifier IDVAR:Identifier IDVARVAL:Identifier "COREF:Record Qualifier" COVAL:Topic "COVAL1:Topic" "COEVAL:Record Qualifier" CODTC:Timing
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=COVAL1
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COVAL1 type=Char
+---
+S1 | CO | 001 | 1 | Comment | continued
+---

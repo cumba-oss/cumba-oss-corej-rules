@@ -18,9 +18,13 @@ Bindings:
   expression: "get_model_column_order()"
 - name: "$model_order_upper"
   expression: "upper($model_order)"
+- name: "$not_in_model"
+  expression: "minus($dataset_order_upper, subtract=$model_order_upper)"
+- name: "$known_order"
+  expression: "minus($dataset_order_upper, subtract=$not_in_model)"
 Check:
   expression: >-
-    not empty($model_order) and not is_ordered_subset_of($dataset_order_upper, $model_order_upper)
+    not empty($model_order) and not is_ordered_subset_of($known_order, $model_order_upper)
 Outcome:
   Message: "SDTM variables introduced for SEND use are not presented in the SDTM model\
     \ variable order."
@@ -29,6 +33,8 @@ Outcome:
   - "$model_order"
   - "!$dataset_order_upper"
   - "!$model_order_upper"
+  - "!$known_order"
+  - "!$not_in_model"
 Source:
   Class: "ALL"
   Domain: "ALL"

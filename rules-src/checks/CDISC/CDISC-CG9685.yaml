@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9685"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Body System or Organ Class Code (--BDSYCD) is not\
+  \ present in the dataset although Body System or Organ Class (--BODSYS) is populated."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "EVENTS"
+Requirements:
+  Variables:
+    None:
+    - "--BDSYCD"
+    All:
+    - "--BODSYS"
+Check:
+  expression: >-
+    not empty(--BODSYS)
+Outcome:
+  Message: "--BDSYCD is not present in the dataset although --BODSYS is populated."
+  Output_Variables:
+  - "--BODSYS"
+Source_Proposed:
+  Sheet_Issue: "#280"
+  Class: "EVT"
+  Domain: "ALL"
+  Variable: "--BDSYCD"
+  Condition: "--BODSYS ^= null"
+  Rule: "--BDSYCD is present in the dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

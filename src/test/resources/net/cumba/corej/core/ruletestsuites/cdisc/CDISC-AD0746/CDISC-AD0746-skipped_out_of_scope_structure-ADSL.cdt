@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0746 expect=skipped domain=ADSL
+#note "Scope.Data_Structures.Include names BDS, OCCDS and the medical-device OCCDS only, so ADSL (structure ADSL) is out of scope -> skipped. Discriminating: SRCDOM XX is neither a study domain nor a dataset name of this study, so the check would fire on row 1 if the structure scope were dropped."
+# Rule:Description: SRCDOM has a value that is not an SDTM domain name, ADaM dataset name, or null
+# Declared-tier scope: structure= states the ADaM data structure this minimal table stands for;
+# #define is its mandatory carrier (ScenarioDeclaredScopeProvider.install).
+#define standard=adamig version=1-3
+dataset ADSL structure=ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col SRCDOM type=Char
+---
+STUDY01 | 001 | XX
+---
+
+dataset DM
+col STUDYID type=Char label="Study Identifier"
+---
+STUDY01
+---

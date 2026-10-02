@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0218 expect=skipped domain=SV
+#runLevel Info
+#note "SVSTDTC column absent: Requirements.Variables.All [EPOCH, SE.EPOCH, SVSTDTC, USUBJID] skips the rule with the reason named, since without the visit start there is no element to place the visit in. Discriminating for the All gate only (not for the verdict): without it the absent SVSTDTC reads as a constant missing value, every date comparison and both not empty(earliest_possible(...)) guards are false, and the rule would answer noViolation instead of skipped, although EPOCH SCREENING disagrees with the TREATMENT element."
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | DAY 1 | SCREENING
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06T09:00 | 2012-07-09T10:00 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09T10:00 | 2012-08-20T12:00 | TREATMENT
+---

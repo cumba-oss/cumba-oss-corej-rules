@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0664 expect=skipped domain=VS
+#note "DISCRIMINATING. The data and declared standard of CDISC-CG0664-invalid-VS (VSTEST still declared before VSTESTCD), with the `#library model-column-order` line REMOVED. getStandardModelVariables returns null for a name it holds no order for and the executor maps null AND empty to LIBRARY_NOT_AVAILABLE, so the whole rule SKIPs before the Check runs -- which is also why the rule's own `not empty($model_column_order)` guard is unreachable. Mirrors CDISC-SEND-0393-skipped_no_model_order-BW."
+#library standard=sdtmig version=3-4
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | Systolic Blood Pressure | SYSBP | 120
+---

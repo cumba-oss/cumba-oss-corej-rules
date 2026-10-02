@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0013-A expect=violation domain=SV
+#note "SVLNKID is a model Identifier variable, but SV Assumption 10 permits only --SEQ, --GRPID, --REFID and --SPID, so it stays disallowed while SVSEQ beside it is permitted."
+#library standard=sdtmig version=3-4
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#expectViolationCount 1
+#expectViolationAt variable_name=SVLNKID
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col SVSEQ type=Num
+col SVLNKID type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | 1 | L1
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0013 expect=skipped domain=SV
+#note "SV is out of CG0013 scope since 2026-10-02: SE, SV, DM and CO carry IG grants for additional variables and are checked by the split siblings CDISC-CG0013-A..D. EPOCH here would otherwise be reported, although SV Assumption 11 permits it."
+#library standard=sdtmig version=3-4
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col EPOCH type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | TREATMENT
+---

@@ -18,9 +18,13 @@ Bindings:
   expression: "get_column_order_from_dataset()"
 - name: "$column_order_from_dataset_upper"
   expression: "upper($column_order_from_dataset)"
+- name: "$not_in_model"
+  expression: "minus($column_order_from_dataset_upper, subtract=$model_column_order_upper)"
+- name: "$known_order"
+  expression: "minus($column_order_from_dataset_upper, subtract=$not_in_model)"
 Check:
   expression: >-
-    not empty($model_column_order) and not is_ordered_subset_of($column_order_from_dataset_upper,
+    not empty($model_column_order) and not is_ordered_subset_of($known_order,
     $model_column_order_upper)
 Outcome:
   Message: "Variables are not in the correct order as shown in the SDTM Model for\
@@ -30,6 +34,8 @@ Outcome:
   - "$model_column_order"
   - "!$column_order_from_dataset_upper"
   - "!$model_column_order_upper"
+  - "!$known_order"
+  - "!$not_in_model"
 Source:
   FDA_Validator_Rule_Message: "Variable is in wrong order within domain"
   FDA_Validator_Rule_Description: "Order of variables should reflect the order of\

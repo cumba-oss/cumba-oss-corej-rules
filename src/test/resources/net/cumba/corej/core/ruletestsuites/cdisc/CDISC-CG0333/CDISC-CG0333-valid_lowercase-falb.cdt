@@ -1,0 +1,27 @@
+#!RuleTest
+#test CDISC-CG0333 expect=noViolation domain=falb
+# Rule:Description: Raise an error when a Findings About dataset name begins with "FA", is longer than two characters, and the characters following "FA" do not match the two-character code of a domain present in the study.
+#note "The lowercase Findings About split falb has suffix lb, which upper() folds to LB, the DOMAIN of LBCH. Without upper() the case-insensitive regex would let falb through and lb would not be in [FA, LB, DM]: a false violation."
+dataset falb label="Findings About split, lowercase member name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | FA | 01-701-1015
+---
+
+dataset LBCH label="Laboratory Test Results - Chemistry"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

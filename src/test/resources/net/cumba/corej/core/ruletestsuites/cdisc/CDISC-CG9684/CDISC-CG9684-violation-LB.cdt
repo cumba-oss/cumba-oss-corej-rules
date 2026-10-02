@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG9684 expect=violation domain=LB
+#note "GLUC in SERUM carries LBORRESU mg/dL on row 1, so units apply to this test, and row 2 (same test, same specimen) is numeric with LBORRESU empty -> fires on row 2 only. PH never carries a unit, so row 3 is clean."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSPEC   type=Char label="Specimen Type"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+---
+S1 | LB | 001 | 1 | GLUC | SERUM | 5.5 | mg/dL
+S1 | LB | 002 | 1 | GLUC | SERUM | 6.1 |
+S1 | LB | 001 | 2 | PH   | URINE | 6.5 |
+---

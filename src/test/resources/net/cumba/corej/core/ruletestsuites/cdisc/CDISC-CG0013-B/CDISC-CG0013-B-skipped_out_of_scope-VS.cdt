@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0013-B expect=skipped domain=VS
+#note "Scope.Domains.Include is DM only, so VS is out of CDISC-CG0013-B scope: VS is checked by the parent CDISC-CG0013. VSCUSTOM is a sponsor variable in no model list and in no grant, so the check would report it if the Include scope were dropped."
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSTESTCD VSTEST VSORRES
+dataset VS
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VSSEQ type=Num
+col VSTESTCD type=Char
+col VSTEST type=Char
+col VSORRES type=Char
+col VSCUSTOM type=Char
+---
+S1 | VS | 001 | 1 | SYSBP | Systolic Blood Pressure | 120 | X
+---

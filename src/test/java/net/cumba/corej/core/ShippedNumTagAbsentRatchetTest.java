@@ -93,7 +93,10 @@ class ShippedNumTagAbsentRatchetTest
      * serve every distribution. (The measurement history of these numbers is in this file's git
      * history and the archived rule review {@code core-engine-update-status.md}.)
      */
-    private static final Map<String, Integer> PRESENT = Map.of("prefix(", 66, "suffix(", 36,
+    // prefix( 66 -> 65 on 2026-10-02 (rule round 2026-10-02): CDISC-CG0332 folds its AP/FA
+    // exclusion and CDISC-CG0333 its FA test into one case-insensitive name regex, so two
+    // prefix(...) calls left the shipped corpus. Re-derived from a run.
+    private static final Map<String, Integer> PRESENT = Map.of("prefix(", 65, "suffix(", 36,
             "date(", 785, "date_part(", 222, "time_part(", 8);
 
     /** Every file under {@code rules/}, read as one string each. */

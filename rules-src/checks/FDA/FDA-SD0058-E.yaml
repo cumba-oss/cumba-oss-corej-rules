@@ -1,0 +1,98 @@
+Core:
+  Id: "FDA-SD0058-E"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in a SEND CO, DM or SE dataset\
+  \ is in neither the SDTM model list of allowed variables for the observation class\
+  \ nor the IG variable list for the dataset. Raise a warning when the IG defines\
+  \ the variable for the dataset but the SDTM model version the IG links to does not\
+  \ list it. (The SENDIG grants additional Timing variables to the general-observation-class\
+  \ domains only, so these special-purpose datasets keep the plain check.)"
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+    - "DM"
+    - "SE"
+Bindings:
+- name: "$model_variables"
+  expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
+Check:
+  ERROR:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables
+    Message: "Variable is in neither the SDTM model list of allowed variables for the\
+      \ observation class nor the IG's variable list for the dataset (sponsor-defined)."
+  WARNING:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) in $ig_variables
+    Message: "Variable is defined by the IG for this dataset but is not in the SDTM model\
+      \ list of allowed variables for the observation class of the model version the IG\
+      \ links to."
+Outcome:
+  Message: "Variable is present in the dataset but is not listed in the SDTM model\
+    \ list of allowed variables for the observation class."
+  Output_Variables:
+  - "variable_name"
+  - "$model_variables"
+  - "$ig_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "CO, DM, SE"
+  Variable: "GEN"
+  Condition: "Dataset is a SEND CO, DM or SE dataset; FDA-SD0058 excludes these domains\
+    \ for its SDTMIG arms, which carry the SDTMIG grants"
+  Rule: "Variable = SDTM Model list for the observation class, or a variable the IG\
+    \ permits adding to the domain"
+Source:
+  FDA_Validator_Rule_Message: "Variable appears in dataset, but is not in SDTM model"
+  FDA_Validator_Rule_Description: "Only variables listed in SDTM model should appear\
+    \ in a dataset. New sponsor defined variables must not be added, and existing\
+    \ variables must not be renamed or modified."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "FDA Validator Rules"
+      Rule_Identifier:
+        Id: "SD0058"
+        Version: "1"
+      Version: "1.6"

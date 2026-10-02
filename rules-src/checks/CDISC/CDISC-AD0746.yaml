@@ -12,11 +12,14 @@ Scope:
     - "OCCURRENCE DATA STRUCTURE"
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Bindings:
-- name: "$datasets"
+- name: "$study_domains"
+  expression: "study_domains()"
+- name: "$dataset_names"
   expression: "dataset_names()"
 Check:
   expression: >-
-    not empty(SRCDOM) and SRCDOM not in $datasets
+    not empty(SRCDOM) and upper(SRCDOM) not in $study_domains and upper(SRCDOM) not in
+    $dataset_names
 Outcome:
   Message: "SRCDOM has a value that is not an SDTM domain name or ADaM dataset name."
   Output_Variables:

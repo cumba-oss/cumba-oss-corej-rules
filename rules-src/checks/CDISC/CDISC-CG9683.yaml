@@ -1,0 +1,53 @@
+Core:
+  Id: "CDISC-CG9683"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a numeric Character Result/Finding in Standard\
+  \ Format (--STRESC) is populated and Standard Units (--STRESU) is empty, although\
+  \ --STRESU is populated on another record of the same test (same --TESTCD, --OBJ,\
+  \ --TSTDTL, --CAT, --SCAT, --SPEC and --METHOD)."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    All:
+    - "--STRESC"
+    - "--STRESU"
+    - "--TESTCD"
+Bindings:
+- name: "$units_for_test"
+  expression: "record_count(group=[--TESTCD, --OBJ, --TSTDTL, --CAT, --SCAT, --SPEC,\
+    \ --METHOD], filter=(not empty(--STRESU)))"
+Check:
+  expression: >-
+    not empty(--STRESC) and --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/ and empty(--STRESU) and
+    $units_for_test >= 1
+Outcome:
+  Message: "--STRESU is empty for a numeric --STRESC although the same test carries\
+    \ --STRESU on another record."
+  Output_Variables:
+  - "--TESTCD"
+  - "--STRESC"
+  - "--STRESU"
+  - "$units_for_test"
+Source_Proposed:
+  Sheet_Issue: "#278"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--STRESU"
+  Condition: "--STRESC ^= null and numeric, and --STRESU ^= null on another record\
+    \ of the same test"
+  Rule: "--STRESU ^= null"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

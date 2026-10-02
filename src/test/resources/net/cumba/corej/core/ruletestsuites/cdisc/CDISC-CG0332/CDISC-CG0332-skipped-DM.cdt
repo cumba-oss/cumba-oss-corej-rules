@@ -1,7 +1,7 @@
 #!RuleTest
-#test CDISC-CG0332 expect=noViolation domain=DM
+#test CDISC-CG0332 expect=skipped domain=DM
 # Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
-#note "DM is a two-letter parent domain, not a split domain, so the rule does not fire"
+#note "Verdict changed noViolation -> skipped on 2026-10-02, when CDISC-CG0332 gained `include_split_datasets: true` (splits only, a conjunctive gate on top of Include/Exclude). DM carries DOMAIN=DM, so its data-derived base equals its name; it is not a split and is out of scope before the check is reached."
 dataset DM label=Demographics
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

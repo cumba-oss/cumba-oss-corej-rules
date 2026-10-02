@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0058-C expect=violation domain=CO
+#note "EPOCH is not in the closed SDTMIG 3.2 CO list (Assumption 6), so it is reported. SDTMIG 3.3/3.4 permit any Timing variable in CO; that arm is CDISC-CG0013-D."
+#library standard=sdtmig version=3-2
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#expectViolationCount 1
+#expectViolationAt severity=ERROR variable_name=EPOCH
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col EPOCH type=Char
+---
+S1 | CO | 001 | 1 | Comment | TREATMENT
+---

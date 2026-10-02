@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG9684 expect=skipped domain=LB
+#note "LBORRES column absent: Requirements.Variables.All [--ORRES, --ORRESU, --TESTCD] skips the rule with the reason named. Discriminating for the All gate only (not for the verdict): without it the absent LBORRES reads as a constant missing value, 'not empty(--ORRES)' is false on every record and the rule would answer noViolation instead of skipped. LBORRESU is populated on row 1 and empty on row 2 of the same test, so the unit half of the check would be met."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSPEC   type=Char label="Specimen Type"
+col LBORRESU type=Char label="Original Units"
+---
+S1 | LB | 001 | 1 | GLUC | SERUM | mmol/L
+S1 | LB | 002 | 1 | GLUC | SERUM |
+---

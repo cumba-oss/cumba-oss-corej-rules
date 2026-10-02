@@ -19,11 +19,9 @@ Bindings:
 - name: "$aetrtem_count"
   expression: "record_count(domain=\"SUPPAE\", group=[USUBJID], filter=(QNAM == \"\
     AETRTEM\"))"
-- name: "$study_datasets"
-  expression: "dataset_names()"
 Check:
   expression: >-
-    not shares_elements_with($study_datasets, keys=[SUPPAE]) or $aetrtem_count < 1
+    $aetrtem_count < 1
 Outcome:
   Message: "Subject has AE records but no treatment-emergent flag is present in SUPPAE\
     \ for that subject (no record with QNAM equal to 'AETRTEM')."

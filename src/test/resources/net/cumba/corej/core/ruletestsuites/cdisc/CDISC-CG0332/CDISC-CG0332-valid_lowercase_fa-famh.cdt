@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0332 expect=noViolation domain=famh
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "The AP/FA exclusion is case-insensitive: the lowercase Findings About split famh is excluded by the regex's (?i)^(?!AP|FA) lookahead (CDISC-CG0333 owns it). Before the 2026-10-02 change the exclusion compared the raw prefix fa with [AP, FA], the dataset was not excluded, and fa was not in [FA, DM], so the rule fired."
+dataset famh label="Findings About split, lowercase member name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | FA | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

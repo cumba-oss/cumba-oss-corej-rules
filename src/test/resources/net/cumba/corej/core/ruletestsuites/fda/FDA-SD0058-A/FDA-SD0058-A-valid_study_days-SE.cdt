@@ -1,0 +1,20 @@
+#!RuleTest
+#test FDA-SD0058-A expect=noViolation domain=SE
+#note "SE Assumptions 12/13 (SDTMIG 3.2; 10/11 in 3.3/3.4) permit adding Timing variables to SE. SESTDY and SEENDY are Timing variables that the SE list of SDTMIG 3.2/3.3 does not carry; FDA-SD0058 flagged them on the PhUSE pilot data before the SE arm moved here."
+#library standard=sdtmig version=3-4
+#library model-column-order SE STUDYID DOMAIN USUBJID SESEQ ETCD ELEMENT SESTDTC SEENDTC TAETORD EPOCH SEUPDES
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+dataset SE
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SESEQ type=Num
+col ETCD type=Char
+col SESTDTC type=Char
+col SEENDTC type=Char
+col EPOCH type=Char
+col SESTDY type=Num
+col SEENDY type=Num
+---
+S1 | SE | 001 | 1 | SCRN | 2012-07-06 | 2012-07-09 | SCREENING | -3 | 1
+---

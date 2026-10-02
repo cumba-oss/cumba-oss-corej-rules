@@ -4,7 +4,7 @@ Core:
   Version: "1"
 Description: "Raise a warning when Standard Units (--STRESU) is not present in the\
   \ dataset although a numeric Character Result/Finding in Standard Format (--STRESC)\
-  \ is reported."
+  \ is reported with Original Units (--ORRESU) populated."
 Sensitivity: "Dataset"
 Executability: "Partially Executable - Possible Overreporting"
 Scope:
@@ -17,14 +17,16 @@ Requirements:
     - "--STRESU"
     All:
     - "--STRESC"
+    - "--ORRESU"
 Check:
   expression: >-
-    --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/
+    --STRESC =~ /^-?[0-9]+(\\.[0-9]+)?$/ and not empty(--ORRESU)
 Outcome:
   Message: "--STRESU is not present in the dataset although numeric standardised results\
-    \ are reported."
+    \ with original units are reported."
   Output_Variables:
   - "--STRESC"
+  - "--ORRESU"
 Source_Proposed:
   Sheet_Issue: "#172,#173,#174"
   Class: "FND"

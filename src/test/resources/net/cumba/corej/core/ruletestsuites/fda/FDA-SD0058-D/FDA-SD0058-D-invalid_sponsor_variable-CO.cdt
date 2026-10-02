@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD0058-D expect=violation domain=CO
+#note "COCUSTOM is neither in the model list for CO nor an Identifier or Timing variable, so it is reported."
+#library standard=sdtmig version=3-4
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#expectViolationCount 1
+#expectViolationAt severity=ERROR variable_name=COCUSTOM
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COCUSTOM type=Char
+---
+S1 | CO | 001 | 1 | Comment | X
+---

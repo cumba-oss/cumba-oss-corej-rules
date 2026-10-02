@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG9684 expect=skipped domain=LB
+#note "LBTESTCD column absent: Requirements.Variables.All [--ORRES, --ORRESU, --TESTCD] skips the rule with the reason named, since without the test code there is no test to group by. Discriminating: without the gate the absent LBTESTCD reads as one constant value, both rows fall into one group (same LBSPEC), LBORRESU is populated on row 1, and row 2 (numeric LBORRES, LBORRESU empty) would be reported."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num label="Sequence Number"
+col LBSPEC   type=Char label="Specimen Type"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBORRESU type=Char label="Original Units"
+---
+S1 | LB | 001 | 1 | SERUM | 5.5 | mmol/L
+S1 | LB | 002 | 1 | SERUM | 6.1 |
+---

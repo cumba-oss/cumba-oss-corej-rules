@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0332 expect=noViolation domain=qsni
+# Rule:Description: Raise an error when a split dataset (a three- or four-character dataset name not beginning with AP or FA) does not have its two-character parent domain present in the study.
+#note "Dataset names match case-insensitively (owner, 2026-10-01). The lowercase split qsni (DOMAIN QS) has prefix qs, which upper() folds to QS, a domain present in the study. Before the 2026-10-02 regex/upper() change the raw prefix qs was not in [QS, DM] and the rule fired."
+dataset qsni label="Questionnaires split, lowercase member name"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | QS | 01-701-1015
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+---

@@ -1,0 +1,52 @@
+Core:
+  Id: "CDISC-CG0013-C"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a variable present in the Comments (CO) dataset\
+  \ is neither in the SDTM Model list of allowed variables for CO nor one of the additional\
+  \ variables SDTMIG 3.2 permits in CO: COGRPID, COREFID, COSPID, VISIT, VISITNUM,\
+  \ VISITDY, TAETORD, CODY, COTPT, COTPTNUM, COELTM, COTPTREF and CORFTDTC."
+Executability: "Partially Executable - Possible Underreporting"
+Scope:
+  Domains:
+    Include:
+    - "CO"
+Bindings:
+- name: "$allowed_variables"
+  expression: "get_model_column_order()"
+Check:
+  expression: >-
+    upper(varname()) not in $allowed_variables and upper(varname()) not in ["COGRPID", "COREFID",
+    "COSPID", "VISIT", "VISITNUM", "VISITDY", "TAETORD", "CODY", "COTPT", "COTPTNUM", "COELTM",
+    "COTPTREF", "CORFTDTC"]
+Outcome:
+  Message: "Variable is not in the SDTM Model list of allowed variables for CO and\
+    \ is not one of the additional variables SDTMIG 3.2 permits in CO."
+  Output_Variables:
+  - "variable_name"
+  - "$allowed_variables"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "CO"
+  Variable: "GEN"
+  Condition: "Dataset is CO; SDTMIG 3.2 CO assumption 6 permits only COGRPID, COREFID,\
+    \ COSPID, VISIT, VISITNUM, VISITDY, TAETORD, CODY, COTPT, COTPTNUM, COELTM, COTPTREF\
+    \ and CORFTDTC in addition"
+  Rule: "Variable = Model List of Allowed Variables for the domain, or a variable\
+    \ the IG permits adding to it"
+Source:
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "GEN"
+  Rule: "Variable = Model List of Allowed Variables for Observation Class"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+    References:
+    - Origin: "SDTM and SDTMIG Conformance Rules"
+      Rule_Identifier:
+        Id: "CG0013"
+        Version: "1"
+      Version: "2.0"
