@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0180 expect=noViolation domain=ADAE
+#note "SRCDOM values in lower case (dm, lb) name the SDTM domains DM and LB. Dataset and domain names match case-insensitively (owner, 2026-10-01), so upper(SRCDOM) is compared and nothing fires; before the change SRCDOM was compared raw and both rows fired. Same fix as the sibling CDISC-AD0746 (cumba-corej-rules@f73497b1)."
+#library standard=adamig version=1-0
+#library standard-domains AE DM LB VS
+dataset ADAE structure=BDS label="Adverse Events Analysis Dataset"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col SRCDOM  type=Char label="Source Data"
+---
+S1 | 001 | AEP | dm
+S1 | 002 | AEP | lb
+S1 | 003 | AEP |

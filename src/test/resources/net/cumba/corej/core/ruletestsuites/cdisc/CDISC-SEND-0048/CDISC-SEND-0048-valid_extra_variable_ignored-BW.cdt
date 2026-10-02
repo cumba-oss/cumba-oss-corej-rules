@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0048 expect=noViolation domain=BW
+#note "BWCUSTOM is not in the SENDIG variable list. The order is judged only over the variables the library list knows (owner, 2026-10-02, the same change as the five SDTM order rules in cumba-corej-rules@9004d362), so it is ignored and the known variables are in SENDIG order. Before the change the first unknown variable ended the ordered-subset walk and the rule fired for a correct order; whether BWCUSTOM is allowed at all is another rule's question."
+#library standard=sendig version=3-1-1
+#library column-order BW STUDYID DOMAIN USUBJID BWSEQ BWTESTCD BWORRES
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWCUSTOM type=Char label="Sponsor Variable"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | BW | 001 | 1 | BW | X | 250
+---
