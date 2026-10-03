@@ -14,16 +14,23 @@ Requirements:
   Variables:
     All:
     - "TSPARMCD"
+Bindings:
+- name: "$present_parameters"
+  expression: "distinct(TSPARMCD)"
+- name: "$missing_parameters"
+  expression: "minus([\"ADDON\", \"AGEMAX\", \"AGEMIN\", \"LENGTH\", \"PLANSUB\",\
+    \ \"RANDOM\", \"SEXPOP\", \"STOPRULE\", \"TBLIND\", \"TCNTRL\", \"TITLE\", \"\
+    TPHASE\", \"TTYPE\", \"OBJPRIM\", \"SPONSOR\", \"REGID\", \"OUTMSPRI\", \"FCNTRY\"\
+    , \"ADAPT\", \"DCUTDTC\", \"DCUTDESC\", \"NARMS\", \"STYPE\", \"SSTDTC\", \"SENDTC\"\
+    , \"ACTSUB\", \"HLTSUBJI\"], subtract=$present_parameters)"
 Check:
   expression: >-
-    var_exists("TSPARMCD") and not contains_all(TSPARMCD, keys=[ADDON, AGEMAX, AGEMIN, LENGTH,
-    PLANSUB, RANDOM, SEXPOP, STOPRULE, TBLIND, TCNTRL, TITLE, TPHASE, TTYPE, OBJPRIM, SPONSOR,
-    REGID, OUTMSPRI, FCNTRY, ADAPT, DCUTDTC, DCUTDESC, NARMS, STYPE, SSTDTC, SENDTC, ACTSUB,
-    HLTSUBJI])
+    var_exists("TSPARMCD") and not empty($missing_parameters)
 Outcome:
   Message: "The Trial Summary dataset is missing one or more required TSPARMCD values."
   Output_Variables:
-  - "TSPARMCD"
+  - "$missing_parameters"
+  - "!TSPARMCD"
 Source:
   Class: "TDM"
   Domain: "TS"

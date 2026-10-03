@@ -1,0 +1,39 @@
+#!RuleTest
+#test CDISC-CG0287 expect=violation domain=TS
+#note "Rule round 2026-10-03 (owner: \"agree to the proposed rule change\"): TS holds 25 of the 27 required codes, with ADDON on the first row; AGEMAX and HLTSUBJI are absent. The single dataset finding must name exactly those two in $missing_parameters. The old rule output TSPARMCD (the first row's value, ADDON), which read as if ADDON were missing; it carried no $missing_parameters, so this assertion fails under it."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 "$missing_parameters"="[AGEMAX, HLTSUBJI]"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | ADDON | v-ADDON
+CDISCPILOT01 | TS | 2 | AGEMIN | v-AGEMIN
+CDISCPILOT01 | TS | 3 | LENGTH | v-LENGTH
+CDISCPILOT01 | TS | 4 | PLANSUB | v-PLANSUB
+CDISCPILOT01 | TS | 5 | RANDOM | v-RANDOM
+CDISCPILOT01 | TS | 6 | SEXPOP | v-SEXPOP
+CDISCPILOT01 | TS | 7 | STOPRULE | v-STOPRULE
+CDISCPILOT01 | TS | 8 | TBLIND | v-TBLIND
+CDISCPILOT01 | TS | 9 | TCNTRL | v-TCNTRL
+CDISCPILOT01 | TS | 10 | TITLE | v-TITLE
+CDISCPILOT01 | TS | 11 | TPHASE | v-TPHASE
+CDISCPILOT01 | TS | 12 | TTYPE | v-TTYPE
+CDISCPILOT01 | TS | 13 | OBJPRIM | v-OBJPRIM
+CDISCPILOT01 | TS | 14 | SPONSOR | v-SPONSOR
+CDISCPILOT01 | TS | 15 | REGID | v-REGID
+CDISCPILOT01 | TS | 16 | OUTMSPRI | v-OUTMSPRI
+CDISCPILOT01 | TS | 17 | FCNTRY | v-FCNTRY
+CDISCPILOT01 | TS | 18 | ADAPT | v-ADAPT
+CDISCPILOT01 | TS | 19 | DCUTDTC | v-DCUTDTC
+CDISCPILOT01 | TS | 20 | DCUTDESC | v-DCUTDESC
+CDISCPILOT01 | TS | 21 | NARMS | v-NARMS
+CDISCPILOT01 | TS | 22 | STYPE | v-STYPE
+CDISCPILOT01 | TS | 23 | SSTDTC | v-SSTDTC
+CDISCPILOT01 | TS | 24 | SENDTC | v-SENDTC
+CDISCPILOT01 | TS | 25 | ACTSUB | v-ACTSUB
+---

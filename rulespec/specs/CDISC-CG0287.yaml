@@ -2,8 +2,10 @@ name: CDISC-CG0287
 kind: rule
 description: |
   Record-Data port. CDISC-CG0287: the TS dataset's TSPARMCD column must contain all the
-  required parameter codes. Single leaf: TSPARMCD not_contains_all <list>. The TS row only
-  carries TITLE, so the required set is not fully present and the rule fires.
+  required parameter codes. $missing_parameters = minus(<list>, subtract=distinct(TSPARMCD));
+  the rule fires when it is not empty. The TS row only carries TITLE, so the required set is
+  not fully present and the rule fires. Since rule round 2026-10-03 the finding reports the
+  missing codes in $missing_parameters and no longer TSPARMCD (the first row's value).
 python_source: rules-sdtmig-3-3.json (CORE-000740)
 rule:
   coreId: CDISC-CG0287
@@ -24,5 +26,5 @@ expected_violations:
     row_key: {STUDYID: S1, TSPARMCD: TITLE, TSSEQ: 1}
     status: SUCCESS
     output_variables:
-      TSPARMCD: TITLE
+      $missing_parameters: '[ACTSUB, ADAPT, ADDON, AGEMAX, AGEMIN, DCUTDESC, DCUTDTC, FCNTRY, HLTSUBJI, LENGTH, NARMS, OBJPRIM, OUTMSPRI, PLANSUB, RANDOM, REGID, SENDTC, SEXPOP, SPONSOR, SSTDTC, STOPRULE, STYPE, TBLIND, TCNTRL, TPHASE, TTYPE]'
 expected_errors: []
