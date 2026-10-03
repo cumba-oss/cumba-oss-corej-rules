@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0022 expect=noViolation domain=AE
+#note "Guard boundary (rule round 2026-10-03 close): the Check opens with var_exists(\"--LNKGRP\"), and AE carries no AELNKGRP, so AE is not reported. FALNKGRP is carried by FA alone and there is no RELREC, so $variable_count = 1 and nothing is exempted: without the var_exists guard AE would be reported for FA's group."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 1
+---
+
+dataset FA label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Num label="Sequence Number"
+col FALNKGRP type=Char label="Link Group ID"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | 1
+---

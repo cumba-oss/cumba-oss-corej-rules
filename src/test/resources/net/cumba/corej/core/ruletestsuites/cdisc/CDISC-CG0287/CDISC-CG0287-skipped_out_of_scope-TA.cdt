@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0287 expect=skipped domain=TA
+#note "Scope boundary (rule round 2026-10-03 close): Scope.Domains.Include is TS only, so a TA dataset is out of scope -> skipped. The TA dataset carries a TSPARMCD column holding only TITLE, so Requirements.Variables.All is met and the check would report the 26 missing codes if the Include scope were dropped - the skip is owed to the scope alone."
+#library standard=sdtmig version=3-3
+dataset TA label="Trial Arms"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ARMCD    type=Char label="Planned Arm Code"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+---
+CDISCPILOT01 | TA | PBO | TITLE
+---
