@@ -1,0 +1,48 @@
+#!RuleTest
+#test CDISC-CG0022 expect=noViolation domain=FA
+#note "Rule round 2026-10-03, owner: \"b - accept a LNKGRP that RELREC relates to a LNKID in another domain. and file a sheet issue\" (sheet issue #286). The DataExchange-DatasetJson shape: FALNKGRP is carried by FA alone (variable_count = 1), and RELREC relates AE.AELNKID (RELTYPE ONE) to FA.FALNKGRP (RELTYPE MANY) under RELID AEFA, beside two unrelated LNKID-LNKID relations. The group is linked to another domain's LNKID, so the rule is silent. The old rule fired here (FALNKGRP in no other domain)."
+dataset FA label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Num label="Sequence Number"
+col FALNKGRP type=Char label="Link Group ID"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | 1
+CDISCPILOT01 | FA | 01-701-1015 | 2 | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 1
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSLNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | 1
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE type=Char label="Relationship Type"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | AE |  | AELNKID |  | ONE | AEDS
+CDISCPILOT01 | DS |  | DSLNKID |  | ONE | AEDS
+CDISCPILOT01 | AE |  | AELNKID |  | ONE | AEFA
+CDISCPILOT01 | FA |  | FALNKGRP |  | MANY | AEFA
+---

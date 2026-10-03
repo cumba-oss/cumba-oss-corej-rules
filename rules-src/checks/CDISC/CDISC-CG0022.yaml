@@ -2,8 +2,9 @@ Core:
   Id: "CDISC-CG0022"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when Link Group ID (--LNKGRP) is present in a domain\
-  \ but is not present in any other domain."
+Description: "Raise an error when Link Group ID (--LNKGRP) is present in a domain,\
+  \ is not present in any other domain, and RELREC does not relate it to a Link ID\
+  \ (--LNKID) of another domain."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -12,14 +13,48 @@ Scope:
 Bindings:
 - name: "$variable_count"
   expression: "variable_count(\"--LNKGRP\")"
+- name: "$this_domain"
+  expression: "distinct(DOMAIN)"
+- name: "$relrec_lnkgrp_domains"
+  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
+    \ \"LNKGRP\")))"
+- name: "$relrec_lnkid_domains"
+  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
+    \ \"LNKID\")))"
+- name: "$relrec_other_lnkid_domains"
+  expression: "minus($relrec_lnkid_domains, subtract=$this_domain)"
+- name: "$relrec_lnkgrp_relids"
+  expression: "distinct(RELID, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
+    \ \"LNKGRP\")))"
+- name: "$relrec_lnkid_relids"
+  expression: "distinct(RELID, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
+    \ \"LNKID\")))"
+- name: "$relrec_links_lnkid"
+  expression: "shares_elements_with($relrec_lnkgrp_domains, $this_domain) and not\
+    \ empty($relrec_other_lnkid_domains) and shares_elements_with($relrec_lnkgrp_relids,\
+    \ $relrec_lnkid_relids)"
 Check:
   expression: >-
-    var_exists("--LNKGRP") and $variable_count < 2
+    var_exists("--LNKGRP") and $variable_count < 2 and $relrec_links_lnkid == false
 Outcome:
-  Message: "--LNKGRP is present in this domain but is not present in any other domain."
+  Message: "--LNKGRP is present in this domain but is not present in any other domain,\
+    \ and RELREC does not relate it to a --LNKID of another domain."
   Output_Variables:
   - "--LNKGRP"
   - "$variable_count"
+  - "!$relrec_links_lnkid"
+  - "!$relrec_other_lnkid_domains"
+  - "!DOMAIN"
+Source_Proposed:
+  Sheet_Issue: "#286"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--LNKGRP"
+  Condition: "--LNKGRP present in a domain"
+  Rule: "--LNKGRP present in another domain, or RELREC relates this domain's --LNKGRP\
+    \ to a --LNKID of another domain (a RELREC record with RDOMAIN = this domain and\
+    \ IDVAR = its --LNKGRP, and a RELREC record with the same STUDYID, USUBJID and\
+    \ RELID whose RDOMAIN differs and whose IDVAR is that domain's --LNKID)"
 Source:
   Class: "ALL"
   Domain: "ALL"

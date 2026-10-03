@@ -287,17 +287,17 @@ class SourceProposedCaseTest
 
 
     /**
-     * ⭐ 25 — 29 less the seven ruling J removed, plus three whose proposal sits in a Status cell.
-     * owner ruling J removed the seven rules whose register entry raised a <em>question</em> rather
-     * than naming a corrected cell, each measured against its own {@code Source} and found to
-     * implement it. Membership is <b>rule-first</b>: an entry existing does not put a rule in this
-     * population; the rule must actually diverge from its row.
+     * ⭐ 26 — 29 less the seven ruling J removed, plus three whose proposal sits in a Status cell
+     * (25), plus {@code CDISC-CG0022} (sheet issue #286, rule round 2026-10-03). owner ruling J
+     * removed the seven rules whose register entry raised a <em>question</em> rather than naming a
+     * corrected cell, each measured against its own {@code Source} and found to implement it.
+     * Membership is <b>rule-first</b>: an entry existing does not put a rule in this population;
+     * the rule must actually diverge from its row.
      */
     @Test
-    void theCorrectionPopulationIsTwentyFiveNamedRulesAndNoneOverlapsAnotherCase()
-        throws IOException
+    void theCorrectionPopulationIsTwentySixNamedRulesAndNoneOverlapsAnotherCase() throws IOException
     {
-        assertEquals(25, SourceProposedCase.CORRECTION_RULES.size());
+        assertEquals(26, SourceProposedCase.CORRECTION_RULES.size());
         for (String id : SourceProposedCase.CORRECTION_RULES)
         {
             assertFalse(SourceProposedCase.isMintedSibling(id), id + " would classify as SPLIT");

@@ -1,0 +1,50 @@
+#!RuleTest
+#test CDISC-CG0022 expect=violation domain=FA
+#note "Rule round 2026-10-03, owner: \"b - accept a LNKGRP that RELREC relates to a LNKID in another domain. and file a sheet issue\" (sheet issue #286). RELREC exists and relates AE.AELNKID to DS.DSLNKID (RELID AEDS) and to CM.CMLNKGRP (RELID AECM, CM not submitted), but holds no row for FA.FALNKGRP. Another domain's group being linked does not exempt FA's: FALNKGRP is in no other domain and RELREC does not relate it, so the rule fires once for FA. Guards the this-domain part of the exemption."
+#expectViolationCount 1
+#expectViolationAt row=1 FALNKGRP=1 "$variable_count"=1
+dataset FA label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Num label="Sequence Number"
+col FALNKGRP type=Char label="Link Group ID"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | 1
+CDISCPILOT01 | FA | 01-701-1015 | 2 | 1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AELNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 1
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSLNKID type=Char label="Link ID"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | 1
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE type=Char label="Relationship Type"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | AE |  | AELNKID |  | ONE | AEDS
+CDISCPILOT01 | DS |  | DSLNKID |  | ONE | AEDS
+CDISCPILOT01 | AE |  | AELNKID |  | ONE | AECM
+CDISCPILOT01 | CM |  | CMLNKGRP |  | MANY | AECM
+---

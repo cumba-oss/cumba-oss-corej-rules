@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0022 expect=violation domain=FA
+#note "Rule round 2026-10-03, owner: \"b - accept a LNKGRP that RELREC relates to a LNKID in another domain. and file a sheet issue\" (sheet issue #286). RELREC relates FA.FALNKGRP to FA.FALNKID - an LNKID of the SAME domain. The ruling accepts a relation to a LNKID in ANOTHER domain only, so the rule still fires once for FA."
+#expectViolationCount 1
+#expectViolationAt row=1 FALNKGRP=1 "$variable_count"=1
+dataset FA label="Findings About Events or Interventions"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Num label="Sequence Number"
+col FALNKID type=Char label="Link ID"
+col FALNKGRP type=Char label="Link Group ID"
+---
+CDISCPILOT01 | FA | 01-701-1015 | 1 | A1 | 1
+CDISCPILOT01 | FA | 01-701-1015 | 2 | A2 | 1
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE type=Char label="Relationship Type"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | FA |  | FALNKID |  | ONE | R1
+CDISCPILOT01 | FA |  | FALNKGRP |  | MANY | R1
+---

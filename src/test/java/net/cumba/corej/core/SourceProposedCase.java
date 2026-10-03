@@ -93,6 +93,12 @@ public enum SourceProposedCase
      * </p>
      *
      * <p>
+     * ⭐ <b>26 since 2026-10-03</b>: {@code CDISC-CG0022}, sheet issue #286 (rule round 2026-10-03,
+     * owner: <i>"accept a LNKGRP that RELREC relates to a LNKID in another domain. and file a sheet
+     * issue"</i>). The register entry carries the written correction proposal.
+     * </p>
+     *
+     * <p>
      * ⚠ This derivation read <i>"= 29"</i> above a {@code Set.of} holding 22, and then 25, for two
      * review cycles — the retracted pre-ruling-J arithmetic left in the <b>shipped class
      * javadoc</b>, which is the first thing the next reader trusts. Restated in full so each step
@@ -102,9 +108,9 @@ public enum SourceProposedCase
     public static final Set<String> CORRECTION_RULES = Set.of("CDISC-AD0167", "CDISC-AD0222",
             "CDISC-AD0346", "CDISC-AD0552", "CDISC-AD0565", "CDISC-AD0566", "CDISC-AD0567",
             "CDISC-AD0568", "CDISC-AD0569", "CDISC-AD0583", "CDISC-AD0587", "CDISC-AD0749",
-            "CDISC-AD0794", "CDISC-CG0348", "CDISC-CG0625", "CDISC-CG0634", "CDISC-CG0637",
-            "CDISC-CG0647", "CDISC-SEND-0293", "PMDA-AD0201", "PMDA-AD0482", "PMDA-AD0483",
-            "PMDA-AD0484", "PMDA-AD0485", "PMDA-SD1086");
+            "CDISC-AD0794", "CDISC-CG0022", "CDISC-CG0348", "CDISC-CG0625", "CDISC-CG0634",
+            "CDISC-CG0637", "CDISC-CG0647", "CDISC-SEND-0293", "PMDA-AD0201", "PMDA-AD0482",
+            "PMDA-AD0483", "PMDA-AD0484", "PMDA-AD0485", "PMDA-SD1086");
 
     /** The lowest numeric tail that counts as a coreJ-minted id rather than a published one. */
     public static final int MINTED_BAND_FLOOR = 9000;
