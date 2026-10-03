@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1260 expect=skipped domain=TA
+#note "Scope boundary (round 2026-10-02 c close): Scope.Domains.Include is TS only, so a TA dataset is out of scope -> skipped, even when it carries TS-shaped reference-terminology columns. MED-RT is versioned and TSVCDVER is empty, so the check would report the row if the Include scope were dropped."
+#library standard=sdtmig version=3-4
+dataset TA label="Trial Arms"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ARMCD    type=Char label="Planned Arm Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+S1 | TA | A | MED-RT |
+---

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0013-C expect=skipped domain=CO
+#note "Library-dependency boundary (round 2026-10-02 c close): the IG list is served but the MODEL list is not, so get_model_column_order maps the absent answer to LIBRARY_NOT_AVAILABLE and the rule SKIPS. The IG list alone never decides: an absent model list must not turn every column not in the IG list into a finding. Discriminating: COCUSTOM is in neither list nor in the SDTMIG 3.2 CO grant and would be reported if a model list were served; COVAL1 is IG-only."
+#library standard=sdtmig version=3-2
+#library domain-variables CO STUDYID:Identifier DOMAIN:Identifier RDOMAIN:Identifier USUBJID:Identifier COSEQ:Identifier IDVAR:Identifier IDVARVAL:Identifier "COREF:Record Qualifier" COVAL:Topic "COVAL1:Topic" "COEVAL:Record Qualifier" CODTC:Timing
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COVAL1 type=Char
+col COCUSTOM type=Char
+---
+S1 | CO | 001 | 1 | Comment | continued | X
+---

@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-CG0359 expect=skipped domain=DM
+#note "Library-dependency boundary (round 2026-10-02 c): since the IG-label exemption the Check reads var_label(\"LIBRARY\"), so a run with no Library access at all (no #library line) SKIPS, as CG0303 does, rather than judging the label without the exemption. Discriminating: the body is the invalid one (DOMAIN 'all lowercase label' would fire), and the rule before the exemption, which read no library, reported it here."
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="all lowercase label"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
+---

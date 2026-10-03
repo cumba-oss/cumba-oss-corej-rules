@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0013-A expect=skipped domain=SV
+#note "Library-dependency boundary (round 2026-10-02 c close): the IG list is served but the MODEL list is not, so get_model_column_order maps the absent answer to LIBRARY_NOT_AVAILABLE and the rule SKIPS. The IG list alone never decides: an absent model list must not turn every column not in the IG list into a finding. Discriminating: SVCUSTOM is in neither list nor an identifier or timing grant and would be reported if a model list were served; SVCNTMOD is IG-only."
+#library standard=sdtmig version=3-3
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#library domain-variables SV STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VISITNUM:Timing VISIT:Timing VISITDY:Timing SVSTDTC:Timing SVENDTC:Timing SVSTDY:Timing SVENDY:Timing SVUPDES:Timing "SVCNTMOD:Record Qualifier"
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col SVCNTMOD type=Char
+col SVCUSTOM type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | IN PERSON | X
+---
