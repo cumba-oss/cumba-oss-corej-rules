@@ -13,22 +13,28 @@ Scope:
 Bindings:
 - name: "$variable_count"
   expression: "variable_count(\"--LNKGRP\")"
-- name: "$this_domain"
+- name: "$dataset_domain"
   expression: "distinct(DOMAIN)"
+- name: "$this_domain"
+  expression: "upper($dataset_domain)"
+- name: "$relrec_lnkgrp_rdomains"
+  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(not empty(RDOMAIN) and\
+    \ not empty(IDVAR) and upper(IDVAR) == concat(upper(RDOMAIN), \"LNKGRP\")))"
 - name: "$relrec_lnkgrp_domains"
-  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
-    \ \"LNKGRP\")))"
+  expression: "upper($relrec_lnkgrp_rdomains)"
+- name: "$relrec_lnkid_rdomains"
+  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(not empty(RDOMAIN) and\
+    \ not empty(IDVAR) and upper(IDVAR) == concat(upper(RDOMAIN), \"LNKID\")))"
 - name: "$relrec_lnkid_domains"
-  expression: "distinct(RDOMAIN, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
-    \ \"LNKID\")))"
+  expression: "upper($relrec_lnkid_rdomains)"
 - name: "$relrec_other_lnkid_domains"
   expression: "minus($relrec_lnkid_domains, subtract=$this_domain)"
 - name: "$relrec_lnkgrp_relids"
-  expression: "distinct(RELID, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
-    \ \"LNKGRP\")))"
+  expression: "distinct(RELID, domain=\"RELREC\", filter=(not empty(RDOMAIN) and not\
+    \ empty(IDVAR) and upper(IDVAR) == concat(upper(RDOMAIN), \"LNKGRP\")))"
 - name: "$relrec_lnkid_relids"
-  expression: "distinct(RELID, domain=\"RELREC\", filter=(IDVAR == concat(RDOMAIN,\
-    \ \"LNKID\")))"
+  expression: "distinct(RELID, domain=\"RELREC\", filter=(not empty(RDOMAIN) and not\
+    \ empty(IDVAR) and upper(IDVAR) == concat(upper(RDOMAIN), \"LNKID\")))"
 - name: "$relrec_links_lnkid"
   expression: "shares_elements_with($relrec_lnkgrp_domains, $this_domain) and not\
     \ empty($relrec_other_lnkid_domains) and shares_elements_with($relrec_lnkgrp_relids,\
