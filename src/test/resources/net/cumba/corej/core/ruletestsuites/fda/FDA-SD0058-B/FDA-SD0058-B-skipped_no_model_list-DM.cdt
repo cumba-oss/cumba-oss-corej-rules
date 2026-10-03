@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0058-B expect=skipped domain=DM
+#note "Library-dependency boundary (round 2026-10-02 c close): the IG list is served but the MODEL list is not, so get_model_column_order maps the absent answer to LIBRARY_NOT_AVAILABLE and the rule SKIPS. The IG list alone never decides: an absent model list must not turn every column not in the IG list into a finding. Discriminating: DMCUSTOM is in neither list nor in the DM Assumption 8 grant and would be reported if a model list were served; ARMNRS is IG-only (at WARNING under the ladder)."
+#library standard=sdtmig version=3-4
+#library domain-variables DM STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier SUBJID:Topic RFSTDTC:Timing "SITEID:Record Qualifier" "AGE:Record Qualifier" "SEX:Record Qualifier" "ARMCD:Record Qualifier" "ARM:Synonym Qualifier" "COUNTRY:Record Qualifier" "ARMNRS:Record Qualifier"
+dataset DM
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SUBJID type=Char
+col SITEID type=Char
+col ARMNRS type=Char
+col DMCUSTOM type=Char
+---
+S1 | DM | 001 | 001 | 01 | SCREEN FAILURE | X
+---
