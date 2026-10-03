@@ -81,7 +81,11 @@ class MetadataLibraryProviderStoreParityTest
         // members that the old IG-only behaviour dropped.
         assertTrue(vars.contains("AETPT"), "AE algorithm-A includes timing var AETPT");
         assertTrue(vars.contains("VISIT"), "AE algorithm-A includes timing var VISIT");
-        assertTrue(vars.contains("AEOCCUR"), "AE algorithm-A includes EVENTS class var AEOCCUR");
+        assertTrue(vars.contains("AELAT"), "AE algorithm-A includes EVENTS class var AELAT");
+        // 2026-10-03 store format 5: the walk honours usageRestrictions. SDTM 2.0 marks --OCCUR
+        // "Not in AE domain", so AEOCCUR (the member this line used to pin) left the AE walk;
+        // AELAT is an unrestricted EVENTS class var the IG AE dataset omits.
+        assertFalse(vars.contains("AEOCCUR"), "AE algorithm-A excludes AEOCCUR (Not in AE domain)");
         assertTrue(vars.contains("STUDYID"), "AE algorithm-A includes STUDYID");
         assertTrue(vars.contains("USUBJID"), "AE algorithm-A includes USUBJID");
         // The pure-Model EVENTS set is materially larger than the ~60-var IG AE dataset.

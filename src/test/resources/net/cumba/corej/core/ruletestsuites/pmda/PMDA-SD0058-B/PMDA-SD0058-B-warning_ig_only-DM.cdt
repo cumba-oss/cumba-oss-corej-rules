@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0058-B expect=violation domain=DM
+#note "ARMNRS is in the IG list for DM (served through domain-variables, read by get_dataset_filtered_variables) but not in the model list, and it is not one of VISITNUM, VISIT, VISITDY and DMXFN that DM Assumption 8 grants -> WARNING, never ERROR. Discriminating: with the IG list removed, the ERROR level reports ARMNRS, so this scenario goes red on the severity pin if the levels are collapsed or the IG list stops being read."
+#library standard=sdtmig version=3-4
+#library model-column-order DM STUDYID DOMAIN USUBJID SUBJID RFSTDTC SITEID AGE SEX ARMCD ARM COUNTRY
+#library domain-variables DM STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier SUBJID:Topic RFSTDTC:Timing "SITEID:Record Qualifier" "AGE:Record Qualifier" "SEX:Record Qualifier" "ARMCD:Record Qualifier" "ARM:Synonym Qualifier" "COUNTRY:Record Qualifier" "ARMNRS:Record Qualifier"
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=ARMNRS
+dataset DM
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SUBJID type=Char
+col SITEID type=Char
+col ARMNRS type=Char
+---
+S1 | DM | 001 | 001 | 01 | SCREEN FAILURE
+---

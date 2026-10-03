@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0351 expect=noViolation domain=VS
+#note "MHEVDTYP-style case found on DataExchange-DatasetJson (round 2026-10-02 c): the variable is defined by the IG list for the dataset but not by the model list -> allowed, no finding. Goes red if the IG list is dropped from the check again."
+#library standard=sdtmig version=3-3
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSTESTCD VSTEST VSORRES
+#library domain-variables VS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VSSEQ:Identifier VSTESTCD:Topic "VSTEST:Synonym Qualifier" "VSORRES:Result Qualifier" "VSCSTATE:Record Qualifier"
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSCSTATE type=Char label="Consciousness State"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120 | CONSCIOUS
+---

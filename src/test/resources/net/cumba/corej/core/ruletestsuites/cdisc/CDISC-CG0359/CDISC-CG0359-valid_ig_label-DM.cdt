@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0359 expect=noViolation domain=DM
+#note "DataExchange-DatasetJson (round 2026-10-02 c): ARMNRS carries the SDTMIG 3.3 label 'Reason Arm and/or Actual Arm is Null', whose lowercase 'is' fails the title-case pattern. A label equal to the IG label is accepted, so CG0303 (label = IG label) and CG0359 can both be met. Goes red if the library-label exemption is dropped."
+#library standard=sdtmig version=3-3
+#library variable-metadata DM ARMNRS name=ARMNRS label="Reason Arm and/or Actual Arm is Null"
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMNRS type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | SCREEN FAILURE
+---

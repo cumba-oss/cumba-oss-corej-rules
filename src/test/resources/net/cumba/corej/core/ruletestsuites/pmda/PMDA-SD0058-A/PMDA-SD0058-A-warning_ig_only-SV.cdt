@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD0058-A expect=violation domain=SV
+#note "SVCNTMOD (Contact Mode) is in the IG list for SV (served through domain-variables, read by get_dataset_filtered_variables) but not in the model list, and it is neither a timing variable nor one of the identifiers SV Assumption 10 grants -> WARNING, never ERROR. Discriminating: with the IG list removed, the ERROR level reports SVCNTMOD (it is not granted), so this scenario goes red on the severity pin if the levels are collapsed or the IG list stops being read."
+#library standard=sdtmig version=3-4
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#library domain-variables SV STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VISITNUM:Timing VISIT:Timing VISITDY:Timing SVSTDTC:Timing SVENDTC:Timing SVSTDY:Timing SVENDY:Timing SVUPDES:Timing "SVCNTMOD:Record Qualifier"
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=SVCNTMOD
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col SVCNTMOD type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | IN PERSON
+---

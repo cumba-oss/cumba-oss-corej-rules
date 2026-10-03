@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD0058 expect=violation domain=VS
+#note "WARNING level alone (PLAN-model-vs-ig-column-order §4d): VSCSTATE is defined by the IG list but not by the model list, so it is reported at WARNING, never ERROR. This is the scenario that goes red if the levels are collapsed back to one (it would then report ERROR)."
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSTESTCD VSTEST VSORRES
+#library domain-variables VS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VSSEQ:Identifier VSTESTCD:Topic "VSTEST:Synonym Qualifier" "VSORRES:Result Qualifier" "VSCSTATE:Record Qualifier"
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=VSCSTATE
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSCSTATE type=Char label="Consciousness State"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120 | CONSCIOUS
+---

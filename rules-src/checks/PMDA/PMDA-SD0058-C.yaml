@@ -2,30 +2,44 @@ Core:
   Id: "PMDA-SD0058-C"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable present in the CO dataset is not listed\
-  \ in the SDTM model list of allowed variables for the observation class and is not\
-  \ one of the closed list of identifiers and timing variables SDTMIG 3.1.2-3.2 permit\
-  \ adding to CO."
+Description: "Raise an error when a variable present in the CO dataset is in neither\
+  \ the SDTM model list of allowed variables for the observation class nor the IG\
+  \ variable list for the dataset, and is not one of the closed list of identifiers\
+  \ and timing variables SDTMIG 3.1.2-3.2 permit adding to CO. Raise a warning when\
+  \ the IG defines the variable for the dataset but the SDTM model version the IG\
+  \ links to does not list it."
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
     Include:
     - "CO"
 Bindings:
-- name: "$allowed_variables"
+- name: "$model_variables"
   expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
 Check:
-  expression: >-
-    upper(varname()) not in $allowed_variables and upper(varname()) not in ["COGRPID", "COREFID",
-    "COSPID", "VISIT", "VISITNUM", "VISITDY", "TAETORD", "CODY", "COTPT", "COTPTNUM", "COELTM",
-    "COTPTREF", "CORFTDTC"]
+  ERROR:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables and
+      upper(varname()) not in ["COGRPID", "COREFID", "COSPID", "VISIT", "VISITNUM", "VISITDY",
+      "TAETORD", "CODY", "COTPT", "COTPTNUM", "COELTM", "COTPTREF", "CORFTDTC"]
+    Message: "Variable is in neither the SDTM model list for the observation class nor\
+      \ the IG variable list for the dataset, and is not one of the closed list of identifiers\
+      \ and timing variables SDTMIG 3.1.2-3.2 permit adding to CO."
+  WARNING:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) in $ig_variables
+    Message: "Variable is defined by the IG for this dataset but is not in the SDTM model\
+      \ list of allowed variables for the observation class of the model version the IG\
+      \ links to."
 Outcome:
   Message: "Variable is present in the dataset but is not listed in the SDTM model\
-    \ list for the observation class, and is not one of the closed list of identifiers\
-    \ and timing variables SDTMIG 3.1.2-3.2 permit adding to CO."
+    \ list of allowed variables for the observation class."
   Output_Variables:
   - "variable_name"
-  - "$allowed_variables"
+  - "$model_variables"
+  - "$ig_variables"
 Source_Proposed:
   Class: "SPC"
   Domain: "CO"

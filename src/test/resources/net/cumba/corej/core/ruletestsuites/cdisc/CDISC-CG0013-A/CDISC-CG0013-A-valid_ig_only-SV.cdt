@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0013-A expect=noViolation domain=SV
+#note "MHEVDTYP-style case found on DataExchange-DatasetJson (round 2026-10-02 c): the variable is defined by the IG list for the dataset but not by the model list -> allowed, no finding. Goes red if the IG list is dropped from the check again."
+#library standard=sdtmig version=3-3
+#library model-column-order SV STUDYID DOMAIN USUBJID VISITNUM VISIT VISITDY SVSTDTC SVENDTC SVSTDY SVENDY SVUPDES
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#library domain-variables SV STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier VISITNUM:Timing VISIT:Timing VISITDY:Timing SVSTDTC:Timing SVENDTC:Timing SVSTDY:Timing SVENDY:Timing SVUPDES:Timing "SVCNTMOD:Record Qualifier"
+dataset SV
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col VISITNUM type=Num
+col VISIT type=Char
+col SVSTDTC type=Char
+col SVCNTMOD type=Char
+---
+S1 | SV | 001 | 1 | WEEK 1 | 2012-07-09 | IN PERSON
+---

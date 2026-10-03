@@ -2,10 +2,12 @@ Core:
   Id: "PMDA-SD0058-A"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable present in the SE/SV dataset is not listed\
-  \ in the SDTM model list of allowed variables for the observation class and is not\
-  \ one of the identifiers --SEQ, --GRPID, --REFID, --SPID and the Timing variables\
-  \ except the time-point variables, which the IG permits adding to SE/SV."
+Description: "Raise an error when a variable present in the SE/SV dataset is in neither\
+  \ the SDTM model list of allowed variables for the observation class nor the IG\
+  \ variable list for the dataset, and is not one of the identifiers --SEQ, --GRPID,\
+  \ --REFID, --SPID and the Timing variables except the time-point variables, which\
+  \ the IG permits adding to SE/SV. Raise a warning when the IG defines the variable\
+  \ for the dataset but the SDTM model version the IG links to does not list it."
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
@@ -13,8 +15,10 @@ Scope:
     - "SE"
     - "SV"
 Bindings:
-- name: "$allowed_variables"
+- name: "$model_variables"
   expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
 - name: "$timing_variables"
   expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
     , model_class=\"Findings\")"
@@ -22,18 +26,29 @@ Bindings:
   expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Identifier\"\
     , model_class=\"Findings\")"
 Check:
-  expression: >-
-    upper(varname()) not in $allowed_variables and not (upper(varname()) in $timing_variables and
-    upper(varname()) !~ /^..(TPT|TPTNUM|ELTM|TPTREF|RFTDTC)$/) and not (upper(varname()) in
-    $identifier_variables and upper(varname()) =~ /^..(SEQ|GRPID|REFID|SPID)$/)
+  ERROR:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables and not
+      (upper(varname()) in $timing_variables and upper(varname()) !~
+      /^..(TPT|TPTNUM|ELTM|TPTREF|RFTDTC)$/) and not (upper(varname()) in $identifier_variables and
+      upper(varname()) =~ /^..(SEQ|GRPID|REFID|SPID)$/)
+    Message: "Variable is in neither the SDTM model list for the observation class nor\
+      \ the IG variable list for the dataset, and is not one of the identifiers --SEQ,\
+      \ --GRPID, --REFID, --SPID and the Timing variables except the time-point variables,\
+      \ which the IG permits adding to SE/SV."
+  WARNING:
+    expression: >-
+      upper(varname()) not in $model_variables and upper(varname()) in $ig_variables
+    Message: "Variable is defined by the IG for this dataset but is not in the SDTM model\
+      \ list of allowed variables for the observation class of the model version the IG\
+      \ links to."
 Outcome:
   Message: "Variable is present in the dataset but is not listed in the SDTM model\
-    \ list for the observation class, and is not one of the identifiers --SEQ, --GRPID,\
-    \ --REFID, --SPID and the Timing variables except the time-point variables, which\
-    \ the IG permits adding to SE/SV."
+    \ list of allowed variables for the observation class."
   Output_Variables:
   - "variable_name"
-  - "$allowed_variables"
+  - "$model_variables"
+  - "$ig_variables"
 Source_Proposed:
   Class: "SPC"
   Domain: "SE, SV"

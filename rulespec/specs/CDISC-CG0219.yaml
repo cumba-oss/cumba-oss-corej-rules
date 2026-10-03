@@ -7,6 +7,8 @@ description: |
   `get_column_order_from_dataset` builds $dataset_variables; the check fires when
   the dataset shares_no_elements_with the timing list. The AE dataset below has no
   Timing variable (no AESTDTC etc.), so it fires.
+  2026-10-03 store format 5: the SDTM 2.0 model walk honours usageRestrictions, so AEPTFL
+  and AEPDUR (specimen-based Findings domains only) left the AE Timing list.
 python_source: rules-sdtmig-3-4.json (CORE-000575)
 rule:
   coreId: CDISC-CG0219
@@ -28,7 +30,7 @@ expected_violations:
     status: SUCCESS
     output_variables:
       $dataset_variables: '[AESEQ, AETERM, DOMAIN, STUDYID, USUBJID]'
-      $timing_variables: '[AECHDY, AECHENDY, AECHSTDY, AEDETECT, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC, AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEVINTX, AEEVLINT, AENOMDY, AENOMLBL, AEPDUR, AEPTFL, AERFTDTC,
-        AERPDY, AERPENDY, AERPSTDY, AESTDTC, AESTDY, AESTINT, AESTRF, AESTRTPT, AESTTPT, AETPT, AETPTNUM, AETPTREF, AEXDY, AEXENDY, AEXSTDY, EPOCH, MIDS, MIDSDTC, RELMIDS, RPHASE, RPPLDY, RPPLENDY, RPPLSTDY,
-        TAETORD, VISIT, VISITDY, VISITNUM]'
+      $timing_variables: '[AECHDY, AECHENDY, AECHSTDY, AEDETECT, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC, AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEVINTX, AEEVLINT, AENOMDY, AENOMLBL, AERFTDTC,
+        AERPDY, AERPENDY, AERPSTDY, AESTDTC, AESTDY, AESTINT, AESTRF, AESTRTPT, AESTTPT, AETPT, AETPTNUM, AETPTREF, AEXDY, AEXENDY, AEXSTDY, EPOCH, MIDS, MIDSDTC, RELMIDS, RPHASE,
+        RPPLDY, RPPLENDY, RPPLSTDY, TAETORD, VISIT, VISITDY, VISITNUM]'
 expected_errors: []

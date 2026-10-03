@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-CG0013"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable present in a dataset is not among the\
-  \ variables permitted by the SDTM Model list of allowed variables for the dataset's\
-  \ general observation class."
+Description: "Raise an error when a variable present in a dataset is neither among\
+  \ the variables permitted by the SDTM Model list of allowed variables for the dataset's\
+  \ general observation class nor in the IG's variable list for the dataset."
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
@@ -14,17 +14,21 @@ Scope:
     - "SE"
     - "SV"
 Bindings:
-- name: "$allowed_variables"
+- name: "$model_variables"
   expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
 Check:
   expression: >-
-    upper(varname()) not in $allowed_variables
+    upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables
 Outcome:
-  Message: "Variable is not listed in the SDTM Model list of allowed variables for\
-    \ the observation class and should be represented in supplemental qualifiers (SUPP--)."
+  Message: "Variable is in neither the SDTM Model list of allowed variables for the\
+    \ observation class nor the IG variable list for the dataset, and should be represented\
+    \ in supplemental qualifiers (SUPP--)."
   Output_Variables:
   - "variable_name"
-  - "$allowed_variables"
+  - "$model_variables"
+  - "$ig_variables"
 Source:
   Class: "ALL"
   Domain: "ALL"

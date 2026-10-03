@@ -12,7 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    var_label("DATA") !~
+    (empty(var_label("LIBRARY")) or var_label("DATA") != var_label("LIBRARY")) and var_label("DATA")
+    !~
     /^\\s*[A-Z]\\S*(\\s+(a|an|the|and|or|nor|but|for|so|yet|about|above|across|after|against|along|amid|among|around|as|at|before|behind|below|beneath|beside|between|beyond|by|concerning|despite|down|during|except|following|from|inside|into|in|like|near|onto|on|outside|out|over|of|off|past|per|regarding|since|than|throughout|through|till|toward|towards|to|underneath|under|until|unto|upon|up|versus|via|within|without|with|if|while|whereas|because|unless|although|though|when|where|whether|once|and\/or|vs\\.|w\/|\\([^)]*\\)|[a-z]+[A-Z]\\S*|[A-Z]\\S*))*\\s*$/
 Outcome:
   Message: "Variable label is not in title case."

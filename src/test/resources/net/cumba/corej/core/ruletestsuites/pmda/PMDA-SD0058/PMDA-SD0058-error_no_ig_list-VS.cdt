@@ -1,0 +1,21 @@
+#!RuleTest
+#test PMDA-SD0058 expect=violation domain=VS
+#note "PLAN-model-vs-ig-column-order §4b row 2: the model list is served but the IG list is ABSENT (no domain-variables, no column-order) -> the rule still answers, and a variable not in the model list is reported at ERROR, as before the ladder. The IG has nothing to say, so the model answer is the only answer: never a skip, never a downgrade. Discriminating for the binding choice: had the IG list been bound through get_column_order_from_library, its empty answer maps to LIBRARY_NOT_AVAILABLE and the whole rule would SKIP here."
+#library standard=sdtmig version=3-4
+#library model-column-order VS STUDYID DOMAIN USUBJID VSSEQ VSTESTCD VSTEST VSORRES
+#expectViolationCount 2
+#expectViolationAt severity=ERROR variable_name=VSCSTATE
+#expectViolationAt severity=ERROR variable_name=VSCUSTOM
+dataset VS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSCSTATE type=Char label="Consciousness State"
+col VSCUSTOM type=Char label="Sponsor Defined Variable"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | Systolic Blood Pressure | 120 | CONSCIOUS | X
+---

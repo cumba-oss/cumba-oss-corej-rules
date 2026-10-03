@@ -1,0 +1,19 @@
+#!RuleTest
+#test PMDA-SD0058-D expect=violation domain=CO
+#note "COVAL1 is in the IG list for CO (served through domain-variables, read by get_dataset_filtered_variables) but not in the model list, and it is neither an Identifier nor a Timing variable of the model class lists SDTMIG 3.3/3.4 grant to CO -> WARNING, never ERROR. Discriminating: with the IG list removed, the ERROR level reports COVAL1, so this scenario goes red on the severity pin if the levels are collapsed or the IG list stops being read."
+#library standard=sdtmig version=3-4
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#library domain-variables CO STUDYID:Identifier DOMAIN:Identifier RDOMAIN:Identifier USUBJID:Identifier COSEQ:Identifier IDVAR:Identifier IDVARVAL:Identifier "COREF:Record Qualifier" COVAL:Topic "COVAL1:Topic" "COEVAL:Record Qualifier" CODTC:Timing
+#expectViolationCount 1
+#expectViolationAt severity=WARNING variable_name=COVAL1
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COVAL1 type=Char
+---
+S1 | CO | 001 | 1 | Comment | continued
+---

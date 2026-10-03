@@ -71,15 +71,19 @@ import org.junit.jupiter.api.io.TempDir;
  * ({@code def:ValueListRef}); the rules ask for the element, so they fire by their letter;</li>
  * <li>0265 / DD0136: CM's label "Concomitant Medications" is "Concomitant/Prior Medications" in
  * SDTMIG 3.3, TS's "Trial Summary" is "Trial Summary Information";</li>
- * <li>0266 / DD0137: LBTESTCD — SDTMIG 3.3 publishes the label WITH a trailing period ("Lab Test or
- * Examination Short Name."), the example without; a strict comparison, as the rule states;</li>
  * <li>DD0118 ×2: RSTESTCD / RSTEST reference the HAMD-17 codelists {@code C100138} /
  * {@code C100137}, while the Library assigns RS only {@code C96782} / {@code C96781}.</li>
  * </ul>
  * <p>
- * 0067, 0097, 0098, 0099, 0263 and DD0116 raise nothing here (the Req variables are all
- * {@code Mandatory="Yes"}; every CT-required codelist and item carries its alias or is a marked
- * extension; 3.3 is published).
+ * 0067, 0097, 0098, 0099, 0263, 0266, DD0116 and DD0137 raise nothing here (the Req variables are
+ * all {@code Mandatory="Yes"}; every CT-required codelist and item carries its alias or is a marked
+ * extension; 3.3 is published; every variable label matches).
+ * </p>
+ * <p>
+ * 2026-10-03 store format 5: 0266 / DD0137 used to fire once each on LBTESTCD, because SDTMIG 3.3
+ * published its label with a trailing period ("Lab Test or Examination Short Name."). That period
+ * is a Library defect SDTMIG 3.4 (and 3.2) corrects; the seeder's errata register removes it
+ * (metadata issue {@code #282}.2), so the example's label now matches.
  * </p>
  */
 class LibraryRulesRealStoreTest
@@ -112,8 +116,6 @@ class LibraryRulesRealStoreTest
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "DEFINE-XML-0265 /ItemGroupDef[@OID='IG.TS']"
                     + " = Trial Summary vs Trial Summary Information",
-            "DEFINE-XML-0266 /ItemGroupDef[@OID='IG.LB']/ItemRef[5] = LBTESTCD: Lab Test or"
-                    + " Examination Short Name vs Lab Test or Examination Short Name.",
             "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[5] = RSTESTCD: C100138 vs C96782",
             "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[6] = RSTEST: C100137 vs C96781",
             "PMDA-DD0124 /ItemGroupDef[@OID='IG.DM']/ItemRef[18] = RACE",
@@ -127,9 +129,7 @@ class LibraryRulesRealStoreTest
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.CM']"
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.TS']"
-                    + " = Trial Summary vs Trial Summary Information",
-            "PMDA-DD0137 /ItemGroupDef[@OID='IG.LB']/ItemRef[5] = LBTESTCD: Lab Test or"
-                    + " Examination Short Name vs Lab Test or Examination Short Name.");
+                    + " = Trial Summary vs Trial Summary Information");
 
     @TempDir
     Path tempDir;

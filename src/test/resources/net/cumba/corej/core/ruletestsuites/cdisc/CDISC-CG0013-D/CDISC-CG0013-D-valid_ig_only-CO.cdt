@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0013-D expect=noViolation domain=CO
+#note "MHEVDTYP-style case found on DataExchange-DatasetJson (round 2026-10-02 c): the variable is defined by the IG list for the dataset but not by the model list -> allowed, no finding. Goes red if the IG list is dropped from the check again."
+#library standard=sdtmig version=3-3
+#library model-column-order CO STUDYID DOMAIN RDOMAIN USUBJID COSEQ IDVAR IDVARVAL COREF COVAL COEVAL CODTC
+#library model-class-variables FINDINGS STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier --SEQ:Identifier --GRPID:Identifier --REFID:Identifier --SPID:Identifier --LNKID:Identifier --TESTCD:Topic VISITNUM:Timing VISIT:Timing VISITDY:Timing TAETORD:Timing EPOCH:Timing --DTC:Timing --STDTC:Timing --ENDTC:Timing --DY:Timing --STDY:Timing --ENDY:Timing --DUR:Timing --TPT:Timing --TPTNUM:Timing --ELTM:Timing --TPTREF:Timing --RFTDTC:Timing
+#library domain-variables CO STUDYID:Identifier DOMAIN:Identifier RDOMAIN:Identifier USUBJID:Identifier COSEQ:Identifier IDVAR:Identifier IDVARVAL:Identifier "COREF:Record Qualifier" COVAL:Topic "COVAL1:Topic" "COEVAL:Record Qualifier" CODTC:Timing
+dataset CO
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col COSEQ type=Num
+col COVAL type=Char
+col COVAL1 type=Char
+---
+S1 | CO | 001 | 1 | Comment | continued
+---

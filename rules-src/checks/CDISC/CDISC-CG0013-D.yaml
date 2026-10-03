@@ -11,8 +11,10 @@ Scope:
     Include:
     - "CO"
 Bindings:
-- name: "$allowed_variables"
+- name: "$model_variables"
   expression: "get_model_column_order()"
+- name: "$ig_variables"
+  expression: "get_dataset_filtered_variables()"
 - name: "$timing_variables"
   expression: "get_model_filtered_variables(key_name=\"role\", key_value=\"Timing\"\
     , model_class=\"Findings\")"
@@ -21,14 +23,16 @@ Bindings:
     , model_class=\"Findings\")"
 Check:
   expression: >-
-    upper(varname()) not in $allowed_variables and upper(varname()) not in $timing_variables and
-    upper(varname()) not in $identifier_variables
+    upper(varname()) not in $model_variables and upper(varname()) not in $ig_variables and
+    upper(varname()) not in $timing_variables and upper(varname()) not in $identifier_variables
 Outcome:
-  Message: "Variable is not in the SDTM Model list of allowed variables for CO and\
-    \ is not an Identifier or Timing variable, which the IG permits adding to CO."
+  Message: "Variable is in neither the SDTM Model list of allowed variables for CO\
+    \ nor the IG variable list for the dataset, and is not an Identifier or Timing\
+    \ variable, which the IG permits adding to CO."
   Output_Variables:
   - "variable_name"
-  - "$allowed_variables"
+  - "$model_variables"
+  - "$ig_variables"
 Source_Proposed:
   Class: "SPC"
   Domain: "CO"

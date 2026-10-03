@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD1260 expect=noViolation domain=TS
+#note "Unversioned reference terminologies are excluded (owner, round 2026-10-02 c, reopening finding CG0267-F1/SD1260-F1): UNII, ISO 8601, ISO 3166-1 alpha-3 and clinicaltrials.gov carry no version, so an empty TSVCDVER is correct for them. Row 1 (UNII, TSVCDVER empty) is not a finding; row 2 (MEDDRA 21.0) is versioned and populated. Goes red if the exclusion list is dropped."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | TRT | Investigational Therapy or Treatment | XANOMELINE | U6RSY2UBI4 | UNII |
+CDISCPILOT01 | TS | 2 | INDIC | Trial Indication | ASTHMA | 10003553 | MEDDRA | 21.0

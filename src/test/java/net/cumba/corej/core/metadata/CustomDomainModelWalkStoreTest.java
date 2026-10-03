@@ -715,22 +715,27 @@ class CustomDomainModelWalkStoreTest
 
 
     @Test
-    void anExposureMethodIsAnErrorWhereTheIgLeavesExposureOut() throws IOException
+    void anExposureMethodIsModelAllowedAndASponsorVariableAnErrorWhereTheIgLeavesExposureOut()
+        throws IOException
     {
-        // P10: EX is IG-absent at SENDIG-AR 1.0, so its IG list is its model walk, which lacks
-        // EXMETHOD — the ruled ladder's ERROR rung. Where the IG defines EX, EXMETHOD is IG-only:
-        // WARNING.
-        IDataTable ex = table("EX",
-                List.of("STUDYID", "DOMAIN", "USUBJID", "EXSEQ", "EXTRT", "EXMETHOD", "EXSTDTC"),
-                new String[]
-                {
-                        "S", "EX", "U1", "1", "T", "M", "2020-01-01"
-                });
-        assertEquals(Map.of("EXMETHOD", Severity.ERROR), byVariable(
+        // P10: EX is IG-absent at SENDIG-AR 1.0, so its IG list is its model walk; a variable in
+        // neither list is the ruled ladder's ERROR rung (EXFOO).
+        // 2026-10-03 store format 5: EXMETHOD used to be that ERROR here, and a WARNING (IG-only)
+        // at SENDIG 3.1.1 and DART 1.1. The errata register adds the printed domain-specific
+        // tables to SDTM 1.5-1.8 (metadata issue #283.1-283.4), where EXMETHOD is an Interventions
+        // root restricted to EX ("Not in human clinical trials; EX domain only"). SENDIG-AR 1.0
+        // links SDTM 1.8, SENDIG 3.1.1 SDTM 1.5, DART 1.1 SDTM 1.6, so EXMETHOD is now a model
+        // variable of EX in all three and is silent.
+        IDataTable ex = table("EX", List.of("STUDYID", "DOMAIN", "USUBJID", "EXSEQ", "EXTRT",
+                "EXMETHOD", "EXSTDTC", "EXFOO"), new String[]
+        {
+                "S", "EX", "U1", "1", "T", "M", "2020-01-01", "X"
+        });
+        assertEquals(Map.of("EXFOO", Severity.ERROR), byVariable(
                 run("rules-fda-sendig-ar-1-0.json", "sendig ar-1-0", "FDA-SD0058", ex), "AR"));
-        assertEquals(Map.of("EXMETHOD", Severity.WARNING), byVariable(
+        assertEquals(Map.of("EXFOO", Severity.ERROR), byVariable(
                 run("rules-fda-sendig-3-1-1.json", "sendig 3-1-1", "FDA-SD0058", ex), "3.1.1"));
-        assertEquals(Map.of("EXMETHOD", Severity.WARNING),
+        assertEquals(Map.of("EXFOO", Severity.ERROR),
                 byVariable(
                         run("rules-fda-sendig-dart-1-1.json", "sendig dart-1-1", "FDA-SD0058", ex),
                         "DART 1.1"));

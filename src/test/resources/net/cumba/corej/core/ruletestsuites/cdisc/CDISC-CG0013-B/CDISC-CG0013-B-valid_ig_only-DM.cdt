@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0013-B expect=noViolation domain=DM
+#note "MHEVDTYP-style case found on DataExchange-DatasetJson (round 2026-10-02 c): the variable is defined by the IG list for the dataset but not by the model list -> allowed, no finding. Goes red if the IG list is dropped from the check again."
+#library standard=sdtmig version=3-3
+#library model-column-order DM STUDYID DOMAIN USUBJID SUBJID RFSTDTC SITEID AGE SEX ARMCD ARM COUNTRY
+#library domain-variables DM STUDYID:Identifier DOMAIN:Identifier USUBJID:Identifier SUBJID:Topic RFSTDTC:Timing "SITEID:Record Qualifier" "AGE:Record Qualifier" "SEX:Record Qualifier" "ARMCD:Record Qualifier" "ARM:Synonym Qualifier" "COUNTRY:Record Qualifier" "ARMNRS:Record Qualifier"
+dataset DM
+col STUDYID type=Char
+col DOMAIN type=Char
+col USUBJID type=Char
+col SUBJID type=Char
+col SITEID type=Char
+col ARMNRS type=Char
+---
+S1 | DM | 001 | 001 | 01 | SCREEN FAILURE
+---

@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0267 expect=violation domain=TS
+#note "DataExchange-DatasetJson shape: the exclusion matches case-insensitively (clinicaltrials.gov, ISO 3166-1 alpha-3 as written in the data), while MED-RT is versioned and its empty TSVCDVER is still a finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 TSPARMCD=PCLAS
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+S1 | TS | 1 | REGID | Registry Identifier | NCT00000000 | NCT00000000 | clinicaltrials.gov |
+S1 | TS | 1 | FCNTRY | Planned Country of Investigational Sites | USA | USA | ISO 3166-1 alpha-3 |
+S1 | TS | 1 | PCLAS | Pharmacologic Class | Cholinesterase Inhibitors | N0000175701 | MED-RT |
+---

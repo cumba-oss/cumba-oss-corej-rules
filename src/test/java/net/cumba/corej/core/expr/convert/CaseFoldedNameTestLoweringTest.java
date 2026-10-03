@@ -91,13 +91,17 @@ class CaseFoldedNameTestLoweringTest
     // 48 -> 61 rules / 68 -> 114 sites - the round added upper() folds (CG0332/CG0333 prefix and
     // suffix, CG0425/CG9672/SD0029/SD9715 none, AD0746 upper(SRCDOM), the CG0013/SD0058 siblings
     // upper(varname()) membership). Re-derived from a run, not nudged.
+    // 2026-10-03 (rule round 2026-10-02 c): membership sites 114 -> 135, rules unchanged at 61.
+    // The CG0013 family's allowed = model OR IG adds one upper(varname()) membership to each of
+    // CG0013, -A..-D and CG0351 (+6), and the PMDA-SD0058 ladder adds three to each of SD0058,
+    // -A..-D (+15). Re-derived per rule against 43233244^.
     private static final int EXPECTED_FOLDED_RULES = 115;
 
     private static final int EXPECTED_FOLDED_SITES = 197;
 
     private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 61;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 114;
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 135;
 
     private static final Set<String> PREDICATES = Set.of("ends_with", "starts_with", "contains",
             "does_not_contain", "prefix_matches", "suffix_matches");

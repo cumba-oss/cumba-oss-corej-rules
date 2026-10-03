@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0359 expect=violation domain=DM
+#note "The exemption covers only the exact IG label: ARMNRS labelled 'Reason arm is null' differs from the IG label and is not title case -> one finding."
+#library standard=sdtmig version=3-3
+#library variable-metadata DM ARMNRS name=ARMNRS label="Reason Arm and/or Actual Arm is Null"
+#expectViolationCount 1
+#expectViolationAt variable_name=ARMNRS
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMNRS type=Char label="Reason arm is null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | SCREEN FAILURE
+---

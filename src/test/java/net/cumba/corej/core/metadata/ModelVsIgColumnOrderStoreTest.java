@@ -73,6 +73,15 @@ class ModelVsIgColumnOrderStoreTest
      * Per package ({@code "<standard> <version>"} as the store keys it), per dataset: the
      * IG-defined variables absent from the dataset's model list. Measured 2026-09-26 through this
      * class's own {@link #skewOf} walk; an empty map is a package with no skew.
+     *
+     * <p>
+     * 2026-10-03 store format 5: the errata register adds the printed domain-specific variable
+     * tables to SDTM 1.5-1.8 (metadata issue {@code #283}.1-283.4) as class-table roots restricted
+     * to their domain, and the walk honours that restriction. That emptied the SDTMIG 3.3 roster
+     * (SDTM 1.7: EGBEATNO, MHEVDTYP, MSAGENT, MSCONC, MSCONCU), and took EXMETHOD out of SENDIG 3.1
+     * / 3.1.1 (SDTM 1.5) and EXMETHOD and ICIMPLBL out of SENDIG-DART 1.1 (SDTM 1.6). SENDIG 3.0
+     * links SDTM 1.2, which prints no such table, so its EXMETHOD stays.
+     * </p>
      */
     private static final Map<String, Map<String, Set<String>>> SKEW = skewRoster();
 
@@ -82,10 +91,7 @@ class ModelVsIgColumnOrderStoreTest
         skew.put("sdtmig 3-1-2", Map.of());
         skew.put("sdtmig 3-1-3", Map.of());
         skew.put("sdtmig 3-2", Map.of());
-        skew.put("sdtmig 3-3",
-                Map.ofEntries(Map.entry("EG", Set.of("EGBEATNO")),
-                        Map.entry("MH", Set.of("MHEVDTYP")),
-                        Map.entry("MS", Set.of("MSAGENT", "MSCONC", "MSCONCU"))));
+        skew.put("sdtmig 3-3", Map.of());
         skew.put("sdtmig 3-4", Map.of());
         skew.put("sendig 3-0", Map.ofEntries(Map.entry("BG", Set.of("BGEXCLFL", "BGREASEX")),
                 Map.entry("BW", Set.of("BWEXCLFL", "BWREASEX")),
@@ -108,13 +114,9 @@ class ModelVsIgColumnOrderStoreTest
                 Map.entry("RELREC", Set.of("POOLID")),
                 Map.entry("TF", Set.of("TFANTREG", "TFDETECT", "TFDIR", "TFLAT")),
                 Map.entry("VS", Set.of("VSCSTATE", "VSEXCLFL", "VSREASEX"))));
-        skew.put("sendig 3-1", Map.ofEntries(Map.entry("CO", Set.of("CODY")),
-                Map.entry("EX", Set.of("EXMETHOD"))));
-        skew.put("sendig 3-1-1", Map.ofEntries(Map.entry("CO", Set.of("CODY")),
-                Map.entry("EX", Set.of("EXMETHOD"))));
-        skew.put("sendig dart-1-1",
-                Map.ofEntries(Map.entry("CO", Set.of("CODY", "CORPDY", "RPHASE")),
-                        Map.entry("EX", Set.of("EXMETHOD")), Map.entry("IC", Set.of("ICIMPLBL"))));
+        skew.put("sendig 3-1", Map.of("CO", Set.of("CODY")));
+        skew.put("sendig 3-1-1", Map.of("CO", Set.of("CODY")));
+        skew.put("sendig dart-1-1", Map.of("CO", Set.of("CODY", "CORPDY", "RPHASE")));
         skew.put("sendig ar-1-0", Map.of());
         return skew;
     }
@@ -265,14 +267,22 @@ class ModelVsIgColumnOrderStoreTest
 
 
     @Test
-    void sdtmig34HasNoSkewAndAnAe120NameModelList()
+    void sdtmig34HasNoSkewAndAnAe112NameModelList()
     {
         // The plan's phase-0 control, through the real walk: AE / EVENTS / SDTMIG 3.4 is the list
-        // rulespec/specs/FDA-SD0058.yaml pins as (120 names).
+        // rulespec/specs/FDA-SD0058.yaml pins as (112 names).
+        // 2026-10-03 store format 5: 120 -> 112. The walk honours SDTM 2.0's usageRestrictions:
+        // --BEATNO (EG only), --EVDTYP (MH only), --OCCUR / --REASOC / --STAT / --REASND (not in
+        // AE) and --PTFL / --PDUR (specimen-based Findings domains only) leave the AE walk.
         List<String> ae = provider("sdtmig 3-4").getStandardModelVariables(dataset("AE"), null);
         assertNotNull(ae);
-        assertEquals(120, new TreeSet<>(ae).size());
-        assertTrue(ae.containsAll(List.of("AEBEATNO", "STUDYID", "USUBJID", "AESEQ", "AETERM")));
+        assertEquals(112, new TreeSet<>(ae).size());
+        assertTrue(ae.containsAll(List.of("STUDYID", "USUBJID", "AESEQ", "AETERM", "AESINTV")));
+        for (String gone : List.of("AEBEATNO", "AEEVDTYP", "AEOCCUR", "AEREASOC", "AESTAT",
+                "AEREASND", "AEPTFL", "AEPDUR"))
+        {
+            assertFalse(ae.contains(gone), gone + " is restricted out of the AE walk");
+        }
         assertTrue(SKEW.get("sdtmig 3-4").isEmpty());
     }
 
@@ -302,20 +312,26 @@ class ModelVsIgColumnOrderStoreTest
 
 
     @Test
-    void sdtmig33BeatNumberIsAWarning() throws IOException
+    void sdtmig33BeatNumberIsAModelVariableOfEg() throws IOException
     {
+        // 2026-10-03 store format 5: EGBEATNO used to be IG-only at SDTMIG 3.3 (WARNING). SDTM 1.7
+        // prints it in Table 2.2.12.1 Domain-Specific Variables (metadata issue #283.3), so it is
+        // now in both lists and silent; EGFOO keeps the rule's ERROR rung in view.
         IDataTable eg = dataset("EG", "STUDYID", "USUBJID", "EGSEQ", "EGTESTCD", "EGTEST",
-                "EGORRES", "EGBEATNO");
-        assertEquals(Map.of("EGBEATNO", Severity.WARNING),
+                "EGORRES", "EGBEATNO", "EGFOO");
+        assertEquals(Map.of("EGFOO", Severity.ERROR),
                 findings(run("rules-fda-sdtmig-3-3.json", "sdtmig 3-3", eg)));
     }
 
 
     @Test
-    void sendigDart11ImplantationLabelIsAWarning() throws IOException
+    void sendigDart11ImplantationLabelIsAModelVariableOfIc() throws IOException
     {
-        IDataTable ic = dataset("IC", "STUDYID", "USUBJID", "ICSEQ", "ICIMPLBL");
-        assertEquals(Map.of("ICIMPLBL", Severity.WARNING),
+        // 2026-10-03 store format 5: ICIMPLBL used to be IG-only at SENDIG-DART 1.1 (WARNING).
+        // SDTM 1.6, which DART 1.1 links, prints it in Table 2.2.12 Domain-Specific Variables
+        // (metadata issue #283.2), so it is now in both lists and silent.
+        IDataTable ic = dataset("IC", "STUDYID", "USUBJID", "ICSEQ", "ICIMPLBL", "ICFOO");
+        assertEquals(Map.of("ICFOO", Severity.ERROR),
                 findings(run("rules-fda-sendig-dart-1-1.json", "sendig dart-1-1", ic)));
     }
 
@@ -323,8 +339,10 @@ class ModelVsIgColumnOrderStoreTest
     @Test
     void sdtmig34ReportsOnlyErrors() throws IOException
     {
+        // 2026-10-03 store format 5: SDTM 2.0 restricts --BEATNO to EG ("EG Domain only") and the
+        // walk now honours it, so AEBEATNO is in neither list and an ERROR like AEFOO.
         IDataTable ae = dataset("AE", "STUDYID", "USUBJID", "AESEQ", "AETERM", "AEBEATNO", "AEFOO");
-        assertEquals(Map.of("AEFOO", Severity.ERROR),
+        assertEquals(Map.of("AEBEATNO", Severity.ERROR, "AEFOO", Severity.ERROR),
                 findings(run("rules-fda-sdtmig-3-4.json", "sdtmig 3-4", ae)));
     }
 
