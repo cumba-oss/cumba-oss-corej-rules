@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0708 expect=noViolation domain=ADSL
+#note "PLAN-library-template-label-resolution R2-2 (owner 2026-10-04): the label is compared through matches_label_template for a literal name too, so D7 holds here as under CDISC-AD0709 / PMDA-AD0018 - 'Imput.' and 'Imputation' are one word, the abbreviation the implementation guide itself publishes (metadata issue #97). TRTSDTF spelled out against ADaMIG 1.1's published 'Date of First Exposure Imput. Flag' -> silent; under the retired exact comparison (!=) this was a violation. For a literal the template is the label, so D7 is the only difference."
+#library standard=adamig version=1-1
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL TRTSDTF name=TRTSDTF label="Date of First Exposure Imput. Flag"
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col TRTSDTF type=Char label="Date of First Exposure Imputation Flag"
+---
+CDISCPILOT01 | D
+---

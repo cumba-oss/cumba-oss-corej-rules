@@ -99,9 +99,13 @@ class CaseFoldedNameTestCensusTest
     // `upper(varname()) !~ /^TR(T|0[1-9]|[1-9][0-9])SDTF$/` exclusions of AD0513/14/19/20 and
     // AD0504's `not ends_with(upper(varname()), "DTM")` (-5 sites) are retired as structural;
     // the rules' own ends_with gates stay counted. Re-derived from a run, not nudged.
+    // 2026-10-04 (same plan, round-2 ruling R2-3): name-test sites 192 -> 193, rules unchanged.
+    // Each stem rule now judges every name its suffix matches through label_template(…,
+    // stem="*TM"), which a DTM name matches too, so AD0504's own pre-plan scope test
+    // `not ends_with(upper(varname()), "DTM")` (+1 site) is back. Re-derived from a run.
     private static final int EXPECTED_FOLDED_RULES = 115;
 
-    private static final int EXPECTED_FOLDED_SITES = 192;
+    private static final int EXPECTED_FOLDED_SITES = 193;
 
     private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 50;
 

@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-AD0512"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in SDY, the ADaM implementation\
-  \ guide's *SDY naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not contain the fragment's phrase 'Relative Start Day'."
+Description: "Raise an error when a variable's name ends in SDY and is not a standard\
+  \ library variable, and its label does not contain the phrase of the ADaM implementation\
+  \ guide's *SDY naming fragment ('Relative Start Day')."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -12,8 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "SDY") and var_name("LIBRARY") == "*SDY" and not
-    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
+    ends_with(upper(varname()), "SDY") and not empty(label_template("LIBRARY", stem="*SDY")) and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY", stem="*SDY"))
 Outcome:
   Message: "A variable ending in SDY does not contain 'Relative Start Day' in the\
     \ label."

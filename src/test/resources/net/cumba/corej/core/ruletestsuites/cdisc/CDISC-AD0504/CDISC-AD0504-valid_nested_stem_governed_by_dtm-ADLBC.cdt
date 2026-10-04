@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0504 expect=noViolation domain=ADLBC
-#note "PLAN-library-template-label-resolution (review H2): the former 'not ends_with DTM' conjunct is structural now - XDTM is governed by the longest published stem, *DTM, so var_name(\"LIBRARY\") is *DTM and this rule (*TM) does not judge it; CDISC-AD0505 does. Its label lacks 'Time' on purpose. XTM is the positive control: governed by *TM, its label contains 'Time'."
+#note "CR504 scopes the rule to names ending in TM but not DTM (its Description since before PLAN-library-template-label-resolution): a DTM name has its own fragment and rule (*DTM, CDISC-AD0505), and 'Datetime' does not contain 'Time' as written. Round 1 retired the conjunct as structural under longest-suffix governance; round 2 (R2-3: each rule judges every name its suffix matches, label_template(\"LIBRARY\", stem=\"*TM\") answers '{Time}' for XDTM too) brings it back as the rule's own scope test. XDTM's label lacks 'Time' on purpose and stays unjudged here; XTM is the positive control: its label contains 'Time'."
 #library standard=adamig version=1-3
 #library variable-metadata ADLBC *TM name=*TM label="{Time}"
 #library variable-metadata ADLBC *DTM name=*DTM label="{Datetime}"

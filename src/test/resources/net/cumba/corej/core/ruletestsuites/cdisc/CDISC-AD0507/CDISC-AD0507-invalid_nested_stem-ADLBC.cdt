@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0507 expect=violation domain=ADLBC
+#note "PLAN-library-template-label-resolution R2-3 (owner 2026-10-04, follow the authority): CR507 covers every variable whose name ends in DTF, so this rule judges XSDTF - the stem form label_template(\"LIBRARY\", stem=\"*DTF\") answers '{Date Imputation Flag}' for it, it is no library variable - although the longer *SDTF covers the name too and CDISC-AD0513 judges it as well. The rule keeps its authority's own test (an 'Imputation Flag' / 'Imput. Flag' ending and 'Date'): 'Start Date Imputed' has no such ending -> one violation, reported with *DTF's template. XEDTF ('End Date Imput. Flag') conforms; XDTF is the plain positive control. Under round 1 (longest-suffix governance) this rule did not judge XSDTF."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC *DTF name=*DTF label="{Date Imputation Flag}"
+#library variable-metadata ADLBC *SDTF name=*SDTF label="{Start Date Imputation Flag}"
+#library variable-metadata ADLBC *EDTF name=*EDTF label="{End Date Imputation Flag}"
+#expectViolationCount 1
+#expectViolationAt variable_name=XSDTF variable_label="Start Date Imputed" library_variable_label_template="{Date Imputation Flag}"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col XDTF type=Char label="Analysis Date Imputation Flag"
+col XSDTF type=Char label="Start Date Imputed"
+col XEDTF type=Char label="End Date Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | D | D | D
+---

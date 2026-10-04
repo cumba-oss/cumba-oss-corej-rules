@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0503 expect=noViolation domain=ADLBC
-#note "PLAN-library-template-label-resolution (review H2): the stem rules skip a standard library variable structurally - ADT resolves to the BDS literal ADT at the first tier and reaches no stem, so var_name(\"LIBRARY\") is ADT, not *DT, and this rule is silent on it whatever its label. A mislabelled ADT is the exact-label rules' finding (CDISC-AD0708 / AD0709 compare 'Foo' with the published 'Analysis Date'), not a second report here. Until this plan AD0503 had no skip at all and fired on it too."
+#note "PLAN-library-template-label-resolution (review H2): the stem rules skip a standard library variable structurally - ADT resolves to the BDS literal ADT at the first tier and reaches no stem, so the stem form label_template(\"LIBRARY\", stem=\"*DT\") answers a missing for it (R2-3: a library variable is governed by its own published label, never by the suffix convention) and this rule is silent on it whatever its label. A mislabelled ADT is the exact-label rules' finding (CDISC-AD0708 / AD0709 compare 'Foo' with the published 'Analysis Date'), not a second report here. Until this plan AD0503 had no skip at all and fired on it too."
 #library standard=adamig version=1-3
 #library variable-metadata ADLBC ADT name=ADT label="Analysis Date"
 #library variable-metadata ADLBC *DT name=*DT label="{Date}"

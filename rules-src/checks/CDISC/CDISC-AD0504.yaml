@@ -2,9 +2,11 @@ Core:
   Id: "CDISC-AD0504"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in TM, the ADaM implementation\
-  \ guide's *TM naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not contain the fragment's phrase 'Time'."
+Description: "Raise an error when a variable's name ends in TM, but not DTM, and is\
+  \ not a standard library variable, and its label does not contain the phrase of\
+  \ the ADaM implementation guide's *TM naming fragment ('Time') - every such name,\
+  \ also one that ends in STM or ETM and so falls under that longer fragment's rule\
+  \ as well."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -12,8 +14,9 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "TM") and var_name("LIBRARY") == "*TM" and not
-    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
+    ends_with(upper(varname()), "TM") and not ends_with(upper(varname()), "DTM") and not
+    empty(label_template("LIBRARY", stem="*TM")) and not matches_label_template(var_label("DATA"),
+    label_template("LIBRARY", stem="*TM"))
 Outcome:
   Message: "The variable's name ends in TM, but its label does not contain 'Time'."
   Output_Variables:

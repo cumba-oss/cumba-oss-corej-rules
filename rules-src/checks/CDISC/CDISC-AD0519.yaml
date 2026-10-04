@@ -2,10 +2,9 @@ Core:
   Id: "CDISC-AD0519"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in EDTF, the ADaM implementation\
-  \ guide's *EDTF naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not end with 'Imputation Flag' (or 'Imput. Flag') or does not\
-  \ contain 'End' or does not contain 'Date'."
+Description: "Raise an error when a variable's name ends in EDTF and is not a standard\
+  \ library variable, and its label does not end with 'Imputation Flag' (or 'Imput.\
+  \ Flag') or does not contain 'End' or does not contain 'Date'."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -13,8 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "EDTF") and var_name("LIBRARY") == "*EDTF" and (var_label("DATA") !~
-    / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
+    ends_with(upper(varname()), "EDTF") and not empty(label_template("LIBRARY", stem="*EDTF")) and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
     contains(var_label("DATA"), "Date"))
 Outcome:
   Message: "A variable ending in EDTF has a label that does not end with 'Imputation\

@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-AD0514 expect=violation domain=ADLBC
 # Rule:Description: A variable ending in STMF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Start" and "Time"
-#note "ASTMF has no Imputation-Flag suffix; BSTMF lacks "Start"; CSTMF lacks "Time"; DSTMF carries the phrase but not at the END; ESTMF differs only in CASE. TR1STMF, TRTSTMF, TR01STMF and TR99STMF all carry the SAME label, and only the library tells them apart: TRTSTMF is the ADSL literal TRTSTMF and TR01STMF / TR99STMF match the ADSL template TRxxSTMF (D9, PLAN-library-template-label-resolution), so var_name(\"LIBRARY\") is not *STMF and the rule does not judge them; the near-miss TR1STMF (one digit) matches no template, falls to the *STMF stem and still fires."
+#note "ASTMF has no Imputation-Flag suffix; BSTMF lacks "Start"; CSTMF lacks "Time"; DSTMF carries the phrase but not at the END; ESTMF differs only in CASE. TR1STMF, TRTSTMF, TR01STMF and TR99STMF all carry the SAME label, and only the library tells them apart: TRTSTMF is the ADSL literal TRTSTMF and TR01STMF / TR99STMF match the ADSL template TRxxSTMF (D9, PLAN-library-template-label-resolution), so they are no stem case - label_template(\"LIBRARY\", stem=\"*STMF\") answers a missing for them (R2-3) - and the rule does not judge them; the near-miss TR1STMF (one digit) matches no template, falls to the *STMF stem and still fires."
 #expectViolationCount 6
 #expectViolationAt variable_label="Start Time Flag" variable_name=ASTMF
 #expectViolationAt variable_label="Analysis Time Imput. Flag" variable_name=BSTMF

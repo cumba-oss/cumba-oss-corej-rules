@@ -2755,7 +2755,7 @@ The example above is the complete call.
 
 `expected_variables()` → **value (a list)**
 
-The variables the CDISC Library marks Expected for this dataset, as a list — for an ADaM dataset, the expected variables of its detected data structure(s), naming templates substituted against the dataset's own columns.
+The variables the CDISC Library marks Expected for this dataset, as a list — for an ADaM dataset, the expected variables of its detected data structure(s), naming templates substituted against the dataset's own columns, and `--` and domain-prefixed names resolved as [`required_variables()`](#required_variables) describes.
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `expected_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
@@ -2817,7 +2817,7 @@ Check:
   expression: 'upper(varname()) in $allowed_variables and upper(varname()) not in $library_order'
 ```
 
-The example above is the complete call: a variable the model allows that the implementation guide does not list for the domain (`FDA-SD1076` / `PMDA-SD1076`). For an ADaM dataset the list is the governing data structure's (ADSL, BDS, OCCDS …), selected as `Scope.Data_Structures` detects it, with its naming templates substituted against the dataset's columns (`TRTxxP` → the dataset's `TRT01P`) as `required_variables()` substitutes them. The ADaM stem rules `CDISC-AD0503`–`AD0520` do not read it: they select their stem through the library read, `var_name("LIBRARY") == "*SDT"`.
+The example above is the complete call: a variable the model allows that the implementation guide does not list for the domain (`FDA-SD1076` / `PMDA-SD1076`). For an ADaM dataset the list is the governing data structure's (ADSL, BDS, OCCDS …), selected as `Scope.Data_Structures` detects it, with its naming templates substituted against the dataset's columns (`TRTxxP` → the dataset's `TRT01P`) as `required_variables()` substitutes them. Its `--` and domain-prefixed names resolve as [`required_variables()`](#required_variables) describes. The ADaM stem rules `CDISC-AD0503`–`AD0520` do not read it: they read their stem's phrase through [`label_template("LIBRARY", stem="*SDT")`](#label_template).
 
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is *library not available* (*"Rule skipped — library returned no data for get_column_order_from_library"*). To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
 
@@ -2951,7 +2951,7 @@ The example above is the complete call.
 
 ### label_template
 
-`label_template([x,] "LIBRARY")` → **value**
+`label_template([x,] "LIBRARY"[, stem="*DT"])` → **value**
 
 The variable's library label as a **template**, in the grammar of [`matches_label_template`](#matches_label_template); `LIBRARY` only — the template is a product of the Library's naming conventions, which no Define-XML publishes.
 
@@ -2959,6 +2959,7 @@ The variable's library label as a **template**, in the grammar of [`matches_labe
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `LIBRARY` |
+| `stem` | string literal | no | A published `*`-stem (`"*DT"`): read that stem's template instead of the column's own (the stem-selecting form below) |
 
 **Example**
 
@@ -2966,9 +2967,15 @@ The variable's library label as a **template**, in the grammar of [`matches_labe
 expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY"))'
 ```
 
-**How the column finds its template.** An ADaM product's variables are keyed by **data structure** (ADSL, BDS, OCCDS …), and the dataset's structures are detected as the `Scope.Data_Structures` gate detects them (the Define-XML declaration first). Within the governing structure the column resolves, in order: by its **literal** name; through a published **index template** — `TRT01P` is `TRTxxP`, `AVALCAT1` is `AVALCATy`, `P02S1SDT` is `PxxSwSDT`, with `xx`/`zz` two digits, `y` any number and `w` one digit; through the **ADSL** structure (an ADSL variable copied into a BDS or OCCDS dataset keeps its ADSL definition); and last through the longest published `*`-**stem** (`XXSDT` is `*SDT`'s, never `*DT`'s). `var_name("LIBRARY")` then names what resolved — the published spelling, the template (`TRTxxP`) or the stem (`*SDT`) — and `var_label("LIBRARY")` the label with the column's digits substituted as whole words (`Planned Treatment for Period 01`). A `*`-stem serves **no label** and no type, only its phrase here, so a rule guarded by `not empty(var_label("LIBRARY"))` never judges a stem column — the stem rules (`CDISC-AD0503`–`AD0520`) select their stem with `var_name("LIBRARY") == "*SDT"`.
+**How the column finds its template.** An ADaM product's variables are keyed by **data structure** (ADSL, BDS, OCCDS …), and the dataset's structures are detected as the `Scope.Data_Structures` gate detects them (the Define-XML declaration first). Within the governing structure the column resolves, in order: by its **literal** name; through a published **index template** — `TRT01P` is `TRTxxP`, `AVALCAT1` is `AVALCATy`, `P02S1SDT` is `PxxSwSDT`, with `xx`/`zz` two digits, `y` any number and `w` one digit; through the **ADSL** structure (an ADSL variable copied into a BDS or OCCDS dataset keeps its ADSL definition); and last through the longest published `*`-**stem** (`XXSDT` is `*SDT`'s, never `*DT`'s). `var_name("LIBRARY")` then names what resolved — the published spelling, the template (`TRTxxP`) or the stem (`*SDT`) — and `var_label("LIBRARY")` the label with the column's digits substituted as whole words (`Planned Treatment for Period 01`). A `*`-stem serves **no label** and no type, only its phrase here, so a rule guarded by `not empty(var_label("LIBRARY"))` never judges a stem column — the stem rules (`CDISC-AD0503`–`AD0520`) read the stem-selecting form below.
 
 **What the template holds.** For a literal, the label itself. For an index template, the substituted label, and — when the name carries `y` or `zz` — a trailing ` ...`, the IG's descriptive tail (*"descriptive text is allowed at the end of the labels of variables whose names contain indexes 'y' or 'zz'"*): `AVALCAT1` → `Analysis Value Category 1 ...` (ADaMIG 1.1–1.3; ADaMIG 1.0 publishes `Analysis Category y`, so there it is `Analysis Category 1 ...`), `TRT01P` → `Planned Treatment for Period 01` (an `xx` name allows none). For a stem, the published phrase: `{Start Date}`; ADaMIG 1.0 spells it `Start Date of ...`. **Missing** — so a `not empty(label_template("LIBRARY"))` guard decides — for a column the Library does not know, a column spelled like the template itself (`TRTXXP`), two templates matching one column, and one name the structure publishes twice with different labels: the OCCDS structures publish `DECDORGw` both as the MedDRA `PT in Original Dictionary w` and as the WHO Drug `Standardized Med Name in Orig Dict w`, and which one a `DECDORG1` must carry depends on a dictionary the name does not tell. Where a subclass structure publishes a name its base publishes too, the subclass's row governs.
+
+**The stem-selecting form.** `label_template("LIBRARY", stem="*DT")` answers the **named** stem's template when the column's name ends in that stem's suffix and the column is a stem case — no literal, index template or ADSL name claims it — and a **missing** otherwise (a library variable such as `ADT` or `TRTSDT` is governed by its own published label, never by the suffix convention). A nested column answers every stem it ends in: `RANDSDT` is `{Date}` for `stem="*DT"` and `{Start Date}` for `stem="*SDT"`, so each stem rule judges every column its suffix matches with its **own** phrase, and `RANDSDT` is judged by `CDISC-AD0503` and `AD0509` alike. The stem is a string literal rooted at `*` with at least one character after it; any other value, and `stem=` on any other accessor, is a load error. A finding of a rule whose `label_template` reads all name one stem reports **that** stem's template as `library_variable_label_template`; the plain form keeps the column's own template (the longest stem it ends in).
+
+```yaml
+expression: 'ends_with(upper(varname()), "DT") and not empty(label_template("LIBRARY", stem="*DT")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY", stem="*DT"))'
+```
 
 **An ADaMIG 1.1 run and ADAE.** ADaMIG 1.1 publishes no occurrence structure; the OCCDS product of the IG's own generation is added for the run (OCCDS 1.0 for ADaMIG 1.1, OCCDS 1.1 for 1.2 and 1.3) unless a product publishing one is declared with `-mp`, and the run log names it. Nothing is added for ADaMIG 1.0 or a TIG leg.
 
@@ -3000,6 +3007,8 @@ The example above is the complete call.
 `required_variables()` → **value (a list)**
 
 The variables the CDISC Library marks Required (`Req`) for this dataset, as a list — for an ADaM dataset, the required variables of its detected data structure(s), naming templates substituted against the dataset's own columns.
+
+**An ADaM occurrence dataset's domain-bound names.** An occurrence structure publishes the variables it copies from an SDTM domain as `--` names (`--SEQ`, `--TERM`), and the base OCCDS structures mix the AE and CM conventions (`CMTRT` and `AESER` are both Required in OCCDS 1.0). A `--` name resolves to the dataset's **source domain** — the two letters after `AD` in the dataset's name, confirmed by a `<domain>SEQ` column: `ADAE` with `AESEQ` is `AE`, so `--SEQ` is `AESEQ`. A name that carries a domain's prefix — its published description opens with that domain's source token (`CMTRT`: `CM.CMTRT`) — is listed only for a dataset of that domain, so `ADAE` is not asked for `CMTRT`. With no confirmed domain neither kind is listed: the function never names a variable it cannot tie to the dataset. ADSL, BDS and TTE publish no such names.
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `required_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 

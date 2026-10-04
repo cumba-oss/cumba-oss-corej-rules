@@ -2,10 +2,10 @@ Core:
   Id: "CDISC-AD0508"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in TMF, the ADaM implementation\
-  \ guide's *TMF naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not end with 'Imputation Flag' (or 'Imput. Flag') or does not\
-  \ contain 'Time'."
+Description: "Raise an error when a variable's name ends in TMF and is not a standard\
+  \ library variable, and its label does not end with 'Imputation Flag' (or 'Imput.\
+  \ Flag') or does not contain 'Time' - every such name, also one that ends in STMF\
+  \ or ETMF and so falls under that longer fragment's rule as well."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -13,8 +13,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "TMF") and var_name("LIBRARY") == "*TMF" and (var_label("DATA") !~ /
-    Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Time"))
+    ends_with(upper(varname()), "TMF") and not empty(label_template("LIBRARY", stem="*TMF")) and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Time"))
 Outcome:
   Message: "A variable ending in TMF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'Time'."

@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0708 expect=violation domain=ADSL
+#note "CR708 (ADaMIG 1.1): the label of a variable with a fixed standard label must match it. Since R2-2 (PLAN-library-template-label-resolution) the comparison runs through matches_label_template, which still demands the published label exactly, letter case included - only 'Imput.' and 'Imputation' are one word (D7). TRTSDTF's 'Date of First Exposure Flag' drops the imputation word -> one violation; STUDYID is the conforming control."
+#library standard=adamig version=1-1
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL TRTSDTF name=TRTSDTF label="Date of First Exposure Imput. Flag"
+#expectViolationCount 1
+#expectViolationAt variable_name=TRTSDTF variable_label="Date of First Exposure Flag" library_variable_label="Date of First Exposure Imput. Flag"
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col TRTSDTF type=Char label="Date of First Exposure Flag"
+---
+CDISCPILOT01 | D
+---

@@ -2,9 +2,9 @@ Core:
   Id: "CDISC-AD0510"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in STM, the ADaM implementation\
-  \ guide's *STM naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not contain the fragment's phrase 'Start Time'."
+Description: "Raise an error when a variable's name ends in STM and is not a standard\
+  \ library variable, and its label does not contain the phrase of the ADaM implementation\
+  \ guide's *STM naming fragment ('Start Time')."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -12,8 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "STM") and var_name("LIBRARY") == "*STM" and not
-    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
+    ends_with(upper(varname()), "STM") and not empty(label_template("LIBRARY", stem="*STM")) and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY", stem="*STM"))
 Outcome:
   Message: "A variable ending in STM does not contain 'Start Time' in the label."
   Output_Variables:

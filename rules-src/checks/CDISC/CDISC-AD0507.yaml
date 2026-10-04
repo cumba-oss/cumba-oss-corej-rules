@@ -2,10 +2,10 @@ Core:
   Id: "CDISC-AD0507"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in DTF, the ADaM implementation\
-  \ guide's *DTF naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not end with 'Imputation Flag' (or 'Imput. Flag') or does not\
-  \ contain 'Date'."
+Description: "Raise an error when a variable's name ends in DTF and is not a standard\
+  \ library variable, and its label does not end with 'Imputation Flag' (or 'Imput.\
+  \ Flag') or does not contain 'Date' - every such name, also one that ends in SDTF\
+  \ or EDTF and so falls under that longer fragment's rule as well."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -13,8 +13,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "DTF") and var_name("LIBRARY") == "*DTF" and (var_label("DATA") !~ /
-    Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Date"))
+    ends_with(upper(varname()), "DTF") and not empty(label_template("LIBRARY", stem="*DTF")) and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Date"))
 Outcome:
   Message: "A variable ending in DTF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'Date'."

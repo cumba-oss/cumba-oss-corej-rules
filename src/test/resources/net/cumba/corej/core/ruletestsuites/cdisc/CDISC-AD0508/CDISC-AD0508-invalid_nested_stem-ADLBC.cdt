@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0508 expect=violation domain=ADLBC
+#note "PLAN-library-template-label-resolution R2-3 (owner 2026-10-04, follow the authority): CR508 covers every variable whose name ends in TMF, so this rule judges XSTMF - the stem form label_template(\"LIBRARY\", stem=\"*TMF\") answers '{Time Imputation Flag}' for it, it is no library variable - although the longer *STMF covers the name too and CDISC-AD0514 judges it as well. The rule keeps its authority's own test (an 'Imputation Flag' / 'Imput. Flag' ending and 'Time'): 'Start Time Imputed' has no such ending -> one violation, reported with *TMF's template. XETMF ('End Time Imput. Flag') conforms; XTMF is the plain positive control. Under round 1 (longest-suffix governance) this rule did not judge XSTMF."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC *TMF name=*TMF label="{Time Imputation Flag}"
+#library variable-metadata ADLBC *STMF name=*STMF label="{Start Time Imputation Flag}"
+#library variable-metadata ADLBC *ETMF name=*ETMF label="{End Time Imputation Flag}"
+#expectViolationCount 1
+#expectViolationAt variable_name=XSTMF variable_label="Start Time Imputed" library_variable_label_template="{Time Imputation Flag}"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col XTMF type=Char label="Analysis Time Imputation Flag"
+col XSTMF type=Char label="Start Time Imputed"
+col XETMF type=Char label="End Time Imput. Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | H | H | H
+---

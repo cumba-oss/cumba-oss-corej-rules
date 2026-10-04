@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0505 expect=violation domain=ADLBC
+#note "PLAN-library-template-label-resolution R2-3 (owner 2026-10-04, follow the authority): CR505 covers every variable whose name ends in DTM, so this rule judges XSDTM with its OWN fragment's phrase - label_template(\"LIBRARY\", stem=\"*DTM\") is '{Datetime}' for it - although the longer *SDTM covers the name too and CDISC-AD0511 judges it as well. 'Start Moment' lacks 'Datetime' -> one violation, reported with the phrase this rule judged. XEDTM ends in EDTM and its label carries 'Datetime'; XDTM is the plain positive control. Under round 1 (longest-suffix governance) this rule did not judge XSDTM."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC *DTM name=*DTM label="{Datetime}"
+#library variable-metadata ADLBC *SDTM name=*SDTM label="{Start Datetime}"
+#library variable-metadata ADLBC *EDTM name=*EDTM label="{End Datetime}"
+#expectViolationCount 1
+#expectViolationAt variable_name=XSDTM variable_label="Start Moment" library_variable_label_template="{Datetime}"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col XDTM type=Char label="Analysis Datetime"
+col XSDTM type=Char label="Start Moment"
+col XEDTM type=Char label="End Datetime"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | y | z
+---

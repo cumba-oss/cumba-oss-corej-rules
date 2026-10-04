@@ -2,10 +2,9 @@ Core:
   Id: "CDISC-AD0520"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in ETMF, the ADaM implementation\
-  \ guide's *ETMF naming fragment governs it (the name is not a standard library variable),\
-  \ and its label does not end with 'Imputation Flag' (or 'Imput. Flag') or does not\
-  \ contain 'End' or does not contain 'Time'."
+Description: "Raise an error when a variable's name ends in ETMF and is not a standard\
+  \ library variable, and its label does not end with 'Imputation Flag' (or 'Imput.\
+  \ Flag') or does not contain 'End' or does not contain 'Time'."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -13,8 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "ETMF") and var_name("LIBRARY") == "*ETMF" and (var_label("DATA") !~
-    / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
+    ends_with(upper(varname()), "ETMF") and not empty(label_template("LIBRARY", stem="*ETMF")) and
+    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
     contains(var_label("DATA"), "Time"))
 Outcome:
   Message: "A variable ending in ETMF has a label that does not end with 'Imputation\

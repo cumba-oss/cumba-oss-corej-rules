@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0503 expect=violation domain=ADLBC
+#note "PLAN-library-template-label-resolution R2-3 (owner 2026-10-04, follow the authority): CR503 covers every variable whose name ends in DT, so this rule judges RANDSDT with its OWN fragment's phrase - label_template(\"LIBRARY\", stem=\"*DT\") is '{Date}' for it - although the longer *SDT covers the name too and CDISC-AD0509 judges it as well (a second report, under the second rule whose authority covers it). 'Randomization Start' lacks 'Date' -> one violation, which shows the phrase THIS rule judged as library_variable_label_template ('{Date}', not *SDT's '{Start Date}'). RANDEDT ends in EDT and its label carries 'Date'; XDT is the plain positive control. Under round 1 (longest-suffix governance, var_name(\"LIBRARY\") == \"*DT\") this rule did not judge RANDSDT, and this file pinned that as valid_nested_stem_governed_by_sdt."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC *DT name=*DT label="{Date}"
+#library variable-metadata ADLBC *SDT name=*SDT label="{Start Date}"
+#library variable-metadata ADLBC *EDT name=*EDT label="{End Date}"
+#expectViolationCount 1
+#expectViolationAt variable_name=RANDSDT variable_label="Randomization Start" library_variable_label_template="{Date}"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col XDT type=Char label="Analysis Date"
+col RANDSDT type=Char label="Randomization Start"
+col RANDEDT type=Char label="Randomization End Date"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x | y | z
+---

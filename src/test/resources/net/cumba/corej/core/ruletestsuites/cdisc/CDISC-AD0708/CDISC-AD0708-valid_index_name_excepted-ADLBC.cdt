@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0708 expect=noViolation domain=ADLBC
+#note "CR708's own exception, kept (QH1 (a), PLAN-library-template-label-resolution): a variable whose name contains an index (w, y, xx, zz) is not judged here. ANL01FL resolves through the BDS template ANLzzFL (its library label is 'Analysis Flag 01') and carries a wrong label on purpose; the rule's varname() !~ /[0-9]/ scope keeps it out - PMDA-AD0018 judges it. STUDYID is a judged literal and conforms."
+#library standard=adamig version=1-1
+#library variable-metadata ADLBC STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADLBC ANLzzFL name=ANLzzFL label="Analysis Flag zz"
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col ANL01FL type=Char label="Any Sponsor Label"
+---
+CDISCPILOT01 | ALB | Y
+---
