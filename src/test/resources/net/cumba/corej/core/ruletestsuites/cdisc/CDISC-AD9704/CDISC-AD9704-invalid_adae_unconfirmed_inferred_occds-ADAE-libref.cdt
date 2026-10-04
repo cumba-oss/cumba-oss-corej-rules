@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD9704 expect=violation domain=ADAE
+#note "PLAN-library-template-label-resolution round-2 T2 review H1, on OUR metadata store: ADAE under the D10-inferred OCCDS 1.0 (base Req STUDYID, USUBJID, --SEQ, --TERM, CMTRT, AESER) with NO AESEQ column, so no source domain is confirmed. The '--' names are not demanded (R2-1 (i): the concrete variable cannot be named), CMTRT carries the CM prefix and ADAE gives no CM evidence (no CMSEQ) so it is not demanded either; but AESER carries ADAE's own AD<domain> candidate AE and stays demanded (R2-1 (ii) drops only a name carrying ANOTHER domain's prefix) -> one violation naming exactly AESER. Before the fix the unconfirmed domain dropped AESER too, so the missing AESEQ disarmed its sibling's requirement and the dataset passed."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt "$missing_required_variables"="[AESER]"
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | HEADACHE
+---
