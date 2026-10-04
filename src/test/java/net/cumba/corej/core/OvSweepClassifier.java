@@ -15,10 +15,10 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The one classification of a rule's authored {@code Output_Variables} entries behind
- * {@code PLAN-redundant-output-variables-sweep} (Q1, Q2 (a), Q4): which authored include entries
- * the load-time derivation ({@link OutputVariableDeriver}) produces anyway, which of those may be
- * stripped, which must stay as the Q2 residual, and what the effective list is before and after the
- * strip.
+ * {@code PLAN-redundant-output-variables-sweep} (Q1, Q4) and the D3 strip of
+ * {@code PLAN-output-variable-null-key-provenance}: which authored include entries the load-time
+ * derivation ({@link OutputVariableDeriver}) produces anyway — every one of them is stripped — and
+ * what the effective list is before and after the strip.
  *
  * <h2>Computed through the deriver, never a reimplementation</h2>
  * <p>
@@ -32,26 +32,23 @@ import org.jspecify.annotations.Nullable;
  *
  * <h2>Per-variable = the deriver's test ∪ the runtime {@link BindingScope}</h2>
  * <p>
- * On the per-variable projection paths ({@code RuleRunner.evaluateMetadataNative(perVariable)} and
- * {@code evaluateVariableValueNative}) a <em>derived</em> entry that resolves to nothing is omitted
- * while an <em>authored</em> one keeps a {@code null}-valued key
- * ({@code RuleRunner.putUnlessDerivedNull}). Stripping an entry there flips the key, so under Q2
- * (a) only an entry that can never resolve to null — {@code variable_name}, which both paths write
- * unconditionally — is stripped on such a rule; every other derived authored entry is the residual
- * (the committed allowance of {@code RedundantOutputVariableLintTest}, owned and retired by
- * {@code PLAN-output-variable-null-key-provenance}). A rule counts as per-variable when
- * <b>either</b> the deriver's own test fires (its D7 marker: {@code variable_name} is in
- * {@link OutputVariableDeriver#derivedSet}, which happens exactly on the deriver's per-variable /
- * VLM path) <b>or</b> the runtime dispatch {@link BindingScope#of} would route any declared level
- * to {@code PER_VARIABLE} / {@code PER_VARIABLE_ROW}. The union fails safe: should the two
- * predicates ever disagree, the rule is treated as per-variable and nothing but
- * {@code variable_name} is stripped.
+ * The flag is informational (the manifest's {@code perVariable} column). It used to gate the Q2 (a)
+ * residual: until {@code PLAN-output-variable-null-key-provenance} the per-variable projection
+ * paths kept a {@code null}-valued key for an <em>authored</em> entry that resolved to nothing and
+ * omitted a <em>derived</em> one, so stripping an entry there flipped the key, and only
+ * {@code variable_name} was stripped on such a rule. Since that plan every entry projects
+ * identically whatever its provenance (an entry with no value carries its typed default), so the
+ * residual is gone and the strip is the whole of {@code authored ∩ derived} on every rule. A rule
+ * counts as per-variable when <b>either</b> the deriver's own test fires (its D7 marker:
+ * {@code variable_name} is in {@link OutputVariableDeriver#derivedSet}) <b>or</b> the runtime
+ * dispatch {@link BindingScope#of} would route any declared level to {@code PER_VARIABLE} /
+ * {@code PER_VARIABLE_ROW}.
  * </p>
  */
 public final class OvSweepClassifier
 {
 
-    /** The one entry Q2 (a) strips on a per-variable rule — never {@code null} on either path. */
+    /** The column cursor's entry — hoisted to index 0 on per-variable paths (R-9.7). */
     public static final String VARIABLE_NAME = "variable_name";
 
     private OvSweepClassifier()
@@ -72,17 +69,15 @@ public final class OvSweepClassifier
      * @param derived
      *            {@link OutputVariableDeriver#derivedSet} — what the derivation adds
      * @param strip
-     *            the authored entries to remove (authored ∩ derived, minus the residual)
-     * @param residual
-     *            the authored ∩ derived entries kept on a per-variable rule (Q2 (a))
+     *            the authored entries to remove (authored ∩ derived)
      * @param before
      *            the effective list as loaded ({@link OutputVariableDeriver#derive})
      * @param after
      *            the effective list the deriver produces over the stripped authored list
      */
     public record Verdict(String coreId, boolean perVariable, List<String> authored,
-            List<String> exclusions, Set<String> derived, List<String> strip, List<String> residual,
-            List<String> before, List<String> after)
+            List<String> exclusions, Set<String> derived, List<String> strip, List<String> before,
+            List<String> after)
     {
 
         /** The authored include entries that remain after the strip, in order. */
@@ -159,18 +154,9 @@ public final class OvSweepClassifier
         boolean perVariable = perVariable(rule, derived);
 
         List<String> strip = new ArrayList<>();
-        List<String> residual = new ArrayList<>();
         for (String entry : authored)
         {
-            if (!derived.contains(entry))
-            {
-                continue;
-            }
-            if (perVariable && !VARIABLE_NAME.equals(entry))
-            {
-                residual.add(entry);
-            }
-            else
+            if (derived.contains(entry))
             {
                 strip.add(entry);
             }
@@ -190,7 +176,7 @@ public final class OvSweepClassifier
             after = predict(rule, stripped.isEmpty() ? null : stripped);
         }
         return new Verdict(coreId, perVariable, List.copyOf(authored), List.copyOf(exclusions),
-                Set.copyOf(derived), List.copyOf(strip), List.copyOf(residual), before, after);
+                Set.copyOf(derived), List.copyOf(strip), before, after);
     }
 
 

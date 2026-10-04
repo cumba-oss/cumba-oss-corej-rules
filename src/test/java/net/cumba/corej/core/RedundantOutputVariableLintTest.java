@@ -30,19 +30,15 @@ import org.junit.jupiter.api.Test;
  * count — a count is blind to a re-key.
  * </p>
  *
- * <h2>The one allowance — Q2 (a), the committed residual</h2>
+ * <h2>No allowance</h2>
  * <p>
- * On a per-variable projection path an <em>authored</em> entry that resolves to nothing keeps a
- * {@code null}-valued key where a <em>derived</em> one is omitted
- * ({@code RuleRunner.putUnlessDerivedNull}), so stripping it there would flip the finding. Until
- * {@code PLAN-output-variable-null-key-provenance} unifies that projection, those entries are KEPT,
- * and this lint carries them as the committed allowance
- * {@code src/test/resources/ovsweep/q2-residual.tsv} ({@code coreId<TAB>entry}). The allowance is
- * asserted <b>exactly</b> in both directions: an entry the corpus no longer authors is a dead
- * allowance (erosion), and a new per-variable redundant entry that is not in the file is an offence
- * like any other — add it to the roster deliberately or do not author it. Per-variable is the
- * deriver's test ∪ the runtime {@code BindingScope} ({@link OvSweepClassifier#perVariable}), so a
- * disagreement between the two fails safe.
+ * Until {@code PLAN-output-variable-null-key-provenance} the per-variable projection paths kept a
+ * {@code null}-valued key for an <em>authored</em> entry that resolved to nothing and omitted a
+ * <em>derived</em> one, so stripping such an entry would have flipped the finding; the lint carried
+ * those 295 entries of 221 rules as the committed allowance {@code q2-residual.tsv} (Q2 (a)). Since
+ * that plan every entry projects identically whatever its provenance (an entry with no value
+ * carries its typed default), its D3 stripped the allowance and retired the file: a derived
+ * authored entry is an offence on every rule, per-variable or not.
  * </p>
  *
  * <h2>Population, non-vacuity, sensitivity</h2>
@@ -50,19 +46,16 @@ import org.junit.jupiter.api.Test;
  * The population is every rule of every package named by {@code packages.json} (floored), and the
  * authored YAMLs that ship in no package ({@code Executability: Not Executable}) are asserted to be
  * exactly {@code unshipped.txt} — out of scope, but never silently so. Two synthetic rules prove on
- * every run that the classifier flags a redundant plain column and a redundant
- * {@code variable_name}, and that it leaves a per-variable {@code variable_label} to the allowance
- * and a non-derived column alone. The offender roster of each run is written to
- * {@code target/ovsweep-offenders.tsv} so a red run can be diffed against the plan's manifest.
+ * every run that the classifier flags a redundant plain column, a redundant {@code variable_name}
+ * and a redundant per-variable {@code variable_label}, and that it leaves a non-derived column
+ * alone. The offender roster of each run is written to {@code target/ovsweep-offenders.tsv} so a
+ * red run can be diffed against the plan's manifest.
  * </p>
  */
 class RedundantOutputVariableLintTest
 {
 
     static final Path CONTRACTS = CorpusPaths.moduleDir().resolve("src/test/resources/ovsweep");
-
-    /** The committed Q2 (a) allowance. */
-    static final String RESIDUAL_FILE = OvSweepCensus.RESIDUAL_FILE;
 
     /** The committed out-of-scope roster. */
     static final String UNSHIPPED_FILE = OvSweepCensus.UNSHIPPED_FILE;
@@ -98,35 +91,17 @@ class RedundantOutputVariableLintTest
         assertEquals(List.of(), defects, "the census met a load error or a member-set defect");
 
         Set<String> offenders = new TreeSet<>();
-        Set<String> residual = new TreeSet<>();
         for (OvSweepCensus.Row row : census.rows().values())
         {
             for (String entry : row.verdict().strip())
             {
                 offenders.add(row.coreId() + "\t" + entry);
             }
-            for (String entry : row.verdict().residual())
-            {
-                residual.add(row.coreId() + "\t" + entry);
-            }
         }
         Path report = CorpusPaths.moduleDir().resolve("target").resolve("ovsweep-offenders.tsv");
         Files.createDirectories(report.getParent());
         Files.writeString(report, String.join("\n", offenders) + (offenders.isEmpty() ? "" : "\n"),
                 StandardCharsets.UTF_8);
-
-        Set<String> allowance = contract(RESIDUAL_FILE);
-        Set<String> dead = new TreeSet<>(allowance);
-        dead.removeAll(residual);
-        Set<String> unlisted = new TreeSet<>(residual);
-        unlisted.removeAll(allowance);
-        assertEquals(Set.of(), dead,
-                "q2-residual.tsv allows entries the corpus no longer authors as a per-variable"
-                        + " derived entry — a dead allowance; remove the rows");
-        assertEquals(Set.of(), unlisted,
-                "per-variable rules author derived entries that are not in q2-residual.tsv —"
-                        + " do not author them, or add them to the allowance deliberately (the"
-                        + " allowance is owned by PLAN-output-variable-null-key-provenance)");
 
         assertEquals(contract(UNSHIPPED_FILE), new TreeSet<>(census.unshipped()),
                 "the authored YAMLs that carry Output_Variables but ship in no package must be"
@@ -142,9 +117,9 @@ class RedundantOutputVariableLintTest
 
 
     /**
-     * The classifier must flag a redundant plain column and a redundant {@code variable_name}, keep
-     * a non-derived column, and leave a per-variable {@code variable_label} to the allowance — else
-     * the roster above proves nothing.
+     * The classifier must flag a redundant plain column, a redundant {@code variable_name} and a
+     * redundant per-variable {@code variable_label}, and keep a non-derived column — else the
+     * roster above proves nothing.
      */
     private static void sensitivityControl() throws IOException
     {
@@ -165,13 +140,12 @@ class RedundantOutputVariableLintTest
         OvSweepClassifier.Verdict v1 = OvSweepClassifier.classify(r1);
         assertEquals(List.of("AETERM"), v1.strip(),
                 "control: a plain column the Check reads is redundant, STUDYID is not");
-        assertTrue(!v1.perVariable() && v1.residual().isEmpty(), "control 1 is a row-path rule");
+        assertTrue(!v1.perVariable(), "control 1 is a row-path rule");
         OvSweepClassifier.Verdict v2 = OvSweepClassifier.classify(r2);
         assertTrue(v2.perVariable(), "control 2 reads a var_* accessor, so it is per-variable");
-        assertEquals(List.of(OvSweepClassifier.VARIABLE_NAME), v2.strip(),
-                "control: on a per-variable rule only variable_name is stripped");
-        assertEquals(List.of("variable_label"), v2.residual(),
-                "control: a derived variable_label on a per-variable rule is the residual");
+        assertEquals(List.of(OvSweepClassifier.VARIABLE_NAME, "variable_label"), v2.strip(),
+                "control: on a per-variable rule variable_name AND the derived variable_label are"
+                        + " stripped (no residual since PLAN-output-variable-null-key-provenance)");
     }
 
 

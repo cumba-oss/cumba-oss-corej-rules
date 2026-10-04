@@ -70,19 +70,19 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * Before the arms, the manifest is checked against a <b>fresh classification</b> of the corpus
- * ({@link OvSweepClassifier}): a strip entry the classifier would not strip (a non-derived entry,
- * or a Q2 (a) residual entry) is reported as an unlisted strip. That is what makes the
- * <b>sensitivity plants</b> visible: {@code --plant i} strips a non-derived entry (members lost),
- * {@code --plant ii} strips a per-variable residual {@code variable_value} (unlisted strip),
- * {@code --plant iii} applies one rule's strip with the remaining entries reversed (an unlisted
- * reorder: the loader's order differs from the prediction). Each plant must make the run exit 1
- * naming the planted rule.
+ * ({@link OvSweepClassifier}): a strip entry the classifier would not strip (a non-derived entry)
+ * is reported as an unlisted strip. That is what makes the <b>sensitivity plants</b> visible:
+ * {@code --plant i} strips a non-derived entry (members lost), {@code --plant iii} applies one
+ * rule's strip with the remaining entries reversed (an unlisted reorder: the loader's order differs
+ * from the prediction). Each plant must make the run exit 1 naming the planted rule. ({@code ii},
+ * which stripped a per-variable Q2 (a) residual entry, retired with the residual itself —
+ * {@code PLAN-output-variable-null-key-provenance} D3.)
  * </p>
  *
  * <p>
- * Usage (test scope): {@code OvSweepStaticDifferential <manifest.tsv> [--plant i|ii|iii]}. Reads
- * the corpus at {@link CorpusPaths#rules()} and the scenario trees of this module. Exit 0 iff no
- * arm reports a difference. Read-only.
+ * Usage (test scope): {@code OvSweepStaticDifferential <manifest.tsv> [--plant i|iii]}. Reads the
+ * corpus at {@link CorpusPaths#rules()} and the scenario trees of this module. Exit 0 iff no arm
+ * reports a difference. Read-only.
  * </p>
  */
 public final class OvSweepStaticDifferential
@@ -107,7 +107,7 @@ public final class OvSweepStaticDifferential
 
     /** One manifest row (the columns this differential reads). */
     record Row(String coreId, boolean perVariable, List<String> authored, List<String> strip,
-            List<String> residual, List<String> before, List<String> after, boolean orderMoves,
+            List<String> before, List<String> after, boolean orderMoves,
             Set<String> specialisedMoveDomains)
     {
     }
@@ -147,8 +147,7 @@ public final class OvSweepStaticDifferential
     {
         if (args.length < 1)
         {
-            System.err
-                    .println("usage: OvSweepStaticDifferential <manifest.tsv> [--plant i|ii|iii]");
+            System.err.println("usage: OvSweepStaticDifferential <manifest.tsv> [--plant i|iii]");
             System.exit(2);
         }
         String plant = args.length >= 3 && "--plant".equals(args[1]) ? args[2] : null;
@@ -217,8 +216,8 @@ public final class OvSweepStaticDifferential
             }
             rows.put(f[0],
                     new Row(f[0], Boolean.parseBoolean(f[3]), split(f[5]), split(f[7]), split(f[8]),
-                            split(f[9]), split(f[10]), Boolean.parseBoolean(f[11]),
-                            f[15].isEmpty() ? Set.of() : Set.of(f[15].split(",", -1))));
+                            split(f[9]), Boolean.parseBoolean(f[10]),
+                            f[14].isEmpty() ? Set.of() : Set.of(f[14].split(",", -1))));
         }
         return rows;
     }
@@ -251,7 +250,6 @@ public final class OvSweepStaticDifferential
             {
                 List<String> kept = new ArrayList<>(r.authored);
                 kept.removeAll(r.strip);
-                kept.removeAll(r.residual);
                 if (!r.strip.isEmpty() && !kept.isEmpty())
                 {
                     List<String> strip = new ArrayList<>(r.strip);
@@ -259,26 +257,9 @@ public final class OvSweepStaticDifferential
                     List<String> after = new ArrayList<>(r.after);
                     after.remove(kept.get(0));
                     manifest.put(r.coreId, new Row(r.coreId, r.perVariable, r.authored, strip,
-                            r.residual, r.before, after, r.orderMoves, r.specialisedMoveDomains));
+                            r.before, after, r.orderMoves, r.specialisedMoveDomains));
                     System.out.println(
                             "[plant i] " + r.coreId + " strips non-derived " + kept.get(0));
-                    return r.coreId;
-                }
-            }
-        }
-        case "ii" ->
-        {
-            // strip a per-variable residual variable_value
-            for (Row r : manifest.values())
-            {
-                if (r.perVariable && r.residual.contains("variable_value"))
-                {
-                    List<String> strip = new ArrayList<>(r.strip);
-                    strip.add("variable_value");
-                    manifest.put(r.coreId, new Row(r.coreId, r.perVariable, r.authored, strip,
-                            r.residual, r.before, r.after, r.orderMoves, r.specialisedMoveDomains));
-                    System.out
-                            .println("[plant ii] " + r.coreId + " strips residual variable_value");
                     return r.coreId;
                 }
             }
@@ -338,8 +319,7 @@ public final class OvSweepStaticDifferential
                 {
                     ledger.problem("consistency: " + e.getKey()
                             + " manifest strips entries the classifier does not (unlisted strip): "
-                            + extra + " (classifier strip " + v.strip() + ", residual "
-                            + v.residual() + ")");
+                            + extra + " (classifier strip " + v.strip() + ")");
                 }
                 Set<String> missing = new LinkedHashSet<>(v.strip());
                 row.strip.forEach(missing::remove);

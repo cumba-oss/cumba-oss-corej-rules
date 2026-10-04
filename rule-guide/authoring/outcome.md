@@ -65,12 +65,10 @@ lead, and the derived columns follow in walk order.
 > will be wrong in exactly the cases that matter. Context columns are the one deliberate
 > exception, and they should be rare.
 
-> ⚠ **One case still wants an authored entry the engine would derive:** on a rule that iterates
-> variables (`varname()`, `value()`, a `var_*` accessor), an *authored* entry whose value is
-> missing keeps a `null`-valued key where a *derived* one is silently dropped. Until the engine
-> unifies that, such entries (other than `variable_name`) stay authored, and the build keeps the
-> list of them in `src/test/resources/ovsweep/q2-residual.tsv` — a new one must be added there
-> deliberately.
+> ℹ **An entry with no value is reported the same way whether you wrote it or the engine derived
+> it:** a char attribute prints `""`, a numeric, boolean or list one prints `.`, an absent column
+> is left out, and a present column's missing cell prints its own missing marker. So there is
+> never a reason to author an entry the engine derives — the build fails on one.
 
 ### Excluding with `!`
 
