@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0709 expect=noViolation domain=ADLBC
+#note "CR709's exception, through the template leg (PLAN-library-template-label-resolution T2 review M1): variables whose names contain the index w, y or zz are excepted. CRIT1 resolves to the BDS template CRITy, ANL01FL to ANLzzFL, and PH1SDT - an ADSL variable copied into a BDS dataset (D9) - to the ADSL template PHwSDT; each carries a WRONG label on purpose, and var_name(\"LIBRARY\") is the template name, so var_name(\"LIBRARY\") !~ /[wyz]/ excepts all three -> silent. Labels as our store publishes them (adamig-1-3). Proven to have teeth: with that conjunct removed from AD0709 all three columns are reported; PMDA-AD0018-invalid_index_wyz_checked-ADLBC is the twin that checks them (no such exception), pinning the difference."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC CRITy name=CRITy label="Analysis Criterion y"
+#library variable-metadata ADLBC ANLzzFL name=ANLzzFL label="Analysis Flag zz"
+#library variable-metadata ADSL PHwSDT name=PHwSDT label="Phase w Start Date" simpleDatatype=Num
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col CRIT1 type=Char label="Criterion 1"
+col ANL01FL type=Char label="Analysis Flag 1"
+col PH1SDT type=Num label="Start Date of Phase 1"
+---
+CDISCPILOT01 | ALB | ALB>2 | Y | 1
+---

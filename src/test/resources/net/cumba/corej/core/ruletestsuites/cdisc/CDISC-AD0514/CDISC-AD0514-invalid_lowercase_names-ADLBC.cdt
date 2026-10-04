@@ -1,8 +1,7 @@
 #!RuleTest
 #test CDISC-AD0514 expect=violation domain=ADLBC
-#note "Authority: ADaM Conformance Rules v5.0 CR514 ('A variable ending in STMF must contain Start Time Imputation Flag in the label'). Lowercase names on the rule's two name tests: astmf ends in STMF and its label 'Start Time Flag' has no Imputation-Flag suffix -> one violation, reported as astmf. trtstmf and tr01stmf carry the same non-conforming label but are the rule's own ^TR(T|nn)STMF$ exclusion, so they stay silent only if the exclusion also folds the name (CIT 3)."
+#note "Authority: ADaM Conformance Rules v5.0 CR514 ('A variable ending in STMF must contain Start Time Imputation Flag in the label'). Lowercase names on the rule's two name tests: astmf ends in STMF and its label 'Start Time Flag' has no Imputation-Flag suffix -> one violation, reported as astmf. trtstmf and tr01stmf carry the same non-conforming label but resolve, ignoring letter case (CIT 1), to the ADSL literal TRTSTMF and the ADSL template TRxxSTMF (D9, PLAN-library-template-label-resolution), so var_name(\"LIBRARY\") is not *STMF and the rule does not judge them."
 #library standard=adamig version=1-3
-#library column-order ADLBC STUDYID USUBJID PARAMCD
 #library variable-metadata ADLBC *STMF name=*STMF label="{Start Time Imputation Flag}"
 #library variable-metadata ADLBC *TMF name=*TMF label="{Time Imputation Flag}"
 #library variable-metadata ADSL TRTSTMF name=TRTSTMF label="Time of First Exposure Imput. Flag"

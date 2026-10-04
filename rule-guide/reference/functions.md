@@ -578,7 +578,7 @@ with [`upper`](#upper)'s list form (rulings register `CIT §3`).
 True when `label` conforms to `template`, a library label read as a template ([`label_template`](#label_template)). The grammar is the ADaM implementation guide's own rule for its labels:
 
 - a **`{phrase}`** must occur somewhere in the label, which is otherwise free (*"labels containing a word or phrase in brackets should be replaced by the producer with appropriate text that contains the bracketed word or phrase somewhere in the text"*): `Start Date of Rescue Med` and `Rescue Med Start Date` both conform to `{Start Date}`;
-- **`...`** is any text, including none, with the whitespace beside it optional: `Analysis Category 1` and `Analysis Category 1 (Low)` both conform to `Analysis Category 1 ...`, and `Start Date of First Dose` to ADaMIG 1.0's `Start Date of ...`;
+- **`...`** is any text, including none, with the whitespace beside it optional: `Analysis Value Category 1` and `Analysis Value Category 1 (Low)` both conform to `Analysis Value Category 1 ...`, and `Start Date of First Dose` to ADaMIG 1.0's `Start Date of ...`. Where the fixed text beside it ends (or starts) with a letter or digit, the free text is empty or set off from it by a non-alphanumeric character: text glued to the fixed text is not free text, it changes the word or the index the fixed text ends in — `Analysis Value Category 12` is `AVALCAT12`'s label and does **not** conform to `AVALCAT1`'s `Analysis Value Category 1 ...`, nor `Analysis Flag 012` to `Analysis Flag 01 ...` (the implementation guide allows descriptive text *at the end* of the label, i.e. after it). Any non-alphanumeric character is such a boundary — `Analysis Flag 01, Primary` conforms;
 - **fixed text** matches exactly, letter case included — `Planned Treatment for Period 01` conforms only to itself;
 - **`Imput.` is `Imputation`** on both sides — the one abbreviation the implementation guide itself publishes (`Date of First Exposure Imput. Flag`); no other.
 
@@ -2809,13 +2809,15 @@ A **registry function** since wave 4 of the operations→functions programme (`P
 
 ```yaml
 Bindings:
-- name: "$library_variables"
+- name: "$allowed_variables"
+  expression: 'get_model_column_order()'
+- name: "$library_order"
   expression: 'get_column_order_from_library()'
 Check:
-  expression: 'upper(varname()) not in $library_variables'
+  expression: 'upper(varname()) in $allowed_variables and upper(varname()) not in $library_order'
 ```
 
-The example above is the complete call.
+The example above is the complete call: a variable the model allows that the implementation guide does not list for the domain (`FDA-SD1076` / `PMDA-SD1076`). For an ADaM dataset the list is the governing data structure's (ADSL, BDS, OCCDS …), selected as `Scope.Data_Structures` detects it, with its naming templates substituted against the dataset's columns (`TRTxxP` → the dataset's `TRT01P`) as `required_variables()` substitutes them. The ADaM stem rules `CDISC-AD0503`–`AD0520` do not read it: they select their stem through the library read, `var_name("LIBRARY") == "*SDT"`.
 
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is *library not available* (*"Rule skipped — library returned no data for get_column_order_from_library"*). To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
 
@@ -2966,7 +2968,7 @@ expression: 'not empty(label_template("LIBRARY")) and not matches_label_template
 
 **How the column finds its template.** An ADaM product's variables are keyed by **data structure** (ADSL, BDS, OCCDS …), and the dataset's structures are detected as the `Scope.Data_Structures` gate detects them (the Define-XML declaration first). Within the governing structure the column resolves, in order: by its **literal** name; through a published **index template** — `TRT01P` is `TRTxxP`, `AVALCAT1` is `AVALCATy`, `P02S1SDT` is `PxxSwSDT`, with `xx`/`zz` two digits, `y` any number and `w` one digit; through the **ADSL** structure (an ADSL variable copied into a BDS or OCCDS dataset keeps its ADSL definition); and last through the longest published `*`-**stem** (`XXSDT` is `*SDT`'s, never `*DT`'s). `var_name("LIBRARY")` then names what resolved — the published spelling, the template (`TRTxxP`) or the stem (`*SDT`) — and `var_label("LIBRARY")` the label with the column's digits substituted as whole words (`Planned Treatment for Period 01`). A `*`-stem serves **no label** and no type, only its phrase here, so a rule guarded by `not empty(var_label("LIBRARY"))` never judges a stem column — the stem rules (`CDISC-AD0503`–`AD0520`) select their stem with `var_name("LIBRARY") == "*SDT"`.
 
-**What the template holds.** For a literal, the label itself. For an index template, the substituted label, and — when the name carries `y` or `zz` — a trailing ` ...`, the IG's descriptive tail (*"descriptive text is allowed at the end of the labels of variables whose names contain indexes 'y' or 'zz'"*): `AVALCAT1` → `Analysis Category 1 ...`, `TRT01P` → `Planned Treatment for Period 01` (an `xx` name allows none). For a stem, the published phrase: `{Start Date}`; ADaMIG 1.0 spells it `Start Date of ...`. **Missing** — so a `not empty(label_template("LIBRARY"))` guard decides — for a column the Library does not know, a column spelled like the template itself (`TRTXXP`), and two templates matching one column.
+**What the template holds.** For a literal, the label itself. For an index template, the substituted label, and — when the name carries `y` or `zz` — a trailing ` ...`, the IG's descriptive tail (*"descriptive text is allowed at the end of the labels of variables whose names contain indexes 'y' or 'zz'"*): `AVALCAT1` → `Analysis Value Category 1 ...` (ADaMIG 1.1–1.3; ADaMIG 1.0 publishes `Analysis Category y`, so there it is `Analysis Category 1 ...`), `TRT01P` → `Planned Treatment for Period 01` (an `xx` name allows none). For a stem, the published phrase: `{Start Date}`; ADaMIG 1.0 spells it `Start Date of ...`. **Missing** — so a `not empty(label_template("LIBRARY"))` guard decides — for a column the Library does not know, a column spelled like the template itself (`TRTXXP`), two templates matching one column, and one name the structure publishes twice with different labels: the OCCDS structures publish `DECDORGw` both as the MedDRA `PT in Original Dictionary w` and as the WHO Drug `Standardized Med Name in Orig Dict w`, and which one a `DECDORG1` must carry depends on a dictionary the name does not tell. Where a subclass structure publishes a name its base publishes too, the subclass's row governs.
 
 **An ADaMIG 1.1 run and ADAE.** ADaMIG 1.1 publishes no occurrence structure; the OCCDS product of the IG's own generation is added for the run (OCCDS 1.0 for ADaMIG 1.1, OCCDS 1.1 for 1.2 and 1.3) unless a product publishing one is declared with `-mp`, and the run log names it. Nothing is added for ADaMIG 1.0 or a TIG leg.
 

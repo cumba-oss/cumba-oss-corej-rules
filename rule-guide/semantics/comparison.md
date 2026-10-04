@@ -230,13 +230,18 @@ case.
 > so a cell that names a column in exactly the column's own spelling (an all-lowercase study) still
 > matches. The naming rules (`varname() =~ /.*[a-z]/`, `varname() !~ /^[A-Z0-9_]+$/` and kin) test
 > the letter case or the characters of the name on purpose and are never folded. A template
-> carve-out is different: the label rules `CDISC-AD0018` / `AD0709` / `PMDA-AD0018` skip a variable
-> whose name contains an index (ruling `M2-D15`), and they recognise it on the **library** name the
-> column resolved to — `var_name("LIBRARY") !~ /[a-z]/`, where a template keeps its lower-case
-> index (`TRTxxP`, `CRITy`) — never on the dataset's own spelling, which a lowercase study spells
-> in lower case throughout. A library name is the standard's spelling, not the data's, so testing
-> it needs no fold; where the rule also pairs the two names it does so case-insensitively,
-> `equalsIgnoreCase(varname(), var_name("LIBRARY"))`.
+> carve-out is different: the label rules recognise a variable whose name contains an index on the
+> **library** name the column resolved to, never on the dataset's own spelling, which a lowercase
+> study spells in lower case throughout. A column named after a naming template (`TRT01P`, or
+> `trt01p`) resolves to the template itself, which keeps its lower-case index (`TRTxxP`), and
+> `label_template("LIBRARY")` serves the template's label with the index substituted (`Planned
+> Treatment for Period 01`). Each rule keeps its own authority's exception (ruling `M2-D15`):
+> `CDISC-AD0018` excludes every index name, `var_name("LIBRARY") !~ /[a-z]/`; `CDISC-AD0709`
+> excludes the indexes `w`, `y` and `zz` only, `var_name("LIBRARY") !~ /[wyz]/`, and judges an
+> `xx` name with `matches_label_template(var_label("DATA"), label_template("LIBRARY"))`;
+> `PMDA-AD0018` states no exception and judges every index name that way. A library name is the
+> standard's spelling, not the data's, so testing it needs no fold, and the resolution itself
+> ignores letter case.
 
 ### Dates — ask for one, and you get one
 

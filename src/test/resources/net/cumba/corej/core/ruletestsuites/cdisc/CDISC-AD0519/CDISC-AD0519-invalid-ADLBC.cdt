@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-AD0519 expect=violation domain=ADLBC
 # Rule:Description: A variable ending in EDTF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "End" and "Date"
-#note "AEDTF has no Imputation-Flag suffix; BEDTF lacks "End"; CEDTF lacks "Date"; DEDTF carries the phrase but not at the END; EEDTF differs only in CASE. TR1EDTF, TRTEDTF, TR01EDTF and TR99EDTF all carry the SAME label, so only the ^TR(T|[0-9]{2})EDTF$ exclusion separates them: the near-miss TR1EDTF (one digit) still fires, the three excluded names do not."
+#note "AEDTF has no Imputation-Flag suffix; BEDTF lacks "End"; CEDTF lacks "Date"; DEDTF carries the phrase but not at the END; EEDTF differs only in CASE. TR1EDTF, TRTEDTF, TR01EDTF and TR99EDTF all carry the SAME label, and only the library tells them apart: TRTEDTF is the ADSL literal TRTEDTF and TR01EDTF / TR99EDTF match the ADSL template TRxxEDTF (D9, PLAN-library-template-label-resolution), so var_name(\"LIBRARY\") is not *EDTF and the rule does not judge them; the near-miss TR1EDTF (one digit) matches no template, falls to the *EDTF stem and still fires."
 #expectViolationCount 6
 #expectViolationAt variable_label="End Date Flag" variable_name=AEDTF
 #expectViolationAt variable_label="Analysis Date Imput. Flag" variable_name=BEDTF
@@ -10,7 +10,6 @@
 #expectViolationAt variable_label="Analysis End Date imputation Flag" variable_name=EEDTF
 #expectViolationAt variable_label="Date of Last Exposure Imput. Flag" variable_name=TR1EDTF
 #library standard=adamig version=1-3
-#library column-order ADLBC STUDYID USUBJID PARAMCD
 #library variable-metadata ADLBC *EDTF name=*EDTF label="{End Date Imputation Flag}"
 #library variable-metadata ADLBC *DTF name=*DTF label="{Date Imputation Flag}"
 #library variable-metadata ADSL TRTEDTF name=TRTEDTF label="Date of Last Exposure Imput. Flag"

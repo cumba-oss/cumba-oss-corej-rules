@@ -1,9 +1,8 @@
 #!RuleTest
 #test CDISC-AD0507 expect=noViolation domain=ADLBC
 # Rule:Description: A variable ending in DTF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Date"
-#note "CDISC's own ADaMIG labels: ADTF spells Imputation in full, PHEDTF abbreviates to "Imput.", and DTHDTF / TRTEDTF interleave words between "Date" and the suffix -> all accepted"
+#note "Labels in the shapes of CDISC's own ADaMIG labels, on sponsor names: XDTF spells Imputation in full (as ADTF does), XHEDTF abbreviates to "Imput." (as PHEDTF), and XTHDTF / XRTEDTF interleave words between "Date" and the suffix (as DTHDTF / TRTEDTF) -> all accepted. The real ADaMIG names resolve to their own literal or template rows in the product and are never judged by a stem rule (PLAN-library-template-label-resolution T2 review L4), so the scenario uses sponsor names to stay on the stem leg."
 #library standard=adamig version=1-3
-#library column-order ADLBC STUDYID USUBJID PARAMCD
 #library variable-metadata ADLBC *DTF name=*DTF label="{Date Imputation Flag}"
 #library variable-metadata ADLBC *SDTF name=*SDTF label="{Start Date Imputation Flag}"
 #library variable-metadata ADLBC *EDTF name=*EDTF label="{End Date Imputation Flag}"
@@ -11,10 +10,10 @@ dataset ADLBC class=BDS
 col STUDYID type=Char
 col USUBJID type=Char
 col PARAMCD type=Char
-col ADTF type=Char label="Analysis Date Imputation Flag"
-col PHEDTF type=Char label="Phase End Date Imput. Flag"
-col DTHDTF type=Char label="Date of Death Imputation Flag"
-col TRTEDTF type=Char label="Date of Last Exposure Imput. Flag"
+col XDTF type=Char label="Analysis Date Imputation Flag"
+col XHEDTF type=Char label="Phase End Date Imput. Flag"
+col XTHDTF type=Char label="Date of Death Imputation Flag"
+col XRTEDTF type=Char label="Date of Last Exposure Imput. Flag"
 ---
 CDISCPILOT01 | 01-701-1015 | ALB | x | x | x | x
 ---

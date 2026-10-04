@@ -1,15 +1,14 @@
 #!RuleTest
 #test CDISC-AD0507 expect=violation domain=ADLBC
 # Rule:Description: A variable ending in DTF must have a label that ends with "Imputation Flag" (or "Imput. Flag") and contains "Date"
-#note "ADTF has no Imputation-Flag suffix; BDTF has the suffix but no "Date"; CDTF carries the phrase but not at the END; DDTF and FDTF differ from a passing label only in CASE -> five violations"
+#note "XDTF has no Imputation-Flag suffix; BDTF has the suffix but no "Date"; CDTF carries the phrase but not at the END; DDTF and FDTF differ from a passing label only in CASE -> five violations"
 #expectViolationCount 5
-#expectViolationAt variable_label="Date Flag" variable_name=ADTF
+#expectViolationAt variable_label="Date Flag" variable_name=XDTF
 #expectViolationAt variable_label="Analysis Imputation Flag" variable_name=BDTF
 #expectViolationAt variable_label="Date Imputation Flag Extra" variable_name=CDTF
 #expectViolationAt variable_label="Analysis Date imputation Flag" variable_name=DDTF
 #expectViolationAt variable_label="Analysis date Imputation Flag" variable_name=FDTF
 #library standard=adamig version=1-3
-#library column-order ADLBC STUDYID USUBJID PARAMCD
 #library variable-metadata ADLBC *DTF name=*DTF label="{Date Imputation Flag}"
 #library variable-metadata ADLBC *SDTF name=*SDTF label="{Start Date Imputation Flag}"
 #library variable-metadata ADLBC *EDTF name=*EDTF label="{End Date Imputation Flag}"
@@ -17,7 +16,7 @@ dataset ADLBC class=BDS
 col STUDYID type=Char
 col USUBJID type=Char
 col PARAMCD type=Char
-col ADTF type=Char label="Date Flag"
+col XDTF type=Char label="Date Flag"
 col BDTF type=Char label="Analysis Imputation Flag"
 col CDTF type=Char label="Date Imputation Flag Extra"
 col DDTF type=Char label="Analysis Date imputation Flag"

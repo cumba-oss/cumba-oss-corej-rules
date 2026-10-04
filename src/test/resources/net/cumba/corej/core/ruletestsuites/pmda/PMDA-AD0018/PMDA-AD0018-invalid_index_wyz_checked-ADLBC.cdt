@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-AD0018 expect=violation domain=ADLBC
+#note "PMDA-AD0018 states no index exception (PLAN-library-template-label-resolution QH1 (a), T2 review M1): the same three columns CDISC-AD0709-valid_index_wyz_excepted-ADLBC excepts are checked here against their resolved templates - CRIT1 against 'Analysis Criterion 1 ...' (BDS CRITy, a y name: the descriptive tail is allowed, but the fixed text must open the label), ANL01FL against 'Analysis Flag 01 ...' (BDS ANLzzFL), PH1SDT against 'Phase 1 Start Date' (the ADSL template PHwSDT, D9; a w name, no tail). All three labels are wrong -> three violations. Pins the difference between the two rules."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC CRITy name=CRITy label="Analysis Criterion y"
+#library variable-metadata ADLBC ANLzzFL name=ANLzzFL label="Analysis Flag zz"
+#library variable-metadata ADSL PHwSDT name=PHwSDT label="Phase w Start Date" simpleDatatype=Num
+#expectViolationCount 3
+#expectViolationAt variable_name=CRIT1 library_variable_label_template="Analysis Criterion 1 ..." variable_label="Criterion 1"
+#expectViolationAt variable_name=ANL01FL library_variable_label_template="Analysis Flag 01 ..." variable_label="Analysis Flag 1"
+#expectViolationAt variable_name=PH1SDT library_variable_label_template="Phase 1 Start Date" variable_label="Start Date of Phase 1"
+dataset ADLBC structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col CRIT1 type=Char label="Criterion 1"
+col ANL01FL type=Char label="Analysis Flag 1"
+col PH1SDT type=Num label="Start Date of Phase 1"
+---
+CDISCPILOT01 | ALB | ALB>2 | Y | 1
+---
