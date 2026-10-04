@@ -257,12 +257,22 @@ expression: 'empty(AGE)'
 
 `var_exists(x)` → **boolean**
 
-True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))`). The column part of a dotted string matches in any letter case (`var_exists("ADSL.trt01p")` finds `TRT01P`); the dataset qualifier is matched as written. A negated spelling `var_not_exists(x)` exists; prefer `not var_exists(x)`.
+True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))`). The column part of a dotted string matches in any letter case (`var_exists("ADSL.trt01p")` finds `TRT01P`); the dataset qualifier is matched as written. A negated spelling `var_not_exists(x)` exists; for a written name prefer `not var_exists(x)` (a computed name needs a guard — see *Missing and empty* below).
 
 A written name (a literal or a column reference) is one fact for the whole dataset. A **computed**
 name is tested **per row** — the rule runs at record level — and resolves exactly as the written
 name would (the dataset through the run's resolver, the SUPP QNAM pivot included). A computed name
 that starts with `--` is not specialised to the domain: it answers as any absent name.
+
+**Through a binding**, `var_exists($n)` answers exactly as the binding's expression written in
+its place. A binding that holds a **written** name — `$c: TRT01P`, `$n: "--SEQ"`,
+`$d: ADSL.TRT01P` — is that name: one fact for the dataset, `--` specialised as for the literal
+(`var_exists($c)` asks whether the column TRT01P exists, never what its cells say); a `${…}`
+template stays the template, per row. A binding that holds a **computed** name —
+`$n: concat("ADSL.TRT", printf("%02d", APERIOD), "P")` — is tested per row, as the computed name
+written inline is. An argument whose type cannot name a column — a number, a boolean, a date, a
+list such as `find_vars(…)` — is a load error (`PARAMETER_TYPE`), bound or inline. To test the
+column a cell names, read the cell: `var_exists(colref("IDVAR"))`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -274,8 +284,12 @@ that starts with `--` is not specialised to the domain: it answers as any absent
 expression: 'var_exists("AWU")'
 ```
 
-**Missing and empty** — A computed name that is missing (or a value that is not text) fires for
-**neither** polarity: `var_exists(…)` and `not var_exists(…)` are both false on that row.
+**Missing and empty** — A computed name that is missing (a missing driver, or one `printf`
+cannot format: `printf("%02d", 1.5)` is missing) or a value that is not text names no column, and
+then **both** `var_exists(…)` and `var_not_exists(…)` are false on that row. `not var_exists(…)`
+is therefore **true** there — `not` flips the false — so a rule that reports an absent computed
+column guards the name: `not empty($n) and not var_exists($n)`. A guard on the driver alone
+(`not empty(APERIOD)`) does not cover a driver the name cannot be built from.
 
 ### var_is_null
 

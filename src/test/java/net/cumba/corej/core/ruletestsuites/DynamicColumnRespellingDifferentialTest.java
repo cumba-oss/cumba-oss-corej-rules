@@ -99,7 +99,7 @@ import org.opentest4j.TestAbortedException;
  * </p>
  *
  * <p>
- * <b>The contract is committed.</b> The plan's 24 expected moves are
+ * <b>The contract is committed.</b> The plan's 26 expected moves are
  * {@code src/test/resources/respell-differential/expected-moves.txt} (verdict moves) and
  * {@code expected-report-moves.txt} (verdict-neutral row moves), read when the matching property is
  * absent. A default run (no {@code corej.respell.*} property besides the base) also pins its
@@ -185,7 +185,7 @@ class DynamicColumnRespellingDifferentialTest
             "CDISC-AD0897");
 
     /** The default run's scenario count; the rule roster is {@code population.txt}. */
-    static final int EXPECTED_SCENARIOS = 171;
+    static final int EXPECTED_SCENARIOS = 173;
 
     /** {@code ${…}} rules of the default population with no scenario directory in either family. */
     private static final Set<String> EXPECTED_WITHOUT_SCENARIOS = Set.of();

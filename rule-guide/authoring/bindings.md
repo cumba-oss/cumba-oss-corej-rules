@@ -129,6 +129,27 @@ Check:
   expression: '$subject_visit_count > 0 and $subject_visit_count < 2'
 ```
 
+A `$`-name answers **exactly as its expression written in its place** — wherever the expression is
+accepted, the binding is, and the other way round. That holds for a column name handed to
+[`var_exists`](../reference/functions.md#var_exists) / `var_not_exists` too:
+
+```yaml
+Bindings:
+- name: "$trt_p"                         # a COMPUTED name: tested per row
+  expression: 'concat("ADSL.TRT", printf("%02d", APERIOD), "P")'
+- name: "$planned"                       # a WRITTEN name: one fact for the dataset
+  expression: "ADSL.TRT01P"
+Check:
+  expression: 'not empty($trt_p) and not var_exists($trt_p)'
+```
+
+`var_exists($planned)` is `var_exists(ADSL.TRT01P)` — whether that column exists, not what its
+cells hold — and `var_exists($trt_p)` is `var_exists(concat(…))`, asked of each row's name. A
+computed name that comes out missing makes both `var_exists` and `var_not_exists` false on that
+row, so `not var_exists($trt_p)` alone would be true there: guard the name with
+`not empty($trt_p)`. A binding whose type cannot name a column (a number, a date, a list) handed
+to `var_exists` is a load error (`PARAMETER_TYPE`), as the same expression written inline is.
+
 ## When not to use one
 
 **When the expression is already clear.** A binding that wraps a single column reference, or a
