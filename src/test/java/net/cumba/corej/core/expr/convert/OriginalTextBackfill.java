@@ -962,8 +962,7 @@ public final class OriginalTextBackfill
      * {@code …-DRAFT} is never mis-stripped — the hyphen arm requires a digit before the hyphen).
      * {@code Fix #248} widened this copy; it must stay in step with the identical predicate in
      * {@code ShippedSourceBlockMatchesWorkbookTest} and with
-     * {@code RuleEquivalenceInventory.splitBases} / {@code generate-inventory.py}'s
-     * {@code build_split_bases}.
+     * {@code RuleEquivalenceInventory.splitBases}.
      */
     static String stripSplitSuffix(String id)
     {
