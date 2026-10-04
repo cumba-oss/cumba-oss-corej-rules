@@ -218,8 +218,18 @@ public final class SpecRunner
         return executeAssert(spec);
     }
 
+    /**
+     * Everything {@link #executeAssert} and {@link #executeRaw} share: the fixture tables, the
+     * scaffolded rule, the primary dataset, the resolver, the library provider and the scope
+     * verdict. One method, so the two entry points cannot drift apart.
+     */
+    private record Prepared(Rule rule, IDataTable primaryTable, String primaryDomain,
+            DatasetResolver resolver, MetadataProvider library, List<String> rowKey,
+            String cdiscDomain, @Nullable String scopeSkipReason)
+    {
+    }
 
-    private static SpecResult executeAssert(SpecSchema spec) throws IOException
+    private static Prepared prepare(SpecSchema spec) throws IOException
     {
         Map<String, IDataTable> tables = FixtureLoader.build(spec.datasets());
 
@@ -325,6 +335,48 @@ public final class SpecRunner
                 ? describeSpecScopeMismatch(rule, primaryDomain, primaryUnsplit, primaryTable,
                         library)
                 : null;
+        return new Prepared(rule, primaryTable, primaryDomain, resolver, library, rowKey,
+                cdiscDomain, scopeSkipReason);
+    }
+
+
+    /**
+     * The <b>raw</b> engine result of a spec — the same preparation and execution as {@link #run},
+     * without the {@link ViolationNormaliser} projection (which keeps neither the level, the keys,
+     * the unit nor the group key, reads {@code ""} as null and sorts {@code $}-lists). For
+     * {@code DynamicColumnRespellingDifferentialTest}, which compares the whole finding rows of two
+     * texts of one rule.
+     *
+     * @param spec
+     *            the parsed spec
+     * @return the engine result, or {@code null} when the primary dataset is outside the rule's
+     *         scope (the spec harness then reports a SKIPPED without running the rule)
+     * @throws IOException
+     *             if a fixture cannot be read
+     */
+    public static @Nullable RuleExecutionResult executeRaw(SpecSchema spec) throws IOException
+    {
+        Prepared p = prepare(spec);
+        if (p.scopeSkipReason() != null)
+        {
+            return null;
+        }
+        return RuleRunnerCalls.execute(p.rule(), p.primaryTable(), p.resolver(), p.cdiscDomain(),
+                p.library(), /*joinCache=*/null, defineProviderFrom(spec.name(), spec.defineXml()));
+    }
+
+
+    private static SpecResult executeAssert(SpecSchema spec) throws IOException
+    {
+        Prepared prepared = prepare(spec);
+        Rule rule = prepared.rule();
+        IDataTable primaryTable = prepared.primaryTable();
+        String primaryDomain = prepared.primaryDomain();
+        DatasetResolver resolver = prepared.resolver();
+        MetadataProvider library = prepared.library();
+        List<String> rowKey = prepared.rowKey();
+        String cdiscDomain = prepared.cdiscDomain();
+        String scopeSkipReason = prepared.scopeSkipReason();
         if (scopeSkipReason != null)
         {
             List<CanonicalViolation> emptyObserved = List.of();
