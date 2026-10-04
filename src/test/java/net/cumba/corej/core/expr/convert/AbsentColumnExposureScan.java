@@ -121,9 +121,9 @@ public final class AbsentColumnExposureScan
      * ⚑ The derivation changed exactly ONE member here — {@code time}. {@code str} was already in
      * the hand list and stays in, which is the answer to R2-13's question about it: a
      * {@code str(X)} wrapper leaves the operand the column under test, so the scan must see through
-     * it. The opposite treatment at {@code CheckExprUnits} / {@code DualFormCheckNode} is about the
-     * retired v1 vocabulary having no type-insensitive-equality family, not about what {@code str}
-     * wraps.
+     * it. The opposite treatment at {@code CheckExprUnits} (and at the deleted operator-leaf
+     * lowering) is about the retired v1 vocabulary having no type-insensitive-equality family, not
+     * about what {@code str} wraps.
      * </p>
      *
      * <p>

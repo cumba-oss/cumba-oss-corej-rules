@@ -13,11 +13,21 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Set;
+import net.cumba.corej.core.expr.CheckExpressionParser;
+import net.cumba.corej.core.expr.ast.Expr;
 import org.junit.jupiter.api.Test;
 
 /**
  * Every case here is drawn from a real corpus pair. The pairs named in the comments are the ones
  * that a naive comparison mis-buckets; see {@code plans/done/PLAN-rule-inventory.md} §2.2.
+ *
+ * <p>
+ * ⚑ The L1 cases take <b>expression</b> input since {@code PLAN-retire-check-lowering} (H5): L1 is
+ * computed on the parsed {@link Expr}, and the operator-leaf fixtures these cases used to be
+ * written in are a load error. Each property — free {@code $}-names, operand order, flattening,
+ * class-aware guard stripping — was re-proven red-first against a canonicaliser with its sort
+ * disabled before the switch.
+ * </p>
  */
 class RuleFingerprintTest
 {
@@ -36,6 +46,12 @@ class RuleFingerprintTest
         }
     }
 
+
+    private static Expr parse(String expression)
+    {
+        return CheckExpressionParser.parse(expression);
+    }
+
     // ------------------------------------------------------------ α-rename
 
 
@@ -46,26 +62,20 @@ class RuleFingerprintTest
         JsonNode fda = rule("""
                 Bindings:
                 - name: "$HLTSUBJI_N"
-                  operator: "record_count"
-                  group: ["STUDYID"]
+                  expression: "record_count(group=[STUDYID])"
                 Check:
-                  all:
-                  - name: "$HLTSUBJI_N"
-                    operator: "greater_than_or_equal_to"
-                    value: 1
+                  expression: "$HLTSUBJI_N >= 1"
                 """);
         JsonNode pmda = rule("""
                 Bindings:
                 - name: "$HLTSUBJI_N_COUNT"
-                  operator: "record_count"
-                  group: ["STUDYID"]
+                  expression: "record_count(group=[STUDYID])"
                 Check:
-                  all:
-                  - name: "$HLTSUBJI_N_COUNT"
-                    operator: "greater_than_or_equal_to"
-                    value: 1
+                  expression: "$HLTSUBJI_N_COUNT >= 1"
                 """);
         assertEquals(RuleFingerprint.l1(fda, false), RuleFingerprint.l1(pmda, false));
+        assertTrue(RuleFingerprint.l1(fda, false).contains("$__0 >= 1"),
+                "the renamed id reaches the printed Check: " + RuleFingerprint.l1(fda, false));
     }
 
 
@@ -76,12 +86,9 @@ class RuleFingerprintTest
         JsonNode fda = rule("""
                 Bindings:
                 - name: "$a"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
-                  all:
-                  - name: "$a"
-                    operator: "greater_than"
-                    value: 1
+                  expression: "$a > 1"
                 Outcome:
                   Message: "m"
                   Output_Variables: ["$a", "TSVAL"]
@@ -89,12 +96,9 @@ class RuleFingerprintTest
         JsonNode pmda = rule("""
                 Bindings:
                 - name: "$a_count"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
-                  all:
-                  - name: "$a_count"
-                    operator: "greater_than"
-                    value: 1
+                  expression: "$a_count > 1"
                 Outcome:
                   Message: "m"
                   Output_Variables: ["$a_count", "TSVAL"]
@@ -103,29 +107,23 @@ class RuleFingerprintTest
     }
 
 
-    /** Two operations that compute different things must never collapse onto one synthetic id. */
+    /** Two bindings that compute different things must never collapse onto one synthetic id. */
     @Test
     void alphaRenameDoesNotMergeGenuinelyDifferentOperations()
     {
         JsonNode a = rule("""
                 Bindings:
                 - name: "$x"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
-                  all:
-                  - name: "$x"
-                    operator: "greater_than"
-                    value: 1
+                  expression: "$x > 1"
                 """);
         JsonNode b = rule("""
                 Bindings:
                 - name: "$x"
-                  operator: "distinct"
+                  expression: "distinct(USUBJID)"
                 Check:
-                  all:
-                  - name: "$x"
-                    operator: "greater_than"
-                    value: 1
+                  expression: "$x > 1"
                 """);
         assertNotEquals(RuleFingerprint.l1(a, false), RuleFingerprint.l1(b, false));
     }
@@ -139,48 +137,60 @@ class RuleFingerprintTest
     {
         JsonNode a = rule("""
                 Check:
-                  all:
-                  - name: "--DY"
-                    operator: "non_empty"
-                  - name: "DM.RFSTDTC"
-                    operator: "is_incomplete_date"
+                  expression: "not empty(--DY) and is_incomplete_date(DM.RFSTDTC)"
                 """);
         JsonNode b = rule("""
                 Check:
-                  all:
-                  - name: "DM.RFSTDTC"
-                    operator: "is_incomplete_date"
-                  - name: "--DY"
-                    operator: "non_empty"
+                  expression: "is_incomplete_date(DM.RFSTDTC) and not empty(--DY)"
                 """);
         assertEquals(RuleFingerprint.l1(a, false), RuleFingerprint.l1(b, false));
     }
 
-    // ------------------------------------------------- redundant wrappers
 
-
-    /** CORE-000021 ({@code all: [x]}) vs CDISC-CG0397 (bare leaf) — not a logic divergence. */
+    /** Disjunctions are commutative too, and sorting reaches a nested one. */
     @Test
-    void redundantSingleChildWrapperCollapsesInTheBaseL1()
+    void anyOperandOrderIsIrrelevantAtAnyDepth()
     {
-        JsonNode wrapped = rule("""
+        JsonNode a = rule("""
                 Check:
-                  all:
-                  - name: "--ORRES"
-                    operator: "non_empty"
-                  - all:
-                    - name: "--STRESC"
-                      operator: "empty"
+                  expression: "AETERM == \\"X\\" and (empty(AESEV) or empty(AEDECOD))"
                 """);
-        JsonNode bare = rule("""
+        JsonNode b = rule("""
                 Check:
-                  all:
-                  - name: "--ORRES"
-                    operator: "non_empty"
-                  - name: "--STRESC"
-                    operator: "empty"
+                  expression: "(empty(AEDECOD) or empty(AESEV)) and AETERM == \\"X\\""
                 """);
-        assertEquals(RuleFingerprint.l1(wrapped, false), RuleFingerprint.l1(bare, false));
+        assertEquals(RuleFingerprint.l1(a, false), RuleFingerprint.l1(b, false));
+    }
+
+    // ------------------------------------------------- flattening
+
+
+    /** {@code a and (b and c)} is {@code a and b and c} — a grouping, not a logic divergence. */
+    @Test
+    void nestedConjunctionsFlattenInTheBaseL1()
+    {
+        JsonNode grouped = rule("""
+                Check:
+                  expression: "not empty(--ORRES) and (empty(--STRESC) and --ORRESU != \\"\\")"
+                """);
+        JsonNode flat = rule("""
+                Check:
+                  expression: "not empty(--ORRES) and empty(--STRESC) and --ORRESU != \\"\\""
+                """);
+        assertEquals(RuleFingerprint.l1(grouped, false), RuleFingerprint.l1(flat, false));
+    }
+
+
+    /** The canonical text, pinned literally: flattened, sorted by printed operand. */
+    @Test
+    void canonicalExpressionIsFlattenedAndSorted()
+    {
+        assertEquals("A > 1 and B > 2 and C > 3",
+                RuleFingerprint.canonicalExpression(parse("(C > 3 and A > 1) and B > 2"), false));
+        assertEquals("not (A > 1 or B > 2)",
+                RuleFingerprint.canonicalExpression(parse("not (B > 2 or A > 1)"), false));
+        assertEquals("empty(X) or not empty(Y)",
+                RuleFingerprint.canonicalExpression(parse("(not empty(Y)) or (empty(X))"), false));
     }
 
     // -------------------------------------------------------------- guards
@@ -194,40 +204,44 @@ class RuleFingerprintTest
     {
         JsonNode guarded = rule("""
                 Check:
-                  all:
-                  - name: "--DTC"
-                    operator: "var_exists"
-                  - name: "--DTC"
-                    operator: "is_incomplete_date"
+                  expression: "var_exists(--DTC) and is_incomplete_date(--DTC)"
                 """);
         JsonNode plain = rule("""
                 Check:
-                  all:
-                  - name: "--DTC"
-                    operator: "is_incomplete_date"
+                  expression: "is_incomplete_date(--DTC)"
                 """);
         assertNotEquals(RuleFingerprint.l1(guarded, false), RuleFingerprint.l1(plain, false));
         assertEquals(RuleFingerprint.l1(guarded, true), RuleFingerprint.l1(plain, true));
     }
 
 
-    /** Class E: {@code empty} fires on an absent column in Java, so the guard is NOT inert. */
+    /** The quoted and the bare spelling of the guarded name are one guard. */
+    @Test
+    void aQuotedExistsOperandIsTheSameGuard()
+    {
+        JsonNode quoted = rule("""
+                Check:
+                  expression: "var_exists(\\"--DTC\\") and is_incomplete_date(--DTC)"
+                """);
+        JsonNode plain = rule("""
+                Check:
+                  expression: "is_incomplete_date(--DTC)"
+                """);
+        assertEquals(RuleFingerprint.l1(quoted, true), RuleFingerprint.l1(plain, true));
+    }
+
+
+    /** Class E: {@code empty} fires on an absent column, so the guard is NOT inert. */
     @Test
     void existsGuardIsNeverStrippedForAClassETarget()
     {
         JsonNode guarded = rule("""
                 Check:
-                  all:
-                  - name: "DTHDTC"
-                    operator: "var_exists"
-                  - name: "DTHDTC"
-                    operator: "empty"
+                  expression: "var_exists(DTHDTC) and empty(DTHDTC)"
                 """);
         JsonNode plain = rule("""
                 Check:
-                  all:
-                  - name: "DTHDTC"
-                    operator: "empty"
+                  expression: "empty(DTHDTC)"
                 """);
         assertNotEquals(RuleFingerprint.l1(guarded, true), RuleFingerprint.l1(plain, true));
     }
@@ -237,21 +251,14 @@ class RuleFingerprintTest
     @Test
     void existsGuardIsNeverStrippedForAClassDTarget()
     {
-        JsonNode guarded = rule("""
-                Check:
-                  all:
-                  - name: "--DECOD"
-                    operator: "var_exists"
-                  - name: "--DECOD"
-                    operator: "is_inconsistent_across_dataset"
-                    value: ["--TESTCD"]
-                """);
+        JsonNode guarded = rule(
+                """
+                        Check:
+                          expression: "var_exists(--DECOD) and is_inconsistent_across_dataset(--DECOD, keys=[--TESTCD])"
+                        """);
         JsonNode plain = rule("""
                 Check:
-                  all:
-                  - name: "--DECOD"
-                    operator: "is_inconsistent_across_dataset"
-                    value: ["--TESTCD"]
+                  expression: "is_inconsistent_across_dataset(--DECOD, keys=[--TESTCD])"
                 """);
         assertNotEquals(RuleFingerprint.l1(guarded, true), RuleFingerprint.l1(plain, true));
     }
@@ -263,16 +270,23 @@ class RuleFingerprintTest
     {
         JsonNode negated = rule("""
                 Check:
-                  all:
-                  - not:
-                      name: "--DTC"
-                      operator: "var_exists"
-                  - name: "--DTC"
-                    operator: "is_incomplete_date"
+                  expression: "not var_exists(--DTC) and is_incomplete_date(--DTC)"
                 """);
         String stripped = RuleFingerprint.l1(negated, true);
         assertTrue(stripped.contains("var_exists"),
-                "the negated exists must survive guard stripping");
+                "the negated exists must survive guard stripping: " + stripped);
+    }
+
+
+    /** A guard inside a negated conjunction is not in positive polarity and stays. */
+    @Test
+    void aGuardUnderAStructuralNotIsNotStripped()
+    {
+        JsonNode node = rule("""
+                Check:
+                  expression: "not (var_exists(--DTC) and is_incomplete_date(--DTC))"
+                """);
+        assertEquals(RuleFingerprint.l1(node, false), RuleFingerprint.l1(node, true));
     }
 
 
@@ -282,13 +296,26 @@ class RuleFingerprintTest
     {
         JsonNode node = rule("""
                 Check:
-                  all:
-                  - name: "AESEQ"
-                    operator: "var_exists"
-                  - name: "AETERM"
-                    operator: "non_empty"
+                  expression: "var_exists(AESEQ) and not empty(AETERM)"
                 """);
         assertEquals(RuleFingerprint.l1(node, false), RuleFingerprint.l1(node, true));
+    }
+
+
+    /** A guard in a conjunction nested under a disjunction (positive polarity) is stripped too. */
+    @Test
+    void aGuardInAConjunctionUnderAnOrIsStripped()
+    {
+        JsonNode guarded = rule(
+                """
+                        Check:
+                          expression: "empty(AESEV) or (var_exists(AESTDTC) and is_incomplete_date(AESTDTC))"
+                        """);
+        JsonNode plain = rule("""
+                Check:
+                  expression: "empty(AESEV) or is_incomplete_date(AESTDTC)"
+                """);
+        assertEquals(RuleFingerprint.l1(guarded, true), RuleFingerprint.l1(plain, true));
     }
 
     // ------------------------------------------------------------ L2 / L3
@@ -349,10 +376,8 @@ class RuleFingerprintTest
      * {@code sortArraysWithin} sorted arrays exactly one object level deep until 2026-08-24, which
      * was harmless for {@code Scope} — {@code l2} hands it {@code Scope[key]}, so
      * {@code Include: [...]} is already at level one — and wrong for {@code Requirements}, which it
-     * is handed whole and whose facet lists live at {@code Variables.All}. Its Python twin
-     * ({@code generate-inventory.py::_sort_lists_within}) sorts two levels, so the two halves
-     * re-bucketed the corpus against each other the moment the block gained carriers (FDA-SD1047 /
-     * CDISC-CG0111).
+     * is handed whole and whose facet lists live at {@code Variables.All}. The pair FDA-SD1047 /
+     * CDISC-CG0111 carried the same requirement in opposite entry order and bucketed differently.
      * </p>
      *
      * <p>
@@ -409,8 +434,7 @@ class RuleFingerprintTest
      * Ruling 6 of {@code PLAN-authoring-grammar-unique-set-and-output-exclusion}
      * ({@code Fix #354}): L3 fingerprints the POST-exclusion set — an {@code !X} token drops X and
      * is never itself a member, so two rules reaching the same reported set fingerprint identically
-     * however they spelled it. The Java twin of {@code generate-inventory.py}'s
-     * {@code apply_exclusions}.
+     * however they spelled it.
      */
     @Test
     void exclusionTokensAreAppliedBeforeL3()
@@ -466,7 +490,7 @@ class RuleFingerprintTest
         JsonNode reported = rule("""
                 Bindings:
                 - name: "$cnt"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
                   expression: "$cnt > 1"
                 Outcome:
@@ -476,7 +500,7 @@ class RuleFingerprintTest
         JsonNode excluded = rule("""
                 Bindings:
                 - name: "$other_name"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
                   expression: "$other_name > 1"
                 Outcome:
@@ -486,7 +510,7 @@ class RuleFingerprintTest
         JsonNode ageOnly = rule("""
                 Bindings:
                 - name: "$third"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
                   expression: "$third > 1"
                 Outcome:
@@ -540,9 +564,7 @@ class RuleFingerprintTest
                   Domains:
                     Include: ["AE"]
                 Check:
-                  all:
-                  - name: "AETERM"
-                    operator: "non_empty"
+                  expression: "not empty(AETERM)"
                 Outcome:
                   Message: "m"
                   Output_Variables: ["AETERM"]
@@ -557,44 +579,17 @@ class RuleFingerprintTest
 
 
     @Test
-    void leavesWalksCompositesAndIgnoresOrder()
+    void namesUsedIgnoresPresenceCallsAndLiteralValues()
     {
-        JsonNode node = rule("""
-                Check:
-                  any:
-                  - all:
-                    - name: "A"
-                      operator: "var_exists"
-                    - name: "B"
-                      operator: "empty"
-                  - name: "C"
-                    operator: "non_empty"
-                """);
-        List<JsonNode> leaves = RuleFingerprint.leaves(node.get("Check"));
-        assertEquals(3, leaves.size());
-    }
-
-
-    @Test
-    void namesUsedIgnoresExistsLeavesAndLiteralValues()
-    {
-        JsonNode check = rule("""
-                Check:
-                  all:
-                  - name: "GUARD"
-                    operator: "var_exists"
-                  - name: "TARGET"
-                    operator: "equal_to"
-                    value: "Y"
-                    value_is_literal: true
-                  - name: "OTHER"
-                    operator: "equal_to"
-                    value: "$op"
-                """).get("Check");
-        Set<String> used = RuleFingerprint.namesUsed(check);
+        Set<String> used = RuleFingerprint.namesUsed(
+                parse("var_exists(GUARD) and TARGET == \"Y\" and OTHER == $op and len(DM.AGE) > 1"
+                        + " and var_label(\"DATA\") =~ /x/ and not empty(value())"));
         assertTrue(used.contains("TARGET"));
         assertTrue(used.contains("OTHER"));
         assertTrue(used.contains("$op"));
+        assertTrue(used.contains("DM.AGE"), "a read inside a value call is a read");
+        assertTrue(used.contains("variable_label"), "an accessor reads its metadata operand");
+        assertTrue(used.contains("variable_value"), "the value() cursor reads variable_value");
         assertFalse(used.contains("GUARD"));
         assertFalse(used.contains("Y"), "a literal value is not a name");
     }
@@ -603,49 +598,27 @@ class RuleFingerprintTest
     @Test
     void guardSensitiveNamesFindsClassEAndClassDTargets()
     {
-        JsonNode check = rule("""
-                Check:
-                  all:
-                  - name: "E_TARGET"
-                    operator: "empty"
-                  - name: "D_TARGET"
-                    operator: "is_not_unique_set"
-                    value: ["USUBJID"]
-                  - name: "V_TARGET"
-                    operator: "non_empty"
-                """).get("Check");
-        Set<String> sensitive = RuleFingerprint.guardSensitiveNames(check);
-        assertEquals(Set.of("E_TARGET", "D_TARGET"), sensitive);
+        Set<String> sensitive = RuleFingerprint.guardSensitiveNames(parse(
+                "empty(ETARGET) and not is_unique_set([DTARGET, USUBJID]) and not empty(VTARGET)"));
+        assertEquals(Set.of("ETARGET", "DTARGET"), sensitive);
     }
 
 
     /**
      * Owner requirement #1 (2026-08-23): the single-list spelling {@code not is_unique_set([A, B,
-     * …])} lowers — through {@code DualFormCheckNode.lowerCheckInPlace}, the surface that feeds
-     * this inventory its leaf view — to a leaf whose {@code name} is member 0 (D-2), so
-     * {@code guardSensitiveNames} still returns it. ⚠ Asserted NON-EMPTY: an empty return is the
-     * silent failure mode the D-2 decision exists to prevent.
+     * …])} names its first member (D-2), so {@code guardSensitiveNames} still returns it. ⚠
+     * Asserted NON-EMPTY: an empty return is the silent failure mode the D-2 decision exists to
+     * prevent.
      */
     @Test
     void guardSensitiveNamesStillFindsMemberZeroOfTheSingleListSpelling()
     {
-        JsonNode ruleNode = rule("""
-                Check:
-                  expression: "var_exists(EPOCH) and not is_unique_set([EPOCH, USUBJID, DSSCAT])"
-                """);
-        assertTrue(DualFormCheckNode.lowerCheckInPlace(ruleNode), "the expression must lower");
-        JsonNode check = ruleNode.get("Check");
-        assertTrue(check.has("all"), "lowered to an operator-leaf tree: " + check);
-        Set<String> sensitive = RuleFingerprint.guardSensitiveNames(check);
+        Set<String> sensitive = RuleFingerprint.guardSensitiveNames(
+                parse("var_exists(EPOCH) and not is_unique_set([EPOCH, USUBJID, DSSCAT])"));
         assertFalse(sensitive.isEmpty(), "⚠ an empty result is the silent failure mode");
-        assertEquals(Set.of("EPOCH"), sensitive, "member 0 is the leaf name (D-2)");
-        // The one-member and the $-ref shapes too.
-        JsonNode one = rule("""
-                Check:
-                  expression: "not is_unique_set([USUBJID])"
-                """);
-        assertTrue(DualFormCheckNode.lowerCheckInPlace(one));
-        assertEquals(Set.of("USUBJID"), RuleFingerprint.guardSensitiveNames(one.get("Check")));
+        assertEquals(Set.of("EPOCH"), sensitive, "member 0 is the unit's name (D-2)");
+        assertEquals(Set.of("USUBJID"),
+                RuleFingerprint.guardSensitiveNames(parse("not is_unique_set([USUBJID])")));
     }
 
 
@@ -687,18 +660,18 @@ class RuleFingerprintTest
 
 
     /**
-     * The whole shipped corpus authors a plain {@code Check:}, so the plain branch must render
-     * exactly the pre-Plan-C string. Pinned literally, because "the partition did not move" is a
-     * claim about this text and nothing else re-derives it.
+     * The plain branch is the canonical expression text behind the bindings. Pinned literally,
+     * because "the partition did not move" is a claim about this text and nothing else re-derives
+     * it. (Until {@code PLAN-retire-check-lowering} this pinned the lowered leaf JSON.)
      */
     @Test
-    void aPlainCheckHashesExactlyAsItDidBeforeLevelMaps()
+    void aPlainCheckHashesToItsCanonicalExpressionText()
     {
         JsonNode node = rule("""
                 Check:
-                  expression: "not empty(AESER)"
+                  expression: "not  empty( AESER )"
                 """);
-        assertEquals("[]|{\"expression\":\"not empty(AESER)\"}", RuleFingerprint.l1(node, false));
+        assertEquals("[]|not empty(AESER)", RuleFingerprint.l1(node, false));
     }
 
 
@@ -734,16 +707,16 @@ class RuleFingerprintTest
         JsonNode ladder = rule("""
                 Check:
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                   INFO:
-                    expression: "a >= b"
+                    expression: "A >= B"
                 """);
         JsonNode reversed = rule("""
                 Check:
                   INFO:
-                    expression: "a >= b"
+                    expression: "A >= B"
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                 """);
         assertEquals(RuleFingerprint.l1(ladder, false), RuleFingerprint.l1(reversed, false));
         assertTrue(RuleFingerprint.l1(ladder, false).indexOf("ERROR=") < RuleFingerprint
@@ -758,12 +731,12 @@ class RuleFingerprintTest
         JsonNode bare = rule("""
                 Check:
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                 """);
         JsonNode messaged = rule("""
                 Check:
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                     Message: "start is after end"
                 """);
         assertEquals(RuleFingerprint.l1(bare, false), RuleFingerprint.l1(messaged, false),
@@ -780,14 +753,14 @@ class RuleFingerprintTest
     {
         JsonNode plain = rule("""
                 Check:
-                  expression: "a > b"
+                  expression: "A > B"
                 Outcome:
                   Message: "m"
                 """);
         JsonNode levelled = rule("""
                 Check:
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                 Outcome:
                   Message: "m"
                 """);
@@ -802,34 +775,22 @@ class RuleFingerprintTest
         JsonNode left = rule("""
                 Bindings:
                 - name: "$N"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
                   ERROR:
-                    all:
-                    - name: "$N"
-                      operator: "greater_than"
-                      value: 1
+                    expression: "$N > 1"
                   INFO:
-                    all:
-                    - name: "$N"
-                      operator: "greater_than"
-                      value: 0
+                    expression: "$N > 0"
                 """);
         JsonNode right = rule("""
                 Bindings:
                 - name: "$COUNT"
-                  operator: "record_count"
+                  expression: "record_count()"
                 Check:
                   ERROR:
-                    all:
-                    - name: "$COUNT"
-                      operator: "greater_than"
-                      value: 1
+                    expression: "$COUNT > 1"
                   INFO:
-                    all:
-                    - name: "$COUNT"
-                      operator: "greater_than"
-                      value: 0
+                    expression: "$COUNT > 0"
                 """);
         assertEquals(RuleFingerprint.l1(left, false), RuleFingerprint.l1(right, false));
     }
@@ -843,7 +804,7 @@ class RuleFingerprintTest
     @Test
     void onlyAnAllLevelKeyedMapCountsAsALevelMap()
     {
-        assertNull(RuleFingerprint.levels(rule("Check:\n  expression: \"a > b\"\n").get("Check")),
+        assertNull(RuleFingerprint.levels(rule("Check:\n  expression: \"A > B\"\n").get("Check")),
                 "a plain condition is not a level map");
         assertNull(RuleFingerprint
                 .levels(rule("Check:\n  ERROR:\n    expression: \"x\"\n  expression: \"y\"\n")
@@ -856,31 +817,10 @@ class RuleFingerprintTest
         assertEquals(List.of("ERROR", "INFO"), List.copyOf(RuleFingerprint.levels(rule("""
                 Check:
                   INFO:
-                    expression: "a >= b"
+                    expression: "A >= B"
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                 """).get("Check")).keySet()));
-    }
-
-
-    /** Every level must reach the leaf-keyed instruments lowered, exactly as a plain Check does. */
-    @Test
-    void dualFormLoweringReachesEveryLevelAndKeepsItsMessage()
-    {
-        JsonNode node = rule("""
-                Check:
-                  ERROR:
-                    expression: "not empty(AESER)"
-                  INFO:
-                    expression: "not empty(AEDECOD)"
-                    Message: "look at this one"
-                """);
-        assertTrue(DualFormCheckNode.lowerCheckInPlace(node));
-        JsonNode check = node.get("Check");
-        assertFalse(check.get("ERROR").has("expression"), "the ERROR level was lowered");
-        assertFalse(check.get("INFO").has("expression"), "the INFO level was lowered too");
-        assertEquals("look at this one", check.get("INFO").get("Message").asText(),
-                "the level's Message survives the lowering");
     }
 
 
@@ -889,13 +829,13 @@ class RuleFingerprintTest
     void checkConditionsSpansEveryDeclaredLevel()
     {
         assertEquals(1,
-                RuleFingerprint.checkConditions(rule("Check:\n  expression: \"a > b\"\n")).size());
+                RuleFingerprint.checkConditions(rule("Check:\n  expression: \"A > B\"\n")).size());
         assertEquals(2, RuleFingerprint.checkConditions(rule("""
                 Check:
                   ERROR:
-                    expression: "a > b"
+                    expression: "A > B"
                   INFO:
-                    expression: "a >= b"
+                    expression: "A >= B"
                 """)).size());
         assertEquals(List.of(), RuleFingerprint.checkConditions(rule("Description: \"none\"\n")));
     }
@@ -915,10 +855,6 @@ class RuleFingerprintTest
      * ⚠ The mechanism, so a future edit knows what it may not break: {@link RuleFingerprint#of}
      * reads <b>named keys</b> off the root node, and every {@code fieldNames()} walk in the class
      * is on a <em>sub</em>-node. A whole-root walk added anywhere above would silently break this.
-     * ⚠⚠ And "Java is inert" does not prove "Python is inert" — the two halves already diverge in
-     * one known place — so the Python fingerprint
-     * ({@code generated/rule-inventory/generate-inventory.py}) is asserted separately, by run, in
-     * phase 3, by diffing {@code rule-equivalence.yaml} across the seeding.
      * </p>
      */
     @Test
@@ -932,9 +868,7 @@ class RuleFingerprintTest
                   Domains:
                     Include: ["AE"]
                 Check:
-                  all:
-                  - name: "AEOBJ"
-                    operator: "is_null"
+                  expression: "empty(AEOBJ)"
                 Outcome:
                   Message: "m"
                 """;
@@ -950,6 +884,6 @@ class RuleFingerprintTest
         // Positive control: the same shape of edit to a key the fingerprint DOES read must move it,
         // or this assertion would pass on a fingerprint that reads nothing at all.
         assertNotEquals(RuleFingerprint.of(rule(body)),
-                RuleFingerprint.of(rule(body.replace("is_null", "is_not_null"))));
+                RuleFingerprint.of(rule(body.replace("empty(AEOBJ)", "not empty(AEOBJ)"))));
     }
 }

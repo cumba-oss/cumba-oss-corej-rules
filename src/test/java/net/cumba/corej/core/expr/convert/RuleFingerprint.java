@@ -15,6 +15,11 @@ import java.util.Map;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.TreeMap;
+import net.cumba.corej.core.CheckExprUnits;
+import net.cumba.corej.core.expr.CheckExpressionParser;
+import net.cumba.corej.core.expr.ExpressionPrinter;
+import net.cumba.corej.core.expr.MetadataOperandMapping;
+import net.cumba.corej.core.expr.ast.Expr;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -49,21 +54,29 @@ import org.jspecify.annotations.Nullable;
  * prefix and uniqueness; the name is free. The rename is substituted through {@code Check}
  * <em>and</em> {@code Outcome.Output_Variables} — renaming only one side charges the pair a phantom
  * OV divergence (FDA-SD1307's {@code $HLTSUBJI_N} vs PMDA-SD1307's {@code $HLTSUBJI_N_COUNT}).</li>
- * <li><strong>Sort {@code all}/{@code any} operand lists.</strong> Safe because neither engine
- * short-circuits: the reference engine evaluates every operand of an {@code all} and ANDs, and
- * re-raises a {@code KeyError} from {@code any} only when <em>every</em> branch raises. R-7.8's
- * "guard placed first" is therefore a readability SHOULD, not an execution requirement. <b>If
- * either engine ever starts short-circuiting, this step becomes unsound.</b></li>
- * <li><strong>Collapse redundant single-child wrappers</strong> ({@code all: [x]} ⇒ {@code x}),
- * applied to the <em>base</em> L1 — not only the guard-stripped variant. Otherwise a wrapper-only
- * difference (CORE-000021 vs CDISC-CG0397) lands in the logic bucket and is then mislabelled
- * guard-only.</li>
+ * <li><strong>Sort {@code and}/{@code or} operand lists.</strong> Safe because the engine does not
+ * short-circuit a conjunction into a different verdict: every operand is evaluated and combined.
+ * R-7.8's "guard placed first" is therefore a readability SHOULD, not an execution requirement.
+ * <b>If the engine ever starts short-circuiting, this step becomes unsound.</b></li>
+ * <li><strong>Flatten nested conjunctions / disjunctions and collapse singletons</strong>
+ * ({@code a and (b and c)} ⇒ {@code a and b and c}), applied to the <em>base</em> L1 — not only the
+ * guard-stripped variant. Otherwise a grouping-only difference lands in the logic bucket and is
+ * then mislabelled guard-only.</li>
  * <li><strong>Sort {@code Scope} include/exclude lists.</strong> {@code Match_Datasets} entry order
  * is <em>not</em> sorted — the join list is not established to be commutative.</li>
  * <li><strong>Compare {@code Output_Variables} as an α-renamed set.</strong> Its order is
  * prescribed by R-9.7/R-9.7b, so an ordering difference is a lint, not a divergence. A drift gate
  * must therefore assert OV <em>ordering</em> separately from L3 equality.</li>
  * </ol>
+ *
+ * <p>
+ * ⭐ <b>L1 is computed on the parsed expression</b> ({@code PLAN-retire-check-lowering}, 2026-10):
+ * each condition's text is parsed with the engine's {@link CheckExpressionParser}, canonicalised on
+ * the {@link Expr} ({@link #canonical}), optionally guard-stripped, and printed back with
+ * {@link ExpressionPrinter}. Until then the instruments hashed a lowering of the expression to the
+ * retired operator-leaf JSON, which refused 81 rules outright (hashed as raw text) and read only
+ * each leaf's left operand. The guard classes below are read off {@link CheckExprUnits}.
+ * </p>
  *
  * <p>
  * {@link #l1(JsonNode, boolean) Guard stripping} is <strong>class-aware</strong>: an {@code exists}
@@ -95,9 +108,6 @@ import org.jspecify.annotations.Nullable;
  */
 final class RuleFingerprint
 {
-
-    /** Composite Check nodes. Anything else with a {@code name} is a leaf. */
-    private static final Set<String> COMPOSITES = Set.of("all", "any", "not");
 
     /**
      * The authorable check levels, <b>strictest first</b> — Plan C §3.4's evaluation order, and
@@ -141,6 +151,10 @@ final class RuleFingerprint
             "additional_columns_empty", "is_unique_set", "is_not_unique_set",
             "is_inconsistent_across_dataset");
 
+    /** The presence family: never a "use" of the name it tests. */
+    private static final Set<String> PRESENCE_CALLS = Set.of("var_exists", "var_not_exists",
+            "ds_exists", "ds_not_exists");
+
     private RuleFingerprint()
     {
     }
@@ -171,9 +185,9 @@ final class RuleFingerprint
      * </p>
      *
      * <p>
-     * ⚑ The plain branch is <b>byte-identical</b> to the pre-Plan-C string, deliberately: the whole
-     * shipped corpus takes it, so the committed {@code rule-equivalence.yaml} partition cannot move
-     * on this change. A level's {@code Message} is stripped before hashing — it is L3's, not L1's.
+     * ⚑ The {@code Bindings} half is the canonical JSON of each (renamed) binding; the
+     * {@code Check} half is the canonical expression text ({@link #canonicalExpression}). A level's
+     * {@code Message} is stripped before hashing — it is L3's, not L1's.
      * </p>
      */
     static String l1(JsonNode rule, boolean stripGuards)
@@ -182,7 +196,7 @@ final class RuleFingerprint
         List<String> ops = new ArrayList<>();
         for (JsonNode op : renamed.operations())
         {
-            ops.add(canon(sortCommutative(op)));
+            ops.add(canon(op));
         }
         ops.sort(Comparator.naturalOrder());
         SequencedMap<String, JsonNode> levels = renamed.levels();
@@ -204,17 +218,21 @@ final class RuleFingerprint
     }
 
 
-    /** One condition's canonical L1 text: simplify, optionally guard-strip, sort, canonicalise. */
-    private static String canonicalCheck(JsonNode condition, boolean stripGuards)
+    /**
+     * One condition's canonical L1 text: the parsed expression, optionally guard-stripped,
+     * flattened and sorted, printed. A node that is not an expression Check (no {@code Check} at
+     * all, or a shape the loader rejects) is hashed as its canonical JSON, so a rule without a
+     * Check still fingerprints; an unparseable expression propagates — the loader rejects it too,
+     * and hashing its text would bucket a load error as a rule.
+     */
+    private static String canonicalCheck(@Nullable JsonNode condition, boolean stripGuards)
     {
-        JsonNode check = simplify(condition);
-        if (stripGuards)
+        JsonNode text = condition == null ? null : condition.get("expression");
+        if (text == null || !text.isTextual())
         {
-            Set<String> used = namesUsed(check);
-            Set<String> sensitive = guardSensitiveNames(check);
-            check = simplify(dropGuards(check, used, sensitive, false));
+            return canon(condition);
         }
-        return canon(sortCommutative(check));
+        return canonicalExpression(CheckExpressionParser.parse(text.asText()), stripGuards);
     }
 
 
@@ -323,11 +341,10 @@ final class RuleFingerprint
      * </p>
      *
      * <p>
-     * ⚠⚠ Keep in lockstep with {@code generated/rule-inventory/generate-inventory.py}'s {@code l2}.
-     * One half moving alone silently re-buckets the corpus. ⚠ That is a standing obligation,
-     * <b>not</b> a statement that the two halves are equivalent today: the list-sorting step they
-     * share is bounded on the Python side and unbounded here, and the exact depths at which they
-     * agree are enumerated in {@link #sortArraysWithin(JsonNode)}.
+     * ⚑ Until {@code PLAN-retire-check-lowering} (2026-10) a Python twin ({@code
+     * generate-inventory.py}'s {@code l2}) had to be kept in lockstep with this method, and the
+     * depths at which the two sorted lists differed are recorded in
+     * {@link #sortArraysWithin(JsonNode)}. The twin is retired; this is the one L2.
      * </p>
      */
     static String l2(JsonNode rule)
@@ -370,7 +387,6 @@ final class RuleFingerprint
      * after {@code sameL1}, and the registry's divergence flags are computed inside one L1 class —
      * so a derived {@code Rule_Type} can never separate two rules L1 has not already separated.
      * Removing it changes no bucket and no divergence flag; the committed registry is unaffected.
-     * Mirrors {@code generated/rule-inventory/generate-inventory.py}'s {@code l3}.
      * </p>
      */
     static String l3(JsonNode rule)
@@ -385,8 +401,8 @@ final class RuleFingerprint
         // Ruling 6 (2026-08-23, PLAN-authoring-grammar-unique-set-and-output-exclusion §5.7): OV
         // is fingerprinted AFTER exclusions are applied — `!X` removes X, and the token itself is
         // never a member. L3 asks "do these two rules report the same thing?", and two rules
-        // that report the same set answer YES however they spelled it. Mirrors
-        // generate-inventory.py's apply_exclusions. (alphaRename renames THROUGH the marker:
+        // that report the same set answer YES however they spelled it. (alphaRename renames
+        // THROUGH the marker:
         // substitute() strips the `!`, α-renames the inner id and re-prefixes it, so an `!$id`
         // token arrives here as `!$__n` and cancels exactly the renamed member it names.)
         List<String> outputVariables = new ArrayList<>(
@@ -509,139 +525,168 @@ final class RuleFingerprint
         return new Renamed(renamedOps, check, levels(check), outputVariables);
     }
 
+    // ------------------------------------------------- the Expr canonical form
 
-    /** {@code all: [x]} and {@code any: [x]} mean {@code x}. */
-    static JsonNode simplify(JsonNode node)
+
+    /**
+     * The canonical text of one parsed condition: guard-stripped when asked, then {@link #canonical
+     * flattened and sorted}, then printed. A condition that is nothing but inert guards strips to
+     * the literal {@code true}.
+     */
+    static String canonicalExpression(Expr parsed, boolean stripGuards)
     {
-        if (node == null)
+        Expr e = parsed;
+        if (stripGuards)
         {
-            return null;
+            Expr stripped = dropGuards(e, namesUsed(e), guardSensitiveNames(e), true);
+            e = stripped == null ? new Expr.Lit(Expr.LitKind.BOOL, true) : stripped;
         }
-        if (node.isObject() && node.size() == 1)
-        {
-            String key = node.fieldNames().next();
-            if ("all".equals(key) || "any".equals(key))
-            {
-                JsonNode children = node.get(key);
-                if (children.isArray() && children.size() == 1)
-                {
-                    return simplify(children.get(0));
-                }
-            }
-        }
-        if (node.isObject())
-        {
-            ObjectNode out = ((ObjectNode) node).objectNode();
-            forEachField(node, (key, value) -> out.set(key, simplify(value)));
-            return out;
-        }
-        if (node.isArray())
-        {
-            ArrayNode out = ((ArrayNode) node).arrayNode();
-            node.forEach(child -> out.add(simplify(child)));
-            return out;
-        }
-        return node;
+        return ExpressionPrinter.print(canonical(e));
     }
 
 
-    /** Sorts every {@code all}/{@code any} operand list — they are commutative. */
-    static JsonNode sortCommutative(JsonNode node)
+    /**
+     * The canonical shape of an expression: nested {@code and}s / {@code or}s flattened into their
+     * parent (associativity), singletons collapsed, and every {@code and} / {@code or} operand list
+     * sorted by its printed text (commutativity). Operands of calls and comparisons are
+     * canonicalised in place; their order is meaning.
+     */
+    static Expr canonical(Expr e)
     {
-        if (node == null)
+        return switch (e)
         {
-            return null;
+        case Expr.And a -> composite(true, a.parts());
+        case Expr.Or o -> composite(false, o.parts());
+        case Expr.Not n -> new Expr.Not(canonical(n.inner()));
+        case Expr.Binary b -> new Expr.Binary(b.op(), canonical(b.left()), canonical(b.right()));
+        case Expr.Call c ->
+        {
+            Map<String, Expr> kwargs = new LinkedHashMap<>();
+            c.kwargs().forEach((k, v) -> kwargs.put(k, canonical(v)));
+            yield new Expr.Call(c.name(),
+                    c.args().stream().map(RuleFingerprint::canonical).toList(), kwargs);
         }
-        if (node.isObject())
+        case Expr.Lit l when l.kind() == Expr.LitKind.LIST -> new Expr.Lit(Expr.LitKind.LIST,
+                ((List<?>) l.value()).stream().map(i -> canonical((Expr) i)).toList());
+        default -> e;
+        };
+    }
+
+
+    private static Expr composite(boolean conjunction, List<Expr> parts)
+    {
+        List<Expr> flat = new ArrayList<>();
+        for (Expr part : parts)
         {
-            ObjectNode out = ((ObjectNode) node).objectNode();
-            forEachField(node, (key, value) ->
+            Expr c = canonical(part);
+            if (conjunction && c instanceof Expr.And a)
             {
-                if (("all".equals(key) || "any".equals(key)) && value.isArray())
-                {
-                    List<JsonNode> children = new ArrayList<>();
-                    value.forEach(child -> children.add(sortCommutative(child)));
-                    children.sort(Comparator.comparing(RuleFingerprint::canon));
-                    ArrayNode sorted = out.arrayNode();
-                    children.forEach(sorted::add);
-                    out.set(key, sorted);
-                }
-                else
-                {
-                    out.set(key, sortCommutative(value));
-                }
-            });
-            return out;
+                flat.addAll(a.parts());
+            }
+            else if (!conjunction && c instanceof Expr.Or o)
+            {
+                flat.addAll(o.parts());
+            }
+            else
+            {
+                flat.add(c);
+            }
         }
-        if (node.isArray())
+        if (flat.size() == 1)
         {
-            ArrayNode out = ((ArrayNode) node).arrayNode();
-            node.forEach(child -> out.add(sortCommutative(child)));
-            return out;
+            return flat.get(0);
         }
-        return node;
+        flat.sort(Comparator.comparing(ExpressionPrinter::print));
+        return conjunction ? new Expr.And(flat) : new Expr.Or(flat);
     }
 
     // ----------------------------------------------------------------- guards
 
 
     /**
-     * Leaf names and non-literal value operands, ignoring {@code exists} leaves — used to decide
-     * whether an {@code exists} leaf guards a variable the Check otherwise reads.
+     * Every name the condition reads outside the presence family — column, {@code $}-binding,
+     * dotted and built-in references, and the metadata operand a {@code var_*} accessor or the
+     * {@code varname()} / {@code value()} cursor names — used to decide whether a
+     * {@code var_exists} leaf guards a variable the Check otherwise reads. A string literal is a
+     * value, never a name.
      */
-    static Set<String> namesUsed(JsonNode check)
+    static Set<String> namesUsed(Expr e)
     {
         Set<String> used = new HashSet<>();
-        for (JsonNode leaf : leaves(check))
-        {
-            if (isExists(leaf))
-            {
-                continue;
-            }
-            JsonNode name = leaf.get("name");
-            if (name != null && name.isTextual())
-            {
-                used.add(name.asText());
-            }
-            if (leaf.path("value_is_literal").asBoolean(false))
-            {
-                continue;
-            }
-            JsonNode value = leaf.get("value");
-            if (value == null)
-            {
-                continue;
-            }
-            if (value.isTextual())
-            {
-                used.add(value.asText());
-            }
-            else if (value.isArray())
-            {
-                value.forEach(entry ->
-                {
-                    if (entry.isTextual())
-                    {
-                        used.add(entry.asText());
-                    }
-                });
-            }
-        }
+        collectNamesUsed(e, used);
         return used;
     }
 
 
-    /** Names read by a class-E or class-D operator anywhere in the Check. */
-    static Set<String> guardSensitiveNames(JsonNode check)
+    private static void collectNamesUsed(Expr e, Set<String> out)
+    {
+        switch (e)
+        {
+        case Expr.Ref r -> out.add(r.name());
+        case Expr.Call c ->
+        {
+            if (PRESENCE_CALLS.contains(c.name()))
+            {
+                return;
+            }
+            String operand = metadataOperand(c);
+            if (operand != null)
+            {
+                out.add(operand);
+            }
+            c.args().forEach(a -> collectNamesUsed(a, out));
+            c.kwargs().values().forEach(a -> collectNamesUsed(a, out));
+        }
+        case Expr.Binary b ->
+        {
+            collectNamesUsed(b.left(), out);
+            collectNamesUsed(b.right(), out);
+        }
+        case Expr.And a -> a.parts().forEach(p -> collectNamesUsed(p, out));
+        case Expr.Or o -> o.parts().forEach(p -> collectNamesUsed(p, out));
+        case Expr.Not n -> collectNamesUsed(n.inner(), out);
+        case Expr.Lit l ->
+        {
+            if (l.kind() == Expr.LitKind.LIST)
+            {
+                ((List<?>) l.value()).forEach(i -> collectNamesUsed((Expr) i, out));
+            }
+        }
+        }
+    }
+
+
+    private static @Nullable String metadataOperand(Expr.Call c)
+    {
+        if (c.args().isEmpty() && c.kwargs().isEmpty())
+        {
+            if ("varname".equals(c.name()))
+            {
+                return "variable_name";
+            }
+            if ("value".equals(c.name()))
+            {
+                return "variable_value";
+            }
+        }
+        return MetadataOperandMapping.reverseToOperand(c);
+    }
+
+
+    /**
+     * Names read by a class-E or class-D operator anywhere in the condition — the target of every
+     * {@link CheckExprUnits} unit whose operator is in {@link #GUARD_SENSITIVE_OPS} (a
+     * {@code [not] is_unique_set([A, …])} names its first member, D-2).
+     */
+    static Set<String> guardSensitiveNames(Expr e)
     {
         Set<String> sensitive = new HashSet<>();
-        for (JsonNode leaf : leaves(check))
+        for (CheckExprUnits.Unit unit : CheckExprUnits.units(e))
         {
-            JsonNode name = leaf.get("name");
-            if (name != null && name.isTextual()
-                    && GUARD_SENSITIVE_OPS.contains(leaf.path("operator").asText()))
+            if (unit.name() != null && unit.operator() != null
+                    && GUARD_SENSITIVE_OPS.contains(unit.operator()))
             {
-                sensitive.add(name.asText());
+                sensitive.add(unit.name());
             }
         }
         return sensitive;
@@ -649,134 +694,75 @@ final class RuleFingerprint
 
 
     /**
-     * Removes inert {@code exists} guards from a top-level {@code all}. Never descends into a
-     * {@code not} subtree, and never strips a guard whose target is read by a class-E/D operator.
+     * Removes inert {@code var_exists} guards from every conjunction in positive polarity. Never
+     * strips under a {@code not} (there the conjunction is a disjunction, and an {@code exists}
+     * under {@code not} is a fire-when-absent predicate), and never strips a guard whose target is
+     * read by a class-E/D operator. A conjunction or disjunction emptied by stripping yields
+     * {@code null}; one left with a single operand yields that operand.
      */
-    static JsonNode dropGuards(JsonNode node, Set<String> used, Set<String> sensitive,
-            boolean underNot)
+    static @Nullable Expr dropGuards(Expr e, Set<String> used, Set<String> sensitive,
+            boolean positive)
     {
-        if (node == null)
+        return switch (e)
         {
-            return null;
-        }
-        if (node.isObject() && isComposite(node))
+        case Expr.And a ->
         {
-            ObjectNode out = ((ObjectNode) node).objectNode();
-            Iterator<String> keys = node.fieldNames();
-            while (keys.hasNext())
+            List<Expr> kept = new ArrayList<>();
+            for (Expr part : a.parts())
             {
-                String key = keys.next();
-                JsonNode value = node.get(key);
-                boolean negated = underNot || "not".equals(key);
-                if (("all".equals(key) || "any".equals(key)) && value.isArray())
+                Expr survivor = dropGuards(part, used, sensitive, positive);
+                if (survivor == null || (positive && isStrippableGuard(survivor, used, sensitive)))
                 {
-                    ArrayNode kept = out.arrayNode();
-                    for (JsonNode child : value)
-                    {
-                        JsonNode survivor = dropGuards(child, used, sensitive, negated);
-                        if (survivor == null)
-                        {
-                            continue;
-                        }
-                        if ("all".equals(key) && !negated
-                                && isStrippableGuard(survivor, used, sensitive))
-                        {
-                            continue;
-                        }
-                        kept.add(survivor);
-                    }
-                    if (kept.isEmpty())
-                    {
-                        return null;
-                    }
-                    if (kept.size() == 1)
-                    {
-                        return kept.get(0);
-                    }
-                    out.set(key, kept);
+                    continue;
                 }
-                else
+                kept.add(survivor);
+            }
+            yield kept.isEmpty() ? null : kept.size() == 1 ? kept.get(0) : new Expr.And(kept);
+        }
+        case Expr.Or o ->
+        {
+            List<Expr> kept = new ArrayList<>();
+            for (Expr part : o.parts())
+            {
+                Expr survivor = dropGuards(part, used, sensitive, positive);
+                if (survivor != null)
                 {
-                    out.set(key, dropGuards(value, used, sensitive, negated));
+                    kept.add(survivor);
                 }
             }
-            return out;
+            yield kept.isEmpty() ? null : kept.size() == 1 ? kept.get(0) : new Expr.Or(kept);
         }
-        return node;
+        case Expr.Not n ->
+        {
+            Expr inner = dropGuards(n.inner(), used, sensitive, !positive);
+            yield inner == null ? null : new Expr.Not(inner);
+        }
+        default -> e;
+        };
     }
 
 
-    private static boolean isStrippableGuard(JsonNode leaf, Set<String> used, Set<String> sensitive)
+    private static boolean isStrippableGuard(Expr e, Set<String> used, Set<String> sensitive)
     {
-        if (!leaf.isObject() || !isExists(leaf))
+        if (!(e instanceof Expr.Call c) || !"var_exists".equals(c.name()) || c.args().size() != 1
+                || !c.kwargs().isEmpty())
         {
             return false;
         }
-        JsonNode name = leaf.get("name");
-        return name != null && name.isTextual() && used.contains(name.asText())
-                && !sensitive.contains(name.asText());
+        String name = presenceName(c.args().get(0));
+        return name != null && used.contains(name) && !sensitive.contains(name);
     }
 
 
-    private static boolean isExists(JsonNode leaf)
+    /** The name a presence call tests: its quoted or bare operand. */
+    private static @Nullable String presenceName(Expr arg)
     {
-        // `var_exists` joined at the expression flip: the writer disambiguates every generic
-        // `exists` to `var_exists`, so the lowered dual-form dict spells both alike.
-        String operator = leaf.path("operator").asText();
-        return "var_exists".equals(operator);
-    }
-
-
-    private static boolean isComposite(JsonNode node)
-    {
-        for (String key : COMPOSITES)
+        return switch (arg)
         {
-            if (node.has(key))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /** Every leaf of a Check tree, in document order. */
-    static List<JsonNode> leaves(JsonNode node)
-    {
-        List<JsonNode> found = new ArrayList<>();
-        collectLeaves(node, found);
-        return found;
-    }
-
-
-    private static void collectLeaves(JsonNode node, List<JsonNode> found)
-    {
-        if (node == null)
-        {
-            return;
-        }
-        if (node.isArray())
-        {
-            node.forEach(child -> collectLeaves(child, found));
-            return;
-        }
-        if (!node.isObject())
-        {
-            return;
-        }
-        if (!isComposite(node))
-        {
-            found.add(node);
-            return;
-        }
-        for (String key : COMPOSITES)
-        {
-            JsonNode child = node.get(key);
-            if (child != null)
-            {
-                collectLeaves(child, found);
-            }
-        }
+        case Expr.Lit l when l.kind() == Expr.LitKind.STRING -> (String) l.value();
+        case Expr.Ref r -> r.name();
+        default -> null;
+        };
     }
 
     // ------------------------------------------------------------- primitives
@@ -924,8 +910,8 @@ final class RuleFingerprint
                 // method sorted arrays exactly ONE object level deep. That was invisible while its
                 // only two callers were `Scope`'s per-key values ({Include: [...]}, already one
                 // level) — but `l2` calls it on the WHOLE `Requirements` block, whose lists live
-                // one level deeper ({Variables: {All: [...]}}), and the Python twin
-                // `generate-inventory.py::_sort_lists_within` sorts TWO levels. The two halves
+                // one level deeper ({Variables: {All: [...]}}), and the then Python twin
+                // (`_sort_lists_within`, retired 2026-10) sorted TWO levels. The two halves
                 // therefore disagreed the moment `Requirements` gained its first carriers
                 // (PLAN-scope-requirements-split phase 4a): FDA-SD1047 and CDISC-CG0111 carry the
                 // same requirement in opposite entry order, Python bucketed the pair 0-identical
@@ -941,9 +927,9 @@ final class RuleFingerprint
                 // distinct L2 strings over the whole tree; 1 000 → 976 over the inventory view),
                 // every one of them order-only.
                 //
-                // ⚠⚠ This is NOT lockstep with Python, and must not be described as such. The twin
-                // (`generated/rule-inventory/generate-inventory.py:470`) is a hard-coded
-                // TWO-LEVEL dict comprehension; this is unbounded. Relative to the block root:
+                // ⚠⚠ This was NOT lockstep with the Python twin while it existed (a hard-coded
+                // TWO-LEVEL dict comprehension; this is unbounded); kept as the record of where
+                // the two sorted differently. Relative to the block root:
                 // • depth 1 (`Requirements.Datasets: [...]`) — both sort;
                 // • depth 2 (`Requirements.Variables.All: [...]`) — both sort. This is the fix;
                 // • depth ≥ 3 — Java sorts, Python does NOT. A future three-level facet such as

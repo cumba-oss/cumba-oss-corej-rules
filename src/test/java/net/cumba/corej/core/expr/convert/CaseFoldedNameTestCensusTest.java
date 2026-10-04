@@ -3,13 +3,10 @@ package net.cumba.corej.core.expr.convert;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,28 +26,26 @@ import net.cumba.corej.core.expr.ast.Expr;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * CIT &#167;3, phase 3c of {@code PLAN-case-insensitive-templates} (2026-09-28): a rule tests a
  * column NAME as a string with the dataset side folded ({@code ends_with(upper(varname()), "FL")},
- * {@code upper(varname()) =~ /^ANL/}, {@code prefix(upper(varname()), 2) not in $x}), and
- * {@link DualFormCheckNode} lowers the folded subject to the SAME leaf as the unwrapped form — the
- * Java mirror of {@code scripts/lib/check_expr.py}'s {@code _case_folded_subject}, whose own suite
- * is {@code generated/rule-inventory/test_case_folded_name_tests.py}.
+ * {@code upper(varname()) =~ /^ANL/}, {@code prefix(upper(varname()), 2) not in $x}). This census
+ * walks every authored Check's AST and pins the folded name tests, the folded name memberships, the
+ * deliberately unfolded rosters and the two-sidedness of exact-cell probes.
  *
  * <p>
- * Without that arm every folded rule lowered to {@code null} and silently left the instruments
- * built on this class ({@code RuleDocCensus}, {@code RuleFingerprint}, the equivalence inventory).
- * The corpus test below compares every folded rule's lowering with that of its textually unfolded
- * twin, so the claim "the fold is invisible to the leaf-derived instruments" is measured on the
- * shipped rules, not argued.
+ * ⚑ Until {@code PLAN-retire-check-lowering} (2026-10) this class was
+ * {@code CaseFoldedNameTestLoweringTest} and also proved that the operator-leaf lowering
+ * ({@code DualFormCheckNode}, the Java mirror of the Python {@code check_expr.py}) mapped a folded
+ * subject to the same leaf as the unwrapped form; the lowering and its Python mirror (whose own
+ * suite was {@code test_case_folded_name_tests.py}) were deleted with that plan, and the three
+ * lowering cases went with them. The AST census — the live half — is unchanged.
  * </p>
  *
  * <p>
- * Review round 3 (2026-09-28) made the corpus census an AST walk with EXACT pins, as in the Python
- * suite, and added the name MEMBERSHIP arm: a line-wrapped {@code varname() not in
+ * Review round 3 (2026-09-28) made the corpus census an AST walk with EXACT pins, as in the then
+ * Python suite, and added the name MEMBERSHIP arm: a line-wrapped {@code varname() not in
  * $library_variables} in {@code CDISC-AD0509} / {@code AD0510} survived 3b and 3c beside a folded
  * {@code ends_with(upper(varname()), "SDT")} and fired on a conformant lowercase ADSL. Every name
  * test and every name membership / equality probe is folded bar exact rosters; a folded subject
@@ -59,10 +54,8 @@ import org.junit.jupiter.params.provider.CsvSource;
  * column in the column's own spelling stays silent.
  * </p>
  */
-class CaseFoldedNameTestLoweringTest
+class CaseFoldedNameTestCensusTest
 {
-
-    private static final JsonNodeFactory NODES = JsonNodeFactory.instance;
 
     /** Name tests deliberately NOT folded, each for a reason its authority gives. */
     private static final Set<String> UNFOLDED = Set.of(
@@ -149,14 +142,6 @@ class CaseFoldedNameTestLoweringTest
 
     }
 
-    private static JsonNode check(String expression)
-    {
-        ObjectNode node = NODES.objectNode();
-        node.put("expression", expression);
-        return node;
-    }
-
-
     /**
      * A DATA-side name source: {@code varname()} or {@code var_name(level)} for any level but
      * LIBRARY. {@code var_name("LIBRARY")} is the name the standard publishes, in the standard's
@@ -201,9 +186,9 @@ class CaseFoldedNameTestLoweringTest
         return switch (e)
         {
         case Expr.And a -> new Expr.And(
-                a.parts().stream().map(CaseFoldedNameTestLoweringTest::stripFold).toList());
+                a.parts().stream().map(CaseFoldedNameTestCensusTest::stripFold).toList());
         case Expr.Or o -> new Expr.Or(
-                o.parts().stream().map(CaseFoldedNameTestLoweringTest::stripFold).toList());
+                o.parts().stream().map(CaseFoldedNameTestCensusTest::stripFold).toList());
         case Expr.Not n -> new Expr.Not(stripFold(n.inner()));
         case Expr.Binary b -> new Expr.Binary(b.op(), stripFold(b.left()), stripFold(b.right()));
         case Expr.Call c ->
@@ -211,7 +196,7 @@ class CaseFoldedNameTestLoweringTest
             Map<String, Expr> kwargs = new LinkedHashMap<>();
             c.kwargs().forEach((k, v) -> kwargs.put(k, stripFold(v)));
             yield new Expr.Call(c.name(),
-                    c.args().stream().map(CaseFoldedNameTestLoweringTest::stripFold).toList(),
+                    c.args().stream().map(CaseFoldedNameTestCensusTest::stripFold).toList(),
                     kwargs);
         }
         default -> e;
@@ -282,7 +267,7 @@ class CaseFoldedNameTestLoweringTest
     private static void membership(Expr.Binary b, Census out)
     {
         List<Expr> sides = Stream.of(b.left(), b.right())
-                .filter(CaseFoldedNameTestLoweringTest::isNameOrFolded).toList();
+                .filter(CaseFoldedNameTestCensusTest::isNameOrFolded).toList();
         if (sides.isEmpty())
         {
             return;
@@ -401,36 +386,6 @@ class CaseFoldedNameTestLoweringTest
             CORPUS.put(id, census(expressions(rule.get("Check")), bindings));
             CHECKS.put(id, rule.get("Check"));
         }
-    }
-
-
-    @ParameterizedTest
-    @CsvSource(delimiter = '|', value =
-    {
-            "ends_with(upper(varname()), \"FL\")|ends_with(varname(), \"FL\")",
-            "starts_with(lower(varname()), \"AE\")|starts_with(varname(), \"AE\")",
-            "not contains(upper(varname()), \"DT\")|not contains(varname(), \"DT\")",
-            "upper(varname()) =~ /^ANL[0-9]{2}FL$/|varname() =~ /^ANL[0-9]{2}FL$/",
-            "upper(varname()) !~ /^TRTSTMF$/|varname() !~ /^TRTSTMF$/",
-            "upper(var_name(\"DATA\")) =~ /DTC$/|var_name(\"DATA\") =~ /DTC$/",
-            "prefix(upper(varname()), 2) not in $domain_list|prefix(varname(), 2) not in $domain_list"
-    })
-    void aFoldedNameSubjectLowersLikeTheUnwrappedForm(String folded, String plain)
-    {
-        JsonNode expected = DualFormCheckNode.lowerOrNull(check(plain));
-        assertNotNull(expected, plain);
-        assertEquals(expected, DualFormCheckNode.lowerOrNull(check(folded)), folded);
-    }
-
-
-    @Test
-    void aFoldedCellValueAndOtherShapesStayUnlowerable()
-    {
-        // A folded CELL has its own case-insensitive v1 leaf family; a plain leaf would misstate
-        // it. Both shapes must lower exactly as before the name arm existed: not at all.
-        assertNull(
-                DualFormCheckNode.lowerOrNull(check("not contains(upper(VISIT), \"UNSCHEDUL\")")));
-        assertNull(DualFormCheckNode.lowerOrNull(check("upper(varname()) == \"AESEQ\"")));
     }
 
 
@@ -599,56 +554,5 @@ class CaseFoldedNameTestLoweringTest
         Census probe = census(List.of("varname() == var_name(\"LIBRARY\")"), Map.of());
         assertEquals(1, probe.members.size());
         assertNull(probe.members.get(0).fold(), "the data side is still an unfolded probe");
-    }
-
-
-    @Test
-    void everyFoldedRuleLowersLikeItsUnfoldedTwin()
-    {
-        int compared = 0;
-        for (Map.Entry<String, Census> e : CORPUS.entrySet())
-        {
-            if (e.getValue().tests.stream().noneMatch(s -> s.fold() != null))
-            {
-                continue;
-            }
-            JsonNode checkNode = CHECKS.get(e.getKey());
-            JsonNode unfolded = unfold(checkNode);
-            assertNotEquals(checkNode, unfolded, e.getKey() + ": the unfold removed nothing");
-            assertEquals(DualFormCheckNode.lowerOrNull(unfolded),
-                    DualFormCheckNode.lowerOrNull(checkNode), e.getKey());
-            compared++;
-        }
-        assertEquals(EXPECTED_FOLDED_RULES, compared);
-    }
-
-
-    /** The same Check with every name-TEST fold textually removed (membership folds untouched). */
-    private static JsonNode unfold(JsonNode checkNode)
-    {
-        JsonNode copy = checkNode.deepCopy();
-        if (copy.has("expression"))
-        {
-            ((ObjectNode) copy).put("expression", unfoldText(copy.get("expression").asText()));
-            return copy;
-        }
-        for (Iterator<JsonNode> levels = copy.elements(); levels.hasNext();)
-        {
-            JsonNode level = levels.next();
-            if (level.isObject() && level.has("expression"))
-            {
-                ((ObjectNode) level).put("expression",
-                        unfoldText(level.get("expression").asText()));
-            }
-        }
-        return copy;
-    }
-
-
-    private static String unfoldText(String expression)
-    {
-        return expression.replaceAll("upper\\(varname\\(\\)\\)(\\s*)([=!]~)", "varname()$1$2")
-                .replaceAll("(ends_with|starts_with)\\(upper\\(varname\\(\\)\\),", "$1(varname(),")
-                .replaceAll("prefix\\(upper\\(varname\\(\\)\\), ", "prefix(varname(), ");
     }
 }

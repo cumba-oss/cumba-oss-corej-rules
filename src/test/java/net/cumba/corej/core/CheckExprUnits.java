@@ -92,22 +92,15 @@ public final class CheckExprUnits
     private static final Set<String> SUBSTRING_PREDICATES = Set.of("contains", "does_not_contain",
             "starts_with", "ends_with");
 
-    /** Left-operand wrappers the v1 leaf held as an operator family rather than as a call. */
+    /**
+     * Left-operand wrappers the v1 leaf held as an operator family rather than as a call. ⚑ The one
+     * copy since {@code PLAN-retire-check-lowering} (2026-10): the two mirrors that
+     * {@code UnaryWrapperRosterDriftTest} kept in step — the operator-leaf lowering
+     * {@code DualFormCheckNode} and the Python {@code scripts/lib/check_expr.py} — were deleted
+     * with the lowering.
+     */
     private static final Set<String> UNARY_WRAPPERS = Set.of("date", "len", "date_part",
             "time_part", "lowcase", "upcase");
-
-    /**
-     * The v1 wrapper roster, exposed for {@code UnaryWrapperRosterDriftTest} (review round 2,
-     * R2-14). Three copies of this roster exist — here, {@code DualFormCheckNode} and
-     * {@code scripts/lib/check_expr.py} — and until that gate all three were kept in step BY HAND.
-     *
-     * @return the wrapper names
-     */
-    public static Set<String> unaryWrappers()
-    {
-        return UNARY_WRAPPERS;
-    }
-
 
     /**
      * Every {@code ExprCompiler.comparisonMarkers()} member, each accounted for by an explicit

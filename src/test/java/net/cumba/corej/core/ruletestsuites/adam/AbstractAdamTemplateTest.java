@@ -1612,16 +1612,16 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
          * ⚠ Deriving widens the set by TWO, not one: the hand list was
          * {@code date/date_part/time_part/num}, and the compiler's vocabulary also carries
          * {@code time} and {@code str} (review round 2, R2-13 — the M4 commit message named only
-         * {@code time}). {@code str} is kept, deliberately: the two GATED sites
-         * ({@code CheckExprUnits}, {@code DualFormCheckNode}) exclude it because they translate to
-         * the retired v1 vocabulary, which has no type-insensitive-equality family — an argument
-         * about the LEGACY surface that says nothing about this harness, which only needs to see
-         * through a transparent wrapper to the column beneath it. {@code str(X)} is exactly such a
-         * wrapper. Measured harmless as well as sound: no {@code *-adamig-*} package contains the
-         * token {@code str(}, so no ADaM template scenario reaches it today. ⚠ This sentence used
-         * to enumerate which standards the four {@code str(} rules — CDISC-CG0371, CORE-000206,
-         * FDA-SD0077, PMDA-SD0077 — belong to, and was corrected TWICE for getting that enumeration
-         * wrong ("all SDTM" → "SDTM/SEND" → CORE-000206 is also published into
+         * {@code time}). {@code str} is kept, deliberately: the GATED site ({@code CheckExprUnits};
+         * the operator-leaf lowering beside it was deleted 2026-10) excludes it because it
+         * translates to the retired v1 vocabulary, which has no type-insensitive-equality family —
+         * an argument about the LEGACY surface that says nothing about this harness, which only
+         * needs to see through a transparent wrapper to the column beneath it. {@code str(X)} is
+         * exactly such a wrapper. Measured harmless as well as sound: no {@code *-adamig-*} package
+         * contains the token {@code str(}, so no ADaM template scenario reaches it today. ⚠ This
+         * sentence used to enumerate which standards the four {@code str(} rules — CDISC-CG0371,
+         * CORE-000206, FDA-SD0077, PMDA-SD0077 — belong to, and was corrected TWICE for getting
+         * that enumeration wrong ("all SDTM" → "SDTM/SEND" → CORE-000206 is also published into
          * {@code rules-core-tig-1-0}). The enumeration was never the operative claim; the ADaM
          * absence is, and it is re-derived above. Do not put a standards list back.
          * </p>

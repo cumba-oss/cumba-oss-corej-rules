@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.exec.RuleClassifier;
 import net.cumba.corej.core.expr.BuiltinRegistry;
-import net.cumba.corej.core.expr.convert.DualFormCheckNode;
 import net.cumba.corej.core.expr.convert.RuleStorageAssembler;
 import net.cumba.corej.core.model.Executability;
 import net.cumba.corej.core.model.Rule;
@@ -59,11 +58,10 @@ import net.cumba.corej.core.model.VariableUniverse;
  * <b>This view replaced the deleted {@code rules-legacy/} corpus in wave 33</b>, and it is a strict
  * improvement: it is the same tree {@code rules-legacy} was written from, without the five
  * Python-facing degradations, and it is built rather than read, so it cannot go stale against
- * {@code rules-src}. Every Variable_Universe and Sensitivity count below is taken here, and so is
- * the Check-operator census — with {@code Sensitivity} derived by this census itself
- * ({@link RuleClassifier#deriveSensitivity}) wherever it is not authored: since
- * {@code PLAN-retire-corpus-transforms.md} phase 1 the assembler only <em>validates</em> the
- * derivation and no longer writes the derived value into the node.</li>
+ * {@code rules-src}. Every Variable_Universe and Sensitivity count below is taken here — with
+ * {@code Sensitivity} derived by this census itself ({@link RuleClassifier#deriveSensitivity})
+ * wherever it is not authored: since {@code PLAN-retire-corpus-transforms.md} phase 1 the assembler
+ * only <em>validates</em> the derivation and no longer writes the derived value into the node.</li>
  * <li>{@code rules/rules-*.json} — the <b>native / expression</b> corpus, the same fan-out with the
  * Check lowered to an expression string. It carries {@code Sensitivity} only on the override set,
  * so it can only contribute view sizes. It carries the same {@code Bindings:} as the assembled view
@@ -209,14 +207,16 @@ public final class RuleDocCensus
     // ---------------------------------------------------------------- corpus model
 
     /**
-     * One rule as {@link RuleStorageAssembler}'s canonical package presents it: expression-form
-     * {@code Check} (lowered via {@link DualFormCheckNode} for the operator census), with
+     * One rule as {@link RuleStorageAssembler}'s canonical package presents it, with
      * {@code Sensitivity} taken from the authored value or derived here. {@code variableUniverse}
      * is the authored {@code Variable_Universe}, rendered as {@code Data} when absent — absent
-     * means {@code Data}, full stop ({@link VariableUniverse}).
+     * means {@code Data}, full stop ({@link VariableUniverse}). ⚑ Until
+     * {@code PLAN-retire-check-lowering} (2026-10-03) this record also carried the rule's distinct
+     * Check operators, read off the retired operator-leaf lowering; the expression vocabulary is
+     * censused by {@link ExpressionCheckSpecCensus} instead.
      */
     public record CensusRule(String id, String variableUniverse, String sensitivity,
-            String executability, Set<String> checkOperators)
+            String executability)
     {
     }
 
@@ -336,18 +336,11 @@ public final class RuleDocCensus
 
     private static CensusRule toCensusRule(String id, JsonNode rule)
     {
-        Set<String> checkOps = new TreeSet<>();
-        // Dual-form: an expression Check carries no operator keys, so the raw walk below would
-        // go quietly empty (measured at the flip: every distinct-operator count dropped to 0).
-        // Lower it to the legacy shape first; a conversion-unlowerable Check stays in
-        // expression form and contributes no operators.
-        JsonNode check = DualFormCheckNode.lowerOrNull(rule.path("Check"));
-        collectCheckOperators(check != null ? check : rule.path("Check"), checkOps);
         String universe = rule.hasNonNull("Variable_Universe") ? text(rule, "Variable_Universe")
                 : VariableUniverse.DATA.getJsonValue();
         String sensitivity = rule.hasNonNull("Sensitivity") ? text(rule, "Sensitivity")
                 : derivedSensitivity(rule);
-        return new CensusRule(id, universe, sensitivity, text(rule, "Executability"), checkOps);
+        return new CensusRule(id, universe, sensitivity, text(rule, "Executability"));
     }
 
 
@@ -374,36 +367,6 @@ public final class RuleDocCensus
         RuleClassifier.Derived<Sensitivity> derived = RuleClassifier.deriveSensitivity(bound);
         Sensitivity value = derived.value();
         return value != null ? value.getJsonValue() : "(absent)";
-    }
-
-
-    /**
-     * Collects every leaf {@code operator} under a {@code Check} tree.
-     *
-     * <p>
-     * Deliberately restricted to the {@code Check} subtree: a {@code Bindings} entry is an
-     * expression whose leading function name is a registry function, not a Check operator, and
-     * folding the two together is exactly the kind of silent mis-attribution this census exists to
-     * stop. (Until runbook W8 the bindings' operation vocabulary was a census section of its own,
-     * C.6; there is no operation vocabulary any more.)
-     * </p>
-     */
-    private static void collectCheckOperators(JsonNode node, Set<String> out)
-    {
-        if (node.isArray())
-        {
-            node.forEach(child -> collectCheckOperators(child, out));
-            return;
-        }
-        if (!node.isObject())
-        {
-            return;
-        }
-        if (node.has("name") && node.has("operator"))
-        {
-            out.add(node.path("operator").asText(""));
-        }
-        node.properties().forEach(e -> collectCheckOperators(e.getValue(), out));
     }
 
 
@@ -492,40 +455,32 @@ public final class RuleDocCensus
     {
         b.append("### C.2 `Variable_Universe` — enum roster and corpus distribution\n\n");
         b.append("View: **assembled packages, distinct `Core.Id`**. An absent field"
-                + " counts as `Data` — absent means `Data`, never a derivation. \"Check operators\""
-                + " is the number of distinct Check operators used by the rules of that"
-                + " universe, counted on the instruments' lowered legacy view"
-                + " (`DualFormCheckNode`).\n\n");
-        b.append("| Constant | JSON value | Rules | Check operators |\n");
-        b.append("|----------|------------|------:|----------------:|\n");
+                + " counts as `Data` — absent means `Data`, never a derivation.\n\n");
+        b.append("| Constant | JSON value | Rules |\n");
+        b.append("|----------|------------|------:|\n");
         Map<String, Integer> counts = new TreeMap<>();
-        Map<String, Set<String>> ops = new TreeMap<>();
         for (CensusRule r : s.assembledDistinct().values())
         {
             counts.merge(r.variableUniverse(), 1, Integer::sum);
-            ops.computeIfAbsent(r.variableUniverse(), _ -> new TreeSet<>())
-                    .addAll(r.checkOperators());
         }
         int total = 0;
-        Set<String> allOps = new TreeSet<>();
         for (VariableUniverse u : VariableUniverse.values())
         {
             int n = counts.getOrDefault(u.getJsonValue(), 0);
-            Set<String> o = ops.getOrDefault(u.getJsonValue(), Set.of());
-            allOps.addAll(o);
             total += n;
             b.append("| `").append(u.name()).append("` | `").append(u.getJsonValue()).append("` | ")
-                    .append(n).append(" | ").append(o.size()).append(" |\n");
+                    .append(n).append(" |\n");
         }
-        b.append("| **total** | | **").append(total).append("** | **").append(allOps.size())
-                .append("** |\n\n");
+        b.append("| **total** | | **").append(total).append("** |\n\n");
         b.append("A rule's `Variable_Universe` is invariant across the packages it is fanned out"
                 + " into, so the distinct-id projection is well defined (asserted by"
-                + " `RuleDocCensusDriftTest.classifyingFieldsAreInvariantPerRuleId`). The **total**"
-                + " row's operator count is the size of the union, not the sum of the column."
+                + " `RuleDocCensusDriftTest.classifyingFieldsAreInvariantPerRuleId`)."
                 + " (Until PLAN-leaf-scope-domain-inference phase 7 this section tabulated the"
                 + " derived `Rule_Type`; the engine now infers the evaluation domain from the"
-                + " Check and the universe is the one authored bit that taxonomy carried.)\n\n");
+                + " Check and the universe is the one authored bit that taxonomy carried. Until"
+                + " PLAN-retire-check-lowering it also counted the distinct Check operators per"
+                + " universe on a lowered operator-leaf view; the expression vocabulary is"
+                + " censused in CORE-EXPRESSION-CHECK-SPECIFICATION.md instead.)\n\n");
     }
 
 

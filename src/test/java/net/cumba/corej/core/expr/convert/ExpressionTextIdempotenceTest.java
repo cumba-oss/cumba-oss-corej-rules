@@ -129,7 +129,8 @@ class ExpressionTextIdempotenceTest
                     continue;
                 }
             }
-            else if (DualFormCheckNode.isExpressionCheck(checkNode))
+            else if (checkNode.isObject() && checkNode.has("expression") && !checkNode.has("all")
+                    && !checkNode.has("any") && !checkNode.has("not"))
             {
                 texts = List.of(checkNode.get("expression").asText());
             }
