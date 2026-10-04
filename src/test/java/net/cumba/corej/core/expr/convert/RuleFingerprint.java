@@ -19,6 +19,7 @@ import net.cumba.corej.core.CheckExprUnits;
 import net.cumba.corej.core.expr.CheckExpressionParser;
 import net.cumba.corej.core.expr.ExpressionPrinter;
 import net.cumba.corej.core.expr.MetadataOperandMapping;
+import net.cumba.corej.core.expr.OperandKind;
 import net.cumba.corej.core.expr.ast.Expr;
 import org.jspecify.annotations.Nullable;
 
@@ -51,9 +52,11 @@ import org.jspecify.annotations.Nullable;
  *
  * <ol>
  * <li><strong>α-rename {@code $}-operation ids.</strong> R-6.1/R-6.2 require only a {@code $}
- * prefix and uniqueness; the name is free. The rename is substituted through {@code Check}
- * <em>and</em> {@code Outcome.Output_Variables} — renaming only one side charges the pair a phantom
- * OV divergence (FDA-SD1307's {@code $HLTSUBJI_N} vs PMDA-SD1307's {@code $HLTSUBJI_N_COUNT}).</li>
+ * prefix and uniqueness; the name is free. The rename is substituted through {@code Check} — on the
+ * parsed expression's {@link OperandKind#OPERATION_REF} nodes, so a string or regex literal that
+ * happens to spell an id is never touched — <em>and</em> {@code Outcome.Output_Variables} —
+ * renaming only one side charges the pair a phantom OV divergence (FDA-SD1307's {@code $HLTSUBJI_N}
+ * vs PMDA-SD1307's {@code $HLTSUBJI_N_COUNT}).</li>
  * <li><strong>Sort {@code and}/{@code or} operand lists.</strong> Safe because the engine does not
  * short-circuit a conjunction into a different verdict: every operand is evaluated and combined.
  * R-7.8's "guard placed first" is therefore a readability SHOULD, not an execution requirement.
@@ -100,10 +103,11 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * ⚑ Zero shipped rules declare a second level, so every per-level path below is exercised by
- * synthetic input only. It is written now because the alternative — a fingerprint that reads
- * {@code Check} as one condition — would hash a level map as an opaque object, bucket two genuinely
- * different multi-level rules together the day one is authored, and fail nothing.
+ * ⚑ The corpus authors level maps (the {@code FDA}/{@code PMDA-SD0058} family and a handful of
+ * {@code ERROR}/{@code INFO} rules), so the per-level paths below are exercised by the corpus as
+ * well as by the synthetic input of their tests. The alternative — a fingerprint that reads
+ * {@code Check} as one condition — would hash a level map as an opaque object and bucket two
+ * genuinely different multi-level rules together, failing nothing.
  * </p>
  */
 final class RuleFingerprint
@@ -202,7 +206,7 @@ final class RuleFingerprint
         SequencedMap<String, JsonNode> levels = renamed.levels();
         if (levels == null)
         {
-            return ops + "|" + canonicalCheck(renamed.check(), stripGuards);
+            return ops + "|" + canonicalCheck(renamed.check(), stripGuards, renamed.mapping());
         }
         StringBuilder rendered = new StringBuilder("{");
         for (Map.Entry<String, JsonNode> level : levels.entrySet())
@@ -212,27 +216,66 @@ final class RuleFingerprint
                 rendered.append(", ");
             }
             rendered.append(level.getKey()).append('=')
-                    .append(canonicalCheck(level.getValue(), stripGuards));
+                    .append(canonicalCheck(level.getValue(), stripGuards, renamed.mapping()));
         }
         return ops + "|" + rendered.append('}');
     }
 
 
     /**
-     * One condition's canonical L1 text: the parsed expression, optionally guard-stripped,
-     * flattened and sorted, printed. A node that is not an expression Check (no {@code Check} at
-     * all, or a shape the loader rejects) is hashed as its canonical JSON, so a rule without a
-     * Check still fingerprints; an unparseable expression propagates — the loader rejects it too,
-     * and hashing its text would bucket a load error as a rule.
+     * One condition's canonical L1 text: the parsed expression, α-renamed ({@link #renameRefs}),
+     * optionally guard-stripped, flattened and sorted, printed. A node that is not an expression
+     * Check (no {@code Check} at all, or a shape the loader rejects) is hashed as its canonical
+     * JSON, renamed generically, so a rule without a Check still fingerprints; an unparseable
+     * expression propagates — the loader rejects it too, and hashing its text would bucket a load
+     * error as a rule.
      */
-    private static String canonicalCheck(@Nullable JsonNode condition, boolean stripGuards)
+    private static String canonicalCheck(@Nullable JsonNode condition, boolean stripGuards,
+            Map<String, String> mapping)
     {
         JsonNode text = condition == null ? null : condition.get("expression");
         if (text == null || !text.isTextual())
         {
-            return canon(condition);
+            return canon(substitute(condition, mapping));
         }
-        return canonicalExpression(CheckExpressionParser.parse(text.asText()), stripGuards);
+        return canonicalExpression(renameRefs(CheckExpressionParser.parse(text.asText()), mapping),
+                stripGuards);
+    }
+
+
+    /**
+     * α-renames a parsed condition: every {@link OperandKind#OPERATION_REF} reference whose id
+     * {@code mapping} names is replaced by its synthetic {@code $__n}; nothing else moves. Renaming
+     * on the {@link Expr} rather than on the {@code Check} text (T2 review L4,
+     * {@code PLAN-retire-check-lowering}) is what keeps a string or regex literal that spells an id
+     * — {@code "$x"}, {@code /^$x/} — out of the rename: a text substitution cannot tell a token
+     * from a literal, and a renamed literal is a changed rule.
+     */
+    static Expr renameRefs(Expr e, Map<String, String> mapping)
+    {
+        return switch (e)
+        {
+        case Expr.Ref r when r.kind() == OperandKind.OPERATION_REF
+                && mapping.containsKey(r.name()) -> new Expr.Ref(mapping.get(r.name()), r.kind());
+        case Expr.Ref r -> r;
+        case Expr.Lit l when l.kind() == Expr.LitKind.LIST -> new Expr.Lit(l.kind(),
+                ((List<?>) l.value()).stream().map(i -> (Object) renameRefs((Expr) i, mapping))
+                        .toList());
+        case Expr.Lit l -> l;
+        case Expr.Not n -> new Expr.Not(renameRefs(n.inner(), mapping));
+        case Expr.And a -> new Expr.And(
+                a.parts().stream().map(p -> renameRefs(p, mapping)).toList());
+        case Expr.Or o -> new Expr.Or(o.parts().stream().map(p -> renameRefs(p, mapping)).toList());
+        case Expr.Binary b -> new Expr.Binary(b.op(), renameRefs(b.left(), mapping),
+                renameRefs(b.right(), mapping));
+        case Expr.Call c ->
+        {
+            Map<String, Expr> kwargs = new LinkedHashMap<>();
+            c.kwargs().forEach((k, v) -> kwargs.put(k, renameRefs(v, mapping)));
+            yield new Expr.Call(c.name(),
+                    c.args().stream().map(a -> renameRefs(a, mapping)).toList(), kwargs);
+        }
+        };
     }
 
 
@@ -424,11 +467,11 @@ final class RuleFingerprint
      * </p>
      *
      * <p>
-     * ⚑ Why the empty string rather than a constant {@code |[]}: every shipped rule authors a plain
-     * {@code Check:} and therefore no per-level message, so an unconditional suffix would shift all
-     * 3 804 L3 strings to record a fact none of them carries. Relative comparison would survive it
-     * — L3 is only ever compared against another L3 — but a no-op that rewrites every hash is a
-     * change to explain later for no gain today.
+     * ⚑ Why the empty string rather than a constant {@code |[]}: almost every shipped rule authors
+     * a plain {@code Check:} and therefore no per-level message, so an unconditional suffix would
+     * shift thousands of L3 strings to record a fact they do not carry. Relative comparison would
+     * survive it — L3 is only ever compared against another L3 — but a no-op that rewrites every
+     * hash is a change to explain later for no gain today.
      * </p>
      */
     private static String levelMessages(JsonNode rule)
@@ -464,24 +507,29 @@ final class RuleFingerprint
      * @param operations
      *            the renamed {@code Operations} entries, authored order
      * @param check
-     *            the renamed {@code Check:} node exactly as authored — the plain condition, or the
-     *            whole level map. Never {@code null}-checked here; {@link #l1} reads it only on the
-     *            plain branch
+     *            the {@code Check:} node exactly as authored, <b>not</b> renamed — the plain
+     *            condition, or the whole level map. Never {@code null}-checked here; {@link #l1}
+     *            reads it only on the plain branch
      * @param levels
-     *            the renamed per-level conditions in ladder order, {@code Message} stripped, or
-     *            {@code null} when the {@code Check:} is a plain condition
+     *            the per-level conditions in ladder order, not renamed, {@code Message} stripped,
+     *            or {@code null} when the {@code Check:} is a plain condition
      * @param outputVariables
      *            the renamed {@code Outcome.Output_Variables} entries
+     * @param mapping
+     *            authored id → synthetic {@code $__n}; the {@code Check} conditions are renamed
+     *            with it on their parsed expression ({@link #renameRefs}), not here
      */
     record Renamed(List<JsonNode> operations, JsonNode check,
-            @Nullable SequencedMap<String, JsonNode> levels, List<JsonNode> outputVariables)
+            @Nullable SequencedMap<String, JsonNode> levels, List<JsonNode> outputVariables,
+            Map<String, String> mapping)
     {
     }
 
     /**
      * Sorts the operations by their content with {@code id} removed, renames the ids to
-     * {@code $__0..$__n}, and substitutes the mapping through the operations, the {@code Check} and
-     * {@code Outcome.Output_Variables}. Two operations collapse onto the same synthetic id only
+     * {@code $__0..$__n}, and substitutes the mapping through the operations and
+     * {@code Outcome.Output_Variables}; the {@code Check} is renamed later, on its parsed
+     * expression ({@link #renameRefs}). Two operations collapse onto the same synthetic id only
      * when their content is identical, i.e. when they compute the same value.
      */
     static Renamed alphaRename(JsonNode rule)
@@ -519,10 +567,10 @@ final class RuleFingerprint
             declaredOv.forEach(entry -> outputVariables.add(substitute(entry, mapping)));
         }
 
-        // ⚑ substitute() walks generically, so it renames THROUGH a level map's values without
-        // knowing what a level is; the split into levels happens after, on the renamed node.
-        JsonNode check = substitute(rule.get("Check"), mapping);
-        return new Renamed(renamedOps, check, levels(check), outputVariables);
+        // ⚑ The Check is NOT text-substituted (T2 review L4): canonicalCheck renames each
+        // condition on its parsed Expr, where a `$id` reference and a literal spelling one differ.
+        JsonNode check = rule.get("Check");
+        return new Renamed(renamedOps, check, levels(check), outputVariables, Map.copyOf(mapping));
     }
 
     // ------------------------------------------------- the Expr canonical form

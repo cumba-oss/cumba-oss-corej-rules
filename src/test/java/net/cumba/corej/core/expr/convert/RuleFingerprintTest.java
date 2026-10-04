@@ -128,6 +128,37 @@ class RuleFingerprintTest
         assertNotEquals(RuleFingerprint.l1(a, false), RuleFingerprint.l1(b, false));
     }
 
+
+    /**
+     * T2 review L4 ({@code PLAN-retire-check-lowering}): the α-rename reaches the {@code $}-id
+     * <em>references</em> of the Check and nothing else. A string literal that spells a binding id
+     * is a value — the substring rename this replaced turned {@code "$x"} into {@code "$__0"} and
+     * so made two rules comparing against different literals hash as one rule.
+     */
+    @Test
+    void alphaRenameNeverRenamesInsideAStringLiteral()
+    {
+        JsonNode x = rule("""
+                Bindings:
+                - name: "$x"
+                  expression: "record_count()"
+                Check:
+                  expression: '$x > 1 and AETERM == "$x"'
+                """);
+        JsonNode y = rule("""
+                Bindings:
+                - name: "$y"
+                  expression: "record_count()"
+                Check:
+                  expression: '$y > 1 and AETERM == "$y"'
+                """);
+        String l1 = RuleFingerprint.l1(x, false);
+        assertTrue(l1.contains("$__0 > 1"), "the reference is renamed: " + l1);
+        assertTrue(l1.contains("\"$x\""), "the literal keeps its authored text: " + l1);
+        assertNotEquals(l1, RuleFingerprint.l1(y, false),
+                "two rules comparing AETERM against different literals are different rules");
+    }
+
     // ------------------------------------------------------- commutativity
 
 
