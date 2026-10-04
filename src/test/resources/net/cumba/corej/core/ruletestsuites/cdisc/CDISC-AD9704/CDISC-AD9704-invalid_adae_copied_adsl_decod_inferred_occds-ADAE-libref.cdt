@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD9704 expect=violation domain=ADAE
+#note "PLAN-occds-source-domain-by-ig owner ruling MED-1 (a), on OUR metadata store: ADAE under the D10-inferred OCCDS 1.0 (base Req STUDYID, USUBJID, --SEQ, --TERM, CMTRT, AESER) with NO AESEQ column, carrying ADSL's DCDECOD as copied subject-level data. A source domain is evidenced only by its --SEQ or its topic variable (--TERM / --TRT); a --DECOD column alone adds no domain. So AETERM names AE alone, --SEQ / --TERM resolve to AESEQ / AETERM and are demanded, and the absent AESEQ is reported; CMTRT carries the CM prefix and is not demanded; AESER (AE) is demanded and present -> one violation naming [AESEQ]. Before the ruling DCDECOD read as a second domain DC, the dataset was multi-domain (D3), no '--' name was demanded, and the missing AESEQ went unreported (silent)."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt "$missing_required_variables"="[AESEQ]"
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AESER type=Char label="Serious Event"
+col DCDECOD type=Char label="Standardized Disposition Term"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | HEADACHE | N | COMPLETED
+---

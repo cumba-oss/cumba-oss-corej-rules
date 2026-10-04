@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0047 expect=violation domain=ADAE
+#note "PLAN-occds-source-domain-by-ig owner ruling MED-1 (a) with review H1, on OUR metadata store: an ADAE declared OCCDS (as by a define's def:Class) whose only occurrence-shaped column is ADSL's copied DCDECOD, resolved against the D10-inferred OCCDS 1.0 (base Req STUDYID, USUBJID, --SEQ, --TERM, CMTRT, AESER). A --DECOD column alone adds no domain, so the evidence set is EMPTY: the '--' names stay unresolved and are not demanded (D4), and no concrete carried name is dropped (H1) - CMTRT and AESER are both demanded and both absent -> one violation naming [CMTRT, AESER]. Before the ruling DCDECOD named the single domain DC: --SEQ / --TERM became DCSEQ / DCTERM and the AE name AESER was dropped as another domain's ([DCSEQ, DCTERM])."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt "$missing_required_variables"="[CMTRT, AESER]"
+dataset ADAE structure=OCCDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DCDECOD type=Char label="Standardized Disposition Term"
+---
+CDISCPILOT01 | 01-701-1015 | COMPLETED
+---
