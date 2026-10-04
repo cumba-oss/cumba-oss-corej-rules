@@ -43,6 +43,8 @@ expected_violations:
     # dataset-level binding hands over no first value, so each renders null where the operation
     # result used to be absent from the map. Same (dataset-level) finding, same status.
     output_variables:
-      $TRTSDTM_EXISTS: null
-      $TRTSDT_EXISTS: null
+      # PLAN-output-variable-null-key-provenance (M4): a boolean binding with no row to read on an
+      # empty dataset reports its typed default, the missing marker — it printed an untyped "".
+      $TRTSDTM_EXISTS: '.'
+      $TRTSDT_EXISTS: '.'
 expected_errors: []

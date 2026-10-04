@@ -356,13 +356,35 @@ public final class SpecRunner
      */
     public static @Nullable RuleExecutionResult executeRaw(SpecSchema spec) throws IOException
     {
+        return executeRawWithTable(spec).result();
+    }
+
+    /**
+     * {@link #executeRaw}'s result beside the primary table it ran on — for
+     * {@code NullKeyProvenanceDifferentialTest}, which classifies a reported entry by whether the
+     * primary dataset carries a column of that name.
+     *
+     * @param result
+     *            the engine result, or {@code null} when the primary dataset is outside the rule's
+     *            scope
+     * @param primaryTable
+     *            the primary dataset the spec names
+     */
+    public record RawExecution(@Nullable RuleExecutionResult result, IDataTable primaryTable)
+    {
+    }
+
+    /** As {@link #executeRaw}, with the primary table. */
+    public static RawExecution executeRawWithTable(SpecSchema spec) throws IOException
+    {
         Prepared p = prepare(spec);
         if (p.scopeSkipReason() != null)
         {
-            return null;
+            return new RawExecution(null, p.primaryTable());
         }
-        return RuleRunnerCalls.execute(p.rule(), p.primaryTable(), p.resolver(), p.cdiscDomain(),
-                p.library(), /*joinCache=*/null, defineProviderFrom(spec.name(), spec.defineXml()));
+        return new RawExecution(RuleRunnerCalls.execute(p.rule(), p.primaryTable(), p.resolver(),
+                p.cdiscDomain(), p.library(), /*joinCache=*/null,
+                defineProviderFrom(spec.name(), spec.defineXml())), p.primaryTable());
     }
 
 
@@ -423,6 +445,10 @@ public final class SpecRunner
         MetadataProvider defineProvider = defineProviderFrom(spec.name(), spec.defineXml());
         RuleExecutionResult result = RuleRunnerCalls.execute(rule, primaryTable, resolver,
                 cdiscDomain, library, /*joinCache=*/null, defineProvider);
+        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null, outside the
+        // committed present-column / no-cell roster — judged on every spec execution.
+        net.cumba.corej.core.FindingValuesNullGuard.requireNullFree("spec " + spec.name(), rule,
+                result.getViolations());
 
         List<CanonicalViolation> observed = ViolationNormaliser.normalise(result, primaryTable,
                 primaryDomain, rowKey);

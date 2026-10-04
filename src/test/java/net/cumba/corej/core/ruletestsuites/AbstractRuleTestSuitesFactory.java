@@ -611,10 +611,16 @@ abstract class AbstractRuleTestSuitesFactory
         // Plan C §3.4: the scenario's `#runLevel`, or the engine default (Warning) when it
         // declares none — so every scenario in this suite that says nothing is a
         // default-threshold baseline, exactly as it was before per-level Checks existed.
-        return RuleRunnerCalls.execute(aRule, aPrimary, aResolver, aDomain, aLibrary, null, aDefine,
-                Integer.MAX_VALUE, null, aDictionaries, aVlm, java.util.Set.of(),
-                java.util.Set.of(),
+        RuleExecutionResult result = RuleRunnerCalls.execute(aRule, aPrimary, aResolver, aDomain,
+                aLibrary, null, aDefine, Integer.MAX_VALUE, null, aDictionaries, aVlm,
+                java.util.Set.of(), java.util.Set.of(),
                 net.cumba.corej.core.exec.EngineLimits.resolveSeverityThreshold(aRunLevel));
+        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null, outside the
+        // committed present-column / no-cell roster — judged on every scenario execution.
+        net.cumba.corej.core.FindingValuesNullGuard.requireNullFree(
+                "scenario " + aDomain + " / " + aPrimary.getMetaData().getName(), aRule,
+                result.getViolations());
+        return result;
     }
 
 
