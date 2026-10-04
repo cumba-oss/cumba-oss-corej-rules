@@ -91,21 +91,22 @@ import org.opentest4j.TestAbortedException;
  * ({@code RuleCorpusGenerator} reads {@code rules-src/} and
  * {@code rules-src/package-standards.json} relative to the working directory, which is why it runs
  * inside {@code TREE}.) Without the property the class is skipped — it is the plan's instrument,
- * not a permanent gate. ⚠ <b>It is kept until the plan's S2 rules land</b>
- * ({@code CDISC-AD0102 / 0103 / 0104 / 0498}, {@code PMDA-AD0102 / 0103 / 0104}, deferred on an
- * engine decision): they still carry {@code ${…}} and their respelling needs this instrument.
- * Nothing here claims that the {@code ${…}} path has engine-test coverage of its own.
+ * not a permanent gate. The plan's S2 rules ({@code CDISC-AD0102 / 0103 / 0104 / 0498},
+ * {@code PMDA-AD0102 / 0103 / 0104}) landed last (§6.2, after the engine fix of owner ruling (a),
+ * 2026-10-04, which makes {@code var_exists($n)} read the bound name), so all 42 rules of the plan
+ * are in the population (with {@code CDISC-AD0719}, joined by its listed moves). Nothing here
+ * claims that the {@code ${…}} path has engine-test coverage of its own.
  * </p>
  *
  * <p>
- * <b>The contract is committed.</b> The plan's 21 expected moves are
+ * <b>The contract is committed.</b> The plan's 24 expected moves are
  * {@code src/test/resources/respell-differential/expected-moves.txt} (verdict moves) and
  * {@code expected-report-moves.txt} (verdict-neutral row moves), read when the matching property is
  * absent. A default run (no {@code corej.respell.*} property besides the base) also pins its
  * population: the exact rule roster ({@code population.txt}), the scenario count
  * ({@value #EXPECTED_SCENARIOS}), the three rulespec fixtures and the {@code ${…}} rules that have
- * no scenario directory at all ({@code CDISC-AD0104}). A count pin alone is blind to a re-key,
- * which is why the roster is a list of ids.
+ * no scenario directory at all (none since §6.2 gave {@code CDISC-AD0104} its first scenarios). A
+ * count pin alone is blind to a re-key, which is why the roster is a list of ids.
  * </p>
  *
  * <p>
@@ -184,10 +185,10 @@ class DynamicColumnRespellingDifferentialTest
             "CDISC-AD0897");
 
     /** The default run's scenario count; the rule roster is {@code population.txt}. */
-    static final int EXPECTED_SCENARIOS = 166;
+    static final int EXPECTED_SCENARIOS = 171;
 
     /** {@code ${…}} rules of the default population with no scenario directory in either family. */
-    private static final Set<String> EXPECTED_WITHOUT_SCENARIOS = Set.of("CDISC-AD0104");
+    private static final Set<String> EXPECTED_WITHOUT_SCENARIOS = Set.of();
 
     /** The families the {@code ${…}} rules live in; a factory per family runs the scenarios. */
     private static final List<AbstractRuleTestSuitesFactory> FACTORIES = List

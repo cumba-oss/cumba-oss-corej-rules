@@ -22,14 +22,18 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$tr_edt"
+  expression: "concat(\"ADSL.TR\", printf(\"%02d\", APERIOD), \"EDT\")"
 Check:
   expression: >-
-    APERIOD > 1 and not var_exists(ADSL.TR${APERIOD:%02d}EDT)
+    APERIOD > 1 and not empty($tr_edt) and not var_exists($tr_edt)
 Outcome:
   Message: "The value of APERIOD (greater than 1) has no corresponding TRxxEDT variable\
     \ present in ADSL."
   Output_Variables:
   - "APERIOD"
+  - "!$tr_edt"
 Source:
   Class: "ALL"
   Variable_or_Item: "APERIOD"

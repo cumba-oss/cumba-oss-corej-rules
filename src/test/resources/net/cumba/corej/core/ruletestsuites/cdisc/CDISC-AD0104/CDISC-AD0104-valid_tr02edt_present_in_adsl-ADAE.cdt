@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0104 expect=noViolation domain=ADAE
+#note "PLAN-dynamic-column-corpus-respelling §6.2, the first CDISC-AD0104 scenarios (column PRESENT): APERIOD=2 and ADSL carries TR02EDT, so the bound name $tr_edt (ADSL.TR02EDT) exists -> no violation. Row 1 (APERIOD=1) is outside the APERIOD > 1 gate although ADSL has no TR01EDT."
+#library standard=adamig version=1-3
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col APERIOD type=Num
+col AETERM  type=Char
+---
+STUDY1 | S1 | 1 | AE1
+STUDY1 | S1 | 2 | AE1
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TR02EDT type=Date
+---
+STUDY1 | S1 | 2024-03-01
+---

@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0498 expect=noViolation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.2 Q1 / QS (b), S2 with two drivers: row 1 APERIOD=1.5 (ASPER=1), row 2 ASPER=1.5 (APERIOD=1). printf(\"%02dS%d\", APERIOD, ASPER) is a computed missing when either driver is non-integral, so the bound name $p_s is missing and `not empty($p_s)` is false -> both rows silent. The base ${APERIOD:%02d}S${ASPER:%d} spelling truncated both to ADSL.P01S1, which ADSL does not carry (only P02S2), and fired on both rows (red on the base text, as ruled 2026-10-03)."
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APERIOD type=Num
+col ASPER type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1.5 | 1
+CDISCPILOT01 | 01-701-1015 | 1 | 1.5
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col P02S2 type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915
+---

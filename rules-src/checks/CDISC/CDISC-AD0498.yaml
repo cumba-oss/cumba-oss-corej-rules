@@ -24,15 +24,19 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$p_s"
+  expression: "concat(\"ADSL.P\", printf(\"%02dS%d\", APERIOD, ASPER))"
 Check:
   expression: >-
-    not empty(APERIOD) and not empty(ASPER) and not var_exists(ADSL.P${APERIOD:%02d}S${ASPER:%d})
+    not empty(APERIOD) and not empty(ASPER) and not empty($p_s) and not var_exists($p_s)
 Outcome:
   Message: "The values of APERIOD and ASPER have no corresponding PxxSw variable present\
     \ in ADSL."
   Output_Variables:
   - "APERIOD"
   - "ASPER"
+  - "!$p_s"
 Source:
   Class: "ALL"
   Variable_or_Item: "APERIOD; ASPER"

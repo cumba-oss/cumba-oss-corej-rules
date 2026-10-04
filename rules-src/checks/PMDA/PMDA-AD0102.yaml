@@ -23,13 +23,17 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$trt_p"
+  expression: "concat(\"ADSL.TRT\", printf(\"%02d\", APERIOD), \"P\")"
 Check:
   expression: >-
-    not empty(APERIOD) and not var_exists(ADSL.TRT${APERIOD:%02d}P)
+    not empty(APERIOD) and not empty($trt_p) and not var_exists($trt_p)
 Outcome:
   Message: "TRTxxP is not present in ADSL for this record's APERIOD value."
   Output_Variables:
   - "APERIOD"
+  - "!$trt_p"
 Source:
   Message: "There is no TRTxxP variable in ADSL for every unique xx value of APERIOD"
   Description: "The Analysis Period (APERIOD) values will be a number like 01. There\
