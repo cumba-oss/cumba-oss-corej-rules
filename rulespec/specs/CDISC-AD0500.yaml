@@ -2,11 +2,13 @@ name: CDISC-AD0500
 kind: rule
 description: |
   CDISC-AD0500: the value of APHASE (if populated) must be one of the values in the ADSL
-  APHASEw variables. Aligned to rules-legacy: Match_Datasets [ADSL on USUBJID] + Check
-  `APHASE non_empty AND APHASE is_not_contained_by ADSL.APHASE${*}`. Java resolves the ${*}
-  wildcard column-set against the joined ADSL and fires on USUBJID 002 (APHASE=SCREENING not in
-  ADSL {TREATMENT, FOLLOWUP}). Baselined lane=python: the Python harness cannot expand a ${*}
-  column-set (is_contained_by raises "only list-like objects … isin()"). Expected = Java output.
+  APHASEw variables. Match_Datasets [ADSL on USUBJID] + Check
+  `not empty(APHASE) and APHASE not in colref(find_vars("ADSL.APHASEw"))`: find_vars selects
+  the one-digit APHASEw columns of the joined ADSL, colref reads their values, and the rule fires
+  on USUBJID 002 (APHASE=SCREENING not in ADSL {TREATMENT, FOLLOWUP}). The spec was first aligned
+  to rules-legacy's `is_not_contained_by` over a wildcard ADSL.APHASE column-set and baselined
+  lane=python: the Python harness could not expand that column-set (is_contained_by raised "only
+  list-like objects … isin()"). Expected = Java output.
 python_source: rules-adamig-1-3.json (CDISC-AD0500)
 rule:
   coreId: CDISC-AD0500
