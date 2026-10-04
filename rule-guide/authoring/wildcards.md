@@ -81,7 +81,9 @@ Check:
 On a dataset carrying `TRT02P` the rule **runs and passes** — a treatment variable exists, so
 there is nothing to report. On a dataset carrying none of them it runs and reports. With no
 template left in a presence test, remove the rule's `wildcards` block as well — a bound on a token
-no name uses is a load error (above). `CDISC-AD0581` is the worked case (2026-09-30).
+no name uses is a load error (above). `CDISC-AD0581` is the worked case (2026-09-30);
+`CDISC-AD0719` followed on 2026-10-04 (its sixteen indexed families, the same way), and no
+shipped rule carries a template in `Requirements.Variables.None` any more.
 
 > ⚑ **The former fix** put the templates into
 > [`Requirements.Variables.None`](requirements.md#none--no-entry-may-be-present). That **skips** the

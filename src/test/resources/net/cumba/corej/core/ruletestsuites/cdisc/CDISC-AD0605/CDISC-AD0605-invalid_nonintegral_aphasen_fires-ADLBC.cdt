@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0605 expect=violation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.2 Q1, S1 unguarded: APHASEN=1.5 is not a phase number. printf(\"%d\", 1.5) is a computed missing, so $ph_sdt is missing and `PHSDT != $ph_sdt` fires (register: != on a missing fires). The retired ${APHASEN:%d} spelling truncated 1.5 to 1 and compared PHSDT 21915 against PH1SDT 21915 -> silent (red on the base text, as ruled 2026-09-30)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APHASEN type=Num
+col PHSDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1.5 | 21915
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDT type=Num
+col PH2SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21950
+---

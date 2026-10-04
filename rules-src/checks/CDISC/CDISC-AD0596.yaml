@@ -24,17 +24,20 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$ap_etm"
+  expression: "colref(concat(\"ADSL.AP\", printf(\"%02d\", APERIOD), \"ETM\"))"
 Check:
   expression: >-
-    not empty(APERETM) and not empty(ADSL.AP${APERIOD:%02d}ETM) and APERETM !=
-    ADSL.AP${APERIOD:%02d}ETM
+    not empty(APERETM) and not empty($ap_etm) and APERETM != $ap_etm
 Outcome:
   Message: "On a given record, the value of APERETM is not equal to the value of variable\
     \ APxxETM where xx equals the value of APERIOD"
   Output_Variables:
   - "APERIOD"
   - "APERETM"
-  - "ADSL.AP${*}ETM"
+  - "ADSL.APxxETM"
+  - "!$ap_etm"
 Source:
   Class: "ALL"
   Variable_or_Item: "APERETM"

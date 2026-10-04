@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0607 expect=violation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.4, the absent arm of the unguarded S1 family: APHASEN=2 names ADSL.PH2STM, which the bound ADSL row does not carry. colref of the absent name answers the character default '' (no position of the rule expects a number of it), `PHSTM != ''` takes the string arm -> fires. The retired ${APHASEN:%d} spelling answered the same '' (PMDA-AD0605 invalid_target_column_absent pins that mechanism), so the two spellings agree; a guarded respelling (`not empty($ph_stm)`) would silence this row, which is what this scenario exists to catch."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APHASEN type=Num
+col PHSTM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 2 | 23100
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1STM type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 23000
+---

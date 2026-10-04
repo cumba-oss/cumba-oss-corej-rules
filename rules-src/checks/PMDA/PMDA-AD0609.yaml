@@ -24,16 +24,20 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$ph_sdtm"
+  expression: "colref(concat(\"ADSL.PH\", printf(\"%d\", APHASEN), \"SDTM\"))"
 Check:
   expression: >-
-    not empty(APHASEN) and not empty(PHSDTM) and PHSDTM != ADSL.PH${APHASEN:%d}SDTM
+    not empty(APHASEN) and not empty(PHSDTM) and PHSDTM != $ph_sdtm
 Outcome:
   Message: "On a given record, APHASEN is populated and the value of PHSDTM is not\
     \ equal to the value of variable PHwSDTM where w equals the value of APHASEN"
   Output_Variables:
   - "APHASEN"
   - "PHSDTM"
-  - "ADSL.PH${*}SDTM"
+  - "ADSL.PHwSDTM"
+  - "!$ph_sdtm"
 Source:
   Message: "APHASEN w has a PHSDTM != ADSL.PHwSDTM"
   Description: "When analysis Phase (APHASE) variable is defined, the analysis Phase\

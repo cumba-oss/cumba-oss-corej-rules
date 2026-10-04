@@ -23,8 +23,9 @@ Match_Datasets:
   - "USUBJID"
 Check:
   expression: >-
-    not empty(TRTP) and TRTP not in ADSL.TRT${*}P and TRTP not in ADSL.TRTSEQP and TRTP not in
-    ADSL.TRTPG${*} and TRTP not in ADSL.TR${*}PG${*}
+    not empty(TRTP) and TRTP not in colref(find_vars("ADSL.TRTxxP")) and TRTP not in ADSL.TRTSEQP
+    and TRTP not in colref(find_vars("ADSL.TRTPGy")) and TRTP not in
+    colref(find_vars("ADSL.TRxxPGy"))
 Outcome:
   Message: "The value of TRTP was not found among the values of the character planned\
     \ treatment variables in ADSL defined in the IG."

@@ -24,7 +24,8 @@ Match_Datasets:
   - "USUBJID"
 Check:
   expression: >-
-    not var_exists("APHASEN") and not empty(PHEDTM) and PHEDTM not in ADSL.PH${*}EDTM
+    not var_exists("APHASEN") and not empty(PHEDTM) and PHEDTM not in
+    colref(find_vars("ADSL.PHwEDTM"))
 Outcome:
   Message: "On a given record, APHASEN is not present and the value of PHEDTM does\
     \ not equal any PHwEDTM variable"

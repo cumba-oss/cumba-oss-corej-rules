@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0592 expect=noViolation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.2 Q1, S1 guarded: APERIOD=1.5 is not a period number. printf(\"%02d\", 1.5) is a computed missing, so $ap_sdt is missing and `not empty($ap_sdt)` is false -> silent. The retired ${APERIOD:%02d} spelling truncated 1.5 to 1 and compared APERSDT 21900 against AP01SDT 21915 -> fired (red on the base text, as ruled 2026-09-30)."
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APERIOD type=Num
+col APERSDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1.5 | 21900
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col AP01SDT type=Num
+col AP02SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 21950
+---

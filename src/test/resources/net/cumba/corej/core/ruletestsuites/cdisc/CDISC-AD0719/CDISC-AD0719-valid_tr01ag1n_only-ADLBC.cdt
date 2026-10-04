@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0719 expect=noViolation domain=ADLBC
+# Rule:Description: Raise an error when a BDS dataset contains none of the subject-level or record-level treatment variables defined in the IG.
+#note "Only TR01AG1N is present. It is a member of the TRxxAGyN family defined in the IG (ADaMIG 1.1/1.2/1.3 Table 3.2.4 (ADSL treatment variables, any of which may be copied into a BDS dataset)), so the CR719 requirement is met: the Check's count(find_vars('TRxxAGyN')) == 0 term is false, the rule runs and passes (PLAN-dynamic-column-corpus-respelling phase 2 — the template moved from Requirements.Variables.None into the Check, the AD0581 shape of R-5.31; this dataset used to be SKIPPED, which misreported a conformant dataset as 'could not check')."
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+col TR01AG1N type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5 | 1
+---

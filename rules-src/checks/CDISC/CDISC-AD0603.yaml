@@ -25,10 +25,13 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$p_s_edm"
+  expression: "colref(concat(\"ADSL.P\", printf(\"%02dS%d\", APERIOD, ASPER), \"EDM\"\
+    ))"
 Check:
   expression: >-
-    not empty(ASPREDTM) and not empty(ADSL.P${APERIOD:%02d}S${ASPER:%d}EDM) and ASPREDTM !=
-    ADSL.P${APERIOD:%02d}S${ASPER:%d}EDM
+    not empty(ASPREDTM) and not empty($p_s_edm) and ASPREDTM != $p_s_edm
 Outcome:
   Message: "On a given record, the value of ASPREDTM is not equal to the value of\
     \ variable PxxSwEDM where xx equals the value of APERIOD and w equals the value\
@@ -37,7 +40,8 @@ Outcome:
   - "APERIOD"
   - "ASPER"
   - "ASPREDTM"
-  - "ADSL.P${*}S${*}EDM"
+  - "ADSL.PxxSwEDM"
+  - "!$p_s_edm"
 Source:
   Class: "ALL"
   Variable_or_Item: "ASPREDTM"

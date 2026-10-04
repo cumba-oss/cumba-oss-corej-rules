@@ -24,8 +24,8 @@ Match_Datasets:
   - "USUBJID"
 Check:
   expression: >-
-    not empty(TRTA) and TRTA != ADSL.TRTA and TRTA not in ADSL.TRT${*}A and TRTA not in
-    ADSL.TRTAG${*} and TRTA not in ADSL.TR${*}AG${*}
+    not empty(TRTA) and TRTA != ADSL.TRTA and TRTA not in colref(find_vars("ADSL.TRTxxA")) and TRTA
+    not in colref(find_vars("ADSL.TRTAGy")) and TRTA not in colref(find_vars("ADSL.TRxxAGy"))
 Outcome:
   Message: "TRTA is populated, but does not match any of the character actual treatment\
     \ variable values in ADSL"

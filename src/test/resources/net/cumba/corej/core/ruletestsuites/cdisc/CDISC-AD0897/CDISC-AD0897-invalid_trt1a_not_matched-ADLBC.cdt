@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0897 expect=violation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.2 Q3, S4: find_vars(\"ADSL.TRTxxA\") selects the two-digit TRTxxA family the IG defines; ADSL.TRT1A (a non-IG width) is not a member, so TRTA 'Xanomeline High Dose', which equals TRT1A only, matches no actual-treatment variable -> fires. The retired ADSL.TRT${*}A set matched any digit run, took TRT1A as a member and stayed silent (red on the base text, as ruled 2026-09-30)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTA type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Xanomeline High Dose
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTA type=Char
+col TRT1A type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo | Xanomeline High Dose
+---

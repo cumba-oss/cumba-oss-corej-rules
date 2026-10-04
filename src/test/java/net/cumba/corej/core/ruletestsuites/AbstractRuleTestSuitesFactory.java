@@ -345,6 +345,48 @@ abstract class AbstractRuleTestSuitesFactory
         assertNotNull(primary, "Scenario " + s.getCoreId() + " declares domain=" + s.getDomain()
                 + " but no such dataset is present in the file");
 
+        EvalOutcome outcome = evaluateScenario(aFile, s, rule, primary);
+        if (outcome == null)
+        {
+            return; // out of scope — asserted inside evaluateScenario
+        }
+
+        if (ScenarioLocationBackfill.isEnabled())
+        {
+            boolean valueBased = rule.getEvaluationDomain() == null
+                    || rule.getEvaluationDomain().rowCursor();
+            ScenarioLocationBackfill.run(aFile, s, outcome.violations(), outcome.totalCount(),
+                    outcome.truncated(), valueBased);
+            return;
+        }
+
+        assertScenarioVerdict(s, outcome, primary);
+    }
+
+
+    /**
+     * Everything {@link #runScenario} does between resolving the rule and judging the verdict: the
+     * scope pre-gate, the metadata axes and the execution itself — for the rule handed in, which
+     * need not be the one the family packages resolve.
+     *
+     * <p>
+     * Package-private seam for {@code DynamicColumnRespellingDifferentialTest}
+     * ({@code PLAN-dynamic-column-corpus-respelling} §2.8): the differential executes every
+     * scenario of a respelled rule twice — once with the rule's <b>base</b> text (loaded from a
+     * second package directory) and once with the respelled one — and compares the whole finding
+     * rows. Keeping the preparation here, rather than copying it, is what makes the differential
+     * judge exactly the execution the factories run.
+     * </p>
+     *
+     * @return the outcome, or {@code null} when the primary dataset is outside the rule's scope
+     *         (the scenario's declaration is asserted here, as before)
+     */
+    @Nullable
+    EvalOutcome evaluateScenario(Path aFile, RuleTestScenario s, Rule rule,
+            OverlayDataTable primary)
+        throws IOException
+    {
+
         // Production enforces the Domains/Classes scope axes upstream of RuleRunner
         // (DatasetRuleResolver -> ScopeMatcher), so mirror that gate here: an out-of-scope primary
         // dataset means the rule never runs -> "executed, zero violations". This makes Scope
@@ -368,7 +410,7 @@ abstract class AbstractRuleTestSuitesFactory
                             + " dataset: " + scopeMismatch
                             + " — the scenario is not exercising the rule; declare"
                             + " 'expect=skipped', which is what being out of scope means.");
-            return;
+            return null;
         }
 
         DatasetResolver.WithInventory resolver = s.resolver();
@@ -400,18 +442,21 @@ abstract class AbstractRuleTestSuitesFactory
         library = slots.library();
         defineProvider = slots.define();
 
-        EvalOutcome outcome = evaluate(rule, primary, resolver, s.getDomain(), library,
-                defineProvider, resolveDictionaries(s), vlm, s.getRunLevel());
+        return evaluate(rule, primary, resolver, s.getDomain(), library, defineProvider,
+                resolveDictionaries(s), vlm, s.getRunLevel());
+    }
 
-        if (ScenarioLocationBackfill.isEnabled())
-        {
-            boolean valueBased = rule.getEvaluationDomain() == null
-                    || rule.getEvaluationDomain().rowCursor();
-            ScenarioLocationBackfill.run(aFile, s, outcome.violations(), outcome.totalCount(),
-                    outcome.truncated(), valueBased);
-            return;
-        }
 
+    /**
+     * The verdict half of {@link #runScenario}: the scenario's declared execution state and its
+     * optional location assertions, judged against an outcome. Package-private for the same
+     * differential as {@link #evaluateScenario}, which records whether the <b>base</b> text already
+     * satisfies a scenario (a sensitivity scenario must be red there before it is green on the
+     * respelled rule — memory {@code findings-snapshot-blind-on-conformant-data}).
+     */
+    static void assertScenarioVerdict(RuleTestScenario s, EvalOutcome outcome,
+            OverlayDataTable primary)
+    {
         // #library-ref only: a configured-but-degraded Library leaves every (sub-)rule
         // SKIPPED/ERROR — skip rather than fail the verdict assertion.
         // Review F6: a scenario that DECLARES expect=skipped must be asserted, not aborted. The
@@ -460,7 +505,9 @@ abstract class AbstractRuleTestSuitesFactory
      *            must fail such a scenario, not satisfy it, or a rule broken into unconditional
      *            ERROR would keep every skip fixture green (review F1).
      */
-    private record EvalOutcome(boolean violated, boolean executed, boolean errored,
+    // Package-private (was private) for DynamicColumnRespellingDifferentialTest, which compares
+    // two of these — base text vs respelled text — field by field and row by row.
+    record EvalOutcome(boolean violated, boolean executed, boolean errored,
             List<Violation> violations, long totalCount, boolean truncated,
             @Nullable String notExecutedReason)
     {
@@ -850,7 +897,19 @@ abstract class AbstractRuleTestSuitesFactory
      */
     private @Nullable Rule resolveRule(RuleTestScenario aScenario)
     {
-        Map<String, Map<String, Rule>> packages = familyPackages();
+        return resolveIn(familyPackages(), aScenario);
+    }
+
+
+    /**
+     * {@link #resolveRule}'s selection over an explicit package map — the view of the scenario's
+     * declared standard+version, else the canonical fallback. Package-private so the respelling
+     * differential resolves the <b>base</b> rule from a second package directory
+     * ({@link #loadFamily(Path, String)}) with exactly the factories' own choice of view.
+     */
+    static @Nullable Rule resolveIn(Map<String, Map<String, Rule>> packages,
+            RuleTestScenario aScenario)
+    {
         String declared = declaredStandardVersion(aScenario);
         if (declared != null)
         {
@@ -938,9 +997,21 @@ abstract class AbstractRuleTestSuitesFactory
     // running scenario, so `rules-<family>-*.json` would go unverified for an empty subtree.
     static Map<String, Map<String, Rule>> loadFamily(String aFamily)
     {
+        return loadFamily(RULES_DIR, aFamily);
+    }
+
+
+    /**
+     * {@link #loadFamily(String)} over an explicit corpus directory — the respelling differential's
+     * base packages, generated from the base rule text into a directory of its own
+     * ({@code RuleCorpusGenerator <out> <release-out>} with the base tree as the working
+     * directory).
+     */
+    static Map<String, Map<String, Rule>> loadFamily(Path aRulesDir, String aFamily)
+    {
         Map<String, Map<String, Rule>> packages = new HashMap<>();
         String prefix = "rules-" + aFamily + "-";
-        try (DirectoryStream<Path> dir = Files.newDirectoryStream(RULES_DIR, prefix + "*.json"))
+        try (DirectoryStream<Path> dir = Files.newDirectoryStream(aRulesDir, prefix + "*.json"))
         {
             for (Path p : dir)
             {
@@ -964,7 +1035,7 @@ abstract class AbstractRuleTestSuitesFactory
         if (packages.isEmpty())
         {
             throw new IllegalStateException(
-                    "no rule packages found for family " + aFamily + " under " + RULES_DIR);
+                    "no rule packages found for family " + aFamily + " under " + aRulesDir);
         }
         return packages;
     }

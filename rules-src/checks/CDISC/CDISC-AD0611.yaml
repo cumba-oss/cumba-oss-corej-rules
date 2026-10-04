@@ -24,16 +24,20 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$ph_edt"
+  expression: "colref(concat(\"ADSL.PH\", printf(\"%d\", APHASEN), \"EDT\"))"
 Check:
   expression: >-
-    not empty(APHASEN) and not empty(PHEDT) and PHEDT != ADSL.PH${APHASEN:%d}EDT
+    not empty(APHASEN) and not empty(PHEDT) and PHEDT != $ph_edt
 Outcome:
   Message: "On a given record, APHASEN is populated and the value of PHEDT is not\
     \ equal to the value of variable PHwEDT where w equals the value of APHASEN"
   Output_Variables:
   - "APHASEN"
   - "PHEDT"
-  - "ADSL.PH${*}EDT"
+  - "ADSL.PHwEDT"
+  - "!$ph_edt"
 Source:
   Class: "ALL"
   Variable_or_Item: "PHEDT"

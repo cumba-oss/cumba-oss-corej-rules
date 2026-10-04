@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0605 expect=violation domain=ADLBC
+#note "PLAN-dynamic-column-corpus-respelling §2.2 Q3: the Output_Variables template ADSL.PHwSDT reports the one-digit PHwSDT family the IG defines; a column PH10SDT (a non-IG width) is no longer listed in the finding. The retired ADSL.PH${*}SDT entry matched any digit run and reported ADSL.PH10SDT too. The verdict is unchanged: APHASEN=1 names PH1SDT 21915, PHSDT 21900 differs -> fires on both spellings (a whole-row move in the §2.8 differential, not a verdict move)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col APHASEN type=Num
+col PHSDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 21900
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col PH1SDT type=Num
+col PH10SDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 21915 | 22000
+---

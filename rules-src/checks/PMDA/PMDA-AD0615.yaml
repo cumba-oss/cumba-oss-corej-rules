@@ -24,16 +24,20 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$ph_edtm"
+  expression: "colref(concat(\"ADSL.PH\", printf(\"%d\", APHASEN), \"EDTM\"))"
 Check:
   expression: >-
-    not empty(APHASEN) and not empty(PHEDTM) and PHEDTM != ADSL.PH${APHASEN:%d}EDTM
+    not empty(APHASEN) and not empty(PHEDTM) and PHEDTM != $ph_edtm
 Outcome:
   Message: "On a given record, APHASEN is populated and the value of PHEDTM is not\
     \ equal to the value of variable PHwEDTM where w equals the value of APHASEN"
   Output_Variables:
   - "APHASEN"
   - "PHEDTM"
-  - "ADSL.PH${*}EDTM"
+  - "ADSL.PHwEDTM"
+  - "!$ph_edtm"
 Source:
   Message: "APHASEN w has a PHEDTM != ADSL.PHwEDTM"
   Description: "When analysis Phase (APHASE) variable) is defined, the Phase End Datetime\

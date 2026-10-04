@@ -24,15 +24,19 @@ Match_Datasets:
 - Name: "ADSL"
   Keys:
   - "USUBJID"
+Bindings:
+- name: "$p_s"
+  expression: "concat(\"ADSL.P\", printf(\"%02d\", APERIOD), \"Sw\")"
 Check:
   expression: >-
-    not empty(APERIOD) and not empty(ASPER) and not var_exists(ADSL.P${APERIOD:%02d}S${*})
+    not empty(APERIOD) and not empty(ASPER) and not empty($p_s) and count(find_vars($p_s)) == 0
 Outcome:
   Message: "For every unique xx value of APERIOD in BDS or OCCDS datasets, there is\
     \ not a variable PxxSw"
   Output_Variables:
   - "APERIOD"
   - "ASPER"
+  - "!$p_s"
 Source:
   Class: "ALL"
   Variable_or_Item: "ASPER"
