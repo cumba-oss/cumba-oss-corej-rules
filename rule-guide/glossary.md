@@ -115,8 +115,9 @@ a silently coerced comparison.
 **`Outcome.Message`** — the text a person reads, written for someone who has never seen the
 rule. A level may carry its own message; one that does not falls back to this.
 
-**`Output_Variables`** — the columns whose values reach the finding. Choose what a reader needs
-to locate the row and see why it was flagged, and never a column the check did not read.
+**`Output_Variables`** — the columns whose values reach the finding. The engine derives them from
+the check and the bindings; author only a context column it would not derive, and never one the
+engine derives anyway (the build rejects it).
 
 **`Severity`** — `Warning` or `Reject`. An **absent** `Severity` means ERROR, which is why most
 rules omit it.

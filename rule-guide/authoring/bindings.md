@@ -21,9 +21,10 @@ Two reasons to use one:
 
 1. **The check stays readable.** A computation with its own name reads as a noun in the
    condition, which is how the requirement was stated in the first place.
-2. **The value can be reported.** A `$`-name may be listed in
-   [`Output_Variables`](outcome.md), so the number that triggered the finding appears in it —
-   *"expected 2, found 1"* rather than *"something about LNKID"*.
+2. **The value is reported.** A `$`-name the check reads is derived into
+   [`Output_Variables`](outcome.md) by the engine, so the number that triggered the finding
+   appears in it — *"expected 2, found 1"* rather than *"something about LNKID"* — without
+   listing it.
 
 ## The shape
 

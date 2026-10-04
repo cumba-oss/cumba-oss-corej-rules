@@ -12,12 +12,12 @@ ignored, so this is not the cosmetic part.
 ```yaml
 Outcome:
   Message: "Invalid TSVAL value when TSPARMCD equals 'AGEMAX'; TSVAL must be in ISO 8601 duration format or empty."
-  Output_Variables:
-  - "TSPARMCD"
-  - "TSVAL"
 Severity: "Warning"
 Sensitivity: "Dataset"
 ```
+
+No `Output_Variables` here, on purpose: the check reads `TSPARMCD` and `TSVAL`, so the engine
+reports both — see below.
 
 ## `Message`
 
@@ -41,25 +41,35 @@ that does not falls back to this one.
 
 ## `Output_Variables`
 
-The columns whose values are carried into the finding.
+The columns whose values are carried into the finding — and **the engine derives them**. At load
+it reads the check and the bindings and builds the list itself: every column the check reads,
+every `$`-binding it uses, and on a per-variable rule `variable_name` first. Most rules therefore
+author no `Output_Variables` at all; the rule above reports `TSPARMCD` and `TSVAL` without naming
+them.
+
+**List only what the engine cannot derive.** An entry the derivation produces anyway is a copy of
+a guarantee — it adds nothing to the finding, and the corpus build rejects it
+(`RedundantOutputVariableLintTest`). What is left to author is the extra context a reader needs
+that the check never touched, in the order it should appear:
 
 ```yaml
-Output_Variables: ["TSPARMCD", "TSVAL"]
+Output_Variables: ["RDOMAIN"]      # read by no condition, but it tells the reader which domain
 ```
 
-Choose what a person needs in order to (a) find the row in their data and (b) see why it was
-flagged. Usually that is the column that triggered the condition plus the column that failed it.
-
-A [binding](bindings.md)'s `$`-name may be listed too, so the computed value that caused the
-finding is visible:
-
-```yaml
-Output_Variables: ["--LNKID", "$variable_count"]
-```
+Derived entries follow the order in which the check reads them; an authored entry comes first,
+in the order written, so the list is also where you set the leading columns when that matters.
 
 > **Never report a variable the rule did not read.** A finding showing a column the check never
 > touched invites the reader to conclude something the rule never checked — and that conclusion
-> will be wrong in exactly the cases that matter.
+> will be wrong in exactly the cases that matter. Context columns are the one deliberate
+> exception, and they should be rare.
+
+> ⚠ **One case still wants an authored entry the engine would derive:** on a rule that iterates
+> variables (`varname()`, `value()`, a `var_*` accessor), an *authored* entry whose value is
+> missing keeps a `null`-valued key where a *derived* one is silently dropped. Until the engine
+> unifies that, such entries (other than `variable_name`) stay authored, and the build keeps the
+> list of them in `src/test/resources/ovsweep/q2-residual.tsv` — a new one must be added there
+> deliberately.
 
 ### Excluding with `!`
 
@@ -76,7 +86,7 @@ Everything after the `!` is the name, verbatim. Two shapes are load errors: `!` 
 doubled `!!X`.
 
 Use an exclusion when the derived list would carry a column that is noise in the finding — not as
-a way to hand-write the whole list, which the plain entries already do.
+a way to hand-write the whole list, which the derivation already does.
 
 ## `Severity`
 

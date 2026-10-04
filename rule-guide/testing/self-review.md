@@ -18,8 +18,10 @@ loud mistakes catch themselves.
       people trust.
 - [ ] **The `Message` names the fault and what would be right**, in one sentence, to someone who
       has never seen the rule.
-- [ ] **`Output_Variables` lists only columns the check actually read.** Reporting one it never
-      touched invites the reader to conclude something the rule never checked.
+- [ ] **`Output_Variables` is absent, or lists only what the engine does not derive.** The columns
+      the check reads and the bindings it uses reach the finding by themselves; an authored copy
+      fails the build. A context column the check never touched is the one thing to author — and
+      it invites the reader to conclude something the rule never checked, so it should be rare.
 - [ ] **`Executability` is honest**, and where it is not `Fully Executable` the
       `ExecutabilityHint` says *why* — under- and overreporting are different answers and a
       reviewer responds to them differently.

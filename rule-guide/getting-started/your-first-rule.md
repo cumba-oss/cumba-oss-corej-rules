@@ -107,14 +107,13 @@ The whole expression is evaluated per row. Where it is true, that row is a findi
 ```yaml
 Outcome:
   Message: "Invalid TSVAL value when TSPARMCD equals 'AGEMIN'; TSVAL must be in ISO 8601 format for a time period (e.g. P18Y) or empty."
-  Output_Variables:
-  - "TSPARMCD"
-  - "TSVAL"
 ```
 
-`Output_Variables` are the columns whose values appear in the finding. Choose the ones a person
-needs in order to find the row in their data and understand why it was flagged — here, the
-parameter that triggered the rule and the value that failed it.
+The finding also carries the values of the columns the check read — here `TSPARMCD`, the
+parameter that triggered the rule, and `TSVAL`, the value that failed it. You do not list them:
+the engine derives `Output_Variables` from the check, and an entry it would derive anyway is
+rejected by the build. Author an `Output_Variables` list only for a context column the check never
+reads (see [Outcome](../authoring/outcome.md#output_variables)).
 
 > **Never report a variable the rule did not read.** A finding row showing a column the check
 > never touched invites the reader to conclude something the rule never checked.

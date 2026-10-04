@@ -117,7 +117,7 @@ Expansion:                 # ⛔ mutually exclusive with the varname() / value()
 # ---- Result --------------------------------------------------------------
 Outcome:
   Message: "Invalid TSVAL value when TSPARMCD equals 'AGEMAX'."
-  Output_Variables: ["TSPARMCD", "TSVAL"]
+  # no Output_Variables: the engine derives TSPARMCD and TSVAL from the check
 Severity: "Warning"
 Sensitivity: "Dataset"
 
@@ -249,8 +249,8 @@ check is attempted at all. Where `Requirements` asks *"does the column exist?"*,
 asks *"is this data in scope for the question?"*
 
 **`Bindings`** name sub-results — each entry is exactly `name` (a `$`-variable) plus `expression`.
-A binding keeps a long check readable and may be listed in `Output_Variables` so its value reaches
-the finding.
+A binding keeps a long check readable, and its value reaches the finding by itself — the engine
+derives every binding the check reads into `Output_Variables`.
 
 > ⛔ **`Bindings:` is the only spelling.** An `Operations:` block, or a check written as
 > `operator:` / `name:` / `value:`, makes the rule **fail to load**.
@@ -285,9 +285,9 @@ and the `varname()` / `value()` cursor are mutually exclusive; a rule using both
 
 **What a person sees when the rule fires.**
 
-**`Outcome`** — `Message` and `Output_Variables`. The message is read by someone who has never
-seen the rule; the output variables are the columns whose values reach the finding, chosen so
-that person can locate the row and see why it was flagged.
+**`Outcome`** — `Message` and, rarely, `Output_Variables`. The message is read by someone who has
+never seen the rule; the output variables are the columns whose values reach the finding, and the
+engine derives them from the check — author only a context column it would not derive.
 
 > **Never report a variable the rule did not read.** A finding showing a column the check never
 > touched invites the reader to conclude something the rule never checked.
