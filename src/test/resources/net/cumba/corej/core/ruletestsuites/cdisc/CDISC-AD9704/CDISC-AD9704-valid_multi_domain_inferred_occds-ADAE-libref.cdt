@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-AD9704 expect=noViolation domain=ADAE
+#note "PLAN-occds-source-domain-by-ig D3, on OUR metadata store: a multi-domain OCCDS dataset under the D10-inferred OCCDS 1.0 (base Req STUDYID, USUBJID, --SEQ, --TERM, CMTRT, AESER). AESEQ, MHSEQ and MHTERM name two source domains, AE and MH, for which the IG offers --SEQ per domain or SRCDOM / SRCSEQ (ADaMIG-OCCDS 1.1 §3), so no '--' name is demanded (there is no AETERM, and it is not reported); CMTRT carries the CM prefix and CM is not among the dataset's domains, so it is not demanded; AESER carries AE, one of them, and is present -> silent. Under round-2 R2-1 the name ADAE and its AESEQ fixed the domain to AE alone and [AETERM] was reported missing."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 0
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col MHSEQ type=Num label="Sequence Number"
+col MHTERM type=Char label="Reported Term for the Medical History"
+col AESER type=Char label="Serious Event"
+---
+CDISCPILOT01 | 01-701-1015 | 1 | 1 | ASTHMA | N
+---

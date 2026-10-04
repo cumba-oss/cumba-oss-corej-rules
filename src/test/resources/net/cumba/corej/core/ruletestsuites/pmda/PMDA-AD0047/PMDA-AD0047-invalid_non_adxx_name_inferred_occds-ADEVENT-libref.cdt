@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-AD0047 expect=violation domain=ADEVENT
+#note "PLAN-occds-source-domain-by-ig D1, on OUR metadata store: an OCCDS dataset NOT named AD<domain> (ADaMIG-OCCDS 1.1 §4.2: ADAE is not a required dataset name). ADEVENT detects as OCCDS from its AETERM / AEDECOD columns and resolves against the D10-inferred OCCDS 1.0 (base Req STUDYID, USUBJID, --SEQ, --TERM, CMTRT, AESER). Its occurrence variables name AE, so --SEQ / --TERM resolve to AESEQ / AETERM and are demanded, CMTRT (CM) is not, AESER (AE) is -> one violation naming [AESEQ, AESER]. Under round-2 R2-1 the name ADEVENT gave the candidate EV, nothing confirmed it, and the dataset was silent on its missing AESEQ."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt "$missing_required_variables"="[AESEQ, AESER]"
+dataset ADEVENT
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | HEADACHE
+---
