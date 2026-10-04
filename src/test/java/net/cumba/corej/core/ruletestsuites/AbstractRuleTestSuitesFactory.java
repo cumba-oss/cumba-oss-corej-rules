@@ -199,9 +199,29 @@ abstract class AbstractRuleTestSuitesFactory
                     .filter(AbstractRuleTestSuitesFactory::hasShebang)
                     .filter(p -> matchesFilter(p, filter)).sorted().toList();
         }
-        return scenarioFiles.stream().map(p -> toDynamicTest(root, p));
+        // T2 MED-3 of PLAN-output-variable-null-key-provenance: the finding-map null guard sits
+        // inside execute(); the last dynamic test proves it was REACHED on at least a floor of the
+        // scenarios this factory ran (dynamic tests run in stream order, so it runs last).
+        long reachAtStart = net.cumba.corej.core.FindingValuesNullGuard
+                .reach(net.cumba.corej.core.FindingValuesNullGuard.CDT);
+        java.util.concurrent.atomic.AtomicInteger ran = new java.util.concurrent.atomic.AtomicInteger();
+        return Stream.concat(scenarioFiles.stream().map(p -> toDynamicTest(root, p, ran)),
+                Stream.of(DynamicTest.dynamicTest("finding-map null guard reached",
+                        () -> net.cumba.corej.core.FindingValuesNullGuard.requireReach(
+                                net.cumba.corej.core.FindingValuesNullGuard.CDT, reachAtStart,
+                                (long) Math.floor(ran.get()
+                                        * (filter.isEmpty() ? NULL_GUARD_REACH_FLOOR : 0)),
+                                ran.get() + " " + family() + " scenario(s)"))));
     }
 
+    /**
+     * The share of a factory's scenarios on which the finding-map null guard must have run: every
+     * scenario that executes the engine reaches it, and only an out-of-scope primary dataset, a
+     * {@code #library-ref} scenario without a library and the like never execute. A policy floor,
+     * not a measured count; a {@code scenario.filter} run reports its reach without a floor (a
+     * filtered rule may hold only non-executing scenarios).
+     */
+    private static final double NULL_GUARD_REACH_FLOOR = 0.8;
 
     private static List<String> parseFilter()
     {
@@ -321,10 +341,15 @@ abstract class AbstractRuleTestSuitesFactory
     }
 
 
-    private DynamicTest toDynamicTest(Path aRoot, Path aFile)
+    private DynamicTest toDynamicTest(Path aRoot, Path aFile,
+            java.util.concurrent.atomic.AtomicInteger aRan)
     {
         String display = aRoot.relativize(aFile).toString().replace('\\', '/');
-        return DynamicTest.dynamicTest(display, aFile.toUri(), () -> runScenario(aFile));
+        return DynamicTest.dynamicTest(display, aFile.toUri(), () ->
+        {
+            aRan.incrementAndGet();
+            runScenario(aFile);
+        });
     }
 
 
@@ -615,9 +640,10 @@ abstract class AbstractRuleTestSuitesFactory
                 aLibrary, null, aDefine, Integer.MAX_VALUE, null, aDictionaries, aVlm,
                 java.util.Set.of(), java.util.Set.of(),
                 net.cumba.corej.core.exec.EngineLimits.resolveSeverityThreshold(aRunLevel));
-        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null, outside the
-        // committed present-column / no-cell roster — judged on every scenario execution.
+        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null — judged on
+        // every scenario execution, and counted (the factory's last test asserts the reach).
         net.cumba.corej.core.FindingValuesNullGuard.requireNullFree(
+                net.cumba.corej.core.FindingValuesNullGuard.CDT,
                 "scenario " + aDomain + " / " + aPrimary.getMetaData().getName(), aRule,
                 result.getViolations());
         return result;

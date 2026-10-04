@@ -369,8 +369,12 @@ public final class SpecRunner
      *            scope
      * @param primaryTable
      *            the primary dataset the spec names
+     * @param rule
+     *            the rule the spec executed (its binding static types type a reported default — the
+     *            differential's T2 LOW-7)
      */
-    public record RawExecution(@Nullable RuleExecutionResult result, IDataTable primaryTable)
+    public record RawExecution(@Nullable RuleExecutionResult result, IDataTable primaryTable,
+            Rule rule)
     {
     }
 
@@ -380,11 +384,13 @@ public final class SpecRunner
         Prepared p = prepare(spec);
         if (p.scopeSkipReason() != null)
         {
-            return new RawExecution(null, p.primaryTable());
+            return new RawExecution(null, p.primaryTable(), p.rule());
         }
-        return new RawExecution(RuleRunnerCalls.execute(p.rule(), p.primaryTable(), p.resolver(),
-                p.cdiscDomain(), p.library(), /*joinCache=*/null,
-                defineProviderFrom(spec.name(), spec.defineXml())), p.primaryTable());
+        return new RawExecution(
+                RuleRunnerCalls.execute(p.rule(), p.primaryTable(), p.resolver(), p.cdiscDomain(),
+                        p.library(), /*joinCache=*/null,
+                        defineProviderFrom(spec.name(), spec.defineXml())),
+                p.primaryTable(), p.rule());
     }
 
 
@@ -445,9 +451,10 @@ public final class SpecRunner
         MetadataProvider defineProvider = defineProviderFrom(spec.name(), spec.defineXml());
         RuleExecutionResult result = RuleRunnerCalls.execute(rule, primaryTable, resolver,
                 cdiscDomain, library, /*joinCache=*/null, defineProvider);
-        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null, outside the
-        // committed present-column / no-cell roster — judged on every spec execution.
-        net.cumba.corej.core.FindingValuesNullGuard.requireNullFree("spec " + spec.name(), rule,
+        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null — judged on
+        // every spec execution, and counted (RuleExecutionSpecTest asserts the reach).
+        net.cumba.corej.core.FindingValuesNullGuard.requireNullFree(
+                net.cumba.corej.core.FindingValuesNullGuard.SPEC, "spec " + spec.name(), rule,
                 result.getViolations());
 
         List<CanonicalViolation> observed = ViolationNormaliser.normalise(result, primaryTable,

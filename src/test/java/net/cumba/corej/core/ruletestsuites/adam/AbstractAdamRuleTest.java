@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.cumba.corej.core.CorpusPaths;
+import net.cumba.corej.core.FindingValuesNullGuard;
 import net.cumba.corej.core.RulePackageLoader;
 import net.cumba.corej.core.exec.DatasetResolver;
 import net.cumba.corej.core.exec.MetadataProvider;
@@ -29,7 +31,9 @@ import net.cumba.datatable.manager.IDataTableManager;
 import net.cumba.datatable.manager.IDataTableRef;
 import net.cumba.datatable.manager.ILibraryMemberRef;
 import net.cumba.datatable.manager.local.LocalDataTableManager;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
@@ -392,14 +396,15 @@ abstract class AbstractAdamRuleTest
 
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName)
     {
-        return RuleRunnerCalls.execute(rule, table, resolver, domainName, null, null);
+        return judged(rule, RuleRunnerCalls.execute(rule, table, resolver, domainName, null, null));
     }
 
 
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName,
             DatasetResolver customResolver)
     {
-        return RuleRunnerCalls.execute(rule, table, customResolver, domainName, null, null);
+        return judged(rule,
+                RuleRunnerCalls.execute(rule, table, customResolver, domainName, null, null));
     }
 
 
@@ -411,8 +416,53 @@ abstract class AbstractAdamRuleTest
     RuleExecutionResult execute(Rule rule, IDataTable table, String domainName,
             DatasetResolver customResolver, MetadataProvider libraryProvider)
     {
-        return RuleRunnerCalls.execute(rule, table, customResolver, domainName, libraryProvider,
-                null);
+        return judged(rule, RuleRunnerCalls.execute(rule, table, customResolver, domainName,
+                libraryProvider, null));
+    }
+
+
+    /**
+     * The finding-map null guard on every pilot-data execution
+     * ({@code PLAN-output-variable-null-key-provenance} §2.1 / T2 MED-3): no finding value is null.
+     */
+    static RuleExecutionResult judged(Rule rule, RuleExecutionResult result)
+    {
+        FindingValuesNullGuard.requireNullFree(FindingValuesNullGuard.PILOT,
+                "pilot " + FindingValuesNullGuard.coreId(rule), rule, result.getViolations());
+        return result;
+    }
+
+    /**
+     * The share of a class's tests on which the guard must have run: nearly every pilot test
+     * executes a rule. A policy floor, not a measured count (T2 MED-3).
+     */
+    private static final double NULL_GUARD_REACH_FLOOR = 0.5;
+
+    private static final AtomicInteger TESTS_RUN = new AtomicInteger();
+
+    private static long nullGuardReachAtStart;
+
+    @BeforeAll
+    static void markNullGuardReach()
+    {
+        nullGuardReachAtStart = FindingValuesNullGuard.reach(FindingValuesNullGuard.PILOT);
+        TESTS_RUN.set(0);
+    }
+
+
+    @BeforeEach
+    void countNullGuardPopulation()
+    {
+        TESTS_RUN.incrementAndGet();
+    }
+
+
+    @AfterAll
+    static void requireNullGuardReached()
+    {
+        FindingValuesNullGuard.requireReach(FindingValuesNullGuard.PILOT, nullGuardReachAtStart,
+                (long) Math.floor(TESTS_RUN.get() * NULL_GUARD_REACH_FLOOR),
+                TESTS_RUN.get() + " pilot test(s)");
     }
 
     // ---- Assertion helpers ----

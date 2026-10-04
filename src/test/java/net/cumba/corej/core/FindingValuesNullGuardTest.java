@@ -3,6 +3,7 @@ package net.cumba.corej.core;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -27,30 +28,29 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The roster and the sensitivity of {@link FindingValuesNullGuard}
- * ({@code PLAN-output-variable-null-key-provenance} §2.1 / §6.2 H2).
+ * The hand-over list and the sensitivity of {@link FindingValuesNullGuard}
+ * ({@code PLAN-output-variable-null-key-provenance} §2.1 / §6.2 H2 / T2).
  *
- * <h2>The roster is a derivation, asserted exactly</h2>
+ * <h2>The hand-over list is a derivation, asserted exactly</h2>
  * <p>
- * {@code nullkey/present-column-no-cell.tsv} lists every {@code (rule, entry)} of the deferred
+ * {@code nullkey/present-column-omitted.tsv} lists every {@code (rule, entry)} of the deferred
  * present-column / no-cell state: a rule whose Check takes a <b>column-level</b> per-variable path
  * ({@link BindingScope#PER_VARIABLE} on any check level, or the Define variable universe) and an
  * effective {@code Output_Variables} entry of kind {@link OutputEntryKind#COLUMN} (a raw column
- * name or {@code variable_value}) — the only entries the engine may still report with a
- * {@code null} value, because the column is present and the finding has no row. The committed file
- * must equal the derivation over the generated corpus in both directions: a row the corpus no
- * longer produces is a dead allowance, a candidate the file lacks is a null the guard would wave
- * through. {@code -D}{@value #REGENERATE}{@code =true} rewrites the file and aborts (a regeneration
- * is never a green). The file is handed to {@code PLAN-finding-values-record-level-only}, whose V8
- * retires it.
+ * name or {@code variable_value}) — the entries the engine <b>omits</b> when the column is present
+ * and the finding has no row (T2: never a {@code null} key). The list allows nothing: it is the
+ * population {@code PLAN-finding-values-record-level-only} (V8) gives a name-only form. The
+ * committed file must equal the derivation over the generated corpus in both directions: a row the
+ * corpus no longer produces is a dead entry, a candidate the file lacks is an omission that plan
+ * would not see. {@code -D}{@value #REGENERATE}{@code =true} rewrites the file and aborts (a
+ * regeneration is never a green).
  * </p>
  *
  * <h2>Sensitivity</h2>
  * <p>
- * The guard's judgement is proven on every run: a synthetic violation with a null value outside the
- * roster is reported, naming the key; the same key on the roster is accepted; a {@code ""} and a
- * {@code .} are values and never reported; a {@code --} roster entry accepts its specialised
- * spelling.
+ * The guard's judgement is proven on every run: a synthetic violation with null values is reported
+ * key by key — a hand-over entry included, since the list allows nothing; a {@code ""} and a
+ * {@code .} are values and never reported; the reach counter counts every call.
  * </p>
  */
 class FindingValuesNullGuardTest
@@ -79,9 +79,9 @@ class FindingValuesNullGuardTest
         dead.removeAll(derived.keySet());
         Set<String> missing = new TreeSet<>(derived.keySet());
         missing.removeAll(committed);
-        assertEquals(Set.of(), dead, "roster rows the corpus no longer derives (dead allowances)");
-        assertEquals(Set.of(), missing, "present-column / no-cell candidates the roster lacks —"
-                + " regenerate with -D" + REGENERATE + "=true and review the diff");
+        assertEquals(Set.of(), dead, "hand-over rows the corpus no longer derives (dead entries)");
+        assertEquals(Set.of(), missing, "present-column / no-cell candidates the hand-over list"
+                + " lacks — regenerate with -D" + REGENERATE + "=true and review the diff");
         for (String row : committed)
         {
             String entry = row.substring(row.indexOf('\t') + 1);
@@ -92,29 +92,54 @@ class FindingValuesNullGuardTest
 
 
     @Test
-    void theGuardReportsANullOutsideTheRosterAndAcceptsTheRosterAndValues()
+    void theGuardReportsEveryNullAndAcceptsValues()
     {
-        Set<String> roster = Set.of("R-1\tDOMAIN", "R-1\t--CAT");
         Map<String, String> values = new LinkedHashMap<>();
         values.put("variable_name", "AETERM");
         values.put("variable_label", "");
         values.put("variable_length", ".");
         values.put("DOMAIN", null);
-        values.put("AECAT", null);
-        values.put("STUDYID", null);
         values.put("variable_value", null);
         List<Violation> violations = List
                 .of(new Violation(0, values, null, null, Map.of(), null, null));
 
-        List<String> offenders = FindingValuesNullGuard.offenders("R-1", violations, roster);
+        List<String> offenders = FindingValuesNullGuard.offenders("CDISC-CG0349", violations);
 
+        // DOMAIN of CDISC-CG0349 is on the hand-over list — and still an offender: the list
+        // allows nothing, the engine omits those entries.
+        assertTrue(FindingValuesNullGuard.roster().contains("CDISC-CG0349\tDOMAIN"),
+                "precondition: the list names CG0349/DOMAIN — " + FindingValuesNullGuard.roster());
         assertEquals(2, offenders.size(), offenders.toString());
-        assertTrue(offenders.get(0).startsWith("R-1/STUDYID "), offenders.toString());
-        assertTrue(offenders.get(1).startsWith("R-1/variable_value "), offenders.toString());
-        assertTrue(FindingValuesNullGuard.offenders("R-2", violations, roster).size() == 4,
-                "another rule's roster does not cover R-1's keys");
-        assertTrue(FindingValuesNullGuard.offenders("R-1", null, roster).isEmpty());
-        assertTrue(FindingValuesNullGuard.offenders("R-1", List.of(), roster).isEmpty());
+        assertTrue(offenders.get(0).startsWith("CDISC-CG0349/DOMAIN "), offenders.toString());
+        assertTrue(offenders.get(1).startsWith("CDISC-CG0349/variable_value "),
+                offenders.toString());
+        assertTrue(FindingValuesNullGuard.offenders("R-1", null).isEmpty());
+        assertTrue(FindingValuesNullGuard.offenders("R-1", List.of()).isEmpty());
+
+        long before = FindingValuesNullGuard.reach("sensitivity");
+        AssertionError red = assertThrows(AssertionError.class, () -> FindingValuesNullGuard
+                .requireNullFree("sensitivity", "plant", rule("CDISC-CG0349"), violations));
+        assertTrue(red.getMessage().contains("CDISC-CG0349/DOMAIN"), red.getMessage());
+        Map<String, String> clean = new LinkedHashMap<>(values);
+        clean.remove("DOMAIN");
+        clean.remove("variable_value");
+        FindingValuesNullGuard.requireNullFree("sensitivity", "clean", rule("CDISC-CG0349"),
+                List.of(new Violation(0, clean, null, null, Map.of(), null, null)));
+        assertEquals(before + 2, FindingValuesNullGuard.reach("sensitivity"),
+                "every call is counted, a red one too");
+        assertThrows(AssertionError.class, () -> FindingValuesNullGuard.requireReach("sensitivity",
+                before, 3, "the sensitivity control"));
+        FindingValuesNullGuard.requireReach("sensitivity", before, 2, "the sensitivity control");
+    }
+
+
+    private static Rule rule(String coreId)
+    {
+        Rule r = new Rule();
+        net.cumba.corej.core.model.RuleCore core = new net.cumba.corej.core.model.RuleCore();
+        core.setId(coreId);
+        r.setCore(core);
+        return r;
     }
 
 
@@ -213,14 +238,14 @@ class FindingValuesNullGuardTest
     {
         StringBuilder sb = new StringBuilder();
         sb.append(
-                "# present-column-no-cell.tsv — PLAN-output-variable-null-key-provenance §6.2 H2:")
-                .append(" the deferred present-column / no-cell entries, the only Output_Variables")
-                .append(" entries a finding may still carry with a null value (a raw column name or")
-                .append(" variable_value on a column-level per-variable finding, where the column is")
-                .append(" present and the finding has no row). coreId<TAB>entry<TAB>path. Derived by")
+                "# present-column-omitted.tsv — PLAN-output-variable-null-key-provenance §6.2 H2 / T2:")
+                .append(" the present-column / no-cell entries the engine OMITS from a finding (a raw")
+                .append(" column name or variable_value on a column-level per-variable finding, where")
+                .append(" the column is present and the finding has no row) — never a null key. Allows")
+                .append(" nothing: the hand-over list for PLAN-finding-values-record-level-only (V8")
+                .append(" gives them a name-only form). coreId<TAB>entry<TAB>path. Derived by")
                 .append(" FindingValuesNullGuardTest from the generated corpus and asserted exactly")
-                .append(" both ways; read by FindingValuesNullGuard inside the scenario and spec")
-                .append(" harnesses. Handed to PLAN-finding-values-record-level-only (V8 retires it).\n");
+                .append(" both ways.\n");
         for (Map.Entry<String, String> e : derived.entrySet())
         {
             sb.append(e.getKey()).append('\t').append(e.getValue()).append('\n');

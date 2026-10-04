@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.model.Rule;
 import org.jspecify.annotations.Nullable;
@@ -17,35 +19,52 @@ import org.jspecify.annotations.Nullable;
 /**
  * The finding-map null guard of {@code PLAN-output-variable-null-key-provenance} (§2.1, owner
  * 2026-10-04: <i>"nothing can be null"</i>): no {@link Violation#getValues()} entry of any rule
- * executed by the corpus suites carries a {@code null} value — <b>except</b> the committed roster
- * {@value #ROSTER_FILE} of the deferred <em>present-column / no-cell</em> entries (§6.2 H2): a raw
- * column name, or {@code variable_value}, on a <b>column-level</b> finding, where the column is
- * present but the finding has no row to read a cell from. That state is neither §2.1 case (2) nor
- * case (3); {@code PLAN-finding-values-record-level-only} (V8) carries it as a name-only entry and
- * retires the roster.
+ * executed by the corpus suites carries a {@code null} value — <b>none</b>, with no allowance.
  *
  * <p>
- * <b>Where it runs.</b> Inside the harnesses, on every execution: the {@code .cdt} scenario
- * factories ({@code AbstractRuleTestSuitesFactory.execute}) and the rulespec runner
- * ({@code SpecRunner.executeAssert}) hand every result here, so the population is every scenario of
- * every family and every spec — at no extra cost, and a new fixture is covered the moment it is
- * added. The {@code testdata/study} run reads the report, where an absent key and a null value
- * render alike; it is judged by the findings snapshot's classified diff, not here.
+ * <b>The omitted present-column entries.</b> The one state that used to keep a {@code null} key — a
+ * raw column name, or {@code variable_value}, on a <b>column-level</b> finding, where the column is
+ * present but the finding has no row to read a cell from (§6.2 H2) — is <em>omitted</em> from the
+ * finding since T2 (coordinator decision 2026-10-04, under the owner's ruling), for both
+ * provenances, until {@code PLAN-finding-values-record-level-only} (V8) gives it a name-only form.
+ * The committed file {@value #ROSTER_FILE} lists every such {@code (rule, entry)} as that plan's
+ * hand-over list; {@link FindingValuesNullGuardTest} asserts it equals its static derivation in
+ * both directions. It allows nothing here.
  * </p>
  *
  * <p>
- * <b>The roster is static, not observed.</b> {@link FindingValuesNullGuardTest} derives it from the
- * generated corpus (every per-variable rule whose Check takes the column-level path × every
- * effective entry of kind {@code COLUMN}) and asserts the committed file equals that derivation in
- * both directions, so a row cannot erode and a new candidate cannot hide. A {@code --} entry of the
- * roster allows its specialised spellings ({@code --CAT} allows {@code AECAT}).
+ * <b>Where it runs.</b> Inside the harnesses, on every execution: the {@code .cdt} scenario
+ * factories ({@code AbstractRuleTestSuitesFactory.execute}), the rulespec runner
+ * ({@code SpecRunner.executeAssert}), the pilot-data suites ({@code AbstractAdamRuleTest} /
+ * {@code AbstractSdtmRuleTest}) and the {@code testdata/study} run ({@code FindingsSnapshot},
+ * through the engine's {@code RuntimeListener.onRuleResult}). Each call is counted under its
+ * harness ({@link #reach}), and each harness asserts at its end that the guard was reached on at
+ * least a floor of its population (T2 MED-3) — a guard whose hook is bypassed would otherwise pass
+ * in silence.
  * </p>
  */
 public final class FindingValuesNullGuard
 {
 
-    /** The committed roster, under {@code src/test/resources/nullkey/}. */
-    public static final String ROSTER_FILE = "present-column-no-cell.tsv";
+    /**
+     * The committed hand-over list of the omitted present-column entries, under
+     * {@code src/test/resources/nullkey/}.
+     */
+    public static final String ROSTER_FILE = "present-column-omitted.tsv";
+
+    /** Harness tag of the {@code .cdt} scenario factories. */
+    public static final String CDT = "cdt";
+
+    /** Harness tag of the rulespec runner. */
+    public static final String SPEC = "spec";
+
+    /** Harness tag of the pilot-data suites. */
+    public static final String PILOT = "pilot";
+
+    /** Harness tag of the {@code testdata/study} run. */
+    public static final String STUDY = "study";
+
+    private static final Map<String, AtomicLong> REACH = new ConcurrentHashMap<>();
 
     private static @Nullable Set<String> roster;
 
@@ -63,29 +82,71 @@ public final class FindingValuesNullGuard
 
     /**
      * Fails (an {@link AssertionError} naming the place, the rule and the key) when any value of
-     * any violation is {@code null} and {@code (rule, key)} is not on the roster.
+     * any violation is {@code null}; counts the call under {@code harness} either way.
      */
-    public static void requireNullFree(String where, Rule rule,
+    public static void requireNullFree(String harness, String where, Rule rule,
             @Nullable List<Violation> violations)
     {
-        List<String> offenders = offenders(coreId(rule), violations, roster());
+        List<String> offenders = judge(harness, coreId(rule), violations);
         if (!offenders.isEmpty())
         {
             throw new AssertionError(where + ": " + offenders.size() + " null-valued finding"
-                    + " entr" + (offenders.size() == 1 ? "y" : "ies") + " outside the roster "
-                    + ROSTER_FILE + " (PLAN-output-variable-null-key-provenance §2.1 — nothing"
-                    + " may be null; a present-column / no-cell entry belongs on the roster):\n  "
+                    + " entr" + (offenders.size() == 1 ? "y" : "ies")
+                    + " (PLAN-output-variable-null-key-provenance §2.1 — nothing may be null; an"
+                    + " entry with no value is omitted or carries its typed default):\n  "
                     + String.join("\n  ", offenders));
         }
     }
 
 
     /**
-     * The {@code rule/key} pairs of {@code violations} whose value is {@code null} and that
-     * {@code allowed} does not list — the pure judgement, for the sensitivity control.
+     * The judgement without the throw, for a caller on a worker thread (the study run's runtime
+     * listener collects and fails after the run): counts the call under {@code harness} and answers
+     * the offenders.
      */
-    public static List<String> offenders(String coreId, @Nullable List<Violation> violations,
-            Set<String> allowed)
+    public static List<String> judge(String harness, String coreId,
+            @Nullable List<Violation> violations)
+    {
+        REACH.computeIfAbsent(harness, _ -> new AtomicLong()).incrementAndGet();
+        return offenders(coreId, violations);
+    }
+
+
+    /**
+     * How often the guard ran under {@code harness} in this JVM — the reach a harness asserts a
+     * floor on.
+     */
+    public static long reach(String harness)
+    {
+        AtomicLong n = REACH.get(harness);
+        return n == null ? 0 : n.get();
+    }
+
+
+    /**
+     * Fails unless the guard ran at least {@code floor} times under {@code harness} since
+     * {@code start} (a {@link #reach} reading taken when the harness began).
+     */
+    public static void requireReach(String harness, long start, long floor, String population)
+    {
+        long reached = reach(harness) - start;
+        System.out.println("[nullkey-guard] " + harness + ": reached " + reached + " time(s) for "
+                + population + " (floor " + floor + ")");
+        if (reached < floor)
+        {
+            throw new AssertionError("the finding-map null guard ran " + reached + " time(s) under "
+                    + harness + ", below its floor " + floor + " for " + population
+                    + " — its hook is bypassed (PLAN-output-variable-null-key-provenance T2"
+                    + " MED-3)");
+        }
+    }
+
+
+    /**
+     * The {@code rule/key} pairs of {@code violations} whose value is {@code null} — the pure
+     * judgement, for the sensitivity control.
+     */
+    public static List<String> offenders(String coreId, @Nullable List<Violation> violations)
     {
         List<String> out = new ArrayList<>();
         if (violations == null)
@@ -101,7 +162,7 @@ public final class FindingValuesNullGuard
             }
             for (Map.Entry<String, String> e : values.entrySet())
             {
-                if (e.getValue() == null && !isAllowed(coreId, e.getKey(), allowed))
+                if (e.getValue() == null)
                 {
                     out.add(coreId + "/" + e.getKey() + " (row " + v.getRow() + ", values " + values
                             + ")");
@@ -109,25 +170,6 @@ public final class FindingValuesNullGuard
             }
         }
         return out;
-    }
-
-
-    /** Exact {@code coreId<TAB>key}, or a {@code --} roster entry the key specialises. */
-    static boolean isAllowed(String coreId, String key, Set<String> allowed)
-    {
-        if (allowed.contains(coreId + "\t" + key))
-        {
-            return true;
-        }
-        String prefix = coreId + "\t--";
-        for (String row : allowed)
-        {
-            if (row.startsWith(prefix) && key.endsWith(row.substring(prefix.length())))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -139,7 +181,7 @@ public final class FindingValuesNullGuard
     }
 
 
-    /** The committed roster as {@code coreId<TAB>entry} rows; loaded once. */
+    /** The committed hand-over list as {@code coreId<TAB>entry} rows; loaded once. */
     public static synchronized Set<String> roster()
     {
         Set<String> r = roster;
@@ -159,9 +201,9 @@ public final class FindingValuesNullGuard
     {
         if (!Files.isRegularFile(file))
         {
-            throw new IllegalStateException(file + " is missing — the finding-map null guard has"
-                    + " no roster; regenerate it with -D" + FindingValuesNullGuardTest.REGENERATE
-                    + "=true and commit it");
+            throw new IllegalStateException(file + " is missing — the omitted present-column"
+                    + " hand-over list; regenerate it with -D"
+                    + FindingValuesNullGuardTest.REGENERATE + "=true and commit it");
         }
         Set<String> out = new TreeSet<>();
         try

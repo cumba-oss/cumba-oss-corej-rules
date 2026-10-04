@@ -491,8 +491,8 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
 
     private RuleExecutionResult execute(Case c, MetadataProvider provider)
     {
-        return RuleRunnerCalls.execute(c.rule(), c.table(),
-                resolverWith(c.suite().domain(), c.table()), c.suite().domain(), provider, null);
+        return judged(c.rule(), RuleRunnerCalls.execute(c.rule(), c.table(),
+                resolverWith(c.suite().domain(), c.table()), c.suite().domain(), provider, null));
     }
 
 

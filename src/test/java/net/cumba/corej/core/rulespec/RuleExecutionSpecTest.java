@@ -3,8 +3,12 @@ package net.cumba.corej.core.rulespec;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+import net.cumba.corej.core.FindingValuesNullGuard;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -73,11 +77,40 @@ class RuleExecutionSpecTest
         return specs.stream();
     }
 
+    /**
+     * The share of the specs run on which the finding-map null guard must have run
+     * ({@code PLAN-output-variable-null-key-provenance} T2 MED-3): every spec whose primary dataset
+     * is in the rule's scope executes the engine and reaches it. A policy floor, not a measured
+     * count.
+     */
+    private static final double NULL_GUARD_REACH_FLOOR = 0.5;
+
+    private static final AtomicInteger SPECS_RUN = new AtomicInteger();
+
+    private static long nullGuardReachAtStart;
+
+    @BeforeAll
+    static void markNullGuardReach()
+    {
+        nullGuardReachAtStart = FindingValuesNullGuard.reach(FindingValuesNullGuard.SPEC);
+        SPECS_RUN.set(0);
+    }
+
+
+    @AfterAll
+    static void requireNullGuardReached()
+    {
+        FindingValuesNullGuard.requireReach(FindingValuesNullGuard.SPEC, nullGuardReachAtStart,
+                (long) Math.floor(SPECS_RUN.get() * NULL_GUARD_REACH_FLOOR),
+                SPECS_RUN.get() + " spec(s)");
+    }
+
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("specs")
     void runSpec(Path specFile) throws IOException
     {
+        SPECS_RUN.incrementAndGet();
         SpecRunner.SpecResult result = SpecRunner.run(specFile, SpecRunner.Mode.ASSERT);
         // ⛔ The native-backend tripwire that stood here is GONE (owner, 2026-09-18).
         // `NativeExecutionRecorder` was the legacy engine's decommissioning check; the migration is

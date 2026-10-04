@@ -27,6 +27,7 @@ import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.exec.OutputEntryKind;
 import net.cumba.corej.core.exec.RuleExecutionResult;
 import net.cumba.corej.core.exec.Violation;
+import net.cumba.corej.core.expr.typed.ExprType;
 import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.rulespec.MetadataStoreFixture;
@@ -63,7 +64,16 @@ import org.opentest4j.TestAbortedException;
  * <b>base dump</b> written by the engine before the change, under an <b>expected-movement
  * contract</b>: every cell that differs must fall into one of the movement classes the plan's fold
  * names ({@link MoveClass}); any other difference is CONTENT and fails, and a key order that
- * changed is ORDER and fails.
+ * changed is ORDER and fails — unless it is the move {@code ovsweep/accepted-order-moves.tsv}
+ * records for that rule (P2's D3 strip reordered 70 rules after the P0 base was dumped), in which
+ * case the row is counted as {@code orderAccepted} and its values are still judged cell by cell.
+ *
+ * <p>
+ * <b>Value oracles (T2 MED-4).</b> A movement class says only that a cell moved the allowed way;
+ * {@link #VERDICT_CHECKS} additionally re-reads, on every finding of a few rules, the condition the
+ * Check fired on from the reported values ({@code variable_value_length > define_vlm_length} on
+ * FDA/PMDA-SD1231, …), and {@code -Dcorej.nullkey.plant=verdict} proves that oracle red.
+ * </p>
  *
  * <p>
  * <b>Why a dump, not a second corpus.</b> {@code RedundantOvSweepDifferentialTest} compares two
@@ -130,6 +140,18 @@ class NullKeyProvenanceDifferentialTest
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
+    /**
+     * Outcome key → the rule's binding static types ({@code Rule.staticBindingTypes}), filled by
+     * the current run: the type source LOW-7 judges a binding's default by.
+     */
+    private static final Map<String, Map<String, ExprType>> BINDING_TYPES = new LinkedHashMap<>();
+
+    /**
+     * A spec outcome's key → its rule's {@code Core.Id} (a spec outcome is named after the spec
+     * file, the order contract after the rule).
+     */
+    private static final Map<String, String> SPEC_RULE_IDS = new LinkedHashMap<>();
+
     /** Both modes run the same arms; exactly one of the two properties selects the mode. */
     static boolean enabled()
     {
@@ -153,10 +175,18 @@ class NullKeyProvenanceDifferentialTest
          */
         PROJECTION_GAP_RESOLVED,
         /**
-         * H2: a derived raw-column / variable_value entry on a column-level finding, omitted
-         * before, keeps the key with the deferred null (the 5c roster).
+         * H2 / T2: an AUTHORED raw-column / variable_value entry on a column-level finding — the
+         * column present, no row to read — that kept a null-valued key is now omitted (the
+         * hand-over list {@code nullkey/present-column-omitted.tsv}). A derived one was omitted
+         * before and still is: no movement.
          */
-        PRESENT_COLUMN_DERIVED_OMITTED_TO_NULL,
+        PRESENT_COLUMN_NULL_OMITTED,
+        /**
+         * T2 MED-1: {@code variable_length} of a column with an unspecified length printed the
+         * column meta's {@code 0}; it is no value — the numeric default {@code .}, as the Check
+         * reads it.
+         */
+        UNSPECIFIED_LENGTH_TO_MIS,
         /**
          * M4 (record path): a numeric binding or virtual that printed the untyped {@code ""} now
          * prints {@code .}.
@@ -199,6 +229,14 @@ class NullKeyProvenanceDifferentialTest
 
         int outcomes;
 
+        /**
+         * Rows whose key order moved exactly as {@code ovsweep/accepted-order-moves.tsv} records
+         * (the D3 strip of P2 reordered 70 rules after the P0 base was dumped).
+         */
+        int orderAccepted;
+
+        final Set<String> orderAcceptedRules = new TreeSet<>();
+
         int identical;
 
         int moved;
@@ -216,7 +254,8 @@ class NullKeyProvenanceDifferentialTest
             StringBuilder sb = new StringBuilder("[nullkey-differential] outcomes=")
                     .append(outcomes).append(" identical=").append(identical).append(" moved=")
                     .append(moved).append(" content=").append(content.size()).append(" order=")
-                    .append(order.size());
+                    .append(order.size()).append(" orderAccepted=").append(orderAccepted)
+                    .append("/rules=").append(orderAcceptedRules.size());
             for (Map.Entry<MoveClass, Integer> e : moves.entrySet())
             {
                 sb.append(' ').append(e.getKey()).append('=').append(e.getValue()).append("/rules=")
@@ -244,7 +283,9 @@ class NullKeyProvenanceDifferentialTest
             return;
         }
         Map<String, Outcome> baseline = read(Path.of(Objects.requireNonNull(base)));
-        String planted = plant(baseline, System.getProperty(PLANT_PROPERTY));
+        String plantKind = System.getProperty(PLANT_PROPERTY);
+        String planted = "verdict".equals(plantKind) ? plantVerdict(current)
+                : plant(baseline, plantKind);
         Ledger ledger = new Ledger();
         Set<String> seen = new TreeSet<>();
         for (Outcome c : current)
@@ -266,6 +307,7 @@ class NullKeyProvenanceDifferentialTest
                 ledger.content.add(k + ": base outcome is gone from the current run");
             }
         }
+        List<String> verdict = verdictConsistency(current, ledger);
         String summary = ledger.summary();
         System.out.println(summary);
         String reportPath = System.getProperty(REPORT_PROPERTY, "");
@@ -275,16 +317,21 @@ class NullKeyProvenanceDifferentialTest
         }
         if (planted != null)
         {
-            assertFalse(ledger.content.isEmpty() && ledger.order.isEmpty(),
+            List<String> reported = Stream
+                    .of(ledger.content.stream(), ledger.order.stream(), verdict.stream())
+                    .flatMap(x -> x).toList();
+            assertFalse(reported.isEmpty(),
                     "the plant " + planted + " was NOT reported — the instrument is blind");
-            boolean named = Stream.concat(ledger.content.stream(), ledger.order.stream())
-                    .anyMatch(s -> s.contains(planted));
+            boolean named = reported.stream().anyMatch(s -> s.contains(planted));
             assertTrue(named, () -> "the plant " + planted + " was not the reported difference:\n"
-                    + String.join("\n", ledger.content) + "\n" + String.join("\n", ledger.order));
+                    + String.join("\n", reported));
             throw new AssertionError("PLANT REPORTED as intended (" + planted
                     + ") — this run is the sensitivity control and must be red:\n"
-                    + String.join("\n", ledger.content) + "\n" + String.join("\n", ledger.order));
+                    + String.join("\n", reported));
         }
+        assertTrue(verdict.isEmpty(),
+                () -> verdict.size() + " finding(s) whose reported values contradict the verdict:\n"
+                        + String.join("\n", verdict.subList(0, Math.min(60, verdict.size()))));
         assertTrue(ledger.content.isEmpty(),
                 () -> ledger.content.size() + " cell(s) moved OUTSIDE the contract (CONTENT):\n"
                         + String.join("\n",
@@ -375,8 +422,10 @@ class NullKeyProvenanceDifferentialTest
             aborted.add(rel + ": " + e.getMessage());
             return null;
         }
-        return new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), state(o), cols(primary),
+        Outcome out = new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), state(o), cols(primary),
                 o == null ? List.of() : rows(o.violations()));
+        BINDING_TYPES.put(out.key(), rule.staticBindingTypes());
+        return out;
     }
 
 
@@ -389,9 +438,13 @@ class NullKeyProvenanceDifferentialTest
         String state = r == null ? "SCOPE-SKIP"
                 : "status=" + r.getStatus() + " count=" + r.getViolationCount() + " message="
                         + r.getStatusMessage();
-        return new Outcome("spec", rel, schema.name(), raw.primaryTable().getMetaData().getName(),
-                state, cols(raw.primaryTable()),
+        Outcome out = new Outcome("spec", rel, schema.name(),
+                raw.primaryTable().getMetaData().getName(), state, cols(raw.primaryTable()),
                 r == null || r.getViolations() == null ? List.of() : rows(r.getViolations()));
+        BINDING_TYPES.put(out.key(), raw.rule().staticBindingTypes());
+        SPEC_RULE_IDS.put(out.key(),
+                net.cumba.corej.core.FindingValuesNullGuard.coreId(raw.rule()));
+        return out;
     }
 
 
@@ -404,6 +457,17 @@ class NullKeyProvenanceDifferentialTest
         StudyValidationResult result = execute(study);
         Map<String, Map<String, List<Row>>> rows = studyRows(result);
         Map<String, Map<String, String>> states = studyStates(result);
+        Map<String, Map<String, ExprType>> typesByRule = new LinkedHashMap<>();
+        for (Rule rule : result.rules())
+        {
+            typesByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    rule.staticBindingTypes());
+        }
+        for (Rule rule : result.generatedRules().values())
+        {
+            typesByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    rule.staticBindingTypes());
+        }
         Set<String> rules = new TreeSet<>(rows.keySet());
         rules.addAll(states.keySet());
         List<Outcome> out = new ArrayList<>();
@@ -415,10 +479,12 @@ class NullKeyProvenanceDifferentialTest
             for (String dataset : datasets)
             {
                 IDataTable table = tables.get(dataset.toUpperCase(Locale.ROOT));
-                out.add(new Outcome("study", dataset, coreId, dataset,
+                Outcome o = new Outcome("study", dataset, coreId, dataset,
                         states.getOrDefault(coreId, Map.of()).getOrDefault(dataset, "-"),
                         table == null ? List.of() : cols(table),
-                        rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of())));
+                        rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of()));
+                BINDING_TYPES.put(o.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                out.add(o);
             }
         }
         return out;
@@ -704,10 +770,19 @@ class NullKeyProvenanceDifferentialTest
             if (!consistent(new ArrayList<>(rc.values().keySet()),
                     new ArrayList<>(rb.values().keySet())))
             {
-                ledger.order
-                        .add(at + ": keys " + rb.values().keySet() + " -> " + rc.values().keySet());
-                failedHere = true;
-                continue;
+                if (!orderMoveAccepted(SPEC_RULE_IDS.getOrDefault(k, c.rule()),
+                        new ArrayList<>(rb.values().keySet()),
+                        new ArrayList<>(rc.values().keySet())))
+                {
+                    ledger.order.add(
+                            at + ": keys " + rb.values().keySet() + " -> " + rc.values().keySet());
+                    failedHere = true;
+                    continue;
+                }
+                // P2 (D3) moved the effective ORDER of this rule after the base was dumped; the
+                // move is the contract's, so the values are still judged cell by cell.
+                ledger.orderAccepted++;
+                ledger.orderAcceptedRules.add(c.rule());
             }
             Set<String> keys = new LinkedHashSet<>(rb.values().keySet());
             keys.addAll(rc.values().keySet());
@@ -721,7 +796,8 @@ class NullKeyProvenanceDifferentialTest
                 {
                     continue;
                 }
-                MoveClass move = classify(key, inB, vb, inC, vc, cols, c.arm());
+                MoveClass move = classify(key, inB, vb, inC, vc, cols, c.arm(),
+                        BINDING_TYPES.getOrDefault(k, Map.of()).get(key));
                 String detail = at + " " + key + ": " + (inB ? String.valueOf(vb) : "<absent>")
                         + " -> " + (inC ? String.valueOf(vc) : "<absent>");
                 if (move == null)
@@ -757,9 +833,17 @@ class NullKeyProvenanceDifferentialTest
      * column name is present reads the current primary dataset's columns.
      */
     static @Nullable MoveClass classify(String key, boolean inB, @Nullable String vb, boolean inC,
-            @Nullable String vc, Set<String> cols, String arm)
+            @Nullable String vc, Set<String> cols, String arm, @Nullable ExprType bindingType)
     {
         OutputEntryKind kind = OutputEntryKind.of(key);
+        // T2 LOW-7: a binding's default is judged by its stage-A static type — "" only for a
+        // string binding, "." only for a numeric / boolean / list one; a binding whose type stage
+        // A does not know (OPEN-T) may print either, as its evaluated type decides.
+        boolean charDefault = kind == OutputEntryKind.CHAR
+                || (kind == OutputEntryKind.BINDING && !nonCharBinding(bindingType));
+        boolean misDefault = kind == OutputEntryKind.NUM || kind == OutputEntryKind.BOOLEAN
+                || kind == OutputEntryKind.LIST
+                || (kind == OutputEntryKind.BINDING && !charBinding(bindingType));
         boolean present = "variable_value".equals(key) || cols.contains(key);
         // M3: a variable-metadata entry the old projection could not reach (variable_size,
         // variable_max_size, define_vlm_*, variable_value_length, the *_matches facts, a
@@ -773,20 +857,22 @@ class NullKeyProvenanceDifferentialTest
         {
             if (!inC)
             {
-                return kind == OutputEntryKind.COLUMN && !present
-                        ? MoveClass.ABSENT_COLUMN_NULL_OMITTED
-                        : null;
+                if (kind != OutputEntryKind.COLUMN)
+                {
+                    return null;
+                }
+                return present ? MoveClass.PRESENT_COLUMN_NULL_OMITTED
+                        : MoveClass.ABSENT_COLUMN_NULL_OMITTED;
             }
             if (gap && vc != null)
             {
                 return MoveClass.PROJECTION_GAP_RESOLVED;
             }
-            if ("".equals(vc) && (kind == OutputEntryKind.CHAR || kind == OutputEntryKind.BINDING))
+            if ("".equals(vc) && charDefault)
             {
                 return MoveClass.CHAR_NULL_TO_EMPTY;
             }
-            if (MIS.equals(vc) && (kind == OutputEntryKind.NUM || kind == OutputEntryKind.BOOLEAN
-                    || kind == OutputEntryKind.LIST || kind == OutputEntryKind.BINDING))
+            if (MIS.equals(vc) && misDefault)
             {
                 return MoveClass.NONCHAR_NULL_TO_MIS;
             }
@@ -807,16 +893,16 @@ class NullKeyProvenanceDifferentialTest
             {
                 return MoveClass.OMITTED_TO_DEFAULT;
             }
-            if (vc == null && kind == OutputEntryKind.COLUMN && present)
-            {
-                return MoveClass.PRESENT_COLUMN_DERIVED_OMITTED_TO_NULL;
-            }
             return null;
         }
         if (inB && "".equals(vb) && inC && MIS.equals(vc)
-                && (kind == OutputEntryKind.BINDING || kind == OutputEntryKind.NUM))
+                && (kind == OutputEntryKind.NUM || (kind == OutputEntryKind.BINDING && misDefault)))
         {
             return MoveClass.RECORD_EMPTY_TO_MIS;
+        }
+        if (inB && "0".equals(vb) && inC && MIS.equals(vc) && "variable_length".equals(key))
+        {
+            return MoveClass.UNSPECIFIED_LENGTH_TO_MIS;
         }
         // The study arm reads the report: an absent key and a null value both render null there,
         // so a base null that becomes a typed default is judged like the omitted case above.
@@ -826,17 +912,206 @@ class NullKeyProvenanceDifferentialTest
             {
                 return MoveClass.PROJECTION_GAP_RESOLVED;
             }
-            if ("".equals(vc) && (kind == OutputEntryKind.CHAR || kind == OutputEntryKind.BINDING))
+            if ("".equals(vc) && charDefault)
             {
                 return MoveClass.CHAR_NULL_TO_EMPTY;
             }
-            if (MIS.equals(vc) && (kind == OutputEntryKind.NUM || kind == OutputEntryKind.BOOLEAN
-                    || kind == OutputEntryKind.LIST || kind == OutputEntryKind.BINDING))
+            if (MIS.equals(vc) && misDefault)
             {
                 return MoveClass.NONCHAR_NULL_TO_MIS;
             }
         }
         return null;
+    }
+
+
+    /** A binding stage A types as a string. */
+    private static boolean charBinding(@Nullable ExprType type)
+    {
+        return type == ExprType.Primitive.STRING;
+    }
+
+
+    /** A binding stage A types as a number, a boolean or a list. */
+    private static boolean nonCharBinding(@Nullable ExprType type)
+    {
+        return type == ExprType.Primitive.NUMBER || type == ExprType.Primitive.BOOLEAN
+                || type instanceof ExprType.ListOf;
+    }
+
+    // ------------------------------------------------------------------ verdict consistency
+
+    /**
+     * One value oracle of T2 MED-4: the reported values of every finding of {@code rules} must
+     * satisfy {@code holds} — the condition the Check fired on, read back from the projection. The
+     * movement classes judge only that a cell moved the allowed way; this judges that the value it
+     * moved to is the one the verdict was reached with.
+     */
+    private record VerdictCheck(Set<String> rules, List<String> keys, String condition,
+            java.util.function.Predicate<Map<String, @Nullable String>> holds)
+    {
+    }
+
+    private static final List<VerdictCheck> VERDICT_CHECKS = List.of(
+            new VerdictCheck(Set.of("FDA-SD1231", "PMDA-SD1231"),
+                    List.of("variable_value_length", "define_vlm_length"),
+                    "variable_value_length > define_vlm_length",
+                    v -> number(v.get("variable_value_length")) > number(
+                            v.get("define_vlm_length"))),
+            new VerdictCheck(Set.of("FDA-SD1082", "PMDA-SD1082"),
+                    List.of("variable_size", "variable_max_size", "variable_length"),
+                    "variable_size != variable_max_size and variable_size == variable_length",
+                    v -> !Objects.equals(v.get("variable_size"), v.get("variable_max_size"))
+                            && Objects.equals(v.get("variable_size"), v.get("variable_length"))),
+            new VerdictCheck(Set.of("FDA-CT2003", "PMDA-CT2003"),
+                    List.of("library_variable_code_pair_matches"),
+                    "library_variable_code_pair_matches == false",
+                    v -> "false".equals(v.get("library_variable_code_pair_matches"))),
+            new VerdictCheck(Set.of("DRAFT-900025", "FDA-CT2006", "PMDA-CT2006"), List.of(),
+                    "define_variable_decode_matches / define_vlm_decode_matches == false",
+                    v -> "false".equals(v.containsKey("define_vlm_decode_matches")
+                            ? v.get("define_vlm_decode_matches")
+                            : v.get("define_variable_decode_matches"))));
+
+    /**
+     * Applies {@link #VERDICT_CHECKS} to every finding row of the current run. On the scenario and
+     * spec arms every row of a checked rule must carry the keys; the study arm reads the report,
+     * whose {@code variable_name} collapse re-keys a partner entry, so a row there is checked when
+     * it carries them. Each check must have judged at least one row — a check over nothing fails.
+     */
+    private static List<String> verdictConsistency(List<Outcome> current, Ledger ledger)
+    {
+        List<String> out = new ArrayList<>();
+        Map<String, Integer> judged = new TreeMap<>();
+        for (Outcome o : current)
+        {
+            for (VerdictCheck check : VERDICT_CHECKS)
+            {
+                if (!check.rules().contains(o.rule()))
+                {
+                    continue;
+                }
+                for (int i = 0; i < o.rows().size(); i++)
+                {
+                    Map<String, @Nullable String> v = o.rows().get(i).values();
+                    boolean carried = check.keys().stream().allMatch(v::containsKey);
+                    if (!carried && "study".equals(o.arm()))
+                    {
+                        continue;
+                    }
+                    judged.merge(check.condition(), 1, Integer::sum);
+                    if (!carried || !check.holds().test(v))
+                    {
+                        out.add(o.key() + " #" + i + ": " + check.condition()
+                                + " does not hold for " + v);
+                    }
+                }
+            }
+        }
+        for (VerdictCheck check : VERDICT_CHECKS)
+        {
+            if (judged.getOrDefault(check.condition(), 0) == 0)
+            {
+                out.add("verdict check judged no finding: " + check.condition() + " over "
+                        + check.rules());
+            }
+        }
+        ledger.report.append("verdict-consistency ").append(judged).append('\n');
+        System.out.println("[nullkey-differential] verdict consistency: " + judged);
+        return out;
+    }
+
+
+    /** A reported number, NaN for a missing marker or a non-number (so a comparison fails). */
+    private static double number(@Nullable String value)
+    {
+        if (value == null)
+        {
+            return Double.NaN;
+        }
+        try
+        {
+            return Double.parseDouble(value);
+        }
+        catch (NumberFormatException _)
+        {
+            return Double.NaN;
+        }
+    }
+
+
+    /**
+     * The {@code verdict} plant: the first current FDA-SD1231 finding reports a value length that
+     * no longer exceeds the declared one — the oracle must name it.
+     */
+    private static String plantVerdict(List<Outcome> current)
+    {
+        for (int i = 0; i < current.size(); i++)
+        {
+            Outcome o = current.get(i);
+            if ("FDA-SD1231".equals(o.rule()) && !o.rows().isEmpty())
+            {
+                Row first = o.rows().get(0);
+                Map<String, @Nullable String> v = new LinkedHashMap<>(first.values());
+                v.put("variable_value_length", "1");
+                List<Row> rows = new ArrayList<>(o.rows());
+                rows.set(0, new Row(first.where(), first.names(), v));
+                current.set(i, new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(),
+                        o.cols(), rows));
+                System.out.println("[nullkey-differential] PLANTED verdict into " + o.key());
+                return o.key();
+            }
+        }
+        throw new IllegalStateException("no FDA-SD1231 finding to plant into");
+    }
+
+    /** {@code coreId → [before, after]} rows of {@code ovsweep/accepted-order-moves.tsv}. */
+    private static @Nullable Map<String, List<List<List<String>>>> orderContract;
+
+    /**
+     * Whether a row's key order moved exactly as the order contract records for {@code rule}: the
+     * base row's keys follow a contract row's {@code before} list and the current row's keys its
+     * {@code after} list (members a list does not carry are ignored, as in {@link #consistent}).
+     * The contract is the one {@code RedundantOvSweepDifferentialTest} judges the strip by; a
+     * reorder of an unlisted rule, or one that is not the listed move, stays ORDER.
+     */
+    private static synchronized boolean orderMoveAccepted(String rule, List<String> baseKeys,
+            List<String> currentKeys)
+    {
+        if (orderContract == null)
+        {
+            Map<String, List<List<List<String>>>> loaded = new LinkedHashMap<>();
+            Path file = CorpusPaths.moduleDir()
+                    .resolve("src/test/resources/ovsweep/accepted-order-moves.tsv");
+            try
+            {
+                for (String line : Files.readAllLines(file, UTF_8))
+                {
+                    if (line.isBlank() || line.startsWith("#"))
+                    {
+                        continue;
+                    }
+                    String[] c = line.split("\t", -1);
+                    assertTrue(c.length >= 5, "malformed order-contract row: " + line);
+                    loaded.computeIfAbsent(c[0], _ -> new ArrayList<>())
+                            .add(List.of(List.of(c[3].split("\\|")), List.of(c[4].split("\\|"))));
+                }
+            }
+            catch (IOException e)
+            {
+                throw new java.io.UncheckedIOException(e);
+            }
+            assertFalse(loaded.isEmpty(), "the order contract is empty: " + file);
+            orderContract = loaded;
+        }
+        for (List<List<String>> row : orderContract.getOrDefault(rule, List.of()))
+        {
+            if (consistent(baseKeys, row.get(0)) && consistent(currentKeys, row.get(1)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 

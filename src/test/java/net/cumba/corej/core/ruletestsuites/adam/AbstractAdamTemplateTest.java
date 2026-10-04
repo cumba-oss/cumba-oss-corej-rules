@@ -393,9 +393,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 {
                     return; // cannot build valid data for this rule pattern
                 }
-                RuleExecutionResult result = RuleRunnerCalls.execute(rule, table,
-                        resolverWith(domainName, table), domainName,
-                        declaringLibrary(table, declaredStructure), null);
+                RuleExecutionResult result = judged(rule,
+                        RuleRunnerCalls.execute(rule, table, resolverWith(domainName, table),
+                                domainName, declaringLibrary(table, declaredStructure), null));
                 // An ERROR also carries the "__error__" sentinel, so without this the failure
                 // message below would blame a phantom "1 violation(s)" for what is really an
                 // execution failure — loud either way, but pointing at the wrong thing.
@@ -446,9 +446,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                 {
                     return; // cannot build invalid data for this rule pattern
                 }
-                RuleExecutionResult result = RuleRunnerCalls.execute(rule, table,
-                        resolverWith(domainName, table), domainName,
-                        declaringLibrary(table, declaredStructure), null);
+                RuleExecutionResult result = judged(rule,
+                        RuleRunnerCalls.execute(rule, table, resolverWith(domainName, table),
+                                domainName, declaringLibrary(table, declaredStructure), null));
                 // ⚠⚠ The not-errored assertion comes FIRST and is not decoration. RuleRunner
                 // emits an "__error__" sentinel Violation on every ERROR path, so
                 // hasViolations() is TRUE for a rule that errored — and this assertTrue would

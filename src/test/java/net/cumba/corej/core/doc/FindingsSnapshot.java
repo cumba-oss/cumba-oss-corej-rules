@@ -313,19 +313,22 @@ public final class FindingsSnapshot
                 "CDISC_PICKLE_CACHE_DIR / -Dcdisc.pickle.cache.dir must name the pickle corpus — "
                         + "the snapshot seeds the unified metadata store from it, and without one "
                         + "library-dependent rules SKIP and the snapshot is not comparable"));
+        StudyNullGuard nullGuard = new StudyNullGuard();
         StudyValidationParams params = StudyValidationParams.builder()
                 .manager(new LocalDataTableManager()).dataLibrary(study.toString())
                 .defineXmlPath(study.resolve("define.xml").toString()).rulesPackages(RULES_PACKAGES)
                 .rulesDir(CorpusPaths.rules().toString()).ruleThreads(RULE_THREADS)
                 .maxErrorsPerRule(MAX_ERRORS_PER_RULE).severityThreshold(SEVERITY_THRESHOLD)
-                .useCase(useCase).build();
+                .useCase(useCase).runtimeListener(nullGuard).build();
         // tryStoreProvider reads CDISC_METADATA_STORE / cdisc.metadata.store, not a params field —
         // point it at the seeded store for the duration of the run and restore afterwards.
         String prev = System.getProperty(StoreMetadataProviderFactory.STORE_PROPERTY);
         System.setProperty(StoreMetadataProviderFactory.STORE_PROPERTY, store.toString());
         try
         {
-            return new StudyValidationService().validate(params);
+            StudyValidationResult result = new StudyValidationService().validate(params);
+            nullGuard.requireNullFreeAndReached(result);
+            return result;
         }
         finally
         {
@@ -340,6 +343,85 @@ public final class FindingsSnapshot
         }
     }
 
+    /**
+     * The finding-map null guard over the study run
+     * ({@code PLAN-output-variable-null-key-provenance} §2.1 / T2 MED-3): the engine hands every
+     * rule × dataset result to {@code RuntimeListener.onRuleResult}, before the report model reads
+     * it, and every finding value is judged there. The listener runs on the rule worker threads, so
+     * it collects and the run fails afterwards ({@link #requireNullFreeAndReached}), naming the
+     * offenders — and fails too when a finding-bearing execution of the summaries was never heard,
+     * i.e. the hook was bypassed.
+     */
+    static final class StudyNullGuard
+            implements
+            net.cumba.corej.core.report.LibraryValidator.RuntimeListener
+    {
+
+        private final java.util.Queue<String> offenders = new java.util.concurrent.ConcurrentLinkedQueue<>();
+
+        private final java.util.concurrent.atomic.AtomicLong heard = new java.util.concurrent.atomic.AtomicLong();
+
+        private final java.util.concurrent.atomic.AtomicLong heardFindingBearing = new java.util.concurrent.atomic.AtomicLong();
+
+        @Override
+        public void onRuleExecuted(net.cumba.corej.core.report.LibraryValidator.RuntimeEntry entry)
+        {
+            // the result arrives in onRuleResult
+        }
+
+
+        @Override
+        public void onRuleResult(net.cumba.corej.core.report.LibraryValidator.RuntimeEntry entry,
+                net.cumba.corej.core.exec.RuleExecutionResult result)
+        {
+            heard.incrementAndGet();
+            if (entry.violationCount() > 0)
+            {
+                heardFindingBearing.incrementAndGet();
+            }
+            for (String o : net.cumba.corej.core.FindingValuesNullGuard.judge(
+                    net.cumba.corej.core.FindingValuesNullGuard.STUDY, nz(entry.coreId()),
+                    result.getViolations()))
+            {
+                offenders.add(entry.domain() + ": " + o);
+            }
+        }
+
+
+        void requireNullFreeAndReached(StudyValidationResult result)
+        {
+            if (!offenders.isEmpty())
+            {
+                List<String> first = offenders.stream().limit(20).toList();
+                throw new AssertionError("testdata/study: " + offenders.size()
+                        + " null-valued finding entr" + (offenders.size() == 1 ? "y" : "ies")
+                        + " (PLAN-output-variable-null-key-provenance §2.1 — nothing may be"
+                        + " null), first " + first.size() + ":\n  " + String.join("\n  ", first));
+            }
+            long findingBearing = 0;
+            for (DatasetExecutionSummary summary : result.executionSummaries())
+            {
+                for (DatasetExecutionSummary.RuleExecution e : summary.ruleExecutions())
+                {
+                    if (e.violations() > 0)
+                    {
+                        findingBearing++;
+                    }
+                }
+            }
+            System.out.println("[nullkey-guard] study: judged " + heard.get() + " result(s), "
+                    + heardFindingBearing.get() + " finding-bearing, of " + findingBearing
+                    + " finding-bearing execution(s) in the summaries");
+            if (findingBearing == 0 || heardFindingBearing.get() < findingBearing)
+            {
+                throw new AssertionError("testdata/study: the finding-map null guard heard "
+                        + heardFindingBearing.get() + " finding-bearing rule execution(s) of "
+                        + findingBearing + " in the run's summaries (" + heard.get()
+                        + " results heard in all) — its hook is bypassed"
+                        + " (PLAN-output-variable-null-key-provenance T2 MED-3)");
+            }
+        }
+    }
 
     /**
      * In the pom's dedicated snapshot fork (marked by {@link #FORK_MARKER}), refuses to run with
