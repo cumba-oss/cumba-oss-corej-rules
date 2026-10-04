@@ -55,32 +55,74 @@ import org.opentest4j.TestAbortedException;
  * are executed against the <b>base</b> packages (the corpus before the strip) and the
  * <b>current</b> packages (after it), and the <b>whole finding rows</b> are compared — row,
  * reported variable names and values <em>in the order the engine emits them</em>, a {@code null}
- * value explicit ({@code ␀}) and distinct from an absent key, USUBJID / SEQ, keys, group key, unit,
- * level, plus the execution state and the violation count.
+ * value explicit ({@code ␀}), USUBJID / SEQ, keys, group key, unit, level, plus the execution state
+ * and the violation count.
+ *
+ * <p>
+ * ⚠ <b>{@code k=␀} against an absent key is distinguishable on the scenario arm only.</b> There a
+ * row is the {@code Violation}'s own values map, so a key the engine omitted is absent and a key it
+ * kept with a null value reads {@code ␀}. The study arm reads the report: a finding carries one
+ * {@code getVariableNames()} list for all its rows, and {@code getRowValues(pos)} renders every row
+ * over that list, so a key absent from one row and a key present with a null value both read
+ * {@code ␀} there. On the study arm only a name missing from (or added to) the finding's whole
+ * variable-name list is visible (T2 LOW-3).
+ * </p>
  *
  * <p>
  * <b>Why it exists.</b> The findings snapshot is order-blind ({@code FindingsSnapshot} sorts
  * {@code variableNames} and renders {@code values} through a {@code TreeMap}), the {@code .cdt}
  * suites assert verdicts and counts, and the static differential proves member sets on the
  * <em>rule</em>. None of them can see the two ways the strip could change a <em>finding</em>: a key
- * flipping between {@code k=␀} and absent (the Q2 null-key provenance), and a report column order
- * moving where the manifest did not predict it (Q1). This test is the proof that the stripped
- * corpus answers identically, except for the listed, accepted order moves.
+ * flipping between {@code k=␀} and absent (the Q2 null-key provenance; scenario arm only, see
+ * above), and a report column order moving where the manifest did not predict it (Q1). This test is
+ * the proof that, <em>on the rows the fixtures reach</em>, the stripped corpus answers identically
+ * except for the listed, accepted order moves.
  * </p>
  *
  * <p>
  * <b>Three classes, never a silent pass.</b> A scenario (or a rule of the study run) whose two
  * outcomes differ only in the order of the reported keys — the same rows and values in another
  * sequence — is <b>ORDER-ONLY</b>; it passes <em>only</em> when the rule is listed in
- * {@code src/test/resources/ovsweep/accepted-order-moves.tsv} <b>and</b> the observed key order of
- * every row is the derivation's own order for that dataset: the current row's keys in the order of
- * the current rule's effective list as the engine projects it ({@code RuleSpecialiser} for the
- * scenario path, re-derived as {@code DatasetRuleResolver} does for the study path), the base row's
- * in the base rule's. Any other difference is <b>CONTENT</b> and fails — a key lost or added,
- * {@code k=␀} against absent, a value, a state, a count. A scenario the library gate would skip is
- * a failure here, as in {@code DynamicColumnRespellingDifferentialTest}. The summary line and the
- * per-rule <b>reach</b> roster (rules with at least one finding row in either arm) are printed
- * whatever the outcome; rules without reach rest on the static differential's three arms.
+ * {@code src/test/resources/ovsweep/accepted-order-moves.tsv} <b>and</b> its rows pass two order
+ * checks (T2 LOW-4):
+ * </p>
+ * <ol>
+ * <li><b>the contract</b> — the base row's keys follow the contract's {@code before} column and the
+ * current row's its {@code after} column. This is the independent check: those columns were
+ * computed at P0, before the strip, and committed. It applies where the contract states the order
+ * for the judged dataset: the {@code package} row for a domain the rule's {@code specialised} row
+ * does not list, the {@code specialised} row for its representative domain ({@code AE} when listed,
+ * else the first). For the other listed domains of a {@code specialised} row the contract shows no
+ * list and only the second check applies; the summary counts both ({@code contract-judged} /
+ * {@code contract-n/a}).</li>
+ * <li><b>the derivation</b> — each row's keys follow its own side's effective list as the engine
+ * projects it ({@code RuleSpecialiser} on the scenario path, re-derived as
+ * {@code DatasetRuleResolver} does on the study path). This is self-referential by construction
+ * (the rule's list judged against the rule's projection) and proves only that the projection
+ * honours the effective list, not that the list is the right one.</li>
+ * </ol>
+ * <p>
+ * Both checks compare only the keys the list carries: a key it does not name (the injected
+ * identity, a {@code --} name the contract leaves unresolved) is skipped. An <b>expanded
+ * template</b> (wildcard or {@code Expansion:} token) is therefore not order-judged at all — its
+ * rows carry the concrete names the expansion produced and its lists the template's, so neither
+ * check would compare anything; such outcomes are counted ({@code template-unjudged}), never
+ * silently passed as judged, and their order rests on the static differential's arm (c). Any other
+ * difference is <b>CONTENT</b> and fails — a key lost or added, {@code k=␀} against absent
+ * (scenario arm), a value, a state, a count. A scenario the library gate would skip is a failure
+ * here, as in {@code DynamicColumnRespellingDifferentialTest}. The summary line and the per-rule
+ * <b>reach</b> roster (rules with at least one finding row in either arm) are printed whatever the
+ * outcome.
+ * </p>
+ *
+ * <p>
+ * <b>What this proves, and what it leaves to the static arms.</b> It proves, for the rules and rows
+ * the fixtures reach, that no finding changed beyond a listed reorder, and that each observed
+ * reorder is the committed one. It proves nothing for a rule without reach, for a dataset no
+ * fixture holds, for a template's order, or for the effective <em>list</em> itself: those rest on
+ * {@code OvSweepStaticDifferential} (member sets and order at package level, through
+ * {@code RuleSpecialiser} × every scope domain, and through the expanders), and the lists are
+ * pinned from then on by {@code EffectiveOutputVariablesDriftTest}'s golden file.
  * </p>
  *
  * <p>
@@ -131,6 +173,8 @@ class RedundantOvSweepDifferentialTest
 
         final Set<String> accepted;
 
+        final Map<String, List<Move>> contract;
+
         final StringBuilder report = new StringBuilder();
 
         final List<String> contentDiffs = new ArrayList<>();
@@ -155,11 +199,18 @@ class RedundantOvSweepDifferentialTest
 
         int orderOnly;
 
+        int contractJudged;
+
+        int contractNotApplicable;
+
+        int templateUnjudged;
+
         boolean studyRan;
 
-        Ledger(Set<String> aAccepted)
+        Ledger(Map<String, List<Move>> aContract)
         {
-            accepted = aAccepted;
+            contract = aContract;
+            accepted = aContract.keySet();
         }
 
 
@@ -169,12 +220,14 @@ class RedundantOvSweepDifferentialTest
             listedWithReachUnobserved.retainAll(reach);
             listedWithReachUnobserved.removeAll(orderMovesObserved);
             return "[ovsweep-differential] rules=" + rulesSeen.size() + " scenarios=" + scenarios
-                    + " identical=" + identical + " order-only=" + orderOnly + " content="
-                    + contentDiffs.size() + " unlisted-order=" + unlistedOrderDiffs.size()
-                    + " unpredicted-order=" + unpredictedOrderDiffs.size() + " aborted="
-                    + aborted.size() + " study=" + (studyRan ? "ran" : "skipped") + " study-rules="
-                    + studyRules.size() + " reach=" + reach.size() + " listed-moves="
-                    + accepted.size() + " moves-observed=" + orderMovesObserved.size()
+                    + " identical=" + identical + " order-only=" + orderOnly + " (contract-judged="
+                    + contractJudged + " contract-n/a=" + contractNotApplicable
+                    + " template-unjudged=" + templateUnjudged + ") content=" + contentDiffs.size()
+                    + " unlisted-order=" + unlistedOrderDiffs.size() + " unpredicted-order="
+                    + unpredictedOrderDiffs.size() + " aborted=" + aborted.size() + " study="
+                    + (studyRan ? "ran" : "skipped") + " study-rules=" + studyRules.size()
+                    + " reach=" + reach.size() + " listed-moves=" + accepted.size()
+                    + " moves-observed=" + orderMovesObserved.size()
                     + " listed-with-reach-unobserved=" + listedWithReachUnobserved.size() + " "
                     + listedWithReachUnobserved;
         }
@@ -189,11 +242,11 @@ class RedundantOvSweepDifferentialTest
         Set<String> population = rulesRaw != null ? csv(rulesRaw)
                 : contractColumn("manifest-roster.txt", 0);
         assertFalse(population.isEmpty(), "the population is empty");
-        Set<String> accepted = contractColumn("accepted-order-moves.tsv", 0);
-        assertFalse(accepted.isEmpty(), "accepted-order-moves.tsv lists no rule");
+        Map<String, List<Move>> contract = orderMoves();
+        assertFalse(contract.isEmpty(), "accepted-order-moves.tsv lists no rule");
         boolean study = !"false".equalsIgnoreCase(System.getProperty(STUDY_PROPERTY));
 
-        Ledger ledger = new Ledger(accepted);
+        Ledger ledger = new Ledger(contract);
         try
         {
             runScenarios(baseDir, population, rulesRaw != null, ledger);
@@ -330,30 +383,30 @@ class RedundantOvSweepDifferentialTest
         }
         // The scenario path runs the rule as RuleRunner.execute does: specialised for the
         // primary, the effective list carried over with its names resolved (no re-derivation).
-        // A template is expanded; its concrete copies' order is judged against each expansion.
-        judge(rel, coreId, state(b), state(c), rowsB, rowsC,
-                scenarioEffectiveLists(base, primary, s.getDomain()),
-                scenarioEffectiveLists(current, primary, s.getDomain()), ledger);
+        // A template is expanded inside the factory and is not order-judged (class javadoc).
+        judge(rel, coreId, s.getDomain(), state(b), state(c), rowsB, rowsC,
+                scenarioEffectiveList(base, primary, s.getDomain()),
+                scenarioEffectiveList(current, primary, s.getDomain()), ledger);
     }
 
 
-    private static List<List<String>> scenarioEffectiveLists(Rule rule, OverlayDataTable primary,
-            String domain)
+    /** The specialised rule's effective list; {@link Basis#TEMPLATE} for an expanded template. */
+    private static Basis scenarioEffectiveList(Rule rule, OverlayDataTable primary, String domain)
     {
-        List<List<String>> out = new ArrayList<>();
-        if (!WildcardExpander.collectWildcardNames(rule).isEmpty()
-                || (rule.getExpansion() != null && !rule.getExpansion().isEmpty()))
+        if (isTemplate(rule))
         {
-            // the expanded copies are built inside the factory; the order of a template's
-            // finding is accepted only against the template's own resolved list
-            Rule specialised = RuleSpecialiser.specialise(rule, primary, domain);
-            out.add(specialised == null ? List.of()
-                    : specialised.effectiveOutputVariablesOrAuthored());
-            return out;
+            return Basis.TEMPLATE;
         }
         Rule specialised = RuleSpecialiser.specialise(rule, primary, domain);
-        out.add(specialised == null ? List.of() : specialised.effectiveOutputVariablesOrAuthored());
-        return out;
+        return new Basis(
+                specialised == null ? null : specialised.effectiveOutputVariablesOrAuthored());
+    }
+
+
+    private static boolean isTemplate(Rule rule)
+    {
+        return !WildcardExpander.collectWildcardNames(rule).isEmpty()
+                || (rule.getExpansion() != null && !rule.getExpansion().isEmpty());
     }
 
     // ------------------------------------------------------------------ study arm
@@ -403,7 +456,7 @@ class RedundantOvSweepDifferentialTest
                     ledger.reach.add(coreId);
                 }
                 IDataTable table = tables.get(dataset.toUpperCase(Locale.ROOT));
-                judge("study/" + dataset + "/" + coreId, coreId,
+                judge("study/" + dataset + "/" + coreId, coreId, dataset,
                         statesB.getOrDefault(coreId, Map.of()).getOrDefault(dataset, "-"),
                         statesC.getOrDefault(coreId, Map.of()).getOrDefault(dataset, "-"), rb, rc,
                         productionEffectiveLists(baseRules.get(coreId), table, dataset),
@@ -416,27 +469,31 @@ class RedundantOvSweepDifferentialTest
     /**
      * The effective list the production path projects for {@code rule} on {@code dataset}: the
      * {@code --} specialisation followed by the re-derivation {@code DatasetRuleResolver} applies
-     * to every rule it emits. A template (expanded per dataset) yields no prediction here; its
-     * order is then judged against the loaded rule's own list.
+     * to every rule it emits. A template (expanded per dataset) is {@link Basis#TEMPLATE}, not
+     * order-judged (class javadoc).
      */
-    private static List<List<String>> productionEffectiveLists(@Nullable Rule rule,
-            @Nullable IDataTable table, String dataset)
+    private static Basis productionEffectiveLists(@Nullable Rule rule, @Nullable IDataTable table,
+            String dataset)
     {
         if (rule == null)
         {
-            return List.of();
+            return new Basis(null);
+        }
+        if (isTemplate(rule))
+        {
+            return Basis.TEMPLATE;
         }
         Rule specialised = RuleSpecialiser.specialise(rule, table,
                 dataset.toUpperCase(Locale.ROOT));
         if (specialised == null)
         {
-            return List.of();
+            return new Basis(null);
         }
         if (specialised != rule)
         {
             RulePackageLoader.deriveOutputVariables(specialised);
         }
-        return List.of(specialised.effectiveOutputVariablesOrAuthored());
+        return new Basis(specialised.effectiveOutputVariablesOrAuthored());
     }
 
 
@@ -626,12 +683,12 @@ class RedundantOvSweepDifferentialTest
 
     /**
      * Classifies one comparison: IDENTICAL, ORDER-ONLY (accepted iff the rule is listed and every
-     * row's key order is the derivation's own, i.e. consistent with one of the effective lists of
-     * its side), else CONTENT.
+     * row's key order follows the contract's {@code before} / {@code after} list where the contract
+     * states one for this domain, and its own side's effective list — class javadoc), else CONTENT.
      */
-    private static void judge(String rel, String coreId, String stateB, String stateC,
-            @Nullable List<Row> rowsB, @Nullable List<Row> rowsC, List<List<String>> effectiveB,
-            List<List<String>> effectiveC, Ledger ledger)
+    private static void judge(String rel, String coreId, String domain, String stateB,
+            String stateC, @Nullable List<Row> rowsB, @Nullable List<Row> rowsC, Basis effectiveB,
+            Basis effectiveC, Ledger ledger)
     {
         List<String> textB = texts(rowsB, false);
         List<String> textC = texts(rowsC, false);
@@ -652,12 +709,33 @@ class RedundantOvSweepDifferentialTest
                 ledger.unlistedOrderDiffs.add(rel + "\n-- base\n" + String.join("\n", textB)
                         + "\n-- current\n" + String.join("\n", textC));
             }
+            else if (effectiveB.template() || effectiveC.template())
+            {
+                ledger.templateUnjudged++;
+            }
             else
             {
-                String why = unpredicted(rowsB, effectiveB, "base");
+                Move move = contractMove(ledger.contract.getOrDefault(coreId, List.of()), domain);
+                if (move == null)
+                {
+                    ledger.contractNotApplicable++;
+                }
+                else
+                {
+                    ledger.contractJudged++;
+                }
+                String why = unpredicted(rowsB, effectiveB, "base", "derivation");
                 if (why == null)
                 {
-                    why = unpredicted(rowsC, effectiveC, "current");
+                    why = unpredicted(rowsC, effectiveC, "current", "derivation");
+                }
+                if (why == null && move != null)
+                {
+                    why = unpredicted(rowsB, new Basis(move.before()), "base", "contract before");
+                }
+                if (why == null && move != null)
+                {
+                    why = unpredicted(rowsC, new Basis(move.after()), "current", "contract after");
                 }
                 if (why != null)
                 {
@@ -689,40 +767,57 @@ class RedundantOvSweepDifferentialTest
 
 
     /**
-     * {@code null} when every row's keys (and variable names) are ordered as one of the effective
-     * lists orders them — keys the list does not carry (the injected identity) are ignored — else
-     * the first offending row with its expected order.
+     * {@code null} when every row's keys (and variable names) are ordered as {@code basis} orders
+     * them — keys the list does not carry (the injected identity, an unresolved {@code --} name)
+     * are ignored — else the first offending row with the expected order.
      */
-    private static @Nullable String unpredicted(@Nullable List<Row> rows,
-            List<List<String>> effectiveLists, String side)
+    private static @Nullable String unpredicted(@Nullable List<Row> rows, Basis basis, String side,
+            String what)
     {
         if (rows == null || rows.isEmpty())
         {
             return null;
         }
-        if (effectiveLists.isEmpty())
+        List<String> order = basis.order();
+        if (order == null)
         {
-            return side + ": no effective list to judge the order against (an expanded template)";
+            return side + ": no " + what + " list to judge the order against";
         }
         for (Row row : rows)
         {
-            boolean ok = false;
-            for (List<String> effective : effectiveLists)
+            if (!consistent(new ArrayList<>(row.values().keySet()), order)
+                    || !consistent(row.names(), order))
             {
-                if (consistent(new ArrayList<>(row.values().keySet()), effective)
-                        && consistent(row.names(), effective))
-                {
-                    ok = true;
-                    break;
-                }
-            }
-            if (!ok)
-            {
-                return side + " row " + row.text() + " is not in the derivation's order "
-                        + effectiveLists;
+                return side + " row " + row.text() + " is not in the " + what + " order " + order;
             }
         }
         return null;
+    }
+
+
+    /**
+     * The contract row that states the order for {@code domain}: the {@code specialised} row when
+     * it lists the domain and the domain is its representative ({@code AE} when listed, else the
+     * first — the domain its before / after columns show), {@code null} when it lists the domain
+     * otherwise (no list is committed for it), else the {@code package} row, else {@code null}.
+     */
+    static @Nullable Move contractMove(List<Move> moves, String domain)
+    {
+        String d = domain.toUpperCase(Locale.ROOT);
+        Move pkg = null;
+        for (Move m : moves)
+        {
+            if ("specialised".equals(m.level()) && m.domains().contains(d))
+            {
+                String representative = m.domains().contains("AE") ? "AE" : m.domains().get(0);
+                return representative.equals(d) ? m : null;
+            }
+            if ("package".equals(m.level()))
+            {
+                pkg = m;
+            }
+        }
+        return pkg;
     }
 
 
@@ -768,6 +863,47 @@ class RedundantOvSweepDifferentialTest
     }
 
     // ------------------------------------------------------------------ contracts
+
+    /** What one side's key order is judged against: a list, nothing, or an expanded template. */
+    private record Basis(@Nullable List<String> order, boolean template)
+    {
+
+        static final Basis TEMPLATE = new Basis(null, true);
+
+        Basis(@Nullable List<String> order)
+        {
+            this(order, false);
+        }
+    }
+
+
+    /** One row of {@code accepted-order-moves.tsv}. */
+    record Move(String level, List<String> domains, List<String> before, List<String> after)
+    {
+    }
+
+    /** {@code accepted-order-moves.tsv}: coreId → its package and / or specialised rows. */
+    private static Map<String, List<Move>> orderMoves() throws IOException
+    {
+        Map<String, List<Move>> out = new LinkedHashMap<>();
+        for (String line : Files.readAllLines(CONTRACT_DIR.resolve("accepted-order-moves.tsv"),
+                UTF_8))
+        {
+            String t = line.strip();
+            if (t.isEmpty() || t.startsWith("#"))
+            {
+                continue;
+            }
+            String[] c = t.split("\t", -1);
+            assertTrue(c.length == 5, "accepted-order-moves.tsv: expected 5 columns: " + t);
+            assertTrue("package".equals(c[1]) || "specialised".equals(c[1]),
+                    "accepted-order-moves.tsv: unknown level " + c[1]);
+            out.computeIfAbsent(c[0], _ -> new ArrayList<>())
+                    .add(new Move(c[1], "*".equals(c[2]) ? List.of() : List.of(c[2].split(",")),
+                            List.of(c[3].split("\\|")), List.of(c[4].split("\\|"))));
+        }
+        return out;
+    }
 
 
     /** Column {@code col} of a contract file, {@code #} comments and blanks skipped. */

@@ -15,8 +15,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
-import net.cumba.corej.core.exec.OutputVariableDeriver;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import org.junit.jupiter.api.Test;
@@ -133,8 +134,11 @@ class ReleasedRuleFieldFidelityTest
      * {@code Output_Variables} is <em>allowed</em> to be absent because
      * {@code OutputVariableDeriver} supplies it on load; that licence is only safe if the loader
      * actually ran the derivation, so every absent-or-empty entry must come back with an effective
-     * list that is installed (non-null) <b>and is the deriver's own answer</b>
-     * ({@code OutputVariableDeriver.derive(rule)}) — the arm is a deriver-installation guard.
+     * list that is <b>installed (non-null)</b> — the arm is a deriver-installation guard. It does
+     * not compare the list with {@code OutputVariableDeriver.derive(rule)}: the loader installs
+     * exactly that call's answer, so the comparison was a tautology (T2 LOW-2 of
+     * {@code PLAN-redundant-output-variables-sweep}). <em>What</em> each rule derives is pinned by
+     * {@code EffectiveOutputVariablesDriftTest}'s golden file.
      * </p>
      *
      * <p>
@@ -194,11 +198,6 @@ class ReleasedRuleFieldFidelityTest
                             where + ": Output_Variables is " + (ov == null ? "absent" : "empty")
                                     + " and the loader installed no effective list");
                 }
-                else if (!effective.equals(OutputVariableDeriver.derive(rule)))
-                {
-                    notDerived.add(where + ": the installed effective list " + effective
-                            + " is not the deriver's answer " + OutputVariableDeriver.derive(rule));
-                }
                 else if (effective.isEmpty())
                 {
                     emptyEffective++;
@@ -214,7 +213,7 @@ class ReleasedRuleFieldFidelityTest
                         + " Rules Report falls back to it, so a rule without one reports blank.");
         assertEquals(List.of(), notDerived.size() > 25 ? notDerived.subList(0, 25) : notDerived,
                 notDerived.size() + " rules ship with Output_Variables absent or empty AND the"
-                        + " loader did not install the deriver's list. Omitting the field is only"
+                        + " loader installed no effective list. Omitting the field is only"
                         + " safe because OutputVariableDeriver fills it in at load; where it does"
                         + " not, the report loses the columns that say WHICH variables the finding"
                         + " is about.");
@@ -223,6 +222,65 @@ class ReleasedRuleFieldFidelityTest
                         + " (expected at least " + MIN_DERIVED_OUTPUT_VARIABLE_ENTRIES
                         + "). The classification broke, so the derivation assertion above ran over"
                         + " nothing.");
+    }
+
+
+    /**
+     * No rule the sweep stripped ({@code src/test/resources/ovsweep/manifest-roster.txt}) ships
+     * with an empty effective {@code Output_Variables} in any package (T2 LOW-2 of
+     * {@code PLAN-redundant-output-variables-sweep}).
+     *
+     * <p>
+     * A stripped rule authored entries the engine derives, so its effective list cannot be empty
+     * unless the derivation stopped producing them. The general arm above deliberately allows an
+     * empty derived list (the no-witness shape); this one closes that licence for the population
+     * whose report columns now come from the derivation alone. Every roster rule must also be found
+     * shipped, so the arm cannot pass over a roster the corpus no longer carries.
+     * </p>
+     */
+    @Test
+    void noStrippedRuleShipsAnEmptyEffectiveList() throws IOException
+    {
+        Set<String> roster = new TreeSet<>();
+        for (String line : Files.readAllLines(CorpusPaths.moduleDir()
+                .resolve("src/test/resources/ovsweep").resolve(OvSweepCensus.ROSTER_FILE)))
+        {
+            String t = line.strip();
+            if (!t.isEmpty() && !t.startsWith("#"))
+            {
+                roster.add(t);
+            }
+        }
+        assertTrue(roster.size() >= 2600,
+                "the stripped roster holds only " + roster.size() + " rules (committed: 2 631)");
+
+        Set<String> found = new TreeSet<>();
+        List<String> empty = new ArrayList<>();
+        for (Path pkg : shippedPackages())
+        {
+            Map<String, Rule> rules = RulePackageLoader.load(pkg).getRules();
+            assertNotNull(rules, pkg.getFileName() + " has no rules");
+            for (Map.Entry<String, Rule> e : rules.entrySet())
+            {
+                if (!roster.contains(e.getKey()))
+                {
+                    continue;
+                }
+                found.add(e.getKey());
+                List<String> effective = e.getValue().getEffectiveOutputVariables();
+                if (effective == null || effective.isEmpty())
+                {
+                    empty.add(pkg.getFileName() + " / " + e.getKey() + ": " + effective);
+                }
+            }
+        }
+        Set<String> missing = new TreeSet<>(roster);
+        missing.removeAll(found);
+        assertEquals(Set.of(), missing, missing.size() + " stripped rule(s) are not shipped");
+        assertEquals(List.of(), empty.size() > 25 ? empty.subList(0, 25) : empty,
+                empty.size() + " package entries of stripped rules carry no effective"
+                        + " Output_Variables: their report columns came from the authored list"
+                        + " the sweep deleted, so the derivation must reproduce them.");
     }
 
 

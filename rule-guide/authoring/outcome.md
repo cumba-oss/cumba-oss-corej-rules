@@ -57,7 +57,8 @@ Output_Variables: ["RDOMAIN"]      # read by no condition, but it tells the read
 ```
 
 Derived entries follow the order in which the check reads them; an authored entry comes first,
-in the order written, so the list is also where you set the leading columns when that matters.
+in the order written. The list is where you put context columns the engine cannot derive; they
+lead, and the derived columns follow in walk order.
 
 > **Never report a variable the rule did not read.** A finding showing a column the check never
 > touched invites the reader to conclude something the rule never checked — and that conclusion
