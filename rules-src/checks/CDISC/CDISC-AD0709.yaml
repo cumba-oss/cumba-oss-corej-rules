@@ -4,8 +4,9 @@ Core:
   Version: "1"
 Description: "Raise an error when a variable's label does not match the standard label\
   \ for that variable in the ADaM implementation guide, excluding variable names containing\
-  \ the wildcard indexes 'w', 'y', or 'zz' and library labels that contain an asterisk\
-  \ (*), braces ({...}), or an ellipsis (...) for sponsor-specific text."
+  \ the wildcard indexes 'w', 'y', or 'zz' (a name with the index 'xx', such as TRT01P,\
+  \ is checked against its resolved label template) and library labels that contain\
+  \ an asterisk (*), braces ({...}), or an ellipsis (...) for sponsor-specific text."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -13,9 +14,10 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    var_name("LIBRARY") !~ /[a-z]/ and not empty(var_label("LIBRARY")) and not
-    contains(var_label("LIBRARY"), "{") and not contains(var_label("LIBRARY"), "*") and not
-    contains(var_label("LIBRARY"), "...") and var_label("DATA") != var_label("LIBRARY")
+    var_name("LIBRARY") !~ /[wyz]/ and not empty(var_label("LIBRARY")) and not
+    empty(label_template("LIBRARY")) and not contains(var_label("LIBRARY"), "{") and not
+    contains(var_label("LIBRARY"), "*") and not contains(var_label("LIBRARY"), "...") and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
 Outcome:
   Message: "Variable label does not match the standard label defined in the ADaM implementation\
     \ guide."
@@ -23,6 +25,7 @@ Outcome:
   - "variable_name"
   - "variable_label"
   - "library_variable_label"
+  - "library_variable_label_template"
 Source:
   Class: "ALL"
   Variable_or_Item: "ALL"

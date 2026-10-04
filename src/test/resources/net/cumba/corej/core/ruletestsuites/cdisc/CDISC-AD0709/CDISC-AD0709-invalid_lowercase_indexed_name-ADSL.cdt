@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-AD0709 expect=violation domain=ADSL
+#note "CR709 (ADaM Conformance Rules v5.0, ADaMIG 1.2/1.3) excepts names with the indexes w, y and zz - NOT xx (PLAN-library-template-label-resolution, QH1 (a): each authority's exceptions are kept). trt01p is an instance of the ADSL template TRTxxP: the library resolves it through the template (var_name(\"LIBRARY\") is TRTxxP, its only marker xx), substitutes the period into the label, and the label 'Any Sponsor Label' does not conform to 'Planned Treatment for Period 01' -> one violation, the expected form reported as library_variable_label_template. Until this plan the column resolved to no library row and the rule was silent (this scenario was valid_lowercase_indexed_name). studyid is the positive control: resolved, label matches."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL TRTxxP name=TRTxxP label="Planned Treatment for Period xx"
+#expectViolationCount 1
+#expectViolationAt variable_name=trt01p library_variable_label="Planned Treatment for Period 01" library_variable_label_template="Planned Treatment for Period 01" variable_label="Any Sponsor Label"
+dataset ADSL
+col studyid type=Char label="Study Identifier"
+col trt01p  type=Char label="Any Sponsor Label"
+---
+CDISCPILOT01 | Placebo
+---

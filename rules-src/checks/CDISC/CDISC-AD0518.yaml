@@ -2,8 +2,9 @@ Core:
   Id: "CDISC-AD0518"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable name ends in EDY but its label does not\
-  \ contain 'Relative End Day'."
+Description: "Raise an error when a variable's name ends in EDY, the ADaM implementation\
+  \ guide's *EDY naming fragment governs it (the name is not a standard library variable),\
+  \ and its label does not contain the fragment's phrase 'Relative End Day'."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -11,13 +12,15 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "EDY") and not contains(var_label("DATA"), "Relative End Day")
+    ends_with(upper(varname()), "EDY") and var_name("LIBRARY") == "*EDY" and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
 Outcome:
   Message: "A variable ending in EDY does not contain \"Relative End Day\" in the\
     \ label"
   Output_Variables:
   - "variable_name"
   - "variable_label"
+  - "library_variable_label_template"
 skipIfLibraryDefined: true
 Source:
   Class: "ALL"

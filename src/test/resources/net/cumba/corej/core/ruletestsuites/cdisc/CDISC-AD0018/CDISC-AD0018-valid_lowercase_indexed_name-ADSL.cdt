@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0018 expect=noViolation domain=ADSL
-#note "CR18 (ADaM Conformance Rules v5.0, ADaMIG 1.0): the exception for variables whose names contain an index (y, xx, zz, w). trt01p is a period-indexed instance of the ADaMIG template TRTxxP; the Library publishes the template only, so trt01p resolves to no Library variable (var_label(\"LIBRARY\") is empty) and is not judged, whatever its label. studyid is the positive control: resolved, label matches."
+#note "CR18 (ADaM Conformance Rules v5.0, ADaMIG 1.0): the exception for variables whose names contain an index (y, xx, zz). trt01p is a period-indexed instance of the ADaMIG template TRTxxP; since PLAN-library-template-label-resolution the library resolves it THROUGH the template (var_name(\"LIBRARY\") is TRTxxP, var_label(\"LIBRARY\") the label with the period substituted), and it is the template's lower-case index that keeps it out of this rule - CR18's own exception, kept (QH1 (a)) - so the label is not judged here, whatever it says; CDISC-AD0709 (CR709, no xx exception) and PMDA-AD0018 judge it. studyid is the positive control: resolved, label matches."
 #library standard=adamig version=1-0
 #library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
 #library variable-metadata ADSL TRTxxP name=TRTxxP label="Planned Treatment for Period xx"

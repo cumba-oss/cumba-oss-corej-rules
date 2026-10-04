@@ -2,29 +2,27 @@ Core:
   Id: "CDISC-AD0514"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable name ends in STMF but its label does\
-  \ not end with 'Imputation Flag' (or 'Imput. Flag') or does not contain 'Start'\
-  \ or does not contain 'Time', unless the variable is TRTSTMF, TRnnSTMF (nn=01-99),\
-  \ or one of the standard library variables."
+Description: "Raise an error when a variable's name ends in STMF, the ADaM implementation\
+  \ guide's *STMF naming fragment governs it (the name is not a standard library variable),\
+  \ and its label does not end with 'Imputation Flag' (or 'Imput. Flag') or does not\
+  \ contain 'Start' or does not contain 'Time'."
 Executability: "Fully Executable"
 Scope:
   Domains:
     Include:
     - "ALL"
-Bindings:
-- name: "$library_variables"
-  expression: "get_column_order_from_library()"
 Check:
   expression: >-
-    ends_with(upper(varname()), "STMF") and upper(varname()) !~ /^TR(T|0[1-9]|[1-9][0-9])STMF$/ and
-    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Start") or
-    not contains(var_label("DATA"), "Time")) and upper(varname()) not in $library_variables
+    ends_with(upper(varname()), "STMF") and var_name("LIBRARY") == "*STMF" and (var_label("DATA") !~
+    / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Start") or not
+    contains(var_label("DATA"), "Time"))
 Outcome:
   Message: "A variable ending in STMF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'Start' or does not contain 'Time'."
   Output_Variables:
   - "variable_name"
   - "variable_label"
+  - "library_variable_label_template"
 Source:
   Class: "ALL"
   Variable_or_Item: "*STMF"

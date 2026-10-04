@@ -571,6 +571,30 @@ element stays missing** — it is carried through unchanged, in its position (mi
 through the string functions, register `D36`), never folded to `""`. Confirmed by the owner 2026-09-28 together
 with [`upper`](#upper)'s list form (rulings register `CIT §3`).
 
+### matches_label_template
+
+`matches_label_template(label, template)` → **boolean**
+
+True when `label` conforms to `template`, a library label read as a template ([`label_template`](#label_template)). The grammar is the ADaM implementation guide's own rule for its labels:
+
+- a **`{phrase}`** must occur somewhere in the label, which is otherwise free (*"labels containing a word or phrase in brackets should be replaced by the producer with appropriate text that contains the bracketed word or phrase somewhere in the text"*): `Start Date of Rescue Med` and `Rescue Med Start Date` both conform to `{Start Date}`;
+- **`...`** is any text, including none, with the whitespace beside it optional: `Analysis Category 1` and `Analysis Category 1 (Low)` both conform to `Analysis Category 1 ...`, and `Start Date of First Dose` to ADaMIG 1.0's `Start Date of ...`;
+- **fixed text** matches exactly, letter case included — `Planned Treatment for Period 01` conforms only to itself;
+- **`Imput.` is `Imputation`** on both sides — the one abbreviation the implementation guide itself publishes (`Date of First Exposure Imput. Flag`); no other.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `label` | string | yes | The label to judge, usually `var_label("DATA")` |
+| `template` | string | yes | The template, usually `label_template("LIBRARY")` |
+
+**Example**
+
+```yaml
+expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY"))'
+```
+
+**Missing** — A missing `label` or `template` answers **false**, as `contains` does, so the `not empty(label_template("LIBRARY"))` guard is what keeps a column without a template out of the rule; without it, `not matches_label_template(…)` fires on every such column. Both parameters are strings: a number in either position fails to load.
+
 ### max_value_length
 
 `max_value_length([name])` → **value**
@@ -869,7 +893,10 @@ list too) and `equalsIgnoreCase(varname(), var_name("LIBRARY"))`; a name **test*
 **cell** is a value and is not folded — it compares exactly, as every string does. The naming rules
 (`varname() =~ /.*[a-z]/`, `varname() !~ /^[A-Z0-9_]+$/` and kin) test the letter case of the name itself and are
 never folded; a template carve-out tests the **library** name instead, `var_name("LIBRARY") !~ /[a-z]/`, which
-needs no fold.
+needs no fold — and since the library resolves a numbered column through its template (`TRT01P` → `TRTxxP`,
+see [`label_template`](#label_template)), the carve-out is what keeps an index-named column out of a rule whose
+authority excepts it, while a rule that checks such names compares with
+[`matches_label_template`](#matches_label_template) instead of `!=`.
 
 
 ## Numbers and arithmetic
@@ -2920,6 +2947,29 @@ The example above is the complete call.
 **When there is nothing to answer** — a row whose cell is blank, or names a parent no dataset of the study carries, reads **the empty set** (`QNAM in $s` is false; `not in` fires). ⚠ The rule is **SKIPPED**, an exception to the totality rule above, when **no** row's parent resolves a model list (*"Rule skipped — library returned no data for get_parent_model_column_order"*), and when a resolved parent's model list is *library not available* (no product declared, or the Library unreachable) — as [`get_model_column_order()`](#get_model_column_order) skips for its own dataset.
 
 
+### label_template
+
+`label_template([x,] "LIBRARY")` → **value**
+
+The variable's library label as a **template**, in the grammar of [`matches_label_template`](#matches_label_template); `LIBRARY` only — the template is a product of the Library's naming conventions, which no Define-XML publishes.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `level` | level | yes | Which metadata to read — supported here: `LIBRARY` |
+
+**Example**
+
+```yaml
+expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY"))'
+```
+
+**How the column finds its template.** An ADaM product's variables are keyed by **data structure** (ADSL, BDS, OCCDS …), and the dataset's structures are detected as the `Scope.Data_Structures` gate detects them (the Define-XML declaration first). Within the governing structure the column resolves, in order: by its **literal** name; through a published **index template** — `TRT01P` is `TRTxxP`, `AVALCAT1` is `AVALCATy`, `P02S1SDT` is `PxxSwSDT`, with `xx`/`zz` two digits, `y` any number and `w` one digit; through the **ADSL** structure (an ADSL variable copied into a BDS or OCCDS dataset keeps its ADSL definition); and last through the longest published `*`-**stem** (`XXSDT` is `*SDT`'s, never `*DT`'s). `var_name("LIBRARY")` then names what resolved — the published spelling, the template (`TRTxxP`) or the stem (`*SDT`) — and `var_label("LIBRARY")` the label with the column's digits substituted as whole words (`Planned Treatment for Period 01`). A `*`-stem serves **no label** and no type, only its phrase here, so a rule guarded by `not empty(var_label("LIBRARY"))` never judges a stem column — the stem rules (`CDISC-AD0503`–`AD0520`) select their stem with `var_name("LIBRARY") == "*SDT"`.
+
+**What the template holds.** For a literal, the label itself. For an index template, the substituted label, and — when the name carries `y` or `zz` — a trailing ` ...`, the IG's descriptive tail (*"descriptive text is allowed at the end of the labels of variables whose names contain indexes 'y' or 'zz'"*): `AVALCAT1` → `Analysis Category 1 ...`, `TRT01P` → `Planned Treatment for Period 01` (an `xx` name allows none). For a stem, the published phrase: `{Start Date}`; ADaMIG 1.0 spells it `Start Date of ...`. **Missing** — so a `not empty(label_template("LIBRARY"))` guard decides — for a column the Library does not know, a column spelled like the template itself (`TRTXXP`), and two templates matching one column.
+
+**An ADaMIG 1.1 run and ADAE.** ADaMIG 1.1 publishes no occurrence structure; the OCCDS product of the IG's own generation is added for the run (OCCDS 1.0 for ADaMIG 1.1, OCCDS 1.1 for 1.2 and 1.3) unless a product publishing one is declared with `-mp`, and the run log names it. Nothing is added for ADaMIG 1.0 or a TIG leg.
+
 ### natural_key_variables
 
 `natural_key_variables()` → **value (a list)**
@@ -3205,6 +3255,8 @@ expression: 'var_label("DATA") =~ /^[a-z]/'
 ```
 
 **At `LIBRARY`, a dataset whose domain the run's IG does not define has no label** — nor a codelist, core designation or ordinal: the SDTM model's labels are class-level ones, not the label a standard gives the domain, and a sponsor may adjust the labels of a domain it defines. A rule guarded by `not empty(var_label("LIBRARY"))` therefore does not judge such a dataset. Its name, data type and role do come from the model (see [`var_type`](#var_type)).
+
+**At `LIBRARY` on an ADaM dataset**, a column named after a published index template (`TRT01P`, `ANL01FL`) reads the template's label with its digits substituted (`Planned Treatment for Period 01`), an ADSL variable copied into a BDS or OCCDS dataset reads its ADSL label, and a column governed only by a `*`-stem (`RANDSDT`) has **no label** — the stem's phrase is served by [`label_template`](#label_template), which says how the column found its row.
 
 ### var_length
 

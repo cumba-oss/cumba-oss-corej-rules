@@ -525,6 +525,26 @@ public final class ScenarioDeclaredScopeProvider implements MetadataProvider
     }
 
 
+    /**
+     * PLAN-library-template-label-resolution: the structure-keyed read, the LIBRARY read's first
+     * tier for an ADaM product — delegated, as every tier of the wrapped provider is.
+     */
+    @Override
+    public Map<String, String> getVariableMetadata(IDataTable aTable, List<String> aStructures,
+            List<String> aSubclasses, String aDomain, String aVariable)
+    {
+        return base.getVariableMetadata(aTable, aStructures, aSubclasses, aDomain, aVariable);
+    }
+
+
+    @Override
+    public List<String> getColumnOrderForStructures(List<String> aStructures,
+            List<String> aSubclasses, String aDomain)
+    {
+        return base.getColumnOrderForStructures(aStructures, aSubclasses, aDomain);
+    }
+
+
     @Override
     public List<Map<String, String>> getDomainVariables(String aDomain)
     {

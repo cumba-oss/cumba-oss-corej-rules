@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-AD0709 expect=noViolation domain=ADSL
+#note "CR709 checks an xx-indexed name (PLAN-library-template-label-resolution, QH1 (a)): TRT01P resolves through the ADSL template TRTxxP and its label equals the template with the period substituted, 'Planned Treatment for Period 01' -> silent. The positive twin of -invalid_lowercase_indexed_name."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata ADSL TRTxxP name=TRTxxP label="Planned Treatment for Period xx"
+#expectViolationCount 0
+dataset ADSL
+col STUDYID type=Char label="Study Identifier"
+col TRT01P  type=Char label="Planned Treatment for Period 01"
+---
+CDISCPILOT01 | Placebo
+---

@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-AD0018 expect=noViolation domain=ADSL
+#note "D7 (PLAN-library-template-label-resolution): 'Imput.' and 'Imputation' are one word to the matcher, on both sides - the implementation guide publishes the abbreviation itself (24 labels, metadata issue #97). TRTSDTF spelled out against the published 'Date of First Exposure Imput. Flag' -> silent; under the retired exact comparison this was a warning."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL TRTSDTF name=TRTSDTF label="Date of First Exposure Imput. Flag"
+#expectViolationCount 0
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col TRTSDTF type=Char label="Date of First Exposure Imputation Flag"
+---
+CDISCPILOT01 | Y
+---

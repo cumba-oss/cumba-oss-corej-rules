@@ -3,9 +3,12 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise a warning when the label of a variable that is defined in the\
-  \ ADaM metadata does not match the variable label described in ADaM. The check runs\
-  \ only for variables that carry a label in the ADaM standard metadata; newly created\
-  \ variables without ADaM-defined labels are not flagged."
+  \ ADaM metadata does not match the variable label described in ADaM. A variable\
+  \ named after an ADaM naming template (TRT01P, AVALCAT1, ANL01FL) is checked against\
+  \ its resolved label template, with descriptive text allowed after the label of\
+  \ a variable whose name carries the index 'y' or 'zz'. The check runs only for variables\
+  \ that carry a label in the ADaM standard metadata; newly created variables without\
+  \ ADaM-defined labels are not flagged."
 Severity: "Warning"
 Executability: "Fully Executable"
 Scope:
@@ -19,10 +22,10 @@ Scope:
     - "MEDICAL DEVICE OCCURRENCE DATA STRUCTURE"
 Check:
   expression: >-
-    equalsIgnoreCase(varname(), var_name("LIBRARY")) and var_name("LIBRARY") !~ /[a-z]/ and not
-    empty(var_label("LIBRARY")) and not contains(var_label("LIBRARY"), "*") and not
-    contains(var_label("LIBRARY"), "...") and not contains(var_label("LIBRARY"), "{") and
-    var_label("DATA") != var_label("LIBRARY")
+    not empty(var_label("LIBRARY")) and not empty(label_template("LIBRARY")) and not
+    contains(var_label("LIBRARY"), "*") and not contains(var_label("LIBRARY"), "...") and not
+    contains(var_label("LIBRARY"), "{") and not matches_label_template(var_label("DATA"),
+    label_template("LIBRARY"))
 Outcome:
   Message: "The variable label in the dataset does not match the variable label described\
     \ in ADaM."
@@ -30,6 +33,7 @@ Outcome:
   - "variable_name"
   - "library_variable_label"
   - "variable_label"
+  - "library_variable_label_template"
 Source:
   Message: "Variable label mismatch between dataset and ADaM standard"
   Description: "The variable label in the dataset should match the variable label\

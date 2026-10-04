@@ -362,6 +362,31 @@ final class CompositeMetadataProvider implements MetadataProvider
     }
 
 
+    /**
+     * PLAN-library-template-label-resolution: the structure-keyed read is the LIBRARY read's first
+     * tier for an ADaM product; inheriting its self-delegating default would route the stored
+     * provider's answer through the domain-keyed read and lose every non-ADSL row.
+     */
+    @Override
+    public Map<String, String> getVariableMetadata(IDataTable aTable, List<String> aStructures,
+            List<String> aSubclasses, String aDomain, String aVariable)
+    {
+        return firstNonEmptyMap(
+                p -> p.getVariableMetadata(aTable, aStructures, aSubclasses, aDomain, aVariable),
+                mock, stored);
+    }
+
+
+    @Override
+    public List<String> getColumnOrderForStructures(List<String> aStructures,
+            List<String> aSubclasses, String aDomain)
+    {
+        return firstNonEmptyList(
+                p -> p.getColumnOrderForStructures(aStructures, aSubclasses, aDomain), mock,
+                stored);
+    }
+
+
     @Override
     public List<Map<String, String>> getDomainVariables(String domain)
     {

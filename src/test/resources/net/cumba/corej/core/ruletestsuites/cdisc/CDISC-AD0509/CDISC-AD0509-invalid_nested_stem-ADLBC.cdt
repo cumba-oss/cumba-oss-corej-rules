@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0509 expect=violation domain=ADLBC
+#note "PLAN-library-template-label-resolution (review H2): RANDSDT is governed by *SDT (the longest published stem that is a suffix of the name), never by *DT, so this rule judges it alone - CDISC-AD0503 stays silent on it (its valid_nested_stem_governed_by_sdt scenario). The label lacks the stem's phrase 'Start Date'. The finding shows the published phrase as library_variable_label_template."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC *DT name=*DT label="{Date}"
+#library variable-metadata ADLBC *SDT name=*SDT label="{Start Date}"
+#expectViolationCount 1
+#expectViolationAt variable_name=RANDSDT variable_label="Randomization Date" library_variable_label_template="{Start Date}"
+dataset ADLBC class=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col RANDSDT type=Char label="Randomization Date"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | x
+---

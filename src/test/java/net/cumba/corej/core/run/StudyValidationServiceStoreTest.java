@@ -72,7 +72,9 @@ class StudyValidationServiceStoreTest
             var adam = tryStore(params, StudyValidationService.StandardKind.ADAM,
                     params.metadataProducts(), RunStandard.of("standards/adam/adamig-1-3"));
             assertNotNull(adam, "an ADaM run with a configured store loads offline");
-            assertEquals(List.of("standards/adam/adamig-1-3"),
+            // PLAN-library-template-label-resolution D10: ADaMIG 1.3 declared alone carries the
+            // OCCDS of its own generation (OCCDS 1.1) at lowest precedence, named in provenance.
+            assertEquals(List.of("standards/adam/adamig-1-3", "standards/adam/adam-occds-1-1"),
                     adam.declaredStructureKeyedProducts());
             StudyValidationParams unknown = StudyValidationParams.builder()
                     .manager(mock(IDataTableManager.class))

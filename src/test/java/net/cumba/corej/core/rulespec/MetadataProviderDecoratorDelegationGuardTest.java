@@ -299,6 +299,23 @@ class MetadataProviderDecoratorDelegationGuardTest
             + "\\s*DatasetResolver\\s+(\\w+)\\s*,\\s*String\\s+(\\w+)\\s*,"
             + "\\s*String\\s+(\\w+)\\s*\\)";
 
+    /**
+     * {@code Map<String, String> name(IDataTable t, List<String> s, List<String> c, String d,
+     * String v)} — the structure-keyed variable read's shape
+     * (PLAN-library-template-label-resolution).
+     */
+    private static final String MAP_OF_TABLE_LISTS_TWO_STRINGS = "(?<![\\w.])Map\\s*<\\s*String\\s*,"
+            + "\\s*String\\s*>\\s+%s\\s*\\(\\s*IDataTable\\s+(\\w+)\\s*,"
+            + "\\s*List<String>\\s+(\\w+)\\s*,\\s*List<String>\\s+(\\w+)\\s*,"
+            + "\\s*String\\s+(\\w+)\\s*,\\s*String\\s+(\\w+)\\s*\\)";
+
+    /**
+     * {@code List<String> name(List<String> s, List<String> c, String d)} — the structure order.
+     */
+    private static final String LIST_OF_LISTS_STRING = "(?<![\\w.])List<String>\\s+%s\\s*"
+            + "\\(\\s*List<String>\\s+(\\w+)\\s*,\\s*List<String>\\s+(\\w+)\\s*,"
+            + "\\s*String\\s+(\\w+)\\s*\\)";
+
     /** {@code List<Map<String, String>> name(IDataTable t, DatasetResolver r, String c)}. */
     private static final String MAP_LIST_OF_TABLE_STRING = "(?<![\\w.])" + MAP_LIST
             + "\\s+%s\\s*\\(\\s*IDataTable\\s+(\\w+)\\s*,"
@@ -458,10 +475,20 @@ class MetadataProviderDecoratorDelegationGuardTest
             // {} default means "not served", which the var_*("LIBRARY") rules read as a silent
             // pass; a decorator inheriting it hides the tier of the provider it wraps.
             capability("getIgAbsentVariableMetadata(IDataTable, DatasetResolver, String, String)",
-                    MAP_OF_TABLE_TWO_STRINGS));
+                    MAP_OF_TABLE_TWO_STRINGS),
+            // PLAN-library-template-label-resolution: the structure-keyed variable read and
+            // column order — the LIBRARY read's first tier for an ADaM product. Their interface
+            // defaults are self-delegating (the whole answer for a domain-keyed provider), so a
+            // decorator inheriting them silently routes a structure-keyed provider through the
+            // domain-keyed read and loses every non-ADSL row: both harness decorators delegate.
+            capability(
+                    "getVariableMetadata(IDataTable, List<String>, List<String>, String, String)",
+                    MAP_OF_TABLE_LISTS_TWO_STRINGS),
+            capability("getColumnOrderForStructures(List<String>, List<String>, String)",
+                    LIST_OF_LISTS_STRING));
 
     /** Floor on the capability set itself, so an accidental deletion reds. */
-    private static final int MIN_CAPABILITIES = 23;
+    private static final int MIN_CAPABILITIES = 25;
 
     /** Floor on the interface's own default count, so a truncated parse cannot pass. */
     private static final int MIN_INTERFACE_DEFAULTS = 26;

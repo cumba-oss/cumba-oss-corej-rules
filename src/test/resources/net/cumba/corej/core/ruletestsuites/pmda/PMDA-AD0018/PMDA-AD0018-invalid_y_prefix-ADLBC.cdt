@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0018 expect=violation domain=ADLBC
+#note "D8 (PLAN-library-template-label-resolution): the descriptive text of a y-indexed name goes at the END of the label - the template's fixed text 'Analysis Value Category 1' must open it. 'Category 1 Analysis' does not conform -> one violation; AVALCAT2 with the exact text is the positive control."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC AVALCATy name=AVALCATy label="Analysis Value Category y"
+#expectViolationCount 1
+#expectViolationAt variable_name=AVALCAT1 library_variable_label_template="Analysis Value Category 1 ..." variable_label="Category 1 Analysis"
+dataset ADLBC structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVALCAT1 type=Char label="Category 1 Analysis"
+col AVALCAT2 type=Char label="Analysis Value Category 2"
+---
+CDISCPILOT01 | ALB | LOW | NORMAL
+---

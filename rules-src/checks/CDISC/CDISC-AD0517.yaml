@@ -2,8 +2,9 @@ Core:
   Id: "CDISC-AD0517"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable name ends in EDTM but its label does\
-  \ not contain 'End Datetime'."
+Description: "Raise an error when a variable's name ends in EDTM, the ADaM implementation\
+  \ guide's *EDTM naming fragment governs it (the name is not a standard library variable),\
+  \ and its label does not contain the fragment's phrase 'End Datetime'."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -11,12 +12,14 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "EDTM") and not contains(var_label("DATA"), "End Datetime")
+    ends_with(upper(varname()), "EDTM") and var_name("LIBRARY") == "*EDTM" and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
 Outcome:
   Message: "A variable ending in EDTM does not contain \"End Datetime\" in the label"
   Output_Variables:
   - "variable_name"
   - "variable_label"
+  - "library_variable_label_template"
 skipIfLibraryDefined: true
 Source:
   Class: "ALL"

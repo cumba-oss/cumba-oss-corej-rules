@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-AD0018 expect=noViolation domain=ADLBC
+#note "D8 (PLAN-library-template-label-resolution, ADaMIG section 3): descriptive text is allowed at the end of the label of a variable whose name carries the index y or zz. AVALCAT1 resolves through the BDS template AVALCATy, whose template is 'Analysis Category 1 ...', and 'Analysis Value Category 1 (Low/Normal/High)' conforms -> silent; so does the bare 'Analysis Category 1' (ANL01FL, a zz name, likewise)."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC AVALCATy name=AVALCATy label="Analysis Value Category y"
+#library variable-metadata ADLBC ANLzzFL name=ANLzzFL label="Analysis Flag zz"
+#expectViolationCount 0
+dataset ADLBC structure=BDS
+col STUDYID type=Char label="Study Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVALCAT1 type=Char label="Analysis Value Category 1 (Low/Normal/High)"
+col AVALCAT2 type=Char label="Analysis Value Category 2"
+col ANL01FL type=Char label="Analysis Flag 01 - Efficacy"
+---
+CDISCPILOT01 | ALB | LOW | NORMAL | Y
+---

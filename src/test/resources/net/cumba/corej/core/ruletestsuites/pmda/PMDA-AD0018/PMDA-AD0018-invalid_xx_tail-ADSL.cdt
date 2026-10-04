@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-AD0018 expect=violation domain=ADSL
+#note "D8 (PLAN-library-template-label-resolution): a descriptive tail is allowed for y and zz names only. TRT01P (xx) must carry exactly 'Planned Treatment for Period 01'; the trailing ' (Study Part A)' does not conform -> one violation."
+#library standard=adamig version=1-3
+#library variable-metadata ADSL TRTxxP name=TRTxxP label="Planned Treatment for Period xx"
+#expectViolationCount 1
+#expectViolationAt variable_name=TRT01P variable_label="Planned Treatment for Period 01 (Study Part A)"
+dataset ADSL structure=ADSL
+col STUDYID type=Char label="Study Identifier"
+col TRT01P  type=Char label="Planned Treatment for Period 01 (Study Part A)"
+---
+CDISCPILOT01 | Placebo
+---

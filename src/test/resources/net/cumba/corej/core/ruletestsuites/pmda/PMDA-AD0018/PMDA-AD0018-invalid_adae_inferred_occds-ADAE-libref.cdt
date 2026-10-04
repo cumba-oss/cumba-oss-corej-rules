@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-AD0018 expect=violation domain=ADAE
+#note "D10 (PLAN-library-template-label-resolution), on OUR metadata store: a run that declares only ADaMIG 1.1 - which publishes no occurrence structure - resolves ADAE against the OCCDS product of the IG's own generation, OCCDS 1.0, added at lowest precedence and named in the run log. ADURN then has a library label, 'Analysis Duration (N)', and 'AE Duration (N)' does not conform -> one violation (as for ADAE ADURN in the PhUSE pilot). AETERM / AEDECOD make the dataset an OCCDS one; AEDECOD's label matches and is the positive control. Until this plan ADAE resolved against nothing under ADaMIG 1.1."
+#library-ref standard=adamig version=1-1
+#expectViolationCount 1
+#expectViolationAt variable_name=ADURN library_variable_label="Analysis Duration (N)" variable_label="AE Duration (N)"
+dataset ADAE
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col ADURN type=Num label="AE Duration (N)"
+---
+CDISCPILOT01 | 01-701-1015 | HEADACHE | HEADACHE | 3
+---

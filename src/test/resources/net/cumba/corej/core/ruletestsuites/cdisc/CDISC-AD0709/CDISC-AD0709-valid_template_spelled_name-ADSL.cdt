@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0709 expect=noViolation domain=ADSL
-#note "CR709 (ADaM Conformance Rules v5.0, ADaMIG 1.2/1.3): the exception for variables whose names contain an index (y, xx, zz, w), keyed on the LIBRARY name. The column is spelled TRTXXP - the template itself, upper-cased - and resolves case-insensitively to the Library's TRTxxP, whose lower-case index marks it as a template. Its label differs from the template's, but a template label is not a standard label for any concrete variable -> silent. The data name has no lower-case letter, so an exclusion keyed on varname() would have judged it; STUDYID is the positive control."
+#note "CR709 (ADaM Conformance Rules v5.0, ADaMIG 1.2/1.3): a column spelled TRTXXP - the template itself, upper-cased - resolves case-insensitively to the Library's TRTxxP as a LITERAL hit: it names no concrete variable, there are no digits to substitute, and the library serves no label template for it (label_template(\"LIBRARY\") is empty), so the rule's not empty(label_template(\"LIBRARY\")) guard keeps it out whatever its label -> silent (PLAN-library-template-label-resolution). A real period instance, TRT01P, IS checked (-invalid_lowercase_indexed_name). STUDYID is the positive control."
 #library standard=adamig version=1-3
 #library variable-metadata ADSL STUDYID name=STUDYID label="Study Identifier"
 #library variable-metadata ADSL TRTxxP name=TRTxxP label="Planned Treatment for Period xx"

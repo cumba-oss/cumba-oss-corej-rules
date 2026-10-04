@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-AD0709 expect=violation domain=ADLBC
+#note "D9 (PLAN-library-template-label-resolution): an ADSL variable copied into a BDS dataset keeps its ADSL definition - ITTFL in ADLBC resolves to the ADSL row when BDS has none, and 'Intent-to-Treat Population Flag' differs from the published 'Intent-To-Treat Population Flag' (the case of 'To', as in the PhUSE pilot's ADADAS / ADCIBC / ADNPIX) -> one violation. Until this plan no non-ADSL dataset reached the library at all. PARAMCD is the positive control (a BDS literal, label matches)."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC PARAMCD name=PARAMCD label="Parameter Code"
+#library variable-metadata ADSL ITTFL name=ITTFL label="Intent-To-Treat Population Flag"
+#expectViolationCount 1
+#expectViolationAt variable_name=ITTFL library_variable_label="Intent-To-Treat Population Flag" variable_label="Intent-to-Treat Population Flag"
+dataset ADLBC class=BDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL type=Num label="Analysis Value"
+col ITTFL type=Char label="Intent-to-Treat Population Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1 | Y
+---

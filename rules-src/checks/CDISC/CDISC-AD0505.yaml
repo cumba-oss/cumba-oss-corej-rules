@@ -2,8 +2,9 @@ Core:
   Id: "CDISC-AD0505"
   Status: "Published"
   Version: "1"
-Description: "Raise an error when a variable's name ends in DTM but its label does\
-  \ not contain 'Datetime'."
+Description: "Raise an error when a variable's name ends in DTM, the ADaM implementation\
+  \ guide's *DTM naming fragment governs it (the name is not a standard library variable),\
+  \ and its label does not contain the fragment's phrase 'Datetime'."
 Executability: "Fully Executable"
 Scope:
   Domains:
@@ -11,12 +12,14 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    ends_with(upper(varname()), "DTM") and not contains(var_label("DATA"), "Datetime")
+    ends_with(upper(varname()), "DTM") and var_name("LIBRARY") == "*DTM" and not
+    matches_label_template(var_label("DATA"), label_template("LIBRARY"))
 Outcome:
   Message: "The variable's name ends in DTM, but its label does not contain 'Datetime'."
   Output_Variables:
   - "variable_name"
   - "variable_label"
+  - "library_variable_label_template"
 skipIfLibraryDefined: true
 Source:
   Class: "ALL"

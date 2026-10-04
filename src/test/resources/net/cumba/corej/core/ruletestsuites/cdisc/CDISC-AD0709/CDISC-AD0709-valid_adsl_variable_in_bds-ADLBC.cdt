@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-AD0709 expect=noViolation domain=ADLBC
+#note "D9 (PLAN-library-template-label-resolution): ITTFL in ADLBC resolves to its ADSL row and its label equals the published one -> silent. The positive twin of -invalid_adsl_variable_in_bds."
+#library standard=adamig version=1-3
+#library variable-metadata ADLBC PARAMCD name=PARAMCD label="Parameter Code"
+#library variable-metadata ADSL ITTFL name=ITTFL label="Intent-To-Treat Population Flag"
+#expectViolationCount 0
+dataset ADLBC class=BDS
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PARAMCD type=Char label="Parameter Code"
+col AVAL type=Num label="Analysis Value"
+col ITTFL type=Char label="Intent-To-Treat Population Flag"
+---
+CDISCPILOT01 | 01-701-1015 | ALB | 1 | Y
+---

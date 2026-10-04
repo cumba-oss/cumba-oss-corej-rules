@@ -70,8 +70,11 @@ class CaseFoldedNameTestCensusTest
     private static final Set<String> TWO_SIDED_NAME_TESTS = Set.of("CDISC-CG0349");
 
     /**
-     * Name membership / equality probes deliberately NOT folded. Empty since 2026-09-28:
-     * PMDA-AD0018 compares {@code equalsIgnoreCase(varname(), var_name("LIBRARY"))}.
+     * Name membership / equality probes deliberately NOT folded. Empty since 2026-09-28, when
+     * PMDA-AD0018 compared {@code equalsIgnoreCase(varname(), var_name("LIBRARY"))}; since
+     * {@code PLAN-library-template-label-resolution} that rule pairs the names through the library
+     * resolution itself (a numbered column resolves to its template, {@code TRT01P} to
+     * {@code TRTxxP}) and carries no name probe at all.
      */
     private static final Set<String> UNFOLDED_MEMBERSHIP = Set.of();
 
@@ -88,13 +91,21 @@ class CaseFoldedNameTestCensusTest
     // The CG0013 family's allowed = model OR IG adds one upper(varname()) membership to each of
     // CG0013, -A..-D and CG0351 (+6), and the PMDA-SD0058 ladder adds three to each of SD0058,
     // -A..-D (+15). Re-derived per rule against 43233244^.
+    // 2026-10-04 (PLAN-library-template-label-resolution): name-test sites 197 -> 192 and
+    // membership 61 -> 50 rules / 135 -> 124 sites, rules unchanged at 115. The 18 stem rules
+    // CDISC-AD0503-AD0520 select their stem by var_name("LIBRARY") == "*SDT" (a LIBRARY-name
+    // test, which this census does not count), so the eleven `upper(varname()) not in
+    // $library_variables` memberships (-11 rules / -11 sites), the four
+    // `upper(varname()) !~ /^TR(T|0[1-9]|[1-9][0-9])SDTF$/` exclusions of AD0513/14/19/20 and
+    // AD0504's `not ends_with(upper(varname()), "DTM")` (-5 sites) are retired as structural;
+    // the rules' own ends_with gates stay counted. Re-derived from a run, not nudged.
     private static final int EXPECTED_FOLDED_RULES = 115;
 
-    private static final int EXPECTED_FOLDED_SITES = 197;
+    private static final int EXPECTED_FOLDED_SITES = 192;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 61;
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 50;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 135;
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 124;
 
     private static final Set<String> PREDICATES = Set.of("ends_with", "starts_with", "contains",
             "does_not_contain", "prefix_matches", "suffix_matches");
