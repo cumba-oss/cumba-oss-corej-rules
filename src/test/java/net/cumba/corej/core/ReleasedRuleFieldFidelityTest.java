@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
+import net.cumba.corej.core.exec.OutputVariableDeriver;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import org.junit.jupiter.api.Test;
@@ -62,60 +63,22 @@ class ReleasedRuleFieldFidelityTest
     // because nothing else records it.
     private static final int MIN_RULES = 3400;
 
-    /**
-     * Entries whose {@code Outcome.Output_Variables} is absent or empty, measured 2026-09-02:
-     * <b>493 absent + 6 empty = 499</b>, across 123 distinct rule ids.
-     *
-     * <p>
-     * ⚠ A test written on "absent" alone finds 493 and its author then chases a phantom 6.
-     * {@code OutputVariableDeriver.derive} treats absent and empty alike, so this test must too.
-     * The number is an upper bound, not an equality: rules acquiring an explicit list is progress.
-     * </p>
+    /*
+     * ⚑ The absent-OV CEILING that used to sit here ({@code MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES},
+     * 499 → 513 → 519 → 556 → 572 → 523, re-measured at every wave) was RETIRED by
+     * {@code PLAN-redundant-output-variables-sweep} Q5 (owner, 2026-10-04): its doctrine — "a rule
+     * acquiring an explicit list is progress" — is the reverse of the sweep, which deletes every
+     * authored list the derivation reproduces (2 029 keys; ~8 300 absent-OV package entries after
+     * it). The population is now watched from the other side:
+     * {@code RedundantOutputVariableLintTest} fails on any authored entry the engine derives
+     * anyway, so growth of this population is the intended state, not a surface to re-measure.
      */
-    // 499 -> 513 on 2026-09-11 (R-4.11c wave A): FDA/PMDA-SD9718, the minted M19 sisters, ship
-    // with no authored Output_Variables — deliberately, following their model CDISC-CG0554: every
-    // column the Check names is absent from the dataset by definition, so there is no witness
-    // column to output. 14 = FDA-SD9718 x 9 packages + PMDA-SD9718 x 5. Re-measured, not nudged.
-    // 513 -> 519 on 2026-09-11 (R-4.11c wave C3): FDA/PMDA-SD9727, the minted M15 sisters, are
-    // the same shape as the M19 pair — all four columns their Check names (USUBJID/APID/SPDEVID/
-    // POOLID) are absent from the dataset by definition, so like their model CDISC-CG0554 they
-    // author no Output_Variables. 6 = FDA-SD9727 x 4 packages + PMDA-SD9727 x 2. Re-measured
-    // against target/rules (519 entries / 127 distinct rules), not nudged.
-    // 519 -> 556 on 2026-09-11 (wave E — the B1/B2/B3 four-state decomposition): the seven minted
-    // neither-column sisters, all the M15 shape and all authoring no Output_Variables — both
-    // columns their Check names are absent from the dataset by definition, so there is no witness
-    // column to output (the CDISC-CG0554 / SD9718 / SD9727 model). 37 = CDISC-CG9676 x 3 +
-    // CDISC-SEND-9440 x 6 + CDISC-SEND-9441 x 2 + CORE-009708 x 10 + FDA-SD9729 x 10 +
-    // PMDA-SD9729 x 5 + FDA-SD9730 x 1 packages. The fourteen R-5.25 split siblings of the same
-    // wave each output their present column and do not move this bound. Re-measured against
-    // target/rules (556 entries / 134 distinct rules), not nudged.
-    // 556 -> 572 on 2026-09-12 (top-level-or wave 3, R-5.25 group K): the eleven
-    // required-structure split siblings follow their parents' — and the model CDISC-CG0554's —
-    // own convention: every column the Check names is absent from the dataset by definition, so
-    // there is no witness column to output and no Output_Variables is authored. 16 =
-    // CDISC-CG0313-A/-B/-C x 1 package + CDISC-CG0554-A/-B/-C x 2 + CORE-000585-A/-B/-C x 1 +
-    // CDISC-SEND-0400-A/-B x 2. The wave's five OTHER siblings (F1's four and X's
-    // CORE-000107-A) each author their own Output_Variables and do not move this bound.
-    // Re-measured against target/rules by run, not nudged.
-    // ⭐ 572 -> 523 on 2026-09-19 (PLAN-retire-core-family phase 7): the CORE family's 11 packages
-    // stopped being generated, taking 49 entries of this population with them — among them the
-    // CORE-009708 x 10 and CORE-000585-A/-B/-C x 1 entries the two comments above record adding.
-    // Measured by run (the ceiling temporarily tightened so the assertion printed the value, then
-    // restored byte-identically): 523. ⚠⚠ THIS PIN IS AN ADDITION TO §13'S "CLOSED LIST", made
-    // under §13's own amendment rule (an addition needs a measurement attached, not a repair in
-    // flight). It was NOT a breach — a ceiling goes SLACK, not red, when its population shrinks,
-    // and §13 classified it "safe" on exactly that ground. Safe is not the same as re-derived: at
-    // 572 it would have carried 49 entries of budget nobody granted, which is the same silent
-    // erosion ScenarioFixtureCoverageRatchetTest.MAX_UNCOVERED was re-derived for in this phase,
-    // and this constant's own history is a record of being re-measured to the achieved value every
-    // time (499 -> 513 -> 519 -> 556 -> 572). ⚑ Its floor sibling needed nothing: 523 >= 400.
-    private static final int MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES = 523;
 
     /**
-     * ⚠ A FLOOR as well as a ceiling. The derivation arm below only asserts anything about entries
-     * it actually classifies as absent-or-empty, so a change that broke the raw-node lookup would
-     * classify none, assert nothing, and stay green — a bound with no floor is how a guard becomes
-     * vacuous without anyone noticing.
+     * ⚠ A FLOOR. The derivation arm below only asserts anything about entries it actually
+     * classifies as absent-or-empty, so a change that broke the raw-node lookup would classify
+     * none, assert nothing, and stay green — a bound with no floor is how a guard becomes vacuous
+     * without anyone noticing. (Its ceiling sibling is retired — see above.)
      */
     private static final int MIN_DERIVED_OUTPUT_VARIABLE_ENTRIES = 400;
 
@@ -168,9 +131,20 @@ class ReleasedRuleFieldFidelityTest
      * Two claims. First, every shipped rule has an {@code Outcome} with a non-empty {@code Message}
      * — currently true for all 14,451 entries, so this is a free invariant worth pinning. Second,
      * {@code Output_Variables} is <em>allowed</em> to be absent because
-     * {@code OutputVariableDeriver} supplies it on load; that licence is only safe if the
-     * derivation actually produces something, so every absent-or-empty entry must come back with a
-     * non-null effective list after {@code RulePackageLoader} has run.
+     * {@code OutputVariableDeriver} supplies it on load; that licence is only safe if the loader
+     * actually ran the derivation, so every absent-or-empty entry must come back with an effective
+     * list that is installed (non-null) <b>and is the deriver's own answer</b>
+     * ({@code OutputVariableDeriver.derive(rule)}) — the arm is a deriver-installation guard.
+     * </p>
+     *
+     * <p>
+     * ⚠ It does NOT assert the effective list is non-empty. Measured 2026-10-04 (the sweep's P0):
+     * 505 absent-OV package entries — 126 rules — derive an EMPTY list, every one of the no-witness
+     * shape ({@code not ds_exists("ADSL")}, {@code not var_exists("DOMAIN")}, {@code CDISC-AD0001},
+     * {@code CDISC-CG0313-A}, …): every name the Check reads is under an absence predicate, D3
+     * suppresses it, and the run-time projection falls back to the Check's leaf columns
+     * ({@code RuleRunner.projectedOutputVariables}). An empty derived list is that shape, not a
+     * defect; the count is printed, not pinned.
      * </p>
      */
     @Test
@@ -180,6 +154,7 @@ class ReleasedRuleFieldFidelityTest
         List<String> notDerived = new ArrayList<>();
         int entries = 0;
         int derivedEntries = 0;
+        int emptyEffective = 0;
 
         for (Path pkg : shippedPackages())
         {
@@ -212,34 +187,42 @@ class ReleasedRuleFieldFidelityTest
                     continue;
                 }
                 derivedEntries++;
-                if (rule.getEffectiveOutputVariables() == null)
+                List<String> effective = rule.getEffectiveOutputVariables();
+                if (effective == null)
                 {
                     notDerived.add(
                             where + ": Output_Variables is " + (ov == null ? "absent" : "empty")
-                                    + " and the loader derived nothing");
+                                    + " and the loader installed no effective list");
+                }
+                else if (!effective.equals(OutputVariableDeriver.derive(rule)))
+                {
+                    notDerived.add(where + ": the installed effective list " + effective
+                            + " is not the deriver's answer " + OutputVariableDeriver.derive(rule));
+                }
+                else if (effective.isEmpty())
+                {
+                    emptyEffective++;
                 }
             }
         }
+        System.out.println("[fidelity] absent-OV entries relying on derivation: " + derivedEntries
+                + ", of which " + emptyEffective + " derive an empty list (no-witness shape)");
 
         assertTrue(entries >= MIN_RULES, "only " + entries + " rule entries read");
         assertEquals(List.of(), noMessage.size() > 25 ? noMessage.subList(0, 25) : noMessage,
                 noMessage.size() + " shipped rules have no Outcome.Message. Every row of the"
                         + " Rules Report falls back to it, so a rule without one reports blank.");
         assertEquals(List.of(), notDerived.size() > 25 ? notDerived.subList(0, 25) : notDerived,
-                notDerived.size() + " rules ship with Output_Variables absent or empty AND derive"
-                        + " nothing on load. Omitting the field is only safe because"
-                        + " OutputVariableDeriver fills it in; where it does not, the report loses"
-                        + " the columns that say WHICH variables the finding is about.");
+                notDerived.size() + " rules ship with Output_Variables absent or empty AND the"
+                        + " loader did not install the deriver's list. Omitting the field is only"
+                        + " safe because OutputVariableDeriver fills it in at load; where it does"
+                        + " not, the report loses the columns that say WHICH variables the finding"
+                        + " is about.");
         assertTrue(derivedEntries >= MIN_DERIVED_OUTPUT_VARIABLE_ENTRIES,
                 "only " + derivedEntries + " entries were classified as relying on derivation"
                         + " (expected at least " + MIN_DERIVED_OUTPUT_VARIABLE_ENTRIES
                         + "). The classification broke, so the derivation assertion above ran over"
                         + " nothing.");
-        assertTrue(derivedEntries <= MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES,
-                derivedEntries + " entries rely on derivation; the recorded population is "
-                        + MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES + ". Growth is not wrong, but it"
-                        + " widens a surface nothing else measures — re-measure and update"
-                        + " deliberately.");
     }
 
 

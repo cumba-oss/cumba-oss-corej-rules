@@ -153,6 +153,7 @@ public final class OvSweepCensus
         Map<String, Rule> firstRule = new TreeMap<>();
         Set<String> universe = new TreeSet<>();
         Set<String> shipped = new TreeSet<>();
+        List<String> emptyEffective = new ArrayList<>();
         int entries = 0;
         for (Path pkg : packages(rulesDir))
         {
@@ -173,6 +174,11 @@ public final class OvSweepCensus
                 if (rule.getOutcome() == null || rule.getOutcome().getOutputVariables() == null
                         || rule.getOutcome().getOutputVariables().isEmpty())
                 {
+                    List<String> effective = rule.getEffectiveOutputVariables();
+                    if (effective == null || effective.isEmpty())
+                    {
+                        emptyEffective.add(pkg.getFileName() + " / " + coreId);
+                    }
                     continue;
                 }
                 perRule.computeIfAbsent(coreId, _ -> new ArrayList<>())
@@ -184,6 +190,8 @@ public final class OvSweepCensus
         }
         notes.add("package entries read: " + entries + "; distinct shipped ids: " + shipped.size()
                 + "; rules with authored Output_Variables: " + perRule.size());
+        notes.add("absent-OV package entries whose effective list is EMPTY: "
+                + emptyEffective.size() + (emptyEffective.isEmpty() ? "" : " " + emptyEffective));
 
         Map<String, String> families = families(checksDir);
         Map<String, Row> rows = new TreeMap<>();
