@@ -122,7 +122,8 @@ public final class OvSweepCensus
 
 
     /** The whole census. */
-    public record Census(Map<String, Row> rows, List<String> unshipped, List<String> notes)
+    public record Census(Map<String, Row> rows, List<String> unshipped, List<String> notes,
+            int shippedIds)
     {
     }
 
@@ -229,7 +230,7 @@ public final class OvSweepCensus
                 unshipped.add(f.getKey());
             }
         }
-        return new Census(rows, unshipped, notes);
+        return new Census(rows, unshipped, notes, shipped.size());
     }
 
 

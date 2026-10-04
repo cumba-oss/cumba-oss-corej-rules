@@ -67,8 +67,15 @@ class RedundantOutputVariableLintTest
     /** The committed out-of-scope roster. */
     static final String UNSHIPPED_FILE = OvSweepCensus.UNSHIPPED_FILE;
 
-    /** Floors, so a run that read nothing cannot pass (3 307 rules with OV measured 2026-10-04). */
-    private static final int MIN_RULES_WITH_OV = 3000;
+    /**
+     * Floors, so a run that read nothing cannot pass: distinct shipped rules (3 438 measured
+     * 2026-10-04) and rules that still author an Output_Variables list (1 278 after the sweep — the
+     * 2 029 fully redundant lists were deleted, so the pre-sweep 3 307 is no longer the
+     * population).
+     */
+    private static final int MIN_SHIPPED_RULES = 3300;
+
+    private static final int MIN_RULES_WITH_OV = 1000;
 
     private static final int MIN_PACKAGES = 47;
 
@@ -82,6 +89,8 @@ class RedundantOutputVariableLintTest
                 "the generated corpus is incomplete");
         OvSweepCensus.Census census = OvSweepCensus.census(rulesDir,
                 CorpusPaths.moduleDir().resolve("rules-src").resolve("checks"));
+        assertTrue(census.shippedIds() >= MIN_SHIPPED_RULES,
+                "only " + census.shippedIds() + " distinct shipped rules read");
         assertTrue(census.rows().size() >= MIN_RULES_WITH_OV,
                 "only " + census.rows().size() + " rules with Output_Variables read");
         List<String> defects = census.notes().stream()

@@ -218,7 +218,11 @@ class ShippedExpansionTemplateTest
 
         assertEquals(List.of("CDISC-AD0591-AGE", "CDISC-AD0591-SEX"),
                 rules.stream().map(Rule::effectiveId).toList());
-        assertEquals(List.of("AGE", "ADSL.AGE"), rules.get(0).getOutcome().getOutputVariables());
+        // Since PLAN-redundant-output-variables-sweep the template authors no Output_Variables
+        // (both entries were derived); the expansion derives the renamed pair itself
+        // (WildcardExpander -> RulePackageLoader.deriveOutputVariables), so the EFFECTIVE list is
+        // what the finding projects — and what this asserts.
+        assertEquals(List.of("AGE", "ADSL.AGE"), rules.get(0).getEffectiveOutputVariables());
         for (Rule concrete : rules)
         {
             assertNull(concrete.getExpansion(), "an expansion is concrete, never a template again");
