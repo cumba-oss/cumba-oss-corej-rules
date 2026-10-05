@@ -275,6 +275,21 @@ public final class ViolationNormaliser
          */
         READ_VALUE_AMBIGUOUS,
         /**
+         * A rule that references a merged column the data cannot supply — a supplemental qualifier
+         * two rows qualify for one record, a subject- and a record-level row for one subject, an
+         * {@code IDVAR} the primary lacks ({@code PLAN-merged-evaluation-table} §3.5.3 cases 2, 3,
+         * 5, 6, 9-overlap; OD-7, MET #15): {@code RuleRunner.mergeErrorGate}, or the read-time
+         * {@code MergeErrorReadException}. Matched by the fixed head
+         * {@link #MERGE_ERROR_MESSAGE_PREFIX}.
+         */
+        MERGE_ERROR,
+        /**
+         * A merge the datatable refused while building the merged evaluation view (a degenerate or
+         * clashing key, a {@code Cardinality} violation): the {@code MergeException} catch in
+         * {@code RuleRunner}. Matched by the fixed head {@link #MERGE_REFUSED_MESSAGE_PREFIX}.
+         */
+        MERGE_REFUSED,
+        /**
          * An {@code ERROR} this classifier does not recognise — including a null status message.
          */
         OTHER
@@ -347,6 +362,19 @@ public final class ViolationNormaliser
     static final String READ_VALUE_AMBIGUOUS_MESSAGE_SUFFIX = " — ONLY asserts exactly one qualifying row";
 
     /**
+     * Verbatim copy of {@code MergedEvaluation.MERGE_ERROR_MESSAGE_PREFIX} in the engine: the fixed
+     * head of a flagged-column ERROR (the tail names the column and quotes the datatable's
+     * {@code MERGE_ERROR}). {@code MergeErrorReasonReachabilityTest} drives the engine to it.
+     */
+    static final String MERGE_ERROR_MESSAGE_PREFIX = "MERGE_ERROR on ";
+
+    /**
+     * Verbatim copy of {@code MergedEvaluation.MERGE_REFUSED_MESSAGE_PREFIX} in the engine: the
+     * fixed head of a refused-merge ERROR (the tail is the datatable's own message).
+     */
+    static final String MERGE_REFUSED_MESSAGE_PREFIX = "merged evaluation table: ";
+
+    /**
      * Classifies an execution result into the closed {@link ErrorReason} vocabulary and returns the
      * token names, sorted and de-duplicated.
      *
@@ -417,6 +445,14 @@ public final class ViolationNormaliser
         if (statusMessage.endsWith(READ_VALUE_AMBIGUOUS_MESSAGE_SUFFIX))
         {
             return ErrorReason.READ_VALUE_AMBIGUOUS;
+        }
+        if (statusMessage.startsWith(MERGE_ERROR_MESSAGE_PREFIX))
+        {
+            return ErrorReason.MERGE_ERROR;
+        }
+        if (statusMessage.startsWith(MERGE_REFUSED_MESSAGE_PREFIX))
+        {
+            return ErrorReason.MERGE_REFUSED;
         }
         // Checked last: a load error's text is authored, so it could in principle collide with a
         // fixed engine message. Preferring the fixed messages keeps the classification stable.

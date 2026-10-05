@@ -1,0 +1,31 @@
+#!RuleTest
+#test FDA-SE2234 expect=executionError domain=PC
+#note "SUPP case table case 3: a subject-level row (blank IDVAR) and a record-level row (PCSEQ=1) for one subject and one QNAM. Every record of that subject is flagged; the rule reading PCCALCN ERRORs. Red-first: the legacy pivot served the record-level row to record 1 and the subject-level row to record 2 (0 findings)."
+#library standard=sendig version=3-1-1
+#expect-execution-error "a subject-level and a record-level row qualify one subject"
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ | 
+S1 | PC | 001 | 2 | DRUGX | BLQ | 
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | PC | 001 |  |  | PCCALCN | Numeric Interpretation for Calculations | 0.05
+S1 | PC | 001 | PCSEQ | 1 | PCCALCN | Numeric Interpretation for Calculations | 0.07
+---

@@ -189,6 +189,30 @@ class ExpectedErrorsTest
 
 
         @Test
+        void mergeErrorMessageClassifiesByItsFixedHead()
+        {
+            Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.MERGE_ERROR.name()),
+                    ViolationNormaliser
+                            .reasonsFrom(error(ViolationNormaliser.MERGE_ERROR_MESSAGE_PREFIX
+                                    + "PCCALCN: SUPPPC: qualifier PCCALCN: more than one row"
+                                    + " qualifies one record (rows 1, 2)"), null));
+        }
+
+
+        @Test
+        void mergeRefusedMessageClassifiesByItsFixedHead()
+        {
+            Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.MERGE_REFUSED.name()),
+                    ViolationNormaliser
+                            .reasonsFrom(error(ViolationNormaliser.MERGE_REFUSED_MESSAGE_PREFIX
+                                    + "join on 'SUPPAE' has no usable key: every key column"
+                                    + " (NOSUCH) is absent from both the primary dataset and"
+                                    + " 'SUPPAE'; an empty key would match every row against"
+                                    + " every row"), null));
+        }
+
+
+        @Test
         void noNativeCheckExprMessageClassifies()
         {
             Assertions.assertEquals(
@@ -347,7 +371,14 @@ class ExpectedErrorsTest
             // mode="ONLY") matching several rows (owner D13), its own catch. Its population is
             // zero (every shipped site authors mode="FIRST"); the branch is proved reachable by
             // ReadValueAmbiguityErrorReasonReachabilityTest with the ENGINE's own message.
-            Assertions.assertEquals(9, ViolationNormaliser.ErrorReason.values().length,
+            // Widened 9 -> 11 on 2026-10-05 by PLAN-merged-evaluation-table W3a (OD-7, MET #15):
+            // MERGE_ERROR covers RuleRunner's tenth ERROR site (mergeErrorGate: a rule references
+            // a merged column carrying MERGE_ERROR) and the read-time MergeErrorReadException;
+            // MERGE_REFUSED covers the eleventh (the MergeException catch: the datatable refused
+            // the merge). Both are proved reachable by MergeErrorReasonReachabilityTest with the
+            // ENGINE's own messages; MERGE_ERROR's population is the §3.5.3 SUPP case-table
+            // scenarios of CDISC-SEND-0330 / FDA-SE2234, MERGE_REFUSED's is zero.
+            Assertions.assertEquals(11, ViolationNormaliser.ErrorReason.values().length,
                     "A new ErrorReason means a new classification branch and, most likely, a new "
                             + "RuleRunner ERROR site — update EngineContract below before widening "
                             + "this, and add a classify() case or it silently buckets as OTHER.");

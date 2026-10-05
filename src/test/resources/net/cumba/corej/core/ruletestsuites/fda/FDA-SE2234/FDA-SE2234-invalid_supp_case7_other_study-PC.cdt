@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SE2234 expect=violation domain=PC
+#note "SUPP case table case 7 / 3.5.1 STUDYID in the key (MET #18): the SUPPPC row belongs to study S2, so it qualifies no record of study S1 -- no match, no error, both BLQ records fire. Red-first: the legacy pivot never read STUDYID and matched record 1 (1 finding)."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSTRESC type=Char label="Result or Finding in Standard Format"
+col PCSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+---
+S1 | PC | 001 | 1 | DRUGX | BLQ | 
+S1 | PC | 001 | 2 | DRUGX | BLQ | 
+---
+
+dataset SUPPPC label="Supplemental Qualifiers for PC"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S2 | PC | 001 | PCSEQ | 1 | PCCALCN | Numeric Interpretation for Calculations | 0.05
+---
