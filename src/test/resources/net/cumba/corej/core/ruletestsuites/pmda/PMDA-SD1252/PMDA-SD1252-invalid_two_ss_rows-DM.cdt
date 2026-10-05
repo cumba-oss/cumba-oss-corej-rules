@@ -1,8 +1,9 @@
 #!RuleTest
 #test PMDA-SD1252 expect=violation domain=DM
-#note "FRESH, DISCRIMINATING: the batch's 1:N join-expansion multiplicity pin. Subject 001 has TWO SS status records, both DEAD (e.g. re-assessment). The inner join expands the DM row into TWO evaluated rows; BOTH fire. Both violations map back to the SAME primary row and project IDENTICAL output values, so the pin is COUNT-ONLY BY NECESSITY - do not add #expectViolationAt lines."
+#note "W3e of PLAN-merged-evaluation-table (MET #22, §3.8): the join FAN-OUT pin. Subject 001 has TWO SS status records, both DEAD; the join expands the one DM record into two evaluated rows and both fire. They print the same values (the effective Output_Variables read only DM columns and the shared SS.SSSTRESC value), so they report the SAME thing: ONE finding on DM row 1. Before W3e this counted 2 (one per expanded row)."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
 dataset DM class="SPECIAL PURPOSE" label="Demographics"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-CG0545 expect=violation domain=SM
+# Rule:Description: Raise an error when the Disease Milestone Type (MIDSTYPE) is not unique within a subject for a disease milestone that can occur only once (the matching Trial Disease Milestones (TM) record has TMRPT equal to 'N').
+#note "OD-6 + MET #22 (PLAN-merged-evaluation-table W3e): TM carries HYPOGLYCEMIC EVENT twice and subject 01-701-1015 has the milestone on TWO SM records — a true duplicate, which still fires; each record is reported ONCE although the join gives it two evaluation rows. Subject 01-701-1023 has it once: no finding."
+#expectViolationCount 2
+#expectViolationAt row=1 SMSEQ=1 USUBJID=01-701-1015
+#expectViolationAt row=2 SMSEQ=2 USUBJID=01-701-1015
+dataset SM label="Subject Disease Milestones"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SMSEQ type=Num label="Sequence Number"
+col MIDSTYPE type=Char label="Milestone Type"
+---
+CDISCPILOT01 | SM | 01-701-1015 | 1 | HYPOGLYCEMIC EVENT
+CDISCPILOT01 | SM | 01-701-1015 | 2 | HYPOGLYCEMIC EVENT
+CDISCPILOT01 | SM | 01-701-1023 | 1 | HYPOGLYCEMIC EVENT
+---
+
+dataset TM label="Trial Disease Milestones"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col MIDSTYPE type=Char label="Milestone Type"
+col TMDEF type=Char label="Disease Milestone Definition"
+col TMRPT type=Char label="Planned Milestone Repeated"
+---
+CDISCPILOT01 | TM | HYPOGLYCEMIC EVENT | Glucose below 70 mg/dL | N
+CDISCPILOT01 | TM | HYPOGLYCEMIC EVENT | Symptomatic hypoglycemia | N
+---

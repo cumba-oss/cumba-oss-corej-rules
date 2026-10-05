@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-CG0134 expect=violation domain=DM
+#note "W3e of PLAN-merged-evaluation-table (MET #22, §3.8): the join FAN-OUT pin. Subject 001 has TWO AE records, both AEOUT=FATAL; the join expands the one DM record into two evaluated rows and both fire. They print the same values (the effective Output_Variables read only DM columns and the shared AE.AEOUT value), so they report the SAME thing: ONE finding on DM row 1. Before W3e this counted 2 (one per expanded row)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=001
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | N
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+S1 | AE | 001 | 1 | CARDIAC ARREST | FATAL
+S1 | AE | 001 | 2 | SEPTIC SHOCK   | FATAL
+---
