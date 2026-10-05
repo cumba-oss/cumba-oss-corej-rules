@@ -75,12 +75,14 @@ import org.jspecify.annotations.Nullable;
  * </pre>
  * <p>
  * A {@code finding} row carries the finding's row index ({@code -} for a row-less finding), the
- * finding's variable names (sorted), the {@code name=value} pairs of that row, the severity, the
- * finding kind, the reported {@code FindingScope} and the location's highlighted columns (sorted —
- * the one visible consumer of the scope label). A {@code status} row carries {@code rule × dataset}
- * execution status with its violation count in the {@code values} column. Rows are sorted, and
- * duplicates are <em>kept</em> (a {@code #n} suffix on the row column) — multiplicity is the whole
- * point.
+ * finding's variable names (sorted; the columns it lists <em>by name without a value</em> among
+ * them), the {@code name=value} pairs of that row — a name-only column as the bare {@code name}, no
+ * {@code =}: a state of its own, distinct from {@code name=} (an empty value) and {@code name=.} (a
+ * missing one) — the severity, the finding kind, the reported {@code FindingScope} and the
+ * location's highlighted columns (sorted — the one visible consumer of the scope label). A
+ * {@code status} row carries {@code rule × dataset} execution status with its violation count in
+ * the {@code values} column. Rows are sorted, and duplicates are <em>kept</em> (a {@code #n} suffix
+ * on the row column) — multiplicity is the whole point.
  * </p>
  *
  * <h2>Regenerating</h2>
@@ -486,7 +488,10 @@ public final class FindingsSnapshot
         // names that come from an Expr.Call kwargs map (Map.copyOf randomises iteration order per
         // JVM — measured 2026-08-22 on FDA-SD2216 / PMDA-SD2216, whose filter keys TSPARMCD /
         // TSVAL swapped between two runs). Order is not what this instrument pins.
-        String vars = sorted(f.getVariableNames());
+        List<String> named = f.getNamedColumns();
+        List<String> allNames = new ArrayList<>(f.getVariableNames());
+        allNames.addAll(named);
+        String vars = sorted(allNames);
         String locationVars = f.getLocation() == null || f.getLocation().getVariableNames() == null
                 ? "-"
                 : sorted(f.getLocation().getVariableNames());
@@ -496,15 +501,15 @@ public final class FindingsSnapshot
         List<Row> out = new ArrayList<>();
         if (f.getKind() != FindingKind.RULE_VIOLATION || !f.hasRows())
         {
-            out.add(new Row(id, dataset, "-", vars, renderValues(f.getFirstRowValues()), severity,
-                    kind, scope, locationVars));
+            out.add(new Row(id, dataset, "-", vars, renderValues(f.getFirstRowValues(), named),
+                    severity, kind, scope, locationVars));
             return out;
         }
         int n = f.getRowCount();
         for (int pos = 0; pos < n; pos++)
         {
             out.add(new Row(id, dataset, Integer.toString(f.getRows().rowIndexAt(pos)), vars,
-                    renderValues(f.getRowValues(pos)), severity, kind, scope, locationVars));
+                    renderValues(f.getRowValues(pos), named), severity, kind, scope, locationVars));
         }
         return out;
     }
@@ -522,22 +527,46 @@ public final class FindingsSnapshot
     }
 
 
-    private static String renderValues(@Nullable Map<String, @Nullable String> values)
+    /**
+     * The row's {@code name=value} pairs and the finding's name-only columns as bare names, all in
+     * one sorted sequence (so a name-only column sorts where its value would have), joined by
+     * {@code |}.
+     */
+    private static String renderValues(@Nullable Map<String, @Nullable String> values,
+            List<String> named)
     {
-        if (values == null || values.isEmpty())
+        TreeMap<String, @Nullable String> cells = values == null ? new TreeMap<>()
+                : new TreeMap<>(values);
+        TreeSet<String> nameOnly = new TreeSet<>(named);
+        if (cells.isEmpty() && nameOnly.isEmpty())
         {
             return "-";
         }
         StringBuilder b = new StringBuilder();
-        for (Map.Entry<String, @Nullable String> e : new TreeMap<>(values).entrySet())
+        for (String key : new TreeSet<>(union(cells.keySet(), nameOnly)))
         {
             if (b.length() > 0)
             {
                 b.append('|');
             }
-            b.append(e.getKey()).append('=').append(escape(e.getValue()));
+            if (cells.containsKey(key))
+            {
+                b.append(key).append('=').append(escape(cells.get(key)));
+            }
+            else
+            {
+                b.append(key); // listed by name, no value — no '=' at all
+            }
         }
         return b.toString();
+    }
+
+
+    private static Set<String> union(Set<String> a, Set<String> b)
+    {
+        Set<String> out = new TreeSet<>(a);
+        out.addAll(b);
+        return out;
     }
 
 

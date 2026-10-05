@@ -128,6 +128,27 @@ import org.opentest4j.TestAbortedException;
  * {@code -Dcorej.nullkey.plant=nameonly-both|nameonly-unlisted|nameonly-record|nameonly-foreign}
  * mutate the CURRENT side one row at a time and each must be reported.
  * </p>
+ *
+ * <p>
+ * <b>The report surfaces ({@code PLAN-finding-values-record-level-only} P2).</b> Once the report
+ * model carries the list, the {@code study} arm reads {@code ValidationFinding.getNamedColumns()}
+ * and a third study arm, {@code study-v2}, reads the v2 {@code Findings} document
+ * ({@code StudyValidationResult.sections().combinedFindings()}): one row per v2 row, its
+ * {@code USUBJID} / {@code SEQ} and its positional {@code variables} / {@code values} as the values
+ * map, the finding-level {@code columns} field as the name-only list (a padding {@code ["null"]} of
+ * a row with no variables is not a variable and is not recorded). Three movements are the report
+ * side's own: {@link MoveClass#S7_COLLAPSE_NULL_TO_NAME_ONLY} — the {@code variable_name}
+ * collapse's partner-less column, a {@code null} cell in the base (the {@code "null"} token on the
+ * v2 arm), is listed by name now; the engine arm never lists it, which is what tells it from the
+ * next class — {@link MoveClass#REPORT_NAME_ONLY_RESTORED} — a column the engine arm lists
+ * name-only that the P1 report dropped and the report lists again; and
+ * {@link MoveClass#GROUP_ANCHOR_IDENTITY_DROPPED} — on the v2 arm only, the anchor row's
+ * {@code USUBJID} / {@code SEQ} of a Group finding (the engine arm stamped a group key on it) read
+ * {@code ""} now (owner Q-A, 2026-10-05). Plants: {@code nameonly-s7-both} (an S7 column valued and
+ * listed at once), {@code nameonly-group-nongroup} (a non-group finding's {@code USUBJID} blanked
+ * on the v2 arm), {@code nameonly-report-foreign} (a report-arm row listing a name no column
+ * carries and no engine arm lists).
+ * </p>
  */
 @EnabledIf("net.cumba.corej.core.ruletestsuites.NullKeyProvenanceDifferentialTest#enabled")
 class NullKeyProvenanceDifferentialTest
@@ -180,6 +201,19 @@ class NullKeyProvenanceDifferentialTest
      * evidence the report arm's vanished keys are judged against.
      */
     private static final Map<String, Set<String>> STUDY_ENGINE_NAMED = new LinkedHashMap<>();
+
+    /**
+     * {@code rule|dataset} of every study execution whose violations the engine stamped a group key
+     * on ({@code Violation.isGroupFinding()}) — the evidence the v2 arm's blanked anchor identity
+     * is judged against.
+     */
+    private static final Set<String> STUDY_GROUP_FINDINGS = new TreeSet<>();
+
+    /** The arm reading the v2 {@code Findings} document of the study run. */
+    private static final String ARM_STUDY_V2 = "study-v2";
+
+    /** The arm reading the report model ({@code ValidationFinding}) of the study run. */
+    private static final String ARM_STUDY = "study";
 
     /** Both modes run the same arms; exactly one of the two properties selects the mode. */
     static boolean enabled()
@@ -247,7 +281,27 @@ class NullKeyProvenanceDifferentialTest
          * {@code nullkey/present-column-omitted.tsv}, now retired) was omitted; it is listed by
          * name now.
          */
-        OMITTED_TO_NAME_ONLY
+        OMITTED_TO_NAME_ONLY,
+        /**
+         * {@code PLAN-finding-values-record-level-only} P2, 5b's S7: the report builder's
+         * {@code variable_name} collapse put the named column into the finding's schema with a
+         * {@code null} cell when the finding carried no partner value ({@code variable_label},
+         * {@code variable_data_type}, …); the column is the finding's first name-only column now.
+         * Report arms only; the engine arm never lists it (the collapse is the report's).
+         */
+        S7_COLLAPSE_NULL_TO_NAME_ONLY,
+        /**
+         * P2: a column the engine lists name-only, which the P1 report dropped from the finding
+         * (its model had no field for it), is listed by the report again — on the engine arm's
+         * evidence for the same rule × dataset.
+         */
+        REPORT_NAME_ONLY_RESTORED,
+        /**
+         * P2 (owner Q-A, 2026-10-05): the v2 document no longer prints the anchor row's
+         * {@code USUBJID} / {@code SEQ} on a Group finding unless the column is a group key — they
+         * describe the block's first flagged row, not the group. v2 arm only; v1 keeps them.
+         */
+        GROUP_ANCHOR_IDENTITY_DROPPED
     }
 
 
@@ -541,6 +595,7 @@ class NullKeyProvenanceDifferentialTest
         EngineRows engineRows = new EngineRows();
         StudyValidationResult result = execute(study, engineRows);
         Map<String, Map<String, List<Row>>> rows = studyRows(result);
+        Map<String, Map<String, List<Row>>> v2Rows = studyV2Rows(result);
         Map<String, Map<String, String>> states = studyStates(result);
         Map<String, Map<String, ExprType>> typesByRule = new LinkedHashMap<>();
         Map<String, Sensitivity> sensitivityByRule = new LinkedHashMap<>();
@@ -560,12 +615,14 @@ class NullKeyProvenanceDifferentialTest
         }
         Set<String> rules = new TreeSet<>(rows.keySet());
         rules.addAll(states.keySet());
+        rules.addAll(v2Rows.keySet());
         List<Outcome> out = new ArrayList<>();
         for (String coreId : rules)
         {
             Set<String> datasets = new TreeSet<>();
             datasets.addAll(rows.getOrDefault(coreId, Map.of()).keySet());
             datasets.addAll(states.getOrDefault(coreId, Map.of()).keySet());
+            datasets.addAll(v2Rows.getOrDefault(coreId, Map.of()).keySet());
             for (String dataset : datasets)
             {
                 IDataTable table = tables.get(dataset.toUpperCase(Locale.ROOT));
@@ -597,8 +654,74 @@ class NullKeyProvenanceDifferentialTest
                     named.addAll(r.namedColumns());
                 }
                 STUDY_ENGINE_NAMED.put(coreId + "|" + dataset, named);
+                if (engineRows.isGroupFinding(coreId, dataset))
+                {
+                    STUDY_GROUP_FINDINGS.add(coreId + "|" + dataset);
+                }
                 out.add(e);
+                // The v2 arm: the same rule × dataset as the v2 Findings document prints it.
+                Outcome v2 = new Outcome(ARM_STUDY_V2, dataset, coreId, dataset, state, o.cols(),
+                        o.primaryRows(),
+                        v2Rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of()));
+                BINDING_TYPES.put(v2.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                if (sensitivity != null)
+                {
+                    SENSITIVITIES.put(v2.key(), sensitivity);
+                }
+                out.add(v2);
             }
+        }
+        return out;
+    }
+
+
+    /**
+     * rule → domain → the rows of the v2 {@code Findings} document, in document order: the row's
+     * {@code USUBJID} and {@code SEQ} first, then {@code variables[i] → values[i]}; the
+     * finding-level {@code columns} field is the row's name-only list (absent ⇒ empty). The
+     * document is the one every v2 consumer reads (the REST findings page, the XLSX Issue Details
+     * sheet), assembled by {@code StudyValidationResult.sections()}.
+     */
+    private static Map<String, Map<String, List<Row>>> studyV2Rows(StudyValidationResult result)
+    {
+        Map<String, Map<String, List<Row>>> out = new TreeMap<>();
+        for (Map<String, Object> f : result.sections().combinedFindings())
+        {
+            String id = f.get("core_id") == null ? "-" : String.valueOf(f.get("core_id"));
+            String domain = String.valueOf(f.get("domain"));
+            List<Row> rows = out.computeIfAbsent(id, _ -> new TreeMap<>()).computeIfAbsent(domain,
+                    _ -> new ArrayList<>());
+            List<String> variables = strings(f.get("variables"));
+            List<String> named = strings(f.get("columns"));
+            for (Object o : (List<?>) Objects.requireNonNull(f.get("rows")))
+            {
+                Map<?, ?> r = (Map<?, ?>) o;
+                List<String> values = strings(r.get("values"));
+                Map<String, @Nullable String> cells = new LinkedHashMap<>();
+                cells.put("USUBJID", String.valueOf(r.get("USUBJID")));
+                cells.put("SEQ", String.valueOf(r.get("SEQ")));
+                for (int i = 0; i < variables.size() && i < values.size(); i++)
+                {
+                    cells.put(variables.get(i), values.get(i));
+                }
+                rows.add(new Row("row=" + r.get("row") + " v2", variables, cells, named));
+            }
+        }
+        return out;
+    }
+
+
+    /** A v2 document's string list, or empty when the field is absent. */
+    private static List<String> strings(@Nullable Object list)
+    {
+        if (!(list instanceof List<?> l))
+        {
+            return List.of();
+        }
+        List<String> out = new ArrayList<>(l.size());
+        for (Object o : l)
+        {
+            out.add(String.valueOf(o));
         }
         return out;
     }
@@ -612,6 +735,10 @@ class NullKeyProvenanceDifferentialTest
     {
 
         private final Map<String, List<Row>> rows = new java.util.concurrent.ConcurrentHashMap<>();
+
+        /** {@code rule|dataset} whose violations carry a group key (a Group finding). */
+        private final Set<String> groupFindings = java.util.concurrent.ConcurrentHashMap
+                .newKeySet();
 
         @Override
         public void onRuleExecuted(LibraryValidator.RuntimeEntry entry)
@@ -627,19 +754,34 @@ class NullKeyProvenanceDifferentialTest
             {
                 return;
             }
-            rows.merge(entry.coreId() + "|" + entry.domain(),
-                    NullKeyProvenanceDifferentialTest.rows(result.getViolations()), (a, b) ->
+            String key = entry.coreId() + "|" + entry.domain();
+            rows.merge(key, NullKeyProvenanceDifferentialTest.rows(result.getViolations()),
+                    (a, b) ->
                     {
                         List<Row> both = new ArrayList<>(a);
                         both.addAll(b);
                         return both;
                     });
+            for (Violation v : result.getViolations())
+            {
+                if (v.isGroupFinding())
+                {
+                    groupFindings.add(key);
+                    break;
+                }
+            }
         }
 
 
         List<Row> rows(String coreId, String dataset)
         {
             return rows.getOrDefault(coreId + "|" + dataset, List.of());
+        }
+
+
+        boolean isGroupFinding(String coreId, String dataset)
+        {
+            return groupFindings.contains(coreId + "|" + dataset);
         }
     }
 
@@ -690,10 +832,16 @@ class NullKeyProvenanceDifferentialTest
     }
 
 
-    /** rule → dataset → the finding rows, in emission order (report level). */
+    /**
+     * rule → dataset → the finding rows, in emission order (report level). Beside the rows, the
+     * report model's key slab is censused: a {@code null} key cell (5b's S8) is counted and, in
+     * compare mode, forbidden — the engine's key maps carry a marker for a missing key cell, so a
+     * {@code null} there would be a storage state the model invented.
+     */
     private static Map<String, Map<String, List<Row>>> studyRows(StudyValidationResult result)
     {
         Map<String, Map<String, List<Row>>> out = new TreeMap<>();
+        List<String> nullKeyCells = new ArrayList<>();
         for (ValidationReportMember m : result.report().getMembers())
         {
             for (ValidationFinding f : m.getFindings())
@@ -703,22 +851,50 @@ class NullKeyProvenanceDifferentialTest
                         .computeIfAbsent(m.getDomain(), _ -> new ArrayList<>());
                 String severity = f.getSeverity() == null ? "-" : f.getSeverity().name();
                 String kind = f.getKind() == null ? "-" : f.getKind().name();
+                List<String> named = reportNamedColumns(f);
                 if (f.getKind() != FindingKind.RULE_VIOLATION || !f.hasRows())
                 {
                     rows.add(new Row("row=- " + severity + "/" + kind, f.getVariableNames(),
-                            new LinkedHashMap<>(f.getFirstRowValues()), List.of()));
+                            new LinkedHashMap<>(f.getFirstRowValues()), named));
                     continue;
                 }
                 for (int pos = 0; pos < f.getRowCount(); pos++)
                 {
                     rows.add(new Row(
                             "row=" + f.getRows().rowIndexAt(pos) + " " + severity + "/" + kind,
-                            f.getVariableNames(), new LinkedHashMap<>(f.getRowValues(pos)),
-                            List.of()));
+                            f.getVariableNames(), new LinkedHashMap<>(f.getRowValues(pos)), named));
+                    for (Map.Entry<String, @Nullable String> k : f.getRowKeys(pos).entrySet())
+                    {
+                        if (k.getValue() == null)
+                        {
+                            nullKeyCells
+                                    .add(id + "|" + m.getDomain() + " #" + pos + " " + k.getKey());
+                        }
+                    }
                 }
             }
         }
+        System.out.println("[nullkey-differential] study report: " + nullKeyCells.size()
+                + " null key-slab cell(s)");
+        if (System.getProperty(DUMP_PROPERTY) == null)
+        {
+            assertTrue(nullKeyCells.isEmpty(),
+                    () -> nullKeyCells.size()
+                            + " null key-slab cell(s) in the study report (5b S8 — the key channel"
+                            + " stores no null):\n" + String.join("\n",
+                                    nullKeyCells.subList(0, Math.min(40, nullKeyCells.size()))));
+        }
         return out;
+    }
+
+
+    /**
+     * The columns the report model lists by name without a value
+     * ({@code ValidationFinding.getNamedColumns()}, P2) — constant across the finding's rows.
+     */
+    private static List<String> reportNamedColumns(ValidationFinding f)
+    {
+        return f.getNamedColumns();
     }
 
 
@@ -913,7 +1089,7 @@ class NullKeyProvenanceDifferentialTest
         for (int i = 0; i < current.size(); i++)
         {
             Outcome o = current.get(i);
-            if (!"cdt".equals(o.arm()) && !"spec".equals(o.arm()))
+            if (!plantArm(plant, o.arm()))
             {
                 continue;
             }
@@ -922,9 +1098,11 @@ class NullKeyProvenanceDifferentialTest
             {
                 continue;
             }
+            boolean groupFinding = STUDY_GROUP_FINDINGS.contains(o.rule() + "|" + o.domain());
             for (int r = 0; r < o.rows().size(); r++)
             {
-                Row planted = plantedRow(plant, o.rows().get(r), b.rows().get(r), o.cols());
+                Row planted = plantedRow(plant, o.rows().get(r), b.rows().get(r), o.cols(),
+                        groupFinding);
                 if (planted != null)
                 {
                     List<Row> rows = new ArrayList<>(o.rows());
@@ -941,8 +1119,21 @@ class NullKeyProvenanceDifferentialTest
     }
 
 
+    /** The arms a name-only plant mutates: the engine-side arms, or the report-side arms. */
+    private static boolean plantArm(String plant, String arm)
+    {
+        return switch (plant)
+        {
+        case "nameonly-s7-both", "nameonly-report-foreign" -> ARM_STUDY.equals(arm);
+        case "nameonly-group-nongroup" -> ARM_STUDY_V2.equals(arm);
+        default -> "cdt".equals(arm) || "spec".equals(arm);
+        };
+    }
+
+
     /** The plant's mutation of one current row, or {@code null} when the row offers no target. */
-    private static @Nullable Row plantedRow(String plant, Row row, Row baseRow, List<String> cols)
+    private static @Nullable Row plantedRow(String plant, Row row, Row baseRow, List<String> cols,
+            boolean groupFinding)
     {
         return switch (plant)
         {
@@ -955,8 +1146,50 @@ class NullKeyProvenanceDifferentialTest
                 : new Row(row.where(), row.names(), row.values(),
                         concat(row.namedColumns(), "PLANTED_NO_SUCH_COLUMN"));
         case "nameonly-record" -> plantRecordRow(row, baseRow, cols);
+        // P2 (report arm): an S7 column — listed now, a null cell in the base — valued as well.
+        case "nameonly-s7-both" -> plantS7Both(row, baseRow);
+        // P2 (report arm): a listed name no column carries and the engine arm never lists.
+        case "nameonly-report-foreign" -> row.namedColumns().isEmpty() ? null
+                : new Row(row.where(), row.names(), row.values(),
+                        concat(row.namedColumns(), "PLANTED_NO_SUCH_COLUMN"));
+        // P2 (v2 arm): a NON-group finding's anchor USUBJID blanked — the drop Q-A allows only on
+        // a Group finding.
+        case "nameonly-group-nongroup" -> groupFinding ? null : plantBlankUsubjid(row, baseRow);
         default -> throw new IllegalArgumentException("unknown plant " + plant);
         };
+    }
+
+
+    /**
+     * A report-arm row listing a column the base carried with a {@code null} cell (S7), with that
+     * column valued too — or {@code null} when the row has no such column.
+     */
+    private static @Nullable Row plantS7Both(Row row, Row baseRow)
+    {
+        for (String name : row.namedColumns())
+        {
+            if (baseRow.values().containsKey(name) && baseRow.values().get(name) == null)
+            {
+                return withValue(row, name, "PLANTED");
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * A v2-arm row whose non-empty {@code USUBJID} (equal on both sides) is blanked — or
+     * {@code null} when the row carries none.
+     */
+    private static @Nullable Row plantBlankUsubjid(Row row, Row baseRow)
+    {
+        String current = row.values().get("USUBJID");
+        if (current == null || current.isEmpty()
+                || !current.equals(baseRow.values().get("USUBJID")))
+        {
+            return null;
+        }
+        return withValue(row, "USUBJID", "");
     }
 
 
@@ -1052,9 +1285,10 @@ class NullKeyProvenanceDifferentialTest
             keys.addAll(rc.values().keySet());
             keys.addAll(rb.namedColumns());
             keys.addAll(rc.namedColumns());
-            Set<String> namedElsewhere = "study".equals(c.arm())
+            Set<String> namedElsewhere = reportArm(c.arm())
                     ? STUDY_ENGINE_NAMED.getOrDefault(c.rule() + "|" + c.domain(), Set.of())
                     : Set.of();
+            boolean groupFinding = STUDY_GROUP_FINDINGS.contains(c.rule() + "|" + c.domain());
             for (String key : keys)
             {
                 boolean inB = rb.values().containsKey(key);
@@ -1062,7 +1296,8 @@ class NullKeyProvenanceDifferentialTest
                 String vb = rb.values().get(key);
                 String vc = rc.values().get(key);
                 boolean namedB = rb.namedColumns().contains(key);
-                boolean namedC = rc.namedColumns().contains(key) || namedElsewhere.contains(key);
+                boolean engineLists = namedElsewhere.contains(key);
+                boolean namedC = rc.namedColumns().contains(key) || engineLists;
                 if (inB && inC && Objects.equals(vb, vc) && !namedB && !namedC)
                 {
                     continue;
@@ -1074,8 +1309,12 @@ class NullKeyProvenanceDifferentialTest
                 MoveClass move;
                 if (namedB || namedC)
                 {
-                    move = classifyNameOnly(key, inB, vb, inC, vc, namedB, namedC, cols, c, rc,
-                            SENSITIVITIES.get(k));
+                    move = classifyNameOnly(key, inB, vb, inC, vc, namedB, namedC, engineLists,
+                            cols, c, rc, SENSITIVITIES.get(k));
+                }
+                else if (ARM_STUDY_V2.equals(c.arm()) && isAnchorIdentity(key))
+                {
+                    move = classifyAnchorIdentity(groupFinding, inB, vb, inC, vc);
                 }
                 else
                 {
@@ -1128,8 +1367,8 @@ class NullKeyProvenanceDifferentialTest
      * value.
      */
     static @Nullable MoveClass classifyNameOnly(String key, boolean inB, @Nullable String vb,
-            boolean inC, @Nullable String vc, boolean namedB, boolean namedC, Set<String> cols,
-            Outcome c, Row rc, @Nullable Sensitivity sensitivity)
+            boolean inC, @Nullable String vc, boolean namedB, boolean namedC, boolean engineLists,
+            Set<String> cols, Outcome c, Row rc, @Nullable Sensitivity sensitivity)
     {
         if (namedC && inC)
         {
@@ -1141,14 +1380,26 @@ class NullKeyProvenanceDifferentialTest
         }
         OutputEntryKind kind = OutputEntryKind.of(key);
         boolean dotted = key.indexOf('.') > 0;
+        // The report arms carry no row identity and number rows from 0; their vanished keys are
+        // accepted on the engine arm's evidence for the same rule × dataset (STUDY_ENGINE_NAMED),
+        // where the identity test below has already been applied.
+        boolean report = reportArm(c.arm());
+        // S7 (P2): the report's variable_name collapse — a bare column name the engine never
+        // lists (the engine's entry is variable_name = X, the report re-keys it to X) that the
+        // base carried with a null cell (the v2 document's "null" token) and the report lists by
+        // name now. The variable the finding is about need not be a column of the dataset (a
+        // finding about a variable that should exist names an absent one), so the column test
+        // below does not apply; the null base cell is the discriminator.
+        boolean nullBase = vb == null || (ARM_STUDY_V2.equals(c.arm()) && "null".equals(vb));
+        if (report && !engineLists && !namedB && namedC && inB && !inC && nullBase
+                && kind == OutputEntryKind.COLUMN)
+        {
+            return MoveClass.S7_COLLAPSE_NULL_TO_NAME_ONLY;
+        }
         if (kind != OutputEntryKind.COLUMN || (!dotted && !cols.contains(key)))
         {
             return null; // not a raw column of the dataset
         }
-        // The report arm carries no row identity and numbers rows from 0; its vanished keys are
-        // accepted on the engine arm's evidence for the same rule × dataset (STUDY_ENGINE_NAMED),
-        // where the identity test below has already been applied.
-        boolean report = "study".equals(c.arm());
         if (!namedB && namedC && inB && !inC)
         {
             // A value became a name. Never on a record finding: the row identity is the mark of
@@ -1177,7 +1428,44 @@ class NullKeyProvenanceDifferentialTest
         }
         if (!namedB && namedC && !inB && !inC)
         {
+            if (report)
+            {
+                // P2: the report lists a column again that the P1 report dropped — only on the
+                // engine arm's evidence; a report listing a name the engine does not is CONTENT.
+                return engineLists ? MoveClass.REPORT_NAME_ONLY_RESTORED : null;
+            }
             return MoveClass.OMITTED_TO_NAME_ONLY;
+        }
+        return null;
+    }
+
+
+    /** The arms that read the report side of the study run (the model, the v2 document). */
+    private static boolean reportArm(String arm)
+    {
+        return ARM_STUDY.equals(arm) || ARM_STUDY_V2.equals(arm);
+    }
+
+
+    /** The v2 row's two identity cells, as the document spells them. */
+    private static boolean isAnchorIdentity(String key)
+    {
+        return "USUBJID".equals(key) || "SEQ".equals(key);
+    }
+
+
+    /**
+     * The movement class of a v2 row's {@code USUBJID} / {@code SEQ} cell (P2, owner Q-A): on a
+     * Group finding (the engine stamped a group key on the rule × dataset) the anchor row's
+     * identity reads {@code ""} now — {@link MoveClass#GROUP_ANCHOR_IDENTITY_DROPPED}. Any other
+     * movement of these cells — on a non-group finding, or to anything but {@code ""} — is CONTENT.
+     */
+    static @Nullable MoveClass classifyAnchorIdentity(boolean groupFinding, boolean inB,
+            @Nullable String vb, boolean inC, @Nullable String vc)
+    {
+        if (groupFinding && inB && inC && vb != null && !vb.isEmpty() && "".equals(vc))
+        {
+            return MoveClass.GROUP_ANCHOR_IDENTITY_DROPPED;
         }
         return null;
     }
@@ -1351,7 +1639,7 @@ class NullKeyProvenanceDifferentialTest
                 {
                     Map<String, @Nullable String> v = o.rows().get(i).values();
                     boolean carried = check.keys().stream().allMatch(v::containsKey);
-                    if (!carried && "study".equals(o.arm()))
+                    if (!carried && reportArm(o.arm()))
                     {
                         continue;
                     }
