@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import net.cumba.corej.core.exec.OutputEntryKind;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.expr.eval.BindingDomains;
+import net.cumba.corej.core.expr.eval.Domain;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Sensitivity;
 import org.jspecify.annotations.Nullable;
@@ -143,9 +144,10 @@ public final class FindingValuesNullGuard
         String coreId = coreId(rule);
         BindingDomains bindings = BindingDomains.forRule(rule);
         Sensitivity sensitivity = rule.getSensitivity();
+        Domain domain = rule.getEvaluationDomain();
         for (Violation v : violations)
         {
-            boolean nonRecord = isNonRecord(sensitivity, v.getGroupKey(), v.getUnit(),
+            boolean nonRecord = isNonRecord(sensitivity, domain, v.getGroupKey(), v.getUnit(),
                     v.getNamedColumns());
             out.addAll(entryOffenders(coreId, v.getRow(), v.getValues(), v.getNamedColumns(),
                     nonRecord, ref -> bindings.domainOf(ref).rowCursor()));
@@ -157,17 +159,25 @@ public final class FindingValuesNullGuard
     /**
      * Whether a finding is <b>non-record</b> (V1): its producing site listed a column by name, or
      * stamped the dataset unit, or the rule is a Dataset / Study rule and the finding is no Group
-     * finding (a Group finding keeps D94c's distinct sets, Q-A). A Record rule folded to a dataset
-     * verdict with nothing to list stamps no unit on the single-level path and is not recognised —
-     * it carries no raw column then, so there is nothing to judge.
+     * finding (a Group finding keeps D94c's distinct sets, Q-A), or the rule's evaluation domain is
+     * {@code {VAR}} — the variable cursor without the row cursor, the domain the report projects as
+     * {@code FindingScope.VARIABLE}: every finding of such a rule is <b>column-level</b>
+     * ({@code RuleRunner.buildVariableViolation} / {@code buildDefineVariableViolation}) or a
+     * dataset verdict, and has no row (owner Q-C on the column-level path, 2026-10-05). That arm
+     * judges a column-level finding whose name-only list is empty — before it a per-row binding
+     * VALUED there passed unseen whenever no raw column was listed beside it. A Record rule folded
+     * to a dataset verdict with nothing to list stamps no unit on the single-level path and is not
+     * recognised — it carries no raw column then, so there is nothing to judge.
      */
-    static boolean isNonRecord(@Nullable Sensitivity sensitivity,
+    static boolean isNonRecord(@Nullable Sensitivity sensitivity, @Nullable Domain domain,
             @Nullable Map<String, String> groupKey, Violation.@Nullable Unit unit,
             @Nullable List<String> named)
     {
         return (named != null && !named.isEmpty()) || unit instanceof Violation.Unit.Dataset
-                || (groupKey == null && (sensitivity == Sensitivity.DATASET
-                        || sensitivity == Sensitivity.STUDY));
+                || (groupKey == null
+                        && (sensitivity == Sensitivity.DATASET || sensitivity == Sensitivity.STUDY))
+                || (groupKey == null && domain != null && domain.varCursor()
+                        && !domain.rowCursor());
     }
 
 
@@ -176,9 +186,10 @@ public final class FindingValuesNullGuard
      * <ul>
      * <li>a {@code null} value (NK §1 — unreachable through {@code Violation}'s constructor since
      * P2 review MED-1 (b), kept so the guard does not depend on it);</li>
-     * <li>on a <b>non-record</b> finding (P1 review M-1 (a)): a valued raw column
-     * ({@code OutputEntryKind.COLUMN}; the {@code __error__} sentinel exempt) — its value would
-     * belong to an arbitrary record — and a valued <b>per-row binding</b> (owner Q-C);</li>
+     * <li>on a <b>non-record</b> finding (P1 review M-1 (a); a column-level one included,
+     * {@link #isNonRecord}): a valued raw column ({@code OutputEntryKind.COLUMN}; the
+     * {@code __error__} sentinel exempt) — its value would belong to an arbitrary record — and a
+     * valued <b>per-row binding</b> (owner Q-C);</li>
      * <li>a name-only entry that is {@link #nameOnlyOffence wrong}, or listed twice (L-1).</li>
      * </ul>
      *

@@ -1,6 +1,7 @@
 package net.cumba.corej.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -176,6 +177,58 @@ class FindingValuesNullGuardTest
         assertEquals(1, offenders.size(), offenders.toString());
         assertTrue(offenders.get(0).contains("$n listed by name is a dataset-scope binding"),
                 offenders.toString());
+    }
+
+
+    /**
+     * ⛔⛔ PLANTED SENSITIVITY TEST (Q-C on the column-level path): a {@code {VAR}} Record rule's
+     * finding has no row, so a per-row binding VALUED on it — what {@code buildVariableViolation}
+     * printed before the follow-up (the binding's {@code Vector}) — is reported even when nothing
+     * else is listed by name, the case the named / unit / sensitivity arms cannot see. The same
+     * finding of a {@code {VAR,ROW}} rule is a (column, row) record finding and is not reported.
+     */
+    @Test
+    void aPerRowBindingValuedOnAColumnLevelFindingIsReportedQc() throws Exception
+    {
+        Rule columnLevel = RulePackageLoader.loadFromString("""
+                {"rules":{"R1":{"Core":{"Id":"R-VAR"},"Sensitivity":"Record",
+                 "Bindings":[{"name":"$end","expression":"AEENDY"}],
+                 "Check":{"expression":"empty(var_format(\\"DATA\\"))"},
+                 "Outcome":{"Message":"m","Output_Variables":["variable_name","$end"]}}}}""")
+                .getRules().get("R1");
+        Rule perCell = RulePackageLoader.loadFromString("""
+                {"rules":{"R1":{"Core":{"Id":"R-CELL"},"Sensitivity":"Record",
+                 "Bindings":[{"name":"$end","expression":"AEENDY"}],
+                 "Check":{"expression":"empty(var_format(\\"DATA\\")) and len(value()) > 3"},
+                 "Outcome":{"Message":"m","Output_Variables":["variable_name","$end"]}}}}""")
+                .getRules().get("R1");
+        assertNull(columnLevel.getLoadError(), columnLevel.getLoadError());
+        assertNull(perCell.getLoadError(), perCell.getLoadError());
+        assertEquals(net.cumba.corej.core.expr.eval.Domain.VARIABLE,
+                columnLevel.getEvaluationDomain());
+        assertTrue(perCell.getEvaluationDomain().rowCursor(), "the control is row-bearing");
+
+        Violation valued = new Violation(0, Map.of("variable_name", "AETERM", "$end", "2"));
+        List<String> offenders = FindingValuesNullGuard.offenders(columnLevel, List.of(valued));
+        assertEquals(1, offenders.size(), offenders.toString());
+        assertTrue(offenders.get(0).startsWith("R-VAR/$end valued on a non-record finding"),
+                offenders.toString());
+        Violation rawValued = new Violation(0, Map.of("variable_name", "AETERM", "DOMAIN", "AE"));
+        assertEquals(1, FindingValuesNullGuard.offenders(columnLevel, List.of(rawValued)).size(),
+                "a raw column valued on a column-level finding (V1 / V4)");
+
+        // Controls.
+        Violation listed = new Violation(0, Map.of("variable_name", "AETERM"), null, null, Map.of(),
+                null, null, null, List.of("$end"));
+        assertTrue(FindingValuesNullGuard.offenders(columnLevel, List.of(listed)).isEmpty(),
+                "the Q-C state on the column-level path");
+        assertTrue(FindingValuesNullGuard.offenders(perCell, List.of(valued)).isEmpty(),
+                "a (column, row) finding prints its row's values");
+        assertTrue(FindingValuesNullGuard.isNonRecord(Sensitivity.RECORD,
+                net.cumba.corej.core.expr.eval.Domain.VARIABLE, null, null, List.of()));
+        assertFalse(FindingValuesNullGuard.isNonRecord(Sensitivity.RECORD,
+                net.cumba.corej.core.expr.eval.Domain.VARIABLE, Map.of("USUBJID", "S1"), null,
+                List.of()), "a Group finding keeps its distinct sets (Q-A)");
     }
 
 
