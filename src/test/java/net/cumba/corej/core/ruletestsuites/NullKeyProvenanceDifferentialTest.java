@@ -151,6 +151,27 @@ import org.opentest4j.TestAbortedException;
  * undone, so the v2 arm's S7 — whose base "null" is a token, not a null — has no evidence and must
  * be CONTENT).
  * </p>
+ *
+ * <p>
+ * <b>The absent column's use-derived type ({@code PLAN-column-typed-function-absent-type}).</b> A
+ * column-typed function over an absent column — {@code read_value}, {@code max} over a column,
+ * {@code row_max} — and a binding over an absent column answer the default the column would get if
+ * it were read directly: {@code MIS} in a numeric position, {@code ""} otherwise. Three classes,
+ * each judged on a reported {@code $} binding by its <b>root</b> (the call or column its
+ * {@code $}-chain resolves to, {@link #BINDING_ROOTS}): {@link MoveClass#FN_ABSENT_EMPTY_TO_MIS}
+ * ({@code ""} → {@code .}, root a column-typed function), {@link MoveClass#FN_ABSENT_MIS_TO_EMPTY}
+ * ({@code .} → {@code ""}, root {@code max} / {@code row_max} only — they answered {@code MIS} in
+ * every position before) and {@link MoveClass#BINDING_ABSENT_EMPTY_TO_MIS} ({@code ""} → {@code .},
+ * root a {@code colref}, a dotted column, or a plain column the dataset lacks). Anything else is
+ * CONTENT, and so is any state or row-count change — the plan's VERDICT 0.
+ * {@code -Dcorej.nullkey.allow=A,B} restricts the contract to the listed classes (a move in any
+ * other class is CONTENT), so a fresh base admits exactly this plan's movement. Plants:
+ * {@code absent-reverse} (a column-typed binding moving {@code .} → {@code ""} where its root never
+ * may), {@code absent-unrooted} (a binding with no column-typed root moving {@code ""} → {@code .})
+ * — each mutates one cell of both sides and must be reported; and the positive control
+ * {@code absent-accept} (a {@code read_value} binding moving {@code ""} → {@code .}) must be
+ * classified, not reported, since the plan's measured corpus reach is 0.
+ * </p>
  */
 @EnabledIf("net.cumba.corej.core.ruletestsuites.NullKeyProvenanceDifferentialTest#enabled")
 class NullKeyProvenanceDifferentialTest
@@ -165,6 +186,9 @@ class NullKeyProvenanceDifferentialTest
     private static final String REPORT_PROPERTY = "corej.nullkey.report";
 
     private static final String PLANT_PROPERTY = "corej.nullkey.plant";
+
+    /** A comma list of {@link MoveClass} names: the only classes the contract admits. */
+    private static final String ALLOW_PROPERTY = "corej.nullkey.allow";
 
     private static final Path PROJECT_DIR = Path.of(System.getProperty("projectBasedir"));
 
@@ -194,6 +218,13 @@ class NullKeyProvenanceDifferentialTest
      * file, the order contract after the rule).
      */
     private static final Map<String, String> SPEC_RULE_IDS = new LinkedHashMap<>();
+
+    /**
+     * Outcome key → the rule's bindings → the kind of the root each one's {@code $}-chain resolves
+     * to ({@link #rootKind}), filled by the current run: what the absent-type classes judge a moved
+     * binding cell by.
+     */
+    private static final Map<String, Map<String, String>> BINDING_ROOTS = new LinkedHashMap<>();
 
     /** Outcome key → the rule's {@link Sensitivity}, filled by the current run (M1's class). */
     private static final Map<String, Sensitivity> SENSITIVITIES = new LinkedHashMap<>();
@@ -316,7 +347,25 @@ class NullKeyProvenanceDifferentialTest
          * {@code USUBJID} / {@code SEQ} on a Group finding unless the column is a group key — they
          * describe the block's first flagged row, not the group. v2 arm only; v1 keeps them.
          */
-        GROUP_ANCHOR_IDENTITY_DROPPED
+        GROUP_ANCHOR_IDENTITY_DROPPED,
+        /**
+         * {@code PLAN-column-typed-function-absent-type} A1: a binding whose root is a column-typed
+         * function ({@code read_value}, {@code max} over a column, {@code row_max}) over an absent
+         * column or dataset, read in a numeric position, printed {@code ""}; it is {@code .} now.
+         */
+        FN_ABSENT_EMPTY_TO_MIS,
+        /**
+         * A1 / §6 H2: a {@code max} / {@code row_max} binding over an absent column (or no matching
+         * column) answered {@code MIS} in every position; read in no numeric position it is
+         * {@code ""} now (D34 #3, D76a).
+         */
+        FN_ABSENT_MIS_TO_EMPTY,
+        /**
+         * A2: a binding whose root is a {@code colref}, a dotted column or a plain column the
+         * dataset lacks, read in a numeric position, printed {@code ""} (a binding carried no
+         * position kind); it is {@code .} now.
+         */
+        BINDING_ABSENT_EMPTY_TO_MIS
     }
 
 
@@ -360,6 +409,9 @@ class NullKeyProvenanceDifferentialTest
 
         final Map<MoveClass, Set<String>> movedRules = new TreeMap<>();
 
+        /** The absent-type classes' reach by root function ({@code CLASS[root]} → cells). */
+        final Map<String, Integer> reach = new TreeMap<>();
+
         final List<String> content = new ArrayList<>();
 
         final List<String> order = new ArrayList<>();
@@ -400,6 +452,7 @@ class NullKeyProvenanceDifferentialTest
                 sb.append(' ').append(e.getKey()).append('=').append(e.getValue()).append("/rules=")
                         .append(movedRules.get(e.getKey()).size());
             }
+            reach.forEach((k, v) -> sb.append(' ').append(k).append('=').append(v));
             return sb.toString();
         }
     }
@@ -431,6 +484,10 @@ class NullKeyProvenanceDifferentialTest
         else if (plantKind != null && plantKind.startsWith("nameonly-"))
         {
             planted = plantNameOnly(current, baseline, plantKind);
+        }
+        else if (plantKind != null && plantKind.startsWith("absent-"))
+        {
+            planted = plantAbsentType(current, baseline, plantKind);
         }
         else
         {
@@ -464,6 +521,19 @@ class NullKeyProvenanceDifferentialTest
         if (!reportPath.isBlank())
         {
             Files.writeString(Path.of(reportPath), summary + "\n" + ledger.report, UTF_8);
+        }
+        if ("absent-accept".equals(plantKind))
+        {
+            // The positive control: a planted A1 movement must be CLASSIFIED, never CONTENT — the
+            // classes are not blind (the corpus reach of the plan's classes is measured 0).
+            assertTrue(ledger.content.isEmpty() && ledger.order.isEmpty(),
+                    () -> "the planted FN_ABSENT_EMPTY_TO_MIS cell was not classified: "
+                            + ledger.content + ledger.order);
+            assertTrue(ledger.moves.getOrDefault(MoveClass.FN_ABSENT_EMPTY_TO_MIS, 0) == 1,
+                    () -> "the planted cell is not the one FN_ABSENT_EMPTY_TO_MIS move: "
+                            + summary);
+            throw new AssertionError("PLANT CLASSIFIED as intended (" + planted
+                    + ") — this run is the sensitivity control and must be red: " + summary);
         }
         if (planted != null)
         {
@@ -575,6 +645,7 @@ class NullKeyProvenanceDifferentialTest
         Outcome out = new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), state(o), cols(primary),
                 primary.getRowCount(), o == null ? List.of() : rows(o.violations()));
         BINDING_TYPES.put(out.key(), rule.staticBindingTypes());
+        BINDING_ROOTS.put(out.key(), bindingRoots(rule));
         SENSITIVITIES.put(out.key(), rule.getSensitivity());
         return out;
     }
@@ -594,6 +665,7 @@ class NullKeyProvenanceDifferentialTest
                 raw.primaryTable().getRowCount(),
                 r == null || r.getViolations() == null ? List.of() : rows(r.getViolations()));
         BINDING_TYPES.put(out.key(), raw.rule().staticBindingTypes());
+        BINDING_ROOTS.put(out.key(), bindingRoots(raw.rule()));
         SENSITIVITIES.put(out.key(), raw.rule().getSensitivity());
         SPEC_RULE_IDS.put(out.key(),
                 net.cumba.corej.core.FindingValuesNullGuard.coreId(raw.rule()));
@@ -614,6 +686,7 @@ class NullKeyProvenanceDifferentialTest
         Map<String, Map<String, String>> states = studyStates(result);
         Map<String, Map<String, ExprType>> typesByRule = new LinkedHashMap<>();
         Map<String, Sensitivity> sensitivityByRule = new LinkedHashMap<>();
+        Map<String, Map<String, String>> rootsByRule = new LinkedHashMap<>();
         for (Rule rule : result.rules())
         {
             typesByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
@@ -627,6 +700,16 @@ class NullKeyProvenanceDifferentialTest
                     rule.staticBindingTypes());
             sensitivityByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
                     rule.getSensitivity());
+        }
+        for (Rule rule : result.rules())
+        {
+            rootsByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    bindingRoots(rule));
+        }
+        for (Rule rule : result.generatedRules().values())
+        {
+            rootsByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    bindingRoots(rule));
         }
         Set<String> rules = new TreeSet<>(rows.keySet());
         rules.addAll(states.keySet());
@@ -647,6 +730,7 @@ class NullKeyProvenanceDifferentialTest
                         table == null ? -1 : table.getRowCount(),
                         rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of()));
                 BINDING_TYPES.put(o.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                BINDING_ROOTS.put(o.key(), rootsByRule.getOrDefault(coreId, Map.of()));
                 Sensitivity sensitivity = sensitivityByRule.get(coreId);
                 if (sensitivity != null)
                 {
@@ -659,6 +743,7 @@ class NullKeyProvenanceDifferentialTest
                 Outcome e = new Outcome("study-engine", dataset, coreId, dataset, state, o.cols(),
                         o.primaryRows(), engine);
                 BINDING_TYPES.put(e.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                BINDING_ROOTS.put(e.key(), rootsByRule.getOrDefault(coreId, Map.of()));
                 if (sensitivity != null)
                 {
                     SENSITIVITIES.put(e.key(), sensitivity);
@@ -679,6 +764,7 @@ class NullKeyProvenanceDifferentialTest
                         o.primaryRows(),
                         v2Rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of()));
                 BINDING_TYPES.put(v2.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                BINDING_ROOTS.put(v2.key(), rootsByRule.getOrDefault(coreId, Map.of()));
                 if (sensitivity != null)
                 {
                     SENSITIVITIES.put(v2.key(), sensitivity);
@@ -1364,8 +1450,21 @@ class NullKeyProvenanceDifferentialTest
                 }
                 else
                 {
-                    move = classify(key, inB, vb, inC, vc, cols, c.arm(),
-                            BINDING_TYPES.getOrDefault(k, Map.of()).get(key));
+                    String root = BINDING_ROOTS.getOrDefault(k, Map.of()).get(key);
+                    move = classifyAbsentType(inB, vb, inC, vc, cols, root);
+                    if (move == null)
+                    {
+                        move = classify(key, inB, vb, inC, vc, cols, c.arm(),
+                                BINDING_TYPES.getOrDefault(k, Map.of()).get(key));
+                    }
+                    else
+                    {
+                        ledger.reach.merge(move + "[" + rootFunction(root) + "]", 1, Integer::sum);
+                    }
+                }
+                if (move != null && !allowed(move))
+                {
+                    move = null; // a class the run's contract does not admit is CONTENT
                 }
                 String detail = at + " " + key + ": " + (inB ? String.valueOf(vb) : "<absent>")
                         + (namedB ? "+named" : "") + " -> "
@@ -1845,5 +1944,204 @@ class NullKeyProvenanceDifferentialTest
             last = at;
         }
         return true;
+    }
+    // ------------------------------------------------------------------ the absent-type classes
+
+
+    /**
+     * {@code PLAN-column-typed-function-absent-type}: the class of a reported binding cell that
+     * moved between {@code ""} and {@code .}, judged by the kind of its root ({@link #rootKind}),
+     * or {@code null} when it is not one of the plan's movements.
+     */
+    static @Nullable MoveClass classifyAbsentType(boolean inB, @Nullable String vb, boolean inC,
+            @Nullable String vc, Set<String> cols, @Nullable String root)
+    {
+        if (!inB || !inC || vb == null || vc == null || root == null)
+        {
+            return null;
+        }
+        if ("".equals(vb) && MIS.equals(vc))
+        {
+            if (root.startsWith("fn:"))
+            {
+                return MoveClass.FN_ABSENT_EMPTY_TO_MIS;
+            }
+            if ("colref".equals(root) || root.startsWith("dotted:")
+                    || (root.startsWith("column:") && !cols.contains(root.substring(7))))
+            {
+                return MoveClass.BINDING_ABSENT_EMPTY_TO_MIS;
+            }
+            return null;
+        }
+        if (MIS.equals(vb) && "".equals(vc) && ("fn:max".equals(root) || "fn:row_max".equals(root)))
+        {
+            return MoveClass.FN_ABSENT_MIS_TO_EMPTY;
+        }
+        return null;
+    }
+
+
+    /** The function (or {@code column} / {@code dotted} / {@code colref}) a root kind names. */
+    private static String rootFunction(@Nullable String root)
+    {
+        if (root == null)
+        {
+            return "?";
+        }
+        int colon = root.indexOf(':');
+        return colon < 0 ? root
+                : root.startsWith("fn:") ? root.substring(3) : root.substring(0, colon);
+    }
+
+
+    /** Whether the run's contract ({@code -Dcorej.nullkey.allow}) admits {@code move}. */
+    private static boolean allowed(MoveClass move)
+    {
+        String allow = System.getProperty(ALLOW_PROPERTY, "");
+        if (allow.isBlank())
+        {
+            return true;
+        }
+        for (String name : allow.split(",", -1))
+        {
+            if (name.trim().equals(move.name()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Every binding of {@code rule} → the kind of its root: {@code fn:read_value}, {@code fn:max}
+     * (over a column), {@code fn:row_max}, {@code colref}, {@code column:NAME},
+     * {@code dotted:NAME}, else {@code other}.
+     */
+    static Map<String, String> bindingRoots(Rule rule)
+    {
+        Map<String, net.cumba.corej.core.expr.ast.Expr> map = new LinkedHashMap<>();
+        for (net.cumba.corej.core.model.CompiledBinding b : rule.bindingOrder())
+        {
+            map.put(b.name(), b.expression());
+        }
+        Map<String, String> out = new LinkedHashMap<>();
+        for (String name : map.keySet())
+        {
+            net.cumba.corej.core.expr.ast.Expr at = map.get(name);
+            for (int hops = 0; hops <= map.size()
+                    && at instanceof net.cumba.corej.core.expr.ast.Expr.Ref ref
+                    && ref.kind() == net.cumba.corej.core.expr.OperandKind.OPERATION_REF
+                    && map.containsKey(ref.name()); hops++)
+            {
+                at = map.get(ref.name());
+            }
+            out.put(name, rootKind(at));
+        }
+        return out;
+    }
+
+
+    private static String rootKind(net.cumba.corej.core.expr.ast.@Nullable Expr root)
+    {
+        if (root instanceof net.cumba.corej.core.expr.ast.Expr.Call c)
+        {
+            return switch (c.name())
+            {
+            case "read_value", "row_max" -> "fn:" + c.name();
+            case "max" -> (c.args().isEmpty() ? c.kwargs().get("name")
+                    : c.args().get(0)) instanceof net.cumba.corej.core.expr.ast.Expr.Ref ? "fn:max"
+                            : "other";
+            case "colref" -> "colref";
+            default -> "other";
+            };
+        }
+        if (root instanceof net.cumba.corej.core.expr.ast.Expr.Ref ref)
+        {
+            return switch (ref.kind())
+            {
+            case COLUMN, WILDCARD_COLUMN -> "column:" + ref.name();
+            case DOTTED_REF -> "dotted:" + ref.name();
+            default -> "other";
+            };
+        }
+        return "other";
+    }
+
+
+    /**
+     * The absent-type plants, each a cell mutation of BOTH sides the contract must reject:
+     * {@code absent-reverse} moves a binding whose root is {@code read_value} / {@code colref} / a
+     * column from {@code .} to {@code ""} (only {@code max} / {@code row_max} may move that way);
+     * {@code absent-unrooted} moves a binding with no column-typed root from {@code ""} to
+     * {@code .}. The positive control {@code absent-accept} moves a {@code read_value} binding from
+     * {@code ""} to {@code .} and must be classified {@link MoveClass#FN_ABSENT_EMPTY_TO_MIS}.
+     * Returns the planted outcome's key.
+     */
+    private static String plantAbsentType(List<Outcome> current, Map<String, Outcome> baseline,
+            String plant)
+    {
+        for (int i = 0; i < current.size(); i++)
+        {
+            Outcome o = current.get(i);
+            Outcome b = baseline.get(o.key());
+            if (b == null || b.rows().size() != o.rows().size() || o.rows().isEmpty())
+            {
+                continue;
+            }
+            Row rc = o.rows().get(0);
+            Row rb = b.rows().get(0);
+            String key = plantKey(BINDING_ROOTS.getOrDefault(o.key(), Map.of()), rc, rb, plant);
+            if (key != null)
+            {
+                String before = "absent-reverse".equals(plant) ? MIS : "";
+                String after = "absent-reverse".equals(plant) ? "" : MIS;
+                current.set(i, withCell(o, rc, key, after));
+                baseline.put(b.key(), withCell(b, rb, key, before));
+                System.out.println(
+                        "[nullkey-differential] PLANTED " + plant + " into " + o.key() + " " + key);
+                return o.key();
+            }
+        }
+        throw new IllegalStateException("no binding cell to plant " + plant + " into");
+    }
+
+
+    /** The first binding cell of the row pair whose root the plant targets, or {@code null}. */
+    private static @Nullable String plantKey(Map<String, String> roots, Row rc, Row rb,
+            String plant)
+    {
+        for (String key : rc.values().keySet())
+        {
+            String root = roots.get(key);
+            if (root == null || !rb.values().containsKey(key))
+            {
+                continue;
+            }
+            boolean target = switch (plant)
+            {
+            case "absent-reverse" -> "fn:read_value".equals(root) || "colref".equals(root)
+                    || root.startsWith("column:");
+            case "absent-unrooted" -> "other".equals(root);
+            case "absent-accept" -> "fn:read_value".equals(root);
+            default -> throw new IllegalArgumentException("unknown plant " + plant);
+            };
+            if (target)
+            {
+                return key;
+            }
+        }
+        return null;
+    }
+
+
+    private static Outcome withCell(Outcome o, Row first, String key, String value)
+    {
+        Map<String, @Nullable String> v = new LinkedHashMap<>(first.values());
+        v.put(key, value);
+        List<Row> rows = new ArrayList<>(o.rows());
+        rows.set(0, new Row(first.where(), first.names(), v, first.namedColumns()));
+        return new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(), o.cols(),
+                o.primaryRows(), rows);
     }
 }

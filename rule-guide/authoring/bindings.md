@@ -151,6 +151,12 @@ row, so `not var_exists($trt_p)` alone would be true there: guard the name with
 `not empty($trt_p)`. A binding whose type cannot name a column (a number, a date, a list) handed
 to `var_exists` is a load error (`PARAMETER_TYPE`), as the same expression written inline is.
 
+The same holds for an **absent column**: the binding's *uses* give it its type, as the position
+gives a column read in place. `$x: AESTDY` read as `$x > 5` takes the missing an absent `AESTDY > 5`
+takes, and `$v: read_value(X, domain=D, …)` over an absent `D` or `X`, read as a number, is the
+missing too; read only as text, or not typed at all, it is `""` (see
+[Absent columns](../semantics/absent-columns.md#the-same-through-a-binding-and-through-a-function)).
+
 ## When not to use one
 
 **When the expression is already clear.** A binding that wraps a single column reference, or a

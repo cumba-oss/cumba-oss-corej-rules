@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SE0083 expect=noViolation domain=TF
+#note "DS is present but carries NO DSSTDY column, so max(DSSTDY, domain=DS, group=[USUBJID]) reads an absent column and answers its use-derived default (PLAN-column-typed-function-absent-type A1): TFDETECT > $max_dsstdy reads the binding in a numeric position, so $max_dsstdy is the missing on every row, as DSSTDY read directly would be. The not empty($max_dsstdy) guard silences the rule. If this FIRES, the guard was deleted: a missing sorts below every value (D34 #5), so TFDETECT > missing is true on every TF row with a TFDETECT - the flood the guard exists to stop (authoring rule R-4.11b)."
+#library standard=sendig version=3-1-1
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | TUMEXAM | 200
+---
+
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE

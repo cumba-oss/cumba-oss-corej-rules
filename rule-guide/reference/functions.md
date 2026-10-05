@@ -216,7 +216,7 @@ Check:
   expression: 'empty(coalesce(AEDECOD, AETERM))'
 ```
 
-**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`. A plain missing, and an absent numeric column, count as the identity `.`: `coalesce(.A, «missing» .)` is `MIS`; an absent character column reads `""` and contributes no identity.
+**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`. A plain missing, and an absent numeric column, count as the identity `.`: `coalesce(.A, «missing» .)` is `MIS`; an absent character column reads `""` and contributes no identity. The call's **position passes through to its operands**: in `coalesce(A, B) > 3` an absent `A` takes the default `A > 3` would give it — missing — rule-wide, exactly as `A` read in place; `coalesce`'s own answer is unchanged by it (owner 2026-10-05, `PLAN-column-typed-function-absent-type`).
 
 
 ### ds_exists
@@ -1737,7 +1737,12 @@ Check:
 
 **When there is nothing to answer** — **missing** — for a group with no candidate (all cells
 missing or blank, or a filter that keeps no row), and for a row of the evaluated dataset whose key
-has no group (a subject with no `DS` row; an absent `domain` dataset). `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true. A group whose inputs are all missing carries their missing
+has no group (a subject with no `DS` row). An **absent `domain` dataset**, or a target **column the
+dataset does not carry**, answers what that column would answer read directly at the call's
+position (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the call
+— or the binding it is bound to — is read as a number (`--DY > $max_ds_dsstdy`), `""` everywhere else
+(`empty()` is true either way; until 2026-10-05 the missing everywhere). A `max` over a computed
+target keeps the missing. `!=` against the missing fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true. A group whose inputs are all missing carries their missing
 identity.
 
 
@@ -1937,7 +1942,7 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks, an undeterminable date extreme, or a dataset with no matching column answers the plain missing. `empty()` on it is true, so guard with `not empty($x)` as the example does. (Until wave 3 of the operation→function programme this was an operation; it also accepted `name` / `names`, which it never read.)
+**When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks or an undeterminable date extreme answers the plain missing. A dataset with **no matching column** answers what an absent column would answer at the call's position (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the call — or the binding it is bound to — is read as a number, `""` everywhere else (the example's `TRTEDT != $trxx_max` is no numeric position, so `""`; until 2026-10-05 the missing everywhere). `empty()` on either is true, so guard with `not empty($x)` as the example does. (Until wave 3 of the operation→function programme this was an operation; it also accepted `name` / `names`, which it never read.)
 
 ### tuple
 
@@ -4147,8 +4152,15 @@ character column, missing for a numeric one — so `empty($x)` is true either wa
 default `""` is an ordinary empty text: `$x == ""` is true, and `!=` against a present literal
 (`$x != "RAT"`) is true. The numeric default is a missing: `!=` against it fires (rulings register
 `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest
-value (`D34 #5`): `X > $x` and `$x < X` fire, `X < $x` does not. That is the answer for a filter no row satisfies, for an absent `domain` dataset and for a
-`name` the dataset does not carry; the rule executes (it does not skip). A qualifying row whose
+value (`D34 #5`): `X > $x` and `$x < X` fire, `X < $x` does not. That is the answer for a filter no row satisfies.
+An **absent `domain` dataset**, or a **`name` the dataset does not carry**, has no column type to take a
+default from, so the call answers what that column would answer read directly **at the call's
+position** (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the
+call — or the binding it is bound to — is read as a number (`$x > 5`, `$x + 1`, `X > $x`), `""`
+everywhere else; where the uses disagree the number wins, and with no typed use at all (`empty($x)`,
+a reported value) it is `""`. Until 2026-10-05 it was always `""`. Either way the rule executes (it
+does not skip), and a numeric use over a possibly absent column wants a `not empty($x)` guard (the
+missing sorts lowest: `X > $x` would fire on every row). A qualifying row whose
 `name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more
 qualifying rows report the rule as ERROR (`… — ONLY asserts exactly one qualifying row`), because the
 rule asserted a single row and the data says otherwise.
@@ -4210,9 +4222,10 @@ Check:
 take at the same position: the plain missing where the expression expects a number (`colref(…) <
 3`), `""` otherwise (rulings register `DCF Q14`). A missing `x` yields **that missing value**
 (`D85c`); a present `x` that is not text names no column and yields the plain missing (`DCF Q7`);
-a list keeps a missing member as a member (`DCF Q4`). ⚠ Through a binding the position is the
-binding reference's, which carries no kind — so `$x < 3` over `$x: colref("X")` defaults to `""`,
-exactly as `$x: X` does.
+a list keeps a missing member as a member (`DCF Q4`). Through a binding the position is the
+binding's **use**: `$x < 3` over `$x: colref("X")` defaults to the missing, exactly as
+`colref("X") < 3` and `$x: X` do (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A2;
+until then a binding reference carried no kind and both read `""`).
 
 **Names.** A name matches its column whatever its case, and so does the absent default:
 `colref("zz")` and `colref("ZZ")` answer alike. A **written** `--` name (`colref("--SEQ")`) is

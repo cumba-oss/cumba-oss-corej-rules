@@ -29,6 +29,28 @@ character column — the same answer it gives for a blank cell, which is exactly
 column that is not there and a column full of blanks are indistinguishable to a check that asks
 about emptiness.
 
+### The same through a binding, and through a function
+
+The position decides wherever the column is read (owner 2026-10-05,
+`PLAN-column-typed-function-absent-type`):
+
+- **Through a `$`-binding the binding's *uses* decide.** `$x: AESTDY` read as `$x > AEENDY` is
+  `AESTDY > AEENDY` — a number, so missing. A binding answers exactly as its expression written in
+  its place, here too.
+- **A function whose result is the type of a column it reads** takes that column's default at its
+  own position when the column is not there: `read_value` over an absent `domain` dataset or
+  column, `max` over an absent column, `row_max` over a pattern no column matches, `colref` naming
+  an absent column — missing where the result is read as a number, `""` everywhere else.
+- Where the uses disagree (a number in one place, text in another) the **number wins**; with no
+  typed use at all (`empty($x)`, a reported value) it is **`""`**. `coalesce` passes its position
+  through to its operands.
+
+> ⚠ **Mind the direction of an order comparison.** A missing sorts below every value, so
+> `X > $x` over an absent column is **true on every row** where `X` is present — a flood, not
+> silence. Guard a numeric use of such a binding with `not empty($x)` (authoring rule R-4.11b: a
+> value-level rule does not emit more than one finding per dataset for the sole reason that a
+> column is absent).
+
 ## The usual consequence: silence
 
 Most checks simply do not fire on an absent column, and that is usually correct.

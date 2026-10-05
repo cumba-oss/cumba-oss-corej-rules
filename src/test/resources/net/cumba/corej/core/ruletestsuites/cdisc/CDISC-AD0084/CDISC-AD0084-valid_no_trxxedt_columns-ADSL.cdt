@@ -1,0 +1,11 @@
+#!RuleTest
+#test CDISC-AD0084 expect=noViolation domain=ADSL
+# Rule:Description: TRTEDT is not equal to the maximum value of all TRxxEDT variables
+#note "dataset ADSL with STUDYID/USUBJID/TRTEDT only - the name_pattern matches NO column, so row_max answers the absent column's use-derived default (PLAN-column-typed-function-absent-type A1, D34 #3): TRTEDT != $trxx_max is a column-vs-binding equality, no numeric position, so $trxx_max is \"\" (it was the computed missing in every position until 2026-10-05) -> `not empty($trxx_max)` false -> noViolation WITH execution (row_max is not library-dependent; there is no skip arm, so a SKIPPED here would be a defect). The twin of PMDA-AD0084-valid_no_trxxedt_columns."
+dataset ADSL
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTEDT type=Num
+---
+CDISCPILOT01 | 01-701-1015 | 22000
+---
