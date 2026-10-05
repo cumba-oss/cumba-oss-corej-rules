@@ -1,17 +1,11 @@
 package net.cumba.corej.core;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import net.cumba.corej.core.exec.OutputEntryKind;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.model.Rule;
 import org.jspecify.annotations.Nullable;
@@ -22,14 +16,13 @@ import org.jspecify.annotations.Nullable;
  * executed by the corpus suites carries a {@code null} value — <b>none</b>, with no allowance.
  *
  * <p>
- * <b>The omitted present-column entries.</b> The one state that used to keep a {@code null} key — a
- * raw column name, or {@code variable_value}, on a <b>column-level</b> finding, where the column is
- * present but the finding has no row to read a cell from (§6.2 H2) — is <em>omitted</em> from the
- * finding since T2 (coordinator decision 2026-10-04, under the owner's ruling), for both
- * provenances, until {@code PLAN-finding-values-record-level-only} (V8) gives it a name-only form.
- * The committed file {@value #ROSTER_FILE} lists every such {@code (rule, entry)} as that plan's
- * hand-over list; {@link FindingValuesNullGuardTest} asserts it equals its static derivation in
- * both directions. It allows nothing here.
+ * <b>The name-only channel</b> ({@code PLAN-finding-values-record-level-only} V8 (b)) is judged
+ * too: {@link Violation#getNamedColumns()} holds raw column <em>names</em> and nothing else — no
+ * {@code null} element, no blank, no {@code $} binding or metadata / virtual name (those always
+ * carry a value), and no name that is also a key of the values map (a column is valued OR listed,
+ * never both). The state that used to be a {@code null} key — a present raw column on a
+ * column-level finding, 5b's hand-over list {@code nullkey/present-column-omitted.tsv} (retired
+ * with this plan) — is listed by name there now.
  * </p>
  *
  * <p>
@@ -46,12 +39,6 @@ import org.jspecify.annotations.Nullable;
 public final class FindingValuesNullGuard
 {
 
-    /**
-     * The committed hand-over list of the omitted present-column entries, under
-     * {@code src/test/resources/nullkey/}.
-     */
-    public static final String ROSTER_FILE = "present-column-omitted.tsv";
-
     /** Harness tag of the {@code .cdt} scenario factories. */
     public static final String CDT = "cdt";
 
@@ -66,23 +53,15 @@ public final class FindingValuesNullGuard
 
     private static final Map<String, AtomicLong> REACH = new ConcurrentHashMap<>();
 
-    private static @Nullable Set<String> roster;
-
     private FindingValuesNullGuard()
     {
     }
 
 
-    /** The roster file's path in this module. */
-    public static Path rosterPath()
-    {
-        return CorpusPaths.moduleDir().resolve("src/test/resources/nullkey").resolve(ROSTER_FILE);
-    }
-
-
     /**
      * Fails (an {@link AssertionError} naming the place, the rule and the key) when any value of
-     * any violation is {@code null}; counts the call under {@code harness} either way.
+     * any violation is {@code null}, or its name-only list holds anything but a raw column name;
+     * counts the call under {@code harness} either way.
      */
     public static void requireNullFree(String harness, String where, Rule rule,
             @Nullable List<Violation> violations)
@@ -90,10 +69,11 @@ public final class FindingValuesNullGuard
         List<String> offenders = judge(harness, coreId(rule), violations);
         if (!offenders.isEmpty())
         {
-            throw new AssertionError(where + ": " + offenders.size() + " null-valued finding"
+            throw new AssertionError(where + ": " + offenders.size() + " offending finding"
                     + " entr" + (offenders.size() == 1 ? "y" : "ies")
                     + " (PLAN-output-variable-null-key-provenance §2.1 — nothing may be null; an"
-                    + " entry with no value is omitted or carries its typed default):\n  "
+                    + " entry with no value is omitted, carries its typed default, or is listed"
+                    + " by name — PLAN-finding-values-record-level-only V8 (b)):\n  "
                     + String.join("\n  ", offenders));
         }
     }
@@ -143,8 +123,9 @@ public final class FindingValuesNullGuard
 
 
     /**
-     * The {@code rule/key} pairs of {@code violations} whose value is {@code null} — the pure
-     * judgement, for the sensitivity control.
+     * The {@code rule/key} pairs of {@code violations} whose value is {@code null}, and the
+     * name-only entries that are not a raw column name — the pure judgement, for the sensitivity
+     * control.
      */
     public static List<String> offenders(String coreId, @Nullable List<Violation> violations)
     {
@@ -156,20 +137,68 @@ public final class FindingValuesNullGuard
         for (Violation v : violations)
         {
             Map<String, String> values = v.getValues();
-            if (values == null)
+            if (values != null)
             {
+                for (Map.Entry<String, String> e : values.entrySet())
+                {
+                    if (e.getValue() == null)
+                    {
+                        out.add(coreId + "/" + e.getKey() + " (row " + v.getRow() + ", values "
+                                + values + ")");
+                    }
+                }
+            }
+            List<String> named = v.getNamedColumns();
+            if (named == null)
+            {
+                out.add(coreId + "/<namedColumns> is null (row " + v.getRow() + ")");
                 continue;
             }
-            for (Map.Entry<String, String> e : values.entrySet())
+            for (String name : named)
             {
-                if (e.getValue() == null)
+                String why = nameOnlyOffence(name, values);
+                if (why != null)
                 {
-                    out.add(coreId + "/" + e.getKey() + " (row " + v.getRow() + ", values " + values
-                            + ")");
+                    out.add(coreId + "/" + name + " listed by name " + why + " (row " + v.getRow()
+                            + ", values " + values + ", named " + named + ")");
                 }
             }
         }
         return out;
+    }
+
+
+    /**
+     * Why {@code name} may not be in a finding's name-only list, or {@code null} when it may: the
+     * list holds raw column names only (V8 (b)) — a binding, a metadata attribute and a dataset
+     * virtual always carry a value, and a listed name has no value, so it is never a key of the
+     * values map too.
+     */
+    static @Nullable String nameOnlyOffence(@Nullable String name,
+            @Nullable Map<String, String> values)
+    {
+        if (name == null)
+        {
+            return "is null";
+        }
+        if (name.isBlank())
+        {
+            return "is blank";
+        }
+        if (name.startsWith("$"))
+        {
+            return "is a binding, which always carries a value";
+        }
+        if (OutputEntryKind.isMetadataOrVirtual(name) || OutputEntryKind.VARIABLE_NAME.equals(name)
+                || OutputEntryKind.VARIABLE_VALUE.equals(name))
+        {
+            return "is a metadata / virtual entry, which always carries a value";
+        }
+        if (values != null && values.containsKey(name))
+        {
+            return "and valued at once";
+        }
+        return null;
     }
 
 
@@ -178,55 +207,5 @@ public final class FindingValuesNullGuard
     {
         return rule.getCore() != null && rule.getCore().getId() != null ? rule.getCore().getId()
                 : String.valueOf(rule.getId());
-    }
-
-
-    /** The committed hand-over list as {@code coreId<TAB>entry} rows; loaded once. */
-    public static synchronized Set<String> roster()
-    {
-        Set<String> r = roster;
-        if (r == null)
-        {
-            r = read(rosterPath());
-            roster = r;
-        }
-        return r;
-    }
-
-
-    /**
-     * Reads a roster file: {@code coreId<TAB>entry[<TAB>…]}, {@code #} comments and blanks skipped.
-     */
-    public static Set<String> read(Path file)
-    {
-        if (!Files.isRegularFile(file))
-        {
-            throw new IllegalStateException(file + " is missing — the omitted present-column"
-                    + " hand-over list; regenerate it with -D"
-                    + FindingValuesNullGuardTest.REGENERATE + "=true and commit it");
-        }
-        Set<String> out = new TreeSet<>();
-        try
-        {
-            for (String line : Files.readAllLines(file, StandardCharsets.UTF_8))
-            {
-                String t = line.strip();
-                if (t.isEmpty() || t.startsWith("#"))
-                {
-                    continue;
-                }
-                String[] c = t.split("\t", -1);
-                if (c.length < 2)
-                {
-                    throw new IllegalStateException(file + ": malformed roster row: " + t);
-                }
-                out.add(c[0] + "\t" + c[1]);
-            }
-        }
-        catch (IOException e)
-        {
-            throw new UncheckedIOException(e);
-        }
-        return out;
     }
 }

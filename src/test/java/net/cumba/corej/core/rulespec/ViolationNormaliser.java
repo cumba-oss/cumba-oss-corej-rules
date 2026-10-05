@@ -30,6 +30,11 @@ import org.jspecify.annotations.Nullable;
  * {@code Outcome.Output_Variables}.</li>
  * <li>{@code output_variables} ← {@link Violation#getValues()} as-is (the engine has already
  * projected these per the rule's {@code Outcome.Output_Variables} list).</li>
+ * <li>{@code name_only} ← {@link Violation#getNamedColumns()} — the raw columns a non-record
+ * finding lists by name without a value ({@code PLAN-finding-values-record-level-only} V8 (b));
+ * absent when the finding lists none, so a spec written before that plan reads unchanged for a
+ * record finding and FAILS for a dataset finding whose raw column it still spells as a value (the
+ * movement is loud, by design).</li>
  * <li>{@code status} ← always {@code SUCCESS} per emitted violation. This is the
  * <b>per-violation</b> axis and is a different thing from the rule-level {@code expected_status}:
  * it qualifies one violation entry, not the run. The rule-level status is
@@ -99,7 +104,8 @@ public final class ViolationNormaliser
                                     : value);
                 }
             }
-            out.add(CanonicalViolation.of(result.getRuleId(), primaryDomain, rowKey, outputVars));
+            out.add(CanonicalViolation.of(result.getRuleId(), primaryDomain, rowKey, outputVars,
+                    v.getNamedColumns()));
         }
         return out;
     }

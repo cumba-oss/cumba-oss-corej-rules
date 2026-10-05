@@ -28,9 +28,10 @@ expected_violations:
     output_variables:
       $domain_is_custom: 'true'
       $domain_list: '[XX]'
-      # PLAN-output-variable-null-key-provenance (H2 / T2): DOMAIN is derived from `distinct
-      # DOMAIN`; a present column on a column-level finding has no cell and is OMITTED, never a
-      # null key (the hand-over list nullkey/present-column-omitted.tsv) until
-      # PLAN-finding-values-record-level-only (V8) gives it a name-only form.
       variable_name: YYORRES
+    # PLAN-finding-values-record-level-only (V8 (b)): DOMAIN is derived from `distinct DOMAIN`;
+    # a present column on a column-level finding has no cell, so it is listed by name without a
+    # value (it was omitted — never a null key — under PLAN-output-variable-null-key-provenance
+    # H2 / T2, the one row of its hand-over list, now retired).
+    name_only: [DOMAIN]
 expected_errors: []

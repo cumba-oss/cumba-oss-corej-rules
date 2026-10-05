@@ -2,7 +2,7 @@
 #test CDISC-CG0022 expect=violation domain=FA
 #note "Rule round 2026-10-03, owner: \"b - accept a LNKGRP that RELREC relates to a LNKID in another domain. and file a sheet issue\" (sheet issue #286). RELREC exists and relates AE.AELNKID to DS.DSLNKID (RELID AEDS) and to CM.CMLNKGRP (RELID AECM, CM not submitted), but holds no row for FA.FALNKGRP. Another domain's group being linked does not exempt FA's: FALNKGRP is in no other domain and RELREC does not relate it, so the rule fires once for FA. Guards the this-domain part of the exemption."
 #expectViolationCount 1
-#expectViolationAt row=1 FALNKGRP=1 "$variable_count"=1
+#expectViolationAt row=1 nameOnly=FALNKGRP $variable_count=1
 dataset FA label="Findings About Events or Interventions"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

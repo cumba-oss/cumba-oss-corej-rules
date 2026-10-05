@@ -704,6 +704,9 @@ class DynamicColumnRespellingDifferentialTest
         row.put("keys", ordered(v.getKeys(), aSorted));
         row.put("group", ordered(v.getGroupKey(), aSorted));
         row.put("values", ordered(v.getValues(), aSorted));
+        // PLAN-finding-values-record-level-only V8 (b): the columns a non-record finding lists by
+        // name are part of what the finding says — a respelling that moves a name is a difference.
+        row.put("named", v.getNamedColumns());
         return row.toString();
     }
 

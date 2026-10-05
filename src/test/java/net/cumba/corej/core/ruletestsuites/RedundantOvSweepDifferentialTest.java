@@ -659,7 +659,10 @@ class RedundantOvSweepDifferentialTest
             String where = "row=" + v.getRowNumber() + " usubjid=" + v.getUsubjid() + " seq="
                     + v.getSeq() + " level=" + v.getLevel() + " unit=" + v.getUnit() + " keys="
                     + (v.getKeys() == null ? "{}" : new TreeMap<>(v.getKeys())) + " group="
-                    + (v.getGroupKey() == null ? "{}" : new TreeMap<>(v.getGroupKey()));
+                    + (v.getGroupKey() == null ? "{}" : new TreeMap<>(v.getGroupKey()))
+                    // PLAN-finding-values-record-level-only V8 (b): the name-only columns are part
+                    // of the finding; a strip that moved one would otherwise pass unseen.
+                    + " named=" + v.getNamedColumns();
             Map<String, @Nullable String> values = v.getValues() == null ? new LinkedHashMap<>()
                     : new LinkedHashMap<>(v.getValues());
             out.add(new Row(where, "violation", List.of(), values));

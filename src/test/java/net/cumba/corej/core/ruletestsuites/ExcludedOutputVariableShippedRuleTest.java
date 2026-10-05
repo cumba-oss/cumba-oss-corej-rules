@@ -285,34 +285,51 @@ class ExcludedOutputVariableShippedRuleTest
         assertEquals(before.getViolationCount(), after.getViolationCount());
         assertEquals(rows(before), rows(after));
 
-        // … the excluded RESOLVED name is absent from the shipped finding and a retained sibling
-        // is still projected …
+        // … the excluded RESOLVED name is absent from the shipped finding — from BOTH channels:
+        // a raw column of a non-record finding is listed by name rather than valued
+        // (PLAN-finding-values-record-level-only V8 (b)), and an excluded one is in neither —
+        // and a retained sibling is still projected …
         for (Violation v : after.getViolations())
         {
             for (String key : aProjected)
             {
-                assertFalse(v.getValues().containsKey(key), key + " in " + v.getValues());
+                assertFalse(projected(v).contains(key), key + " in " + describe(v));
             }
-            assertTrue(v.getValues().containsKey(aRetainedKey),
-                    aRetainedKey + " missing from " + v.getValues());
+            assertTrue(projected(v).contains(aRetainedKey),
+                    aRetainedKey + " missing from " + describe(v));
         }
         // … it IS projected on the control …
         for (Violation v : before.getViolations())
         {
             for (String key : aProjected)
             {
-                assertTrue(v.getValues().containsKey(key), key + " not in " + v.getValues());
+                assertTrue(projected(v).contains(key), key + " not in " + describe(v));
             }
         }
-        // … and the removal of those keys is the ONLY delta to the projected map.
+        // … and the removal of those keys is the ONLY delta to the projection.
         List<Violation> shippedViolations = after.getViolations();
         List<Violation> controlViolations = before.getViolations();
         for (int i = 0; i < shippedViolations.size(); i++)
         {
-            Set<String> expected = new TreeSet<>(controlViolations.get(i).getValues().keySet());
+            Set<String> expected = new TreeSet<>(projected(controlViolations.get(i)));
             expected.removeAll(aProjected);
-            assertEquals(expected, new TreeSet<>(shippedViolations.get(i).getValues().keySet()));
+            assertEquals(expected, new TreeSet<>(projected(shippedViolations.get(i))));
         }
+    }
+
+
+    /** The names a finding projects, whichever channel carries them: valued or name-only. */
+    private static Set<String> projected(Violation v)
+    {
+        Set<String> out = new TreeSet<>(v.getValues().keySet());
+        out.addAll(v.getNamedColumns());
+        return out;
+    }
+
+
+    private static String describe(Violation v)
+    {
+        return "values " + v.getValues() + " named " + v.getNamedColumns();
     }
 
 

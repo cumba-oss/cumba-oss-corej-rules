@@ -2,7 +2,7 @@
 #test PMDA-AD0543 expect=violation domain=ADLBC
 #note "dataset ADLBC. Columns STUDYID(Char), USUBJID(Char), PARAMCD(Char), AVALCA1N(Num). ONE row: `CDISCPILOT01 | 01-701-1015 | ALT | 1`. AVALCA1N is declared, AVALCAT1 is NOT a column of the table at all - that absence is the violation. Wildcard: `AVALCAyN` matches AVALCA1N so the tuple y=1 is seeded; `AVALCATy` has no matching column and its concrete name AVALCAT1 is synthesised as absent, giving the single expansion `var_exists('AVALCA1N') and not var_exists('AVALCAT1')` = TRUE. Presence Check -> dataset granularity -> exactly ONE violation."
 #expectViolationCount 1
-#expectViolationAt AVALCA1N=1
+#expectViolationAt nameOnly=AVALCA1N
 #library standard=adamig version=1-3
 dataset ADLBC
 col STUDYID type=Char

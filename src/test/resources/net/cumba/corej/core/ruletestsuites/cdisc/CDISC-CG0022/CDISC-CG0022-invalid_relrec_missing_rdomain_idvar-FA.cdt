@@ -2,7 +2,7 @@
 #test CDISC-CG0022 expect=violation domain=FA
 #note "Rule round 2026-10-03 review (sheet issue #286). RELREC carries a row whose RDOMAIN and IDVAR are both missing (Dataset-JSON loads an empty value as a missing value), under RELID R1, the same RELID as the FA.FALNKGRP row. concat(missing, \"LNKGRP\") is missing and missing == missing holds (D34/D36), so the unguarded filters took that row as both an LNKGRP and an LNKID half and its RELID alone satisfied the pairing: the rule was silent. Every RELREC filter now requires RDOMAIN and IDVAR to be present, so no LNKGRP is related to an LNKID and the rule fires once for FA."
 #expectViolationCount 1
-#expectViolationAt row=1 FALNKGRP=1 "$variable_count"=1
+#expectViolationAt row=1 nameOnly=FALNKGRP $variable_count=1
 dataset FA label="Findings About Events or Interventions"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

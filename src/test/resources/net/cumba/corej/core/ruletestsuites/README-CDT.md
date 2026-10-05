@@ -386,7 +386,7 @@ col DOMAIN  type=Char
 | `#note "<text>"` | no | human-readable description |
 | `#expect-execution-error "<substring>"` | no | assert the engine's error message contains `<substring>`; requires `expect=executionError` (see *The `executionError` verdict*) |
 | `#expectViolationCount <N>` | no | assert the rule fires exactly `N` times (see *Asserting where a rule fires*) |
-| `#expectViolationAt [row=<N>] [severity=<LEVEL>] [COL=value ...]` | no | assert one fired location, and optionally the check level it fired at; repeatable, exact-set match |
+| `#expectViolationAt [row=<N>] [severity=<LEVEL>] [nameOnly=<COL> ...] [COL=value ...]` | no | assert one fired location, optionally the check level it fired at, and the columns it lists by name without a value; repeatable, exact-set match |
 | `#library <kind> ...` | no | inline CDISC-Library metadata (see below) |
 | `#library-include <file.yaml>` | no | pull Library metadata from a YAML sidecar |
 | `#library-ref standard=<id> version=<id> [ct=<pkg> ...] [substandard=<id>]` | no | run against **real** CDISC Library metadata, as held in our unified metadata store (see below); mutually exclusive with `#library` / `#library-include` |
@@ -532,12 +532,15 @@ block, or on its own `#`-leading line.
 - **`#expectViolationCount <N>`** — the rule must fire exactly `N` times. Use it
   alone when you only care about the count, or alongside `#expectViolationAt`
   (then `N` must equal the number of `#expectViolationAt` lines).
-- **`#expectViolationAt [row=<N>] [severity=<LEVEL>] [COL=value ...]`** — one fired
-  location, repeatable. `row=N` is the **1-based** data-row number (the *N*th line
+- **`#expectViolationAt [row=<N>] [severity=<LEVEL>] [nameOnly=<COL> ...] [COL=value ...]`** —
+  one fired location, repeatable. `row=N` is the **1-based** data-row number (the *N*th line
   under `---`); `severity=<LEVEL>` pins the check level the violation fired at (see
-  *Check levels and the run threshold*). Both keys are **reserved** and are never
-  column constraints. Each `COL=value` is matched against the violation's projected output
-  variables first, then the primary table's column `COL` at the fired row.
+  *Check levels and the run threshold*); `nameOnly=<COL>` (repeatable, one column per token) pins
+  that the violation **lists `COL` by name without a value** (see *Name-only columns* below).
+  All three keys are **reserved** and are never column constraints. Each `COL=value` is matched
+  against the violation's projected output variables first, then the primary table's column
+  `COL` at the fired row — **unless the violation lists `COL` by name, in which case a value pin
+  fails and the table is never read.**
   ⚠ That fallback means a pin **cannot see an exclusion**: when a rule's
   `Output_Variables` carries `"!COL"` (R-9.12, `Fix #354`) the projection has no
   `COL` key, so the checker quietly reads the primary table's `COL` cell
@@ -554,10 +557,11 @@ block, or on its own `#`-leading line.
 
 - **Record-level (value-based) rules** — address by `row=` (optionally with
   identity pins like `USUBJID=…` / `<DOMAIN>SEQ=…`). The engine reports a real
-  data row for these.
+  data row for these, and its raw columns carry their values.
 - **Variable-metadata / dataset-level (per-domain) rules** — the engine's row is
   a column index or `0`, so **do not** use `row=`. Pin by the projected output
-  variable instead, e.g. `#expectViolationAt variable_name=AEFOO`.
+  variable instead, e.g. `#expectViolationAt variable_name=AEFOO`; a raw column such a
+  finding projects is **name-only** — pin it `nameOnly=COL`, never `COL=value`.
 - **Wildcard / template rules** (e.g. `*FL`, `ANLzzFN`) — a row can fire under
   several concrete expansions, producing multiple violations on the same row;
   an exact-set scenario must enumerate each. Prefer adopting location
@@ -565,6 +569,35 @@ block, or on its own `#`-leading line.
 
 Validation: `#expectViolationAt` and `#expectViolationCount ≥ 1` require
 `expect=violation`; `#expectViolationCount 0` requires `expect=noViolation`.
+
+#### Name-only columns
+
+**A raw column's value is printed only on a record-level finding** (owner, 2026-10-04;
+`<meta>/plans/PLAN-finding-values-record-level-only.md` V1–V8). A dataset verdict (a
+presence-class rule such as `var_exists("AETERM") and not var_exists("AEDECOD")`, a
+`record_count()` comparison, a Study rule), a Dataset-sensitivity rule evaluated row by row
+(one finding at its first firing row) and a column-level per-variable finding all **list** their
+raw columns — bare, `--`-resolved, SUPP-delivered or `DS.COL` — **by name without a value**
+(`Violation.getNamedColumns()`): the finding is about the dataset or the variable, so row 0's
+cell was never a fact about it. The finding's own values still print — a `$binding`,
+`record_count`, `dataset_name`, the `variable_*` / `library_variable_*` / `define_*` metadata.
+A Group finding is unchanged: its raw columns report the group's distinct set (D94c).
+
+```
+#!RuleTest
+#test CDISC-AD0366 expect=violation domain=ADSL
+#expectViolationCount 1
+#expectViolationAt nameOnly=RANDFL "$RANDFL_Y_COUNT"=1
+```
+
+- `nameOnly=COL` asserts the column is listed; a `COL=value` pin (the empty `COL=` included) on a
+  listed column **fails** — the checker never falls back to the table cell for it, because that
+  fallback is exactly what would have kept a `RANDFL=Y` pin green against row 1's cell after the
+  engine stopped printing it. The failure message names the columns and the spelling to use.
+- An **absent** column is in neither channel (it is omitted, as before), so neither `nameOnly=`
+  nor `COL=value` can pin it.
+- `-Dbackfill.locations=true` emits `nameOnly=` pins from the engine's list, so a back-fill
+  cannot erase them (the same self-deleting shape the `$` and `severity=` pins guard against).
 
 Most existing scenarios were back-filled with these directives by running the
 factories with `-Dbackfill.locations=true` (which captures the locations the

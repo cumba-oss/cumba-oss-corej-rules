@@ -30,6 +30,8 @@ import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.expr.typed.ExprType;
 import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
 import net.cumba.corej.core.model.Rule;
+import net.cumba.corej.core.model.Sensitivity;
+import net.cumba.corej.core.report.LibraryValidator;
 import net.cumba.corej.core.rulespec.MetadataStoreFixture;
 import net.cumba.corej.core.rulespec.SpecLoader;
 import net.cumba.corej.core.rulespec.SpecRunner;
@@ -104,9 +106,27 @@ import org.opentest4j.TestAbortedException;
  * </p>
  *
  * <p>
- * <b>Opt-in</b>, a plan instrument: {@code -Dcorej.nullkey.study=false} skips the study arm (the
+ * <b>Opt-in</b>, a plan instrument: {@code -Dcorej.nullkey.study=false} skips the study arms (the
  * OSS corpus has no fixture); without it a missing fixture or an unavailable metadata store is a
  * failure, never a skip. {@code -Dcorej.nullkey.report=FILE} writes every classified movement.
+ * </p>
+ *
+ * <p>
+ * <b>The name-only channel ({@code PLAN-finding-values-record-level-only} §7 M5).</b> A row
+ * carries, beside its values map, the columns the finding lists <em>by name without a value</em>
+ * ({@code Violation.getNamedColumns()}, V8 (b)). A key that leaves the values map and appears in
+ * the name-only list is one of {@link MoveClass#VALUE_TO_NAME_ONLY},
+ * {@link MoveClass#RECORD_RULE_FOLDED_TO_DATASET}, {@link MoveClass#EMPTY_TABLE_EMPTY_TO_NAME_ONLY}
+ * or {@link MoveClass#FIX18_NAME_AS_VALUE_TO_NAME_ONLY}; a present column the engine used to omit
+ * and now lists is {@link MoveClass#OMITTED_TO_NAME_ONLY}. A key that leaves the values map and is
+ * listed nowhere, a name listed in both channels, a listed name that is no column of the dataset,
+ * or a record finding (one with a row identity) that loses a value are CONTENT. The study run has
+ * two arms: {@code study} reads the report ({@code ValidationFinding}, which carries no name-only
+ * list until the report model does) and {@code study-engine} reads the engine's own
+ * {@code Violation}s through {@code RuntimeListener.onRuleResult}; a report-arm key that vanished
+ * is accepted only when the engine arm lists it name-only for the same rule × dataset. Plants:
+ * {@code -Dcorej.nullkey.plant=nameonly-both|nameonly-unlisted|nameonly-record|nameonly-foreign}
+ * mutate the CURRENT side one row at a time and each must be reported.
  * </p>
  */
 @EnabledIf("net.cumba.corej.core.ruletestsuites.NullKeyProvenanceDifferentialTest#enabled")
@@ -152,6 +172,15 @@ class NullKeyProvenanceDifferentialTest
      */
     private static final Map<String, String> SPEC_RULE_IDS = new LinkedHashMap<>();
 
+    /** Outcome key → the rule's {@link Sensitivity}, filled by the current run (M1's class). */
+    private static final Map<String, Sensitivity> SENSITIVITIES = new LinkedHashMap<>();
+
+    /**
+     * {@code rule|dataset} → the names the engine arm of the study run lists name-only, the
+     * evidence the report arm's vanished keys are judged against.
+     */
+    private static final Map<String, Set<String>> STUDY_ENGINE_NAMED = new LinkedHashMap<>();
+
     /** Both modes run the same arms; exactly one of the two properties selects the mode. */
     static boolean enabled()
     {
@@ -191,19 +220,60 @@ class NullKeyProvenanceDifferentialTest
          * M4 (record path): a numeric binding or virtual that printed the untyped {@code ""} now
          * prints {@code .}.
          */
-        RECORD_EMPTY_TO_MIS
+        RECORD_EMPTY_TO_MIS,
+        /**
+         * {@code PLAN-finding-values-record-level-only} V1 / V5: a raw column's value on a
+         * non-record finding (a dataset verdict, a Dataset {@code {ROW}} rule's first firing row, a
+         * Study rule) is now listed by name without a value.
+         */
+        VALUE_TO_NAME_ONLY,
+        /**
+         * §7 M1: a Record-sensitivity rule whose Check the missing-column fold decided at dataset
+         * level — one finding, row 1, no row identity — printed row 0's value; it is name-only now.
+         */
+        RECORD_RULE_FOLDED_TO_DATASET,
+        /**
+         * §7 M6 / QNU N20: a present column on a dataset-level finding over an EMPTY primary
+         * printed {@code ""} (there was no row to read); it is name-only now.
+         */
+        EMPTY_TABLE_EMPTY_TO_NAME_ONLY,
+        /**
+         * §7 M7: the Fix #18 identifier — a dotted entry no join serves on a {@code {VAR}} rule,
+         * which printed its own name as its value — is listed by name now.
+         */
+        FIX18_NAME_AS_VALUE_TO_NAME_ONLY,
+        /**
+         * §7 M6: a present raw column on a column-level per-variable finding (5b's hand-over list
+         * {@code nullkey/present-column-omitted.tsv}, now retired) was omitted; it is listed by
+         * name now.
+         */
+        OMITTED_TO_NAME_ONLY
     }
 
 
-    /** One finding row: its location text, its variable names and its values in emission order. */
-    record Row(String where, List<String> names, Map<String, @Nullable String> values)
+    /**
+     * One finding row: its location text, its variable names, its values in emission order and the
+     * columns it lists by name without a value (absent in a base dumped before the engine carried
+     * the list, read as empty).
+     */
+    record Row(String where, List<String> names, Map<String, @Nullable String> values,
+            @Nullable List<String> named)
     {
+
+        List<String> namedColumns()
+        {
+            return named == null ? List.of() : named;
+        }
     }
 
 
-    /** One compared unit: a scenario, a spec, or a (rule, dataset) of the study run. */
+    /**
+     * One compared unit: a scenario, a spec, or a (rule, dataset) of the study run (report arm
+     * {@code study}, engine arm {@code study-engine}). {@code primaryRows} is the primary dataset's
+     * row count ({@code -1} when unknown), the N20 empty-table discriminator.
+     */
     record Outcome(String arm, String where, String rule, String domain, String state,
-            List<String> cols, List<Row> rows)
+            List<String> cols, long primaryRows, List<Row> rows)
     {
 
         String key()
@@ -284,8 +354,19 @@ class NullKeyProvenanceDifferentialTest
         }
         Map<String, Outcome> baseline = read(Path.of(Objects.requireNonNull(base)));
         String plantKind = System.getProperty(PLANT_PROPERTY);
-        String planted = "verdict".equals(plantKind) ? plantVerdict(current)
-                : plant(baseline, plantKind);
+        String planted;
+        if ("verdict".equals(plantKind))
+        {
+            planted = plantVerdict(current);
+        }
+        else if (plantKind != null && plantKind.startsWith("nameonly-"))
+        {
+            planted = plantNameOnly(current, baseline, plantKind);
+        }
+        else
+        {
+            planted = plant(baseline, plantKind);
+        }
         Ledger ledger = new Ledger();
         Set<String> seen = new TreeSet<>();
         for (Outcome c : current)
@@ -407,7 +488,7 @@ class NullKeyProvenanceDifferentialTest
         Rule rule = AbstractRuleTestSuitesFactory.resolveIn(packages, s);
         if (rule == null)
         {
-            return new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), "NO-RULE", List.of(),
+            return new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), "NO-RULE", List.of(), -1,
                     List.of());
         }
         OverlayDataTable primary = s.primaryTable();
@@ -423,8 +504,9 @@ class NullKeyProvenanceDifferentialTest
             return null;
         }
         Outcome out = new Outcome("cdt", rel, s.getCoreId(), s.getDomain(), state(o), cols(primary),
-                o == null ? List.of() : rows(o.violations()));
+                primary.getRowCount(), o == null ? List.of() : rows(o.violations()));
         BINDING_TYPES.put(out.key(), rule.staticBindingTypes());
+        SENSITIVITIES.put(out.key(), rule.getSensitivity());
         return out;
     }
 
@@ -440,8 +522,10 @@ class NullKeyProvenanceDifferentialTest
                         + r.getStatusMessage();
         Outcome out = new Outcome("spec", rel, schema.name(),
                 raw.primaryTable().getMetaData().getName(), state, cols(raw.primaryTable()),
+                raw.primaryTable().getRowCount(),
                 r == null || r.getViolations() == null ? List.of() : rows(r.getViolations()));
         BINDING_TYPES.put(out.key(), raw.rule().staticBindingTypes());
+        SENSITIVITIES.put(out.key(), raw.rule().getSensitivity());
         SPEC_RULE_IDS.put(out.key(),
                 net.cumba.corej.core.FindingValuesNullGuard.coreId(raw.rule()));
         return out;
@@ -454,19 +538,25 @@ class NullKeyProvenanceDifferentialTest
         assertTrue(Files.isDirectory(study), "testdata/study is missing — pass -D" + STUDY_PROPERTY
                 + "=false to skip the study arm deliberately");
         Map<String, IDataTable> tables = loadStudy(study);
-        StudyValidationResult result = execute(study);
+        EngineRows engineRows = new EngineRows();
+        StudyValidationResult result = execute(study, engineRows);
         Map<String, Map<String, List<Row>>> rows = studyRows(result);
         Map<String, Map<String, String>> states = studyStates(result);
         Map<String, Map<String, ExprType>> typesByRule = new LinkedHashMap<>();
+        Map<String, Sensitivity> sensitivityByRule = new LinkedHashMap<>();
         for (Rule rule : result.rules())
         {
             typesByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
                     rule.staticBindingTypes());
+            sensitivityByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    rule.getSensitivity());
         }
         for (Rule rule : result.generatedRules().values())
         {
             typesByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
                     rule.staticBindingTypes());
+            sensitivityByRule.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                    rule.getSensitivity());
         }
         Set<String> rules = new TreeSet<>(rows.keySet());
         rules.addAll(states.keySet());
@@ -479,19 +569,82 @@ class NullKeyProvenanceDifferentialTest
             for (String dataset : datasets)
             {
                 IDataTable table = tables.get(dataset.toUpperCase(Locale.ROOT));
-                Outcome o = new Outcome("study", dataset, coreId, dataset,
-                        states.getOrDefault(coreId, Map.of()).getOrDefault(dataset, "-"),
+                String state = states.getOrDefault(coreId, Map.of()).getOrDefault(dataset, "-");
+                Outcome o = new Outcome("study", dataset, coreId, dataset, state,
                         table == null ? List.of() : cols(table),
+                        table == null ? -1 : table.getRowCount(),
                         rows.getOrDefault(coreId, Map.of()).getOrDefault(dataset, List.of()));
                 BINDING_TYPES.put(o.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                Sensitivity sensitivity = sensitivityByRule.get(coreId);
+                if (sensitivity != null)
+                {
+                    SENSITIVITIES.put(o.key(), sensitivity);
+                }
                 out.add(o);
+                // The engine arm: the same rule × dataset, read from the Violations the runtime
+                // listener heard — the finding as the engine emitted it, name-only list included.
+                List<Row> engine = engineRows.rows(coreId, dataset);
+                Outcome e = new Outcome("study-engine", dataset, coreId, dataset, state, o.cols(),
+                        o.primaryRows(), engine);
+                BINDING_TYPES.put(e.key(), typesByRule.getOrDefault(coreId, Map.of()));
+                if (sensitivity != null)
+                {
+                    SENSITIVITIES.put(e.key(), sensitivity);
+                }
+                Set<String> named = new TreeSet<>();
+                for (Row r : engine)
+                {
+                    named.addAll(r.namedColumns());
+                }
+                STUDY_ENGINE_NAMED.put(coreId + "|" + dataset, named);
+                out.add(e);
             }
         }
         return out;
     }
 
+    /**
+     * The study run's engine-level rows: every rule × dataset result the engine hands to
+     * {@code RuntimeListener.onRuleResult} (on the rule worker threads), keyed by Core.Id and
+     * dataset, its violations projected exactly as the scenario and spec arms project theirs.
+     */
+    private static final class EngineRows implements LibraryValidator.RuntimeListener
+    {
 
-    private static StudyValidationResult execute(Path study) throws IOException
+        private final Map<String, List<Row>> rows = new java.util.concurrent.ConcurrentHashMap<>();
+
+        @Override
+        public void onRuleExecuted(LibraryValidator.RuntimeEntry entry)
+        {
+            // the result arrives in onRuleResult
+        }
+
+
+        @Override
+        public void onRuleResult(LibraryValidator.RuntimeEntry entry, RuleExecutionResult result)
+        {
+            if (entry.coreId() == null || result.getViolations() == null)
+            {
+                return;
+            }
+            rows.merge(entry.coreId() + "|" + entry.domain(),
+                    NullKeyProvenanceDifferentialTest.rows(result.getViolations()), (a, b) ->
+                    {
+                        List<Row> both = new ArrayList<>(a);
+                        both.addAll(b);
+                        return both;
+                    });
+        }
+
+
+        List<Row> rows(String coreId, String dataset)
+        {
+            return rows.getOrDefault(coreId + "|" + dataset, List.of());
+        }
+    }
+
+    private static StudyValidationResult execute(Path study, EngineRows engineRows)
+        throws IOException
     {
         Path store = MetadataStoreFixture.storeFile().orElseThrow(() -> new IOException(
                 "CDISC_PICKLE_CACHE_DIR / -Dcdisc.pickle.cache.dir must name the pickle corpus —"
@@ -500,7 +653,8 @@ class NullKeyProvenanceDifferentialTest
                 .manager(new LocalDataTableManager()).dataLibrary(study.toString())
                 .defineXmlPath(study.resolve("define.xml").toString()).rulesPackages(STUDY_PACKAGES)
                 .rulesDir(CorpusPaths.rules().toString()).ruleThreads(4).maxErrorsPerRule(50)
-                .severityThreshold(net.cumba.datatable.report.Severity.INFO).build();
+                .severityThreshold(net.cumba.datatable.report.Severity.INFO)
+                .runtimeListener(engineRows).build();
         String prev = System.getProperty(StoreMetadataProviderFactory.STORE_PROPERTY);
         System.setProperty(StoreMetadataProviderFactory.STORE_PROPERTY, store.toString());
         try
@@ -552,14 +706,15 @@ class NullKeyProvenanceDifferentialTest
                 if (f.getKind() != FindingKind.RULE_VIOLATION || !f.hasRows())
                 {
                     rows.add(new Row("row=- " + severity + "/" + kind, f.getVariableNames(),
-                            new LinkedHashMap<>(f.getFirstRowValues())));
+                            new LinkedHashMap<>(f.getFirstRowValues()), List.of()));
                     continue;
                 }
                 for (int pos = 0; pos < f.getRowCount(); pos++)
                 {
                     rows.add(new Row(
                             "row=" + f.getRows().rowIndexAt(pos) + " " + severity + "/" + kind,
-                            f.getVariableNames(), new LinkedHashMap<>(f.getRowValues(pos))));
+                            f.getVariableNames(), new LinkedHashMap<>(f.getRowValues(pos)),
+                            List.of()));
                 }
             }
         }
@@ -595,9 +750,16 @@ class NullKeyProvenanceDifferentialTest
                     + (v.getGroupKey() == null ? "{}" : new TreeMap<>(v.getGroupKey()));
             Map<String, @Nullable String> values = v.getValues() == null ? new LinkedHashMap<>()
                     : new LinkedHashMap<>(v.getValues());
-            out.add(new Row(where, List.of(), values));
+            out.add(new Row(where, List.of(), values, namedColumnsOf(v)));
         }
         return out;
+    }
+
+
+    /** The columns a violation lists by name without a value (V8 (b)). */
+    private static List<String> namedColumnsOf(Violation v)
+    {
+        return v.getNamedColumns();
     }
 
 
@@ -713,7 +875,7 @@ class NullKeyProvenanceDifferentialTest
             Map<String, @Nullable String> v = new LinkedHashMap<>(first.values());
             String k = v.keySet().iterator().next();
             v.put(k, "PLANTED-" + v.get(k));
-            rows.set(0, new Row(first.where(), first.names(), v));
+            rows.set(0, new Row(first.where(), first.names(), v, first.namedColumns()));
         }
         case "order" ->
         {
@@ -725,15 +887,117 @@ class NullKeyProvenanceDifferentialTest
             {
                 v.put(keys.get(i), first.values().get(keys.get(i)));
             }
-            rows.set(0, new Row(first.where(), first.names(), v));
+            rows.set(0, new Row(first.where(), first.names(), v, first.namedColumns()));
         }
         case "count" -> rows.remove(0);
         default -> throw new IllegalArgumentException("unknown plant " + plant);
         }
-        target.setValue(
-                new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(), o.cols(), rows));
+        target.setValue(new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(), o.cols(),
+                o.primaryRows(), rows));
         System.out.println("[nullkey-differential] PLANTED " + plant + " into " + target.getKey());
         return target.getKey();
+    }
+
+
+    /**
+     * The name-only plants ({@code PLAN-finding-values-record-level-only} M5), each a mutation of
+     * the CURRENT side that the contract must reject: {@code nameonly-both} lists a name-only
+     * column in the values map too; {@code nameonly-unlisted} drops a name-only column from the
+     * list (the base value then vanished into nothing); {@code nameonly-foreign} lists a name no
+     * column of the dataset carries; {@code nameonly-record} moves a raw column of a record finding
+     * (one with a row identity) from its value to the list. Returns the planted outcome's key.
+     */
+    private static String plantNameOnly(List<Outcome> current, Map<String, Outcome> baseline,
+            String plant)
+    {
+        for (int i = 0; i < current.size(); i++)
+        {
+            Outcome o = current.get(i);
+            if (!"cdt".equals(o.arm()) && !"spec".equals(o.arm()))
+            {
+                continue;
+            }
+            Outcome b = baseline.get(o.key());
+            if (b == null || b.rows().size() != o.rows().size())
+            {
+                continue;
+            }
+            for (int r = 0; r < o.rows().size(); r++)
+            {
+                Row planted = plantedRow(plant, o.rows().get(r), b.rows().get(r), o.cols());
+                if (planted != null)
+                {
+                    List<Row> rows = new ArrayList<>(o.rows());
+                    rows.set(r, planted);
+                    current.set(i, new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(),
+                            o.cols(), o.primaryRows(), rows));
+                    System.out.println("[nullkey-differential] PLANTED " + plant + " into "
+                            + o.key() + " #" + r);
+                    return o.key();
+                }
+            }
+        }
+        throw new IllegalStateException("no outcome to plant " + plant + " into");
+    }
+
+
+    /** The plant's mutation of one current row, or {@code null} when the row offers no target. */
+    private static @Nullable Row plantedRow(String plant, Row row, Row baseRow, List<String> cols)
+    {
+        return switch (plant)
+        {
+        case "nameonly-both" -> row.namedColumns().isEmpty() ? null
+                : withValue(row, row.namedColumns().get(0), "PLANTED");
+        case "nameonly-unlisted" -> row.namedColumns().isEmpty() ? null
+                : new Row(row.where(), row.names(), row.values(),
+                        row.namedColumns().subList(1, row.namedColumns().size()));
+        case "nameonly-foreign" -> row.namedColumns().isEmpty() ? null
+                : new Row(row.where(), row.names(), row.values(),
+                        concat(row.namedColumns(), "PLANTED_NO_SUCH_COLUMN"));
+        case "nameonly-record" -> plantRecordRow(row, baseRow, cols);
+        default -> throw new IllegalArgumentException("unknown plant " + plant);
+        };
+    }
+
+
+    /**
+     * A record finding (row identity carried) whose raw-column value is moved to the name-only list
+     * — the movement the engine must never make — or {@code null} when {@code row} is not such a
+     * finding.
+     */
+    private static @Nullable Row plantRecordRow(Row row, Row baseRow, List<String> cols)
+    {
+        if (row.where().contains("usubjid=null"))
+        {
+            return null;
+        }
+        for (String key : row.values().keySet())
+        {
+            if (cols.contains(key) && OutputEntryKind.of(key) == OutputEntryKind.COLUMN
+                    && Objects.equals(row.values().get(key), baseRow.values().get(key)))
+            {
+                Map<String, @Nullable String> values = new LinkedHashMap<>(row.values());
+                values.remove(key);
+                return new Row(row.where(), row.names(), values, concat(row.namedColumns(), key));
+            }
+        }
+        return null;
+    }
+
+
+    private static Row withValue(Row row, String key, String value)
+    {
+        Map<String, @Nullable String> values = new LinkedHashMap<>(row.values());
+        values.put(key, value);
+        return new Row(row.where(), row.names(), values, row.namedColumns());
+    }
+
+
+    private static List<String> concat(List<String> list, String tail)
+    {
+        List<String> out = new ArrayList<>(list);
+        out.add(tail);
+        return out;
     }
 
     // ------------------------------------------------------------------ judgement
@@ -786,20 +1050,41 @@ class NullKeyProvenanceDifferentialTest
             }
             Set<String> keys = new LinkedHashSet<>(rb.values().keySet());
             keys.addAll(rc.values().keySet());
+            keys.addAll(rb.namedColumns());
+            keys.addAll(rc.namedColumns());
+            Set<String> namedElsewhere = "study".equals(c.arm())
+                    ? STUDY_ENGINE_NAMED.getOrDefault(c.rule() + "|" + c.domain(), Set.of())
+                    : Set.of();
             for (String key : keys)
             {
                 boolean inB = rb.values().containsKey(key);
                 boolean inC = rc.values().containsKey(key);
                 String vb = rb.values().get(key);
                 String vc = rc.values().get(key);
-                if (inB && inC && Objects.equals(vb, vc))
+                boolean namedB = rb.namedColumns().contains(key);
+                boolean namedC = rc.namedColumns().contains(key) || namedElsewhere.contains(key);
+                if (inB && inC && Objects.equals(vb, vc) && !namedB && !namedC)
                 {
                     continue;
                 }
-                MoveClass move = classify(key, inB, vb, inC, vc, cols, c.arm(),
-                        BINDING_TYPES.getOrDefault(k, Map.of()).get(key));
+                if (!inB && !inC && namedB && namedC)
+                {
+                    continue; // listed by name on both sides
+                }
+                MoveClass move;
+                if (namedB || namedC)
+                {
+                    move = classifyNameOnly(key, inB, vb, inC, vc, namedB, namedC, cols, c, rc,
+                            SENSITIVITIES.get(k));
+                }
+                else
+                {
+                    move = classify(key, inB, vb, inC, vc, cols, c.arm(),
+                            BINDING_TYPES.getOrDefault(k, Map.of()).get(key));
+                }
                 String detail = at + " " + key + ": " + (inB ? String.valueOf(vb) : "<absent>")
-                        + " -> " + (inC ? String.valueOf(vc) : "<absent>");
+                        + (namedB ? "+named" : "") + " -> "
+                        + (inC ? String.valueOf(vc) : "<absent>") + (namedC ? "+named" : "");
                 if (move == null)
                 {
                     ledger.content.add(detail);
@@ -824,6 +1109,77 @@ class NullKeyProvenanceDifferentialTest
         {
             ledger.identical++;
         }
+    }
+
+
+    /**
+     * The movement class of a cell that touches the name-only channel on either side
+     * ({@code PLAN-finding-values-record-level-only} M5), or {@code null} (CONTENT): a name listed
+     * on both sides and valued on neither is identical (filtered by the caller); a name that leaves
+     * the values map for the list is {@link MoveClass#VALUE_TO_NAME_ONLY} — or
+     * {@link MoveClass#RECORD_RULE_FOLDED_TO_DATASET} on a Record-sensitivity rule whose finding is
+     * the single, identity-less row-1 dataset verdict,
+     * {@link MoveClass#EMPTY_TABLE_EMPTY_TO_NAME_ONLY} for a {@code ""} over an empty primary,
+     * {@link MoveClass#FIX18_NAME_AS_VALUE_TO_NAME_ONLY} for a dotted entry that printed its own
+     * name; a name valued nowhere that joins the list is {@link MoveClass#OMITTED_TO_NAME_ONLY}.
+     * Everything else is CONTENT: a name in both channels at once, a name that left the list, a
+     * listed name that is no column of the dataset (a dotted joined entry excepted — the primary
+     * never carries it), or a raw column of a record finding (a row identity carried) that lost its
+     * value.
+     */
+    static @Nullable MoveClass classifyNameOnly(String key, boolean inB, @Nullable String vb,
+            boolean inC, @Nullable String vc, boolean namedB, boolean namedC, Set<String> cols,
+            Outcome c, Row rc, @Nullable Sensitivity sensitivity)
+    {
+        if (namedC && inC)
+        {
+            return null; // both channels at once
+        }
+        if (namedB && !namedC)
+        {
+            return null; // left the list
+        }
+        OutputEntryKind kind = OutputEntryKind.of(key);
+        boolean dotted = key.indexOf('.') > 0;
+        if (kind != OutputEntryKind.COLUMN || (!dotted && !cols.contains(key)))
+        {
+            return null; // not a raw column of the dataset
+        }
+        // The report arm carries no row identity and numbers rows from 0; its vanished keys are
+        // accepted on the engine arm's evidence for the same rule × dataset (STUDY_ENGINE_NAMED),
+        // where the identity test below has already been applied.
+        boolean report = "study".equals(c.arm());
+        if (!namedB && namedC && inB && !inC)
+        {
+            // A value became a name. Never on a record finding: the row identity is the mark of
+            // one (dataset verdicts and column-level findings pass none).
+            boolean identity = !report && !rc.where().contains("usubjid=null seq=null");
+            if (identity)
+            {
+                return null;
+            }
+            if ("".equals(vb) && c.primaryRows() == 0)
+            {
+                return MoveClass.EMPTY_TABLE_EMPTY_TO_NAME_ONLY;
+            }
+            if (dotted && key.equals(vb))
+            {
+                return MoveClass.FIX18_NAME_AS_VALUE_TO_NAME_ONLY;
+            }
+            if (sensitivity == Sensitivity.RECORD)
+            {
+                // M1: a Record rule decided at dataset level by the fold — one finding at row 1.
+                boolean folded = c.rows().size() == 1
+                        && (report || rc.where().startsWith("row=1 "));
+                return folded ? MoveClass.RECORD_RULE_FOLDED_TO_DATASET : null;
+            }
+            return MoveClass.VALUE_TO_NAME_ONLY;
+        }
+        if (!namedB && namedC && !inB && !inC)
+        {
+            return MoveClass.OMITTED_TO_NAME_ONLY;
+        }
+        return null;
     }
 
 
@@ -1055,9 +1411,9 @@ class NullKeyProvenanceDifferentialTest
                 Map<String, @Nullable String> v = new LinkedHashMap<>(first.values());
                 v.put("variable_value_length", "1");
                 List<Row> rows = new ArrayList<>(o.rows());
-                rows.set(0, new Row(first.where(), first.names(), v));
+                rows.set(0, new Row(first.where(), first.names(), v, first.namedColumns()));
                 current.set(i, new Outcome(o.arm(), o.where(), o.rule(), o.domain(), o.state(),
-                        o.cols(), rows));
+                        o.cols(), o.primaryRows(), rows));
                 System.out.println("[nullkey-differential] PLANTED verdict into " + o.key());
                 return o.key();
             }
