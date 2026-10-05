@@ -4179,7 +4179,11 @@ everywhere else; where the uses disagree the number wins, and with no typed use 
 a reported value) it is `""`. The uses that count are those of **every** `read_value` / `max` call
 over the same `domain` dataset and column, as two direct reads of one column share one type:
 `read_value(X, domain=D, mode="FIRST") > 5 or read_value(X, domain=D, mode="MAX") == ""` reads the
-missing in both calls. Until 2026-10-05 it was always `""`. Either way the rule executes (it
+missing in both calls. One limit: a call that names the dataset under evaluation in `domain=`
+(`max(AEX, domain=AE)`) and one that omits `domain=` (`max(AEX)`) are **not** counted as one column,
+although on an `AE` evaluation they read the same one — which dataset is under evaluation is known
+only when the rule runs, not when it loads, so each keeps its own uses. Until 2026-10-05 it was
+always `""`. Either way the rule executes (it
 does not skip), and a numeric use over a possibly absent column wants a `not empty($x)` guard (the
 missing sorts lowest: `X > $x` would fire on every row). A qualifying row whose
 `name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more

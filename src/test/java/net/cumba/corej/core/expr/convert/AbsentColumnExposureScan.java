@@ -143,8 +143,9 @@ public final class AbsentColumnExposureScan
 
     /**
      * Registered BOOLEAN predicates that route through {@code ExprCompiler.compileBoolCall}'s
-     * generic tail and therefore fold an absent operand. {@code empty} / {@code is_missing} are
-     * excluded — they own their absent-column contract via {@code FIRES_ON_ABSENT_COLUMN}.
+     * generic tail and therefore fold an absent operand. {@code empty} is excluded — it owns its
+     * absent-column contract via {@code FIRES_ON_ABSENT_COLUMN}. {@code is_missing} left that set
+     * with register D50 (owner 2026-10-05) and now takes the generic tail, so it is listed here.
      *
      * <p>
      * Added after the Phase 3 dynamic run: the first cut collected only {@link Expr.Binary} leaves
@@ -161,7 +162,10 @@ public final class AbsentColumnExposureScan
             // Fix #157 — the date-portion pair. is_not_complete_date_part fires on an absent
             // column (its operand folds to ""), so it must be classified here or an audit that
             // keys on the operator name would score it as a safe positive leaf.
-            "is_complete_date_part", "is_not_complete_date_part");
+            "is_complete_date_part", "is_not_complete_date_part",
+            // D50 (owner 2026-10-05): strict is_missing folds an absent operand to its type
+            // default like any generic predicate ("" ⇒ false, numeric-expected MIS ⇒ true).
+            "is_missing");
 
     /**
      * Scans one rule's Check expression.
@@ -343,12 +347,16 @@ public final class AbsentColumnExposureScan
     }
 
 
-    /** {@code not empty(X)} (NNF of {@code non_empty}) contributes X. */
+    /**
+     * {@code not empty(X)} (NNF of {@code non_empty}) contributes X. {@code not is_missing(X)} does
+     * NOT (register D50, owner 2026-10-05): is_missing is strict, so over an absent character
+     * column (default {@code ""}) {@code not is_missing(X)} is true on every row and guards
+     * nothing.
+     */
     private static void addNotEmptyGuard(Expr part, Set<String> out)
     {
         if (part instanceof Expr.Not n && n.inner() instanceof Expr.Call c
-                && ("empty".equals(c.name()) || "is_missing".equals(c.name()))
-                && c.args().size() == 1)
+                && "empty".equals(c.name()) && c.args().size() == 1)
         {
             String name = operandName(c.args().get(0));
             if (name != null)
