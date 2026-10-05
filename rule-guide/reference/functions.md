@@ -2492,7 +2492,7 @@ expression: 'ds_structure("DEFINE")'
 
 One dataset-metadata value of the current dataset, named by its key: `"dataset_name"`, `"dataset_label"`, `"dataset_size"` (bytes of the parsed file), `"dataset_location"` / `"filename"` (the source file's name), or any other key the dataset's reader publishes (`"file_format"`, …).
 
-Its result type follows the key: `"dataset_size"` is a **number**, the other keys named above (and `"file_format"`) a **string**; any other key has whatever type the reader gives it. A finding reporting a binding over it with no value prints `.` or `""` by that type ([Outcome](../authoring/outcome.md#output_variables)).
+Its result type follows the key: `"dataset_size"` is a **number**; `"dataset_name"`, `"dataset_label"`, `"dataset_location"`, `"filename"` and `"file_format"` are **strings**. A finding reporting a binding over one of these keys with no value prints `.` or `""` by that type ([Outcome](../authoring/outcome.md#output_variables)). Any other key is **untyped at load** — its value is whatever the dataset's reader publishes, present on one file format and absent on another — so a binding over it cannot be reported: naming it in `Output_Variables` is a load error (it is never derived, so simply leave it out). Use it in the Check only, or use a typed key.
 
 | parameter | type | required | description |
 |---|---|---|---|

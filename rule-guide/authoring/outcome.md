@@ -76,8 +76,11 @@ lead, and the derived columns follow in walk order.
 > number, `domain_is_custom()` a boolean, `extract_metadata("dataset_size")` a number while its
 > other documented keys are strings — except the few whose result is the type of the column they
 > read (`read_value`, `max`, `row_max`, `coalesce`, `colref`, `value()`), which print by that
-> column's type. A binding whose type cannot be known at all fails the rule with an error rather
-> than print a guess.
+> column's type. A binding whose type cannot be known at all — `extract_metadata` of a key other
+> than the documented ones — **cannot be reported**: listing it in `Output_Variables`, or letting
+> the engine derive it, is a load error that names it. Remove an authored entry, exclude a derived
+> one with `!$name`, or bind a function whose result type is known (for `extract_metadata`, one of
+> the typed keys).
 
 ### Excluding with `!`
 
