@@ -89,14 +89,6 @@ class MergedTableShadowDifferentialTest
     enum Movement
     {
         /**
-         * The W1 review's HIGH (W1-H1, coordinator 2026-10-05): a merge whose dropped (inner) and
-         * expanded (n:m) rows cancel out is built as unexpanded, so the primary part is not
-         * row-mapped and the parts read different records on one row. Pending the datatable fix;
-         * never worked around in the engine. Signature: the row set differs while the merged view
-         * says it is not expanded and has exactly the primary's row count.
-         */
-        W1_H1_PENDING_DATATABLE_FIX,
-        /**
          * §3.5.3 cases 2, 3, 5, 6, 9 (MET #15, OD-1, OD-2): the merged qualifier column carries a
          * {@code MERGE_ERROR}; today the first row wins. Lands in W3a as ERROR (QNAM).
          */
@@ -183,14 +175,11 @@ class MergedTableShadowDifferentialTest
     /** The class of one divergence. */
     static Movement classify(MergedTableShadow.Report r, MergedTableShadow.Divergence d)
     {
-        MergedTable merged = r.merged();
         return switch (d.kind())
         {
-        case ROW_SET, ROW_ABSENT, KEYED_VALUE, KEYED_TEXT, KEYED_MATCHED -> merged != null
-                && r.counts().containsKey(MergedTableShadow.Kind.ROW_SET) && !merged.isExpanded()
-                && merged.getRowCount() == r.primary().getRowCount()
-                        ? Movement.W1_H1_PENDING_DATATABLE_FIX
-                        : Movement.UNEXPLAINED;
+        // W1-H1 (row mapping decided on identity, MergedTable.isRowMapped) was fixed by the W1
+        // review fold and measured at 0 (W3a step 0): a keyed divergence is never a ruled movement.
+        case ROW_SET, ROW_ABSENT, KEYED_VALUE, KEYED_TEXT, KEYED_MATCHED -> Movement.UNEXPLAINED;
         case SUPP_MERGE_ERROR -> Movement.SUPP_CASE_TABLE_ERROR;
         case SUPP_VALUE -> withoutStudyidAndRdomain(r, d) ? Movement.SUPP_IG_KEY
                 : Movement.UNEXPLAINED;
