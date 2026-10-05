@@ -359,7 +359,18 @@ public final class FindingsSnapshot
             net.cumba.corej.core.report.LibraryValidator.RuntimeListener
     {
 
-        private final java.util.Queue<String> offenders = new java.util.concurrent.ConcurrentLinkedQueue<>();
+        /**
+         * Every heard result with violations — judged after the run, when the rules are known (P1
+         * review M-1 (a): the non-record judgement needs the rule's Sensitivity and binding
+         * domains, which a {@code RuntimeEntry} does not carry).
+         */
+        private final java.util.Queue<Heard> heardResults = new java.util.concurrent.ConcurrentLinkedQueue<>();
+
+        /** One heard rule × dataset result. */
+        private record Heard(String domain, String coreId,
+                List<net.cumba.corej.core.exec.Violation> violations)
+        {
+        }
 
         private final java.util.concurrent.atomic.AtomicLong heard = new java.util.concurrent.atomic.AtomicLong();
 
@@ -381,24 +392,52 @@ public final class FindingsSnapshot
             {
                 heardFindingBearing.incrementAndGet();
             }
-            for (String o : net.cumba.corej.core.FindingValuesNullGuard.judge(
-                    net.cumba.corej.core.FindingValuesNullGuard.STUDY, nz(entry.coreId()),
-                    result.getViolations()))
+            if (result.getViolations() != null && !result.getViolations().isEmpty())
             {
-                offenders.add(entry.domain() + ": " + o);
+                heardResults
+                        .add(new Heard(entry.domain(), nz(entry.coreId()), result.getViolations()));
             }
         }
 
 
         void requireNullFreeAndReached(StudyValidationResult result)
         {
+            Map<String, net.cumba.corej.core.model.Rule> byCoreId = new java.util.HashMap<>();
+            for (net.cumba.corej.core.model.Rule rule : result.rules())
+            {
+                byCoreId.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                        rule);
+            }
+            for (net.cumba.corej.core.model.Rule rule : result.generatedRules().values())
+            {
+                byCoreId.putIfAbsent(net.cumba.corej.core.FindingValuesNullGuard.coreId(rule),
+                        rule);
+            }
+            List<String> offenders = new ArrayList<>();
+            for (Heard h : heardResults)
+            {
+                net.cumba.corej.core.model.Rule rule = byCoreId.get(h.coreId());
+                if (rule == null)
+                {
+                    offenders.add(h.domain() + ": " + h.coreId()
+                            + " — a heard result whose rule the run does not list");
+                    continue;
+                }
+                for (String o : net.cumba.corej.core.FindingValuesNullGuard.judge(
+                        net.cumba.corej.core.FindingValuesNullGuard.STUDY, rule, h.violations()))
+                {
+                    offenders.add(h.domain() + ": " + o);
+                }
+            }
             if (!offenders.isEmpty())
             {
                 List<String> first = offenders.stream().limit(20).toList();
                 throw new AssertionError("testdata/study: " + offenders.size()
-                        + " null-valued finding entr" + (offenders.size() == 1 ? "y" : "ies")
+                        + " offending finding entr" + (offenders.size() == 1 ? "y" : "ies")
                         + " (PLAN-output-variable-null-key-provenance §2.1 — nothing may be"
-                        + " null), first " + first.size() + ":\n  " + String.join("\n  ", first));
+                        + " null; PLAN-finding-values-record-level-only V1 / Q-C — no raw value"
+                        + " on a non-record finding), first " + first.size() + ":\n  "
+                        + String.join("\n  ", first));
             }
             long findingBearing = 0;
             for (DatasetExecutionSummary summary : result.executionSummaries())

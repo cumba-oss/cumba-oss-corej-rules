@@ -579,9 +579,11 @@ presence-class rule such as `var_exists("AETERM") and not var_exists("AEDECOD")`
 (one finding at its first firing row) and a column-level per-variable finding all **list** their
 raw columns — bare, `--`-resolved, SUPP-delivered or `DS.COL` — **by name without a value**
 (`Violation.getNamedColumns()`): the finding is about the dataset or the variable, so row 0's
-cell was never a fact about it. The finding's own values still print — a `$binding`,
-`record_count`, `dataset_name`, the `variable_*` / `library_variable_*` / `define_*` metadata.
-A Group finding is unchanged: its raw columns report the group's distinct set (D94c).
+cell was never a fact about it. The finding's own values still print — a dataset-scope
+`$binding`, `record_count`, `dataset_name`, the `variable_*` / `library_variable_*` / `define_*`
+metadata. A **per-row** binding (e.g. `$end: AEENDTC`) is listed by name like a raw column —
+pin it `nameOnly=$end` (owner Q-C, 2026-10-05). A Group finding is unchanged: its raw columns
+report the group's distinct set (D94c).
 
 ```
 #!RuleTest
@@ -596,6 +598,11 @@ A Group finding is unchanged: its raw columns report the group's distinct set (D
   engine stopped printing it. The failure message names the columns and the spelling to use.
 - An **absent** column is in neither channel (it is omitted, as before), so neither `nameOnly=`
   nor `COL=value` can pin it.
+- On a violation that lists anything by name, **no** `COL=value` pin is read from the table cell
+  at its row — that row is no record of a non-record finding, so such a pin passed on the
+  fixture's row, not on the finding (CDISC-AD0661's `DOSEDURU=HOURS`, re-spelled as `#note`).
+  Only the row anchors `USUBJID` / `--SEQ` may still locate the firing row; say anything else in
+  the scenario's `#note`.
 - `-Dbackfill.locations=true` emits `nameOnly=` pins from the engine's list, so a back-fill
   cannot erase them (the same self-deleting shape the `$` and `severity=` pins guard against).
 

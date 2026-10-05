@@ -1,13 +1,18 @@
 package net.cumba.corej.core;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import net.cumba.corej.core.exec.OutputEntryKind;
 import net.cumba.corej.core.exec.Violation;
+import net.cumba.corej.core.expr.eval.BindingDomains;
 import net.cumba.corej.core.model.Rule;
+import net.cumba.corej.core.model.Sensitivity;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -53,42 +58,44 @@ public final class FindingValuesNullGuard
 
     private static final Map<String, AtomicLong> REACH = new ConcurrentHashMap<>();
 
+    /** The engine-error sentinel key ({@code RuleRunner}): no projected entry, never judged. */
+    private static final String SENTINEL = "__error__";
+
     private FindingValuesNullGuard()
     {
     }
 
 
     /**
-     * Fails (an {@link AssertionError} naming the place, the rule and the key) when any value of
-     * any violation is {@code null}, or its name-only list holds anything but a raw column name;
-     * counts the call under {@code harness} either way.
+     * Fails (an {@link AssertionError} naming the place, the rule and the key) when any violation
+     * offends ({@link #offenders}); counts the call under {@code harness} either way.
      */
     public static void requireNullFree(String harness, String where, Rule rule,
             @Nullable List<Violation> violations)
     {
-        List<String> offenders = judge(harness, coreId(rule), violations);
+        List<String> offenders = judge(harness, rule, violations);
         if (!offenders.isEmpty())
         {
             throw new AssertionError(where + ": " + offenders.size() + " offending finding"
                     + " entr" + (offenders.size() == 1 ? "y" : "ies")
                     + " (PLAN-output-variable-null-key-provenance §2.1 — nothing may be null; an"
                     + " entry with no value is omitted, carries its typed default, or is listed"
-                    + " by name — PLAN-finding-values-record-level-only V8 (b)):\n  "
+                    + " by name — PLAN-finding-values-record-level-only V1 / V8 (b) / Q-C):\n  "
                     + String.join("\n  ", offenders));
         }
     }
 
 
     /**
-     * The judgement without the throw, for a caller on a worker thread (the study run's runtime
-     * listener collects and fails after the run): counts the call under {@code harness} and answers
-     * the offenders.
+     * The judgement without the throw, for a caller that fails later (the study run collects during
+     * the run and judges after it, when the rules are known): counts the call under {@code harness}
+     * and answers the offenders.
      */
-    public static List<String> judge(String harness, String coreId,
+    public static List<String> judge(String harness, Rule rule,
             @Nullable List<Violation> violations)
     {
         REACH.computeIfAbsent(harness, _ -> new AtomicLong()).incrementAndGet();
-        return offenders(coreId, violations);
+        return offenders(rule, violations);
     }
 
 
@@ -123,45 +130,104 @@ public final class FindingValuesNullGuard
 
 
     /**
-     * The {@code rule/key} pairs of {@code violations} whose value is {@code null}, and the
-     * name-only entries that are not a raw column name — the pure judgement, for the sensitivity
-     * control.
+     * The offending entries of {@code violations} of {@code rule} — the pure judgement, for the
+     * sensitivity control. Per violation, {@link #entryOffenders}.
      */
-    public static List<String> offenders(String coreId, @Nullable List<Violation> violations)
+    public static List<String> offenders(Rule rule, @Nullable List<Violation> violations)
     {
         List<String> out = new ArrayList<>();
-        if (violations == null)
+        if (violations == null || violations.isEmpty())
         {
             return out;
         }
+        String coreId = coreId(rule);
+        BindingDomains bindings = BindingDomains.forRule(rule);
+        Sensitivity sensitivity = rule.getSensitivity();
         for (Violation v : violations)
         {
-            Map<String, String> values = v.getValues();
-            if (values != null)
+            boolean nonRecord = isNonRecord(sensitivity, v.getGroupKey(), v.getUnit(),
+                    v.getNamedColumns());
+            out.addAll(entryOffenders(coreId, v.getRow(), v.getValues(), v.getNamedColumns(),
+                    nonRecord, ref -> bindings.domainOf(ref).rowCursor()));
+        }
+        return out;
+    }
+
+
+    /**
+     * Whether a finding is <b>non-record</b> (V1): its producing site listed a column by name, or
+     * stamped the dataset unit, or the rule is a Dataset / Study rule and the finding is no Group
+     * finding (a Group finding keeps D94c's distinct sets, Q-A). A Record rule folded to a dataset
+     * verdict with nothing to list stamps no unit on the single-level path and is not recognised —
+     * it carries no raw column then, so there is nothing to judge.
+     */
+    static boolean isNonRecord(@Nullable Sensitivity sensitivity,
+            @Nullable Map<String, String> groupKey, Violation.@Nullable Unit unit,
+            @Nullable List<String> named)
+    {
+        return (named != null && !named.isEmpty()) || unit instanceof Violation.Unit.Dataset
+                || (groupKey == null && (sensitivity == Sensitivity.DATASET
+                        || sensitivity == Sensitivity.STUDY));
+    }
+
+
+    /**
+     * One violation's offending entries ({@code rule/key …} lines):
+     * <ul>
+     * <li>a {@code null} value (NK §1 — unreachable through {@code Violation}'s constructor since
+     * P2 review MED-1 (b), kept so the guard does not depend on it);</li>
+     * <li>on a <b>non-record</b> finding (P1 review M-1 (a)): a valued raw column
+     * ({@code OutputEntryKind.COLUMN}; the {@code __error__} sentinel exempt) — its value would
+     * belong to an arbitrary record — and a valued <b>per-row binding</b> (owner Q-C);</li>
+     * <li>a name-only entry that is {@link #nameOnlyOffence wrong}, or listed twice (L-1).</li>
+     * </ul>
+     *
+     * @param perRowBinding
+     *            whether a {@code $} name is a per-row (row-cursor) binding of the rule
+     */
+    static List<String> entryOffenders(String coreId, long row,
+            @Nullable Map<String, String> values, @Nullable List<String> named, boolean nonRecord,
+            Predicate<String> perRowBinding)
+    {
+        List<String> out = new ArrayList<>();
+        if (values != null)
+        {
+            for (Map.Entry<String, String> e : values.entrySet())
             {
-                for (Map.Entry<String, String> e : values.entrySet())
+                String key = e.getKey();
+                if (e.getValue() == null)
                 {
-                    if (e.getValue() == null)
-                    {
-                        out.add(coreId + "/" + e.getKey() + " (row " + v.getRow() + ", values "
-                                + values + ")");
-                    }
+                    out.add(coreId + "/" + key + " (row " + row + ", values " + values + ")");
+                }
+                else if (nonRecord && !SENTINEL.equals(key)
+                        && (OutputEntryKind.of(key) == OutputEntryKind.COLUMN
+                                || (key.startsWith("$") && perRowBinding.test(key))))
+                {
+                    out.add(coreId + "/" + key + " valued on a non-record finding — "
+                            + (key.startsWith("$") ? "a per-row binding (Q-C)"
+                                    : "a raw column (V1)")
+                            + " is listed by name there (row " + row + ", values " + values
+                            + ", named " + named + ")");
                 }
             }
-            List<String> named = v.getNamedColumns();
-            if (named == null)
+        }
+        if (named == null)
+        {
+            out.add(coreId + "/<namedColumns> is null (row " + row + ")");
+            return out;
+        }
+        Set<String> seen = new HashSet<>();
+        for (String name : named)
+        {
+            String why = nameOnlyOffence(name, values, perRowBinding);
+            if (why == null && !seen.add(name))
             {
-                out.add(coreId + "/<namedColumns> is null (row " + v.getRow() + ")");
-                continue;
+                why = "twice";
             }
-            for (String name : named)
+            if (why != null)
             {
-                String why = nameOnlyOffence(name, values);
-                if (why != null)
-                {
-                    out.add(coreId + "/" + name + " listed by name " + why + " (row " + v.getRow()
-                            + ", values " + values + ", named " + named + ")");
-                }
+                out.add(coreId + "/" + name + " listed by name " + why + " (row " + row
+                        + ", values " + values + ", named " + named + ")");
             }
         }
         return out;
@@ -170,12 +236,12 @@ public final class FindingValuesNullGuard
 
     /**
      * Why {@code name} may not be in a finding's name-only list, or {@code null} when it may: the
-     * list holds raw column names only (V8 (b)) — a binding, a metadata attribute and a dataset
-     * virtual always carry a value, and a listed name has no value, so it is never a key of the
-     * values map too.
+     * list holds raw column names (V8 (b)) and per-row bindings (owner Q-C) — a dataset-scope
+     * binding, a metadata attribute and a dataset virtual always carry a value, and a listed name
+     * has no value, so it is never a key of the values map too.
      */
     static @Nullable String nameOnlyOffence(@Nullable String name,
-            @Nullable Map<String, String> values)
+            @Nullable Map<String, String> values, Predicate<String> perRowBinding)
     {
         if (name == null)
         {
@@ -185,9 +251,9 @@ public final class FindingValuesNullGuard
         {
             return "is blank";
         }
-        if (name.startsWith("$"))
+        if (name.startsWith("$") && !perRowBinding.test(name))
         {
-            return "is a binding, which always carries a value";
+            return "is a dataset-scope binding, which always carries its value";
         }
         if (OutputEntryKind.isMetadataOrVirtual(name) || OutputEntryKind.VARIABLE_NAME.equals(name)
                 || OutputEntryKind.VARIABLE_VALUE.equals(name))

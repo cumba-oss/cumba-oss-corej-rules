@@ -147,7 +147,9 @@ import org.opentest4j.TestAbortedException;
  * {@code ""} now (owner Q-A, 2026-10-05). Plants: {@code nameonly-s7-both} (an S7 column valued and
  * listed at once), {@code nameonly-group-nongroup} (a non-group finding's {@code USUBJID} blanked
  * on the v2 arm), {@code nameonly-report-foreign} (a report-arm row listing a name no column
- * carries and no engine arm lists).
+ * carries and no engine arm lists), {@code nameonly-s7-v2only} (P2 review LOW-2: the study arm's S7
+ * undone, so the v2 arm's S7 — whose base "null" is a token, not a null — has no evidence and must
+ * be CONTENT).
  * </p>
  */
 @EnabledIf("net.cumba.corej.core.ruletestsuites.NullKeyProvenanceDifferentialTest#enabled")
@@ -208,6 +210,12 @@ class NullKeyProvenanceDifferentialTest
      * is judged against.
      */
     private static final Set<String> STUDY_GROUP_FINDINGS = new TreeSet<>();
+
+    /**
+     * {@code rule|dataset|column} of every S7 movement the {@code study} arm classified — the
+     * evidence a {@code study-v2} S7 is judged against (P2 review LOW-2).
+     */
+    private static final Set<String> STUDY_S7 = new TreeSet<>();
 
     /** The arm reading the v2 {@code Findings} document of the study run. */
     private static final String ARM_STUDY_V2 = "study-v2";
@@ -290,6 +298,13 @@ class NullKeyProvenanceDifferentialTest
          * Report arms only; the engine arm never lists it (the collapse is the report's).
          */
         S7_COLLAPSE_NULL_TO_NAME_ONLY,
+        /**
+         * Owner Q-C (2026-10-05, <i>"agree, name only"</i>): a per-row binding ({@code $x} whose
+         * value is a {@code Vector}) on a non-record finding printed its value at the finding's row
+         * — a record's value through the binding channel; it is listed by name now. Never on a
+         * record finding (a row identity carried).
+         */
+        PER_ROW_BINDING_TO_NAME_ONLY,
         /**
          * P2: a column the engine lists name-only, which the P1 report dropped from the finding
          * (its model had no field for it), is listed by the report again — on the engine arm's
@@ -1111,7 +1126,11 @@ class NullKeyProvenanceDifferentialTest
                             o.cols(), o.primaryRows(), rows));
                     System.out.println("[nullkey-differential] PLANTED " + plant + " into "
                             + o.key() + " #" + r);
-                    return o.key();
+                    // The v2-only S7 plant mutates the study arm, and what must be reported is
+                    // the v2 arm's movement of the same rule × dataset.
+                    return "nameonly-s7-v2only".equals(plant)
+                            ? ARM_STUDY_V2 + o.key().substring(o.arm().length())
+                            : o.key();
                 }
             }
         }
@@ -1124,7 +1143,8 @@ class NullKeyProvenanceDifferentialTest
     {
         return switch (plant)
         {
-        case "nameonly-s7-both", "nameonly-report-foreign" -> ARM_STUDY.equals(arm);
+        case "nameonly-s7-both", "nameonly-report-foreign", "nameonly-s7-v2only" -> ARM_STUDY
+                .equals(arm);
         case "nameonly-group-nongroup" -> ARM_STUDY_V2.equals(arm);
         default -> "cdt".equals(arm) || "spec".equals(arm);
         };
@@ -1148,6 +1168,10 @@ class NullKeyProvenanceDifferentialTest
         case "nameonly-record" -> plantRecordRow(row, baseRow, cols);
         // P2 (report arm): an S7 column — listed now, a null cell in the base — valued as well.
         case "nameonly-s7-both" -> plantS7Both(row, baseRow);
+        // P2 review LOW-2 (report arm): an S7 column put back to the base's null cell, so the
+        // study arm reads it unchanged and records no S7 — the v2 arm's S7 for the same column
+        // then has no evidence and must be CONTENT.
+        case "nameonly-s7-v2only" -> plantS7Undone(row, baseRow);
         // P2 (report arm): a listed name no column carries and the engine arm never lists.
         case "nameonly-report-foreign" -> row.namedColumns().isEmpty() ? null
                 : new Row(row.where(), row.names(), row.values(),
@@ -1171,6 +1195,28 @@ class NullKeyProvenanceDifferentialTest
             if (baseRow.values().containsKey(name) && baseRow.values().get(name) == null)
             {
                 return withValue(row, name, "PLANTED");
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * A report-arm row whose S7 column (listed now, a {@code null} cell in the base) is put back to
+     * the base's {@code null} cell and dropped from the list — or {@code null} when the row has no
+     * such column.
+     */
+    private static @Nullable Row plantS7Undone(Row row, Row baseRow)
+    {
+        for (String name : row.namedColumns())
+        {
+            if (baseRow.values().containsKey(name) && baseRow.values().get(name) == null)
+            {
+                Map<String, @Nullable String> values = new LinkedHashMap<>(row.values());
+                values.put(name, null);
+                List<String> named = new ArrayList<>(row.namedColumns());
+                named.remove(name);
+                return new Row(row.where(), row.names(), values, named);
             }
         }
         return null;
@@ -1394,7 +1440,27 @@ class NullKeyProvenanceDifferentialTest
         if (report && !engineLists && !namedB && namedC && inB && !inC && nullBase
                 && kind == OutputEntryKind.COLUMN)
         {
-            return MoveClass.S7_COLLAPSE_NULL_TO_NAME_ONLY;
+            // P2 review LOW-2: on the v2 arm the base's "null" is a TOKEN, which a genuine value
+            // printed as null would spell the same way — so a v2 S7 is accepted only on the study
+            // (report-model) arm's S7 for the same rule × dataset × column, judged first (the
+            // arms are compared in that order), where the base cell is a real null. A v2-only
+            // movement is CONTENT, never hidden as S7.
+            String s7 = c.rule() + "|" + c.domain() + "|" + key;
+            if (ARM_STUDY.equals(c.arm()))
+            {
+                STUDY_S7.add(s7);
+                return MoveClass.S7_COLLAPSE_NULL_TO_NAME_ONLY;
+            }
+            return STUDY_S7.contains(s7) ? MoveClass.S7_COLLAPSE_NULL_TO_NAME_ONLY : null;
+        }
+        if (kind == OutputEntryKind.BINDING)
+        {
+            // Q-C: a binding is no column of the dataset; it may only move from its value to the
+            // list, and never on a record finding.
+            boolean identity = !report && !rc.where().contains("usubjid=null seq=null");
+            return !namedB && namedC && inB && !inC && !identity
+                    ? MoveClass.PER_ROW_BINDING_TO_NAME_ONLY
+                    : null;
         }
         if (kind != OutputEntryKind.COLUMN || (!dotted && !cols.contains(key)))
         {
