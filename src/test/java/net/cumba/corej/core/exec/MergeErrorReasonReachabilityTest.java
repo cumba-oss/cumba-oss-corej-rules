@@ -136,6 +136,28 @@ class MergeErrorReasonReachabilityTest
     }
 
 
+    /**
+     * W3d (MQ7): the read-time backstop — a {@code colref} over the flagged qualifier reaches
+     * {@code MergeErrorReadException} (the static gate sees no reference) and classifies as
+     * {@code MERGE_ERROR} through the same prefix. RED before W3d: {@code colref} read no qualifier
+     * and the rule EXECUTED clean over the duplicate.
+     */
+    @Test
+    void aFlaggedQualifierReadThroughColrefClassifiesAsMergeError()
+    {
+        IDataTable supp = table("SUPPAE", SUPP_COLUMNS, "S1", "AE", "01", "AESEQ", "1", "AETRTEM",
+                "Y", "S1", "AE", "01", "AESEQ", "1", "AETRTEM", "N");
+        Rule rule = load("{\"Core\":{\"Id\":\"X-1\"},"
+                + "\"Check\":{\"expression\":\"colref(\\\"AETRTEM\\\") == \\\"Y\\\"\"},"
+                + "\"Outcome\":{\"Message\":\"m\",\"Output_Variables\":[\"AESEQ\"]}}");
+        RuleExecutionResult result = run(rule, ae(), resolver(ae(), supp));
+        assertEquals(RuleExecutionStatus.ERROR, result.getStatus(), result.getStatusMessage());
+        assertTrue(result.getStatusMessage().contains("AETRTEM"), result.getStatusMessage());
+        assertEquals(List.of(ViolationNormaliser.ErrorReason.MERGE_ERROR.name()),
+                ViolationNormaliser.reasonsFrom(result, rule), result.getStatusMessage());
+    }
+
+
     @Test
     void aMergeTheDatatableRefusesClassifiesAsMergeRefused()
     {

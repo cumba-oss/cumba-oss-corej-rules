@@ -23,6 +23,15 @@ One rule often has to say the same thing about many variables — every `--DTC` 
 `--STDTC` in a rule running on `AE` means `AESTDTC`. The rule is written once and expanded per
 dataset.
 
+## A qualified template expands over the joined dataset
+
+A marker template written qualified — `empty(J.TRTxxP)` over a `Match_Datasets` entry `J` —
+enumerates the **joined dataset's** real columns (`J.TRT01P`, `J.TRT02P`, …) and each expansion
+reads the column through the join, exactly as the bare `TRTxxP` enumerates the primary's own
+columns. A supplemental qualifier is never enumerated (`find_vars`, `${*}` and the templates
+agree on "real columns only"); a qualifier naming no entry of the rule enumerates nothing — the
+template does not expand and Stage A reports the undeclared qualifier.
+
 ## `wildcards` — bounding an index
 
 ```yaml

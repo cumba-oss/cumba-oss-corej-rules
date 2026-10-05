@@ -487,12 +487,17 @@ public final class AbsentColumnExposureScan
     }
 
 
-    /** The column name of a bare primary-column ref, or {@code null}. */
+    /**
+     * The column name of a column ref — a bare primary column, or (W3d of
+     * {@code PLAN-merged-evaluation-table}, N28-lint) a qualified {@code J.X}, which is a column of
+     * the merged evaluation table and folds like a bare one when absent — or {@code null}. The name
+     * is upper-cased whole, qualifier included, so a guard {@code var_exists("J.X")} matches it.
+     */
     private static @org.jspecify.annotations.Nullable String columnName(Expr e)
     {
-        if (e instanceof Expr.Ref r
-                && (r.kind() == OperandKind.COLUMN || r.kind() == OperandKind.WILDCARD_COLUMN)
-                && r.name().indexOf('.') < 0 && !r.name().startsWith("$"))
+        if (e instanceof Expr.Ref r && (r.kind() == OperandKind.COLUMN
+                || r.kind() == OperandKind.WILDCARD_COLUMN || r.kind() == OperandKind.DOTTED_REF)
+                && !r.name().startsWith("$"))
         {
             return r.name().toUpperCase(Locale.ROOT);
         }
