@@ -69,6 +69,15 @@ lead, and the derived columns follow in walk order.
 > it:** a char attribute prints `""`, a numeric, boolean or list one prints `.`, an absent column
 > is left out, and a present column's missing cell prints its own missing marker. So there is
 > never a reason to author an entry the engine derives — the build fails on one.
+>
+> A **`$`-binding** with no value prints by the type of its expression the same way: `""` for a
+> string (or a date / time, which are text), `.` for a number, boolean or list. Every function
+> has a result type for this — `dataset_class_from_library()` is a string, `variable_count(…)` a
+> number, `domain_is_custom()` a boolean, `extract_metadata("dataset_size")` a number while its
+> other documented keys are strings — except the few whose result is the type of the column they
+> read (`read_value`, `max`, `row_max`, `coalesce`, `colref`, `value()`), which print by that
+> column's type. A binding whose type cannot be known at all fails the rule with an error rather
+> than print a guess.
 
 ### Excluding with `!`
 

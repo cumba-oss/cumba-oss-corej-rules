@@ -2492,6 +2492,8 @@ expression: 'ds_structure("DEFINE")'
 
 One dataset-metadata value of the current dataset, named by its key: `"dataset_name"`, `"dataset_label"`, `"dataset_size"` (bytes of the parsed file), `"dataset_location"` / `"filename"` (the source file's name), or any other key the dataset's reader publishes (`"file_format"`, …).
 
+Its result type follows the key: `"dataset_size"` is a **number**, the other keys named above (and `"file_format"`) a **string**; any other key has whatever type the reader gives it. A finding reporting a binding over it with no value prints `.` or `""` by that type ([Outcome](../authoring/outcome.md#output_variables)).
+
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | string | yes | The metadata key |
@@ -2697,7 +2699,7 @@ Check:
 
 `cross_dataset_variable_metadata(name, domain=)` → **value (per variable)**
 
-Per variable of the current dataset, one metadata attribute — `"label"`, `"data_type"` (`Char` / `Num`), `"length"` or `"format"` — of the **same-named variable in another dataset**: the one `domain=` names, or with `domain="*"` the first dataset of the study that carries the variable (shortest name first, then alphabetical — so an SDTM domain wins over an ADaM dataset), the current dataset excluded by its name.
+Per variable of the current dataset, one metadata attribute — `"label"`, `"data_type"` (`Char` / `Num`), `"length"` (a **number**) or `"format"` (the other three are **strings**) — of the **same-named variable in another dataset**: the one `domain=` names, or with `domain="*"` the first dataset of the study that carries the variable (shortest name first, then alphabetical — so an SDTM domain wins over an ADaM dataset), the current dataset excluded by its name.
 
 | parameter | type | required | description |
 |---|---|---|---|
