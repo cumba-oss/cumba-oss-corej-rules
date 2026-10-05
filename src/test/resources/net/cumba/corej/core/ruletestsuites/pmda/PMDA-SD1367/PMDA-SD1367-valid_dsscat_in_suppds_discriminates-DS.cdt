@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1367 expect=noViolation domain=DS
+#note "DSSCAT held in SUPPDS (non-conformant data: a standard variable as a supplemental qualifier) is a column of the rule's one evaluation table (PLAN-merged-evaluation-table W3c, N16): the Grouping key and the is_unique_set member read it as the Check's own bare read does. The three TREATMENT records carry three different DSSCATs -> three groups, each unique -> silent. Red-first: until W3c the key readers dropped the SUPP-held DSSCAT as an absent column, all three records were one group and the rule reported them as duplicates (1 finding)."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 3 | DISPOSITION EVENT | TREATMENT
+---
+
+dataset SUPPDS label="Supplemental Qualifiers for DS"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 1 | DSSCAT | Subcategory for Disposition Event | STUDY PARTICIPATION
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 2 | DSSCAT | Subcategory for Disposition Event | STUDY TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 3 | DSSCAT | Subcategory for Disposition Event | FOLLOW-UP
+---

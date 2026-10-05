@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0536 expect=violation domain=DS
+#note "DSSCAT held in SUPPDS (non-conformant data) is a key column of the one evaluation table (PLAN-merged-evaluation-table W3c, N16): records 2 and 3 share DSSCAT (STUDY TREATMENT) and EPOCH -> one group with a duplicate, one finding anchored at its first record; record 1 (STUDY PARTICIPATION) is its own unique group -> silent. Red-first: until W3c the SUPP-held DSSCAT was dropped from the key, all three records were one group and the finding anchored at record 1."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 DSSEQ=2 USUBJID=01-701-1015
+dataset DS class=EVENTS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 2 | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | 3 | DISPOSITION EVENT | TREATMENT
+---
+
+dataset SUPPDS label="Supplemental Qualifiers for DS"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 1 | DSSCAT | Subcategory for Disposition Event | STUDY PARTICIPATION
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 2 | DSSCAT | Subcategory for Disposition Event | STUDY TREATMENT
+CDISCPILOT01 | DS | 01-701-1015 | DSSEQ | 3 | DSSCAT | Subcategory for Disposition Event | STUDY TREATMENT
+---
