@@ -76,11 +76,15 @@ lead, and the derived columns follow in walk order.
 > number, `domain_is_custom()` a boolean, `extract_metadata("dataset_size")` a number while its
 > other documented keys are strings — except the few whose result is the type of the column they
 > read (`read_value`, `max`, `row_max`, `coalesce`, `colref`, `value()`), which print by that
-> column's type. A binding whose type cannot be known at all — `extract_metadata` of a key other
-> than the documented ones — **cannot be reported**: listing it in `Output_Variables`, or letting
-> the engine derive it, is a load error that names it. Remove an authored entry, exclude a derived
-> one with `!$name`, or bind a function whose result type is known (for `extract_metadata`, one of
-> the typed keys).
+> column's type — `coalesce` only when one of its arguments reads a column, is a literal or is a
+> function call with a known result type, `max` only when its target does. A binding whose type cannot be known at all — `extract_metadata`
+> of a key other than the documented ones, or a `coalesce` of two such keys — **cannot be
+> reported**: listing it in `Output_Variables`, or letting the engine derive it, is a load error
+> that names it. Remove an authored entry, exclude a derived one with `!$name`, or bind a function
+> whose result type is known (for `extract_metadata`, one of the typed keys). A binding the engine
+> does not derive is never reported unless you list it, so reading such a binding in the Check
+> alone is always fine — also in a rule with no `Output_Variables`, whose reported names the
+> engine infers from the Check.
 
 ### Excluding with `!`
 
