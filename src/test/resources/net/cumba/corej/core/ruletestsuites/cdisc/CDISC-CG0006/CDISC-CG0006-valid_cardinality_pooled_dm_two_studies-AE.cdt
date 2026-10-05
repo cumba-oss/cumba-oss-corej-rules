@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0006 expect=noViolation domain=AE
+#note "PLAN-merged-evaluation-table W3f (OD-10): a pooled DM carries USUBJID 01-701-1015 under two studies (unique per STUDYID and USUBJID, SDTMIG 3.4 sec. 4.2.3). The DM join keys on [STUDYID, USUBJID], so the AE record of CDISCPILOT01 meets its own study's DM row only, AEDY 10 is correct against it: no finding and no Cardinality refusal. Before W3f the USUBJID-only join paired it with both DM rows and the OTHERSTUDY copy fired (day 6)."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2020-01-10 | 10
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2020-01-01
+OTHERSTUDY | DM | 01-701-1015 | 2020-01-05
+---

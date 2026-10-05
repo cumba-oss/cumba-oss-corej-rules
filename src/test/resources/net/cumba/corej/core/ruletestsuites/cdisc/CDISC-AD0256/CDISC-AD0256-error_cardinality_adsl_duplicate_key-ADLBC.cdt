@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-AD0256 expect=executionError domain=ADLBC
+#note "PLAN-merged-evaluation-table W3f (MET #12, OD-10): the ADSL join authors Cardinality n:1 on [STUDYID, USUBJID] and ADSL carries subject 01-701-1015 twice, so the rule ERRORs naming ADSL, the key and both rows. Before W3f the left join paired the ADLBC record with each ADSL row, both matched: silent."
+#expect-execution-error "Cardinality n:1: ADSL has duplicate key (STUDYID=CDISCPILOT01, USUBJID=01-701-1015) at rows 1 and 2"
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-1015 | ALT | 12.5
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+---
+CDISCPILOT01 | 01-701-1015
+CDISCPILOT01 | 01-701-1015
+---

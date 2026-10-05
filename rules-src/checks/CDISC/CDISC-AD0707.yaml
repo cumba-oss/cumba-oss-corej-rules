@@ -14,16 +14,21 @@ Scope:
 Requirements:
   Variables:
     All:
+    - "STUDYID"
     - "USUBJID"
     - "APERIOD"
     - "ASPER"
     All_Or_None:
+    - - "STUDYID"
+      - "ADSL.STUDYID"
     - - "USUBJID"
       - "ADSL.USUBJID"
 Match_Datasets:
 - Name: "ADSL"
   Keys:
+  - "STUDYID"
   - "USUBJID"
+  Cardinality: "n:1"
 Bindings:
 - name: "$p_s"
   expression: "concat(\"ADSL.PxxS\", printf(\"%d\", ASPER))"

@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0006 expect=executionError domain=AE
+#note "PLAN-merged-evaluation-table W3f (MET #12, P-16): the WHOLE DM side is checked - DM carries subject 01-701-1023 twice although no AE record belongs to that subject, and the n:1 DM join refuses it: the rule ERRORs naming DM, the key and both rows (the owner's 'DM must not contain duplicate keys'). Before W3f AE's own subject joined once and AEDY was correct: silent."
+#expect-execution-error "Cardinality n:1: DM has duplicate key (STUDYID=CDISCPILOT01, USUBJID=01-701-1023) at rows 2 and 3"
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-02 | 1
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+CDISCPILOT01 | DM | 01-701-1023 | 2014-02-01
+CDISCPILOT01 | DM | 01-701-1023 | 2014-02-03
+---

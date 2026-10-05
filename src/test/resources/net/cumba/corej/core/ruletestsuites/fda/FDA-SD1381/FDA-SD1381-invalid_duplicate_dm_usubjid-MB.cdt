@@ -1,8 +1,8 @@
 #!RuleTest
-#test FDA-SD1381 expect=violation domain=MB
-#note "PLAN-function-surface-wave1 phase 2 (b) on a parameterised-reference rule: DM carries subject 001 twice with RFXSTDTC 2023-06-10 and 2023-06-14. The inner join row-multiplies the one MB record into two copies (D32). MBXDY=6 is correct against the first DM row (2023-06-15 is day 6 from 2023-06-10); the copy paired with the second row computes day 2 and fires: ONE finding. Pre-port (measured at the go) the operation's subject map gave day 2 to both copies: TWO findings."
+#test FDA-SD1381 expect=executionError domain=MB
+#note "PLAN-merged-evaluation-table W3f, OD-10: the DM join authors Cardinality n:1 on [STUDYID, USUBJID], so a DM carrying the subject twice is refused - the rule ERRORs naming DM, the key and the two rows, instead of evaluating one copy of the record per DM row. A duplicate DM is reported by the DM uniqueness rules (CG0151), not by every rule joining DM. Until W3f this was the D32 copies sensitivity arm of PLAN-function-surface-wave1 phase 2 (b): one finding from the copy paired with the second DM row."
 #library standard=sendig version=ar-1-0
-#expectViolationCount 1
+#expect-execution-error "Cardinality n:1: DM has duplicate key (STUDYID=S1, USUBJID=001) at rows 1 and 2"
 dataset MB class=FINDINGS
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

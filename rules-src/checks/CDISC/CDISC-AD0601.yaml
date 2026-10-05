@@ -14,17 +14,22 @@ Scope:
 Requirements:
   Variables:
     All:
+    - "STUDYID"
     - "USUBJID"
     - "ASPREDT"
     - "APERIOD"
     - "ASPER"
     All_Or_None:
+    - - "STUDYID"
+      - "ADSL.STUDYID"
     - - "USUBJID"
       - "ADSL.USUBJID"
 Match_Datasets:
 - Name: "ADSL"
   Keys:
+  - "STUDYID"
   - "USUBJID"
+  Cardinality: "n:1"
 Bindings:
 - name: "$p_s_edt"
   expression: "colref(concat(\"ADSL.P\", printf(\"%02dS%d\", APERIOD, ASPER), \"EDT\"\

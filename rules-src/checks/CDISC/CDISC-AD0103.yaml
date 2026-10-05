@@ -14,14 +14,19 @@ Requirements:
   Variables:
     All:
     - "APERIOD"
+    - "STUDYID"
     - "USUBJID"
     All_Or_None:
+    - - "STUDYID"
+      - "ADSL.STUDYID"
     - - "USUBJID"
       - "ADSL.USUBJID"
 Match_Datasets:
 - Name: "ADSL"
   Keys:
+  - "STUDYID"
   - "USUBJID"
+  Cardinality: "n:1"
 Bindings:
 - name: "$tr_sdt"
   expression: "concat(\"ADSL.TR\", printf(\"%02d\", APERIOD), \"SDT\")"

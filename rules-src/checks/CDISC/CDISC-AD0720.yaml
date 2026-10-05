@@ -12,15 +12,20 @@ Scope:
 Requirements:
   Variables:
     All:
+    - "STUDYID"
     - "USUBJID"
     - "TRTP"
     All_Or_None:
+    - - "STUDYID"
+      - "ADSL.STUDYID"
     - - "USUBJID"
       - "ADSL.USUBJID"
 Match_Datasets:
 - Name: "ADSL"
   Keys:
+  - "STUDYID"
   - "USUBJID"
+  Cardinality: "n:1"
 Check:
   expression: >-
     not empty(TRTP) and TRTP not in colref(find_vars("ADSL.TRTxxP")) and TRTP not in ADSL.TRTSEQP

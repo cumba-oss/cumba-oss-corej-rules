@@ -13,15 +13,20 @@ Scope:
 Requirements:
   Variables:
     All:
+    - "STUDYID"
     - "USUBJID"
     - "PHEDT"
     All_Or_None:
+    - - "STUDYID"
+      - "ADSL.STUDYID"
     - - "USUBJID"
       - "ADSL.USUBJID"
 Match_Datasets:
 - Name: "ADSL"
   Keys:
+  - "STUDYID"
   - "USUBJID"
+  Cardinality: "n:1"
 Check:
   expression: >-
     not var_exists("APHASEN") and not empty(PHEDT) and PHEDT not in colref(find_vars("ADSL.PHwEDT"))

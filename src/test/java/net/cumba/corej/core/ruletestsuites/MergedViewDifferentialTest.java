@@ -41,8 +41,9 @@ import org.opentest4j.TestAbortedException;
  * <p>
  * Every difference must be a <b>ruled movement</b>: a scenario of the §3.5.3 SUPP case table (the
  * {@code _supp_case} scenarios of the two rules that read a qualifier bare, landed in W3a) whose
- * note says it moves — and each of those <em>must</em> move (non-vacuity). Any other difference is
- * UNEXPLAINED and fails; the study snapshot must agree row for row.
+ * note says it moves, or a W3f {@code Cardinality} refusal (the five OD-10 duplicate-DM scenarios
+ * and the {@code error_cardinality_} ones) — and each of those <em>must</em> move (non-vacuity).
+ * Any other difference is UNEXPLAINED and fails; the study snapshot must agree row for row.
  * </p>
  *
  * <p>
@@ -80,10 +81,36 @@ class MergedViewDifferentialTest
          * case-table scenarios of W3a whose note records the legacy verdict as different.
          */
         SUPP_CASE_TABLE,
+        /**
+         * W3f (MET #12, OD-10): a scenario whose DM / ADSL carries a duplicate key under the
+         * {@code Cardinality: n:1} join — the view refuses the merge (the rule ERRORs), the legacy
+         * arm checks no cardinality and expands. Exactly the five OD-10 scenarios and the
+         * {@code error_cardinality_} scenarios of W3f.
+         */
+        CARDINALITY,
         /** Not a ruled movement. */
         UNEXPLAINED
     }
 
+    /**
+     * The five scenarios OD-10 re-expects (review L2-H2 found them): each carries a duplicate DM
+     * USUBJID, which the {@code n:1} DM join refuses.
+     */
+    private static final java.util.Set<String> OD10_DUPLICATE_DM = java.util.Set.of(
+            "cdisc/CDISC-CG0006/CDISC-CG0006-invalid_duplicate_dm_usubjid-AE.cdt",
+            "fda/FDA-SD1381/FDA-SD1381-invalid_duplicate_dm_usubjid-MB.cdt",
+            "cdisc/CDISC-SEND-0401/CDISC-SEND-0401-invalid_dm_duplicate_usubjid_copies-BW.cdt",
+            "cdisc/CDISC-SEND-0402/CDISC-SEND-0402-invalid_dm_duplicate_usubjid_copies-EX.cdt",
+            "cdisc/CDISC-SEND-0403/CDISC-SEND-0403-invalid_dm_duplicate_usubjid_copies-FW.cdt");
+
+    /**
+     * Whether a scenario is one W3f's {@code Cardinality} moves between the arms: the five OD-10
+     * scenarios and every {@code error_cardinality_} scenario.
+     */
+    static boolean expectedCardinalityMove(String rel)
+    {
+        return OD10_DUPLICATE_DM.contains(rel) || rel.contains("-error_cardinality_");
+    }
 
     /** One scenario's outcome on both arms. */
     private record Row(String where, @Nullable String rule, String legacy, String view,
@@ -153,12 +180,16 @@ class MergedViewDifferentialTest
                     + " reads are not served from the" + " view: " + summary);
             return;
         }
-        // Non-vacuity: every SUPP case-table scenario that moves between the arms must move.
-        assertTrue(mustMove.isEmpty(), () -> "SUPP case-table scenarios that did NOT move"
-                + " between the legacy arm and the view (the view is not read, or the case is not"
-                + " what its note says):\n" + String.join("\n", mustMove));
+        // Non-vacuity: every SUPP case-table and Cardinality scenario that moves between the arms
+        // must move.
+        assertTrue(mustMove.isEmpty(),
+                () -> "SUPP case-table / Cardinality scenarios that did NOT move"
+                        + " between the legacy arm and the view (the view is not read, or the case is not"
+                        + " what its note says):\n" + String.join("\n", mustMove));
         assertTrue(byMovement.getOrDefault(Movement.SUPP_CASE_TABLE, 0) > 0,
                 "no SUPP case-table movement seen: " + summary);
+        assertTrue(byMovement.getOrDefault(Movement.CARDINALITY, 0) > 0,
+                "no Cardinality movement seen: " + summary);
         assertTrue(unexplained.isEmpty(), () -> summary + "\n" + String.join("\n", unexplained));
         assertTrue(studyDiff.isEmpty(), () -> summary + "\n"
                 + String.join("\n", studyDiff.subList(0, Math.min(40, studyDiff.size()))));
@@ -211,15 +242,16 @@ class MergedViewDifferentialTest
                             continue;
                         }
                         boolean moved = !legacy.equals(view);
-                        boolean expected = expectedToMove(rel);
-                        if (expected && !moved)
+                        Movement movement = expectedToMove(rel) ? Movement.SUPP_CASE_TABLE
+                                : expectedCardinalityMove(rel) ? Movement.CARDINALITY
+                                        : Movement.UNEXPLAINED;
+                        if (movement != Movement.UNEXPLAINED && !moved)
                         {
                             mustMove.add(rel + " (" + view + ")");
                         }
                         if (moved)
                         {
-                            rows.add(new Row(rel, s.getCoreId(), legacy, view,
-                                    expected ? Movement.SUPP_CASE_TABLE : Movement.UNEXPLAINED));
+                            rows.add(new Row(rel, s.getCoreId(), legacy, view, movement));
                         }
                     }
                 }

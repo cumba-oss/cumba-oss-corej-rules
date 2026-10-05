@@ -105,6 +105,12 @@
           "type": ["boolean", "null"],
           "description": "The declared SUPP merge (owner P-Q1, 2026-09-28; PLAN-operation-replacements): true (the default when absent) lets a bare name the parent dataset does not carry read its SUPP<domain> qualifier per record (by value and by existence; never a variable of the parent for the variable-inventory checks) and keeps the dotted existence pivot; false evaluates the raw dataset and answers both pivots false."
         },
+        "Supp_Keys": {
+          "type": ["array", "null"],
+          "minItems": 1,
+          "items": { "oneOf": [ { "type": "string" }, { "type": "object", "required": ["left", "right"], "additionalProperties": false, "properties": { "left": { "type": "string" }, "right": { "type": "string" } } } ] },
+          "description": "The key of the SUPP merge (PLAN-merged-evaluation-table §3.5.1, MET #13 / #18), in the Match_Datasets Keys shape: a column both sides carry, or {left: <evaluated>, right: <SUPP>}. Absent = the IG's key: STUDYID, {left: DOMAIN, right: RDOMAIN}, USUBJID, POOLID, APID, SPDEVID, IDVAR, IDVARVAL. A component present on both sides is used, on one side only ignored with a log warning, on neither ignored. IDVAR / IDVARVAL is the indirect pair (the column IDVAR names equals IDVARVAL), named whole and bare. A load error under Supp_Merge: false. It keys the evaluated dataset's qualifiers and a joined dataset's (<Name>.<QNAM>) alike."
+        },
         "ExecutabilityHint": {
           "type": ["object", "null"],
           "description": "The actionable 'how' beside Executability, never in place of it. Closed to the two keys the engine binds (PLAN-rule-unknown-keys-gate); every carrier is an object, so the string form this schema used to admit is gone.",
@@ -305,7 +311,8 @@
         "keep_missings": { "type": ["boolean", "null"] },
         "Join_Type": { "type": ["string", "null"] },
         "Filter": { "type": ["string", "null"] },
-        "Join_As_String": { "type": ["boolean", "null"] }
+        "Join_As_String": { "type": ["boolean", "null"] },
+        "Cardinality": { "anyOf": [{ "enum": ["1:1", "1:n", "n:1", "n:m"] }, { "type": "null" }], "description": "The declared shape of the merge (PLAN-merged-evaluation-table §3.4, MET #12): left = the evaluated dataset, right = this entry's dataset. A side declared 1 must carry each participating key once over the whole side, else the rule ERRORs naming the dataset, the key and the first two duplicate rows; n:m (the default when absent) checks nothing and expands. Every DM / ADSL join authors n:1 on [STUDYID, USUBJID] (OD-10). Only n:m on a Child: true or a keyless (forward RELREC) entry until those move into the merged evaluation table." }
       },
       "additionalProperties": false
     }
