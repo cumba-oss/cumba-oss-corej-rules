@@ -15,8 +15,8 @@ The summary tables are in [Expression syntax](expression-syntax.md#functions).
 
 **1. `""` is a present value and is read literally.** `len("")` is `0`, `upper("")` is `""`. There
 is no "empty means missing" behaviour — with one deliberate family of exceptions, the emptiness
-predicates (`empty` / `is_missing`), whose whole purpose is to report `""` and a genuine missing
-alike. A section headed **Missing and empty** appears wherever a function departs from this.
+predicate `empty` (and its positive spellings), whose whole purpose is to report `""` and a genuine
+missing alike. `is_missing` is **not** one of them: it is true only for a genuine missing. A section headed **Missing and empty** appears wherever a function departs from this.
 
 **2. A missing input propagates.** A genuine [missing value](../semantics/values-and-missing.md)
 passed to a function yields a missing result rather than a default, an error or a sentinel — so a
@@ -239,7 +239,7 @@ expression: 'ds_exists("SJ")'
 
 `empty(x)` → **boolean**
 
-True when the value is missing or `""`. Also spelled `is_missing`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`.
+True when the value is missing or `""`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. `is_missing(x)` is **not** a spelling of it: it is true only for a genuine missing (rulings register `D50`, owner 2026-10-05: *"is_missing() is for misisng and empty() is for missing or \"\""*) — `is_missing("")` is false. Until 2026-10-05 `is_missing` was an alias of `empty`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -252,6 +252,24 @@ expression: 'empty(AGE)'
 ```
 
 **Missing and empty** — This is one of the few places `""` is **not** read literally: it reports both a genuine missing value and `""` as empty. That is the function's purpose.
+
+### is_missing
+
+`is_missing(x)` → **boolean**
+
+True only when the value is a genuine missing — `.` or any special missing (`.A`–`.Z`, `._`) — and never for `""`, which is a present value (rulings register `D50`, owner 2026-10-05: *"is_missing() is for misisng and empty() is for missing or \"\""*). To ask "missing or `""`" write [`empty(x)`](#empty). Until 2026-10-05 `is_missing` was an alias of `empty`; no shipped rule calls it.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The value to read |
+
+**Example**
+
+```yaml
+expression: 'is_missing(AGE)'
+```
+
+**Missing and empty** — `is_missing("")` is false, `is_missing(.)` is true. Over an **absent column** it answers the column's default at its position: false where the column reads as `""`, true where its other positions make it a number and so the missing (`is_missing(X) or X > 3`). An empty list is a present value, not a missing.
 
 ### var_exists
 
@@ -4158,7 +4176,10 @@ default from, so the call answers what that column would answer read directly **
 position** (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the
 call — or the binding it is bound to — is read as a number (`$x > 5`, `$x + 1`, `X > $x`), `""`
 everywhere else; where the uses disagree the number wins, and with no typed use at all (`empty($x)`,
-a reported value) it is `""`. Until 2026-10-05 it was always `""`. Either way the rule executes (it
+a reported value) it is `""`. The uses that count are those of **every** `read_value` / `max` call
+over the same `domain` dataset and column, as two direct reads of one column share one type:
+`read_value(X, domain=D, mode="FIRST") > 5 or read_value(X, domain=D, mode="MAX") == ""` reads the
+missing in both calls. Until 2026-10-05 it was always `""`. Either way the rule executes (it
 does not skip), and a numeric use over a possibly absent column wants a `not empty($x)` guard (the
 missing sorts lowest: `X > $x` would fire on every row). A qualifying row whose
 `name` cell is missing hands that missing through. `mode="ONLY"` is the one loud case: two or more
@@ -4455,7 +4476,7 @@ Takes no arguments.
 expression: 'len(value()) > 200'
 ```
 
-**Missing and empty** — A `""` cell yields `""`. A missing cursor or an absent column yields **missing**.
+**Missing and empty** — A `""` cell yields `""`. A missing cursor names no variable and yields **missing**. A cursor naming a column the dataset does not carry (a Define-XML variable absent from the data) answers what that column would answer read directly **at the call's position** (owner 2026-10-05, `PLAN-column-typed-function-absent-type`): the missing where `value()` — or the binding it is bound to — is read as a number, `""` everywhere else. Until 2026-10-05 it was the missing everywhere. Under the default `Data` variable universe the cursor only ever names a column the dataset carries.
 
 ### varname
 

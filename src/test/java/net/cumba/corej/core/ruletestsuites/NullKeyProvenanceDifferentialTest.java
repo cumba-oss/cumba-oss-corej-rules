@@ -162,8 +162,9 @@ import org.opentest4j.TestAbortedException;
  * ({@code ""} → {@code .}, root a column-typed function), {@link MoveClass#FN_ABSENT_MIS_TO_EMPTY}
  * ({@code .} → {@code ""}, root {@code max} / {@code row_max} only — they answered {@code MIS} in
  * every position before) and {@link MoveClass#BINDING_ABSENT_EMPTY_TO_MIS} ({@code ""} → {@code .},
- * root a {@code colref}, a dotted column, or a plain column the dataset lacks). Anything else is
- * CONTENT, and so is any state or row-count change — the plan's VERDICT 0.
+ * root a {@code colref}, a dotted column, or a plain column the dataset lacks); the plan's fold
+ * adds {@link MoveClass#VALUE_ABSENT_MIS_TO_EMPTY} ({@code .} → {@code ""}, root {@code value()}).
+ * Anything else is CONTENT, and so is any state or row-count change — the plan's VERDICT 0.
  * {@code -Dcorej.nullkey.allow=A,B} restricts the contract to the listed classes (a move in any
  * other class is CONTENT), so a fresh base admits exactly this plan's movement. Plants:
  * {@code absent-reverse} (a column-typed binding moving {@code .} → {@code ""} where its root never
@@ -365,7 +366,14 @@ class NullKeyProvenanceDifferentialTest
          * dataset lacks, read in a numeric position, printed {@code ""} (a binding carried no
          * position kind); it is {@code .} now.
          */
-        BINDING_ABSENT_EMPTY_TO_MIS
+        BINDING_ABSENT_EMPTY_TO_MIS,
+        /**
+         * The plan's fold (A5): a binding whose root is {@code value()} over a cursor variable the
+         * data lacks (a Define-universe ItemDef) answered {@code MIS} in every position; read in no
+         * numeric position it is {@code ""} now. Expected reach 0 — the Define universe refuses a
+         * row-cursor Check (measured), so no shipped run reaches the arm.
+         */
+        VALUE_ABSENT_MIS_TO_EMPTY
     }
 
 
@@ -1962,7 +1970,7 @@ class NullKeyProvenanceDifferentialTest
         }
         if ("".equals(vb) && MIS.equals(vc))
         {
-            if (root.startsWith("fn:"))
+            if (root.startsWith("fn:") && !FN_VALUE.equals(root))
             {
                 return MoveClass.FN_ABSENT_EMPTY_TO_MIS;
             }
@@ -1977,9 +1985,15 @@ class NullKeyProvenanceDifferentialTest
         {
             return MoveClass.FN_ABSENT_MIS_TO_EMPTY;
         }
+        if (MIS.equals(vb) && "".equals(vc) && FN_VALUE.equals(root))
+        {
+            return MoveClass.VALUE_ABSENT_MIS_TO_EMPTY;
+        }
         return null;
     }
 
+    /** The root kind of a {@code value()} binding (the fold's A5). */
+    static final String FN_VALUE = "fn:value";
 
     /** The function (or {@code column} / {@code dotted} / {@code colref}) a root kind names. */
     private static String rootFunction(@Nullable String root)
@@ -2015,7 +2029,7 @@ class NullKeyProvenanceDifferentialTest
 
     /**
      * Every binding of {@code rule} → the kind of its root: {@code fn:read_value}, {@code fn:max}
-     * (over a column), {@code fn:row_max}, {@code colref}, {@code column:NAME},
+     * (over a column), {@code fn:row_max}, {@code fn:value}, {@code colref}, {@code column:NAME},
      * {@code dotted:NAME}, else {@code other}.
      */
     static Map<String, String> bindingRoots(Rule rule)
@@ -2053,6 +2067,7 @@ class NullKeyProvenanceDifferentialTest
                     : c.args().get(0)) instanceof net.cumba.corej.core.expr.ast.Expr.Ref ? "fn:max"
                             : "other";
             case "colref" -> "colref";
+            case "value" -> c.args().isEmpty() && c.kwargs().isEmpty() ? FN_VALUE : "other";
             default -> "other";
             };
         }

@@ -93,17 +93,18 @@ expression: not empty(AESEV) and AESEV != "MILD"
 ## The five presence predicates
 
 These are the only functions that treat an empty string as though it were missing. That is
-their whole purpose.
+their whole purpose — and `is_missing`, listed here because it is so easily mistaken for one of
+them, is the one that does **not**.
 
 | write | true when the value is | alias of |
 |---|---|---|
 | `empty(x)` | missing **or** `""` | — |
-| `is_missing(x)` | missing **or** `""` | `empty` |
+| `is_missing(x)` | missing **only** — `""` is present | — |
 | `non_empty(x)` | anything else | — |
 | `present(x)` | anything else | `non_empty` |
 | `is_present(x)` | anything else | `non_empty` |
 
-The aliases are exact: `is_missing(TSVAL)` and `empty(TSVAL)` are the same call.
+The aliases are exact: `present(TSVAL)` and `non_empty(TSVAL)` are the same call.
 
 > **Prefer the positive name with `not`.** Write `not empty(AESEV)`, not `non_empty(AESEV)`. A
 > negated name forces the reader to hold a double negative whenever it appears under a `not` or
@@ -111,9 +112,10 @@ The aliases are exact: `is_missing(TSVAL)` and `empty(TSVAL)` are the same call.
 > one place. The two are interchangeable, so this is a style rule with no behavioural catch —
 > `empty` and `not empty` are the pair to reach for.
 
-> **`is_missing` does not mean "missing".** It means "missing or empty". If you genuinely need
-> to distinguish an absent cell from an empty string, these predicates cannot do it for you —
-> say so in review rather than approximating it.
+> **`is_missing` means "missing" — and only that** (rulings register `D50`, owner 2026-10-05:
+> *"is_missing() is for misisng and empty() is for missing or \"\""*). `is_missing("")` is false;
+> `empty("")` is true. Until 2026-10-05 `is_missing` was an alias of `empty`; a rule that meant
+> "missing or empty" writes `empty`.
 
 ## Every other function reads `""` literally
 

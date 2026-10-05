@@ -4,7 +4,7 @@
      valueRefPlan fold a foldable column reference to it; the fold is TYPE-DERIVED (D76/D131a):
      numeric-expected -> all-missing, otherwise a STRING vector, which is why len(ABSENT) == 0
      holds alongside len(BLANK) == 0 (see BuiltinFunctions' len comment).
-     FIRES_ON_ABSENT_COLUMN = {empty, is_missing}. Requirements skip semantics:
+     FIRES_ON_ABSENT_COLUMN = {empty} (is_missing left it with register D50, 2026-10-05). Requirements skip semantics:
      VariableRequirement / ScopeMatcher.describeVariablesMismatch. -->
 
 A rule is offered datasets it was written for, but a dataset may still not carry every column the
@@ -41,6 +41,9 @@ The position decides wherever the column is read (owner 2026-10-05,
   own position when the column is not there: `read_value` over an absent `domain` dataset or
   column, `max` over an absent column, `row_max` over a pattern no column matches, `colref` naming
   an absent column — missing where the result is read as a number, `""` everywhere else.
+- Two `read_value` / `max` calls over the same `domain` dataset and column are **one column**: the
+  uses of both decide, as two direct reads of one column do. `value()` over a Define-XML variable
+  the data lacks is decided by its position the same way.
 - Where the uses disagree (a number in one place, text in another) the **number wins**; with no
   typed use at all (`empty($x)`, a reported value) it is **`""`**. `coalesce` passes its position
   through to its operands.
@@ -66,9 +69,12 @@ expression: 'AESTDY > AEENDY'      # AESTDY absent → no findings, no error
 > *"the rule ran and the data was fine"* from *"the column was not there"*. If that distinction
 > matters — and for a conformance rule it usually does — see the next section.
 
-## Two predicates that do fire
+## A predicate that does fire
 
-`empty(x)` and `is_missing(x)` report **every row** of an absent column as empty. An absent column
+`empty(x)` reports **every row** of an absent column as empty. (`is_missing(x)` does not: it is
+true only for a genuine missing, so over an absent column it answers the column's default — false
+where the column reads as `""`, true where its position makes it a number and so the missing;
+rulings register `D50`, owner 2026-10-05.) An absent column
 carries no data, so it is empty for every row; that is the honest answer, and it is also a trap:
 
 ```yaml

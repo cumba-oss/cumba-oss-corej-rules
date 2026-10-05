@@ -51,14 +51,16 @@ class FunctionReferenceRosterTest
 
     /**
      * The registered names documented inside ANOTHER function's section — alias → primary. Measured
-     * 2026-09-30: 23, every one a negated or alternative spelling its primary's section names.
+     * 2026-09-30: 23, every one a negated or alternative spelling its primary's section names; 22
+     * since 2026-10-05, when {@code is_missing} stopped being {@code empty}'s alias (register D50)
+     * and got its own section.
      */
     static final Map<String, String> ALIASES = Map.ofEntries(
             Map.entry("does_not_contain", "contains"), Map.entry("ds_not_exists", "ds_exists"),
             Map.entry("has_not_equal_length", "has_equal_length"),
             Map.entry("invalid_date", "is_valid_date"),
             Map.entry("invalid_duration", "is_valid_duration"),
-            Map.entry("is_incomplete_date", "is_partial_date"), Map.entry("is_missing", "empty"),
+            Map.entry("is_incomplete_date", "is_partial_date"),
             Map.entry("is_not_complete_date_part", "is_complete_date_part"),
             Map.entry("is_not_integer", "is_integer"),
             Map.entry("is_not_ordered_subset_of", "is_ordered_subset_of"),

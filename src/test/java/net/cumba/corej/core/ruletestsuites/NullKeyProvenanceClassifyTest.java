@@ -100,4 +100,21 @@ class NullKeyProvenanceClassifyTest
         assertNull(classify("variable_size", true, "8", true, "9", null),
                 "a value that changes is CONTENT");
     }
+
+
+    @Test
+    void aValueBindingMovesOnlyFromMisToEmpty()
+    {
+        // PLAN-column-typed-function-absent-type fold (A5): value() over an absent cursor column
+        // answered MIS in every position; outside a numeric one it is "" now — and nothing else.
+        String value = NullKeyProvenanceDifferentialTest.FN_VALUE;
+        assertEquals(MoveClass.VALUE_ABSENT_MIS_TO_EMPTY, NullKeyProvenanceDifferentialTest
+                .classifyAbsentType(true, MIS, true, "", COLS, value));
+        assertNull(NullKeyProvenanceDifferentialTest.classifyAbsentType(true, "", true, MIS, COLS,
+                value), "value() never moved \"\" -> \".\": it was MIS in every position");
+        assertNull(NullKeyProvenanceDifferentialTest.classifyAbsentType(true, MIS, true, "", COLS,
+                "fn:read_value"), "the planted control: read_value never moves . -> \"\"");
+        assertEquals(MoveClass.FN_ABSENT_EMPTY_TO_MIS, NullKeyProvenanceDifferentialTest
+                .classifyAbsentType(true, "", true, MIS, COLS, "fn:read_value"));
+    }
 }
