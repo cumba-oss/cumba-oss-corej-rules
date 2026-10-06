@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-SD0077 expect=violation domain=CO
-#note "FRESH - CO primary + wrong-subject + blank-IDVAR faces. Row 1: subject 001's LB has no LBSEQ=5 -> FIRES. Row 2: matches 001's LBSEQ=1 -> silent. Row 3: blank IDVAR and IDVARVAL -> guarded, silent. Row 4: LBSEQ=7 exists ONLY under USUBJID 001, not 002 -> no match under the [USUBJID] standard key -> FIRES. If row 4 is silent (wrong-subject matched anyway) or row 3 fires, escalate."
+#note "FRESH - CO primary + wrong-subject + blank-IDVAR faces. Row 1: subject 001's LB has no LBSEQ=5 -> FIRES. Row 2: matches 001's LBSEQ=1 -> silent. Row 3: blank IDVAR and IDVARVAL -> guarded, silent. Row 4: LBSEQ=7 exists ONLY under USUBJID 001, not 002 -> no match under the [STUDYID, USUBJID, IDVAR, IDVARVAL] key (the subject part: STUDYID and USUBJID) -> FIRES. If row 4 is silent (wrong-subject matched anyway) or row 3 fires, escalate."
 #library standard=sdtmig version=3-4
 #expectViolationCount 2
 #expectViolationAt row=1 IDVARVAL=5

@@ -310,6 +310,13 @@ class JoinKeyDeclarationLintTest
         assertClean(childNoStudyid);
         assertEquals(List.of("T-CHILD Match_Datasets 'SUPP--'"),
                 check(parse(childNoStudyid)).childWithoutStudyid, "the STUDYID census");
+        // A keyless Child entry runs on the engine's default keys [USUBJID, IDVAR, IDVARVAL] — no
+        // STUDYID: the census counts it, never skips it (pack-1 review 1b LOW-2).
+        String childKeyless = childNoStudyid
+                .replace("  Keys: [\"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n", "");
+        assertEquals(List.of("T-CHILD Match_Datasets 'SUPP--' (default Child keys)"),
+                check(parse(childKeyless)).childWithoutStudyid, "a keyless Child entry");
+        assertEquals(1, check(parse(childKeyless)).child, "counted as a Child entry");
 
         // The exception (review round 2, M1): a Child key that ALSO keys an ordinary entry of the
         // same rule is legitimately named by that entry's group.
@@ -506,6 +513,17 @@ class JoinKeyDeclarationLintTest
         {
             List<String> left = md.getKeys();
             List<String> right = md.getRightKeys();
+            if (Boolean.TRUE.equals(md.getChild()) && (left == null || left.isEmpty()))
+            {
+                // A keyless Child entry runs on the engine's default keys
+                // (ChildEntries.CANONICAL_CHILD_KEYS = [USUBJID, IDVAR, IDVARVAL]), which have no
+                // STUDYID: the census counts it as such, never skips it (pack-1 review 1b LOW-2).
+                // Nothing is declared, so the bare-in-All rules have nothing to judge.
+                c.child++;
+                c.childWithoutStudyid
+                        .add(id + " Match_Datasets '" + md.getName() + "' (default Child keys)");
+                continue;
+            }
             if (left == null || right == null || left.isEmpty())
             {
                 continue;

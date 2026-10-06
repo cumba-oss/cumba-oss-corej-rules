@@ -31,8 +31,9 @@ import org.junit.jupiter.api.TestFactory;
  * byte-identical in {@code Check} <b>and</b> {@code Match_Datasets} (measured — canonical-JSON
  * sha1): the SUPP--/CO/RELREC class ({@code CORE-000206}, {@code CDISC-CG0371}, {@code FDA-SD0077},
  * {@code PMDA-SD0077}) and the SUPPAE→AE class ({@code CORE-000597}, {@code FDA-SD1143},
- * {@code CDISC-CG0043} — which has no scenario directory of its own, which is exactly why the
- * replay exists; the {@code .cdt} files are never copied).
+ * {@code CDISC-CG0043} — whose own directory holds only its four own scenarios (the D4 key-type
+ * probe, the two pooled-study cases, a lowercase QNAM value), none of the class's shared ones,
+ * which is exactly why the replay exists; the {@code .cdt} files are never copied).
  *
  * <p>
  * ⚠⚠ <b>The two scenario bases were CORE directories until the 2026-09-19 CORE retirement</b>
