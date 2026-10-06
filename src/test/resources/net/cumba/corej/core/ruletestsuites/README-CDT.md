@@ -401,9 +401,10 @@ col DOMAIN  type=Char
 | `#define-include <file.yaml>` | no | pull synthetic Define-XML metadata from a YAML sidecar |
 | `#define-xml <file.xml>` | no | run against a **real** Define-XML sidecar (same directory); serves `define_*` AND `define_vlm_*` accessors; mutually exclusive with `#define` / `#define-include` |
 | `#ct-packages <pkg> [<pkg> ...]` | no | the run's **CT Packages** field, for a run-level CT-selection scenario; absent means a blank field. Ignored by the per-rule runner |
-| `#ct-available none\|<pkg> [<pkg> ...]` | no | the CT packages the run's metadata store holds (run-level scenarios); absent means every referenced package is seeded |
+| `#ct-available none\|<pkg> [<pkg> ...]` | no / **yes** with a `TS` dataset | the CT packages the run's metadata store holds (run-level scenarios); absent means every package the `#ct-packages` field and the define reference is seeded. A scenario carrying a Trial Summary (`TS`) dataset **must** declare it, or the runner fails the scenario: the default is never widened by the TS's own packages |
 | `#expect-abort "<substring>"` | no | the run must **abort** before any rule executes, with a message containing `<substring>`; requires `expect=skipped` |
 | `#expect-ct-mismatch "<substring>"` | no | the completed run carries a `CT_Declaration_Mismatch` note containing `<substring>`; rejected together with `#expect-abort` |
+| `#run-product <product>` | no | the metadata product a run-level CT-selection scenario runs on, canonical and lower-case without the `standards/` prefix (e.g. `sendig/3-1-1`, `adam/adamig-1-3`, `tig/1-0/sdtm`); absent means `sdtmig/3-4`. It sets the run's rule package and store product, and with them the CT roots consumed and the Trial Summary family read. Ignored by the per-rule runner |
 | `#dictionaries dummy` | no | run with the checked-in dummy external-dictionary bundle (see below) |
 | `#runLevel <LEVEL>` | no | the **run severity threshold** for this scenario — the weakest check level it evaluates (see *Check levels and the run threshold*) |
 
