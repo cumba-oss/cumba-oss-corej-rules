@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD0077 expect=violation domain=RELREC
+#note "FU-6 (PLAN-merge-followups), pooled two-study package, RELREC primary. Row 1 (study S2) relates AE record (USUBJID 01-701-1015, AESEQ 1), which exists only in study S1; S2's subject 01-701-1015 has AE record AESEQ 2 only (USUBJID is unique per study only, SDTMIG 4.2.3) -> under the Child key [STUDYID, USUBJID, IDVAR, IDVARVAL] the referenced record does not exist -> FIRES. Row 2 (study S2) relates S2's AESEQ 2 -> exists -> silent. Under the old key [USUBJID, IDVAR, IDVARVAL] row 1 found S1's record -> no violation at all (the cross-study false negative this key closes)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVARVAL=1
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S2 | AE | 01-701-1015 | AESEQ | 1 |  | REL1
+S2 | AE | 01-701-1015 | AESEQ | 2 |  | REL1
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | AE | 01-701-1015 | 1 | HEADACHE
+S2 | AE | 01-701-1015 | 2 | NAUSEA
