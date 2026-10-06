@@ -26,6 +26,7 @@ import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
 import net.cumba.corej.ruletest.cdt.CdtLoader;
 import net.cumba.corej.ruletest.cdt.ruletest.MapBackedLibraryMetadataProvider;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioDeclaredScopeProvider;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.impl.support.OverlayDataTable;
 import org.junit.jupiter.api.BeforeAll;

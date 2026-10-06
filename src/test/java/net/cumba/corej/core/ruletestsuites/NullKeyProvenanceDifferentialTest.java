@@ -41,6 +41,7 @@ import net.cumba.corej.core.run.StudyValidationResult;
 import net.cumba.corej.core.run.StudyValidationService;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner;
 import net.cumba.datatable.DataTableMeta;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.impl.support.OverlayDataTable;
@@ -640,7 +641,7 @@ class NullKeyProvenanceDifferentialTest
         }
         OverlayDataTable primary = s.primaryTable();
         assertNotNull(primary, rel + " names no primary dataset");
-        AbstractRuleTestSuitesFactory.EvalOutcome o;
+        ScenarioRunner.EvalOutcome o;
         try
         {
             o = factory.evaluateScenario(file, s, rule, primary);
@@ -1048,7 +1049,7 @@ class NullKeyProvenanceDifferentialTest
     }
 
 
-    private static String state(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o)
+    private static String state(ScenarioRunner.@Nullable EvalOutcome o)
     {
         if (o == null)
         {

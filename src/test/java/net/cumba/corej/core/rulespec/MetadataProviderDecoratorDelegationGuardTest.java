@@ -202,8 +202,9 @@ class MetadataProviderDecoratorDelegationGuardTest
             // the rulespec harness
             "CompositeMetadataProvider.java", Role.DECORATOR, //
             "MockLibraryProvider.java", Role.LEAF, //
-            // the .cdt scenario harness
-            "ScenarioDeclaredScopeProvider.java", Role.DECORATOR, //
+            // ⚑ ScenarioDeclaredScopeProvider, the .cdt harness's decorator, moved to the engine
+            // repository's cumba-corej-ruletest main tree with PLAN-rule-authoring-api phase 3
+            // (2026-10-06); the engine copy of this guard pins it now — MOVED, never deleted.
             // test double; a second copy of the same class also lives in the engine repo
             "StubMetadataProvider.java", Role.LEAF);
 
@@ -214,9 +215,11 @@ class MetadataProviderDecoratorDelegationGuardTest
      * ⚠⚠ <b>This is the SIBLING half of the guard, and it exists because the split cut the
      * population in two.</b> In the coreJ monorepo one copy of this test covered all eight
      * {@code MetadataProvider} implementations. Five live in the engine repo and are policed by
-     * that repo's copy; <b>four</b> are pinned above and live here, under {@code src/test} — the
-     * monorepo's three harness classes plus {@code StubMetadataProvider}, of which each repo keeps
-     * its own copy, which is why 5 + 4 still reconciles with eight distinct classes. No build ever
+     * that repo's copy; <b>three</b> are pinned above and live here, under {@code src/test} — two
+     * of the monorepo's three harness classes plus {@code StubMetadataProvider}, of which each repo
+     * keeps its own copy ({@code ScenarioDeclaredScopeProvider} moved to the engine's
+     * {@code cumba-corej-ruletest} with {@code PLAN-rule-authoring-api} phase 3, so the engine copy
+     * pins six), which is why 6 + 3 still reconciles with eight distinct classes. No build ever
      * checks out both repos at once, so neither copy can see the other's.
      * </p>
      *
@@ -224,11 +227,11 @@ class MetadataProviderDecoratorDelegationGuardTest
      * ⚠ <b>The two copies must be kept in step by hand.</b> A delegation rule added to one and not
      * the other silently stops applying to half the population. The counterpart is the engine
      * repository's {@code corej-core/src/test/java/net/cumba/corej/core/exec/
-     * MetadataProviderDecoratorDelegationGuardTest.java}, whose floors are 5 / 2.
+     * MetadataProviderDecoratorDelegationGuardTest.java}, whose floors are 6 / 3.
      * </p>
      *
      * <p>
-     * Two of the four here are {@code DECORATOR}s — exactly the shape whose silent delegation gaps
+     * One of the three here is a {@code DECORATOR} — exactly the shape whose silent delegation gaps
      * this guard exists to catch, and precisely why the copy was not skipped.
      * </p>
      *
@@ -239,9 +242,9 @@ class MetadataProviderDecoratorDelegationGuardTest
      * has never contained it. Re-measure per repo — see that list's javadoc.
      * </p>
      */
-    private static final int MIN_IMPLEMENTATIONS = 4;
+    private static final int MIN_IMPLEMENTATIONS = 3;
 
-    private static final int MIN_DECORATORS = 2;
+    private static final int MIN_DECORATORS = 1;
 
     /** The two-arg primary: {@code getXForStructure(String token, List<String> subclasses)}. */
     private static final String TWO_ARG = "(?<![\\w.])%s\\s*\\(\\s*String\\s+(\\w+)\\s*,"

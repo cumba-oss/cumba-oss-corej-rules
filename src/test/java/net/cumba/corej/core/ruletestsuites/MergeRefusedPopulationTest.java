@@ -15,6 +15,7 @@ import net.cumba.corej.core.exec.RuleExecutionStatus;
 import net.cumba.corej.core.rulespec.ViolationNormaliser;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -68,7 +69,7 @@ class MergeRefusedPopulationTest
                     AbstractRuleTestSuitesFactory.familyRoot(factory.family())))
             {
                 population++;
-                AbstractRuleTestSuitesFactory.EvalOutcome outcome = factory.outcomeOf(p);
+                ScenarioRunner.EvalOutcome outcome = factory.outcomeOf(p);
                 assertNotNull(outcome, p.getFileName() + ": out of the rule's scope");
                 String reason = outcome.notExecutedReason();
                 assertTrue(outcome.errored() && reason != null && reason.startsWith(ERROR_HEAD),

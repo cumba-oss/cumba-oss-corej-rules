@@ -4,61 +4,53 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-import net.cumba.cdisc.define.DefineXmlParser;
 import net.cumba.corej.core.CorpusPaths;
-import net.cumba.corej.core.RulePackageLoader;
-import net.cumba.corej.core.exec.DatasetResolver;
-import net.cumba.corej.core.exec.MetadataProvider;
-import net.cumba.corej.core.exec.RuleExecutionResult;
-import net.cumba.corej.core.exec.RuleRunnerCalls;
-import net.cumba.corej.core.exec.ScopeMatcher;
-import net.cumba.corej.core.exec.ScopeVariableSource;
-import net.cumba.corej.core.exec.Violation;
-import net.cumba.corej.core.gen.TokenExpander;
-import net.cumba.corej.core.gen.WildcardExpander;
-import net.cumba.corej.core.metadata.AdamDataStructureDetector;
-import net.cumba.corej.core.metadata.AdamSubclassDetector;
-import net.cumba.corej.core.metadata.DefineXmlMetadataProvider;
-import net.cumba.corej.core.metadata.OdmDefineXMLProvider;
-import net.cumba.corej.core.metadata.RuntimeDictionaryProvider;
-import net.cumba.corej.core.metadata.VlmResolver;
-import net.cumba.corej.core.model.ClassScope;
+import net.cumba.corej.core.FindingValuesNullGuard;
 import net.cumba.corej.core.model.Rule;
-import net.cumba.corej.core.model.RulePackage;
-import net.cumba.corej.ruletest.cdt.ruletest.ExecutionVerdictCheck;
-import net.cumba.corej.ruletest.cdt.ruletest.LibraryRef;
-import net.cumba.corej.ruletest.cdt.ruletest.MapBackedLibraryMetadataProvider;
+import net.cumba.corej.ruletest.cdt.ruletest.ExecutionObserver;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario;
+import net.cumba.corej.ruletest.cdt.ruletest.RunEnvironment;
 import net.cumba.corej.ruletest.cdt.ruletest.ScenarioLocationBackfill;
-import net.cumba.corej.ruletest.cdt.ruletest.ViolationLocationCheck;
-import net.cumba.datatable.DataTableMeta;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRuleSelector;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner.EvalOutcome;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner.ScenarioEvaluation;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner.ScenarioRunResult;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioScopeGate;
+import net.cumba.corej.ruletest.cdt.ruletest.SidecarResolver;
 import net.cumba.datatable.impl.support.OverlayDataTable;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 /**
- * Base for the per-family {@code @TestFactory} classes that replay the {@code .cdt} rule-test
- * scenarios shipped in this suites module. The scenario tree is <em>family-based</em>: each rule
- * family (cdisc / draft / fda / pmda) owns one resource subtree named after it, and its factory
- * resolves rules from that family's assembled packages
- * ({@code target/rules/rules-<family>-*.json}), loaded per standard+version: the executed view is
- * the declared standard's package when the scenario declares one, else a deterministic canonical
- * fallback (see {@code resolveRule}).
+ * Family-scoped {@code .cdt} rule-test factory: one {@link DynamicTest} per scenario of the
+ * family's subtree, each run through the engine's {@link ScenarioRunner} and judged by it — the
+ * harness that used to live in this class was lifted into {@code cumba-corej-ruletest} main scope
+ * by {@code PLAN-rule-authoring-api} phase 3, so the corpus gate and the rule editor run <b>one
+ * implementation</b>. What stays here is the corpus: which packages, which scenario files, the
+ * declared-standard membership gate, the location back-fill mode, the finding-map null guard and
+ * the opt-in outcome dump.
+ *
+ * <p>
+ * Each scenario resolves its rule from <em>this family's</em> assembled packages
+ * ({@code rules-<family>-<standard>-<version>.json}, see {@code RuleCorpusGenerator}): the declared
+ * standard's package when the scenario declares one, else a deterministic canonical fallback
+ * ({@link ScenarioRuleSelector#resolveIn}).
+ * </p>
  *
  * <p>
  * Every {@code .cdt} file under the family subtree that carries a {@code #!RuleTest} shebang
@@ -77,11 +69,20 @@ import org.junit.jupiter.api.TestFactory;
  *
  * <p>
  * A scenario carrying {@code #dictionaries dummy} runs with the checked-in dummy
- * external-dictionary bundle ({@code src/test/resources/dictionaries}) wired into the engine via
- * {@link RuntimeDictionaryProvider}; without the directive no provider is supplied and
- * dictionary-dependent rules SKIP — the declared ({@code $}-ref) form every shipped rule uses via
- * {@code RuleRunner}'s eager dictionary arm ({@code Fix #268}), an inlined call via its injected
- * {@code dictionary_available} gate. The {@code *-skipped_no_dictionary-*.cdt} scenarios pin that.
+ * external-dictionary bundle ({@code src/test/resources/dictionaries}) wired into the engine;
+ * without the directive no provider is supplied and dictionary-dependent rules SKIP — the declared
+ * ({@code $}-ref) form every shipped rule uses via {@code RuleRunner}'s eager dictionary arm
+ * ({@code Fix #268}), an inlined call via its injected {@code dictionary_available} gate. The
+ * {@code *-skipped_no_dictionary-*.cdt} scenarios pin that.
+ * </p>
+ *
+ * <h2>The JUnit face of the three outcomes</h2>
+ *
+ * <p>
+ * {@link ScenarioRunner.Outcome#PASS} passes, {@link ScenarioRunner.Outcome#FAIL} fails with the
+ * runner's detail (the text the old assertions produced), {@link ScenarioRunner.Outcome#ABORTED}
+ * aborts through {@link Assumptions} — exactly the states the old harness reached through
+ * {@code Assertions} / {@code Assumptions} (the mapping table is on {@link ScenarioRunner}).
  * </p>
  */
 abstract class AbstractRuleTestSuitesFactory
@@ -126,18 +127,38 @@ abstract class AbstractRuleTestSuitesFactory
     private static final Map<String, Map<String, Map<String, Rule>>> PACKAGES_BY_FAMILY = new ConcurrentHashMap<>();
 
     /**
-     * Fallback resolution order for scenarios that declare no standard+version: the historic
-     * canonical packages of the pre-family factories (ADaM suite → {@code adamig-1-3}, SDTM suite →
-     * {@code sdtmig-3-4}), then SEND's shipping version, then any package containing the rule
-     * (sorted, last wins — deterministic).
+     * The corpus's run environment, built once: this JVM's store ({@link ScenarioLibrarySupport}),
+     * the dummy dictionary bundle, a sidecar resolver confined to the suites tree (every corpus
+     * sidecar sits beside its scenario, so nothing changes for the corpus; the confinement is the
+     * editor's requirement).
      */
-    private static final List<String> DEFAULT_PACKAGE_PREFERENCE = List.of("adamig-1-3",
-            "sdtmig-3-4", "sendig-3-1-1");
+    private static final class Environment
+    {
 
-    /** The default standard/version of a {@code #library} block with no explicit declaration. */
-    private static final String UNDECLARED_STANDARD = "test";
+        static final RunEnvironment VALUE = build();
 
-    private static volatile @Nullable RuntimeDictionaryProvider dummyDictionaries;
+        private static RunEnvironment build()
+        {
+            try
+            {
+                return new RunEnvironment(ScenarioLibrarySupport.store(), DUMMY_DICTIONARIES_DIR,
+                        SidecarResolver.rootedAt(RESOURCE_BASE));
+            }
+            catch (IOException e)
+            {
+                throw new UncheckedIOException(
+                        "the suites tree is not a directory: " + RESOURCE_BASE, e);
+            }
+        }
+    }
+
+    /**
+     * The finding-map null guard as the runner's observer: judged on every scenario execution, and
+     * counted (the factory's last test asserts the reach).
+     */
+    private static final ExecutionObserver NULL_GUARD = (context, rule,
+            result) -> FindingValuesNullGuard.requireNullFree(FindingValuesNullGuard.CDT, context,
+                    rule, result.getViolations());
 
     /**
      * The family key — simultaneously the resource-subtree name under the suites scenario root and
@@ -165,6 +186,13 @@ abstract class AbstractRuleTestSuitesFactory
     static Path familyRoot(String aFamily)
     {
         return RESOURCE_BASE.resolve(aFamily);
+    }
+
+
+    /** The corpus's run environment (package-private for the tests that run scenarios directly). */
+    static RunEnvironment environment()
+    {
+        return Environment.VALUE;
     }
 
 
@@ -200,15 +228,15 @@ abstract class AbstractRuleTestSuitesFactory
                     .filter(p -> matchesFilter(p, filter)).sorted().toList();
         }
         // T2 MED-3 of PLAN-output-variable-null-key-provenance: the finding-map null guard sits
-        // inside execute(); the last dynamic test proves it was REACHED on at least a floor of the
-        // scenarios this factory ran (dynamic tests run in stream order, so it runs last).
-        long reachAtStart = net.cumba.corej.core.FindingValuesNullGuard
-                .reach(net.cumba.corej.core.FindingValuesNullGuard.CDT);
+        // inside the runner's execute(); the last dynamic test proves it was REACHED on at least a
+        // floor of the scenarios this factory ran (dynamic tests run in stream order, so it runs
+        // last).
+        long reachAtStart = FindingValuesNullGuard.reach(FindingValuesNullGuard.CDT);
         java.util.concurrent.atomic.AtomicInteger ran = new java.util.concurrent.atomic.AtomicInteger();
         return Stream.concat(scenarioFiles.stream().map(p -> toDynamicTest(root, p, ran)),
                 Stream.of(DynamicTest.dynamicTest("finding-map null guard reached",
-                        () -> net.cumba.corej.core.FindingValuesNullGuard.requireReach(
-                                net.cumba.corej.core.FindingValuesNullGuard.CDT, reachAtStart,
+                        () -> FindingValuesNullGuard.requireReach(FindingValuesNullGuard.CDT,
+                                reachAtStart,
                                 (long) Math.floor(ran.get()
                                         * (filter.isEmpty() ? NULL_GUARD_REACH_FLOOR : 0)),
                                 ran.get() + " " + family() + " scenario(s)"))));
@@ -348,7 +376,33 @@ abstract class AbstractRuleTestSuitesFactory
         return DynamicTest.dynamicTest(display, aFile.toUri(), () ->
         {
             aRan.incrementAndGet();
-            runScenario(aFile);
+            // PLAN-rule-authoring-api phase 3: the opt-in outcome dump records the verdict path
+            // of every scenario (ScenarioOutcomeDump); off, this is the plain call it was.
+            ScenarioOutcomeDump.Entry entry = ScenarioOutcomeDump.begin(family() + "/" + display);
+            try
+            {
+                runScenario(aFile, entry);
+                entry.junit("PASS", null);
+            }
+            catch (org.opentest4j.TestAbortedException e)
+            {
+                entry.junit("ABORTED", e.getMessage());
+                throw e;
+            }
+            catch (AssertionError e)
+            {
+                entry.junit("FAIL", e.getMessage());
+                throw e;
+            }
+            catch (RuntimeException | IOException e)
+            {
+                entry.junit("ERROR", e.toString());
+                throw e;
+            }
+            finally
+            {
+                ScenarioOutcomeDump.record(entry);
+            }
         });
     }
 
@@ -358,7 +412,14 @@ abstract class AbstractRuleTestSuitesFactory
     // the factories run (LAC review round 1, L2).
     void runScenario(Path aFile) throws IOException
     {
-        RuleTestScenario s = RuleTestCdt.load(aFile);
+        runScenario(aFile, ScenarioOutcomeDump.begin(aFile.toString()));
+    }
+
+
+    /** {@link #runScenario(Path)} recording its verdict path into the outcome dump entry. */
+    void runScenario(Path aFile, ScenarioOutcomeDump.Entry aDump) throws IOException
+    {
+        RuleTestScenario s = load(aFile);
 
         checkDeclaredStandardMembership(s);
 
@@ -370,11 +431,23 @@ abstract class AbstractRuleTestSuitesFactory
         assertNotNull(primary, "Scenario " + s.getCoreId() + " declares domain=" + s.getDomain()
                 + " but no such dataset is present in the file");
 
-        EvalOutcome outcome = evaluateScenario(aFile, s, rule, primary);
+        if (ScenarioOutcomeDump.enabled())
+        {
+            // Recorded before the gate judges it, so a rejected expectation still shows the axis.
+            aDump.scope(ScenarioScopeGate.describeScopeMismatch(rule, primary));
+        }
+        ScenarioEvaluation evaluation = ScenarioRunner.evaluate(rule, s, primary, aFile,
+                environment(), NULL_GUARD);
+        EvalOutcome outcome = evaluation.outcome();
         if (outcome == null)
         {
-            return; // out of scope — asserted inside evaluateScenario
+            // out of scope (the gate's refusals are mapped below), or a stop before execution
+            judged(ScenarioRunner.judge(s, evaluation, primary));
+            return;
         }
+        aDump.outcome(outcome.violated(), outcome.executed(), outcome.errored(),
+                outcome.violations(), outcome.totalCount(), outcome.truncated(),
+                outcome.notExecutedReason());
 
         if (ScenarioLocationBackfill.isEnabled())
         {
@@ -385,7 +458,32 @@ abstract class AbstractRuleTestSuitesFactory
             return;
         }
 
-        assertScenarioVerdict(s, outcome, primary);
+        judged(ScenarioRunner.judge(s, evaluation, primary));
+    }
+
+
+    /** The runner's three outcomes onto JUnit's states. */
+    static void judged(ScenarioRunResult aResult)
+    {
+        switch (aResult.outcome())
+        {
+        case PASS ->
+        {
+            // the scenario's declaration holds
+        }
+        case ABORTED -> Assumptions.abort(aResult.detail());
+        case FAIL -> fail(aResult.detail());
+        }
+    }
+
+
+    /** Load a scenario with the corpus's confined sidecar resolver. */
+    static RuleTestScenario load(Path aFile) throws IOException
+    {
+        String content = Files.readString(aFile, UTF_8);
+        SidecarResolver sidecars = environment().sidecars();
+        assertNotNull(sidecars, "the corpus environment has a sidecar resolver");
+        return RuleTestCdt.parse(content, aFile.toString(), sidecars.includeResolver(aFile));
     }
 
 
@@ -400,7 +498,7 @@ abstract class AbstractRuleTestSuitesFactory
     @Nullable
     EvalOutcome outcomeOf(Path aFile) throws IOException
     {
-        RuleTestScenario s = RuleTestCdt.load(aFile);
+        RuleTestScenario s = load(aFile);
         Rule rule = resolveRule(s);
         assertNotNull(rule, "Rule " + s.getCoreId() + " not found in the " + family()
                 + " family's rule packages");
@@ -412,513 +510,66 @@ abstract class AbstractRuleTestSuitesFactory
 
 
     /**
-     * Everything {@link #runScenario} does between resolving the rule and judging the verdict: the
-     * scope pre-gate, the metadata axes and the execution itself — for the rule handed in, which
-     * need not be the one the family packages resolve.
+     * Everything {@link #runScenario} does between resolving the rule and judging the verdict —
+     * {@link ScenarioRunner#evaluate} with the corpus's environment and null guard — for the rule
+     * handed in, which need not be the one the family packages resolve. A stop before execution (a
+     * refused scope expectation, no carrier block, an unreadable sidecar) is mapped onto JUnit
+     * here, as the old in-class harness asserted it.
      *
      * <p>
      * Package-private seam for {@code DynamicColumnRespellingDifferentialTest}
      * ({@code PLAN-dynamic-column-corpus-respelling} §2.8): the differential executes every
      * scenario of a respelled rule twice — once with the rule's <b>base</b> text (loaded from a
      * second package directory) and once with the respelled one — and compares the whole finding
-     * rows. Keeping the preparation here, rather than copying it, is what makes the differential
-     * judge exactly the execution the factories run.
+     * rows. Keeping the preparation on the lifted runner, rather than copying it, is what makes the
+     * differential judge exactly the execution the factories run.
      * </p>
      *
      * @return the outcome, or {@code null} when the primary dataset is outside the rule's scope
      *         (the scenario's declaration is asserted here, as before)
      */
     @Nullable
-    EvalOutcome evaluateScenario(Path aFile, RuleTestScenario s, Rule rule,
+    static EvalOutcome evaluateScenario(Path aFile, RuleTestScenario s, Rule rule,
             OverlayDataTable primary)
-        throws IOException
     {
-
-        // Production enforces the Domains/Classes scope axes upstream of RuleRunner
-        // (DatasetRuleResolver -> ScopeMatcher), so mirror that gate here: an out-of-scope primary
-        // dataset means the rule never runs -> "executed, zero violations". This makes Scope
-        // fixes testable (an expect=noViolation scenario on out-of-scope data). The class axis
-        // is only judged when the scenario declares a dataset class (`dataset NAME class=...`).
-        String scopeMismatch = describeScopeMismatch(rule, primary);
-        if (scopeMismatch != null)
+        ScenarioEvaluation evaluation = ScenarioRunner.evaluate(rule, s, primary, aFile,
+                environment(), NULL_GUARD);
+        if (evaluation.stop() != null)
         {
-            // Review F2: an out-of-scope primary is a NON-EXECUTION, exactly like a
-            // Requirements.Variables
-            // skip — in production DatasetRuleResolver never even emits the rule for this dataset.
-            // It
-            // must therefore be declared, not silently accepted: an `expect=noViolation` scenario
-            // here passes while exercising nothing, which is the same rot the verdict switch below
-            // exists to prevent. `expect=skipped` is the honest contract.
-            assertFalse(s.getExpect() == RuleTestScenario.Verdict.VIOLATION,
-                    s.getCoreId() + " expected a violation but the primary dataset is outside "
-                            + "the rule's scope: " + scopeMismatch);
-            assertFalse(s.getExpect() == RuleTestScenario.Verdict.NO_VIOLATION,
-                    s.getCoreId() + " declares expect=noViolation but the rule never runs on this"
-                            + " dataset: " + scopeMismatch
-                            + " — the scenario is not exercising the rule; declare"
-                            + " 'expect=skipped', which is what being out of scope means.");
-            return null;
+            judged(ScenarioRunner.judge(s, evaluation, primary));
         }
-
-        DatasetResolver.WithInventory resolver = s.resolver();
-        // Inline provider for normal scenarios; a real CDISC-Library provider for #library-ref
-        // scenarios (skips the test when no Library is configured).
-        MetadataProvider library = ScenarioLibrarySupport.resolveOrSkip(s);
-
-        // Define axis: a #define-xml sidecar yields the production wiring (define provider + VLM
-        // resolver from the same parsed model); else the synthetic map-backed #define double.
-        MetadataProvider defineProvider = s.getDefine();
-        VlmResolver vlm = null;
-        if (s.getDefineXml() != null)
-        {
-            OdmDefineXMLProvider parsed = parseDefineXml(aFile, s.getDefineXml());
-            defineProvider = new DefineXmlMetadataProvider(parsed, null);
-            vlm = VlmResolver.from(parsed.metaDataVersion());
-        }
-
-        // Declared ADaM scope axis (structure= / subclass=). RuleRunner re-applies the
-        // Data_Structures / Subclasses gates at execution time and reads the DECLARED tier from
-        // `defineProvider != null ? defineProvider : libraryProvider` — it knows nothing about the
-        // two table-metadata keys CdtLoader stores. Route the declaration into whichever of those
-        // two slots RuleRunner will consult, so the pre-gate above and the engine see the same
-        // declared value. A scenario that declares an axis with neither block is refused here (a
-        // decorator over an empty slot would switch that level's availability self-skips off) —
-        // see ScenarioDeclaredScopeProvider for the full argument.
-        ScenarioDeclaredScopeProvider.Slots slots = ScenarioDeclaredScopeProvider.install(primary,
-                library, defineProvider, s.getSource(), readsDeclaredAdamTier(rule));
-        library = slots.library();
-        defineProvider = slots.define();
-
-        return evaluate(rule, primary, resolver, s.getDomain(), library, defineProvider,
-                resolveDictionaries(s), vlm, s.getRunLevel());
+        return evaluation.outcome();
     }
 
 
     /**
      * The verdict half of {@link #runScenario}: the scenario's declared execution state and its
-     * optional location assertions, judged against an outcome. Package-private for the same
-     * differential as {@link #evaluateScenario}, which records whether the <b>base</b> text already
-     * satisfies a scenario (a sensitivity scenario must be red there before it is green on the
-     * respelled rule — memory {@code findings-snapshot-blind-on-conformant-data}).
+     * optional location assertions, judged against an outcome — {@link ScenarioRunner#judge} mapped
+     * onto JUnit. Package-private for the same differential as {@link #evaluateScenario}, which
+     * records whether the <b>base</b> text already satisfies a scenario (a sensitivity scenario
+     * must be red there before it is green on the respelled rule — memory
+     * {@code findings-snapshot-blind-on-conformant-data}).
      */
     static void assertScenarioVerdict(RuleTestScenario s, EvalOutcome outcome,
             OverlayDataTable primary)
     {
-        // #library-ref only: a configured-but-degraded Library leaves every (sub-)rule
-        // SKIPPED/ERROR — skip rather than fail the verdict assertion.
-        // Review F6: a scenario that DECLARES expect=skipped must be asserted, not aborted. The
-        // rescue below exists for a #library-ref scenario degraded by a missing Library; applying
-        // it to a deliberate skip would silently abort the very contract under test.
-        if (s.getExpect() != RuleTestScenario.Verdict.SKIPPED)
-        {
-            ScenarioLibrarySupport.skipRefIfNotExecuted(s, outcome.executed(), "");
-        }
-
-        // Assert the observed EXECUTION STATE against the declared one before judging violations.
-        // A SKIPPED / ERROR rule reports zero violations, so without this an `expect=noViolation`
-        // scenario passes whether or not it exercised the rule at all — which is how a fixture
-        // rots: tighten a rule's scope, or trim away the column that scope needs, and the scenario
-        // keeps passing while testing nothing. `expect=skipped` is the positive form: the
-        // deliberate absent-optional-variable scenarios assert the skip instead of borrowing
-        // `noViolation`.
-        // Phase 4b: the verdict judgement moved to ExecutionVerdictCheck (the ruletest module),
-        // so the parse side and the assert side can no longer disagree — they used to live in two
-        // repos, and an `expect=` constant added on one side fell through this switch SILENTLY.
-        // ⚠ Java does NOT require an arrow switch STATEMENT over an enum to be exhaustive, so
-        // adding `executionError` compiled clean here and a scenario written with it would have
-        // passed while asserting nothing. That is the exact fixture-rot the execution-state check
-        // above exists to prevent, reintroduced one level up.
-        // ⚠ notExecutedReason is `status + ": " + statusMessage`, so the engine's own status word
-        // rides along in the detail. Deliberate: in a failure message that word is the first thing
-        // the reader needs.
-        ExecutionVerdictCheck.Result verdict = ExecutionVerdictCheck.verify(s,
-                new ExecutionVerdictCheck.Outcome(outcome.executed(), outcome.errored(),
-                        outcome.violated(), outcome.totalCount(), outcome.notExecutedReason()));
-        assertTrue(verdict.pass(), verdict.detail());
-
-        // Optional location assertions (#expectViolationCount / #expectViolationAt); a no-op for
-        // verdict-only scenarios. Violations are aggregated across wildcard expansions.
-        ViolationLocationCheck.Result loc = ViolationLocationCheck.verify(s, outcome.violations(),
-                outcome.totalCount(), outcome.truncated(), primary);
-        assertTrue(loc.pass(), loc.detail());
-    }
-
-    /**
-     * @param executed
-     *            the rule ran — neither SKIPPED nor ERROR
-     * @param errored
-     *            it did not run <em>because it failed</em>. Kept apart from {@code executed}
-     *            because {@code expect=skipped} asserts a <b>deliberate</b> non-execution: an ERROR
-     *            must fail such a scenario, not satisfy it, or a rule broken into unconditional
-     *            ERROR would keep every skip fixture green (review F1).
-     */
-    // Package-private (was private) for DynamicColumnRespellingDifferentialTest, which compares
-    // two of these — base text vs respelled text — field by field and row by row.
-    record EvalOutcome(boolean violated, boolean executed, boolean errored,
-            List<Violation> violations, long totalCount, boolean truncated,
-            @Nullable String notExecutedReason)
-    {
-    }
-
-    /**
-     * Evaluates a rule against the scenario's primary dataset. {@code wildcards} template rules are
-     * expanded against the present columns ({@link WildcardExpander}) and every concrete expansion
-     * is executed; results aggregate across expansions.
-     */
-    private static EvalOutcome evaluate(Rule aRule, OverlayDataTable aPrimary,
-            DatasetResolver.WithInventory aResolver, String aDomain,
-            @Nullable MetadataProvider aLibrary, @Nullable MetadataProvider aDefine,
-            @Nullable RuntimeDictionaryProvider aDictionaries, @Nullable VlmResolver aVlm,
-            net.cumba.datatable.report.@Nullable Severity aRunLevel)
-    {
-        // nativeEval=true runs the native expression engine — the engine production uses
-        // (StudyValidationParams / LibraryValidator both default nativeEval=true; the legacy
-        // engine has been removed). Mirrors AbstractSdtmRuleTest.execute.
-        // Fix #147: the three-arg entry point, so a declared-token `Expansion:` template expands
-        // here exactly as it does in DatasetRuleResolver. With the two-arg form an
-        // Expansion-bearing
-        // rule falls through as NotApplicable and the scenario silently executes the TEMPLATE —
-        // testing a column literally named '&VAR&', which no fixture can have.
-        TokenExpander.Context expansionContext = new TokenExpander.Context(
-                ScopeVariableSource.of(aResolver, aPrimary), aLibrary, aDomain);
-        return switch (WildcardExpander.tryExpand(aRule, aPrimary.getMetaData(), expansionContext))
-        {
-        case WildcardExpander.ExpansionResult.NotApplicable _ ->
-        {
-            RuleExecutionResult r = execute(aRule, aPrimary, aResolver, aDomain, aLibrary, aDefine,
-                    aDictionaries, aVlm, aRunLevel);
-            List<Violation> v = r.getViolations() != null ? r.getViolations() : List.of();
-            boolean ran = !(r.isSkipped() || r.isError());
-            yield new EvalOutcome(r.hasViolations(), ran, r.isError(), v, r.getViolationCount(),
-                    r.isTruncated(), ran ? null : r.getStatus() + ": " + r.getStatusMessage());
-        }
-        // No matching column: the rule does not apply to this fixture, so nothing was exercised.
-        // Reported as not-executed so an expect=noViolation scenario cannot pass vacuously when
-        // its fixture lost every wildcard-matching column — declare expect=skipped if the
-        // non-applicability IS the contract under test (same discipline as the scope gate).
-        // Fix #147 — carry the expander's own reason through. A declared-token template states
-        // exactly why it could not bind ("dataset 'ADSL' is not among the loaded datasets"),
-        // and that sentence is the whole point of the mechanism: never a silent zero-expansion.
-        case WildcardExpander.ExpansionResult.NoMatch(String reason) -> new EvalOutcome(false,
-                false, false, List.of(), 0, false, "SKIPPED: " + reason);
-        // A partially dropped expansion (a token surviving substitution, a join key the fixture
-        // lacks) is the resolver's audit concern; the scenario runner executes what survived.
-        case WildcardExpander.ExpansionResult.Expanded(List<Rule> concrete, _) ->
-        {
-            boolean violated = false;
-            boolean executed = false;
-            boolean errored = false;
-            String notExecuted = null;
-            List<Violation> all = new ArrayList<>();
-            long total = 0;
-            boolean truncated = false;
-            for (Rule r : concrete)
-            {
-                RuleExecutionResult res = execute(r, aPrimary, aResolver, aDomain, aLibrary,
-                        aDefine, aDictionaries, aVlm, aRunLevel);
-                if (!(res.isSkipped() || res.isError()))
-                {
-                    executed = true;
-                }
-                else
-                {
-                    // Any errored expansion taints the set: expect=skipped must not be satisfied
-                    // by a rule that is broken for some tuples (review F1).
-                    errored |= res.isError();
-                    if (notExecuted == null)
-                    {
-                        // First non-executing expansion explains the set when NONE executes.
-                        notExecuted = res.getStatus() + ": " + res.getStatusMessage();
-                    }
-                }
-                if (res.hasViolations())
-                {
-                    violated = true;
-                }
-                if (res.getViolations() != null)
-                {
-                    all.addAll(res.getViolations());
-                }
-                total += res.getViolationCount();
-                truncated |= res.isTruncated();
-            }
-            yield new EvalOutcome(violated, executed, errored, all, total, truncated,
-                    executed ? null : notExecuted);
-        }
-        };
+        judged(ScenarioRunner.judge(s,
+                new ScenarioEvaluation(ScenarioRunner.ScopeGate.IN, outcome, List.of(), null),
+                primary));
     }
 
 
-    private static RuleExecutionResult execute(Rule aRule, OverlayDataTable aPrimary,
-            DatasetResolver.WithInventory aResolver, String aDomain,
-            @Nullable MetadataProvider aLibrary, @Nullable MetadataProvider aDefine,
-            @Nullable RuntimeDictionaryProvider aDictionaries, @Nullable VlmResolver aVlm,
-            net.cumba.datatable.report.@Nullable Severity aRunLevel)
-    {
-        // Plan C §3.4: the scenario's `#runLevel`, or the engine default (Warning) when it
-        // declares none — so every scenario in this suite that says nothing is a
-        // default-threshold baseline, exactly as it was before per-level Checks existed.
-        // The scenario's `#library standard=` (or `#library-ref`) is the run standard its SUPP--
-        // and RELREC merges are read under (PLAN-merged-evaluation-table T2 fold, H1): a
-        // throwaway per-execution JoinCache carries it, exactly as LibraryValidator's per-dataset
-        // cache carries the derived run standard. An undeclared library ("test") stays UNKNOWN,
-        // the POOLID inference.
-        net.cumba.corej.core.exec.JoinCache joinCache = new net.cumba.corej.core.exec.JoinCache(
-                null, net.cumba.datatable.merge.MergeStandard
-                        .ofStandardName(aLibrary != null ? aLibrary.getStandard() : null));
-        RuleExecutionResult result = RuleRunnerCalls.execute(aRule, aPrimary, aResolver, aDomain,
-                aLibrary, joinCache, aDefine, Integer.MAX_VALUE, null, aDictionaries, aVlm,
-                java.util.Set.of(), java.util.Set.of(),
-                net.cumba.corej.core.exec.EngineLimits.resolveSeverityThreshold(aRunLevel));
-        // PLAN-output-variable-null-key-provenance §2.1: no finding value is null — judged on
-        // every scenario execution, and counted (the factory's last test asserts the reach).
-        net.cumba.corej.core.FindingValuesNullGuard.requireNullFree(
-                net.cumba.corej.core.FindingValuesNullGuard.CDT,
-                "scenario " + aDomain + " / " + aPrimary.getMetaData().getName(), aRule,
-                result.getViolations());
-        return result;
-    }
-
-
-    /**
-     * The production scope verdict for the scenario's primary dataset, or {@code null} when in
-     * scope. Five axes, in the production order — Domains, <b>Datasets</b>, Classes,
-     * Data_Structures, Subclasses — matching {@code DatasetRuleResolver.describeScopeSkip} call for
-     * call. ⚠ An axis missing from this list is an axis the pre-gate does not judge, and a scenario
-     * would then pass because the gate was off for it rather than because the rule was in scope;
-     * {@code Scope.Datasets} was exactly that hole until phase 5 of
-     * {@code plans/done/PLAN-scope-requirements-split.md}.
-     *
-     * <p>
-     * The two axes differ in how an undeclared value is treated, deliberately:
-     * </p>
-     * <ul>
-     * <li>the <b>class</b> axis reads the scenario's {@code class=} when it declares one. ⚠ Since
-     * <b>Fix #206</b> an absent {@code class=} no longer switches the axis off for an <em>ADaM</em>
-     * class scope: ADaM has no observation class, so those tokens are structure tokens and are
-     * judged from the detected structure set below — see {@link #describeAdamClassMismatch}, which
-     * also documents why an SDTM class scope stays undetermined;</li>
-     * <li>the <b>ADaM structure / subclass</b> axes <b>detect</b> from the fixture's columns when
-     * the scenario declares no {@code structure=} / {@code subclass=}. A {@code .cdt} fixture
-     * always carries real columns, so detection is meaningful and a structure- or subclass-scoped
-     * rule cannot be satisfied by omission. An explicit declaration is the <em>declared</em>
-     * (Define-XML {@code def:Class} / {@code def:SubClass}) tier, which since <b>Fix #154</b>
-     * <em>overrides</em> the columns by default; {@code -Dcorej.defineFirst=false} restores the old
-     * columns-first order, where a declaration is only a fallback.</li>
-     * </ul>
-     *
-     * <p>
-     * ⚠⚠ <b>Phase 3a.3 — the two are no longer independent.</b> The bullets above described the
-     * harness's own split, not production's: Define-XML has a single {@code def:Class} element,
-     * which is the SDTM observation class for an SDTM dataset and the ADaM <em>data structure</em>
-     * for an ADaM one (ADaM has no class of its own), and one value therefore feeds both gates in a
-     * real run. A scenario's {@code class=} is now read as a structure declaration too when it
-     * names one — {@link ScenarioDeclaredScopeProvider#effectiveDeclaredStructure} — so a fixture
-     * saying {@code class="BASIC DATA STRUCTURE"} means in the harness what it would mean in a
-     * study. An SDTM class value is not an ADaM structure and is unaffected.
-     * </p>
-     *
-     * <p>
-     * {@link net.cumba.corej.core.exec.RuleRunner} applies the same two ADaM axes at execution
-     * time, from the same detectors with the same declared tier — the declaration reaches it via
-     * {@link ScenarioDeclaredScopeProvider}, which the runner sees as an ordinary
-     * {@link MetadataProvider}. This pre-gate therefore does not change <em>whether</em> a scenario
-     * is in scope; it attributes the verdict to the scope layer that owns it, which is what makes
-     * {@code expect=skipped} the honest contract rather than a mid-execution SKIPPED.
-     * </p>
-     */
-    // Package-private (not private) so AdamClassScopeGateTest can pin the WIRING end-to-end, not
-    // just describeAdamClassMismatch in isolation: with 0 verdict changes across the 494 newly
-    // judged scenarios (Fix #206), deleting the call below would otherwise redden nothing.
+    /** {@link ScenarioScopeGate#describeScopeMismatch}, the name the corpus tests cite. */
     static @Nullable String describeScopeMismatch(Rule aRule, OverlayDataTable aPrimary)
     {
-        // Same inputs as production (DatasetRuleResolver.describeScopeSkip): the dataset name plus
-        // the
-        // DOMAIN/RDOMAIN-derived unsplit name, so split datasets (LBHEMAT with DOMAIN=LB) match
-        // their parent domain's scope.
-        String mismatch = ScopeMatcher.describeDomainMismatch(aRule,
-                aPrimary.getMetaData().getName(),
-                net.cumba.corej.core.exec.DatasetIdentity.unsplitNameFromData(aPrimary));
-        if (mismatch != null)
-        {
-            return mismatch;
-        }
-        // Scope.Datasets (owner requirement #5, PLAN-scope-requirements-split phase 5) —
-        // immediately after Domains, exactly where DatasetRuleResolver.describeScopeSkip puts it,
-        // and on
-        // the MEMBER file name with no split-base re-test. Without this leg every .cdt scenario on
-        // a Datasets-scoped rule is pre-gated wrong, and silently: the axis simply would not be
-        // judged, so a fixture would pass because the gate was off for it. Inert while the corpus
-        // ships zero carriers — which is precisely why it has to be wired before one appears.
-        mismatch = ScopeMatcher.describeDatasetMismatch(aRule, aPrimary.getMetaData().getName());
-        if (mismatch != null)
-        {
-            return mismatch;
-        }
-        // Exactly the inputs and precedence RuleRunner uses (Fix #117/#118/#119): the column
-        // heuristic plus the DECLARED tier, which here is the scenario's structure= / subclass=
-        // rather than a Define-XML def:Class / def:SubClass. Same call, same
-        // corej.defineFirst preference — so this pre-gate cannot disagree with the engine.
-        // Computed BEFORE the class gate since Fix #206: an ADaM Classes scope is judged from this
-        // same structure set (see describeAdamClassMismatch).
-        List<String> columns = scopeColumnNames(aPrimary);
-        boolean defineFirst = AdamDataStructureDetector.defineFirstPreference();
-        String name = aPrimary.getMetaData().getName();
-        // Phase 3a.3: the declared tier is `structure=` OR an ADaM-structure `class=`. Production
-        // has one def:Class element feeding both the class gate and the structure gate; the
-        // harness's independent-axes treatment was the divergence.
-        List<String> structures = AdamDataStructureDetector.detectAll(name, columns,
-                ScenarioDeclaredScopeProvider.effectiveDeclaredStructure(aPrimary), defineFirst);
-        Object datasetClass = aPrimary.getMetaData().getMetaData("dataset_class");
-        mismatch = datasetClass != null
-                ? ScopeMatcher.describeClassMismatch(aRule, datasetClass.toString())
-                : describeAdamClassMismatch(aRule, structures);
-        if (mismatch != null)
-        {
-            return mismatch;
-        }
-        mismatch = ScopeMatcher.describeDataStructureMismatch(aRule, structures);
-        if (mismatch != null)
-        {
-            return mismatch;
-        }
-        return ScopeMatcher.describeSubclassMismatch(aRule,
-                AdamSubclassDetector.resolve(name, structures, columns,
-                        ScenarioDeclaredScopeProvider.declaredSubclasses(aPrimary), defineFirst));
+        return ScenarioScopeGate.describeScopeMismatch(aRule, aPrimary);
     }
 
 
-    /**
-     * <b>Fix #206 — the ADaM arm of the {@code Scope.Classes} gate.</b> Returns {@code null} when
-     * the rule's {@code Scope.Classes} block does not apply here or is satisfied by
-     * {@code aStructures}, else the mismatch description.
-     *
-     * <p>
-     * Reached only when the scenario declares no {@code class=}. Until Fix #206 that meant the
-     * class axis was <em>not judged at all</em>, which is the harness/production divergence wave 27
-     * recorded as {@code R-d}: a fixture passed because the gate was off for it, not because the
-     * rule was in scope. Production has no such hole — {@code DatasetRuleResolver} judges
-     * {@code Scope.Classes} for every dataset, strict-on-null (Fix #41).
-     * </p>
-     *
-     * <p>
-     * ⚠⚠ <b>Production's chain cannot be reproduced literally here, and reproducing it partially
-     * would be worse than the hole.</b> {@code LibraryValidator.classNameFor} resolves the class
-     * through {@code MetadataProvider.getDatasetClass(member, domain, columns)}, whose decisive
-     * ADaM tier is the CDISC Library <em>product reverse-walk</em> ({@code AdamProduct}). No
-     * {@code .cdt} scenario has a Library — {@code MapBackedLibraryMetadataProvider} does not
-     * override {@code getDatasetClass} at all, so it returns {@code null} — and the curated offline
-     * fallback ({@code DomainClassMap}) has <b>zero</b> {@code adam} entries. A literal
-     * transcription would therefore resolve {@code null} (or the FU-4 {@code ADAM OTHER} sentinel)
-     * for essentially every ADaM fixture and skip them all, which is the opposite of what a
-     * Library-backed production run does.
-     * </p>
-     *
-     * <p>
-     * ⚑ What <em>is</em> reproducible is the semantics: <b>ADaM has no observation class</b>. The
-     * single Define-XML {@code def:Class} element carries the ADaM <em>data structure</em>
-     * (`PLAN-adam-structure-set-valued.md` §7.1 — identity, no mapping), so an ADaM
-     * {@code Scope.Classes} token is a structure token and is judged from exactly the set the
-     * {@code Scope.Data_Structures} gate uses, lifted over the is-a set the same way
-     * ({@code Include} is satisfied when <b>any</b> detected token matches). The per-token verdict
-     * comes from {@link ScopeMatcher#describeClassMismatch} itself, so normalisation and the
-     * {@code ALL} wildcard cannot drift from the class matcher.
-     * </p>
-     *
-     * <p>
-     * <b>Three deliberate refusals</b>, each returning {@code null} (i.e. leaving the pre-Fix-#206
-     * behaviour) rather than guessing:
-     * </p>
-     * <ul>
-     * <li><b>SDTM class scopes.</b> Judged only when the block names at least one ADaM structure
-     * token ({@link AdamDataStructureDetector#structureTokenFromDeclaredClass}). An SDTM class
-     * genuinely is undetermined without a Library, and the wave-27 census found <b>0</b> files
-     * mixing an SDTM class with an ADaM structure, so the two populations do not overlap.</li>
-     * <li><b>{@code Exclude}.</b> Lifting an Exclude list over a set is not expressible through
-     * {@link ScopeMatcher#describeClassMismatch} per token (that method folds Include and Exclude
-     * into one verdict), and the corpus has <b>0</b> ADaM {@code Classes.Exclude} entries — its
-     * only four are {@code RELATIONSHIP}, which is SDTM. Reimplementing the lift here would put
-     * matcher semantics in the harness for a population of zero.</li>
-     * <li><b>An empty/absent {@code Include}.</b> Nothing to judge.</li>
-     * </ul>
-     */
-    // Package-private (not private) so AdamClassScopeGateTest can drive it directly with a
-    // synthetic Rule + structure set; every branch below is otherwise reachable only through a
-    // .cdt fixture, and adding fixtures would move the migration ratchet's scenario counts.
+    /** {@link ScenarioScopeGate#describeAdamClassMismatch}, the name the corpus tests cite. */
     static @Nullable String describeAdamClassMismatch(Rule aRule, List<String> aStructures)
     {
-        if (aRule.getScope() == null || aRule.getScope().getClasses() == null)
-        {
-            return null;
-        }
-        ClassScope classes = aRule.getScope().getClasses();
-        List<String> include = classes.getInclude();
-        if (include == null || include.isEmpty()
-                || (classes.getExclude() != null && !classes.getExclude().isEmpty()))
-        {
-            return null;
-        }
-        if (include.stream().noneMatch(
-                t -> AdamDataStructureDetector.structureTokenFromDeclaredClass(t) != null))
-        {
-            return null;
-        }
-        for (String structure : aStructures)
-        {
-            if (ScopeMatcher.describeClassMismatch(aRule, structure) == null)
-            {
-                return null;
-            }
-        }
-        // Names the MOST SPECIFIC detected token first, like describeDataStructureMismatch, and
-        // appends the full set when there is an is-a chain so the reader can see why a
-        // supertype-scoped rule would have matched.
-        return "data structure " + aStructures.getFirst() + " not in Scope.Classes.Include "
-                + include + (aStructures.size() > 1 ? " (detected " + aStructures + ")" : "");
-    }
-
-
-    /**
-     * Phase 3a.3: whether {@code aRule} carries one of the two gates that read the declared ADaM
-     * tier. Mirrors {@code RuleRunner}'s own guard exactly — the runner computes the structure set
-     * (and therefore consults {@code getDeclaredDatasetClass}) only inside
-     * {@code rule.getScope() != null && (getDataStructures() != null || getSubclasses() != null)}.
-     * For every other rule a declared-tier decoration is unobservable, which is what lets
-     * {@link ScenarioDeclaredScopeProvider#install} leave the 543 {@code class=}-only fixtures that
-     * carry no provider block alone.
-     */
-    private static boolean readsDeclaredAdamTier(Rule aRule)
-    {
-        return aRule.getScope() != null && (aRule.getScope().getDataStructures() != null
-                || aRule.getScope().getSubclasses() != null);
-    }
-
-
-    /** Column names in declared order — mirrors {@code DatasetRuleResolver.doGenerate}. */
-    private static List<String> scopeColumnNames(OverlayDataTable aPrimary)
-    {
-        DataTableMeta meta = aPrimary.getMetaData();
-        List<String> names = new ArrayList<>(meta.getColumnCount());
-        for (int i = 0; i < meta.getColumnCount(); i++)
-        {
-            names.add(meta.getColumn(i).getName());
-        }
-        return names;
-    }
-
-
-    /** Parse a {@code #define-xml} sidecar, resolved against the scenario file's directory. */
-    private static OdmDefineXMLProvider parseDefineXml(Path aScenarioFile, String aRelative)
-    {
-        Path file = aScenarioFile.resolveSibling(aRelative);
-        try
-        {
-            return new OdmDefineXMLProvider(new DefineXmlParser().parse(file.toFile()));
-        }
-        catch (IOException e)
-        {
-            throw new UncheckedIOException("could not parse #define-xml sidecar " + file, e);
-        }
+        return ScenarioScopeGate.describeAdamClassMismatch(aRule, aStructures);
     }
 
 
@@ -929,7 +580,7 @@ abstract class AbstractRuleTestSuitesFactory
      */
     private void checkDeclaredStandardMembership(RuleTestScenario aScenario)
     {
-        String declared = declaredStandardVersion(aScenario);
+        String declared = ScenarioRuleSelector.declaredStandardVersion(aScenario);
         if (declared == null)
         {
             assertFalse(requireDeclaredStandard(),
@@ -953,9 +604,7 @@ abstract class AbstractRuleTestSuitesFactory
 
     /**
      * Resolve the rule to execute: the declared standard+version's assembled view when the scenario
-     * declares one, else the first canonical package containing the rule
-     * ({@link #DEFAULT_PACKAGE_PREFERENCE}), else — deterministically — the last sorted package
-     * that contains it.
+     * declares one, else the canonical fallback ({@link ScenarioRuleSelector#resolveIn}).
      */
     private @Nullable Rule resolveRule(RuleTestScenario aScenario)
     {
@@ -964,81 +613,14 @@ abstract class AbstractRuleTestSuitesFactory
 
 
     /**
-     * {@link #resolveRule}'s selection over an explicit package map — the view of the scenario's
-     * declared standard+version, else the canonical fallback. Package-private so the respelling
-     * differential resolves the <b>base</b> rule from a second package directory
-     * ({@link #loadFamily(Path, String)}) with exactly the factories' own choice of view.
+     * {@link ScenarioRuleSelector#resolveIn} under the name the respelling differential cites: the
+     * view of the scenario's declared standard+version, else the canonical fallback, over an
+     * explicit package map ({@link #loadFamily(Path, String)}).
      */
     static @Nullable Rule resolveIn(Map<String, Map<String, Rule>> packages,
             RuleTestScenario aScenario)
     {
-        String declared = declaredStandardVersion(aScenario);
-        if (declared != null)
-        {
-            Map<String, Rule> pkg = packages.get(declared);
-            return pkg != null ? pkg.get(aScenario.getCoreId()) : null;
-        }
-        for (String preferred : DEFAULT_PACKAGE_PREFERENCE)
-        {
-            Map<String, Rule> pkg = packages.get(preferred);
-            if (pkg != null && pkg.containsKey(aScenario.getCoreId()))
-            {
-                return pkg.get(aScenario.getCoreId());
-            }
-        }
-        Rule found = null;
-        for (String standardVersion : new java.util.TreeSet<>(packages.keySet()))
-        {
-            Rule candidate = packages.get(standardVersion).get(aScenario.getCoreId());
-            if (candidate != null)
-            {
-                found = candidate;
-            }
-        }
-        return found;
-    }
-
-
-    /** The scenario's declared {@code <standard>-<version>}, or {@code null} if undeclared. */
-    private static @Nullable String declaredStandardVersion(RuleTestScenario aScenario)
-    {
-        LibraryRef ref = aScenario.getLibraryRef();
-        if (ref != null)
-        {
-            return ref.getStandard() + "-" + ref.getVersion();
-        }
-        MapBackedLibraryMetadataProvider lib = aScenario.getLibrary();
-        if (lib != null && !UNDECLARED_STANDARD.equals(lib.getStandard()))
-        {
-            return lib.getStandard() + "-" + lib.getVersion();
-        }
-        return null;
-    }
-
-
-    private static @Nullable RuntimeDictionaryProvider resolveDictionaries(
-            RuleTestScenario aScenario)
-    {
-        if (aScenario.getDictionaries() == null)
-        {
-            return null;
-        }
-        // Parser guarantees the only accepted value is "dummy".
-        RuntimeDictionaryProvider provider = dummyDictionaries;
-        if (provider == null)
-        {
-            try
-            {
-                provider = RuntimeDictionaryProvider.loadDirectory(DUMMY_DICTIONARIES_DIR);
-            }
-            catch (IOException e)
-            {
-                throw new UncheckedIOException(
-                        "could not load the dummy dictionaries from " + DUMMY_DICTIONARIES_DIR, e);
-            }
-            dummyDictionaries = provider;
-        }
-        return provider;
+        return ScenarioRuleSelector.resolveIn(packages, aScenario);
     }
 
 
@@ -1067,38 +649,10 @@ abstract class AbstractRuleTestSuitesFactory
      * {@link #loadFamily(String)} over an explicit corpus directory — the respelling differential's
      * base packages, generated from the base rule text into a directory of its own
      * ({@code RuleCorpusGenerator <out> <release-out>} with the base tree as the working
-     * directory).
+     * directory). {@link ScenarioRuleSelector#loadPackages}.
      */
     static Map<String, Map<String, Rule>> loadFamily(Path aRulesDir, String aFamily)
     {
-        Map<String, Map<String, Rule>> packages = new HashMap<>();
-        String prefix = "rules-" + aFamily + "-";
-        try (DirectoryStream<Path> dir = Files.newDirectoryStream(aRulesDir, prefix + "*.json"))
-        {
-            for (Path p : dir)
-            {
-                String name = p.getFileName().toString();
-                String standardVersion = name.substring(prefix.length(),
-                        name.length() - ".json".length());
-                RulePackage pkg = RulePackageLoader.load(p);
-                Map<String, Rule> byCoreId = new HashMap<>();
-                for (Rule rule : pkg.getRules().values())
-                {
-                    String coreId = rule.getCore() != null ? rule.getCore().getId() : rule.getId();
-                    byCoreId.put(coreId, rule);
-                }
-                packages.put(standardVersion, byCoreId);
-            }
-        }
-        catch (IOException e)
-        {
-            throw new UncheckedIOException("could not load rule packages for family " + aFamily, e);
-        }
-        if (packages.isEmpty())
-        {
-            throw new IllegalStateException(
-                    "no rule packages found for family " + aFamily + " under " + aRulesDir);
-        }
-        return packages;
+        return ScenarioRuleSelector.loadPackages(aRulesDir, aFamily);
     }
 }

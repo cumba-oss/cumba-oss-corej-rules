@@ -34,6 +34,7 @@ import net.cumba.corej.core.run.StudyValidationResult;
 import net.cumba.corej.core.run.StudyValidationService;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner;
 import net.cumba.datatable.IDataTable;
 import net.cumba.datatable.impl.support.OverlayDataTable;
 import net.cumba.datatable.manager.IDataTableLibraryRef;
@@ -363,8 +364,8 @@ class RedundantOvSweepDifferentialTest
         OverlayDataTable primary = s.primaryTable();
         assertNotNull(primary, rel + " names no primary dataset");
 
-        AbstractRuleTestSuitesFactory.EvalOutcome b;
-        AbstractRuleTestSuitesFactory.EvalOutcome c;
+        ScenarioRunner.EvalOutcome b;
+        ScenarioRunner.EvalOutcome c;
         try
         {
             b = factory.evaluateScenario(file, s, base, primary);
@@ -647,7 +648,7 @@ class RedundantOvSweepDifferentialTest
         }
     }
 
-    private static @Nullable List<Row> rows(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o)
+    private static @Nullable List<Row> rows(ScenarioRunner.@Nullable EvalOutcome o)
     {
         if (o == null)
         {
@@ -671,7 +672,7 @@ class RedundantOvSweepDifferentialTest
     }
 
 
-    private static String state(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o)
+    private static String state(ScenarioRunner.@Nullable EvalOutcome o)
     {
         if (o == null)
         {

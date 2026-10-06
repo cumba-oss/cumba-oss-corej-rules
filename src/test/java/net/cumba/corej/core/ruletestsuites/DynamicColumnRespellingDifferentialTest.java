@@ -38,6 +38,7 @@ import net.cumba.corej.core.rulespec.SpecSchema;
 import net.cumba.corej.ruletest.cdt.ruletest.ExecutionVerdictCheck;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestCdt;
 import net.cumba.corej.ruletest.cdt.ruletest.RuleTestScenario;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioRunner;
 import net.cumba.corej.ruletest.cdt.ruletest.ViolationLocationCheck;
 import net.cumba.datatable.impl.support.OverlayDataTable;
 import org.jspecify.annotations.Nullable;
@@ -406,8 +407,8 @@ class DynamicColumnRespellingDifferentialTest
         OverlayDataTable primary = s.primaryTable();
         assertNotNull(primary, rel + " names no primary dataset");
 
-        AbstractRuleTestSuitesFactory.EvalOutcome b;
-        AbstractRuleTestSuitesFactory.EvalOutcome c;
+        ScenarioRunner.EvalOutcome b;
+        ScenarioRunner.EvalOutcome c;
         try
         {
             b = factory.evaluateScenario(file, s, base, primary);
@@ -500,9 +501,9 @@ class DynamicColumnRespellingDifferentialTest
             SpecSchema current = SpecLoader.load(specFile);
             SpecSchema base = substituted(specFile, baseDir, "base");
             SpecSchema control = substituted(specFile, CorpusPaths.rules(), "control");
-            AbstractRuleTestSuitesFactory.EvalOutcome c = outcomeOf(SpecRunner.executeRaw(current));
-            AbstractRuleTestSuitesFactory.EvalOutcome b = outcomeOf(SpecRunner.executeRaw(base));
-            AbstractRuleTestSuitesFactory.EvalOutcome k = outcomeOf(SpecRunner.executeRaw(control));
+            ScenarioRunner.EvalOutcome c = outcomeOf(SpecRunner.executeRaw(current));
+            ScenarioRunner.EvalOutcome b = outcomeOf(SpecRunner.executeRaw(base));
+            ScenarioRunner.EvalOutcome k = outcomeOf(SpecRunner.executeRaw(control));
             assertEquals(render(c), render(k), () -> rel + ": the coreId substitution is not"
                     + " faithful — resolving from the current corpus by substitution renders"
                     + " differently from the loader's own resolution");
@@ -553,8 +554,7 @@ class DynamicColumnRespellingDifferentialTest
     }
 
 
-    private static AbstractRuleTestSuitesFactory.@Nullable EvalOutcome outcomeOf(
-            @Nullable RuleExecutionResult r)
+    private static ScenarioRunner.@Nullable EvalOutcome outcomeOf(@Nullable RuleExecutionResult r)
     {
         if (r == null)
         {
@@ -562,7 +562,7 @@ class DynamicColumnRespellingDifferentialTest
         }
         List<Violation> v = r.getViolations() != null ? r.getViolations() : List.of();
         boolean ran = !(r.isSkipped() || r.isError());
-        return new AbstractRuleTestSuitesFactory.EvalOutcome(r.hasViolations(), ran, r.isError(), v,
+        return new ScenarioRunner.EvalOutcome(r.hasViolations(), ran, r.isError(), v,
                 r.getViolationCount(), r.isTruncated(),
                 ran ? null : r.getStatus() + ": " + r.getStatusMessage());
     }
@@ -630,8 +630,8 @@ class DynamicColumnRespellingDifferentialTest
     }
 
 
-    private static boolean passes(RuleTestScenario s,
-            AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o, OverlayDataTable primary)
+    private static boolean passes(RuleTestScenario s, ScenarioRunner.@Nullable EvalOutcome o,
+            OverlayDataTable primary)
     {
         if (o == null)
         {
@@ -649,21 +649,20 @@ class DynamicColumnRespellingDifferentialTest
      * The whole outcome as text, in the engine's order: state, then one line per finding row in
      * emission order, each row's maps in their iteration order.
      */
-    static String render(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o)
+    static String render(ScenarioRunner.@Nullable EvalOutcome o)
     {
         return render(o, false);
     }
 
 
     /** The same, order-insensitive: rows sorted, maps sorted — the ORDER-ONLY classifier. */
-    static String renderCanonical(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o)
+    static String renderCanonical(ScenarioRunner.@Nullable EvalOutcome o)
     {
         return render(o, true);
     }
 
 
-    private static String render(AbstractRuleTestSuitesFactory.@Nullable EvalOutcome o,
-            boolean aSorted)
+    private static String render(ScenarioRunner.@Nullable EvalOutcome o, boolean aSorted)
     {
         if (o == null)
         {

@@ -9,6 +9,7 @@ import net.cumba.corej.core.metadata.AdamDataStructureDetector;
 import net.cumba.corej.core.model.ClassScope;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Scope;
+import net.cumba.corej.ruletest.cdt.ruletest.ScenarioScopeGate;
 import net.cumba.datatable.impl.support.OverlayDataTable;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,8 @@ class AdamClassScopeGateTest
     @Test
     void adamClassInclude_matchingStructure_inScope()
     {
-        assertNull(AbstractRuleTestSuitesFactory
-                .describeAdamClassMismatch(classScoped(List.of(BDS), null), List.of(BDS)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of(BDS), null),
+                List.of(BDS)));
     }
 
 
@@ -51,7 +52,7 @@ class AdamClassScopeGateTest
     @Test
     void adamClassInclude_structurelessDataset_outOfScope()
     {
-        String mismatch = AbstractRuleTestSuitesFactory
+        String mismatch = ScenarioScopeGate
                 .describeAdamClassMismatch(classScoped(List.of(BDS), null), List.of(OTHER));
         assertNotNull(mismatch);
         assertTrue(mismatch.contains(OTHER) && mismatch.contains("Scope.Classes.Include"),
@@ -67,10 +68,10 @@ class AdamClassScopeGateTest
     @Test
     void adamClassInclude_deviceStructureMatchesItsSupertype_inScope()
     {
-        assertNull(AbstractRuleTestSuitesFactory.describeAdamClassMismatch(
-                classScoped(List.of(BDS), null), AdamDataStructureDetector.structureSet(MDBDS)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of(BDS), null),
+                AdamDataStructureDetector.structureSet(MDBDS)));
         // …and the mismatch message names the MOST SPECIFIC token plus the whole set.
-        String mismatch = AbstractRuleTestSuitesFactory.describeAdamClassMismatch(
+        String mismatch = ScenarioScopeGate.describeAdamClassMismatch(
                 classScoped(List.of(AdamDataStructureDetector.ADSL), null),
                 AdamDataStructureDetector.structureSet(MDBDS));
         assertNotNull(mismatch);
@@ -84,8 +85,8 @@ class AdamClassScopeGateTest
     @Test
     void adamClassInclude_plainStructureDoesNotMatchTheSpecialisation_outOfScope()
     {
-        assertNotNull(AbstractRuleTestSuitesFactory
-                .describeAdamClassMismatch(classScoped(List.of(MDBDS), null), List.of(BDS)));
+        assertNotNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of(MDBDS), null),
+                List.of(BDS)));
     }
 
 
@@ -96,8 +97,8 @@ class AdamClassScopeGateTest
     @Test
     void sdtmClassScope_isNotJudged()
     {
-        assertNull(AbstractRuleTestSuitesFactory
-                .describeAdamClassMismatch(classScoped(List.of("EVENTS"), null), List.of(OTHER)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of("EVENTS"), null),
+                List.of(OTHER)));
     }
 
 
@@ -109,7 +110,7 @@ class AdamClassScopeGateTest
     @Test
     void adamClassScopeWithExclude_isNotJudged()
     {
-        assertNull(AbstractRuleTestSuitesFactory.describeAdamClassMismatch(
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(
                 classScoped(List.of(BDS), List.of(OTHER)), List.of(OTHER)));
     }
 
@@ -118,17 +119,15 @@ class AdamClassScopeGateTest
     @Test
     void emptyOrAbsentClassScope_isNotJudged()
     {
-        assertNull(AbstractRuleTestSuitesFactory
-                .describeAdamClassMismatch(classScoped(List.of(), null), List.of(OTHER)));
-        assertNull(AbstractRuleTestSuitesFactory.describeAdamClassMismatch(classScoped(null, null),
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of(), null),
+                List.of(OTHER)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(null, null),
                 List.of(OTHER)));
         Rule noScope = new Rule();
-        assertNull(
-                AbstractRuleTestSuitesFactory.describeAdamClassMismatch(noScope, List.of(OTHER)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(noScope, List.of(OTHER)));
         Rule emptyScope = new Rule();
         emptyScope.setScope(new Scope());
-        assertNull(AbstractRuleTestSuitesFactory.describeAdamClassMismatch(emptyScope,
-                List.of(OTHER)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(emptyScope, List.of(OTHER)));
     }
 
 
@@ -136,8 +135,8 @@ class AdamClassScopeGateTest
     @Test
     void allWildcardClassScope_isNotJudged()
     {
-        assertNull(AbstractRuleTestSuitesFactory
-                .describeAdamClassMismatch(classScoped(List.of("ALL"), null), List.of(OTHER)));
+        assertNull(ScenarioScopeGate.describeAdamClassMismatch(classScoped(List.of("ALL"), null),
+                List.of(OTHER)));
     }
 
     // -----------------------------------------------------------------------
@@ -154,8 +153,8 @@ class AdamClassScopeGateTest
     {
         // ADLB passes the AD*/AX* name gate; USUBJID/PARAMN carry no BDS indicator
         // (PARAMCD/PARAM/AVAL/AVALC) and no OCCDS suffix (TERM/TRT/DECOD) ⇒ ADAM OTHER.
-        String mismatch = AbstractRuleTestSuitesFactory.describeScopeMismatch(
-                classScoped(List.of(BDS), null), table("ADLB", null, "USUBJID", "PARAMN"));
+        String mismatch = ScenarioScopeGate.describeScopeMismatch(classScoped(List.of(BDS), null),
+                table("ADLB", null, "USUBJID", "PARAMN"));
         assertNotNull(mismatch, "before Fix #206 the class axis was not judged at all here");
         assertTrue(mismatch.contains("Scope.Classes.Include"), mismatch);
     }
@@ -165,9 +164,8 @@ class AdamClassScopeGateTest
     @Test
     void scopeMismatch_adamClassScopeOnBdsFixture_isInScope()
     {
-        assertNull(
-                AbstractRuleTestSuitesFactory.describeScopeMismatch(classScoped(List.of(BDS), null),
-                        table("ADLB", null, "USUBJID", "PARAMCD", "AVAL")));
+        assertNull(ScenarioScopeGate.describeScopeMismatch(classScoped(List.of(BDS), null),
+                table("ADLB", null, "USUBJID", "PARAMCD", "AVAL")));
     }
 
 
@@ -178,8 +176,8 @@ class AdamClassScopeGateTest
     @Test
     void scopeMismatch_declaredClassStillWins()
     {
-        assertNull(AbstractRuleTestSuitesFactory.describeScopeMismatch(
-                classScoped(List.of(BDS), null), table("ADLB", BDS, "USUBJID", "PARAMN")));
+        assertNull(ScenarioScopeGate.describeScopeMismatch(classScoped(List.of(BDS), null),
+                table("ADLB", BDS, "USUBJID", "PARAMN")));
     }
 
 
