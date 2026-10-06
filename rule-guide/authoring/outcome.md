@@ -58,7 +58,9 @@ Output_Variables: ["RDOMAIN"]      # read by no condition, but it tells the read
 
 Derived entries follow the order in which the check reads them; an authored entry comes first,
 in the order written. The list is where you put context columns the engine cannot derive; they
-lead, and the derived columns follow in walk order.
+lead, and the derived columns follow in walk order. The results view's rule definition shows this
+effective list, with the entries you authored marked and your `!X` exclusions struck through; names
+appear as written in the rule — wildcards (`--TESTCD`, `&NAME&`) resolve per dataset.
 
 > **Never report a variable the rule did not read.** A finding showing a column the check never
 > touched invites the reader to conclude something the rule never checked — and that conclusion
