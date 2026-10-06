@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+import net.cumba.corej.authoring.RulePackageConverter;
 import net.cumba.corej.core.expr.CheckExpressionParser;
 import net.cumba.corej.core.expr.ExpressionException;
 import net.cumba.corej.core.expr.ExpressionPrinter;

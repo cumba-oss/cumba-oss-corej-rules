@@ -9,9 +9,11 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import net.cumba.corej.authoring.ReleaseShapeTrimmer;
+import net.cumba.corej.authoring.RulePackageConverter;
+import net.cumba.corej.authoring.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageManifest;
-import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
 
 /**
  * The package <em>writer</em> of the corpus regeneration flow: serialises the already-assembled

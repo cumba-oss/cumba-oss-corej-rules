@@ -1,13 +1,9 @@
 package net.cumba.corej.core.expr.convert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -22,27 +18,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
+import net.cumba.corej.authoring.AuthoredRuleAssembler;
+import net.cumba.corej.authoring.AuthoredRuleAssembler.StandardVersion;
+import net.cumba.corej.authoring.PackageStandardsMap;
+import net.cumba.corej.authoring.RuleFamily;
 import net.cumba.corej.core.RulePackageManifest;
-import net.cumba.corej.core.exec.RuleClassifier;
-import net.cumba.corej.core.model.Executability;
-import net.cumba.corej.core.model.Rule;
-import net.cumba.corej.core.model.RuleFamily;
-import net.cumba.corej.core.model.Sensitivity;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Offline developer tool — the <em>assemble</em> half of the split-storage migration
  * ({@code plans/done/PLAN-rule-storage-split.md}): reads the per-rule YAML under {@code rules-src/}
- * and rebuilds the combined JSON packages. ⚠ This line said "operator-leaf JSON packages" until
- * 2026-09-17: phase 7d of {@code PLAN-typed-expression-engine} deleted the v1 operator-leaf model,
- * and what is assembled is — and for some time already was — expression form.
+ * and rebuilds the combined JSON packages.
  *
  * <p>
- * ⚑ <b>It writes nothing.</b> {@link #assemblePackage} returns the <em>canonical</em> node — the
- * {@code Authorities} join, the {@code Sensitivity} derive-and-validate gate (validation only since
- * {@code PLAN-retire-corpus-transforms.md} phase 1: the derived value is discarded, the shipped
- * corpus carries the field only where authored) and the materialised provider {@code Requirements}
- * (the presence-operator normalisation it once ran moved to the writer, {@code PresenceSpelling}).
+ * ⭐ <b>Since {@code PLAN-rule-authoring-api} (2026-10-06) this class is the corpus-wide driver
+ * only.</b> The per-rule half — the {@code Authorities} join, the {@code Sensitivity}
+ * derive-and-validate gate, the reference keys shared with the docs sidecar — lives in the engine's
+ * {@code cumba-corej-authoring} module ({@link AuthoredRuleAssembler}), where the rule editor runs
+ * the same code: one implementation, two consumers, and this corpus's regeneration is the proof
+ * that the lifted code assembles every rule byte-identically. ⛔ Do not re-grow a per-rule transform
+ * here; it belongs in the engine module or nowhere.
+ * </p>
+ *
+ * <p>
+ * ⚑ <b>It writes nothing.</b> {@link #assemblePackage} returns the <em>canonical</em> node.
  * {@link RuleCorpusGenerator} is the driver: it hands that node to {@link RuleExprGenerator} to
  * produce the shipped {@code rules/} corpus.
  * </p>
@@ -62,32 +61,18 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * Run it through {@code scripts/regen-rules-corpus.sh}, which drives {@link RuleCorpusGenerator} on
- * a classpath guarded against a stale, installed engine ({@code scripts/lib/corpus-gen-env.sh}).
- * There is deliberately no standalone entry point here.
+ * the test classpath ({@code scripts/lib/corpus-gen-env.sh}). There is deliberately no standalone
+ * entry point here.
  * </p>
  */
 public final class RuleStorageAssembler
 {
 
-    private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory());
-
-    private static final ObjectMapper JSON = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
-
     /**
-     * Binds a {@code rules-src} check node to {@link Rule} for derivation. Lenient because the
-     * source YAML carries authoring-only blocks ({@code Standards}, {@code Source}) that the
-     * runtime model does not model.
+     * The {@code Executability} value that parks a rule —
+     * {@link AuthoredRuleAssembler#NOT_EXECUTABLE}.
      */
-    private static final ObjectMapper LENIENT = new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-    /**
-     * The {@code Executability} value that parks a rule — {@link Executability#NOT_EXECUTABLE}'s
-     * authored form. Taken from the enum rather than re-typed, so a rename cannot silently turn the
-     * skip into a no-op.
-     */
-    private static final String NOT_EXECUTABLE = Executability.NOT_EXECUTABLE.getJsonValue();
+    private static final String NOT_EXECUTABLE = AuthoredRuleAssembler.NOT_EXECUTABLE;
 
     private static final Path SRC_DIR = Path.of("rules-src");
 
@@ -153,7 +138,9 @@ public final class RuleStorageAssembler
      * reverse. Do not delete either as duplication.</b> A package that did not come out of this
      * tool (hand-authored, or handed to {@code RulePackageLoader.load} / {@code loadFromString}
      * from outside the shipped corpus) bypasses it, so a {@code Not Executable} rule can still
-     * reach the engine; the loader-side skip is what stops it there.
+     * reach the engine; the loader-side skip is what stops it there. The editor's single-rule path
+     * ({@code AuthoredRuleAssembler.assemble}) reports the same parking as an {@code INFO}
+     * diagnostic and loads nothing.
      * </p>
      *
      * @param loaded
@@ -166,7 +153,7 @@ public final class RuleStorageAssembler
         List<String> parked = new ArrayList<>();
         for (Map.Entry<String, JsonNode> entry : loaded.entrySet())
         {
-            if (NOT_EXECUTABLE.equals(textOrNull(entry.getValue().get("Executability"))))
+            if (AuthoredRuleAssembler.isParked(entry.getValue()))
             {
                 parked.add(entry.getKey());
             }
@@ -178,9 +165,10 @@ public final class RuleStorageAssembler
         if (!parked.isEmpty())
         {
             System.out.printf(Locale.ROOT,
-                    "[assemble] %d rule(s) parked by Executability: \"Not Executable\","
+                    "[assemble] %d rule(s) parked by Executability: \"%s\","
                             + " omitted from BOTH corpora: %s%n",
-                    parked.size(), String.join(", ", parked.stream().sorted().toList()));
+                    parked.size(), NOT_EXECUTABLE,
+                    String.join(", ", parked.stream().sorted().toList()));
         }
         return out;
     }
@@ -204,9 +192,9 @@ public final class RuleStorageAssembler
         for (Map.Entry<String, JsonNode> entry : checks.entrySet())
         {
             String family = RuleFamily.of(entry.getKey());
-            for (String[] sv : standardsOf(entry.getValue()))
+            for (StandardVersion sv : AuthoredRuleAssembler.standardsOf(entry.getValue()))
             {
-                triples.add(new Triple(family, sv[0], sv[1]));
+                triples.add(new Triple(family, sv.name(), sv.version()));
             }
         }
         List<Triple> out = new ArrayList<>(triples);
@@ -217,7 +205,8 @@ public final class RuleStorageAssembler
 
     /**
      * Assembles one family-scoped package: every rule of {@code family} whose {@code Standards}
-     * names {@code (name, version)}, keyed by {@code Core.Id}, sorted.
+     * names {@code (name, version)}, keyed by {@code Core.Id}, sorted. Each rule node is
+     * {@link AuthoredRuleAssembler#rebuildRule} — the editor's per-rule assembly, unchanged.
      *
      * @param family
      *            the rule family (e.g. {@code CDISC}); gates membership
@@ -233,15 +222,16 @@ public final class RuleStorageAssembler
         for (Map.Entry<String, JsonNode> entry : checks.entrySet())
         {
             if (RuleFamily.of(entry.getKey()).equals(family)
-                    && belongs(entry.getValue(), name, version))
+                    && AuthoredRuleAssembler.belongs(entry.getValue(), name, version))
             {
-                selected.put(entry.getKey(),
-                        rebuildRule(entry.getValue(), docs.get(entry.getKey())));
+                selected.put(entry.getKey(), AuthoredRuleAssembler.rebuildRule(entry.getValue(),
+                        docs.get(entry.getKey())));
             }
         }
-        ObjectNode rules = JSON.createObjectNode();
+        ObjectNode rules = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
+                .objectNode();
         selected.forEach(rules::set);
-        ObjectNode pkg = JSON.createObjectNode();
+        ObjectNode pkg = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();
         // Plan 2 R6 — the declaration is written HERE, the single choke point every regeneration
         // path shares (RuleCorpusGenerator and both corpus round-trip tests each drive their own
         // loop around this method). Declaration first, then the rules: a package's header reads
@@ -271,204 +261,6 @@ public final class RuleStorageAssembler
         return standardsMap.forPackage(name, version);
     }
 
-
-    /** The distinct {@code (Name, Version)} pairs a check's {@code Standards} block names. */
-    private static List<String[]> standardsOf(JsonNode check)
-    {
-        List<String[]> out = new ArrayList<>();
-        JsonNode standards = check.get("Standards");
-        if (standards == null)
-        {
-            return out;
-        }
-        for (JsonNode authority : standards)
-        {
-            JsonNode stds = authority.get("Standards");
-            if (stds == null)
-            {
-                continue;
-            }
-            for (JsonNode std : stds)
-            {
-                String name = textOrNull(std.get("Name"));
-                String version = textOrNull(std.get("Version"));
-                if (name != null && version != null)
-                {
-                    out.add(new String[]
-                    {
-                            name, version
-                    });
-                }
-            }
-        }
-        return out;
-    }
-
-
-    /** True iff the check's {@code Standards} block names the given {@code (name, version)}. */
-    private static boolean belongs(JsonNode check, String name, String version)
-    {
-        JsonNode standards = check.get("Standards");
-        if (standards == null)
-        {
-            return false;
-        }
-        for (JsonNode authority : standards)
-        {
-            JsonNode stds = authority.get("Standards");
-            if (stds == null)
-            {
-                continue;
-            }
-            for (JsonNode std : stds)
-            {
-                if (name.equals(textOrNull(std.get("Name")))
-                        && version.equals(textOrNull(std.get("Version"))))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Rebuilds a legacy rule node: check fields minus {@code Standards}, plus rejoined
-     * {@code Authorities} and the materialised provider requirements.
-     */
-    private static ObjectNode rebuildRule(JsonNode check, @Nullable JsonNode doc)
-    {
-        ObjectNode rule = JSON.createObjectNode();
-        JsonNode standards = check.get("Standards");
-        rule.set("Authorities",
-                buildAuthorities(standards, doc == null ? null : doc.get("Citations")));
-        if (!check.hasNonNull("Sensitivity"))
-        {
-            // Validation only, result discarded — the THROW is the point: a rule whose
-            // Sensitivity is absent and underivable must abort the regen here rather than ship
-            // unloadable (RuleClassifier.Confidence.NONE ⇒ IllegalStateException in derive()).
-            // The derived value itself is no longer written into the assembled node: shipping
-            // without the field is safe because RulePackageLoader.finishLoad re-derives it via
-            // deriveOmittedFields, and the 12 authored values are copied through in authored
-            // position like any other field (PLAN-retire-corpus-transforms.md phase 1, #10).
-            derive(check);
-        }
-        // ⚑ PROVIDER REQUIREMENTS ARE NO LONGER MATERIALISED (owner ruling 2026-09-08).
-        // Requirements.Library / .Define / .Dictionary DOCUMENT a fact the engine computes
-        // (ProviderRequirements); they never declare one, and RulePackageLoader's gate R5 says so
-        // in terms: "Omitting it is always legal ... the runtime arms read the derivation
-        // regardless". Materialising them was the last step that made the SHIPPED BYTES depend on
-        // the engine's semantics -- the same YAML through a different engine produced a different
-        // corpus, silently. They are now passed through exactly like Sensitivity: authored ships,
-        // absent stays absent. rules-src authors none today (measured 2026-09-08: 0 files), so the
-        // shipped corpus simply stops carrying the 1 366 derived flag instances it used to.
-        // Gate R5 still validates an AUTHORED value against the derivation, so a rule whose
-        // declaration lies about what it does is still a load error.
-        for (Map.Entry<String, JsonNode> field : check.properties())
-        {
-            if ("Standards".equals(field.getKey()))
-            {
-                continue;
-            }
-            rule.set(field.getKey(), field.getValue().deepCopy());
-        }
-        return rule;
-    }
-
-
-    /**
-     * A build gate wearing a derivation's clothes: verifies the {@code Sensitivity} a source rule
-     * omits is derivable ({@code PLAN-derive-rule-type-sensitivity} phase 5;
-     * {@code PLAN-retire-corpus-transforms.md} phase 1 stopped writing the derived value into the
-     * assembled node — the shipped corpus carries {@code Sensitivity} only where authored, and
-     * {@code RulePackageLoader.finishLoad} re-derives the rest via {@code deriveOmittedFields}).
-     * {@code Rule_Type} is no longer a rule field ({@code PLAN-leaf-scope-domain-inference} phase
-     * 7): the engine infers the evaluation domain from the Check at load, so nothing is derived for
-     * it here.
-     *
-     * @throws IllegalStateException
-     *             when the rule body gives no basis for the value; a silent omission would ship an
-     *             unloadable rule
-     */
-    private static void derive(JsonNode check)
-    {
-        Rule rule;
-        try
-        {
-            rule = LENIENT.treeToValue(check, Rule.class);
-        }
-        catch (JsonProcessingException e)
-        {
-            throw new IllegalStateException("cannot bind rule for derivation: " + check.get("Core"),
-                    e);
-        }
-        // 7b: materialise the Bindings before deriving — an external binder must run this itself
-        // (RulePackageLoader.normalizeOperations javadoc); without it the classifier derives over
-        // a rule with no operations and the gate would judge a different rule than ships.
-        net.cumba.corej.core.RulePackageLoader.materialiseBindings(rule);
-        String coreId = check.path("Core").path("Id").asText("<unknown>");
-        RuleClassifier.Derived<Sensitivity> sensitivity = RuleClassifier.deriveSensitivity(rule);
-        if (sensitivity.confidence() == RuleClassifier.Confidence.NONE)
-        {
-            throw new IllegalStateException("Rule " + coreId + ": Sensitivity is absent and cannot"
-                    + " be derived (" + sensitivity.rationale() + ") — author it explicitly");
-        }
-    }
-
-
-    /**
-     * Re-joins citations onto the {@code Standards} tree, producing the legacy {@code Authorities}.
-     */
-    private static ArrayNode buildAuthorities(@Nullable JsonNode standards,
-            @Nullable JsonNode citations)
-    {
-        ArrayNode out = JSON.createArrayNode();
-        if (standards == null || !standards.isArray())
-        {
-            return out;
-        }
-        List<String> keys = referenceKeys(standards);
-        int idx = 0;
-        for (JsonNode authority : standards)
-        {
-            ObjectNode a = JSON.createObjectNode();
-            a.set("Organization", authority.get("Organization").deepCopy());
-            ArrayNode stds = JSON.createArrayNode();
-            for (JsonNode std : authority.get("Standards"))
-            {
-                ObjectNode s = JSON.createObjectNode();
-                for (Map.Entry<String, JsonNode> f : ((ObjectNode) std).properties())
-                {
-                    if (!"References".equals(f.getKey()))
-                    {
-                        s.set(f.getKey(), f.getValue().deepCopy());
-                    }
-                }
-                ArrayNode refs = JSON.createArrayNode();
-                JsonNode refList = std.get("References");
-                if (refList != null)
-                {
-                    for (JsonNode ref : refList)
-                    {
-                        ObjectNode r = (ObjectNode) ref.deepCopy();
-                        String key = keys.get(idx++);
-                        if (citations != null && citations.has(key))
-                        {
-                            r.set("Citations", citations.get(key).deepCopy());
-                        }
-                        refs.add(r);
-                    }
-                }
-                s.set("References", refs);
-                stds.add(s);
-            }
-            a.set("Standards", stds);
-            out.add(a);
-        }
-        return out;
-    }
-
     // ---- loading & helpers ----------------------------------------------
 
 
@@ -485,7 +277,8 @@ public final class RuleStorageAssembler
             {
                 try
                 {
-                    JsonNode node = YAML.readTree(p.toFile());
+                    JsonNode node = AuthoredRuleAssembler.readYamlTree(
+                            Files.readString(p, java.nio.charset.StandardCharsets.UTF_8));
                     String key = "Core/Id".equals(keyPath) ? node.get("Core").get("Id").asText()
                             : node.get("Core").asText();
                     out.put(key, node);
@@ -500,12 +293,6 @@ public final class RuleStorageAssembler
     }
 
 
-    private static @Nullable String textOrNull(@Nullable JsonNode node)
-    {
-        return node == null || node.isNull() ? null : node.asText();
-    }
-
-
     // Canonical package serialization (indented JSON + trailing LF). Shared by main and tests.
     /**
      * Serialises declared standards to the array a package file carries (Plan 2, R6).
@@ -516,13 +303,13 @@ public final class RuleStorageAssembler
      */
     static ArrayNode jsonOf(List<net.cumba.corej.core.model.StandardRef> refs)
     {
-        return JSON.valueToTree(refs);
+        return AuthoredRuleAssembler.standardsJson(refs);
     }
 
 
     static String serialize(ObjectNode pkg) throws JsonProcessingException
     {
-        return JSON.writeValueAsString(pkg) + "\n";
+        return AuthoredRuleAssembler.serialize(pkg);
     }
 
 
@@ -545,21 +332,17 @@ public final class RuleStorageAssembler
         return checks;
     }
 
-    /** One {@code Reference} of an {@code Authorities} tree, under its stable locator key. */
+    /**
+     * One {@code Reference} of an {@code Authorities} tree, under its stable locator key — the
+     * corpus-side name of {@link AuthoredRuleAssembler.RefCitations}.
+     */
     record RefCitations(String key, @Nullable JsonNode citations)
     {
     }
 
     /**
-     * The ordered reference locator keys of an {@code Authorities}/{@code Standards} tree, used to
-     * re-join doc citations: the keys are identical whether or not the {@code Citations} are
-     * present, since the key derives only from organization / standard / rule-identifier.
-     *
-     * <p>
-     * ⚑ Moved here from {@code RuleStorageSplitter} in wave 33. The splitter was the one-shot
-     * {@code rules-legacy} &rarr; {@code rules-src} migration tool and went with that corpus; these
-     * two helpers were the only part of it anything else used, so they moved rather than died.
-     * </p>
+     * The ordered reference locator keys of an {@code Authorities}/{@code Standards} tree
+     * ({@link AuthoredRuleAssembler#referenceKeys}); kept here as the name the corpus tools cite.
      *
      * @param tree
      *            an {@code Authorities}-shaped array (the check file's {@code Standards} block)
@@ -567,63 +350,22 @@ public final class RuleStorageAssembler
      */
     static List<String> referenceKeys(@Nullable JsonNode tree)
     {
-        List<String> keys = new ArrayList<>();
-        for (RefCitations rc : walkReferences(tree))
-        {
-            keys.add(rc.key());
-        }
-        return keys;
+        return AuthoredRuleAssembler.referenceKeys(tree);
     }
 
 
     /**
-     * Walks every {@code Reference} of an {@code Authorities} tree in stable order, yielding a
-     * deterministic locator key. The key is content-derived (organization, standard,
-     * rule-identifier) with a positional {@code #n} tiebreak for the rare duplicate.
+     * Walks every {@code Reference} of an {@code Authorities} tree in stable order
+     * ({@link AuthoredRuleAssembler#walkReferences}).
      */
     static List<RefCitations> walkReferences(@Nullable JsonNode authorities)
     {
         List<RefCitations> out = new ArrayList<>();
-        Map<String, Integer> seen = new HashMap<>();
-        if (authorities == null || !authorities.isArray())
+        for (AuthoredRuleAssembler.RefCitations rc : AuthoredRuleAssembler
+                .walkReferences(authorities))
         {
-            return out;
-        }
-        for (JsonNode authority : authorities)
-        {
-            String org = refText(authority.get("Organization"));
-            JsonNode stds = authority.get("Standards");
-            if (stds == null)
-            {
-                continue;
-            }
-            for (JsonNode std : stds)
-            {
-                JsonNode refList = std.get("References");
-                if (refList == null)
-                {
-                    continue;
-                }
-                for (JsonNode ref : refList)
-                {
-                    JsonNode rid = ref.get("Rule_Identifier");
-                    String base = String.join("|", org, refText(std.get("Name")),
-                            refText(std.get("Version")), refText(std.get("Substandard")),
-                            rid == null ? "" : refText(rid.get("Id")),
-                            rid == null ? "" : refText(rid.get("Version")));
-                    int n = seen.merge(base, 1, Integer::sum) - 1;
-                    String key = n == 0 ? base : base + "#" + n;
-                    out.add(new RefCitations(key, ref.get("Citations")));
-                }
-            }
+            out.add(new RefCitations(rc.key(), rc.citations()));
         }
         return out;
-    }
-
-
-    /** Empty string for a missing or explicitly-null node, so a key never contains "null". */
-    private static String refText(@Nullable JsonNode node)
-    {
-        return node == null || node.isNull() ? "" : node.asText();
     }
 }

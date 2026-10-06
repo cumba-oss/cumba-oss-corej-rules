@@ -1558,6 +1558,7 @@
             <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-report-json</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
             <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-report-xlsx</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
             <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-ruletest</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
+            <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-authoring</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
             <dependency><groupId>net.cumba</groupId><artifactId>cumba-oss-corej-define-conformance</artifactId><version>${dependency.cumba-oss-corej.version}</version></dependency>
 
             <!-- Upstream cumba-oss-commons modules (released separately). -->
@@ -1749,6 +1750,18 @@
         <dependency>
             <groupId>net.cumba</groupId>
             <artifactId>cumba-oss-corej-ruletest</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- The rule authoring API: the per-rule half of corpus assembly (AuthoredRuleAssembler),
+             the carry-through converter and the release trimmer, PackageStandardsMap and
+             RuleFamily all live there; RuleStorageAssembler and RuleCorpusGenerator are thin
+             drivers over it. The rule editor runs the same code, and this corpus's byte-identical
+             regeneration is the proof that the lift moved nothing. The corpus bytes therefore
+             depend on the INSTALLED authoring jar: RuleCorpusGenerator prints its commit and
+             -Dcorej.authoring.expectedCommit refuses a stale one. -->
+        <dependency>
+            <groupId>net.cumba</groupId>
+            <artifactId>cumba-oss-corej-authoring</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Define-XML metadata for the .cdt fixtures. -->

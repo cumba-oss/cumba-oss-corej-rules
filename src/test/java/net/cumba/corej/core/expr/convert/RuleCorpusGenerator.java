@@ -9,9 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import net.cumba.corej.authoring.AuthoringProvenance;
+import net.cumba.corej.authoring.PackageStandardsMap;
+import net.cumba.corej.authoring.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.CorpusPaths;
 import net.cumba.corej.core.RulePackageManifest;
-import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.expr.convert.RuleStorageAssembler.Triple;
 
 /**
@@ -101,6 +103,18 @@ public final class RuleCorpusGenerator
                 : CorpusPaths.rules();
         Path releaseDir = args.length > 1 && !args[1].isBlank() ? Path.of(args[1])
                 : CorpusPaths.releaseRules();
+
+        // ⛔ PLAN-rule-authoring-api (2026-10-06): the per-rule assembly now ships in the engine's
+        // cumba-corej-authoring jar, so the corpus bytes DEPEND ON THAT JAR. A stale installed
+        // engine can assemble a different corpus from the same YAML, silently — exactly the hazard
+        // scripts/lib/corpus-gen-env.sh retired its guard for on 2026-09-08 ("IF ENGINE-DERIVED
+        // CONTENT EVER RE-ENTERS THE PACKAGE, THIS REASONING DIES WITH IT"). So: the commit the
+        // assembler was built from is printed on every run (the status file records which jar
+        // produced each byte-identical result), and -Dcorej.authoring.expectedCommit=<sha> makes a
+        // mismatch refuse to start — BEFORE the first file is written.
+        AuthoringProvenance.requireExpectedCommitIfConfigured();
+        System.out.printf(Locale.ROOT, "[assemble] cumba-corej-authoring built from commit %s%n",
+                AuthoringProvenance.describe());
 
         RuleStorageAssembler assembler = new RuleStorageAssembler();
         // R9 — the ADaMIG->SDTMIG pairing (and every package's primary product) is DATA read here

@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.cumba.corej.authoring.RulePackageConverter;
+import net.cumba.corej.authoring.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.expr.CheckExpressionParser;
 import net.cumba.corej.core.expr.ast.Expr;
-import net.cumba.corej.core.expr.convert.RulePackageConverter.ConversionReport;
 import net.cumba.corej.core.model.CheckCondition;
 import org.junit.jupiter.api.Test;
 
