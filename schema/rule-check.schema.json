@@ -30,7 +30,7 @@
             "string",
             "number"
           ],
-          "description": "The rule's own version (a string such as \"1\" or \"2\", a number is accepted): bumped when the rule's logic changes, independent of the standard's version."
+          "description": "The rule's own version (a string such as \"1\"; a number is accepted), bumped when the rule's meaning changes (condition, population, comparison) and not for wording or citations; independent of the standard's version."
         }
       },
       "description": "The rule's identity block: Id (the Core.Id the corpus, the packages and every report key on), Status and Version. Closed to those three keys."
@@ -40,7 +40,7 @@
         "string",
         "null"
       ],
-      "description": "The human-readable statement of what the rule checks, as the reviewer reads it in the report; null when the source sheet carries none."
+      "description": "One sentence describing the violation the rule reports, in violation polarity (\"Raise an error when ...\"), as readers see it beside the rule's results; null only when none is authored."
     },
     "Severity": {
       "description": "Rule severity: the level this rule's finding reports at. Absent means Error, and Error is therefore never written (RuleCanonicalizer strips it). Notice is a report-only kind and is not authorable.",
@@ -65,7 +65,7 @@
           "type": "null"
         }
       ],
-      "description": "Record or Dataset: the granularity a finding reports at. Optional - the engine derives it from the Check at load (RuleClassifier) and the generator refuses a rule whose value is neither authored nor derivable; author it only to override a derivation."
+      "description": "The granularity a finding reports at: Record, Dataset, Group or Study. Optional - when absent the loader derives it from the Check and the grouping (RuleClassifier), and the generator refuses a rule whose value is neither authored nor derivable; author it when the derivation has no basis or must be overridden (Group must agree with the grouping key, a load error otherwise)."
     },
     "Variable_Universe": {
       "description": "Which set of variables the VAR cursor iterates for a rule whose inferred evaluation domain carries one (plans/PLAN-leaf-scope-domain-inference.md §3.7): 'Data' (the default when absent — the dataset's columns) or 'Define' (the domain's Define-XML ItemDefs). Never derived; the successor of the retired 'Define Item Metadata Check against Library Metadata' Rule_Type.",
@@ -111,7 +111,7 @@
             "string",
             "null"
           ],
-          "description": "The kind of limitation behind a partial executability (a closed vocabulary read by the rule editor and the reports), or null."
+          "description": "Free text naming the kind of limitation - by corpus convention the executability level in lower case (partially executable, not executable). Not validated, and read by no tool except the loader's parked-rule log line; the substance belongs in Detail."
         },
         "Detail": {
           "type": [
@@ -131,7 +131,7 @@
       "additionalProperties": false,
       "properties": {
         "Classes": {
-          "description": "The observation-class axis: Include / Exclude lists of class names (FINDINGS, EVENTS, INTERVENTIONS, SPECIAL PURPOSE, ..., or ALL). An ADaM token here (BASIC DATA STRUCTURE, ...) is a data-structure token and is judged against the dataset's detected structure set, since ADaM has no observation class."
+          "description": "The SDTM / SEND observation-class axis: Include / Exclude lists of class names (FINDINGS, FINDINGS ABOUT, EVENTS, INTERVENTIONS, SPECIAL PURPOSE, RELATIONSHIP, TRIAL DESIGN, or ALL), matched against the one class resolved for the dataset; FINDINGS also covers FINDINGS ABOUT, and a dataset whose class is undetermined is out of scope for a class-scoped rule. Select ADaM datasets with Data_Structures."
         },
         "Domains": {
           "description": "The domain axis: Include / Exclude lists of domain names (AE, DM, ..., or ALL), with a split dataset matched through its DOMAIN/RDOMAIN-derived base; include_split_datasets narrows the population to split (true) or unsplit (false) datasets on top of the lists."
@@ -141,23 +141,23 @@
           "description": "The dataset-name axis: Include / Exclude lists matched on the member file name itself, with no split-base re-test (owner requirement #5 of PLAN-scope-requirements-split)."
         },
         "Use_Case": {
-          "description": "The TIG use case(s) the rule belongs to (PROD, NONCLIN, ...); a run declaring a use case SKIPS the rules outside it, a run declaring none runs every rule."
+          "description": "The TIG use case code(s) the rule belongs to, as one string of comma-separated upper-case codes (e.g. \"INDH\" or \"INDH, PROD\"; a malformed value is a load error). A run naming a use case SKIPS the rules whose Use_Case lists only other codes; a rule without Use_Case, or a run naming none, runs as usual."
         },
         "Data_Structures": {
           "description": "The ADaM data-structure axis: Include / Exclude lists of structure tokens (SUBJECT LEVEL ANALYSIS DATASET, BASIC DATA STRUCTURE, OCCURRENCE DATA STRUCTURE, ...), judged against the detected structure set with its is-a chain (a device BDS is a BDS)."
         },
         "Subclasses": {
-          "description": "The ADaM subclass axis: Include / Exclude lists of subclass tokens (ADVERSE EVENT, TIME-TO-EVENT, NON-COMPARTMENTAL ANALYSIS, ...), judged with the structure axis from the declared tier or the columns."
+          "description": "The ADaM subclass axis: Include / Exclude lists of Define-XML 2.1 subclass tokens (ADVERSE EVENT, TIME-TO-EVENT, NON-COMPARTMENTAL ANALYSIS, ...; an unknown token is a load error), judged against the dataset's resolved subclasses (a declared def:SubClass first, else column and name signals). Include needs a detected subclass; Exclude rejects only a positive match."
         }
       }
     },
     "Requirements": {
       "$ref": "#/$defs/requirements",
-      "description": "What must be present for the rule to run at all: Requirements.Variables (All / Any / None / All_Or_None) and Requirements.Datasets. An unmet requirement SKIPS the rule - a non-execution, never a finding."
+      "description": "What must be present for the rule to run at all: Requirements.Variables (All / Any / None / All_Or_None), Requirements.Datasets and the derived provider needs (Library / Define / Dictionary). An unmet requirement SKIPS the rule - a non-execution, never a finding."
     },
     "Check": {
       "$ref": "#/$defs/checkOrLevels",
-      "description": "The condition that fires a finding: a single expression leaf ({\"expression\": \"...\"}), or a map of severity levels (REJECT / ERROR / WARNING / INFO) each holding its own expression and Message, judged from the strictest level the run threshold admits."
+      "description": "The condition that fires a finding: one condition ({\"expression\": \"...\"}) judged at the rule's Severity, or a map of levels (REJECT / ERROR / WARNING / INFO), each with its own condition and optional Message, evaluated strictest first with the first claiming level winning; levels below the run's severity threshold are not evaluated."
     },
     "Outcome": {
       "type": "object",
@@ -168,7 +168,7 @@
             "string",
             "null"
           ],
-          "description": "The finding's text as reported, or null when the source sheet carries none. A level-keyed Check may override it per level."
+          "description": "The finding's text as reported, or null when none is authored. A level of a level-keyed Check may carry its own Message; a level without one falls back to this."
         },
         "Output_Variables": {
           "description": "The variables a finding reports. A leading `!` marks an EXCLUSION (`!X` removes the auto-derived X from the effective list; `!--X`, `!$id`, `!DS.COL` likewise) — `--X` is always an include. Every entry must be double-quoted in YAML (an unquoted `!X` is a YAML tag). The pattern rejects a bare `!` and a stacked `!!X`; the loader's E-3 validation judges the rest.",
@@ -202,7 +202,7 @@
       "items": {
         "$ref": "#/$defs/match"
       },
-      "description": "The keyed joins the rule reads other datasets through: one entry per joined dataset with its Name, Keys, Cardinality and join options. Every keyed join declares its key through a Requirements.Variables.All_Or_None group (the authoring gate), so a study missing the key SKIPS the rule."
+      "description": "The keyed joins the rule reads other datasets through: one entry per joined dataset with its Name, Keys, Cardinality and join options. Every keyed entry declares its key in Requirements.Variables (a load error otherwise): an ordinary entry pairs each key with its joined side in an All_Or_None group and lists its first key in All, a Child entry lists every key in All - so a study missing a key SKIPS the rule."
     },
     "Supp_Merge": {
       "type": [
@@ -232,7 +232,7 @@
             "properties": {
               "left": {
                 "type": "string",
-                "description": "The key column on the parent (the evaluated dataset) side of a SUPP merge key pair."
+                "description": "The key column on the parent side of a SUPP merge key pair - the evaluated dataset, or a joined dataset whose qualifiers are read as <Name>.<QNAM>."
               },
               "right": {
                 "type": "string",
@@ -277,7 +277,7 @@
             "boolean",
             "null"
           ],
-          "description": "Whether a row with a missing group key stays in its group (true, the default: the blank key forms its own group) or leaves the grouping (false)."
+          "description": "Whether a group whose key has a missing component is still evaluated, the blank being a key value of its own (true), or dropped from evaluation so it reports nothing (false - also the default when absent or null)."
         }
       }
     },
@@ -501,7 +501,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Dataset names admitted by this axis; every other dataset is out of scope. Absent or empty admits every dataset the Exclude list leaves."
+          "description": "Dataset-name entries (a literal name, ALL / NONE, a glob, a /regex/ or a `--` template) matched against the member file name; a dataset matching none is out of scope. Absent or empty admits every dataset the Exclude list leaves."
         },
         "Exclude": {
           "type": [
@@ -511,7 +511,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Dataset names refused by this axis, applied after Include."
+          "description": "Dataset-name entries (the same forms as Include) refused by this axis, applied after Include."
         }
       }
     },
@@ -524,14 +524,14 @@
             "string",
             "null"
           ],
-          "description": "The organisation publishing the standard(s) of this entry: CDISC, FDA or PMDA."
+          "description": "The authority whose published rules this entry cites - CDISC, FDA or PMDA. It is the rule's publisher, not the standard's: an FDA entry lists CDISC standards such as SDTMIG."
         },
         "Standards": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/standard"
           },
-          "description": "The standards of this organisation the rule belongs to, each with its References - membership of a (Name, Version) here is what puts the rule into that package."
+          "description": "The standards this entry's references apply to, each with its References. Each (Name, Version) named here puts the rule into its family's package for that standard and version, whatever the Organization."
         }
       }
     },
@@ -556,7 +556,7 @@
             "string",
             "null"
           ],
-          "description": "The substandard the rule belongs to within the standard (e.g. a DART or AR sub-IG), or null."
+          "description": "The substandard within the standard, e.g. SDTM for TIG, or null. It does not affect package membership; it is part of the citation locator key."
         },
         "References": {
           "type": "array",
@@ -671,19 +671,19 @@
       "properties": {
         "REJECT": {
           "$ref": "#/$defs/levelCheck",
-          "description": "The check judged at the REJECT level: its expression and optional Message."
+          "description": "The check judged at the REJECT level: its condition and optional Message."
         },
         "ERROR": {
           "$ref": "#/$defs/levelCheck",
-          "description": "The check judged at the ERROR level: its expression and optional Message."
+          "description": "The check judged at the ERROR level: its condition and optional Message."
         },
         "WARNING": {
           "$ref": "#/$defs/levelCheck",
-          "description": "The check judged at the WARNING level: its expression and optional Message."
+          "description": "The check judged at the WARNING level: its condition and optional Message."
         },
         "INFO": {
           "$ref": "#/$defs/levelCheck",
-          "description": "The check judged at the INFO level: its expression and optional Message."
+          "description": "The check judged at the INFO level: its condition and optional Message."
         }
       }
     },
@@ -730,7 +730,7 @@
         },
         "expression": {
           "type": "string",
-          "description": "The check in the rule expression language (rule-guide/reference/expression-syntax.md): compiled at load, a syntax error is a load error naming the character."
+          "description": "The check in the rule expression language (rule-guide/reference/expression-syntax.md). It is parsed when the package is read: a syntax error fails the load of the package with a message naming the character position; type and binding errors are per-rule load errors."
         }
       },
       "anyOf": [
@@ -789,7 +789,7 @@
         "token": {
           "type": "string",
           "pattern": "^&[A-Z][A-Z0-9]*&$",
-          "description": "The placeholder the template expands over, spelled &NAME& (upper-case, digits allowed)."
+          "description": "The placeholder substituted wherever it occurs in the rule, spelled &NAME& with NAME = [A-Z][A-Z0-9]* (e.g. &DOM&, &VAR&); the closing & is mandatory."
         },
         "over": {
           "enum": [
@@ -806,21 +806,21 @@
             "string",
             "null"
           ],
-          "description": "The dataset or variable the expansion reads its candidates from, when over= needs one; null otherwise."
+          "description": "shared_variables only, and required there: the foreign dataset (e.g. ADSL) whose variables, shared by name with the dataset under validation, the token ranges over. A load error on the all_* sources."
         },
         "pattern": {
           "type": [
             "string",
             "null"
           ],
-          "description": "A regular expression a candidate must match to be expanded over, or null for every candidate."
+          "description": "domain_from_variable only, and required there: the column-name shape the token appears in, e.g. &DOM&SEQ. Literal text, not a regular expression (matched ignoring case); it must contain the token exactly once, and the token's position is the capture. A load error on the all_* sources."
         },
         "known_domain_only": {
           "type": [
             "boolean",
             "null"
           ],
-          "description": "Whether a candidate must name a domain the run knows (true) or any value counts (false / null)."
+          "description": "domain_from_variable only: true keeps only captures the metadata library attests as standard dataset names (this excludes ADaM's own ASEQ / SRCSEQ / RECSEQ); false / null keeps every capture. Either way a capture whose dataset is not loaded is not expanded. A load error on the all_* sources."
         }
       }
     },
@@ -832,7 +832,7 @@
             "string",
             "null"
           ],
-          "description": "The joined dataset's name (DM, SUPPAE, ...); a `--` form resolves to the evaluated domain."
+          "description": "The joined dataset's name (DM, SUPPAE, RELREC, ...); a `--` is replaced by the evaluated dataset's name. On a Child: true entry it names the evaluated child dataset (CO, SUPP--), never the parent."
         },
         "Keys": {
           "type": [
@@ -864,28 +864,28 @@
               }
             ]
           },
-          "description": "The join key columns: a bare name shared by both sides, or a left / right pair when the two sides spell it differently."
+          "description": "The join key columns: a bare name both sides carry; a qualified DS.VAR whose record side is VAR of the row's bound DS record (DS an earlier ordinary inner entry) and whose joined side is VAR; or a left / right pair when the sides spell it differently. A Child: true entry without Keys uses [USUBJID, IDVAR, IDVARVAL]."
         },
         "Child": {
           "type": [
             "boolean",
             "null"
           ],
-          "description": "Whether the joined dataset is the child of the relation (the evaluated dataset is its parent), which orients the join."
+          "description": "true marks the evaluated dataset (SUPP--, SQAP--, CO, RELREC) as the child: each row's parent record is found through RDOMAIN (or the SUPP / SQ name), IDVAR and IDVARVAL, and its columns are read as <RDOMAIN>.<column>. Every record is kept (left; another Join_Type is a load error), and Keys other than IDVAR / IDVARVAL narrow the parent records."
         },
         "keep_missings": {
           "type": [
             "boolean",
             "null"
           ],
-          "description": "Whether rows whose key is missing still join (true) or drop out of the join (false / null)."
+          "description": "Whether rows whose key is blank (\"\" or a missing value) take part in the join: null / true keep them (the default), false drops them. Identity stays exact either way (a missing value never joins \"\"). Honoured only by an ordinary keyed entry; false on a Child / RELREC / SUPP-- / SQ* / nameless / keyless entry is a load error."
         },
         "Join_Type": {
           "type": [
             "string",
             "null"
           ],
-          "description": "The join's kind as the engine's JoinType spells it (inner, left, ...), or null for the default."
+          "description": "inner or left (any case); any other value is a load error. Absent means inner. A Child: true entry is always left (another value is a load error); a keyed SUPP-- / SQ* / `--`-template / RELREC-named entry always runs as left."
         },
         "Filter": {
           "type": [
@@ -899,7 +899,7 @@
             "boolean",
             "null"
           ],
-          "description": "Whether the key is compared as text on both sides (true) rather than by the columns' own types."
+          "description": "true compares every key of this entry as rendered text (numeric keys with 1e-12 noise folded) instead of by typed identity; null / false (the default) keep typed identity, under which key columns of different types make the rule ERROR. An unquoted boolean only; true on a Child / RELREC / SUPP-- / SQ* / `--`-template / nameless / keyless entry is a load error."
         },
         "Cardinality": {
           "anyOf": [

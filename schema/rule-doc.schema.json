@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cumba.net/corej/rule-doc.schema.json",
   "title": "coreJ split-storage rule documentation sidecar",
-  "description": "Schema for a single rule's citation prose under rules-src/docs/<FAMILY>/<Core.Id>.yaml (plans/done/PLAN-rule-storage-split.md). Holds the bulky Cited_Guidance / Document / Item / Section text lifted out of the rules-legacy Authorities tree, keyed by the same (Standard, Version[, Substandard]) tuple as the check file's Standards[] entries so the assembler can re-join them. Never read by the execution engine. YAML on disk; validates as JSON Schema after parsing.",
+  "description": "One rule's citation prose, at rules-src/docs/<FAMILY>/<Core.Id>.yaml: the bulky Cited_Guidance / Document / Item / Section text lifted out of the check file's Standards block, keyed per reference by its locator Organization|Name|Version|Substandard|Rule_Identifier.Id|Rule_Identifier.Version[#n] so the assembler (AuthoredRuleAssembler) can re-attach it. Never read by the execution engine; released packages drop citations. YAML on disk; validates as JSON Schema after parsing.",
   "type": "object",
   "required": [
     "Core",
@@ -21,7 +21,7 @@
           "$ref": "#/$defs/citation"
         }
       },
-      "description": "The citations of every reference of the check's Standards block, keyed by the reference's locator key (Organization|Name|Version|Substandard|Id|Version[#n]) and lifted out of the check file so the authored rule stays small; the generator joins them back into Authorities."
+      "description": "The citations per reference of the check's Standards block, keyed by its locator Organization|Name|Version|Substandard|Rule_Identifier.Id|Rule_Identifier.Version (an absent part empty; #1, #2, ... on a repeated key). The generator re-attaches them to the matching reference; a key matching no reference is ignored, and released packages drop citations with the collapsed Authorities."
     }
   },
   "$defs": {
@@ -33,7 +33,7 @@
             "string",
             "null"
           ],
-          "description": "The quoted text of the standard the rule implements, or null."
+          "description": "The quoted text of the cited Document - an IG passage, or the published rule's own text for a validator / conformance-rule document - or null."
         },
         "Document": {
           "type": [
@@ -54,7 +54,7 @@
             "string",
             "null"
           ],
-          "description": "The section number of the document, e.g. \"4.4.4\", or null."
+          "description": "The section of the document, e.g. \"4.4.4\" - or, for a validator-rule document, the business or conformance rule id it cites (FDAB011, CG0456) - or null."
         }
       }
     }
