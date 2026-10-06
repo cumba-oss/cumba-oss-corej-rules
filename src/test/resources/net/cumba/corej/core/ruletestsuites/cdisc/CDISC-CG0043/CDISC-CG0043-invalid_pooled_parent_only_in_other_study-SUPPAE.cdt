@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0043 expect=violation domain=SUPPAE
+#note "FU-6 (PLAN-merge-followups), pooled two-study package. The SUPPAE AESOSP record of study S2 points at AE record (USUBJID 001, AESEQ 1), which exists only in study S1 (AESMIE=Y); USUBJID is unique per study only (SDTMIG 4.2.3), so S2's subject 001 has no AE record AESEQ=1. Child key [STUDYID, USUBJID, IDVAR, IDVARVAL] -> no parent in S2 -> AE.AESMIE not supplied -> fires. Under the old key [USUBJID, IDVAR, IDVARVAL] the S1 record with AESMIE=Y was taken as the parent -> no violation (the cross-study false negative this key closes)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 STUDYID=S2
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+S2 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Description text
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESMIE  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Y
+S2 | AE | 001 | 2 | NAUSEA   | Y
+---
