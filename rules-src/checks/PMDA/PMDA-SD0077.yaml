@@ -39,12 +39,11 @@ Match_Datasets:
   Name: "RELREC"
 Check:
   expression: >-
-    not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(IDVAR))
+    not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(concat(RDOMAIN, ".",
+    IDVAR)))
 Outcome:
   Message: "The referenced record defined by RDOMAIN, USUBJID, IDVAR and IDVARVAL\
     \ does not exist in the target domain."
-  Output_Variables:
-  - "RDOMAIN"
 Source:
   Message: "Invalid referenced record"
   Description: "Reference record defined by Related Domain Abbreviation (RDOMAIN),\

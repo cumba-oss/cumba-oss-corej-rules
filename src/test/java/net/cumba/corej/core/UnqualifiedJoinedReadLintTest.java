@@ -68,9 +68,13 @@ import org.junit.jupiter.api.Test;
  * prefix and are out by construction;</li>
  * <li>no library dataset (SDTM/SEND) or data structure (ADaM) the rule's scope selects defines
  * {@code X} (S3/S4);</li>
- * <li>{@code J} is a non-{@code Child} entry whose target defines {@code X} (S5; D2 — a
- * {@code Child: true} entry reads its parent under the bare name by design);</li>
- * <li>no {@code Child: true} parent of the rule supplies {@code X} (the tie-break);</li>
+ * <li>{@code J} is an entry whose target defines {@code X} (S5) — since W4 of
+ * {@code PLAN-merged-evaluation-table} (MQ1) a {@code Child: true} entry's parent too, named by the
+ * entry ({@code Name: AE} under a {@code SUPPAE} scope): its columns are qualified
+ * ({@code AE.AESMIE}), never merged bare, so the D2 carve-out is gone. A {@code Child} entry that
+ * names the child itself (a {@code --} template, or a dataset of the rule's scope — the per-row
+ * pointer form of {@code CDISC-CG0371}) has no static parent: its parent reads are data-derived
+ * ({@code colref(concat(RDOMAIN, ".", IDVAR))}) and it is counted in R-CHILD instead;</li>
  * <li>{@code X} is not declared: bare in {@code All}, bare in any {@code Any} group (D3), or an
  * {@code All_Or_None} group holding both {@code X} and {@code J.X}. {@code None} and a
  * {@code J.X}-only declaration do not count.</li>
@@ -102,8 +106,8 @@ import org.junit.jupiter.api.Test;
  * static census resolves — an ADaM capture template inside an expression such as {@code TRTxxP}, a
  * {@code *} root, an {@code Output_Variables} template no library dataset publishes or the rule's
  * own Check binds, and an {@code Expansion} token read bare ({@code &VAR&}, {@code &DOM&SEQ}) — is
- * named in R-CAPTURE (S2); a read the {@code Child: true} exclusion takes out is named in R-CHILD;
- * a joined read the rule declares for the primary is named in R-DECLARED. The three rule registers
+ * named in R-CAPTURE (S2); a per-row pointer {@code Child: true} entry is named in R-CHILD; a
+ * joined read the rule declares for the primary is named in R-DECLARED. The three rule registers
  * are keyed by (rule, name) with the number of packages each was seen in, and every one is pinned
  * for exact equality. So are the reach per family (joined (rule, package) pairs examined) and the
  * CANDIDATES per family — (rule, package, name) bare reads no scoped dataset defines, counted
@@ -152,7 +156,10 @@ class UnqualifiedJoinedReadLintTest
     // 1, lane 3 M1 — cumba-corej 4c5743a). Probed after: the six SEND rows are FDA-SD0077
     // [IDVARVAL, IDVAR, RDOMAIN], FDA-SD1012 [ETCD], FDA-SD1023 [VISIT, VISITNUM] (sendig/ar-1-0);
     // ADaM and SDTM did not move. FLAGS stayed 0 and every register below is unchanged.
-    private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 21,
+    // SDTM 21 -> 14 on 2026-10-05 (PLAN-merged-evaluation-table W4, MQ1): the seven bare AESMIE
+    // reads of CDISC-CG0043 (3 packages) and FDA-SD1143 (4) are respelled AE.AESMIE, a qualified
+    // read no bare census counts. FLAGS stayed 0.
+    private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 14,
             "SEND", 6);
 
     private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
@@ -184,8 +191,11 @@ class UnqualifiedJoinedReadLintTest
     private static final Map<String, Integer> EXPECTED_CAPTURES = Map.of("CDISC-AD0591\t&VAR&", 2,
             "CDISC-AD0898\t&DOM&SEQ", 4);
 
-    private static final Map<String, Integer> EXPECTED_CHILD = Map.of("CDISC-CG0043\tAESMIE", 3,
-            "FDA-SD1143\tAESMIE", 4);
+    // W4 of PLAN-merged-evaluation-table: the bare AESMIE reads (CG0043 x3, SD1143 x4) were
+    // respelled AE.AESMIE (MQ1) and the carve-out that excluded them is gone; R-CHILD now counts
+    // the per-row pointer Child entries, whose parent reads no static census can see.
+    private static final Map<String, Integer> EXPECTED_CHILD = Map.of("CDISC-CG0371", 3,
+            "FDA-SD0077", 10, "PMDA-SD0077", 5);
 
     private static final Map<String, Integer> EXPECTED_DECLARED = Map.of(
             "CDISC-AD0899\tRFSTDTC\tDM\tAll", 4, "CDISC-CG0217\tTAETORD\tSE\tAll", 3,
@@ -328,8 +338,11 @@ class UnqualifiedJoinedReadLintTest
          */
         final Map<String, Set<String>> captures = new TreeMap<>();
 
-        /** R-CHILD: {@code ruleId \t X} a {@code Child: true} parent supplies (D2) → packages. */
-        final Map<String, Set<String>> childExcluded = new TreeMap<>();
+        /**
+         * R-CHILD: {@code ruleId} whose {@code Child: true} entry is a per-row pointer (it names
+         * the child itself, so its parent is the data's {@code RDOMAIN}) → packages.
+         */
+        final Map<String, Set<String>> childPointer = new TreeMap<>();
 
         /**
          * R-DECLARED: {@code ruleId \t X \t J \t how} a join carries, no scoped dataset defines,
@@ -376,19 +389,18 @@ class UnqualifiedJoinedReadLintTest
             }
             reach.merge(aUniverse.family(), 1, Integer::sum);
             Map<String, LibraryDataset> targets = new LinkedHashMap<>();
-            boolean childEntry = false;
             for (MatchDataset md : joins)
             {
                 if (md == null)
                 {
                     continue;
                 }
-                if (Boolean.TRUE.equals(md.getChild()))
+                if (Boolean.TRUE.equals(md.getChild()) && namesTheChild(aRule, md))
                 {
-                    // The engine resolves a Child entry's parent per row from RDOMAIN
-                    // (ChildMatchPreMerger), never from the entry's Name — so whatever the entry
-                    // is called, its parent may supply anything the library defines.
-                    childEntry = true;
+                    // A per-row pointer: the parent is the data's RDOMAIN (MQ1), read through
+                    // colref(concat(RDOMAIN, ".", IDVAR)) — no static target. Counted, never
+                    // skipped unseen.
+                    childPointer.computeIfAbsent(id, k -> new TreeSet<>()).add(aPackage);
                     continue;
                 }
                 String name = md.getName() == null ? "" : md.getName().toUpperCase(Locale.ROOT);
@@ -469,7 +481,7 @@ class UnqualifiedJoinedReadLintTest
                 }
             }
             candidates.merge(aUniverse.family(), undefined.size(), Integer::sum);
-            if (!childEntry && targets.isEmpty())
+            if (targets.isEmpty())
             {
                 return;
             }
@@ -478,19 +490,10 @@ class UnqualifiedJoinedReadLintTest
             {
                 String bare = bareDeclaration(vars, x, scope);
                 boolean exact = literal.contains(x);
-                boolean childSupplies = childEntry
-                        && (definedByAny(aUniverse.scopeCandidates(), x, exact) || definedByAny(
-                                List.copyOf(aUniverse.joinTargets().values()), x, exact));
-                if (childSupplies && bare == null)
-                {
-                    childExcluded.computeIfAbsent(id + "\t" + x, k -> new TreeSet<>())
-                            .add(aPackage);
-                    continue;
-                }
                 for (Map.Entry<String, LibraryDataset> target : targets.entrySet())
                 {
                     LibraryDataset joined = target.getValue();
-                    if (!(exact ? joined.publishes(x) : joined.defines(x)) || childSupplies)
+                    if (!(exact ? joined.publishes(x) : joined.defines(x)))
                     {
                         continue;
                     }
@@ -528,8 +531,8 @@ class UnqualifiedJoinedReadLintTest
             captures.forEach((k, v) -> aOut.println("  CAPTURE\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] R-DECLARED: " + declared.size());
             declared.forEach((k, v) -> aOut.println("  DECLARED\t" + k + "\t" + v));
-            aOut.println("[UnqualifiedJoinedReadLint] R-CHILD: " + childExcluded.size());
-            childExcluded.forEach((k, v) -> aOut.println("  CHILD\t" + k + "\t" + v));
+            aOut.println("[UnqualifiedJoinedReadLint] R-CHILD: " + childPointer.size());
+            childPointer.forEach((k, v) -> aOut.println("  CHILD\t" + k + "\t" + v));
             aOut.println("[UnqualifiedJoinedReadLint] load errors: " + loadErrors.size());
             loadErrors.forEach(c -> aOut.println("  LOADERR\t" + c));
         }
@@ -654,9 +657,9 @@ class UnqualifiedJoinedReadLintTest
                 + " no static census resolves (an ADaM capture template, a * root, an Output_Variables"
                 + " template no library publishes or the Check binds, an Expansion token; S2),"
                 + " (rule, name) -> packages");
-        assertEquals(EXPECTED_CHILD, Census.packageCounts(census.childExcluded), "R-CHILD: bare"
-                + " reads a Child: true parent supplies (D2) — excluded, and counted so they stay"
-                + " SEEN; (rule, name) -> packages");
+        assertEquals(EXPECTED_CHILD, Census.packageCounts(census.childPointer), "R-CHILD: the"
+                + " per-row pointer Child: true entries, whose parent reads are data-derived and"
+                + " judged by no static census — counted so they stay SEEN; rule -> packages");
         assertEquals(EXPECTED_DECLARED, Census.packageCounts(census.declared), "R-DECLARED: bare"
                 + " reads a join carries that the rule declares for the primary — the exempted"
                 + " population; (rule, name, join, how) -> packages");
@@ -807,48 +810,36 @@ class UnqualifiedJoinedReadLintTest
 
 
     @Test
-    void aChildParentsBareReadIsExcludedAndCountedNeverUnseen() throws IOException
+    void aChildParentsBareReadIsFlaggedSinceItsColumnsAreQualified() throws IOException
     {
+        // W4 (MQ1): the parent AE's columns are AE.<column> — a bare AESMIE on SUPPAE reads the
+        // primary's absent column, silently, so it is the defect (the D2 carve-out excluded it).
         String suppKeys = "[\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]";
         String child = """
                 "Match_Datasets": [{"Name": "AE", "Child": true,
                     "Keys": ["USUBJID", "IDVAR", "IDVARVAL"]}],
                 """;
         String readAesmie = "QNAM == \\\"AESOSP\\\" and AESMIE != \\\"Y\\\"";
-        Census c = census(rule("T-CHILD", "[\"SUPPAE\"]", child, suppKeys, null, null, null,
-                readAesmie, null));
-        assertEquals(Map.of(), c.flags);
-        assertEquals(Set.of("T-CHILD\tAESMIE"), c.childExcluded.keySet());
-
-        // the tie-break: an ordinary MH entry carries EPOCH, and so does the Child parent AE —
-        // the parent supplies it under the bare name, so it is excluded, not flagged
-        String both = """
-                "Match_Datasets": [{"Name": "AE", "Child": true,
-                    "Keys": ["USUBJID", "IDVAR", "IDVARVAL"]},
-                  {"Name": "MH", "Keys": ["USUBJID"]}],
+        assertFlags(rule("T-CHILD", "[\"SUPPAE\"]", child, suppKeys, null, null, null, readAesmie,
+                null), "T-CHILD\tAESMIE\tAE");
+        // ... and the respelled read is clean
+        Census respelled = census(rule("T-CHILD-Q", "[\"SUPPAE\"]", child, suppKeys, null, null,
+                null, "QNAM == \\\"AESOSP\\\" and AE.AESMIE != \\\"Y\\\"", null));
+        assertEquals(Map.of(), respelled.flags);
+        assertEquals(Map.of(), respelled.childPointer);
+        // a per-row pointer entry (it names the child itself) has no static parent: counted in
+        // R-CHILD, never judged — even for a read only a library parent carries
+        String pointer = """
+                "Match_Datasets": [{"Name": "SUPP--", "Child": true,
+                    "Keys": ["USUBJID", "IDVAR", "IDVARVAL"]}],
                 """;
-        String mhKey = "[\"USUBJID\", \"MH.USUBJID\"]";
-        String readEpoch = "QNAM == \\\"AESOSP\\\" and EPOCH != \\\"\\\"";
-        Census tie = census(
-                rule("T-TIE", "[\"SUPPAE\"]", both, suppKeys, null, null, mhKey, readEpoch, null));
-        assertEquals(Map.of(), tie.flags);
-        assertEquals(Set.of("T-TIE\tEPOCH"), tie.childExcluded.keySet());
-        // ... and without the Child entry the same read IS the defect
-        String plain = """
-                "Match_Datasets": [{"Name": "MH", "Keys": ["USUBJID"]}],
-                """;
-        assertFlags(rule("T-TIE-PLAIN", "[\"SUPPAE\"]", plain, suppKeys, null, null, mhKey,
-                readEpoch, null), "T-TIE-PLAIN\tEPOCH\tMH");
-
-        // the parent is resolved per row from RDOMAIN, never from the entry's Name: a read the
-        // NAMED parent (AE) does not define is still supplied by whichever dataset does — MHTERM
-        // by a scope candidate only (MH), RFSTDTC by a join target only (DM)
-        Census anyParent = census(rule("T-CHILD-ANY", "[\"SUPPAE\"]", child, suppKeys, null, null,
-                null, "QNAM == \\\"AESOSP\\\" and MHTERM != \\\"\\\" and RFSTDTC != \\\"\\\"",
-                null), CHILD_SPLIT);
-        assertEquals(Map.of(), anyParent.flags);
-        assertEquals(Set.of("T-CHILD-ANY\tMHTERM", "T-CHILD-ANY\tRFSTDTC"),
-                anyParent.childExcluded.keySet());
+        Census perRow = census(
+                rule("T-CHILD-ROW", "[\"SUPP--\"]", pointer,
+                        "[\"USUBJID\", \"IDVAR\", \"IDVARVAL\"]", null, null, null,
+                        "str(IDVARVAL) != str(colref(concat(RDOMAIN, \\\".\\\", IDVAR)))", null),
+                CHILD_SPLIT);
+        assertEquals(Map.of(), perRow.flags);
+        assertEquals(Set.of("T-CHILD-ROW"), perRow.childPointer.keySet());
     }
 
 
@@ -1011,6 +1002,25 @@ class UnqualifiedJoinedReadLintTest
     // ------------------------------------------------------------------
     // Scope and declarations
     // ------------------------------------------------------------------
+
+
+    /**
+     * Whether a {@code Child: true} entry names the child itself — a {@code --} template
+     * ({@code SUPP--}) or a dataset the rule's scope includes ({@code CO}, {@code RELREC}) — rather
+     * than its parent ({@code Name: AE} under a {@code SUPPAE} scope).
+     */
+    static boolean namesTheChild(Rule aRule, MatchDataset aEntry)
+    {
+        String name = aEntry.getName();
+        if (name == null || name.contains("--"))
+        {
+            return true;
+        }
+        List<String> include = aRule.getScope() == null || aRule.getScope().getDomains() == null
+                ? null
+                : aRule.getScope().getDomains().getInclude();
+        return include != null && include.stream().anyMatch(name::equalsIgnoreCase);
+    }
 
 
     /** S3: whether the rule's scope selects this library dataset / structure. */
