@@ -390,6 +390,28 @@ abstract class AbstractRuleTestSuitesFactory
 
 
     /**
+     * The outcome {@link #runScenario} judges, unjudged: the scenario's rule resolved through this
+     * family's packages and executed exactly as the factory executes it. Package-private for
+     * {@code MergeRefusedPopulationTest}, which classifies the engine messages of the
+     * {@code expect=executionError} population.
+     *
+     * @return the outcome, or {@code null} when the primary dataset is outside the rule's scope
+     */
+    @Nullable
+    EvalOutcome outcomeOf(Path aFile) throws IOException
+    {
+        RuleTestScenario s = RuleTestCdt.load(aFile);
+        Rule rule = resolveRule(s);
+        assertNotNull(rule, "Rule " + s.getCoreId() + " not found in the " + family()
+                + " family's rule packages");
+        OverlayDataTable primary = s.primaryTable();
+        assertNotNull(primary, "Scenario " + s.getCoreId() + " declares domain=" + s.getDomain()
+                + " but no such dataset is present in the file");
+        return evaluateScenario(aFile, s, rule, primary);
+    }
+
+
+    /**
      * Everything {@link #runScenario} does between resolving the rule and judging the verdict: the
      * scope pre-gate, the metadata axes and the execution itself — for the rule handed in, which
      * need not be the one the family packages resolve.

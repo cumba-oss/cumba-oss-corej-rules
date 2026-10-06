@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0006 expect=skipped domain=AE
+# Rule:Description: Raise an error when the collection Study Day (--DY) is populated and both the date portion of --DTC and the date portion of RFSTDTC are complete dates, but --DY does not equal the value computed by the SDTM study day algorithm (a non-zero integer).
+#note "PLAN-merged-evaluation-table T2 fold (L6): DM is present but lacks STUDYID, so the join-key pair All_Or_None [STUDYID, DM.STUDYID] is partial and the rule SKIPs by requirement - it never joins DM on USUBJID alone (OD-10 keys every DM join on [STUDYID, USUBJID]). AEDY is deliberately wrong on row 1 (999, the algorithm gives 1) so that an EXECUTE would be visible as a finding, never as a silent pass."
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEDTC type=Char label="Date/Time of Collection"
+col AEDY type=Num label="Study Day of Collection"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | 2014-01-02 | 999
+---
+
+dataset DM label=Demographics
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+DM | 01-701-1015 | 2014-01-02
+---

@@ -366,7 +366,12 @@ class ExpectedErrorsTest
             // MERGE_REFUSED covers the eleventh (the MergeException catch: the datatable refused
             // the merge). Both are proved reachable by MergeErrorReasonReachabilityTest with the
             // ENGINE's own messages; MERGE_ERROR's population is the §3.5.3 SUPP case-table
-            // scenarios of CDISC-SEND-0330 / FDA-SE2234, MERGE_REFUSED's is zero.
+            // scenarios of CDISC-SEND-0330 / FDA-SE2234. MERGE_REFUSED's was zero at W3a; since
+            // W3f (OD-10, Cardinality n:1 on every DM / ADSL join) and W5 (OD-5, RELTYPE checked)
+            // it is eight .cdt scenarios — the five OD-10 duplicate-DM copies (CDISC-CG0006,
+            // CDISC-SEND-0401 / 0402 / 0403, FDA-SD1381), CDISC-AD0256's and CDISC-CG0006's
+            // cardinality errors and CDISC-CG0174-error_reltype_one_side_repeats — measured and
+            // asserted, count and roster, by ruletestsuites.MergeRefusedPopulationTest.
             // Narrowed 11 -> 10 on 2026-10-06 by W5 (MQ11): RELREC_KEY_EXPANSION retired with
             // the engine's forward-RELREC × key-expansion sentinel — the merged view composes
             // the two row maps, so the message can no longer be produced.

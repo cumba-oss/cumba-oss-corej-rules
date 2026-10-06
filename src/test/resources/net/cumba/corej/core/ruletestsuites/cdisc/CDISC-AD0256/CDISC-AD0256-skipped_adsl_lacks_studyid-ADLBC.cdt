@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-AD0256 expect=skipped domain=ADLBC
+# Rule:Description: The values of USUBJID are not present in ADSL
+#note "PLAN-merged-evaluation-table T2 fold (L6): ADSL is present but lacks STUDYID, so the join-key pair All_Or_None [STUDYID, ADSL.STUDYID] is partial and the rule SKIPs by requirement - it never joins ADSL on USUBJID alone (OD-10 keys every ADSL join on [STUDYID, USUBJID]). The ADLBC subject is deliberately absent from ADSL so that an EXECUTE would be visible as a finding, never as a silent pass."
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col PARAMCD type=Char
+col AVAL type=Num
+---
+CDISCPILOT01 | 01-701-9999 | ALT | 12.5
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col USUBJID type=Char
+---
+01-701-1015
+---
