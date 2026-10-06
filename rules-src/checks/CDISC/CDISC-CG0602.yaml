@@ -18,7 +18,13 @@ Match_Datasets:
 - Name: "RELREC"
 Check:
   expression: >-
-    not empty(RELREC.**TRT) and empty(RELREC.**DECOD) and FAOBJ != RELREC.**TRT
+    AG._matched_ and not empty(AG.AGTRT) and empty(AG.AGDECOD) and FAOBJ != AG.AGTRT or CM._matched_
+    and not empty(CM.CMTRT) and empty(CM.CMDECOD) and FAOBJ != CM.CMTRT or EC._matched_ and not
+    empty(EC.ECTRT) and empty(EC.ECDECOD) and FAOBJ != EC.ECTRT or EX._matched_ and not
+    empty(EX.EXTRT) and empty(EX.EXDECOD) and FAOBJ != EX.EXTRT or ML._matched_ and not
+    empty(ML.MLTRT) and empty(ML.MLDECOD) and FAOBJ != ML.MLTRT or PR._matched_ and not
+    empty(PR.PRTRT) and empty(PR.PRDECOD) and FAOBJ != PR.PRTRT or SU._matched_ and not
+    empty(SU.SUTRT) and empty(SU.SUDECOD) and FAOBJ != SU.SUTRT
 Outcome:
   Message: "The Findings About record has an Interventions parent record with an empty\
     \ --DECOD, but FAOBJ does not equal the parent record's --TRT value."

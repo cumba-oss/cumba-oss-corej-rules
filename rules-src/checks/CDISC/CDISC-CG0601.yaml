@@ -17,7 +17,13 @@ Match_Datasets:
 - Name: "RELREC"
 Check:
   expression: >-
-    not empty(RELREC.**TERM) and empty(RELREC.**DECOD) and FAOBJ != RELREC.**TERM
+    AE._matched_ and not empty(AE.AETERM) and empty(AE.AEDECOD) and FAOBJ != AE.AETERM or
+    BE._matched_ and not empty(BE.BETERM) and empty(BE.BEDECOD) and FAOBJ != BE.BETERM or
+    CE._matched_ and not empty(CE.CETERM) and empty(CE.CEDECOD) and FAOBJ != CE.CETERM or
+    DS._matched_ and not empty(DS.DSTERM) and empty(DS.DSDECOD) and FAOBJ != DS.DSTERM or
+    DV._matched_ and not empty(DV.DVTERM) and empty(DV.DVDECOD) and FAOBJ != DV.DVTERM or
+    HO._matched_ and not empty(HO.HOTERM) and empty(HO.HODECOD) and FAOBJ != HO.HOTERM or
+    MH._matched_ and not empty(MH.MHTERM) and empty(MH.MHDECOD) and FAOBJ != MH.MHTERM
 Outcome:
   Message: "The Findings About record has an Events parent record with an empty --DECOD,\
     \ but FAOBJ does not equal the parent record's --TERM value."

@@ -18,12 +18,23 @@ Match_Datasets:
 - Name: "RELREC"
 Check:
   expression: >-
-    FAOBJ != RELREC.**TERM and FAOBJ != RELREC.**TRT and not equalsIgnoreCase(FAOBJ, RELREC.**DECOD)
+    not empty(FAOBJ) and (AE._matched_ and FAOBJ != AE.AETERM and not equalsIgnoreCase(FAOBJ,
+    AE.AEDECOD) or BE._matched_ and FAOBJ != BE.BETERM and not equalsIgnoreCase(FAOBJ, BE.BEDECOD)
+    or CE._matched_ and FAOBJ != CE.CETERM and not equalsIgnoreCase(FAOBJ, CE.CEDECOD) or
+    DS._matched_ and FAOBJ != DS.DSTERM and not equalsIgnoreCase(FAOBJ, DS.DSDECOD) or DV._matched_
+    and FAOBJ != DV.DVTERM and not equalsIgnoreCase(FAOBJ, DV.DVDECOD) or HO._matched_ and FAOBJ !=
+    HO.HOTERM and not equalsIgnoreCase(FAOBJ, HO.HODECOD) or MH._matched_ and FAOBJ != MH.MHTERM and
+    not equalsIgnoreCase(FAOBJ, MH.MHDECOD) or AG._matched_ and FAOBJ != AG.AGTRT and not
+    equalsIgnoreCase(FAOBJ, AG.AGDECOD) or CM._matched_ and FAOBJ != CM.CMTRT and not
+    equalsIgnoreCase(FAOBJ, CM.CMDECOD) or EC._matched_ and FAOBJ != EC.ECTRT and not
+    equalsIgnoreCase(FAOBJ, EC.ECDECOD) or EX._matched_ and FAOBJ != EX.EXTRT and not
+    equalsIgnoreCase(FAOBJ, EX.EXDECOD) or ML._matched_ and FAOBJ != ML.MLTRT and not
+    equalsIgnoreCase(FAOBJ, ML.MLDECOD) or PR._matched_ and FAOBJ != PR.PRTRT and not
+    equalsIgnoreCase(FAOBJ, PR.PRDECOD) or SU._matched_ and FAOBJ != SU.SUTRT and not
+    equalsIgnoreCase(FAOBJ, SU.SUDECOD))
 Outcome:
   Message: "A related record is present in the parent domain dataset but FAOBJ does\
     \ not equal the --TERM, --TRT or --DECOD value of the parent record."
-  Output_Variables:
-  - "RELREC.**DECOD"
 Source:
   Class: "FND"
   Domain: "FA"

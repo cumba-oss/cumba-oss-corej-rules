@@ -179,16 +179,6 @@ class ExpectedErrorsTest
 
 
         @Test
-        void relrecKeyExpansionMessageClassifies()
-        {
-            Assertions.assertEquals(
-                    List.of(ViolationNormaliser.ErrorReason.RELREC_KEY_EXPANSION.name()),
-                    ViolationNormaliser.reasonsFrom(
-                            error(ViolationNormaliser.RELREC_KEY_EXPANSION_MESSAGE), null));
-        }
-
-
-        @Test
         void mergeErrorMessageClassifiesByItsFixedHead()
         {
             Assertions.assertEquals(List.of(ViolationNormaliser.ErrorReason.MERGE_ERROR.name()),
@@ -331,9 +321,8 @@ class ExpectedErrorsTest
                 // added to the enum by PLAN-column-type-conformance Phase 3 and never added here,
                 // which is precisely the silent gap this test exists to close. STAGE_B arrives
                 // with D104e.
-                "LOAD_ERROR", "RELREC_KEY_EXPANSION", "NO_NATIVE_CHECK_EXPR",
-                "INVALID_SPLIT_DOMAIN", "COLUMN_TYPE_MISMATCH", "STAGE_B", "UNGATED_PROVIDER_REACH",
-                "OTHER"
+                "LOAD_ERROR", "NO_NATIVE_CHECK_EXPR", "INVALID_SPLIT_DOMAIN",
+                "COLUMN_TYPE_MISMATCH", "STAGE_B", "UNGATED_PROVIDER_REACH", "OTHER"
         })
         void everyTokenNameIsAValidEnumConstant(String token)
         {
@@ -378,7 +367,10 @@ class ExpectedErrorsTest
             // the merge). Both are proved reachable by MergeErrorReasonReachabilityTest with the
             // ENGINE's own messages; MERGE_ERROR's population is the §3.5.3 SUPP case-table
             // scenarios of CDISC-SEND-0330 / FDA-SE2234, MERGE_REFUSED's is zero.
-            Assertions.assertEquals(11, ViolationNormaliser.ErrorReason.values().length,
+            // Narrowed 11 -> 10 on 2026-10-06 by W5 (MQ11): RELREC_KEY_EXPANSION retired with
+            // the engine's forward-RELREC × key-expansion sentinel — the merged view composes
+            // the two row maps, so the message can no longer be produced.
+            Assertions.assertEquals(10, ViolationNormaliser.ErrorReason.values().length,
                     "A new ErrorReason means a new classification branch and, most likely, a new "
                             + "RuleRunner ERROR site — update EngineContract below before widening "
                             + "this, and add a classify() case or it silently buckets as OTHER.");

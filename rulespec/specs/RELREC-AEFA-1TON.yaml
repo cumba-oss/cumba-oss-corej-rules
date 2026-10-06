@@ -3,9 +3,10 @@ kind: rule
 description: |
   RELREC ONE-TO-MANY row expansion on real CDISCPILOT01 data. Primary = AE; one AE record
   (AELNKID) relates to MANY FA findings-about records (FALNKGRP) — dataset-level relationship
-  (blank IDVARVAL, RELTYPE=MANY). The forward-RELREC row-expansion engine produces one expanded
-  evaluation row per (AE, FA) pair, so a single AE record can yield several violations (one per
-  related FA), each carrying that FA's RELREC.FAOBJ.
+  (blank IDVARVAL, RELTYPE=MANY). The forward-RELREC merge (PLAN-merged-evaluation-table W5:
+  the related FA a part of the merged evaluation table, one row per (AE, FA) pair of the
+  relationship) lets a single AE record yield several violations (one per related FA), each
+  carrying that FA's FA.FAOBJ.
 
   SYNTHETIC rule (there is no bundled AE-primary RELREC rule): flags each related FA whose FAOBJ
   differs from the AE's AETERM. Subject CDISC001: AE AELNKID=1 ("INJECTION SITE REACTION") links
@@ -16,7 +17,7 @@ description: |
 python_source: synthetic AE-primary RELREC rule on CDISCPILOT01 RELREC AEFA
 rule:
   Core: {Id: RELREC-AEFA-1TON, Status: Published, Version: '1'}
-  Description: Synthetic — AE primary, one-to-many RELREC join to FA; AETERM vs RELREC.FAOBJ.
+  Description: Synthetic — AE primary, one-to-many RELREC join to FA; AETERM vs FA.FAOBJ.
   Sensitivity: Record
   Executability: Fully Executable
   Scope:
@@ -25,10 +26,10 @@ rule:
   Match_Datasets:
     - {Name: RELREC}
   Check:
-    expression: 'AETERM != RELREC.FAOBJ'
+    expression: 'FA._matched_ and AETERM != FA.FAOBJ'
   Outcome:
     Message: AE relates to FA finding(s) via RELREC; AETERM differs from the related FAOBJ.
-    Output_Variables: [AETERM, RELREC.FAOBJ]
+    Output_Variables: [AETERM, FA.FAOBJ]
   id: synthetic-relrec-aefa-1ton
 datasets:
   AE:
@@ -66,19 +67,19 @@ expected_violations:
     status: SUCCESS
     output_variables:
       AETERM: INJECTION SITE REACTION
-      RELREC.FAOBJ: ERYTHEMA
+      FA.FAOBJ: ERYTHEMA
   - rule_id: RELREC-AEFA-1TON
     dataset: AE
     row_key: {AESEQ: 1, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
     status: SUCCESS
     output_variables:
       AETERM: INJECTION SITE REACTION
-      RELREC.FAOBJ: ERYTHEMA
+      FA.FAOBJ: ERYTHEMA
   - rule_id: RELREC-AEFA-1TON
     dataset: AE
     row_key: {AESEQ: 1, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
     status: SUCCESS
     output_variables:
       AETERM: INJECTION SITE REACTION
-      RELREC.FAOBJ: PAIN
+      FA.FAOBJ: PAIN
 expected_errors: []

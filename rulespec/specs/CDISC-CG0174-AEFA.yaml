@@ -5,10 +5,12 @@ description: |
   blank IDVARVAL, RELTYPE populated). Bundled rule CDISC-CG0174, primary = FA: for each FA
   finding-about record, FAOBJ must equal the parent AE's --TERM / --TRT / --DECOD.
 
-  Exercises the new forward-RELREC row-expansion engine's DATASET-LEVEL branch (join on the
-  IDVAR column VALUE, not IDVARVAL). Each FA record links to its one parent AE record
-  (FALNKGRP == AELNKID). Data is a shortened slice of testdata/study3/sdtm (subject CDISC001,
-  RELID AEFA). RELTYPE is present but unused by both engines.
+  Exercises the forward-RELREC merge's DATASET-LEVEL branch (join on the IDVAR column VALUE,
+  not IDVARVAL). Each FA record links to its one parent AE record (FALNKGRP == AELNKID). Data
+  is a shortened slice of testdata/study3/sdtm (subject CDISC001, RELID AEFA). Since
+  PLAN-merged-evaluation-table W5 the related AE is a part of the merged evaluation table
+  (AE.AETERM) and RELTYPE ONE / MANY is the relationship's checked cardinality (OD-5) — it
+  holds here (one AE per link group).
 python_source: rules-sdtmig-3-4.json (CORE-000744) on CDISCPILOT01 RELREC AEFA
 rule:
   coreId: CDISC-CG0174
@@ -47,23 +49,20 @@ expected_violations:
     row_key: {FASEQ: 1, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
     status: SUCCESS
     output_variables:
+      AE.AETERM: INJECTION SITE REACTION
       FAOBJ: ERYTHEMA
-      RELREC.**DECOD:
-      RELREC.**TERM: INJECTION SITE REACTION
   - rule_id: CDISC-CG0174
     dataset: FA
     row_key: {FASEQ: 2, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
     status: SUCCESS
     output_variables:
+      AE.AETERM: INJECTION SITE REACTION
       FAOBJ: ERYTHEMA
-      RELREC.**DECOD:
-      RELREC.**TERM: INJECTION SITE REACTION
   - rule_id: CDISC-CG0174
     dataset: FA
     row_key: {FASEQ: 3, STUDYID: CDISCPILOT01, USUBJID: CDISC001}
     status: SUCCESS
     output_variables:
+      AE.AETERM: INJECTION SITE REACTION
       FAOBJ: PAIN
-      RELREC.**DECOD:
-      RELREC.**TERM: INJECTION SITE REACTION
 expected_errors: []

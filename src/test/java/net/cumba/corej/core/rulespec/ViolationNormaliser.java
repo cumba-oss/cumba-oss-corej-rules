@@ -220,8 +220,6 @@ public final class ViolationNormaliser
     {
         /** {@code rule.getLoadError() != null} — a load-time defect tagged by RulePackageLoader. */
         LOAD_ERROR,
-        /** A forward RELREC join combined with a key-based Match_Datasets row expansion. */
-        RELREC_KEY_EXPANSION,
         /** The Check compiled to no native expression form (the legacy evaluator is retired). */
         NO_NATIVE_CHECK_EXPR,
         /**
@@ -296,15 +294,12 @@ public final class ViolationNormaliser
     }
 
     /**
-     * Verbatim copy of the RELREC/key-expansion message in {@code RuleRunner}. Matched exactly, not
-     * by substring, so a reworded engine message degrades to {@link ErrorReason#OTHER} — a visible
-     * divergence — rather than silently mis-classifying. {@code ErrorReasonEngineContractTest} pins
-     * this against the engine's real behaviour so the drift is caught at build time.
+     * Verbatim copy of the missing-native-checkExpr message in {@code RuleRunner}. Matched exactly,
+     * not by substring, so a reworded engine message degrades to {@link ErrorReason#OTHER} — a
+     * visible divergence — rather than silently mis-classifying; {@code ExpectedErrorsTest}'s
+     * engine contract pins it against the engine's real behaviour so the drift is caught at build
+     * time.
      */
-    static final String RELREC_KEY_EXPANSION_MESSAGE = "forward RELREC join combined with a key-based Match_Datasets row "
-            + "expansion is not supported on the same rule";
-
-    /** Verbatim copy of the missing-native-checkExpr message in {@code RuleRunner}. */
     static final String NO_NATIVE_CHECK_EXPR_MESSAGE = "Rule error — the Check has no native expression form; the "
             + "legacy evaluator has been retired";
 
@@ -417,10 +412,6 @@ public final class ViolationNormaliser
         {
             // An ERROR with no message still errored; say so rather than returning nothing.
             return ErrorReason.OTHER;
-        }
-        if (RELREC_KEY_EXPANSION_MESSAGE.equals(statusMessage))
-        {
-            return ErrorReason.RELREC_KEY_EXPANSION;
         }
         if (NO_NATIVE_CHECK_EXPR_MESSAGE.equals(statusMessage))
         {

@@ -1,14 +1,16 @@
 name: CDISC-CG0174
 kind: rule
 description: |
-  Wave 3 port — RELREC `**` per-row resolution (validation spec for Finding #12a).
-  CDISC-CG0174: FA.FAOBJ must match one of --TERM / --TRT / --DECOD from the parent
-  domain paired via RELREC.
+  Wave 3 port (validation spec for Finding #12a); respelled in PLAN-merged-evaluation-table
+  W5. CDISC-CG0174: FA.FAOBJ must match one of --TERM / --TRT / --DECOD from the parent
+  domain paired via RELREC — each related domain a part of the merged evaluation table,
+  read qualified (AE.AETERM, CM.CMTRT, ...) under its _matched_ guard.
 
   Test study pairs FA row 0 to AE (AEDECOD="ASPIRIN") via RELID=R1 and FA row 1 to CM
-  (CMDECOD="IBUPROFEN") via RELID=R2. FA row 0 matches AE's `**DECOD` → no violation;
-  FA row 1 (FAOBJ="MYSTERY") matches none of CM's `**TERM` / `**TRT` / `**DECOD` →
-  violation.
+  (CMDECOD="IBUPROFEN") via RELID=R2. FA row 0 matches AE's AEDECOD → no violation;
+  FA row 1 (FAOBJ="MYSTERY") matches none of CM's CMTRT / CMDECOD → violation. The
+  finding prints the Check's comparison operands of the parts RELREC names for FA (AE and
+  CM): AE is not supplied on FA row 1's relationship (its type default), CM.CMTRT is.
 
   Depends on the static SDTM model_metadata mock in engine_adapter (Finding #12a).
   Without it, Python's merge_on_relrec_record skips renaming AEDECOD→**DECOD and the
@@ -52,8 +54,7 @@ expected_violations:
     row_key: {FASEQ: 2, STUDYID: S1, USUBJID: '001'}
     status: SUCCESS
     output_variables:
+      AE.AETERM:
+      CM.CMTRT: IBU
       FAOBJ: MYSTERY
-      RELREC.**DECOD: IBUPROFEN
-      RELREC.**TERM: Ibuprofen dose
-      RELREC.**TRT: IBU
 expected_errors: []

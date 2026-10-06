@@ -39,6 +39,15 @@ import org.opentest4j.TestAbortedException;
  * rule <em>answers</em>, which is what the legacy arm is kept for until W6 deletes it.
  *
  * <p>
+ * <b>View-only rules.</b> A rule with a {@code Child: true} entry (W4) or a forward RELREC entry
+ * (W5) reads those parts through the view on <em>both</em> arms — the pre-merge and the row
+ * expander they replaced are gone, and the seven RELREC rules are respelled to names only the view
+ * serves — so their scenarios compare the view with itself (counted as {@code view-only} in the
+ * summary). Their equality with the retired engine is proved by their unchanged {@code .cdt}
+ * expectations and the rulespec drift guards, run before and after W5, not by this differential.
+ * </p>
+ *
+ * <p>
  * Every difference must be a <b>ruled movement</b>: a scenario of the §3.5.3 SUPP case table (the
  * {@code _supp_case} scenarios of the two rules that read a qualifier bare, landed in W3a) whose
  * note says it moves, or a W3f {@code Cardinality} refusal (the five OD-10 duplicate-DM scenarios
@@ -118,6 +127,9 @@ class MergedViewDifferentialTest
     {
     }
 
+    /** Scenarios whose rule reads a view-only part on both arms (Child, forward RELREC). */
+    private static final java.util.concurrent.atomic.AtomicInteger VIEW_ONLY = new java.util.concurrent.atomic.AtomicInteger();
+
     /**
      * Whether a scenario is a W3a SUPP case-table scenario that moves between the arms: the
      * {@code _supp_case} scenarios, bar cases 1, 4 and 8, whose verdict is identical on both.
@@ -152,8 +164,9 @@ class MergedViewDifferentialTest
                 unexplained.add(render(row));
             }
         }
-        String summary = "[merged-view] scenarios=" + scenarios + " differences=" + byMovement
-                + " expected-moving=" + mustMove.size() + " study-rows-moved=" + studyDiff.size()
+        String summary = "[merged-view] scenarios=" + scenarios + " view-only=" + VIEW_ONLY.get()
+                + " differences=" + byMovement + " expected-moving=" + mustMove.size()
+                + " study-rows-moved=" + studyDiff.size()
                 + (plant != null ? " plant=" + plant : "");
         System.out.println(summary);
         String report = System.getProperty("corej.mergedView.report");
@@ -229,6 +242,13 @@ class MergedViewDifferentialTest
                         OverlayDataTable primary = s.primaryTable();
                         assertNotNull(primary, rel + " names no primary dataset");
                         scenarios++;
+                        if (net.cumba.corej.core.exec.RelrecEntries
+                                .hasForwardEntry(rule.getMatchDatasets())
+                                || net.cumba.corej.core.exec.ChildEntries
+                                        .hasChildEntry(rule.getMatchDatasets()))
+                        {
+                            VIEW_ONLY.incrementAndGet();
+                        }
                         String legacy;
                         String view;
                         try
