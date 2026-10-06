@@ -1,0 +1,29 @@
+#!RuleTest
+#test PMDA-SD0077 expect=violation domain=CO
+#note "FU-6 (PLAN-merge-followups), pooled two-study package, CO primary. Row 1 (study S2) comments on LB record (USUBJID 001, LBSEQ 7), which exists only in study S1; S2's subject 001 has LB record LBSEQ 1 only (USUBJID is unique per study only, SDTMIG 4.2.3) -> under the Child key [STUDYID, USUBJID, IDVAR, IDVARVAL] the referenced record does not exist -> FIRES. Row 2 (study S2) comments on S2's LBSEQ 1 -> exists -> silent. Under the old key [USUBJID, IDVAR, IDVARVAL] row 1 found S1's record -> no violation at all (the cross-study false negative this key closes)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 IDVARVAL=7
+dataset CO label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S2 | CO | LB | 001 | 1 | LBSEQ | 7 | Comment A
+S2 | CO | LB | 001 | 2 | LBSEQ | 1 | Comment B
+---
+
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col LBSEQ   type=Num  label="Sequence Number"
+---
+S1 | LB | 001 | 7
+S2 | LB | 001 | 1
+---
