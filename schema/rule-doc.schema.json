@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cumba.net/corej/rule-doc.schema.json",
+  "title": "coreJ split-storage rule documentation sidecar",
+  "description": "Schema for a single rule's citation prose under rules-src/docs/<FAMILY>/<Core.Id>.yaml (plans/done/PLAN-rule-storage-split.md). Holds the bulky Cited_Guidance / Document / Item / Section text lifted out of the rules-legacy Authorities tree, keyed by the same (Standard, Version[, Substandard]) tuple as the check file's Standards[] entries so the assembler can re-join them. Never read by the execution engine. YAML on disk; validates as JSON Schema after parsing.",
+  "type": "object",
+  "required": [
+    "Core",
+    "Citations"
+  ],
+  "properties": {
+    "Core": {
+      "type": "string",
+      "description": "The Core.Id of the check file this sidecar documents (rules-src/checks/<FAMILY>/<Core.Id>.yaml); the two are joined by it."
+    },
+    "Citations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/citation"
+        }
+      },
+      "description": "The citations of every reference of the check's Standards block, keyed by the reference's locator key (Organization|Name|Version|Substandard|Id|Version[#n]) and lifted out of the check file so the authored rule stays small; the generator joins them back into Authorities."
+    }
+  },
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "properties": {
+        "Cited_Guidance": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The quoted text of the standard the rule implements, or null."
+        },
+        "Document": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The document the citation is taken from, e.g. \"IG v3.4\", or null."
+        },
+        "Item": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The item within the document (a table, a variable, a rule number), or null."
+        },
+        "Section": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The section number of the document, e.g. \"4.4.4\", or null."
+        }
+      }
+    }
+  }
+}

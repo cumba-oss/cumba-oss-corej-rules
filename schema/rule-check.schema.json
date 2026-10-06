@@ -1,0 +1,924 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cumba.net/corej/rule-check.schema.json",
+  "title": "coreJ split-storage rule check file",
+  "description": "Schema for a single hand-authored rule check file under rules-src/checks/<FAMILY>/<Core.Id>.yaml (plans/done/PLAN-rule-storage-split.md). One rule per file, keyed on disk by Core.Id; the bulky citation prose lives in the parallel rules-src/docs/ sidecar. This is the execution payload plus a compact Standards[] membership block that replaces the rules-legacy Authorities tree. Closed (PLAN-rule-unknown-keys-gate, owner ruling 2026-09-25: an unknown key at any level of a rule is a load error): the root, Core, Scope, Outcome, Grouping, each Standards / Expansion / Match_Datasets entry and each object element of Match_Datasets[].Keys declare exactly the keys the corpus may carry, so a misspelt key fails AuthoredCorpusSchemaTest before the assembler ever sees it. The root declares the engine-bound keys plus three authored-only ones the assembler consumes or strips: Standards (rebuilt into Authorities) and Source / Source_Proposed (authoring provenance, stripped from every package by ReleaseShapeTrimmer; in a package they are a load error). The condition node (#/$defs/check) and the children of Scope stay open, as in rule-format.schema.json; the engine rejects stray keys there. Strict, too, on the shapes the assembler and engine dispatch on. The file is YAML on disk but validates as a JSON Schema after parsing (a YAML node and a JSON node are the same Jackson JsonNode). Precondition is deliberately NOT declared: it is engine-internal and not an authorable field (owner ruling Q3), so an authored one is a load error (gate R8) and a schema describing it would invite exactly the authoring the loader now rejects. The assembled rules/ view legitimately carries loader- and generator-emitted availability terms on that field, and rule-format.schema.json keeps it, readOnly. History: until 2026-09-21 nothing validated rules-src against this schema and it had drifted (it declared the retired Original_Description / Original_Condition / Outcome.Original_Message and lacked Severity, Source, Grouping, Expansion and the wildcard-family keys); AuthoredCorpusSchemaTest has pinned it since, and PLAN-rule-unknown-keys-gate closed it, declaring the missing keys and deleting the retired ones and the uncarried Variants block (0 carriers).",
+  "type": "object",
+  "required": [
+    "Core",
+    "Check"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "Core": {
+      "type": "object",
+      "required": [
+        "Id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "Id": {
+          "type": "string",
+          "description": "The rule's identifier, e.g. CDISC-CG0006 or FDA-SD1212: FAMILY-prefixed, unique across the corpus, and the key of the check file, the docs sidecar, the scenario directory and every package entry."
+        },
+        "Status": {
+          "type": "string",
+          "description": "The publication status of the rule as authored (Published, Draft, ...): provenance for readers; the engine does not gate on it."
+        },
+        "Version": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "description": "The rule's own version (a string such as \"1\" or \"2\", a number is accepted): bumped when the rule's logic changes, independent of the standard's version."
+        }
+      },
+      "description": "The rule's identity block: Id (the Core.Id the corpus, the packages and every report key on), Status and Version. Closed to those three keys."
+    },
+    "Description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The human-readable statement of what the rule checks, as the reviewer reads it in the report; null when the source sheet carries none."
+    },
+    "Severity": {
+      "description": "Rule severity: the level this rule's finding reports at. Absent means Error, and Error is therefore never written (RuleCanonicalizer strips it). Notice is a report-only kind and is not authorable.",
+      "enum": [
+        "Reject",
+        "Error",
+        "Warning",
+        "Info"
+      ]
+    },
+    "Sensitivity": {
+      "anyOf": [
+        {
+          "enum": [
+            "Record",
+            "Dataset",
+            "Group",
+            "Study"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Record or Dataset: the granularity a finding reports at. Optional - the engine derives it from the Check at load (RuleClassifier) and the generator refuses a rule whose value is neither authored nor derivable; author it only to override a derivation."
+    },
+    "Variable_Universe": {
+      "description": "Which set of variables the VAR cursor iterates for a rule whose inferred evaluation domain carries one (plans/PLAN-leaf-scope-domain-inference.md §3.7): 'Data' (the default when absent — the dataset's columns) or 'Define' (the domain's Define-XML ItemDefs). Never derived; the successor of the retired 'Define Item Metadata Check against Library Metadata' Rule_Type.",
+      "anyOf": [
+        {
+          "enum": [
+            "Data",
+            "Define"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Executability": {
+      "anyOf": [
+        {
+          "enum": [
+            "Fully Executable",
+            "Partially Executable",
+            "Partially Executable - Possible Overreporting",
+            "Partially Executable - Possible Underreporting",
+            "Not Executable"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "How far the rule can be executed as written: Fully Executable, the Partially Executable grades, or Not Executable - the last PARKS the rule (it is omitted from every package and never loaded)."
+    },
+    "ExecutabilityHint": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The actionable 'how' beside Executability, never in place of it. Closed to the two keys the engine binds (PLAN-rule-unknown-keys-gate); every carrier is an object, so the string form this schema used to admit is gone.",
+      "additionalProperties": false,
+      "properties": {
+        "Category": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The kind of limitation behind a partial executability (a closed vocabulary read by the rule editor and the reports), or null."
+        },
+        "Detail": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free text explaining the limitation named in Category, or null."
+        }
+      }
+    },
+    "Scope": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Which datasets the rule is ABOUT - selection, never a verdict (plans/PLAN-scope-requirements-split.md section 4.1). Classes, Domains, Datasets, Data_Structures, Subclasses, Use_Case. Untyped apart from Datasets, matching rule-format.schema.json. Scope itself is closed: its six keys are declared, so an unknown sibling of them fails here as it fails at load; an unknown key INSIDE one of them is the loader's to reject (PLAN-rule-unknown-keys-gate T1-9). Scope carries NO Variables block: it retired to Requirements.Variables (Include -> All, Exclude -> None) and a surviving one is a load error on a corpus rule (loader gate R1), because the engine model no longer binds it and the restriction would simply disappear.",
+      "additionalProperties": false,
+      "properties": {
+        "Classes": {
+          "description": "The observation-class axis: Include / Exclude lists of class names (FINDINGS, EVENTS, INTERVENTIONS, SPECIAL PURPOSE, ..., or ALL). An ADaM token here (BASIC DATA STRUCTURE, ...) is a data-structure token and is judged against the dataset's detected structure set, since ADaM has no observation class."
+        },
+        "Domains": {
+          "description": "The domain axis: Include / Exclude lists of domain names (AE, DM, ..., or ALL), with a split dataset matched through its DOMAIN/RDOMAIN-derived base; include_split_datasets narrows the population to split (true) or unsplit (false) datasets on top of the lists."
+        },
+        "Datasets": {
+          "$ref": "#/$defs/datasetScope",
+          "description": "The dataset-name axis: Include / Exclude lists matched on the member file name itself, with no split-base re-test (owner requirement #5 of PLAN-scope-requirements-split)."
+        },
+        "Use_Case": {
+          "description": "The TIG use case(s) the rule belongs to (PROD, NONCLIN, ...); a run declaring a use case SKIPS the rules outside it, a run declaring none runs every rule."
+        },
+        "Data_Structures": {
+          "description": "The ADaM data-structure axis: Include / Exclude lists of structure tokens (SUBJECT LEVEL ANALYSIS DATASET, BASIC DATA STRUCTURE, OCCURRENCE DATA STRUCTURE, ...), judged against the detected structure set with its is-a chain (a device BDS is a BDS)."
+        },
+        "Subclasses": {
+          "description": "The ADaM subclass axis: Include / Exclude lists of subclass tokens (ADVERSE EVENT, TIME-TO-EVENT, NON-COMPARTMENTAL ANALYSIS, ...), judged with the structure axis from the declared tier or the columns."
+        }
+      }
+    },
+    "Requirements": {
+      "$ref": "#/$defs/requirements",
+      "description": "What must be present for the rule to run at all: Requirements.Variables (All / Any / None / All_Or_None) and Requirements.Datasets. An unmet requirement SKIPS the rule - a non-execution, never a finding."
+    },
+    "Check": {
+      "$ref": "#/$defs/checkOrLevels",
+      "description": "The condition that fires a finding: a single expression leaf ({\"expression\": \"...\"}), or a map of severity levels (REJECT / ERROR / WARNING / INFO) each holding its own expression and Message, judged from the strictest level the run threshold admits."
+    },
+    "Outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Message": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The finding's text as reported, or null when the source sheet carries none. A level-keyed Check may override it per level."
+        },
+        "Output_Variables": {
+          "description": "The variables a finding reports. A leading `!` marks an EXCLUSION (`!X` removes the auto-derived X from the effective list; `!--X`, `!$id`, `!DS.COL` likewise) — `--X` is always an include. Every entry must be double-quoted in YAML (an unquoted `!X` is a YAML tag). The pattern rejects a bare `!` and a stacked `!!X`; the loader's E-3 validation judges the rest.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "pattern": "^!?[^!].*$"
+          }
+        }
+      },
+      "description": "What a finding says and carries: the Message and the Output_Variables (the report columns). Closed to those two keys."
+    },
+    "Bindings": {
+      "description": "Phase 7b of PLAN-typed-expression-engine (owner rulings 2026-09-17): the bindings, each entry exactly name (the $-variable) + expression (any expression, compiled like the Check — runbook W8). The retired spellings - the Operations: block name, the id: entry key, and the whole field form (operator: + parameter fields) - are load errors naming the replacement; additionalProperties is false here for the same reason the loader's Binding deserializer rejects every stray key: a sibling field beside an expression was measured to be silently discarded (the FDA-SD1078 under-report shape).",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/binding"
+      }
+    },
+    "Match_Datasets": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/match"
+      },
+      "description": "The keyed joins the rule reads other datasets through: one entry per joined dataset with its Name, Keys, Cardinality and join options. Every keyed join declares its key through a Requirements.Variables.All_Or_None group (the authoring gate), so a study missing the key SKIPS the rule."
+    },
+    "Supp_Merge": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "The declared SUPP merge: true (the default when absent) or false. See rule-format.schema.json."
+    },
+    "Supp_Keys": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": [
+              "left",
+              "right"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "left": {
+                "type": "string",
+                "description": "The key column on the parent (the evaluated dataset) side of a SUPP merge key pair."
+              },
+              "right": {
+                "type": "string",
+                "description": "The key column on the SUPP side of the pair, when it is not spelled the same as the parent's."
+              }
+            }
+          }
+        ]
+      },
+      "description": "The key of the SUPP merge, absent = the IG's (PLAN-merged-evaluation-table §3.5.1). See rule-format.schema.json."
+    },
+    "Grouping_Variables": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "The legacy flat spelling of the grouping key (a list of columns); mutually exclusive with the Grouping block, which also carries keep_missings."
+    },
+    "Grouping": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Fix #180 - the rule-level grouping block: the grouping key plus its keep_missings disposition. Mutually exclusive with Grouping_Variables. See rule-format.schema.json.",
+      "additionalProperties": false,
+      "properties": {
+        "Variables": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "The columns whose combined value defines a group for a grouped rule; a row's group is read per row of the evaluated dataset."
+        },
+        "keep_missings": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether a row with a missing group key stays in its group (true, the default: the blank key forms its own group) or leaves the grouping (false)."
+        }
+      }
+    },
+    "Expansion": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Fix #147 / EC-56 - declared-token template expansion. See the rule specification, Extension Fields - Expansion.",
+      "items": {
+        "$ref": "#/$defs/expansion"
+      }
+    },
+    "wildcards": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Engine extension (rule specification, Engine Fields - wildcards): per wildcard group name, the inclusive min / max bounds a captured value must satisfy.",
+      "additionalProperties": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "min": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The inclusive lower bound a value captured by this wildcard group must satisfy, or null for none."
+          },
+          "max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The inclusive upper bound a value captured by this wildcard group must satisfy, or null for none."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "skipIfLibraryDefined": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Engine extension: when true, expanded rules are skipped for variables that have CDISC Library definitions."
+    },
+    "wildcardExclude": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Engine extension (rule specification, Engine Fields - wildcardExclude): secondary columns that must NOT be treated as a pairing secondary when a bare-* / *N / *C template expands."
+    },
+    "wildcardPairCatalogue": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Engine extension (rule specification, Engine Fields - wildcardPairCatalogue): when true, an empty-suffix wildcard pairing template only expands for secondary columns in the curated CDISC-standard pair catalogue."
+    },
+    "Standards": {
+      "description": "The rules-legacy Authorities tree with each Reference.Citations array lifted out to the rules-src/docs/ sidecar. Preserves multi-organization (CDISC + FDA) and multi-reference-per-standard structure so the assembler can rebuild Authorities exactly by re-joining the doc citations.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/authority"
+      }
+    },
+    "Source": {
+      "type": "object",
+      "description": "Authoring provenance: the source conformance-rule sheet's columns, verbatim. Read by corpus tooling and reviewers (ShippedSourceBlockMatchesWorkbookTest governs the interior, which is deliberately left open here), never by the engine. Stripped from every released package by ReleaseShapeTrimmer; a PACKAGE carrying it fails to load (PLAN-rule-unknown-keys-gate T1-1)."
+    },
+    "Source_Proposed": {
+      "type": "object",
+      "description": "Authoring provenance for a rule whose source row is a proposal: same readers, same treatment as Source."
+    }
+  },
+  "$defs": {
+    "requirements": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "What the rule needs in order to be able to answer AT ALL (plans/PLAN-scope-requirements-split.md section 4). An unmet requirement is a SKIPPED status naming it, never a finding. All facets are ANDed with each other and with Scope. Typed strictly: this block has no legacy shapes to tolerate, and the loader itself rejects an unknown key under it (gate R2).",
+      "additionalProperties": false,
+      "properties": {
+        "Variables": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Column-presence requirements; the successor of the retired Scope.Variables (Include -> All, Exclude -> None). Entry vocabulary is unchanged: literal, `--` domain-prefix placeholder, qualified DATASET.VARIABLE (Fix #124), glob and /regex/. A requirement is for a thing whose absence means NOTHING TO CHECK - a presence rule must never list the variable it reports.",
+          "additionalProperties": false,
+          "properties": {
+            "All": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "description": "Every entry must be present. Byte-for-byte the former Scope.Variables.Include."
+            },
+            "Any": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 2
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2
+                  },
+                  "minItems": 1
+                }
+              ],
+              "description": "AND of ORs. Flat form is ONE group: at least one entry must be present; unmet only when EVERY entry is absent. Nested form is a list of such groups, EVERY group must be met. Two entries minimum per group (loader gate R4)."
+            },
+            "None": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "description": "No entry may be present. Byte-for-byte the former Scope.Variables.Exclude. A ':N' / ':C' type suffix is a LOAD ERROR here (gate R9, ruling D1): it would mean \"no variable of that type may be present\", which a variable of the other type also satisfies."
+            },
+            "All_Or_None": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 2
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2
+                  },
+                  "minItems": 1
+                }
+              ],
+              "description": "Groups spelled exactly like Any (flat = ONE group, nested = several; two distinct entries minimum per group). A group is satisfied when EVERY entry is present OR NONE is; a partly present group SKIPS the rule naming both halves. For a join key optional on BOTH sides ([[\"VISITDY\", \"TV.VISITDY\"]]); the first key may also sit in All (ruling Q9). Pattern entries are compared by the concrete names they resolve to and must have the same shape within a group. A type suffix, an entry shared with None, and a filter or _matched_ over a group column are authoring errors (the engine runs the rule when both sides are absent)."
+            }
+          }
+        },
+        "Datasets": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Every listed dataset must be present in the run. Presence is the WIDENED fact ds_exists has tested since Fix #358 - a split domain counts as present - except where the rule reaches the dataset only through a surface that resolves exact. Entries accept the `--` wildcard."
+        },
+        "Library": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether a CDISC Library metadata provider is required. DERIVED - the assembler materialises it into rules/; rules-src may omit it, and an authored value that disagrees with the derivation is a load error (gate R5)."
+        },
+        "Define": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether a sponsor Define-XML overlay is required. Derived - see Library."
+        },
+        "Dictionary": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether at least one external dictionary is required. A boolean, not a list of types. Derived - see Library."
+        }
+      }
+    },
+    "datasetScope": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Scope.Datasets (owner requirement #5) - selection by the dataset NAME, with no split-base re-test and no include_split_datasets. LAST RESORT: it MUST NOT be used while Classes, Domains, Data_Structures or Subclasses can express the same selection (authoring guidelines R-4.16, owner ruling B-Q15).",
+      "additionalProperties": false,
+      "properties": {
+        "Include": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Dataset names admitted by this axis; every other dataset is out of scope. Absent or empty admits every dataset the Exclude list leaves."
+        },
+        "Exclude": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Dataset names refused by this axis, applied after Include."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Organization": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The organisation publishing the standard(s) of this entry: CDISC, FDA or PMDA."
+        },
+        "Standards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/standard"
+          },
+          "description": "The standards of this organisation the rule belongs to, each with its References - membership of a (Name, Version) here is what puts the rule into that package."
+        }
+      }
+    },
+    "standard": {
+      "type": "object",
+      "required": [
+        "Name",
+        "Version"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The standard's display name, e.g. SDTMIG, SENDIG, ADaMIG, SENDIG-DART."
+        },
+        "Version": {
+          "type": "string",
+          "description": "The standard's version in display form, e.g. 3.4 (the package file name encodes it as 3-4)."
+        },
+        "Substandard": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The substandard the rule belongs to within the standard (e.g. a DART or AR sub-IG), or null."
+        },
+        "References": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "description": "The published rule(s) this entry implements: Origin, Rule_Identifier and the reference's own Version; the docs sidecar's Citations hang off each reference by its locator key."
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Origin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The publication the reference comes from, e.g. \"SDTM and SDTMIG Conformance Rules\" or \"FDA Validator Rules\", or null."
+        },
+        "Version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The version of that publication, or null."
+        },
+        "Rule_Identifier": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "Id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The published identifier, e.g. CG0006 or SD1212 - the id a reviewer recognises; rules sharing one across families are twins."
+            },
+            "Version": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The version of the published rule the entry implements, or null."
+            }
+          },
+          "description": "The published rule's own identifier within its Origin, with the identifier's version, or null."
+        },
+        "Citations": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Bound by the engine's Reference model, so admitted here; in rules-src the citations live in the rules-src/docs/ sidecar and no check file carries this key (0 carriers when the schema was closed). Items are not typed here - rule-doc.schema.json owns the citation shape."
+        }
+      }
+    },
+    "checkOrLevels": {
+      "description": "A rule's Check is EITHER one condition OR a map of check levels (plans/done/PLAN-severity-and-check-levels.md section 3.3). A Check whose keys are ALL ladder level names is a level map; a Check with NO level-name key is a plain condition, exactly as before. A MIXED map ({ERROR: ..., expression: ...}) and an UNKNOWN level name are load errors - the discrimination is total and free because every condition key is lower-case and every level name UPPER-case. A single Check: is one level, at the rule's effective Severity (absent Severity means Error); the strictest declared level of a level map MUST equal the rule's Severity, and disagreeing is a load error. Bindings, Scope, Requirements, Grouping, Match_Datasets and Outcome.Output_Variables are shared across all of a rule's levels - a rule that needs different ones is two rules. NOTE the run severity threshold is NOT expressible here or anywhere else in a rule file: it is a RUN option only (CLI --severity-level / REST CheckRunRequest.severityThreshold / .cdt #runLevel), and a rule declaring any spelling of it is a load error - a rule declares which levels EXIST, never which levels RUN.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/levelMap"
+        },
+        {
+          "$ref": "#/$defs/plainCheck"
+        }
+      ]
+    },
+    "plainCheck": {
+      "description": "A Check that declares no level at all - one condition, one level, at the rule's effective Severity. The negative clause is what makes a MIXED map ({ERROR: ..., expression: ...}) invalid: without it the mixed map would satisfy this branch (the condition shape #/$defs/check is deliberately open - see its $comment) and the oneOf would match exactly once and pass.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "REJECT"
+                ]
+              },
+              {
+                "required": [
+                  "ERROR"
+                ]
+              },
+              {
+                "required": [
+                  "WARNING"
+                ]
+              },
+              {
+                "required": [
+                  "INFO"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "levelMap": {
+      "type": "object",
+      "description": "The level-keyed Check: every key is one of REJECT / ERROR / WARNING / INFO, and no other key is allowed. Notice is a report-only kind the engine produces and no rule may author, so it is not a level here. Evaluation runs strictest first (REJECT -> ERROR -> WARNING -> INFO) whatever order the levels were authored in, and first claim wins per finding unit: a row claimed by a stricter level is never re-reported by a weaker one. RuleCanonicalizer renders the map strictest-first, one folded expression scalar per level.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "REJECT": {
+          "$ref": "#/$defs/levelCheck",
+          "description": "The check judged at the REJECT level: its expression and optional Message."
+        },
+        "ERROR": {
+          "$ref": "#/$defs/levelCheck",
+          "description": "The check judged at the ERROR level: its expression and optional Message."
+        },
+        "WARNING": {
+          "$ref": "#/$defs/levelCheck",
+          "description": "The check judged at the WARNING level: its expression and optional Message."
+        },
+        "INFO": {
+          "$ref": "#/$defs/levelCheck",
+          "description": "The check judged at the INFO level: its expression and optional Message."
+        }
+      }
+    },
+    "levelCheck": {
+      "type": "object",
+      "description": "One level's value: the Check condition that level evaluates, optionally carrying that level's own Message. A level that declares no Message falls back to the rule's Outcome.Message, resolved at report time from the claiming level - the rule message is never copied into the levels.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/check"
+        }
+      ],
+      "properties": {
+        "Message": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "This level's message; absent means the rule's Outcome.Message."
+        }
+      },
+      "unevaluatedProperties": false,
+      "$comment": "unevaluatedProperties, NOT additionalProperties: additionalProperties sees only this object's own properties (Message), so it would reject expression / all / any / not in every level entry. unevaluatedProperties also counts the keys the allOf's check evaluated, so a level entry admits exactly one condition's keys plus Message."
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "description": "Legacy composite: every child condition must hold. Zero authored carriers since the expression-form flip; loadable, carried through verbatim."
+        },
+        "any": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "description": "Legacy composite: at least one child condition must hold. Zero authored carriers since the expression-form flip; loadable, carried through verbatim."
+        },
+        "not": {
+          "$ref": "#/$defs/check",
+          "description": "Legacy composite: the child condition must not hold. Zero authored carriers since the expression-form flip; loadable, carried through verbatim."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The check in the rule expression language (rule-guide/reference/expression-syntax.md): compiled at load, a syntax error is a load error naming the character."
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "required": [
+            "any"
+          ]
+        },
+        {
+          "required": [
+            "not"
+          ]
+        },
+        {
+          "required": [
+            "expression"
+          ]
+        }
+      ],
+      "$comment": "The operator-leaf alternative ({ operator:, name:, value:, value_is_literal:, regex:, prefix:, suffix:, within:, ordering:, ... }) was REMOVED on 2026-09-17 together with its leaf $def. Phase 7d of plans/PLAN-typed-expression-engine.md deleted the v1 operator-leaf model whole (ExprLowering, CheckConditionLeaf, CheckOperator), and CheckConditionDeserializer now REJECTS a Check node carrying operator: with a message naming expression: as the replacement. While the alternative stood, this schema validated a rule the loader refuses - a machine-readable document asserting the opposite of the engine, which is worse than a stale sentence because something downstream believes it. Corpus at removal: 0 files with an operator-leaf Check. DELIBERATELY OPEN (PLAN-rule-unknown-keys-gate, review H2): additionalProperties:false here would reject a level's Message through levelCheck's allOf. A key beside a condition's dispatch key ({expression, Mesage}, {all, expression}) is rejected by the loader instead - per rule under Check."
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "expression"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The $-variable the binding defines, e.g. \"$ae_record_count\"."
+        },
+        "expression": {
+          "type": "string",
+          "description": "Any expression, compiled like the Check, e.g. record_count(group=[USUBJID]) or upper(AETERM)."
+        }
+      }
+    },
+    "expansion": {
+      "type": "object",
+      "required": [
+        "token",
+        "over"
+      ],
+      "additionalProperties": false,
+      "description": "One Expansion directive; identical to rule-format.schema.json's expansion definition (see there for the field semantics).",
+      "properties": {
+        "token": {
+          "type": "string",
+          "pattern": "^&[A-Z][A-Z0-9]*&$",
+          "description": "The placeholder the template expands over, spelled &NAME& (upper-case, digits allowed)."
+        },
+        "over": {
+          "enum": [
+            "shared_variables",
+            "domain_from_variable",
+            "all_variables",
+            "all_numeric_variables",
+            "all_character_variables"
+          ],
+          "description": "The set the token ranges over: shared_variables, domain_from_variable, all_variables, all_numeric_variables or all_character_variables."
+        },
+        "with": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The dataset or variable the expansion reads its candidates from, when over= needs one; null otherwise."
+        },
+        "pattern": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A regular expression a candidate must match to be expanded over, or null for every candidate."
+        },
+        "known_domain_only": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether a candidate must name a domain the run knows (true) or any value counts (false / null)."
+        }
+      }
+    },
+    "match": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The joined dataset's name (DM, SUPPAE, ...); a `--` form resolves to the evaluated domain."
+        },
+        "Keys": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "left",
+                  "right"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "left": {
+                    "type": "string",
+                    "description": "The key column on the evaluated dataset's side."
+                  },
+                  "right": {
+                    "type": "string",
+                    "description": "The key column on the joined dataset's side."
+                  }
+                }
+              }
+            ]
+          },
+          "description": "The join key columns: a bare name shared by both sides, or a left / right pair when the two sides spell it differently."
+        },
+        "Child": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the joined dataset is the child of the relation (the evaluated dataset is its parent), which orients the join."
+        },
+        "keep_missings": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether rows whose key is missing still join (true) or drop out of the join (false / null)."
+        },
+        "Join_Type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The join's kind as the engine's JoinType spells it (inner, left, ...), or null for the default."
+        },
+        "Filter": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "An expression over the joined dataset's columns selecting the rows that take part, or null for all rows."
+        },
+        "Join_As_String": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the key is compared as text on both sides (true) rather than by the columns' own types."
+        },
+        "Cardinality": {
+          "anyOf": [
+            {
+              "enum": [
+                "1:1",
+                "1:n",
+                "n:1",
+                "n:m"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The relation the join asserts, e.g. n:1 - a joined dataset that carries the key twice is then REFUSED and the rule ERRORs, instead of evaluating one copy of the record per match."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

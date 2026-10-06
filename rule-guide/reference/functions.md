@@ -1713,9 +1713,9 @@ cross-dataset plan `record_count` and `distinct` follow.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
-| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
+| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
 
 **One positional argument.** The target is the only positional; every other argument is a keyword. A second
@@ -1770,10 +1770,15 @@ identity.
 
 The latest date in a column **per group**, broadcast to every row of the group; a value that
 cannot be positioned yields no value. A registry function since runbook W5; the parameters are
-`max`'s, plus:
+`max`'s, plus `missing_values`:
 
 | parameter | type | required | description |
 |---|---|---|---|
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
+| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
 | `missing_values` | `"skip"` · `"indeterminate"` | no | How a missing input affects the result: skipped (the default), or making the group's extreme undeterminable (EC-51). `"indeterminate"` may only be consumed by a negative-polarity comparison (`!=`); a positive one (`<`, `==`, …) is a load error, because it would read "no value" as "no violation" |
 
 **Determinability (EC-46).** The extreme is answered only when a fully determined candidate wins
@@ -1818,6 +1823,15 @@ The earliest date in a column per group — the same contract as `max_date`, in 
 partial could be the 1st). Its parameters, its `--` resolution in `domain=` and its **one positional
 argument** are `max_date`'s: `min_date(DSSTDTC, DS, group=[USUBJID])` is a load error naming the
 keyword spelling.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
+| `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
+| `missing_values` | `"skip"` · `"indeterminate"` | no | How a missing input affects the result: skipped (the default), or making the group's extreme undeterminable (EC-51). `"indeterminate"` may only be consumed by a negative-polarity comparison (`!=`); a positive one (`<`, `==`, …) is a load error, because it would read "no value" as "no violation" |
 
 **Example**
 
@@ -2292,10 +2306,9 @@ True when the target is sorted by `by=`; authored under `not`, it fires the whol
 | parameter | type | required | description |
 |---|---|---|---|
 | `target` | column reference (bare, or a `--`prefix reference) | yes | The column the function is about — a quoted literal is a load error |
-| `by` | list of `asc(COL)` / `desc(COL)` descriptors | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. The `asc`/`desc` direction itself is declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator |
+| `by` | list of `asc(COL)` / `desc(COL)` descriptors | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. The `asc`/`desc` direction itself is declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator A descriptor may carry `nulls=` (`asc(COL, nulls="first")`): no |
 | `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped) |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
-| `nulls` | `"first"` \| `"last"` kwarg on a `by=[…]` descriptor | no | `asc(COL, nulls="first")` — declarative only: the native evaluator (`ExprCompiler.compileTargetIsNotSortedBy`) reads the descriptor's column names and nothing else, so `nulls=` (default `"last"`) has no runtime effect today; documented for the authoring surface, not as a behavioural guarantee |
 
 **Example**
 
@@ -3497,7 +3510,7 @@ The example above is the complete call.
 
 ### define_variable_decode_matches
 
-`define_variable_decode_matches([x])` → **value**
+`define_variable_decode_matches([name])` → **value**
 
 Whether the record's code and decode agree at variable level, per the Define-XML: the current
 variable is the **code** variable, its ItemDef codelist supplies the coded-value → decode map, and
@@ -3508,7 +3521,7 @@ operand `define_variable_decode_matches` in a `Value Check against Define XML Va
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
+| `name` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
 
 **Example**
 
@@ -3919,7 +3932,7 @@ Takes no arguments.
 
 ### library_variable_code_pair_matches
 
-`library_variable_code_pair_matches([x])` → **value**
+`library_variable_code_pair_matches([name])` → **value**
 
 Whether the record's code and its paired decode map to the **same** CDISC CT term: the current
 variable is the code variable (e.g. `--TESTCD`), its decode partner follows the CDISC convention
@@ -3929,7 +3942,7 @@ operand `library_variable_code_pair_matches` in a `Value Check against Library M
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
+| `name` | any | no | `variable_name` / `varname()`, or nothing — the variable currently being iterated |
 
 **Example**
 
