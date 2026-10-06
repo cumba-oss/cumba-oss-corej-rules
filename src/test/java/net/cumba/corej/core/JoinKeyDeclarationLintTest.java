@@ -56,7 +56,11 @@ import org.junit.jupiter.api.io.TempDir;
  * <tr>
  * <td>{@code Child: true} (SUPP--, CO, SQ--, RELREC primaries)</td>
  * <td>every key bare in {@code All}; nothing on the parent side, which is resolved per row — and no
- * group naming the key, unless an ordinary entry of the same rule keys on it too</td>
+ * group naming the key, unless an ordinary entry of the same rule keys on it too. The corpus shape
+ * is {@code [STUDYID, USUBJID, IDVAR, IDVARVAL]} (FU-6 of {@code PLAN-merge-followups}): the
+ * engine's subject key is the declared keys minus the pointer, so {@code STUDYID} joins it only
+ * when declared, and a pooled package is unique per {@code (STUDYID, USUBJID)} only — every corpus
+ * Child entry keys {@code STUDYID} ({@link #everyKeyedJoinDeclaresItsKey()})</td>
  * </tr>
  * <tr>
  * <td>expansion template ({@code &}-token name or key)</td>
@@ -129,12 +133,16 @@ class JoinKeyDeclarationLintTest
 
         final List<String> violations = new ArrayList<>();
 
+        /** Child entries whose keys omit {@code STUDYID} (FU-6) — a census, not a violation. */
+        final List<String> childWithoutStudyid = new ArrayList<>();
+
         void add(Census other)
         {
             ordinary += other.ordinary;
             child += other.child;
             template += other.template;
             violations.addAll(other.violations);
+            childWithoutStudyid.addAll(other.childWithoutStudyid);
         }
     }
 
@@ -151,6 +159,15 @@ class JoinKeyDeclarationLintTest
                 "ordinary keyed entries — a new keyed rule? confirm it declares its key, then move"
                         + " the pin");
         assertEquals(EXPECTED_CHILD, all.child, "Child: true keyed entries");
+        // FU-6 (PLAN-merge-followups, owner 2026-10-06): a Child entry's subject key is its keys
+        // minus the pointer, so one keyed [USUBJID, IDVAR, IDVARVAL] pairs a pooled package's
+        // records across studies. A re-key conserves EXPECTED_CHILD, so the identities are checked
+        // here, not the count.
+        assertTrue(all.childWithoutStudyid.isEmpty(),
+                all.childWithoutStudyid.size()
+                        + " Child: true entr(y/ies) without STUDYID in Keys — the subject key would"
+                        + " pair records of different studies:\n  "
+                        + String.join("\n  ", all.childWithoutStudyid));
         assertEquals(EXPECTED_TEMPLATE, all.template, "expansion-template keyed entries");
     }
 
@@ -254,26 +271,45 @@ class JoinKeyDeclarationLintTest
                         "[\"DM.RPATHCD\", \"TP.RPATHCD\", \"SJ.RPATHCD\"]"),
                 "T-QUALIFIED", "SJ.RPATHCD", "not a side of key DM.RPATHCD");
 
+        // The corpus Child shape since FU-6 (PLAN-merge-followups): STUDYID first in Keys, every
+        // key bare in All.
         String child = """
                 Core: {Id: "T-CHILD"}
                 Requirements:
                   Variables:
-                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All: ["QNAM", "STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 Match_Datasets:
                 - Name: "SUPP--"
                   Child: true
-                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                  Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 """;
         assertClean(child);
+        assertTrue(check(parse(child)).childWithoutStudyid.isEmpty(), "STUDYID-keyed Child entry");
         assertRedNaming(
-                child.replace("All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
-                        "All: [\"QNAM\", \"USUBJID\", \"IDVAR\"]"),
+                child.replace("All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
+                        "All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\"]"),
                 "T-CHILD", "IDVARVAL", "Child key");
+        // STUDYID in Keys but not declared in All: the same Child-key violation.
         assertRedNaming(
-                child.replace("    All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n",
-                        "    All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n"
+                child.replace("All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
+                        "All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]"),
+                "T-CHILD", "STUDYID", "Child key");
+        assertRedNaming(
+                child.replace(
+                        "    All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n",
+                        "    All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]\n"
                                 + "    All_Or_None: [[\"IDVAR\", \"AE.IDVAR\"]]\n"),
                 "T-CHILD", "IDVAR", "named by an All_Or_None group");
+        // The pre-FU-6 shape [USUBJID, IDVAR, IDVARVAL] is still a well-declared entry (the lint
+        // judges declarations), but the STUDYID census sees it: the corpus test reds on it.
+        String childNoStudyid = child
+                .replace("All: [\"QNAM\", \"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
+                        "All: [\"QNAM\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]")
+                .replace("Keys: [\"STUDYID\", \"USUBJID\", \"IDVAR\", \"IDVARVAL\"]",
+                        "Keys: [\"USUBJID\", \"IDVAR\", \"IDVARVAL\"]");
+        assertClean(childNoStudyid);
+        assertEquals(List.of("T-CHILD Match_Datasets 'SUPP--'"),
+                check(parse(childNoStudyid)).childWithoutStudyid, "the STUDYID census");
 
         // The exception (review round 2, M1): a Child key that ALSO keys an ordinary entry of the
         // same rule is legitimately named by that entry's group.
@@ -281,12 +317,12 @@ class JoinKeyDeclarationLintTest
                 Core: {Id: "T-CHILD-DM"}
                 Requirements:
                   Variables:
-                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All: ["QNAM", "STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                     All_Or_None: [["USUBJID", "DM.USUBJID"]]
                 Match_Datasets:
                 - Name: "SUPP--"
                   Child: true
-                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                  Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 - Name: "DM"
                   Keys: ["USUBJID"]
                 """;
@@ -300,12 +336,12 @@ class JoinKeyDeclarationLintTest
                 Core: {Id: "T-CHILD-TPL"}
                 Requirements:
                   Variables:
-                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL", "STUDYID"]
+                    All: ["QNAM", "STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                     All_Or_None: [["USUBJID", "XX.USUBJID"]]
                 Match_Datasets:
                 - Name: "SUPP--"
                   Child: true
-                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                  Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 - Name: "&DOM&"
                   Keys: ["STUDYID", "USUBJID", "&DOM&SEQ"]
                 """;
@@ -319,12 +355,12 @@ class JoinKeyDeclarationLintTest
                 Core: {Id: "T-CHILD-INERT"}
                 Requirements:
                   Variables:
-                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All: ["QNAM", "STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                     All_Or_None: [["USUBJID", "FOO.BAR"]]
                 Match_Datasets:
                 - Name: "SUPP--"
                   Child: true
-                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                  Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 - Keys: ["USUBJID"]
                 """;
         assertRedNaming(childAndInert, "T-CHILD-INERT", "USUBJID", "named by an All_Or_None group");
@@ -336,12 +372,12 @@ class JoinKeyDeclarationLintTest
                 Core: {Id: "T-CHILD-RTPL"}
                 Requirements:
                   Variables:
-                    All: ["QNAM", "USUBJID", "IDVAR", "IDVARVAL"]
+                    All: ["QNAM", "STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                     All_Or_None: [["USUBJID", "DM.USUBJID"]]
                 Match_Datasets:
                 - Name: "SUPP--"
                   Child: true
-                  Keys: ["USUBJID", "IDVAR", "IDVARVAL"]
+                  Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
                 - Name: "DM"
                   Keys: [{left: "USUBJID", right: "&K&"}]
                 """;
@@ -492,6 +528,10 @@ class JoinKeyDeclarationLintTest
             if (Boolean.TRUE.equals(md.getChild()))
             {
                 c.child++;
+                if (left.stream().noneMatch(k -> "STUDYID".equals(fold(k))))
+                {
+                    c.childWithoutStudyid.add(where);
+                }
                 for (String k : left)
                 {
                     if (!all.contains(fold(k)))
