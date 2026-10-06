@@ -658,8 +658,16 @@ abstract class AbstractRuleTestSuitesFactory
         // Plan C §3.4: the scenario's `#runLevel`, or the engine default (Warning) when it
         // declares none — so every scenario in this suite that says nothing is a
         // default-threshold baseline, exactly as it was before per-level Checks existed.
+        // The scenario's `#library standard=` (or `#library-ref`) is the run standard its SUPP--
+        // and RELREC merges are read under (PLAN-merged-evaluation-table T2 fold, H1): a
+        // throwaway per-execution JoinCache carries it, exactly as LibraryValidator's per-dataset
+        // cache carries the derived run standard. An undeclared library ("test") stays UNKNOWN,
+        // the POOLID inference.
+        net.cumba.corej.core.exec.JoinCache joinCache = new net.cumba.corej.core.exec.JoinCache(
+                null, net.cumba.datatable.merge.MergeStandard
+                        .ofStandardName(aLibrary != null ? aLibrary.getStandard() : null));
         RuleExecutionResult result = RuleRunnerCalls.execute(aRule, aPrimary, aResolver, aDomain,
-                aLibrary, null, aDefine, Integer.MAX_VALUE, null, aDictionaries, aVlm,
+                aLibrary, joinCache, aDefine, Integer.MAX_VALUE, null, aDictionaries, aVlm,
                 java.util.Set.of(), java.util.Set.of(),
                 net.cumba.corej.core.exec.EngineLimits.resolveSeverityThreshold(aRunLevel));
         // PLAN-output-variable-null-key-provenance §2.1: no finding value is null — judged on

@@ -1,0 +1,43 @@
+#!RuleTest
+#test CDISC-CG0174 expect=noViolation domain=FA
+# Rule:Description: Raise an error when a related record is present in the parent domain dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent record.
+#note "SDTM study whose RELREC carries a blank POOLID column, with RELID R1 reused by two subjects (PLAN-merged-evaluation-table T2 fold, H1). Under SDTMIG 8.2 a relationship is the rows sharing (STUDYID, USUBJID, RELID): U1's FA links U1's AE (HEADACHE = HEADACHE) and U2's FA links U2's AE (NAUSEA = NAUSEA), nothing fires. Before H1 the merge inferred SEND from the POOLID column and grouped by (STUDYID, RELID) alone, pairing U1's FA with U2's AE and vice versa: two false findings. The run standard (`#library standard=sdtmig`) now decides the reading. Sensitivity: declare sendig instead and both cross-subject pairs fire."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset FA label="Findings About"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Char label="Sequence Number"
+col FAOBJ type=Char label="Object of the Observation"
+---
+S1 | FA | U1 | 1 | HEADACHE
+S1 | FA | U2 | 1 | NAUSEA
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AETERM type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | U1 | 1 | HEADACHE | HEADACHE
+S1 | AE | U2 | 1 | NAUSEA | NAUSEA
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID type=Char label="Pool Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+S1 | AE | U1 |  | AESEQ | 1 | R1
+S1 | FA | U1 |  | FASEQ | 1 | R1
+S1 | AE | U2 |  | AESEQ | 1 | R1
+S1 | FA | U2 |  | FASEQ | 1 | R1
+---
