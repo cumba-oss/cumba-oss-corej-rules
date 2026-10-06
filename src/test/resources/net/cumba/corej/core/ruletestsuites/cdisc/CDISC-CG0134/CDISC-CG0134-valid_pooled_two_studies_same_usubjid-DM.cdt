@@ -1,0 +1,25 @@
+#!RuleTest
+#test CDISC-CG0134 expect=noViolation domain=DM
+#note "STUDYID join round 2026-10-06: a pooled package carries USUBJID 001 under two studies (USUBJID is unique per submission, SDTMIG sec. 4.2.3; a pooled package is unique per STUDYID and USUBJID). The AE join keys on [STUDYID, USUBJID], so the FATAL AE of S1 meets S1's DM row only, whose DTHFL is Y: no finding. Before the round the USUBJID-only join also paired it with S2's DM row (DTHFL N) and fired."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DTHFL   type=Char label="Subject Death Flag"
+---
+S1 | DM | 001 | Y
+S2 | DM | 001 | N
+---
+
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+S1 | AE | 001 | 1 | CARDIAC ARREST | FATAL
+S2 | AE | 001 | 1 | HEADACHE       | RECOVERED/RESOLVED
+---
