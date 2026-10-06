@@ -412,19 +412,26 @@ Supp_Merge: false
 ```
 
 Every rule reads its dataset's **supplemental qualifiers as values of the parent record**: a bare
-name the domain does not carry resolves to the `SUPP<domain>` row that qualifies the record — the
-same subject (`USUBJID`) **and pool** (`POOLID`, each blank when absent), plus `IDVAR` = `IDVARVAL`.
-A blank `IDVAR` qualifies every record of the subject, or of the pool when `USUBJID` is blank and
-`POOLID` populated; a row naming neither a subject nor a pool qualifies nothing. SENDIG makes
-`USUBJID` and `POOLID` exclusive, so pooled records (blank `USUBJID`) never read another pool's
-qualifiers, and a domain without pools reads exactly as it would keyed on `USUBJID` alone. The
+name the domain does not carry resolves to the `SUPP<domain>` row that qualifies the record — by
+the IG's key: the same study (`STUDYID`), domain (`RDOMAIN`), subject (`USUBJID`; `POOLID` under
+SEND, `APID`, `SPDEVID` where the dataset carries them) plus `IDVAR` = `IDVARVAL`, compared as text
+(a numeric parent column canonicalised: `"01"` and `" 1"` find `1`). A blank `IDVAR` qualifies
+every record of the subject, or of the pool when `USUBJID` is blank and `POOLID` populated. A
+record-level row naming no subject qualifies every record its `IDVAR` = `IDVARVAL` matches under
+SEND, and nothing under SDTM. SENDIG makes `USUBJID` and `POOLID` exclusive, so pooled records (blank
+`USUBJID`) never read another pool's qualifiers, and a domain without pools reads exactly as it
+would keyed on `USUBJID` alone. A split dataset reads both its own `SUPP<dataset>` and its
+domain's `SUPP<domain>`. A rule that needs another key writes
+[`Supp_Keys`](joins.md#supp_keys--the-key-of-the-supp-merge); two supplemental rows qualifying one
+record for one `QNAM` make the rules that read that `QNAM` error (and only those). The
 merge serves the dataset the rule evaluates, never a dataset it reads through `domain=`: in
 `read_value(DSTERM, domain=DS, filter=…)` a `SUPPDS` qualifier is not a column of `DS`. On `PC`
 the check reads `PCCALCN` per record, `empty(PCCALCN)` is true for a record no `SUPPPC` row qualifies
 (or whose `QVAL` is blank), `var_exists("PCCALCN")` is true as soon as any `SUPPPC` row carries the
 name, the finding reports the qualifier's value, and a requirement naming the qualifier — bare, or
 qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset delivers it. That is the default,
-and it needs no key.
+and it needs no key. On a rule that joins another dataset, that dataset's qualifiers are its
+merged columns too: `DM.RACEOTH` reads `SUPPDM`'s qualifier of the joined `DM` record.
 
 A qualifier is **not a variable of the domain**: the variable-inventory checks (column order,
 variable count, lengths, the per-variable rules) see exactly the columns the domain file carries.

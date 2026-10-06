@@ -1,12 +1,16 @@
 # Joins
 
 <!-- Grounded: MatchDataset.java (Name, Keys incl. the sided {left,right} shape, Child,
-     Join_Type, Filter + its right-side-only / D89 skip contract), JoinType.java (json values
-     "inner" / "left"), ChildMatchPreMerger.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
-     resolution, child-wins on column collision), RelrecRowExpander.java (forward RELREC, inner
-     semantics, one row per matched pair), KeyMatchRowExpander.keySpec + RulePackageLoader
-     .checkQualifiedKeys / qualifiedSourceError + UnresolvedQualifiedKeyException (a qualified
-     key, PLAN-rprfdy-offset-tp-join C1). `_matched_` usage measured in the corpus (8 authored checks at 2026-09-22: four whole-check
+     Join_Type, Filter + its right-side-only / D89 skip contract, Cardinality), JoinType.java (json
+     values "inner" / "left"), MergedEvaluation.java (the one merged evaluation table per rule —
+     PLAN-merged-evaluation-table), ChildEntries.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
+     resolution into a part qualified with the parent's domain), RelrecEntries.java (forward
+     RELREC — one part per related domain, the cross product per relationship), KeyGates +
+     RulePackageLoader.checkQualifiedKeys / qualifiedSourceError + UnresolvedQualifiedKeyException
+     (a qualified key, PLAN-rprfdy-offset-tp-join C1), RulePackageLoader.checkCardinality /
+     checkSuppKeys (Cardinality, Supp_Keys), the datatable's net.cumba.datatable.merge specs
+     (KeyedMergeSpec, ChildMergeSpec, RelrecPartSpec, SuppMergeSpec.DEFAULT_KEYS). `_matched_` usage
+     measured in the corpus (8 authored checks at 2026-09-22: four whole-check
      `not X._matched_` rules and the four unplanned-visit cascade carriers that use it as a tier
      discriminator). -->
 
@@ -23,6 +27,31 @@ Check:
 Columns of the joined dataset are referenced **dot-qualified** — `DM.RFSTDTC`. Unqualified names
 always mean the primary dataset, and a bare name that only the join carries
 [fails the build](#-a-bare-name-only-the-join-carries-fails-the-build).
+
+### One table per rule
+
+Every declared merge of a rule — each keyed entry, a `Child: true` parent, a forward `RELREC`
+entry and the [SUPP merge](requirements.md#supp_merge) — becomes **columns of one table**, and the
+rule runs on that table. The primary's own columns keep their names; a keyed partner's columns are
+`<Name>.<column>` (`DM.AGE`); a `Child` parent's and a RELREC-related domain's are
+`<domain>.<column>` (`AE.AESMIE`, `PC.PCRFTDTC`); the primary's supplemental qualifiers are bare
+(`AETRTEM`), a joined dataset's are `<Name>.<QNAM>` (`DM.RACEOTH`). The qualifier matches the entry
+ignoring letter case (`dm.age` reads `DM.AGE`; upper case is the expected spelling). Every reader —
+the `Check`, `Bindings`, `Output_Variables`, `Grouping`, the group functions, `colref` — reads the
+same cell for the same name.
+
+A row of that table is one primary record **combined with** its partners. When a partner may
+repeat (a keyed `n:m` join, a `Child` parent, a RELREC relationship), one primary record becomes
+several rows. Two consequences you can rely on:
+
+- **Findings are not repeated.** Within one rule, findings that agree in their position (the
+  primary record, and the column for a per-variable finding) and in every reported value are one
+  finding, so a record that fires on three combined rows reports once unless its
+  `Output_Variables` print something that differs between the rows (a partner's column).
+- **Counting is per record.** A uniqueness check, a grouped function or `record_count` whose
+  operands are all primary columns counts each primary record once, however many rows it became.
+  An operand that reads a partner's column counts every combined row — that is the question it
+  asks.
 
 ## The ordinary join
 
@@ -64,6 +93,45 @@ it [qualified](#a-qualified-key--joining-through-an-earlier-entry): `Keys: ["DM.
 > implies, and for a rule about *"every AE must have a matching DM record"* that is the wrong
 > question to leave to a default — an `inner` join silently removes exactly the rows the rule
 > exists to find. Say which you mean whenever the absence of a partner is part of the question.
+
+## `Cardinality` — how many partners a record may have
+
+```yaml
+Match_Datasets:
+- Name: "DM"
+  Keys: ["STUDYID", "USUBJID"]
+  Join_Type: "left"
+  Cardinality: "n:1"
+```
+
+`Cardinality` says how many rows each side may carry per key — `1:1`, `1:n`, `n:1` or `n:m`, the
+left side being the primary and the right side the joined dataset. It is a separate axis from
+`Join_Type`.
+
+| authored | primary key unique? | partner key unique? | rows per primary record |
+|---|---|---|---|
+| `1:1` | required | required | 0 or 1 (`inner`) / exactly 1 (`left`) |
+| `1:n` | required | — | 0..n (`inner`) / 1..n (`left`) |
+| `n:1` | — | required | 0 or 1 (`inner`) / exactly 1 (`left`) |
+| `n:m` (the default) | — | — | every combination |
+
+- **A duplicate key on a side declared `1` stops the rule with an error** naming the dataset, the
+  key and the first two duplicate rows — never a silent pick of one partner. Two blank keys count as
+  the same key (two missing values are one key; a missing value and `""` are not).
+- **Unauthored is `n:m`:** a repeated partner key makes the primary record appear once per partner
+  row, every combination.
+- Any other spelling (`many-to-one`) is a load error; letter case is ignored (`N:1` is `n:1`).
+- On a `Child: true` entry the IG's answer is `n:m`; an authored value wins and the load log warns
+  that it disagrees. On a forward `RELREC` entry the authored value overrides every relationship's
+  `RELTYPE` ([below](#forward-relrec--name-relrec-with-no-keys)). A keyless entry other than `RELREC`
+  builds nothing to check, so anything but `n:m` there is a load error.
+
+> ⭐ **Join `DM` and `ADSL` on `[STUDYID, USUBJID]`, `Cardinality: "n:1"`.** That is how every
+> corpus rule joins them. One subject has one `DM` / `ADSL` record, so a duplicate is a data defect
+> the rule must not paper over — it errors, and the dedicated duplicate-subject rules report it.
+> `STUDYID` belongs in the key: a pooled submission may carry the same `USUBJID` in two studies,
+> and that is not a duplicate. Declare it like any key (`All_Or_None: [["STUDYID", "DM.STUDYID"],
+> …]`).
 
 ## ⛔ Declare the key — required for every keyed join
 
@@ -170,8 +238,9 @@ and the join. There are two ways out:
   declare it.
 
 "Defined by the scope" is judged against the standard's own dataset definitions: a name any
-dataset in the rule's scope defines is not flagged, even when the join carries it too. `Child:
-true` entries are exempt — their parent's columns are read bare by design.
+dataset in the rule's scope defines is not flagged, even when the join carries it too. A `Child:
+true` parent and a RELREC-related domain are no exception: their columns are read qualified with
+the domain too (`AE.AESMIE`, `PC.PCRFTDTC`).
 
 ## Key types must agree — and what to do when they do not
 
@@ -398,8 +467,8 @@ polarities and the four-case table are house rules rather than guide material.
 Filter: 'AEOUT == "FATAL"'
 ```
 
-A boolean expression evaluated against the **joined dataset's own rows, before the key index is
-built**. Rows that fail it can never become a partner.
+A boolean expression evaluated against the **joined dataset's own rows, before matching**. Rows
+that fail it can never become a partner.
 
 That ordering is the point. Filtering after the join would depend on *which* partner row
 survived; filtering before it makes the question — *does a fatal AE exist for this subject?* —
@@ -424,24 +493,39 @@ Match_Datasets:
   Child: true
 ```
 
-The engine resolves the parent domain (from `RDOMAIN`, or by stripping the `SUPP` prefix), finds
-the parent row where `parent[IDVAR] == IDVARVAL`, and **augments the primary row with the
-parent's columns**. The check can then read those columns directly.
+The engine resolves each row's parent domain (from `RDOMAIN`, or from the `SUPP` / `SQ` name when
+there is no `RDOMAIN` column), finds the parent record whose `IDVAR` column equals `IDVARVAL`
+(compared as text; a numeric parent column canonicalised, so `" 1"` and `"01"` find `1`), and adds
+that parent's columns to the row, **qualified with the parent's domain**:
 
-The remaining keys — `Keys` minus `IDVAR` and `IDVARVAL` — narrow which parent rows are
+```yaml
+Check:
+  expression: 'QNAM == "AESOSP" and var_exists("AE.AESMIE") and AE.AESMIE != "Y"'
+```
+
+On a `SUPP--` / `CO` / `RELREC` primary whose rows point at several domains, each parent domain is
+its own set of columns, supplied only on the rows whose parent is that domain: a row pointing at
+an AE record reads `AE.AESEQ`, and its `CM.CMSEQ` reads not supplied. To read "the column `IDVAR`
+names, in the domain `RDOMAIN` names", build the name:
+`colref(concat(RDOMAIN, ".", IDVAR))`.
+
+The remaining keys — `Keys` minus `IDVAR` and `IDVARVAL` — narrow which parent records are
 considered.
 
-> ⛔ **A `Child` entry is joined only through its pointer — it has no direct join.** The engine
-> builds no keyed lookup for it, so `AE._matched_` and a dotted read such as `AE.AESMIE` are
-> **load errors** on a `Child` entry — in the `Check`, in a `Bindings` expression, in
-> `Output_Variables`, and as a qualified wildcard (`AE.**SMIE`, `AE.${X}`) — and so are their
-> template spellings, `SUPPAE._matched_`, `SUPPAE.QVAL` or `SUPP--.QVAL` against a `SUPP--` entry.
-> Read the parent's columns **bare**: they arrive through the merge above, under their own names.
-> Two more load errors on a `Child` entry: its `Name` must be a concrete dataset or a template with
-> a **trailing** `--` (`SUPP--`, `SQ--`), and `keep_missings: false` has no effect on it (the
-> pointer merge keeps blank keys unconditionally). ⚠ One shape no check sees: a read whose
-> *qualifier* is itself substituted (`${X}.COL`) is bound per row and, on a `Child` entry, reads the
-> not-supplied default silently — do not write it.
+- **Every record is kept.** A `Child` entry is always a `left` merge: a record whose parent is not
+  found reads the parent's columns as not supplied (`""` / missing), which is exactly what a
+  referenced-record rule such as `CDISC-CG0371` reports. An authored `Join_Type` other than `left`
+  is a load error.
+- **`<domain>._matched_`** (`AE._matched_`) is true on a row whose parent is an `AE` record that was
+  found. The entry's own template name is the child dataset, not a parent: `SUPPAE._matched_`
+  against a `SUPP--` entry is a load error.
+- **A parent may be addressed many times** (`IDVAR` can name a grouping variable such as
+  `AEGRPID`): the IG's cardinality is `n:m`, and a record expands into one row per parent record.
+- **Its `Name` must be a concrete dataset or a template with a trailing `--`** (`SUPP--`, `SQ--`),
+  and `keep_missings: false` has no effect on it (the pointer merge keeps blank keys
+  unconditionally) — both load errors.
+- Under SEND a pointer row naming no subject (`USUBJID` and `POOLID` blank) addresses the parent
+  records of every subject and pool, and `POOLID` is a subject key beside `USUBJID`.
 
 > ⛔ **Declare the child-side keys bare in `All`** — see
 > [Declare the key](#-declare-the-key--required-for-every-keyed-join).
@@ -449,30 +533,85 @@ considered.
 > ⚠ **`STUDYID` participates only if you declare it.** It is not added implicitly. Omitting it
 > from `Keys` means rows are matched across studies, which matters for a pooled submission.
 
-> ⚠ **On a column-name collision the child wins.** If the primary already has a column of that
-> name, the parent's value does not overwrite it.
+> ⚠ One shape no check sees: a read whose *qualifier* is itself substituted (`${X}.COL`) is bound
+> per row and reads the not-supplied default silently when it names no part — do not write it.
+
+## `Supp_Keys` — the key of the SUPP merge
+
+Every rule reads its dataset's supplemental qualifiers as columns ([`Supp_Merge`](requirements.md#supp_merge)),
+keyed by the IG's key: `STUDYID`, the domain (`DOMAIN` against `RDOMAIN`), the subject (`USUBJID`,
+and `POOLID` under SEND, `APID` for associated persons, `SPDEVID` for devices) and the `IDVAR` /
+`IDVARVAL` pair (the column `IDVAR` names equals `IDVARVAL`, compared as text). A rule that needs a
+different key says so on the rule:
+
+```yaml
+Supp_Merge: true          # the default
+Supp_Keys:                # omitted = the IG's key
+- "STUDYID"
+- { left: "DOMAIN", right: "RDOMAIN" }
+- "USUBJID"
+- "IDVAR"
+- "IDVARVAL"
+```
+
+- The elements have the `Keys` shape: a column name shared by both sides, or `{left, right}` — the
+  left side the evaluated dataset, the right side its `SUPP--` dataset.
+- A key column present on both sides is used; on one side only it is ignored (with a log warning);
+  on neither it is ignored.
+- Load errors: `Supp_Keys` with `Supp_Merge: false` (there is no merge to key), an empty list, a
+  qualified name (`DM.USUBJID` — the key reads the dataset and its `SUPP--` only), half of the
+  `IDVAR` / `IDVARVAL` pair, or the pair with a differing left side.
+- Data the key cannot serve **errors the rules that read the qualifier**, and only those: two
+  supplemental rows qualifying one record for one `QNAM`, a subject-level and a record-level row for
+  the same record and `QNAM`, or an `IDVAR` naming a column the domain lacks. Every other rule on
+  the dataset runs normally.
+
+A joined dataset's own qualifiers are its columns too: `DM.RACEOTH` on a rule that joins `DM` reads
+`SUPPDM`'s `RACEOTH` for the joined record. `SUPPDM` qualifies `DM` only — another domain reaches it
+through a `DM` join, never bare.
 
 ## Forward RELREC — `Name: RELREC` with no `Keys`
 
 ```yaml
 Match_Datasets:
 - Name: "RELREC"
+Check:
+  expression: 'PC._matched_ and not empty(PC.PCRFTDTC) and PPRFTDTC == PC.PCRFTDTC and PPCAT != PC.PCTEST'
 ```
 
-A keyless `RELREC` entry is what selects this shape. It builds one evaluation row per
-*(primary record, related record)* pair via RELREC, with the related columns reachable as
-`RELREC.*`.
+A keyless `RELREC` entry merges **every domain the study's RELREC relates to the primary's
+domain**, each as its own set of columns qualified with that domain (`PC.PCRFTDTC`). The key is
+the IG's, not authored: a relationship is the RELREC rows sharing `STUDYID`, `USUBJID` and `RELID`
+under SDTM, and `STUDYID` and `RELID` under SEND, where each row names its record by `USUBJID` or
+by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric column canonicalised.
 
-Three behaviours worth knowing before you use it:
-
-- It is **inner** — a primary record with no related record produces no row, so a rule written
-  this way cannot report *"nothing is related"*.
-- A declared forward join with no matching pairs yields **zero rows**, and therefore no findings.
-- It pairs the primary record with **every** related record, whatever its domain. To mean one
-  related domain, read its columns by their **literal** names and guard them: on a pairing with a
-  record of another domain `RELREC.PCRFTDTC` is absent and reads empty, so
-  `not empty(RELREC.PCRFTDTC)` keeps that row silent. `RELREC.**<suffix>` instead resolves per
-  related record against *that* record's own prefix.
+- **The rows are the cross product per relationship.** A primary record related (one `RELID`) to
+  one CM record and three LB records becomes three rows, the CM record beside each LB record; two
+  CM records and three LB records make six. Records of two **different** relationships are never
+  combined: each relationship gives its own rows. A domain a relationship does not reach reads as
+  not supplied on that relationship's rows.
+- **`<domain>._matched_`** (`PC._matched_`) says whether **this row** carries a record of that
+  domain — guard a read of a domain that may be absent with it. A domain qualifier no relationship
+  of the study reaches reads not supplied, and its flag is false.
+- **`Join_Type` is `inner` by default.** A primary record that no relationship addresses is not
+  evaluated. A record a relationship **does** address is kept even when the related record is not
+  found — its related columns read not supplied. A **dataset-level** relationship (`IDVARVAL`
+  blank) addresses every primary record that carries a value in the `IDVAR` column, so such a
+  record is kept even when no related record shares that value. `Join_Type: "left"` keeps every
+  record; **`RELREC._matched_`** is then true on a record some relationship addresses
+  (`RELREC._matched_` under `inner` is constant-true and a load error, as on any entry).
+- **`RELTYPE` is the checked cardinality** of a dataset-level relationship (`ONE` / `MANY` on each
+  side): related data that repeats a side declared `ONE` stops the rule with an error. An authored
+  `Cardinality` on the entry overrides every relationship's `RELTYPE`.
+- **A related domain lacking the column RELREC names** (`IDVAR`) cannot be paired: the rules that
+  read that domain error; the others run.
+- **`RELREC.<column>` and `RELREC.**<suffix>` are load errors.** The entry has no columns of its
+  own, and a per-row alias has no single answer on a row combining several related records. Name
+  the domain: `PC.PCTEST`, or one guarded arm per domain you mean
+  (`AE._matched_ and FAOBJ != AE.AETERM or CM._matched_ and FAOBJ != CM.CMTRT`). A `**` pattern on
+  a related domain (`AE.**TERM`) does not resolve — write the concrete name.
+- A keyed entry with the same name as a related domain (`Name: CM` beside a forward `RELREC`
+  relating CM) is refused when the rule runs: the two would both be `CM.*`.
 
 > ⛔ **`Wildcard` is retired and is a load error.** It was accepted on this entry and read by
 > nothing; it never filtered the related domain. Any other key an entry does not model is a load
@@ -485,9 +624,11 @@ Three behaviours worth knowing before you use it:
 | compare a value here with a value there | ordinary join, `Keys` |
 | does a related record exist? | `left` join + `_matched_`, usually with `Filter` |
 | does a related record *of a particular kind* exist? | `Filter` on the joined side |
-| my primary dataset points at a parent row | `Child: true` |
+| my primary dataset points at a parent row | `Child: true`, the parent's columns as `<domain>.X` |
+| each record has at most one partner, and a duplicate is a defect | `Cardinality: "n:1"` |
+| the SUPP merge must use another key | `Supp_Keys` |
 | the two sides type the key differently | fix the data, or `Requirements.Variables` on **both** sides, or `Join_As_String: true` |
-| walk RELREC relationships | `Name: "RELREC"`, no `Keys` |
+| walk RELREC relationships | `Name: "RELREC"`, no `Keys`; read `<domain>.X` guarded by `<domain>._matched_` |
 | the key lives in a dataset the rule already joins | a [qualified key](#a-qualified-key--joining-through-an-earlier-entry) on a later entry |
 
 > ⚠ **A join changes what an unqualified name means in only one respect: nothing.** Unqualified

@@ -217,8 +217,8 @@ enforces the same thing, so a finding is not raised twice by two authorities.
 
 **`Supp_Merge`** — the declared SUPP merge, on by default: the rule reads a `SUPP<domain>`
 qualifier as a value of the parent record (`empty(PCCALCN)`, `var_exists("PCCALCN")`) — the
-`SUPP--` row keyed on the same subject **and pool** (`USUBJID`, `POOLID`, each blank when absent)
-plus `IDVAR` = `IDVARVAL` — and a
+`SUPP--` row keyed by the IG's key (`STUDYID`, `RDOMAIN`, the subject **and pool** — `USUBJID`,
+`POOLID` — plus `IDVAR` = `IDVARVAL`; another key with `Supp_Keys`) — and a
 requirement naming one — bare, or qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset
 delivers it; a qualifier is never a variable of the domain for the variable-inventory checks. The
 merge serves the dataset under evaluation only — never a dataset read through `domain=`
@@ -258,9 +258,11 @@ derives every binding the check reads into `Output_Variables`.
 **`Match_Datasets`** joins another dataset so the check can see both sides. Each entry takes
 `Name`, `Keys`, `Join_Type` (`inner` or `left`) and `Filter` — a boolean expression over the
 joined dataset's **own** rows, applied before the key index is built, so it cannot depend on
-which row survives the join. Two special join shapes: `Child` selects parent-row resolution
-for `SUPP--` / `CO` / `RELREC` primaries, and a keyless `RELREC` entry selects forward RELREC
-expansion. Any other key is a load error.
+which row survives the join, and `Cardinality` (`1:1`, `1:n`, `n:1`, `n:m`) — how many partners
+a record may have, checked against the data. Two special join shapes: `Child` selects parent-row
+resolution for `SUPP--` / `CO` / `RELREC` primaries, and a keyless `RELREC` entry merges the
+domains RELREC relates to the primary. Every merge becomes columns of the one table the rule runs
+on (`DM.AGE`, `AE.AESMIE`, `PC.PCTEST`). Any other key is a load error.
 
 **`Grouping`** changes the unit of evaluation from the row to the group: `Variables` are the
 grouping keys, and `keep_missings` decides whether rows with a missing key form groups of their

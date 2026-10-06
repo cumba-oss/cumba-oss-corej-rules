@@ -4218,9 +4218,10 @@ expression: 'not empty(PARAMCD) and not between(char(PARAMCD), char("A"), char("
 
 `colref(x)` → **value**, or a **list** of values when `x` is a list of names
 
-The value of the column *named by* `x` — a dynamic column read. A bare name reads the dataset under
-validation (with the parent columns a `Child: true` entry merged in); `DS.X` reads the joined
-dataset `DS` exactly as the written `DS.X` does. The value keeps its column's type (an ADaM date
+The value of the column *named by* `x` — a dynamic column read. A name reads exactly the column the
+same name written in the expression reads: a bare name the dataset under validation (and its
+supplemental qualifiers), `DS.X` the merged column `DS.X` — a joined dataset's, a `Child: true`
+parent's or a RELREC-related domain's. The value keeps its column's type (an ADaM date
 stays a number). Over a list of names — `colref(find_vars("ADSL.TRTxxA"))` — it answers one value
 per name, in the list's order: `TRTA in colref(find_vars("ADSL.TRTxxA"))` is the function spelling
 of `TRTA in ADSL.TRT${*}A`.
@@ -4232,7 +4233,7 @@ of `TRTA in ADSL.TRT${*}A`.
 **Example**
 
 ```yaml
-expression: 'not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(IDVAR))'
+expression: 'not empty(IDVAR) and not empty(IDVARVAL) and str(IDVARVAL) != str(colref(concat(RDOMAIN, ".", IDVAR)))'
 ```
 
 ```yaml
@@ -4266,10 +4267,14 @@ unless the rule declares it in `Requirements.Variables` (then the rule is skippe
 `colref("DM.SEX")` is refused like `DM.SEX` — a filter sees only its own dataset's columns. A name
 computed per row cannot be checked before the run.
 
-**Real columns only.** `colref` reads the dataset's own columns (with a `Child: true` parent's
-merged in) and the joined datasets' columns — **not** a SUPP qualifier merged in by the SUPP merge,
-which the written bare name does read. Whether it should is an open owner question
-(`PLAN-dynamic-column-functions` F1); today's behaviour is pinned by a test so a change is visible.
+**Supplemental qualifiers too.** `colref("AETRTEM")` reads the `SUPPAE` qualifier exactly as the
+written `AETRTEM` does (`PLAN-merged-evaluation-table`, closing `PLAN-dynamic-column-functions`
+F1), and a qualifier the SUPP merge could not serve (a duplicate supplemental row, an `IDVAR` the
+domain lacks) fails the rule when `colref` reads it, as the written name does.
+
+**A `Child: true` parent** is read qualified with its domain, so the referenced-record check builds
+the qualified name from the pointer row: `colref(concat(RDOMAIN, ".", IDVAR))` reads the column
+`IDVAR` names in the domain `RDOMAIN` names, on the parent record the row points at.
 
 **In a membership test.** On the right of `in`, a list of names is a per-row set:
 `TRTA in colref(find_vars("ADSL.TRTxxA"))`, or through a binding, `$vars: find_vars("ADSL.TRTxxA")`
@@ -4440,7 +4445,7 @@ rule writes a number inside `str`.
 **Example**
 
 ```yaml
-expression: 'str(IDVARVAL) != str(colref(IDVAR))'
+expression: 'str(IDVARVAL) != str(colref(concat(RDOMAIN, ".", IDVAR)))'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept.

@@ -113,8 +113,9 @@ An unqualified name is the **primary** dataset's column, so the constant above i
 reads even when a joined dataset carries a column of that name — the join is reached only through
 the qualified name (`DM.RFSTDTC`). A rule whose scope defines no `X` but whose join does, and that
 reads a bare `X`, therefore fails the corpus build unless it declares `X`; see
-[Joins](../authoring/joins.md#-a-bare-name-only-the-join-carries-fails-the-build). The one
-exception is a `Child: true` entry, whose parent's columns are merged in under their bare names.
+[Joins](../authoring/joins.md#-a-bare-name-only-the-join-carries-fails-the-build). A `Child: true`
+parent is no exception: its columns are read qualified with its domain (`AE.AESMIE`). The bare
+names a merge does supply are the primary's supplemental qualifiers (`AETRTEM`).
 
 ## What you do *not* have to write
 
