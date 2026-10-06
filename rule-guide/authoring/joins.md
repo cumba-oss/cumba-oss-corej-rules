@@ -38,7 +38,8 @@ rule runs on that table. The primary's own columns keep their names; a keyed par
 (`AETRTEM`), a joined dataset's are `<Name>.<QNAM>` (`DM.RACEOTH`) — each dataset's qualifiers from
 its own SUPP sources (its `SUPP<dataset>` plus the domain-level members of its `SUPP<domain>` /
 `SQAP<xx>` family: a split `SUPPAE1` + `SUPPAE2` feeds `AE` whole; a keyed `LB` that resolves as the
-split union `LB1` + `LB2` is fed the whole `SUPPLB` family; a keyed `LBCH` exactly its `SUPPLBCH`).
+split union `LB1` + `LB2` is fed the whole `SUPPLB` family; a keyed `LBCH` its `SUPPLBCH` plus any
+domain-level member of the family, never a sibling's `SUPPLBHE`).
 A keyed entry may name a supplemental family — `Name: "SUPPAE"` resolves every member (`SUPPAE1` +
 `SUPPAE2`) as one partner — and a non-`Child` `SUPP--` / `SQAP--` is the supplemental family of the
 primary's **domain** (`SUPPLB` on `LBCH`, `SQAPMH` on `APMH`), never the member name (the

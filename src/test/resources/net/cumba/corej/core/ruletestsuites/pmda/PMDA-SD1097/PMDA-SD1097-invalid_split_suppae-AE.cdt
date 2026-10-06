@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-SD1097 expect=violation domain=AE
-#note "PLAN-split-supp-resolution: the split SUPPAE family (SUPPAE1 + SUPPAE2, RDOMAIN=AE) carries no AETRTEM in either member -> the family count is 0 -> fires. Not a red-first witness (the pre-plan engine counted 0 too); pins that both members are read (the valid twin is the witness)."
+#note "PLAN-split-supp-resolution: the split SUPPAE family (SUPPAE1 + SUPPAE2, RDOMAIN=AE) resolves to the union of both members and record_count's filter=(QNAM == \"AETRTEM\") is applied over that union: neither member carries AETRTEM, the filtered count is 0, the rule fires. Pins the filter= regression on a family union (an unfiltered count over the 2 rows would silence it). Green on the pre-plan engine too (the family resolved to nothing) -- the valid twin is the red-first witness."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 dataset AE class=EVENTS

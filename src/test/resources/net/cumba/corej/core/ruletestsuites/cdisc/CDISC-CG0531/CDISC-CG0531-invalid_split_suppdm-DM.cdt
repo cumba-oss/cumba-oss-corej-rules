@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0531 expect=violation domain=DM
 # Rule:Description: Raise an error when RACE in DM equals 'MULTIPLE' but multiple race records are not present in SUPPDM for the subject.
-#note "PLAN-split-supp-resolution: SUPPDM split as SUPPDM1 + SUPPDM2 (RDOMAIN=DM). The family carries ONE race record for 01-701-1015 (RACE1 in SUPPDM1; SUPPDM2 has only SAFETY) -> the MULTIPLE subject fires once. Not a red-first witness (the pre-plan engine counted 0 and fired too); pins that both members are counted (the valid twin is the witness)."
+#note "PLAN-split-supp-resolution: SUPPDM split as SUPPDM1 + SUPPDM2 (RDOMAIN=DM). The family carries ONE race record for 01-701-1015 (RACE1 in SUPPDM1; SUPPDM2 has only SAFETY), so record_count(domain=\"SUPPDM\", group=[USUBJID], filter=(starts_with(QNAM, \"RACE\"))) is exactly 1 and the MULTIPLE subject fires once. Pins that no member is fed twice (D11): a double-fed SUPPDM1 would count RACE1 twice, reach 2 and silence the rule. Green on the pre-plan engine too (the family resolved to nothing, count 0) -- the valid twin is the red-first witness."
 #expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-701-1015
 dataset DM label=Demographics

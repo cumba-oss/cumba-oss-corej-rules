@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0218 expect=violation domain=SV
+#note "SV Assumption 11 (SDTMIG 3.2/3.3; #15 in 3.4). Guard-sensitivity scenario for the not empty(earliest_possible(SE.SESTDTC)) conjunct INSIDE joined(...) (PACK 3 review, C8 L3): the visit 2012-07-20 EPOCH=SCREENING lies in TREATMENT [2012-07-15, 2012-08-20), which contains it (ERROR row condition true), and SCREENING has a BLANK start [blank, 2012-08-01). The guard excludes the blank-start element from the candidates, so no candidate carries SCREENING, none(...) is true and the finding fires once on TREATMENT. Delete the guard and the blank start reads as an unbounded range: MISSING <= latest_possible(SVSTDTC) is true (D34 #5), the SCREENING element becomes a candidate carrying the visit's EPOCH, none(...) is false and the finding is SILENCED (measured by sabotaging the rule's joined(...) guard: this scenario goes red)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 severity=ERROR VISITNUM=2 SE.EPOCH=TREATMENT
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | DAY 5 | 2012-07-20 | SCREENING
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 |  | 2012-08-01 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-15 | 2012-08-20 | TREATMENT
+---

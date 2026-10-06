@@ -230,8 +230,9 @@ entry `CIT §2`), exactly as it evaluates a rule against a dataset:
   glob, `/regex/` or template) is also found as a supplemental qualifier: a row of the entry's
   *own* dataset's **supplemental sources** — its `SUPP<dataset>` plus the domain-level members of
   its `SUPP<domain>` / `SQAP<xx>` family, exactly the datasets the [SUPP merge](#supp_merge) reads
-  (`SUPPAE1` + `SUPPAE2` for `AE.AETRTEM` when SUPPAE ships split; exactly `SUPPLBCH` for
-  `LBCH.X`, never a sibling's `SUPPLBHE`), not the supplement of the dataset the rule runs on —
+  (`SUPPAE1` + `SUPPAE2` for `AE.AETRTEM` when SUPPAE ships split; for `LBCH.X` its `SUPPLBCH`
+  plus any domain-level member of the family, never a sibling's `SUPPLBHE`), not the supplement
+  of the dataset the rule runs on —
   whose `QNAM` **equals** the variable name, compared as a string, exactly (a `QNAM` cell is a
   value; rulings register `CIT §3`). It is looked for **before** a missing dataset counts as
   unavailable: `All: [AE.AETRTEM]` in a study with no `AE` but a `SUPPAE` row `QNAM = AETRTEM` is

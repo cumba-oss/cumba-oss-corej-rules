@@ -2423,6 +2423,10 @@ Check:
   expression: 'not empty(EPOCH) and not any(joined(EPOCH == SE.EPOCH))'
 ```
 
+> A quantifier answers the same on every evaluation row of a record, so a Check that is only a
+> quantifier fires once per joined row of the record. Anchor it on a row conjunct (`not
+> empty(EPOCH) and …` above) to report the record once, where the finding belongs.
+
 ### all
 
 `all(list)` → **boolean**
@@ -2441,8 +2445,10 @@ Match_Datasets:
 - Name: "SE"
   Keys: ["STUDYID", "USUBJID"]
 Check:
-  expression: 'all(joined(empty(SE.SEENDTC)))'
+  expression: 'not empty(SVSTDTC) and all(joined(empty(SE.SEENDTC)))'
 ```
+
+> Anchored on `not empty(SVSTDTC)`: a quantifier-only Check fires once per joined row (see `any`).
 
 ### none
 
@@ -2455,9 +2461,11 @@ condition. `none(joined(c))` and `not any(joined(c))` are the same condition.
 |---|---|---|---|
 | `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
 
-**Example** — `CDISC-CG0218`'s shape: the row condition anchors the finding on the element that
-contains the visit start, the quantifier silences it when any element that *may* be in progress
-carries the visit's EPOCH
+**Example** — `CDISC-CG0218`'s `ERROR` level as shipped: the row condition anchors the finding on
+the element that contains the visit start (end-exclusive: the transition instant belongs to the
+next element), the quantifier silences it when any element that *may* be in progress at the
+visit's start — judged on the dates' possible ranges, a date-time's day end-inclusive only when
+both sides are dates — carries the visit's EPOCH
 
 ```yaml
 Match_Datasets:
@@ -2467,8 +2475,17 @@ Check:
   ERROR:
     expression: >-
       date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) < date(SE.SEENDTC) and EPOCH != SE.EPOCH
-      and none(joined(date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) <= date(SE.SEENDTC) and EPOCH == SE.EPOCH))
+      and none(joined(not empty(earliest_possible(SE.SESTDTC)) and not
+      empty(earliest_possible(SVSTDTC)) and date(earliest_possible(SE.SESTDTC)) <=
+      latest_possible(SVSTDTC) and (date(earliest_possible(SVSTDTC)) < latest_possible(SE.SEENDTC)
+      or date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or
+      SE.SEENDTC !~ /T/)) and EPOCH == SE.EPOCH))
 ```
+
+The two `not empty(earliest_possible(…))` guards inside `joined(…)` are load-bearing: a blank
+`SE.SESTDTC` read as a date has an unbounded range, so without them an element with no start
+would count as a candidate and silence the finding
+(`CDISC-CG0218-invalid_blank_sestdtc_candidate_inside_joined-SV.cdt`).
 
 ### joined
 
@@ -2494,6 +2511,8 @@ Match_Datasets:
 Check:
   expression: 'DTHFL != "Y" and any(joined(AE.AEOUT == "FATAL"))'
 ```
+
+> Anchored on the row conjunct `DTHFL != "Y"`: a quantifier-only Check fires once per joined row.
 
 
 ## Dataset and domain metadata

@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1097 expect=violation domain=SUPPAE1
-#note "PLAN-split-supp-resolution (Q1, D7): the split SUPPAE family (SUPPAE1 + SUPPAE2, RDOMAIN=AE) carries no AETRTEM in EITHER member; the family count is 0 -> the dataset-level violation on the SUPPAE1 primary. Not a red-first witness (the pre-plan engine also counted 0); it pins that the family count, not the member's own rows alone, is what the rule reads (the valid twin is the witness)."
+#note "PLAN-split-supp-resolution (Q1, D7): the split SUPPAE family (SUPPAE1 + SUPPAE2, RDOMAIN=AE) resolves to the union of both members, and record_count's filter=(QNAM == \"AETRTEM\") is applied OVER THAT UNION: neither member carries AETRTEM, the filtered count is 0 and the dataset-level violation fires on the SUPPAE1 primary. Pins the filter= regression on a family union (an unfiltered or mis-filtered count over 2 rows would be 2 and silence the rule). Green on the pre-plan engine too (the family resolved to nothing, count 0) -- the valid twin is the red-first witness."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
 dataset SUPPAE1 label="Supplemental Qualifiers for AE (part 1)"
