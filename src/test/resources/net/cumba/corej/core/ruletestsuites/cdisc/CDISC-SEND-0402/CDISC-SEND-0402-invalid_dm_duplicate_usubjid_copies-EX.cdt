@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0402 expect=executionError domain=EX
-#note "PLAN-merged-evaluation-table W3f, OD-10: the DM join authors Cardinality n:1 on [STUDYID, USUBJID], so a DM carrying the subject twice is refused - the rule ERRORs naming DM, the key and the two rows, instead of evaluating one copy of the record per DM row. A duplicate DM is reported by the DM uniqueness rules (CG0151), not by every rule joining DM. Until W3f this was the D-COPIES arm of PLAN-rprfdy-offset-tp-join: one finding from the copy paired with the second DM row."
+#note "PLAN-merged-evaluation-table W3f, OD-10: the DM join authors Cardinality n:1 on [STUDYID, USUBJID], so a DM carrying the subject twice is refused - the rule ERRORs naming DM, the key and the two rows, instead of evaluating one copy of the record per DM row. A duplicate DM is reported by the SEND DM uniqueness rules (CDISC-SEND-0037, CDISC-SEND-0097: not is_unique_set([USUBJID, STUDYID]) on DM, both in SENDIG-DART 1.1 / 1.2), not by every rule joining DM. Until W3f this was the D-COPIES arm of PLAN-rprfdy-offset-tp-join: one finding from the copy paired with the second DM row."
 #library standard=sendig-dart version=1-2
 #expect-execution-error "Cardinality n:1: DM has duplicate key (STUDYID=S1, USUBJID=001) at rows 1 and 2"
 dataset EX class=INTERVENTIONS label="Exposure"

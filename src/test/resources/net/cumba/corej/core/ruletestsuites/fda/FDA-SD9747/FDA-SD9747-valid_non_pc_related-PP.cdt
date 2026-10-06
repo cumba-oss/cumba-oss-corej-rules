@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD9747 expect=noViolation domain=PP
-# Rule:Description: Raise an error when PPCAT and RELREC.PCRFTDTC are populated, PPRFTDTC equals RELREC.PCRFTDTC, and PPCAT does not equal RELREC.PCTEST.
+# Rule:Description: Raise an error when PPCAT and the related PC record's PCRFTDTC are populated, PPRFTDTC equals PC.PCRFTDTC, and PPCAT does not equal PC.PCTEST.
 #note "Pins the authority reading (the RELREC-related PC record only). One RELREC group relates the PP record to a PC record that AGREES (same reference timepoint, PCTEST equals PPCAT) and to an LB record at the SAME reference timepoint whose LBTEST differs from PPCAT. The engine pairs PP with both; on the PP-LB pairing RELREC.PCRFTDTC is absent, reads empty, and the not-empty guard keeps the row silent. Sensitivity arm: rewriting RELREC.PCRFTDTC / RELREC.PCTEST to RELREC.**RFTDTC / RELREC.**TEST (upstream Wildcard alias meaning) makes the PP-LB pairing fire exactly once (PLAN-match-datasets-wildcard)."
 #library standard=sdtmig version=3-4
 dataset PP label="Pharmacokinetics Parameters"
