@@ -187,8 +187,9 @@ both layers:
   below the columns, so an `ADPPK`-named fixture carrying the NCA relative-time columns
   still detects NCA.
 
-The declaration is honoured **end to end**: the scenario pre-gate in
-`AbstractRuleTestSuitesFactory` and the runtime gate inside `RuleRunner` (Fix
+The declaration is honoured **end to end**: the scenario pre-gate
+(`ScenarioScopeGate`, run by the rule-test harness's `ScenarioRunner`) and the
+runtime gate inside `RuleRunner` (Fix
 #117/#118/#119) read the same declared value, the latter through
 `ScenarioDeclaredScopeProvider`, which the engine sees as an ordinary
 `MetadataProvider`. Two consequences worth knowing:
@@ -253,11 +254,17 @@ VALUE | VALUE | VALUE
 Fields are trimmed of leading/trailing whitespace. Use quotes only if needed
 to preserve spaces (rare for test data).
 
-**Null values:**
-- Empty field → null (works for all types)
-- A lone `.` in a numeric field → null (SAS convention)
-- A single `.` on a line by itself → all fields null (useful for single-column
-  tables or "data-insensitive" metadata-check rules)
+**Missing values** (the loader never stores `null`; full grammar: the
+`.cdt` provider's README, *Missing values*):
+- A blank field → `""` in a `Char` column, `MissingValue.MIS` in a
+  `Num` / `Date` / `Time` / `DateTime` column
+- An **unquoted** `.`, `._` or `.A` … `.Z` → that SAS missing value, in
+  **every** column type, `Char` included — the only way to write a missing
+  character value (since 2026-09-17). Nothing else is a sentinel: `NA` is a
+  value
+- A quoted sentinel (`"."`) is the literal string
+- A single `.` on a line by itself → the all-missing row, one `.` per column
+  (useful for single-column tables or "data-insensitive" metadata-check rules)
 
 **Date/time formats in data:**
 
@@ -390,7 +397,13 @@ col DOMAIN  type=Char
 | `#library <kind> ...` | no | inline CDISC-Library metadata (see below) |
 | `#library-include <file.yaml>` | no | pull Library metadata from a YAML sidecar |
 | `#library-ref standard=<id> version=<id> [ct=<pkg> ...] [substandard=<id>]` | no | run against **real** CDISC Library metadata, as held in our unified metadata store (see below); mutually exclusive with `#library` / `#library-include` |
+| `#define <kind> ...` | no | inline synthetic Define-XML metadata — same grammar and merge order as `#library` (see *Real Define-XML sidecar* below) |
+| `#define-include <file.yaml>` | no | pull synthetic Define-XML metadata from a YAML sidecar |
 | `#define-xml <file.xml>` | no | run against a **real** Define-XML sidecar (same directory); serves `define_*` AND `define_vlm_*` accessors; mutually exclusive with `#define` / `#define-include` |
+| `#ct-packages <pkg> [<pkg> ...]` | no | the run's **CT Packages** field, for a run-level CT-selection scenario; absent means a blank field. Ignored by the per-rule runner |
+| `#ct-available none\|<pkg> [<pkg> ...]` | no | the CT packages the run's metadata store holds (run-level scenarios); absent means every referenced package is seeded |
+| `#expect-abort "<substring>"` | no | the run must **abort** before any rule executes, with a message containing `<substring>`; requires `expect=skipped` |
+| `#expect-ct-mismatch "<substring>"` | no | the completed run carries a `CT_Declaration_Mismatch` note containing `<substring>`; rejected together with `#expect-abort` |
 | `#dictionaries dummy` | no | run with the checked-in dummy external-dictionary bundle (see below) |
 | `#runLevel <LEVEL>` | no | the **run severity threshold** for this scenario — the weakest check level it evaluates (see *Check levels and the run threshold*) |
 
@@ -677,6 +690,28 @@ Note for the synthetic channel: `define_variable_name` (the usual "variable is
 declared in the define" guard) reads the `name` key, so declare it explicitly:
 `#define variable-metadata DM AGE name=AGE label="Age"`.
 
+### Sidecars are confined (`SidecarResolver`)
+
+`#library-include`, `#define-include` and `#define-xml` name a sidecar
+**relative to the scenario's directory**, and the runner resolves it through
+`SidecarResolver` (the rule-test harness), confined to a tree the host
+chooses — the corpus passes its suites tree, the rule editor its checkout. A
+payload is refused (a red scenario, `SIDECAR` / `PARSE`) when it:
+
+- is empty, absolute or not a valid path;
+- climbs out of the tree with `..` (climbing *inside* it is fine);
+- passes through a symbolic link, a junction or another redirection on **any**
+  component — even one that points back into the tree;
+- differs in case from the file on disk, or is not a regular file.
+
+A tree reached through a link of its own (a checkout under a linked
+directory) still resolves its sidecars: both the tree and the scenario's
+directory are compared as real paths. Messages name the payload and paths
+relative to the tree, never an absolute path or file content. Every corpus
+sidecar is a plain file name beside its scenario, so confinement changes
+nothing for the corpus. `RuleTestCdt.load(Path)` without a resolver confines
+`#library-include` / `#define-include` to the scenario's own directory.
+
 ### External dictionaries (`#dictionaries`)
 
 Rules using the `valid_external_dictionary_*` operators need an external
@@ -687,8 +722,9 @@ scenario opts in with:
 #dictionaries dummy
 ```
 
-`dummy` — the only supported value — loads the checked-in dummy bundle
-`lib/corej-core/dictionaries/*.json` (all types above) via
+`dummy` — the only supported value — loads the dummy bundle the host hands
+the runner (`RunEnvironment.dictionariesDir`; the corpus passes its checked-in
+`src/test/resources/dictionaries/*.json`, all types above) via
 `RuntimeDictionaryProvider.loadDirectory` and hands it to the engine.
 Scenario data must use terms/codes from those dummy files. Without the
 directive no provider is supplied, so a dictionary-dependent rule **SKIPs**

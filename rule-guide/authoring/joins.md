@@ -489,13 +489,15 @@ For a primary dataset that *points at* another — `SUPP--`, `CO`, `RELREC` — 
 
 ```yaml
 Match_Datasets:
-- Name: "AE"
+- Name: "SUPP--"
   Keys: ["STUDYID", "USUBJID", "IDVAR", "IDVARVAL"]
   Child: true
 ```
 
-The engine resolves each row's parent domain (from `RDOMAIN`, or from the `SUPP` / `SQ` name when
-there is no `RDOMAIN` column), finds the parent record whose `IDVAR` column equals `IDVARVAL`
+⚠ **`Name` names the child, never the parent**: it is the primary the entry applies to (`SUPP--`,
+`CO`, `RELREC`); when no `Child` entry's `Name` matches the primary, the first `Child` entry
+applies. The parent is read per row. The engine resolves each row's parent domain (from `RDOMAIN`,
+or from the `SUPP` / `SQAP` name when there is no `RDOMAIN` column), finds the parent record whose `IDVAR` column equals `IDVARVAL`
 (compared as text; a numeric parent column canonicalised, so `" 1"` and `"01"` find `1`), and adds
 that parent's columns to the row, **qualified with the parent's domain**:
 

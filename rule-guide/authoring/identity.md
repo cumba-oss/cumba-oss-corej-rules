@@ -104,9 +104,12 @@ One of exactly five values, spelled exactly as shown:
 | `Partially Executable` | incomplete in a way that is neither of those, or both |
 | `Not Executable` | recorded for completeness; nothing is evaluated |
 
-> **This field is documentary.** The engine does not consult it when deciding what to run — a
-> `Not Executable` rule is not skipped because of this flag. It exists so that a human, and a
-> downstream report, can tell how much weight a finding deserves.
+> **`Not Executable` parks the rule; the other four values are documentary.** The loader drops a
+> rule declaring `Not Executable` from its package before any other pass — it is never validated,
+> never run and never reported (one `WARNING` per package lists the parked ids; each rule's
+> `ExecutabilityHint` detail is logged at `DEBUG`), and the corpus generator leaves it out of the
+> shipped packages too. The four executable values change nothing the engine does: they exist so
+> that a human, and a downstream report, can tell how much weight a finding deserves.
 
 ### Choosing between the two partial values
 

@@ -161,8 +161,9 @@ disagree.
 
 **`Executability`** — an honest statement of how completely the rule evaluates its requirement:
 `Fully Executable`, `Partially Executable`, `Partially Executable - Possible Overreporting`,
-`Partially Executable - Possible Underreporting`, or `Not Executable`. It is **documentary**: the
-engine does not consult it when deciding what to run.
+`Partially Executable - Possible Underreporting`, or `Not Executable`. **`Not Executable` parks the
+rule**: the loader drops it before anything else, so it never runs and is not shipped. The other
+four values are documentary — the engine runs the rule the same way under each.
 
 > **Under- and overreporting are not interchangeable — say which.** A reviewer's response to *"it
 > may miss violations"* is different from their response to *"it may flag conforming data"*, and a
