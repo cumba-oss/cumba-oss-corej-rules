@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0218 expect=violation domain=SV
 #runLevel Info
-#note "With times the IG answer is exact and the visit IS judged: it starts at 2012-07-09T11:00, after the transition at 10:00, so TREATMENT was in progress at the start of the visit and EPOCH SCREENING is reported against it. Only date-only transition-day visits are left undetermined (valid_transition_day_undetermined)."
+#note "With times the IG answer is exact and the visit IS judged: it starts at 2012-07-09T11:00, after the transition at 10:00, so TREATMENT was in progress at the start of the visit and EPOCH SCREENING is reported against it. SCREENING (ending 2012-07-09T10:00) is no candidate: the same-day term of PLAN-cg0218-transition-day-precision (B2) needs an untimed side, and both carry a time. Only an untimed side leaves a transition-day visit undetermined (valid_transition_day_undetermined, the mixed-precision scenarios)."
 #expectViolationCount 1
 #expectViolationAt row=1 severity=ERROR VISITNUM=2
 dataset SV label="Subject Visits"

@@ -655,6 +655,61 @@ by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric co
 > nothing; it never filtered the related domain. Any other key an entry does not model is a load
 > error too.
 
+## "Some joined row" — `any` / `all` / `none` over `joined(…)`
+
+A join that matches **several** partner records to one record gives that record one evaluation row
+per partner. A condition written on such a row is answered per row, so `EPOCH != SE.EPOCH` is true
+on every element whose epoch differs — and a Check anchored on it reports one finding per such
+element, whatever the other elements say. When the question is about the record's partners **as a
+set** — *is there any element the visit matches?* — write the condition inside `joined(…)` and fold
+it with a quantifier:
+
+| spelling | reads |
+|---|---|
+| `any(joined(c))` | some row of this record satisfies `c` |
+| `all(joined(c))` | every row of this record satisfies `c` |
+| `none(joined(c))` | no row of this record satisfies `c` (the same as `not any(joined(c))`) |
+
+The rows are grouped by **record**, never by subject. Two visits of one subject against three
+elements (inner join on `STUDYID`, `USUBJID`) are six evaluation rows; `any(joined(EPOCH ==
+SE.EPOCH))` answers per visit:
+
+| eval row | visit | `EPOCH` | `SE.EPOCH` | `EPOCH == SE.EPOCH` | `any(joined(EPOCH == SE.EPOCH))` |
+|---|---|---|---|---|---|
+| 0 | 0 | SCREENING | SCREENING | true | true |
+| 1 | 0 | SCREENING | TREATMENT | false | true |
+| 2 | 0 | SCREENING | FOLLOW-UP | false | true |
+| 3 | 1 | FOLLOW-UP | SCREENING | false | false |
+| 4 | 1 | FOLLOW-UP | TREATMENT | false | false |
+| 5 | 1 | FOLLOW-UP | FOLLOW-UP | true | true |
+
+Visit 1's match on its third element does not leak into visit 0, and visit 0's matches do not
+silence visit 1. Notice the last row: visit 1 "matches" an element that need not contain it at all —
+a quantifier ranges over **every** partner row, so restrict the condition to the rows that matter
+(`<element may be in progress> and EPOCH == SE.EPOCH`), as `CDISC-CG0218` does.
+
+Three things to know:
+
+- **A quantifier answers the same on every row of a record.** A Check that is only a quantifier
+  fires on every evaluation row of a failing record — one finding per partner, all distinct by the
+  partner's columns. Anchor the level on a row condition beside it: `<this element contains the
+  visit start> and EPOCH != SE.EPOCH and none(joined(<may be in progress> and EPOCH == SE.EPOCH))`
+  fires once, on the containing element.
+- **The domain is the record's rows in the evaluation table.** On an inner join every matched
+  combination; on a `left` join an unmatched record keeps its one placeholder row, which **is** in
+  the domain — guard it with `J._matched_` inside the condition, as everywhere else. A rule whose
+  entries expand nothing (one partner per record, `Cardinality: "n:1"`) sees one row per record, and
+  `any(joined(c))` is simply `c`.
+- **Where it is legal.** Only in a Check level expression (bare, or under `and` / `or` / `not`) —
+  never in a binding, the Precondition, a comparison operand, a function argument or a `Filter`;
+  `joined(…)` only as the quantifier's direct argument, with its condition written **bare** inside
+  the parentheses; and only in a rule that declares a keyed or RELREC `Match_Datasets` entry. Each
+  of these fails the rule's load with a message naming the position. The YAML `any:` / `all:`
+  composites under a Check level combine whole conditions — they do not range over rows.
+
+Reference: [`any`](../reference/functions.md#any), [`all`](../reference/functions.md#all),
+[`none`](../reference/functions.md#none), [`joined`](../reference/functions.md#joined).
+
 ## Which shape do you need?
 
 | the question | the shape |
@@ -668,6 +723,7 @@ by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric co
 | the two sides type the key differently | fix the data, or `Requirements.Variables` on **both** sides, or `Join_As_String: true` |
 | walk RELREC relationships | `Name: "RELREC"`, no `Keys`; read `<domain>.X` guarded by `<domain>._matched_` |
 | the key lives in a dataset the rule already joins | a [qualified key](#a-qualified-key--joining-through-an-earlier-entry) on a later entry |
+| does **some** of a record's partners satisfy a condition — or none, or all? | the ordinary join, then [`any` / `all` / `none` over `joined(…)`](#some-joined-row--any--all--none-over-joined) in the Check |
 
 > ⚠ **A join changes what an unqualified name means in only one respect: nothing.** Unqualified
 > names keep referring to the primary dataset even after a join. If you mean the joined side,

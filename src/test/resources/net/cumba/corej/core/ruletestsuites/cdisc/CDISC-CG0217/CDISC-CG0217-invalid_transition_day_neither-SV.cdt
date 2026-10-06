@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-CG0217 expect=violation domain=SV
+#note "SV Assumption 11 (SDTMIG 3.2/3.3/3.4): SV.TAETORD is the planned order of the element in progress when the visit starts; SE Assumption 10: an element's SEENDTC is the next element's SESTDTC, the transition instant belongs to the next element (end-exclusive). PLAN-cg0218-transition-day-precision (Q6, owner 2026-10-05): the same shape as CDISC-CG0218 - a visit is judged against every element that MAY be in progress at its start and reported only when its TAETORD matches none of them, once, on the element that contains it. Until this plan the interval was end-inclusive, so on every transition day both adjacent elements contained the visit and the rule fired on the one it did not match. Movement: the transition-day visit labelled 3 matches neither candidate and is reported once, on element 2, which contains it. Today it was reported twice (once per adjacent element): RED against the old rule on the count."
+#expectViolationCount 1
+#expectViolationAt row=1 SVSEQ=1 SE.TAETORD=2
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SVSEQ type=Num label="Sequence Number"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col TAETORD type=Char label="Planned Order of Element within Arm"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 1 | 2012-07-09 | 3
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col TAETORD type=Char label="Planned Order of Element within Arm"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06 | 2012-07-09 | 1
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09 | 2012-08-20 | 2
+---

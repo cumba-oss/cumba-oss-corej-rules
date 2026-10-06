@@ -572,6 +572,15 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`is_sorted_by(target, by=[asc(col)[, nulls=]], within=)`](functions.md#is_sorted_by) | boolean | True when the target is sorted by `by=`; authored under `not`, it fires the whole unsorted group |
 | [`shares_elements_with($a, $b)`](functions.md#shares_elements_with) | boolean | True when the two lists have at least one member in common. A negated spelling `shares_no_elements_with($a, $b)` exists; prefer `not shares_elements_with($a, $b)`. |
 
+### Quantifiers over joined rows
+
+| function | returns | what it does |
+|---|---|---|
+| [`any(joined(c))`](functions.md#any) | boolean | Some evaluation row of the current record satisfies `c` — the rows a `Match_Datasets` entry added for this record. Legal only in a Check level expression (bare, or under `and` / `or` / `not`). |
+| [`all(joined(c))`](functions.md#all) | boolean | Every evaluation row of the current record satisfies `c`. |
+| [`none(joined(c))`](functions.md#none) | boolean | No evaluation row of the current record satisfies `c`; the same as `not any(joined(c))`. |
+| [`joined(c)`](functions.md#joined) | list of booleans | The answers of `c` over the current record's rows; legal only as the direct argument of `any` / `all` / `none`, in a rule with a keyed or RELREC `Match_Datasets` entry. Its condition is written bare: `joined(A == 1 and empty(B))`. |
+
 ### Dataset and domain metadata
 
 | function | returns | what it does |
@@ -826,6 +835,10 @@ parameter left unbound, and an argument name the function does not declare.
 
 Two tokens look like functions inside an argument but are not: **`asc(…)` and `desc(…)`** inside
 `by=[…]` are sort-key descriptors, read structurally by the function that takes them.
+
+**A boolean handed to a function needs its own parentheses** — `filter=(TSPARMCD == "SPECIES")` —
+with one exception: `joined(…)` takes a condition by declaration, so its argument is written bare,
+`any(joined(EPOCH == SE.EPOCH and not empty(SE.SEENDTC)))`.
 
 ## What is not in the language
 

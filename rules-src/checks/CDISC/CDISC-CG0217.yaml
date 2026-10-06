@@ -16,6 +16,7 @@ Requirements:
     All:
     - "TAETORD"
     - "SE.TAETORD"
+    - "SVSTDTC"
     - "STUDYID"
     - "USUBJID"
     All_Or_None:
@@ -30,8 +31,12 @@ Match_Datasets:
   Name: "SE"
 Check:
   expression: >-
-    date(SVSTDTC) >= date(SE.SESTDTC) and date(SVSTDTC) <= date(SE.SEENDTC) and TAETORD !=
-    SE.TAETORD
+    date(SVSTDTC) >= date(SE.SESTDTC) and date(SVSTDTC) < date(SE.SEENDTC) and TAETORD != SE.TAETORD
+    and none(joined(not empty(earliest_possible(SE.SESTDTC)) and not
+    empty(earliest_possible(SVSTDTC)) and date(earliest_possible(SE.SESTDTC)) <=
+    latest_possible(SVSTDTC) and (date(earliest_possible(SVSTDTC)) < latest_possible(SE.SEENDTC) or
+    date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or
+    SE.SEENDTC !~ /T/)) and TAETORD == SE.TAETORD))
 Outcome:
   Message: "TAETORD in SV does not match TAETORD of the corresponding element in the\
     \ SE dataset."

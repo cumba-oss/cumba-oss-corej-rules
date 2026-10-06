@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0218 expect=noViolation domain=SV
 #runLevel Info
-#note "A date-only visit on a transition date (2012-07-09 ends SCREENING and starts TREATMENT, SE Assumption 10) may have started before or after the transition instant, so which element was in progress at the start of the visit (SV Assumption 11) cannot be determined. Owner, 2026-10-02 (option 1): such a visit is not judged, at ERROR or at INFO, so EPOCH SCREENING is not reported here, and neither would TREATMENT be (valid_transition_day). The PhUSE pilot data uses both conventions (SCREENING to TREATMENT: the starting element; TREATMENT to FOLLOW-UP: the ending one). The exact remedy is PLAN-cg0218-transition-day-precision (B2)."
+#note "A date-only visit on a transition date (2012-07-09 ends SCREENING and starts TREATMENT, SE Assumption 10) may have started before or after the transition instant, so which element was in progress at the start of the visit (SV Assumption 11) cannot be determined. PLAN-cg0218-transition-day-precision (B2, owner 2026-10-05): the visit is judged against both adjacent elements - SCREENING, which ends on the visit day with no time on either side, MAY still be in progress and is a candidate; TREATMENT contains the visit. EPOCH SCREENING matches a candidate, so nothing fires at ERROR or at INFO (and neither would TREATMENT, valid_transition_day). The PhUSE pilot data uses both conventions (SCREENING to TREATMENT: the starting element; TREATMENT to FOLLOW-UP: the ending one). History: option 1 (owner 2026-10-02) excluded such a visit from judgement altogether; the quantifier replaced the exclusion."
 dataset SV label="Subject Visits"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

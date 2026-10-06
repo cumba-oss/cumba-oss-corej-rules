@@ -1292,6 +1292,8 @@ expression: 'not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= date(earli
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D85c`). `""`, and a value that cannot be placed on the calendar, yield the plain missing (`MIS`) — never a sentinel date.
 
+⚠ **A bound of a complete value is the value itself**, and two complete values compare as points at the coarser precision — so `date(earliest_possible(A)) < latest_possible(B)` answers exactly `date(A) < date(B)` on complete dates and date-times. A "may" reading of a same-day boundary (an element that ends on the day a date-only visit starts *may* still be in progress) needs its own term; `CDISC-CG0218` spells it as `… < … or (date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or SE.SEENDTC !~ /T/))` — the same-day equality on the bounds (so a partial value whose first or last possible day is the boundary day counts too), granted only when at least one side carries no time.
+
 ### interval_uncertainty_precision_mismatch
 
 `interval_uncertainty_precision_mismatch(name, delimiter=)` → **boolean**
@@ -2364,6 +2366,133 @@ Bindings:
   expression: 'distinct(USUBJID, domain="AE")'
 Check:
   expression: 'not shares_elements_with($ae_subjects)'
+```
+
+
+## Quantifiers over joined rows
+
+A `Match_Datasets` entry that matches several partner records to one record of the dataset under
+evaluation gives that record one evaluation row per partner record (the merged evaluation table —
+[joins](../authoring/joins.md)). A condition written on such a row answers for **that row alone**:
+`EPOCH != SE.EPOCH` is true on every SE element whose epoch differs, and a Check anchored on it fires
+once per element. The quantifiers below answer for the **record**: `joined(c)` is the list of `c`'s
+answers over every evaluation row of the current record, and `any` / `all` / `none` fold that list.
+
+| spelling | reads |
+|---|---|
+| `any(joined(c))` | some row of this record satisfies `c` |
+| `all(joined(c))` | every row of this record satisfies `c` |
+| `none(joined(c))` | no row of this record satisfies `c` (the same as `not any(joined(c))`) |
+
+The domain is the record's rows in the evaluation table — on an inner join every matched
+combination; on a `Join_Type: left` entry an unmatched record keeps its one placeholder row, which
+**is** in the domain (guard it with `J._matched_`, as everywhere else); on a rule whose entries expand
+nothing (one partner per record, or an entry declared `n:1` / `1:1`) the record is its one row and
+`any(joined(c))` is simply `c`. Several expanding entries compose, so the domain is their
+combinations — the three quantifiers do not care how often a combination repeats. The logic is
+two-valued: a condition is true or false on every row, there is no missing boolean.
+
+⚠ The quantifiers are legal **only in a Check level expression** (bare, or under `and` / `or` /
+`not`), never in a binding, the Precondition, a comparison operand, a function argument or a
+`Match_Datasets` Filter; `joined(…)` is legal only as a quantifier's direct argument; and a rule
+that declares no keyed or RELREC `Match_Datasets` entry has nothing for `joined(…)` to range over —
+each of these fails the rule's load with a message naming the position. A quantifier answers the
+same on every row of a record, so a Check that is only a quantifier fires on every evaluation row
+of a failing record — anchor the level on a row condition beside it (`<row> and none(joined(…))`),
+as `CDISC-CG0218` does. The YAML Check composites `any:` / `all:` (a list of conditions under a
+level) are a different thing: they combine whole conditions, they do not range over rows.
+
+### any
+
+`any(list)` → **boolean**
+
+True when at least one element of the list is true. In the current language the list is always
+`joined(<condition>)`: some evaluation row of the current record satisfies the condition.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+
+**Example**
+
+```yaml
+Match_Datasets:
+- Name: "SE"
+  Keys: ["STUDYID", "USUBJID"]
+Check:
+  expression: 'not empty(EPOCH) and not any(joined(EPOCH == SE.EPOCH))'
+```
+
+### all
+
+`all(list)` → **boolean**
+
+True when every element of the list is true — every evaluation row of the current record satisfies
+the condition.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+
+**Example**
+
+```yaml
+Match_Datasets:
+- Name: "SE"
+  Keys: ["STUDYID", "USUBJID"]
+Check:
+  expression: 'all(joined(empty(SE.SEENDTC)))'
+```
+
+### none
+
+`none(list)` → **boolean**
+
+True when no element of the list is true — no evaluation row of the current record satisfies the
+condition. `none(joined(c))` and `not any(joined(c))` are the same condition.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+
+**Example** — `CDISC-CG0218`'s shape: the row condition anchors the finding on the element that
+contains the visit start, the quantifier silences it when any element that *may* be in progress
+carries the visit's EPOCH
+
+```yaml
+Match_Datasets:
+- Name: "SE"
+  Keys: ["STUDYID", "USUBJID"]
+Check:
+  ERROR:
+    expression: >-
+      date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) < date(SE.SEENDTC) and EPOCH != SE.EPOCH
+      and none(joined(date(SE.SESTDTC) <= date(SVSTDTC) and date(SVSTDTC) <= date(SE.SEENDTC) and EPOCH == SE.EPOCH))
+```
+
+### joined
+
+`joined(condition)` → **value** (a list of booleans)
+
+The list of the condition's answers over every evaluation row that stands for the current record.
+Legal only as the direct argument of `any`, `all` or `none` — the engine evaluates the pair as one
+step, so the list is never a value a rule can bind, compare or report. The condition is written bare
+inside the parentheses (`joined(A == 1 and empty(B))`), unlike a boolean handed to any other
+function, which needs its own parentheses (`filter=(A == 1)`). A reference inside the condition
+(`SE.EPOCH`) is reported, as an output variable, at the row the finding is anchored on.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `condition` | boolean | yes | The row condition to answer per evaluation row of the record |
+
+**Example**
+
+```yaml
+Match_Datasets:
+- Name: "AE"
+  Keys: ["STUDYID", "USUBJID"]
+Check:
+  expression: 'DTHFL != "Y" and any(joined(AE.AEOUT == "FATAL"))'
 ```
 
 

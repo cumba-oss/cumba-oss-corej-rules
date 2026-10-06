@@ -1,0 +1,30 @@
+#!RuleTest
+#test CDISC-CG0218 expect=violation domain=SV
+#runLevel Info
+#note "SV Assumption 11 (SDTMIG 3.2/3.3/3.4): SV.EPOCH is the epoch of the element in progress when the visit starts; SE Assumption 10: an element's SEENDTC is the next element's SESTDTC, the transition instant belongs to the next element (end-exclusive). PLAN-cg0218-transition-day-precision (B2, owner 2026-10-05): a visit is judged against every element that MAY be in progress at its start and reported only when its EPOCH matches none of them, once, on the element that contains it (ERROR); partial dates on the same principle at INFO (Q4), once per candidate element. Pin (no movement): the same mixed-precision transition day with EPOCH FOLLOW-UP matches neither candidate, so TREATMENT (the element that contains the visit at the day) reports it once. Pins that Q5 silences only a visit whose EPOCH matches a candidate, never every mixed-precision visit."
+#expectViolationCount 1
+#expectViolationAt row=1 severity=ERROR VISITNUM=2 SE.EPOCH=TREATMENT
+dataset SV label="Subject Visits"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num label="Visit Number"
+col VISIT type=Char label="Visit Name"
+col SVSTDTC type=Char label="Start Date/Time of Visit"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SV | 01-701-0001 | 2 | DAY 1 | 2012-07-09 | FOLLOW-UP
+---
+
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+col EPOCH type=Char label="Epoch"
+---
+CDISCPILOT01 | SE | 01-701-0001 | 1 | 2012-07-06T09:00 | 2012-07-09T10:00 | SCREENING
+CDISCPILOT01 | SE | 01-701-0001 | 2 | 2012-07-09T10:00 | 2012-08-20T12:00 | TREATMENT
+---

@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0218 expect=violation domain=SV
 #runLevel Info
-#note "Review finding 2026-10-02: 2012-07-06 is the start of the subject's FIRST element (SCREENING) - no earlier element ends there, so it is not a transition day and the element in progress at the start of the visit is determinable: SCREENING. EPOCH TREATMENT is reported against it. The date-only exclusion applies only where an element starts after the subject's first one ($first_element_start = min_date(SESTDTC, SE, group=[USUBJID])); without that conjunct this visit would go silent."
+#note "Review finding 2026-10-02: 2012-07-06 is the start of the subject's FIRST element (SCREENING) - no earlier element ends there, so it is not a transition day and the element in progress at the start of the visit is determinable: SCREENING. EPOCH TREATMENT is reported against it. Under PLAN-cg0218-transition-day-precision (B2) the later element is no candidate: TREATMENT starts 2012-07-09, after the visit, so SCREENING is the only element that may be in progress and the visit matches none. (History: option 1 reached the same verdict through a $first_element_start binding, now gone.)"
 #expectViolationCount 1
 #expectViolationAt row=1 severity=ERROR
 dataset SV label="Subject Visits"

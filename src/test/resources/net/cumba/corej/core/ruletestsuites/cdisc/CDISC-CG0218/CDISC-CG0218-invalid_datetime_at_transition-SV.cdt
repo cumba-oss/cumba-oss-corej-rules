@@ -1,7 +1,7 @@
 #!RuleTest
 #test CDISC-CG0218 expect=violation domain=SV
 #runLevel Info
-#note "The transition-day exclusion is date-only: the visit starts at 2012-07-09T10:00, exactly the SESTDTC of TREATMENT (and the exclusive SEENDTC of SCREENING), so TREATMENT was in progress at the start of the visit and EPOCH SCREENING is reported against it at ERROR. The 'SVSTDTC == SE.SESTDTC' exclusion must NOT apply here, because SVSTDTC carries a time. Discriminating: if the exclusion's date-only regex were dropped (or widened to datetimes), the equal SVSTDTC/SESTDTC would silence this finding. SCREENING does not contain the visit, its end being exclusive (10:00 < 10:00 is false)."
+#note "Two times are exact: the visit starts at 2012-07-09T10:00, exactly the SESTDTC of TREATMENT (and the exclusive SEENDTC of SCREENING), so TREATMENT was in progress at the start of the visit and EPOCH SCREENING is reported against it at ERROR. SCREENING is no candidate: its end equals the visit start at the day, but the same-day term of PLAN-cg0218-transition-day-precision (B2) needs an untimed side, and both sides carry a time; nor does it contain the visit (10:00 < 10:00 is false, the end being exclusive). Discriminating: if the same-day term dropped its untimed-side condition, SCREENING would become a candidate the visit matches and this finding would go silent."
 #expectViolationCount 1
 #expectViolationAt row=1 severity=ERROR VISITNUM=2 SE.EPOCH=TREATMENT
 dataset SV label="Subject Visits"
