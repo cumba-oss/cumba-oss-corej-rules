@@ -168,8 +168,9 @@ Match_Datasets:
 - **Several joins on the same key share ONE group** — `[USUBJID, DM.USUBJID, AE.USUBJID]` for a
   rule joining DM and AE on `USUBJID`. Two groups repeating `USUBJID` mean the same thing but draw
   a load warning.
-- **`Child: true` entries declare their keys bare in `All` only** (`USUBJID`, `IDVAR`,
-  `IDVARVAL` on the SUPP--/CO/RELREC primary). The parent is resolved per row, so it has no name
+- **`Child: true` entries declare their keys bare in `All` only** (`STUDYID`, `USUBJID`, `IDVAR`,
+  `IDVARVAL` on the SUPP--/CO/RELREC primary — every corpus `Child` entry keys
+  `[STUDYID, USUBJID, IDVAR, IDVARVAL]`). The parent is resolved per row, so it has no name
   to declare — and no `All_Or_None` group may name a `Child` key, unless an ordinary entry of the
   same rule also keys on it (a `DM` join sharing `USUBJID` carries `[USUBJID, DM.USUBJID]`).
 - **A joined dataset absent from the study skips the rule of an ordinary keyed entry** (one
@@ -531,7 +532,10 @@ considered.
 > [Declare the key](#-declare-the-key--required-for-every-keyed-join).
 
 > ⚠ **`STUDYID` participates only if you declare it.** It is not added implicitly. Omitting it
-> from `Keys` means rows are matched across studies, which matters for a pooled submission.
+> from `Keys` means rows are matched across studies, which matters for a pooled submission:
+> `USUBJID` is unique within a study only, so a `SUPPAE` record of study S2 would find study S1's
+> AE record with the same `USUBJID` and `AESEQ`. Every `Child` entry of the corpus therefore keys
+> `[STUDYID, USUBJID, IDVAR, IDVARVAL]`, and `JoinKeyDeclarationLintTest` reds on one that does not.
 
 > ⚠ One shape no check sees: a read whose *qualifier* is itself substituted (`${X}.COL`) is bound
 > per row and reads the not-supplied default silently when it names no part — do not write it.
@@ -612,6 +616,24 @@ by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric co
   a related domain (`AE.**TERM`) does not resolve — write the concrete name.
 - A keyed entry with the same name as a related domain (`Name: CM` beside a forward `RELREC`
   relating CM) is refused when the rule runs: the two would both be `CM.*`.
+
+> ⚠ **A related domain is read by its name, so a rule sees only the domains it names.** The FA
+> rules `CDISC-CG0174`, `CDISC-CG0601`, `CDISC-CG0602` and `CDISC-CG0603` compare `FAOBJ` with the
+> parent record's topic variable, one guarded arm per IG general-observation domain:
+> Events `AE` `BE` `CE` `DS` `DV` `HO` `MH` (`--TERM` / `--DECOD`) and Interventions `AG` `CM` `EC`
+> `EX` `ML` `PR` `SU` (`--TRT` / `--DECOD`), each behind `<D>._matched_` (CG0601 reads the Events
+> arms only, CG0602 the Interventions arms only). Two consequences, both accepted (FU-1 of
+> `PLAN-merge-followups`, owner 2026-10-06):
+>
+> - **A sponsor-defined custom domain of the Events or Interventions class is not checked.** An FA
+>   record related to a custom `XE` record matches no arm, so the rule is silent on it — not a
+>   pass, an unasked question.
+> - **A Findings parent is silent by design** (FA → `LB`): the parent's `--TERM` / `--TRT` /
+>   `--DECOD` exist only on Events and Interventions, so there is nothing to compare `FAOBJ` with.
+>
+> Selecting the parent by its observation class instead of its name is the deferred draft
+> `PLAN-fa-parent-by-observation-class`; it stays deferred until needed. Until then a new arm
+> means a new domain named in the expression.
 
 > ⛔ **`Wildcard` is retired and is a load error.** It was accepted on this entry and read by
 > nothing; it never filtered the related domain. Any other key an entry does not model is a load
