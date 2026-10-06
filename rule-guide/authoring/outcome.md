@@ -56,11 +56,13 @@ that the check never touched, in the order it should appear:
 Output_Variables: ["RDOMAIN"]      # read by no condition, but it tells the reader which domain
 ```
 
-Derived entries follow the order in which the check reads them; an authored entry comes first,
-in the order written. The list is where you put context columns the engine cannot derive; they
-lead, and the derived columns follow in walk order. The results view's rule definition shows this
-effective list, with the entries you authored marked and your `!X` exclusions struck through; names
-appear as written in the rule — wildcards (`--TESTCD`, `&NAME&`) resolve per dataset.
+The entries you author come first, in the order written, and the derived columns follow in the
+order in which the check reads them — with one exception: on a per-variable rule (and on one that
+reads value-level metadata) `variable_name` is moved to the front, and a derived `variable_value`
+directly after it, ahead of your entries. Your `!X` exclusions come off last, after that move.
+The results view's rule definition shows this effective list, with the entries you authored marked
+and your `!X` exclusions struck through; names appear as written in the rule — wildcards
+(`--TESTCD`, `&NAME&`) resolve per dataset.
 
 > **Never report a variable the rule did not read.** A finding showing a column the check never
 > touched invites the reader to conclude something the rule never checked — and that conclusion

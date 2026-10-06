@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 import net.cumba.corej.authoring.AssembledRule;
 import net.cumba.corej.authoring.AuthoredRuleAssembler;
@@ -32,8 +34,9 @@ import org.junit.jupiter.api.Test;
  * 1 gate (b), pre-go review M1): for <b>every</b> authored rule and <b>every</b> package it appears
  * in, {@link AuthoredRuleAssembler#assemble} over the rule's own two files and the package's
  * declared standards yields exactly the node the generated {@code target/rules/<package>.json}
- * holds under {@code rules.<id>}, and the rule it loads carries the same {@code loadError} as the
- * gate's loaded rule.
+ * holds under {@code rules.<id>} — compared as serialised text, so a key order the generator does
+ * not write is a mismatch ({@link JsonNode#equals} ignores key order) — and the rule it loads
+ * carries the same {@code loadError} and {@code loadWarning} as the gate's loaded rule.
  *
  * <p>
  * Why this is not redundant with the byte-identical regeneration: that gate runs the corpus loop
@@ -48,8 +51,14 @@ class AuthoredRuleCompositionTest
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    /** A floor so a walk that matches nothing cannot pass vacuously. */
-    private static final int MIN_RULES = 3_000;
+    /**
+     * Per-family floors of rule×package entries compared, so a walk that silently loses one family
+     * (its packages, its check directory) cannot pass on the others' count. Measured 2026-10-06
+     * (CDISC 4847, FDA 4583, PMDA 3392, DRAFT 84) and rounded down; a family absent from the
+     * manifest fails too.
+     */
+    private static final Map<String, Integer> MIN_PER_FAMILY = Map.of("CDISC", 4_800, "FDA", 4_500,
+            "PMDA", 3_300, "DRAFT", 80);
 
     @Test
     void everyRuleComposesToItsPackagedNodeInEveryPackage() throws IOException
@@ -61,6 +70,7 @@ class AuthoredRuleCompositionTest
         RulePackageManifest manifest = RulePackageManifest.load(CorpusPaths.rules());
 
         int compared = 0;
+        Map<String, Integer> perFamily = new TreeMap<>();
         List<String> mismatches = new ArrayList<>();
         for (RulePackageManifest.Entry e : manifest.packages())
         {
@@ -80,7 +90,9 @@ class AuthoredRuleCompositionTest
                         Files.readString(check, StandardCharsets.UTF_8),
                         doc == null ? null : Files.readString(doc, StandardCharsets.UTF_8),
                         declared);
-                if (!entry.getValue().equals(r.packagedNode()))
+                String packagedText = JSON.writeValueAsString(entry.getValue());
+                String editorText = JSON.writeValueAsString(r.packagedNode());
+                if (!packagedText.equals(editorText))
                 {
                     mismatches.add(e.file() + " " + id + ": packaged node differs");
                 }
@@ -97,11 +109,23 @@ class AuthoredRuleCompositionTest
                     mismatches.add(e.file() + " " + id + ": loadError differs\n  gate:   "
                             + gate.getLoadError() + "\n  editor: " + editor.getLoadError());
                 }
+                else if (!String.valueOf(gate.getLoadWarning())
+                        .equals(String.valueOf(editor.getLoadWarning())))
+                {
+                    mismatches.add(e.file() + " " + id + ": loadWarning differs\n  gate:   "
+                            + gate.getLoadWarning() + "\n  editor: " + editor.getLoadWarning());
+                }
                 compared++;
+                perFamily.merge(e.family(), 1, Integer::sum);
             }
         }
-        assertTrue(compared >= MIN_RULES,
-                "compared " + compared + " rule×package entries, floor " + MIN_RULES);
+        for (Map.Entry<String, Integer> floor : MIN_PER_FAMILY.entrySet())
+        {
+            int seen = perFamily.getOrDefault(floor.getKey(), 0);
+            assertTrue(seen >= floor.getValue(),
+                    floor.getKey() + ": compared " + seen + " rule×package entries, floor "
+                            + floor.getValue() + " (all: " + perFamily + ")");
+        }
         assertEquals(List.of(), mismatches, mismatches.size() + " mismatch(es) of " + compared);
     }
 
@@ -129,7 +153,38 @@ class AuthoredRuleCompositionTest
                 .readTree(Files.readString(CorpusPaths.rules(pkg.file()), StandardCharsets.UTF_8))
                 .get("rules").get("CDISC-CG0006");
         AssembledRule r = AuthoredRuleAssembler.assemble(mutated, null, List.of());
-        assertFalse(packaged.equals(r.packagedNode()), "a mutated Executability must differ");
+        assertFalse(
+                JSON.writeValueAsString(packaged).equals(JSON.writeValueAsString(r.packagedNode())),
+                "a mutated Executability must differ");
+    }
+
+
+    /**
+     * Sensitivity of the text comparison: the same members in another order are equal to
+     * {@link JsonNode#equals} but not to the serialised-text comparison the main test runs.
+     */
+    @Test
+    void aReorderedNodeIsAMismatch() throws IOException
+    {
+        RulePackageManifest manifest = RulePackageManifest.load(CorpusPaths.rules());
+        RulePackageManifest.Entry pkg = manifest
+                .packages().stream().filter(e -> "CDISC".equals(e.family())
+                        && "SDTMIG".equals(e.standard()) && "3.4".equals(e.version()))
+                .findFirst().orElseThrow();
+        JsonNode packaged = JSON
+                .readTree(Files.readString(CorpusPaths.rules(pkg.file()), StandardCharsets.UTF_8))
+                .get("rules").get("CDISC-CG0006");
+        List<String> names = new ArrayList<>();
+        packaged.fieldNames().forEachRemaining(names::add);
+        assertTrue(names.size() > 1, "premise: the node has members to reorder");
+        ObjectNode reversed = JSON.createObjectNode();
+        for (int i = names.size() - 1; i >= 0; i--)
+        {
+            reversed.set(names.get(i), packaged.get(names.get(i)));
+        }
+        assertEquals(packaged, reversed, "JsonNode.equals ignores the order");
+        assertFalse(JSON.writeValueAsString(packaged).equals(JSON.writeValueAsString(reversed)),
+                "the serialised text sees the order");
     }
 
 

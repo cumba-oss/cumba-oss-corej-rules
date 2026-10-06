@@ -60,8 +60,9 @@ class AuthoredCorpusSchemaTest
 
     /**
      * The schema file: under {@code documentation/} in the authoring repository, under
-     * {@code schema/} in the published one (which also has a {@code documentation/} tree, so the
-     * FILE decides, not the directory).
+     * {@code schema/} in the published one, which tracks no {@code documentation/} tree. The FILE
+     * decides, not the directory, so an untracked {@code documentation/} left in a published
+     * checkout cannot route the lookup away from {@code schema/}.
      */
     static Path schemaFile(String aFileName)
     {

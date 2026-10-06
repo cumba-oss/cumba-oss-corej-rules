@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,14 +44,86 @@ class FunctionReferenceParameterTableTest
         FunctionHelp help = FunctionHelp.parse(Files.readString(
                 CorpusPaths.moduleDir().resolve("rule-guide/reference/functions.md"),
                 StandardCharsets.UTF_8));
+        Comparison result = compare(help, FunctionRegistry.all());
+        assertTrue(result.checked() >= MIN_TABLES_CHECKED, "tables checked: " + result.checked());
+        assertEquals(List.of(), result.problems(), result.problems().size() + " drifted table(s)");
+    }
+
+
+    /**
+     * The comparison must SEE a drift, or the test above is a tautology: the same {@link #compare}
+     * the main test runs, fed a planted page, reports a name drift and a required-flag drift with
+     * their exact messages, and a correct table with none.
+     */
+    @Test
+    void theComparisonSeesADrift()
+    {
+        FunctionDescriptor upper = FunctionRegistry.descriptor("upper");
+        assertTrue(
+                upper != null && upper.parameters().size() == 1
+                        && "x".equals(upper.parameters().getFirst().name())
+                        && upper.parameters().getFirst().required(),
+                "premise: upper takes one required parameter x");
+        Comparison nameDrift = compare(page("| `value` | any | yes | wrong name |"),
+                List.of(upper));
+        assertEquals(
+                List.of("upper: the first (positional) parameter is x, the table opens with"
+                        + " value", "upper: the table names [value], the engine declares [x]"),
+                nameDrift.problems());
+        Comparison flagDrift = compare(page("| `x` | any | no | wrong flag |"), List.of(upper));
+        assertEquals(List.of("upper.x: the table says required=false, the engine says true"),
+                flagDrift.problems());
+        Comparison noTable = compare(FunctionHelp.parse("### upper\n\n`upper(x)`\n"),
+                List.of(upper));
+        assertEquals(List.of("upper: no parameter table; the engine declares [x]"),
+                noTable.problems());
+        Comparison correct = compare(page("| `x` | any | yes | right |"), List.of(upper));
+        assertEquals(List.of(), correct.problems());
+        assertEquals(1, correct.checked());
+    }
+
+
+    private static FunctionHelp page(String aRow)
+    {
+        return FunctionHelp.parse("""
+                ### upper
+
+                `upper(x)` → **value**
+
+                Upper-cases.
+
+                | parameter | type | required | description |
+                |---|---|---|---|
+                """ + aRow + "\n");
+    }
+
+    /**
+     * The tables checked and the drifts found.
+     *
+     * @param checked
+     *            the functions whose section has a parameter table that was compared
+     * @param problems
+     *            one line per drift
+     */
+    record Comparison(int checked, List<String> problems)
+    {
+    }
+
+    /**
+     * Hold every descriptor's parameters against its section's table: the first (positional)
+     * parameter first, the keyword set equal, the required flags equal. A descriptor with no
+     * section (the roster test owns that) or no parameter (nothing to table) is not compared.
+     */
+    static Comparison compare(FunctionHelp aHelp, Collection<FunctionDescriptor> aDescriptors)
+    {
         List<String> problems = new ArrayList<>();
         int checked = 0;
-        for (FunctionDescriptor d : FunctionRegistry.all())
+        for (FunctionDescriptor d : aDescriptors)
         {
-            FunctionHelp.Entry entry = help.entry(d.name());
+            FunctionHelp.Entry entry = aHelp.entry(d.name());
             if (entry == null || d.parameters().isEmpty())
             {
-                continue; // the roster test owns "has a section"; a nullary function has no table
+                continue;
             }
             List<String> engine = d.parameters().stream().map(Parameter::name).toList();
             List<String> doc = entry.parameters().stream().map(FunctionHelp.Parameter::name)
@@ -85,32 +158,6 @@ class FunctionReferenceParameterTableTest
                 }
             }
         }
-        assertTrue(checked >= MIN_TABLES_CHECKED, "tables checked: " + checked);
-        assertEquals(List.of(), problems, problems.size() + " drifted table(s)");
-    }
-
-
-    /** The comparison must SEE a drift, or the test above is a tautology. */
-    @Test
-    void theComparisonSeesADrift()
-    {
-        FunctionHelp help = FunctionHelp.parse("""
-                ### upper
-
-                `upper(x)` → **value**
-
-                Upper-cases.
-
-                | parameter | type | required | description |
-                |---|---|---|---|
-                | `value` | any | no | wrong name, wrong flag |
-                """);
-        FunctionHelp.Entry entry = help.entry("upper");
-        assertTrue(entry != null && entry.parameters().size() == 1);
-        FunctionDescriptor d = FunctionRegistry.descriptor("upper");
-        assertTrue(d != null && !d.parameters().isEmpty(), "premise: upper takes a parameter");
-        List<String> engine = d.parameters().stream().map(Parameter::name).toList();
-        List<String> doc = entry.parameters().stream().map(FunctionHelp.Parameter::name).toList();
-        assertTrue(!doc.equals(engine), "the planted drift is seen: " + doc + " vs " + engine);
+        return new Comparison(checked, List.copyOf(problems));
     }
 }

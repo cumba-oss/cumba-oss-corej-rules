@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 import net.cumba.corej.authoring.AuthoredRuleAssembler;
 import net.cumba.corej.authoring.CorpusIndex;
@@ -94,9 +92,16 @@ class RuleInsightCorpusTest
     @Test
     void theScopeUniverseOverTheStoreAdmitsWhatProductionAdmits() throws IOException
     {
-        Optional<Path> storeFile = MetadataStoreFixture.storeFile();
-        assumeTrue(storeFile.isPresent(), "no CDISC metadata store for this build");
-        try (MetadataStore store = MetadataStore.open(storeFile.get()))
+        // the corpus gate requires the store (CDISC_PICKLE_CACHE_DIR is exported before every run,
+        // and the store-backed lint tests already fail without it): an absent store is a red run
+        // here too, never a silent skip of the only check that the scope universe matches
+        // production
+        Path storeFile = MetadataStoreFixture.storeFile()
+                .orElseThrow(() -> new IllegalStateException(
+                        "No metadata store: the scope universe is read from the CDISC Library products."
+                                + " Set CDISC_PICKLE_CACHE_DIR (or -Dcdisc.pickle.cache.dir) to a pickle"
+                                + " cache directory - MetadataStoreFixture seeds the store from it."));
+        try (MetadataStore store = MetadataStore.open(storeFile))
         {
             // Domains: ALL — every SDTMIG 3.4 dataset is in scope.
             Rule cg0006 = rule("rules-cdisc-sdtmig-3-4.json", "CDISC-CG0006");
