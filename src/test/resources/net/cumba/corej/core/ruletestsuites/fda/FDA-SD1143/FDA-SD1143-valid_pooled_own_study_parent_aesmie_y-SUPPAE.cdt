@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD1143 expect=noViolation domain=SUPPAE
+#note "FU-6 (PLAN-merge-followups), pooled two-study package. Both studies carry an AE record (USUBJID 001, AESEQ 1): S1's has AESMIE=N, S2's has AESMIE=Y. The only SUPPAE AESOSP record is S2's. Child key [STUDYID, USUBJID, IDVAR, IDVARVAL] -> its parent is S2's record, AESMIE=Y -> no violation. Under the old key [USUBJID, IDVAR, IDVARVAL] the record also paired with S1's record (n:m), whose AESMIE=N fired (the cross-study false positive this key closes)."
+#library standard=sdtmig version=3-4
+dataset SUPPAE label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+S2 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Description text
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+col AESMIE  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | N
+S2 | AE | 001 | 1 | NAUSEA   | Y
+---
