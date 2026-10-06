@@ -1,0 +1,42 @@
+#!RuleTest
+#test CDISC-CG0174 expect=violation domain=FAMH
+# Rule:Description: Raise an error when a related record is present in the parent domain dataset but FAOBJ does not equal the --TERM, --TRT or --DECOD value of that parent record.
+#note "Split FA dataset FAMH with a DATASET-level RELREC relationship whose RDOMAIN names the dataset, FAMH, not the domain FA (SDTMIG 3.4 sec. 4.1.7 rule 8; PLAN-merged-evaluation-table sec. 3.6.1, T2 fold lane 5 M1): the rows (FAMH, FALNKID, blank) and (MH, MHLNKID, blank) relate every FAMH record to the MH record of the same subject with the same link id. U1's FAMH record (FAOBJ RASH, link L1) relates U1's MH record (MHTERM HEADACHE, L1): RASH != HEADACHE, one finding. Before the fold the merge compared RDOMAIN with the primary's domain only, so a split FA dataset-level relationship never matched and the rule stayed silent."
+#expectViolationCount 1
+#expectViolationAt row=1 FASEQ=1 USUBJID=U1
+dataset FAMH label="Findings About Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col FASEQ type=Char label="Sequence Number"
+col FALNKID type=Char label="Link ID"
+col FAOBJ type=Char label="Object of the Observation"
+---
+S1 | FA | U1 | 1 | L1 | RASH
+S1 | FA | U2 | 1 | L1 | NAUSEA
+---
+
+dataset MH label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ type=Num label="Sequence Number"
+col MHLNKID type=Char label="Link ID"
+col MHTERM type=Char label="Reported Term for the Medical History"
+col MHDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | MH | U1 | 1 | L1 | HEADACHE | HEADACHE
+S1 | MH | U2 | 1 | L1 | NAUSEA | NAUSEA
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+S1 | FAMH |  | FALNKID |  | R1
+S1 | MH |  | MHLNKID |  | R1
+---
