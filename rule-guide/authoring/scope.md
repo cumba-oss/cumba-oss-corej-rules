@@ -155,7 +155,12 @@ Scope:
 
 A large domain may be delivered as several files — `LB1`, `LB2` — that together are one `LB`.
 `Scope.Domains` is **split-aware**: `Include: ["LB"]` selects `LB1` and `LB2` through the
-data-derived unsplit name, not just a file literally called `LB`.
+data-derived unsplit name, not just a file literally called `LB`. A split **supplemental** family
+is split-aware the same way: `SUPPLBCH` / `SUPPLBHE` / `SUPPLBUR` (each `RDOMAIN = LB`) are `SUPPLB`,
+`SQAPMH1` + `SQAPMH2` (`RDOMAIN = APMH`) are `SQAPMH` — the family read off `RDOMAIN`, whatever the
+letter case of the file name — so `Include: ["SUPPLB"]` and `SUPP--` select every member. (In a
+dataset-name position — `domain=`, `Requirements.Datasets`, a join name — the family name reads every
+member and `SUPP--` is the family of the rule's domain; see [Requirements](requirements.md#datasets--a-whole-dataset-must-be-present).)
 
 `include_split_datasets` makes that explicit:
 

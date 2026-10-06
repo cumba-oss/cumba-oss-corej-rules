@@ -1,0 +1,41 @@
+#!RuleTest
+#test PMDA-SD1097 expect=noViolation domain=AE
+#note "PLAN-split-supp-resolution (Q1-Q3): SUPPAE is submitted split as SUPPAE1 + SUPPAE2 (RDOMAIN=AE); record_count(domain=\"SUPPAE\") counts the family, the AETRTEM flag sits in SUPPAE2 only -> $aetrtem_count=1 -> silent. Red on the pre-plan engine: SUPPAE resolved to nothing, count 0, fired."
+#library standard=sdtmig version=3-4
+#expectViolationCount 0
+dataset AE class=EVENTS
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Num
+col AETERM  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE
+S1 | AE | 002 | 1 | NAUSEA
+---
+
+dataset SUPPAE1 label="Supplemental Qualifiers for AE (part 1)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP  | Other SAE               | N
+---
+
+dataset SUPPAE2 label="Supplemental Qualifiers for AE (part 2)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 002 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+---

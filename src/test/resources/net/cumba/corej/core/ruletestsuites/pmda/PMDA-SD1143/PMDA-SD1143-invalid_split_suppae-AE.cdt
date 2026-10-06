@@ -1,0 +1,42 @@
+#!RuleTest
+#test PMDA-SD1143 expect=violation domain=AE
+#note "PLAN-split-supp-resolution (PG-H1, C5): SUPPAE split as SUPPAE1 + SUPPAE2 (RDOMAIN=AE). The qualified requirement [SUPPAE.QNAM] is met by the family, distinct(domain=\"SUPPAE\") reads both members: 001/1 (SUPPAE1) and 002/1 (SUPPAE2) are described, 003/1 is flagged and described in NEITHER -> exactly one violation. Red on the pre-plan engine: SKIPped on the unmet requirement."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 AESEQ=1 AESMIE=Y
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESMIE  type=Char label="Other Medically Important Serious Event"
+---
+S1 | AE | 001 | 1 | CHEST PAIN | Y
+S1 | AE | 002 | 1 | SYNCOPE    | Y
+S1 | AE | 003 | 1 | DYSPNOEA   | Y
+---
+
+dataset SUPPAE1 label="Supplemental Qualifiers for AE (part 1)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP | Prolonged chest pain treated in ER
+---
+
+dataset SUPPAE2 label="Supplemental Qualifiers for AE (part 2)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 002 | AESEQ | 1 | AESOSP | Recurrent syncope requiring intervention
+---

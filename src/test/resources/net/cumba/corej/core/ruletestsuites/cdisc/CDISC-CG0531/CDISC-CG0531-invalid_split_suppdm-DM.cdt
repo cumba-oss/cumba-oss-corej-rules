@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0531 expect=violation domain=DM
+# Rule:Description: Raise an error when RACE in DM equals 'MULTIPLE' but multiple race records are not present in SUPPDM for the subject.
+#note "PLAN-split-supp-resolution: SUPPDM split as SUPPDM1 + SUPPDM2 (RDOMAIN=DM). The family carries ONE race record for 01-701-1015 (RACE1 in SUPPDM1; SUPPDM2 has only SAFETY) -> the MULTIPLE subject fires once. Not a red-first witness (the pre-plan engine counted 0 and fired too); pins that both members are counted (the valid twin is the witness)."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE type=Char label=Race format=$RACE.
+---
+CDISCPILOT01 | DM | 01-701-1015 | MULTIPLE
+CDISCPILOT01 | DM | 01-701-1023 | WHITE
+---
+
+dataset SUPPDM1 label="Supplemental Qualifiers for DM (part 1)"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM type=Char label="Qualifier Variable Name"
+---
+CDISCPILOT01 | DM | 01-701-1015 | RACE1
+---
+
+dataset SUPPDM2 label="Supplemental Qualifiers for DM (part 2)"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col QNAM type=Char label="Qualifier Variable Name"
+---
+CDISCPILOT01 | DM | 01-701-1015 | SAFETY
+---

@@ -1,0 +1,30 @@
+#!RuleTest
+#test FDA-SD1097 expect=violation domain=SUPPAE1
+#note "PLAN-split-supp-resolution (Q1, D7): the split SUPPAE family (SUPPAE1 + SUPPAE2, RDOMAIN=AE) carries no AETRTEM in EITHER member; the family count is 0 -> the dataset-level violation on the SUPPAE1 primary. Not a red-first witness (the pre-plan engine also counted 0); it pins that the family count, not the member's own rows alone, is what the rule reads (the valid twin is the witness)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset SUPPAE1 label="Supplemental Qualifiers for AE (part 1)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AESOSP | Other Medically Important SAE | N
+---
+
+dataset SUPPAE2 label="Supplemental Qualifiers for AE (part 2)"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 002 | AESEQ | 1 | AESOSP | Other Medically Important SAE | Y
+---

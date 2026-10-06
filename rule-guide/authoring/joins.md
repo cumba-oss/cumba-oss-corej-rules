@@ -35,7 +35,17 @@ entry and the [SUPP merge](requirements.md#supp_merge) — becomes **columns of 
 rule runs on that table. The primary's own columns keep their names; a keyed partner's columns are
 `<Name>.<column>` (`DM.AGE`); a `Child` parent's and a RELREC-related domain's are
 `<domain>.<column>` (`AE.AESMIE`, `PC.PCRFTDTC`); the primary's supplemental qualifiers are bare
-(`AETRTEM`), a joined dataset's are `<Name>.<QNAM>` (`DM.RACEOTH`). The qualifier matches the entry
+(`AETRTEM`), a joined dataset's are `<Name>.<QNAM>` (`DM.RACEOTH`) — each dataset's qualifiers from
+its own SUPP sources (its `SUPP<dataset>` plus the domain-level members of its `SUPP<domain>` /
+`SQAP<xx>` family: a split `SUPPAE1` + `SUPPAE2` feeds `AE` whole; a keyed `LB` that resolves as the
+split union `LB1` + `LB2` is fed the whole `SUPPLB` family; a keyed `LBCH` exactly its `SUPPLBCH`).
+A keyed entry may name a supplemental family — `Name: "SUPPAE"` resolves every member (`SUPPAE1` +
+`SUPPAE2`) as one partner — and a non-`Child` `SUPP--` / `SQAP--` is the supplemental family of the
+primary's **domain** (`SUPPLB` on `LBCH`, `SQAPMH` on `APMH`), never the member name (the
+[`Child: true`](#child-true--resolving-a-parent-row) form keeps matching the primary's own name).
+⚠ When an exactly-named `SUPPAE` ships beside `SUPPAE1`, a keyed `SUPPAE` partner on a rule that also
+reads the SUPP merge is refused (`MERGE_REFUSED`): one name cannot be both the family the join reads
+and the member the merge feeds — name the member, or write `Supp_Merge: false`. The qualifier matches the entry
 ignoring letter case (`dm.age` reads `DM.AGE`; upper case is the expected spelling). Every reader —
 the `Check`, `Bindings`, `Output_Variables`, `Grouping`, the group functions, `colref` — reads the
 same cell for the same name.
@@ -574,7 +584,11 @@ Supp_Keys:                # omitted = the IG's key
 
 A joined dataset's own qualifiers are its columns too: `DM.RACEOTH` on a rule that joins `DM` reads
 `SUPPDM`'s `RACEOTH` for the joined record. `SUPPDM` qualifies `DM` only — another domain reaches it
-through a `DM` join, never bare.
+through a `DM` join, never bare. A split family counts whole: a joined `AE` on a study shipping
+`SUPPAE1` + `SUPPAE2` reads both; a joined split member `LBCH` reads its own `SUPPLBCH`; a joined `LB`
+that resolves as the split union `LB1` + `LB2` reads the whole `SUPPLB` family — a subject-level row
+(blank `IDVAR`) of any member then qualifies the subject's records of every member, and the same
+subject-level `QNAM` in two members is the duplicate that errors the rules reading it.
 
 ## Forward RELREC — `Name: RELREC` with no `Keys`
 

@@ -1,0 +1,48 @@
+#!RuleTest
+#test CDISC-AD0640 expect=violation domain=ADAE
+# Rule:Description: Raise an error when SDTM SUPPAE contains a record with QNAM=AETRTEM for a subject but AETRTEM is not a column of the corresponding ADVERSE EVENT sub-class OCCDS (ADaM) dataset.
+#note "PLAN-split-supp-resolution (C35): SUPPAE is submitted split as SUPPAE1 + SUPPAE2 (RDOMAIN=AE, no SUPPAE); AETRTEM is delivered ONLY by SUPPAE2. The qualified requirement AE.AETRTEM is met through the family's SUPP sources (SuppQualifiers, the one chooser) and ADAE lacks the column -> violation. Red on the pre-plan engine: only an exactly-named SUPPAE was consulted, the requirement was unmet and the rule SKIPped."
+#expectViolationCount 1
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col ASEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ type=Num
+col AETERM type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset SUPPAE1 label="Supplemental Qualifiers for AE (part 1)"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AESOSP | Other Medically Important SAE | N
+---
+
+dataset SUPPAE2 label="Supplemental Qualifiers for AE (part 2)"
+col STUDYID  type=Char
+col RDOMAIN  type=Char
+col USUBJID  type=Char
+col IDVAR    type=Char
+col IDVARVAL type=Char
+col QNAM     type=Char
+col QLABEL   type=Char
+col QVAL     type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+---

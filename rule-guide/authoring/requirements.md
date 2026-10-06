@@ -227,14 +227,18 @@ entry `CIT §2`), exactly as it evaluates a rule against a dataset:
   cannot resolve datasets at all, a qualified entry is undecidable and skips the rule in every
   facet, `None` included.
 - **Supplemental qualifiers count.** A qualified entry whose variable half is a plain name (not a
-  glob, `/regex/` or template) is also found as a supplemental qualifier: a row of
-  `SUPP<dataset>` — `SUPPAE` for `AE.AETRTEM`, the entry's *own* dataset's supplement, not the
-  supplement of the dataset the rule runs on — whose `QNAM` **equals** the variable name, compared
-  as a string, exactly (a `QNAM` cell is a value; rulings register `CIT §3`). It is looked for
-  **before** a missing dataset counts as unavailable: `All: [AE.AETRTEM]`
-  in a study with no `AE` but a `SUPPAE` row `QNAM = AETRTEM` is **met** and the rule runs, and
-  `None: [AE.AETRTEM]` **skips** the rule whenever `SUPPAE` carries that `QNAM`, with or without
-  `AE`. A type suffix on such an entry is checked against `SUPPAE`'s `QVAL` type.
+  glob, `/regex/` or template) is also found as a supplemental qualifier: a row of the entry's
+  *own* dataset's **supplemental sources** — its `SUPP<dataset>` plus the domain-level members of
+  its `SUPP<domain>` / `SQAP<xx>` family, exactly the datasets the [SUPP merge](#supp_merge) reads
+  (`SUPPAE1` + `SUPPAE2` for `AE.AETRTEM` when SUPPAE ships split; exactly `SUPPLBCH` for
+  `LBCH.X`, never a sibling's `SUPPLBHE`), not the supplement of the dataset the rule runs on —
+  whose `QNAM` **equals** the variable name, compared as a string, exactly (a `QNAM` cell is a
+  value; rulings register `CIT §3`). It is looked for **before** a missing dataset counts as
+  unavailable: `All: [AE.AETRTEM]` in a study with no `AE` but a `SUPPAE` row `QNAM = AETRTEM` is
+  **met** and the rule runs, and `None: [AE.AETRTEM]` **skips** the rule whenever `SUPPAE` carries
+  that `QNAM`, with or without `AE`. A qualified entry naming a split family (`SUPPAE.QNAM` on a
+  study shipping `SUPPAE1` + `SUPPAE2`) is decided on the members' columns. A type suffix on such an
+  entry is checked against the sources' `QVAL` type (every source must agree).
 - **A type suffix** (`:N` / `:C`, on `All` and `Any` only) makes a present column of the wrong
   type a mismatch of its own; see [below](#demanding-a-type-as-well-as-presence).
 
@@ -370,7 +374,11 @@ Requirements:
 ```
 
 The named datasets must be present in the run. Presence is **widened**: a split domain counts as
-present, so requiring `LB` is satisfied by `LB1` and `LB2` without naming them.
+present, so requiring `LB` is satisfied by `LB1` and `LB2` without naming them, and a split
+supplemental family counts as present — requiring `SUPPAE` is satisfied by `SUPPAE1` + `SUPPAE2`
+(both `RDOMAIN = AE`), `SQAPMH` by `SQAPMH1` + `SQAPMH2`. A `--` entry names the supplemental
+family of the primary's **domain**: `SUPP--` is `SUPPLB` on `LBCH` and `SQAPMH` on `APMH` (`SQAP--`
+is its synonym). Name the family, never a split member.
 
 Use it when the check reaches into another dataset — a [join](joins.md), or a cross-dataset
 reference — and cannot answer anything without it.
@@ -412,7 +420,11 @@ Supp_Merge: false
 ```
 
 Every rule reads its dataset's **supplemental qualifiers as values of the parent record**: a bare
-name the domain does not carry resolves to the `SUPP<domain>` row that qualifies the record — by
+name the domain does not carry resolves to the supplemental row that qualifies the record, from the
+dataset's **SUPP sources** — its own `SUPP<dataset>` plus the domain-level members of its
+`SUPP<domain>` family (an associated-persons dataset: its `SQAP<xx>` family). A family may ship
+split: `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) are the sources of `AE`, read together; a split
+dataset `LBCH` reads its own `SUPPLBCH` and never a sibling's `SUPPLBHE`. The row is matched by
 the IG's key: the same study (`STUDYID`), domain (`RDOMAIN`), subject (`USUBJID`; `POOLID` under
 SEND, `APID`, `SPDEVID` where the dataset carries them) plus `IDVAR` = `IDVARVAL`, compared as text
 (a numeric parent column canonicalised: `"01"` and `" 1"` find `1`). A blank `IDVAR` qualifies
@@ -421,7 +433,8 @@ record-level row naming no subject qualifies every record its `IDVAR` = `IDVARVA
 SEND, and nothing under SDTM. SENDIG makes `USUBJID` and `POOLID` exclusive, so pooled records (blank
 `USUBJID`) never read another pool's qualifiers, and a domain without pools reads exactly as it
 would keyed on `USUBJID` alone. A split dataset reads both its own `SUPP<dataset>` and its
-domain's `SUPP<domain>`. A rule that needs another key writes
+domain's `SUPP<domain>` — the family's domain-level members, never another member's own
+`SUPP<member>`. A rule that needs another key writes
 [`Supp_Keys`](joins.md#supp_keys--the-key-of-the-supp-merge); two supplemental rows qualifying one
 record for one `QNAM` make the rules that read that `QNAM` error (and only those). The
 merge serves the dataset the rule evaluates, never a dataset it reads through `domain=`: in
@@ -429,8 +442,9 @@ merge serves the dataset the rule evaluates, never a dataset it reads through `d
 the check reads `PCCALCN` per record, `empty(PCCALCN)` is true for a record no `SUPPPC` row qualifies
 (or whose `QVAL` is blank), `var_exists("PCCALCN")` is true as soon as any `SUPPPC` row carries the
 name, the finding reports the qualifier's value, and a requirement naming the qualifier — bare, or
-qualified such as `AE.AETRTEM` — is met when the `SUPP--` dataset delivers it. That is the default,
-and it needs no key. On a rule that joins another dataset, that dataset's qualifiers are its
+qualified such as `AE.AETRTEM` — is met when one of those sources delivers it: the same sources the
+merge reads, so what a requirement or `var_exists` reports present is what the check reads. That is
+the default, and it needs no key. On a rule that joins another dataset, that dataset's qualifiers are its
 merged columns too: `DM.RACEOTH` reads `SUPPDM`'s qualifier of the joined `DM` record.
 
 A qualifier is **not a variable of the domain**: the variable-inventory checks (column order,

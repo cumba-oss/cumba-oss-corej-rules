@@ -223,11 +223,18 @@ Check:
 
 `ds_exists(x)` → **boolean**
 
-True when the named dataset is present in the run. A negated spelling `ds_not_exists(x)` exists; prefer `not ds_exists(x)`.
+True when the named dataset is present in the run — exactly under that name, as a **split domain**
+(`LB` shipped as `LB1` + `LB2`), or as a **split supplemental family**: `SUPPAE` shipped as
+`SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`, no `SUPPAE`) is present, and so is the associated-persons
+twin `SQAPMH` shipped as `SQAPMH1` + `SQAPMH2` (`RDOMAIN = APMH`). A family is read off each member's
+`RDOMAIN`, never guessed from its name: `SUPPLBCH` / `SUPPLBHE` / `SUPPLBUR` are `SUPPLB`. Every member
+name (`SUPPAE1`) and every other name resolves exactly. The same fact decides `Requirements.Datasets`
+and the absent-dataset skip, so a rule never skips on a family `ds_exists` answers true. A negated
+spelling `ds_not_exists(x)` exists; prefer `not ds_exists(x)`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
+| `name` | dataset reference | yes | The dataset to test, as a plain name (`"SJ"` or `SJ`) — no `--`, no dotted or filter form (a load error) |
 
 **Example**
 
@@ -1539,7 +1546,7 @@ what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `c
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load |
-| `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group). Requires `group=` |
@@ -1713,7 +1720,7 @@ cross-dataset plan `record_count` and `distinct` follow.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
-| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
@@ -1775,7 +1782,7 @@ cannot be positioned yields no value. A registry function since runbook W5; the 
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
-| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
@@ -1827,7 +1834,7 @@ keyword spelling.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
-| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
@@ -1903,7 +1910,7 @@ read per row of the evaluated dataset. The bare `record_count()` is the dataset'
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do |
+| `domain` | dataset reference | no | The dataset to count: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are counted, in parentheses: `filter=(TSPARMCD == "INDIC")`, `filter=(TSPARMCD == "INTTYPE" and TSVAL in ["DRUG", "BIOLOGIC"])`, `filter=(starts_with(QNAM, "RACE"))`, `filter=(not empty(AEACN))`. Only bare columns of the target dataset — a dotted, `$` or `--` reference (under `domain`) is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the count is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be a `$`-reference to a dataset-level **list of column names** (`group=[USUBJID, --TESTCD, $TIMING_VARIABLES]`), spliced in place; a per-row binding, or one typed as a number, is a load error. A quoted name (`"USUBJID"`) is not a column and is a load error too. A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain` — never spliced, and never beside `regex=` |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`: the blank key forms its own group) |
