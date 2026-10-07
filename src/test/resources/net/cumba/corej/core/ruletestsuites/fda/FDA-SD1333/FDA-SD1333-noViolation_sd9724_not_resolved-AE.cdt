@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1333 expect=noViolation domain=AE
+#note "Neither AEENDTC nor AEDUR is in the dataset, but no row reports AEOUT='RECOVERED/RESOLVED' - an ongoing event needs neither an end date nor a duration, so the absent columns are unremarkable. The sister fires only where its parent would have fired (R-4.11c)."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOUT   type=Char label="Outcome of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | NOT RECOVERED/NOT RESOLVED
+CDISCPILOT01 | AE | 01-701-1015 | 2 | RASH     | RECOVERING/RESOLVING

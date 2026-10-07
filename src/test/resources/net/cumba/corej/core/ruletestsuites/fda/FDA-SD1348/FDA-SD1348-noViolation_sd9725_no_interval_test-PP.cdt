@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1348 expect=noViolation domain=PP
+#note "Neither PPSTINT nor PPENINT is in the dataset, but no PPTEST value references a 'T1 to T2' interval - point parameters need no assessment interval, so the absent columns are unremarkable. The sister fires only where its parent would have fired (R-4.11c)."
+#library standard=sdtmig version=3-4
+dataset PP class=FINDINGS label="Pharmacokinetics Parameters"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PPSEQ    type=Num  label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPTEST   type=Char label="Parameter Name"
+---
+S1 | PP | 001 | 1 | CMAX | Maximum Concentration
+S1 | PP | 001 | 2 | TMAX | Time of CMAX

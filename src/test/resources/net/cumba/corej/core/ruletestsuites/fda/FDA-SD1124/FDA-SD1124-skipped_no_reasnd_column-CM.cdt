@@ -1,7 +1,8 @@
 #!RuleTest
-#test FDA-SD1124 expect=skipped domain=CM
+#test FDA-SD1124 expect=violation domain=CM
 #note "column-absent case on the INTERVENTIONS arm: CMSTAT='NOT DONE' and the dataset carries no CMREASND column at all. Since 2026-09-11 the rule gates on Requirements.Variables.All [--STAT, --REASND] (R-4.11b, verdict 2-1, T1-11), so the run is an auditable SKIP naming the missing column instead of one finding per NOT DONE row. The absence itself is reported ONCE by the minted sister FDA-SD9726, whose violation scenario carries this shape. Before the gate, the bare empty(--REASND) leaf was TRUE on every row (absent = all-missing, EC-43)."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset CM class=INTERVENTIONS label="Concomitant Medications"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

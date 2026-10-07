@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD0031 expect=noViolation domain=EX
+#note "No start-point column exists (None satisfied) and the EXOCCUR/EXSTAT columns are absent too, but no end timepoint is populated anywhere, so the trigger holds nowhere and the sister stays silent. ⭐ This pins that FDA-SD9721 does NOT carry the FDA-SD0022 branch of the union trigger: FDA-SD9720 would fire on this dataset via (--OCCUR != 'N' and empty(--STAT)), and releasing that branch into the SENDIG packages would assert a condition FDA does not publish there (R-4.11c). R-4.11c containment: FDA-SD0031, the only parent here, would not fire either."
+#library standard=sendig version=3-1-1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | VEHICLE   |
+S1 | EX | 001 | 2 | TEST ITEM |

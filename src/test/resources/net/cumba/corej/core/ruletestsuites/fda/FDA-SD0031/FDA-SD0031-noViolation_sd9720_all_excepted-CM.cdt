@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SD0031 expect=noViolation domain=CM
+#note "No start-point column exists (None satisfied), so the sister RUNS - but neither branch of the union trigger holds on any row: row 1 CMOCCUR='N', row 2 a populated CMSTAT (FDA-SD0022 branch false), and no end timepoint is populated anywhere (FDA-SD0031 branch false). R-4.11c containment: neither parent would fire on this dataset either."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMOCCUR type=Char label="CM Occurrence"
+col CMSTAT  type=Char label="Completion Status"
+col CMENDTC type=Char label="End Date/Time of Medication"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | N |          |
+S1 | CM | 001 | 2 | IBUPROFEN |   | NOT DONE |

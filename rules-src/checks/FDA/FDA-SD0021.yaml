@@ -11,19 +11,20 @@ Scope:
     Include:
     - "INTERVENTIONS"
     - "EVENTS"
-Requirements:
-  Variables:
-    Any:
-    - "--ENDTC"
-    - "--ENRF"
-    - "--ENRTPT"
-    - "--DUR"
+  Domains:
+    Exclude:
+    - "DS"
 Check:
   expression: >-
     empty(--ENDTC) and empty(--ENRF) and empty(--ENRTPT) and --OCCUR != "N" and empty(--STAT) and
     empty(--DUR)
 Outcome:
   Message: "No End Time-Point variable (--ENDTC, --ENRF, or --ENRTPT) is populated."
+  Message_Folded: "None of --ENDTC, --ENRF, --ENRTPT or --DUR is present or populated\
+    \ in the dataset although a record demands an End Time-Point."
+  Keep_Row_Findings:
+  - "--STAT"
+  - "--OCCUR"
   Output_Variables:
   - "!--ENDTC"
   - "!--ENRF"

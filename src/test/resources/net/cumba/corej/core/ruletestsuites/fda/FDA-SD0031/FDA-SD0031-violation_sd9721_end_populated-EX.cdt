@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SD0031 expect=violation domain=EX
+#note "The M11b arm of the FDA package split, sister of FDA-SD0031 ALONE in the four SENDIG packages where FDA-SD0022 does not ship. None of EXSTDTC/EXSTRF/EXSTRTPT is present while EXENDTC is populated on both rows - the state FDA-SD0031 reports per record where the columns exist. Sensitivity is Dataset: reported ONCE."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Actual Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | VEHICLE   | 2023-04-05
+S1 | EX | 001 | 2 | TEST ITEM | 2023-04-06

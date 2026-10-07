@@ -11,17 +11,16 @@ Scope:
     Include:
     - "INTERVENTIONS"
     - "EVENTS"
-Requirements:
-  Variables:
-    Any:
-    - "--STDTC"
-    - "--STRF"
-    - "--STRTPT"
 Check:
   expression: >-
     empty(--STDTC) and empty(--STRF) and empty(--STRTPT) and --OCCUR != "N" and empty(--STAT)
 Outcome:
   Message: "No Start Time-Point variable (--STDTC, --STRF, or --STRTPT) is populated."
+  Message_Folded: "None of --STDTC, --STRF or --STRTPT is present or populated in\
+    \ the dataset although a record demands a Start Time-Point."
+  Keep_Row_Findings:
+  - "--STAT"
+  - "--OCCUR"
   Output_Variables:
   - "!--STDTC"
   - "!--STRF"

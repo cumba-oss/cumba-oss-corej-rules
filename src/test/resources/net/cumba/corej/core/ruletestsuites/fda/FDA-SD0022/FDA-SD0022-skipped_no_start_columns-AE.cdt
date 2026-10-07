@@ -1,7 +1,8 @@
 #!RuleTest
-#test FDA-SD0022 expect=skipped domain=AE
+#test FDA-SD0022 expect=violation domain=AE
 #note "None of the three start-point columns (AESTDTC/AESTRF/AESTRTPT) exists, so Requirements.Variables.Any [--STDTC, --STRF, --STRTPT] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Both rows WOULD fire were the gate removed (AEOCCUR/AESTAT columns absent too). Verdict 2-1 (T1-13/18/21): the absence is itself reportable, and the minted sister FDA-SD9720 reports it ONCE for this dataset."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

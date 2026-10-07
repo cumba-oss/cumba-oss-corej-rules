@@ -1,7 +1,8 @@
 #!RuleTest
-#test FDA-SD1118 expect=skipped domain=DS
+#test FDA-SD1118 expect=violation domain=DS
 #note "AUTHORED BY Plan B phase 4d. NONE of DSSTDTC / DSDTC / DSSTDY is declared, so Requirements.Variables.Any [--STDTC, --DTC, --STDY] is unmet and the rule skips. ⚠⚠ Before 4d the SD1118 pair had NO all-three-absent scenario at all (plan §4.3), so the one facet the Any adoption exists for shipped pinned by nothing — a real corpus carrier with no fixture, the hand-authored-gate-test failure running in reverse. Both findings snapshots are blind here (sdtmig 3-4 testdata/study and phuse both ship a DS carrying the date columns), so this scenario and its PMDA sister are the ONLY evidence for the DS half of 4d. Contrast PMDA-SD1118-invalid_absent_stdtc-DS, which does NOT re-flip: DSDTC and DSSTDY are present there, so the Any leg is satisfied and Fix #331's violation still stands."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset DS class=EVENTS label="Disposition"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

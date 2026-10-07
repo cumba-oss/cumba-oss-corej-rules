@@ -1,7 +1,8 @@
 #!RuleTest
-#test FDA-SD1037 expect=skipped domain=AE
+#test FDA-SD1037 expect=violation domain=AE
 #note "AETOXGR=3 (>0) but the AETOX variable is not present in the dataset. Requirements.Variables.All [--TOXGR, --TOX] gates the rule out -> auditable skip instead of one finding per graded row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1 (T1-24): the absence is itself reportable, and the minted sister FDA-SD9717 reports it ONCE for this dataset. The redundant not empty(--TOXGR) conjunct was dropped in the same edit (B2): Primitives.comparison maps a missing LHS to false, so --TOXGR > 0 is already false on an absent or blank cell."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

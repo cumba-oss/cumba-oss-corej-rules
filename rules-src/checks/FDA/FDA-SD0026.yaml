@@ -13,13 +13,14 @@ Scope:
 Requirements:
   Variables:
     All:
-    - "--ORRESU"
     - "--ORRES"
 Check:
   expression: >-
     not empty(--ORRES) and --ORRES =~ /^-?[0-9]+(\\.[0-9]+)?$/ and empty(--ORRESU)
 Outcome:
   Message: "Missing value for --ORRESU, when --ORRES is provided"
+  Message_Folded: "--ORRES has at least one non-empty value but --ORRESU is absent\
+    \ or empty."
   Output_Variables:
   - "--TESTCD"
   - "!--ORRESU"
