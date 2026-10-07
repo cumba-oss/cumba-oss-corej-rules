@@ -1122,6 +1122,43 @@ Check:
 **When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. An empty minuend answers the empty set without reading `subtract`.
 
 
+### union
+
+`union(first, second, …)` → **value (a list)**
+
+The set union of two or more lists — every member of `first` in its order, then each member of the later operands not yet seen; a member occurs once, its first occurrence kept.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `first` | list | yes | The first operand — a `$`-binding holding a dataset-level list, or a list literal of string literals |
+| `second` | list | yes | The second operand — the same spellings |
+| `more` | list of lists (absorbs the remaining arguments) | no | Any further operands, each a dataset-level list or a list literal |
+
+A **registry function** (`PLAN-union-function`), the set partner of [`minus`](#minus). Every operand is a **dataset-level** list — a `$`-binding holding one (typically the answer of another list function) or a list literal of string literals; a `$`-binding computed per row (`distinct(…, group=[…])`, a per-variable value) is refused at load (*"the list function union(…) … cannot read the per-row or per-variable binding … — a set union reads only dataset-level lists"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load, at every operand position. Operands are **lists only**: a single value is written as its singleton literal `["X"]`; a scalar operand is a rule ERROR at evaluation (unlike `minus`, which still treats a scalar as its singleton). It is an **aggregate**: one list for the dataset. Members compare as set elements, exactly as in `minus`: a text against a text, a missing value by its identity, a row tuple **structurally** — and one union holds one element shape (texts, or tuples of one arity; a mixed union is a rule ERROR). Positional arguments only: the third operand on is collected by `more`.
+
+**Example**
+
+```yaml
+Bindings:
+- name: "$all_keys"
+  expression: 'union($ae_keys, $adae_keys)'
+Check:
+  expression: 'USUBJID not in $all_keys'
+```
+
+**Minimal — required parameters only**
+
+```yaml
+Bindings:
+- name: "$permitted"
+  expression: 'union($published, ["STUDYID", "DOMAIN"])'
+Check:
+  expression: 'not contains_all($permitted, $present)'
+```
+
+**When there is nothing to answer** — **the empty set** (every operand empty). `X in $u` is then vacuously false; `X not in $u` is vacuously true and **fires**.
+
+
 ### round
 
 `round(x)` → **value**

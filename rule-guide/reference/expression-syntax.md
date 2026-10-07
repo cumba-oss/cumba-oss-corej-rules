@@ -509,6 +509,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`is_integer(x)`](functions.md#is_integer) | boolean | True when the value is a finite whole number. A negated spelling `is_not_integer(x)` exists; prefer `not is_integer(x)`. |
 | [`is_numeric(x)`](functions.md#is_numeric) | boolean | True when the value is a decimal number; there is no `is_not_numeric` — write `not is_numeric(x)` |
 | [`minus(value, subtract=)`](functions.md#minus) | value | The set difference of two dataset-level lists — the members of `value` not in `subtract`; a tuple member compares structurally |
+| [`union(first, second, …)`](functions.md#union) | value | The set union of two or more dataset-level lists, in order of first occurrence; lists only, one element shape |
 | [`round(x)`](functions.md#round) | value | The value rounded to the nearest integer, a half rounded up toward +∞ (`round(-2.5)` is `-2`) |
 
 ### Dates and times
