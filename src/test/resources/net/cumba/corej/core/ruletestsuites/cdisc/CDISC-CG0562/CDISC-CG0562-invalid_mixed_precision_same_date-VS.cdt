@@ -1,9 +1,8 @@
 #!RuleTest
 #test CDISC-CG0562 expect=violation domain=VS
 #note "D1 (W6): one SYSBP record dated 2014-01-01 and one at 2014-01-01T09:00, VSREPNUM empty on both. Under the binding's regex both collapse to the date, the timing group holds 2 records, and the empty VSREPNUM fires both rows. RED on the pre-port engine (the unread regex left them in two one-record groups)."
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-701-1015 VSSEQ=1
-#expectViolationAt row=2 USUBJID=01-701-1015 VSSEQ=2
 #library standard=sdtmig version=3-4
 #library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing VSREPNUM:Qualifier DOMAIN:Identifier
 dataset VS label="Vital Signs"

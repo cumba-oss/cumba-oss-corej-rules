@@ -19,12 +19,15 @@ config:
 library_mocks:
   classes:
     basic data structure: [ADLB]
+# PLAN-message-folded-corpus-alignment (2026-10-07): the trigger column is blank or absent on every
+# fixture row, so the rule now reports ONE dataset-level finding (Outcome.Message_Folded, D5) where
+# it reported per row; the per-row rows were replaced by the collapsed one (anchored at the first
+# firing row, columns listed by name).
 expected_violations:
-  - rule_id: CDISC-AD0800
-    dataset: ADLB
-    row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
-    status: SUCCESS
-    output_variables:
-      STUDYID: S1
-      STUDYIDN: null
+- rule_id: CDISC-AD0800
+  dataset: ADLB
+  row_key: {PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
+  status: SUCCESS
+  output_variables: {}
+  name_only: [STUDYID, STUDYIDN]
 expected_errors: []

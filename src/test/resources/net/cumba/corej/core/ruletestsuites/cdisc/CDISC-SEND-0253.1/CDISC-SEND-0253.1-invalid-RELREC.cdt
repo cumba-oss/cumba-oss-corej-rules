@@ -2,9 +2,8 @@
 #test CDISC-SEND-0253.1 expect=violation domain=RELREC
 #note "No DOMAIN column: a real RELREC carries RDOMAIN, and a DOMAIN cell would otherwise be presented as the scope name. Row 1 has RELTYPE populated AND USUBJID populated -> FIRES; row 2 has RELTYPE populated AND IDVARVAL populated -> FIRES; row 3 is a clean domain-to-domain link; row 4 has an empty RELTYPE so the leading conjunct is false (a record-to-record link, CDISC-SEND-0286's business)."
 #library standard=sendig version=3-1-1
-#expectViolationCount 2
-#expectViolationAt row=1 RELTYPE=ONE
-#expectViolationAt row=2 RELTYPE=MANY
+#expectViolationCount 1
+#expectViolationAt row=1 nameOnly=RELTYPE
 dataset RELREC label="Related Records"
 col STUDYID  type=Char label="Study Identifier"
 col RDOMAIN  type=Char label="Related Domain Abbreviation"

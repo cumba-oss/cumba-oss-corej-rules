@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0125.1 expect=violation domain=SE
+#note "The SENDIG arm of the M10 sister family (minted 2026-09-11, wave D -- the F3 carry-over CDISC-CG9674 could not cover, since M10's CDISC sister ships only into the SDTMIG packages), serving CDISC-SEND-0125.1, which has carried All [ETCD, SEUPDES] with NO sister since wave C1. SEUPDES is not in the dataset (None satisfied) while rows 2 and 3 code ETCD='UNPLAN', so the remaining condition holds on two rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify. Same dataset shape as the parent's skipped_no_seupdes_column scenario: the parent skips, this rule reports."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | SE | 001 | 1 | SCRN   | Screening
+S1 | SE | 001 | 2 | UNPLAN | Unplanned Element
+S1 | SE | 002 | 1 | UNPLAN | Unplanned Element
+---

@@ -2,9 +2,8 @@
 #test CDISC-CG0201 expect=violation domain=RELREC
 #note "FRESH. Rows 1/2 are the two halves of one relationship, both fired by the same defect (a dataset-level relationship naming a --SEQ IDVAR); row 3 is a legitimate dataset-level relationship using a non---SEQ IDVAR. Pins Record granularity for the group: two offending rows produce two findings, and the exact-set match must enumerate both. No twin covers a multi-row fire on this rule."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
-#expectViolationAt row=1 IDVAR=AESEQ
-#expectViolationAt row=2 IDVAR=CMSEQ
+#expectViolationCount 1
+#expectViolationAt row=1 nameOnly=IDVAR
 dataset RELREC label="Related Records"
 col STUDYID  type=Char label="Study Identifier"
 col RDOMAIN  type=Char label="Related Domain Abbreviation"

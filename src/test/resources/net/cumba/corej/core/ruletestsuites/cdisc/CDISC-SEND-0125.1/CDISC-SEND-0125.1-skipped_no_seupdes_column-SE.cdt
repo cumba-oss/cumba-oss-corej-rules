@@ -1,7 +1,8 @@
 #!RuleTest
-#test CDISC-SEND-0125.1 expect=skipped domain=SE
+#test CDISC-SEND-0125.1 expect=violation domain=SE
 #note "Requirements.Variables SKIP CHANNEL. All is [ETCD, SEUPDES] and describeVariablesMismatch is CONJUNCTIVE, returning on the FIRST entry the dataset does not carry; this fixture removes the SECOND entry, so a green skip proves the iteration reaches past the first. ETCD is present and holds UNPLAN, so without the gate the rule would be silent for a different reason -- the scenario converts that silence into an auditable skip. Unaffected by M3-D3."
 #library standard=sendig version=3-1-1
+#expectViolationCount 1
 dataset SE label="Subject Elements"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

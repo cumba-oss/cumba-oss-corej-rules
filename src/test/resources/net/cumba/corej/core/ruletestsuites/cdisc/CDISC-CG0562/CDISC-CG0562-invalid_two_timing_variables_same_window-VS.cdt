@@ -1,9 +1,8 @@
 #!RuleTest
 #test CDISC-CG0562 expect=violation domain=VS
 #note "The two-element $TIMING_VARIABLES splice, the firing half: two SYSBP records on the same date AND the same VISITNUM, VSREPNUM empty -> one timing group of two, both rows fire. The regex leaves VISITNUM verbatim (its first value '1' does not match the date pattern), so a numeric timing key is grouped by its own identity. W6 phase 0, scenarios-first."
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-701-1015 VSSEQ=1
-#expectViolationAt row=2 USUBJID=01-701-1015 VSSEQ=2
 #library standard=sdtmig version=3-4
 #library domain-variables VS USUBJID:Identifier VSTESTCD:Topic VSDTC:Timing VISITNUM:Timing VSREPNUM:Qualifier DOMAIN:Identifier
 dataset VS label="Vital Signs"

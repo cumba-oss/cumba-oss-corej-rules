@@ -1,7 +1,8 @@
 #!RuleTest
-#test CDISC-CG0082 expect=skipped domain=AE
+#test CDISC-CG0082 expect=violation domain=AE
 #note "AEBDSYCD column absent. Requirements.Variables.All [--BODSYS, --BDSYCD] (owner, 2026-10-02) skips the record-level rule instead of reading the absent column as all-missing and firing once per populated AEBODSYS record. The absence itself is reported once per dataset by the sister CDISC-CG9685 (CDISC-CG9685-violation_no_bdsycd_column-AE pins the same rows)."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID  type=Char
 col DOMAIN   type=Char

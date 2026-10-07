@@ -27,14 +27,15 @@ library_mocks:
   classes:
     special-purpose: [SV]
     trial-design: [TV]
+# PLAN-message-folded-corpus-alignment (2026-10-07): the trigger column is blank or absent on every
+# fixture row, so the rule now reports ONE dataset-level finding (Outcome.Message_Folded, D5) where
+# it reported per row; the per-row rows were replaced by the collapsed one (anchored at the first
+# firing row, columns listed by name).
 expected_violations:
-  - rule_id: CDISC-CG0213
-    dataset: SV
-    row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 98}
-    status: SUCCESS
-    output_variables:
-      $visitnums_in_tv: '[1]'
-      SVUPDES:
-      VISIT: WEEK 98
-      VISITNUM: '98'
+- rule_id: CDISC-CG0213
+  dataset: SV
+  row_key: {STUDYID: S1, USUBJID: '001', VISITNUM: 98}
+  status: SUCCESS
+  output_variables: {$visitnums_in_tv: '[1]'}
+  name_only: [SVUPDES, VISIT, VISITNUM]
 expected_errors: []

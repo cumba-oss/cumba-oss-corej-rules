@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0164 expect=violation domain=CO
+#note "The sister half of the CDISC-CG0164 and CDISC-CG0166 gate(s) (minted 2026-09-11, M16/T1-35+T1-36 -- ONE sister for both board rows, R-5.26). The RDOMAIN column is absent (None satisfied) while row 1 populates IDVAR and row 2 populates IDVARVAL, so the union trigger holds on both rows; Sensitivity is Dataset, so the absence is reported ONCE. Same dataset shape as the parents' skipped_no_rdomain_column scenarios: the parents skip, this rule reports."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+---
+S1 |     | 1 | AESEQ |   | Comment on the AE record
+S1 | 001 | 2 |       | 3 | Comment keyed by value only

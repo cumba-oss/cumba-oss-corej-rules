@@ -2,9 +2,8 @@
 #test CDISC-CG0462 expect=violation domain=EC
 #note "FLIPPED noViolation -> violation by Fix #340 (owner ruling 2026-08-22 under EC-86 / M3-D18: the four rules that HAND-AUTHOR var_exists(X) and empty(X) drop the hand guard - the ruling forbids the shape). This rule was outside the 453 machine-guarded population Fix #330/#331 measured (review S2), so its guard survived that lane and kept the ECDOSE-column-absent dataset silent. With the hand guard gone the leaf is a bare empty(ECDOSE), which under absent = all-missing is TRUE on every row: both rows have ECOCCUR=Y (!= N), ECSTAT blank and ECDOSTXT blank, so both fire. A submission that omits the dose column entirely is exactly the defect this rule exists for. If this goes silent again, the hand guard was re-introduced -- escalate. History, before Fix #340: the check required the ECDOSE COLUMN to exist (var_exists) before testing its emptiness, so a dataset without the column did not fire per row; the all-absent dataset shape was said to be reported once by the minted sister and this middle configuration deliberately unreported."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 ECSEQ=1 USUBJID=001
-#expectViolationAt row=2 ECSEQ=2 USUBJID=001
 dataset EC class=INTERVENTIONS label="Exposure as Collected"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

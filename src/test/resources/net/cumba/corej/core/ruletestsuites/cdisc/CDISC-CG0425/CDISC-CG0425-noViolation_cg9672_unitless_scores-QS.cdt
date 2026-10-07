@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0425 expect=noViolation domain=QS
+#note "Verdict changed violation -> noViolation on 2026-10-02. QS scores are numeric and unitless: the original result carries no unit (QSORRESU empty), so units are not applicable (owner, 2026-10-02: applicable means --ORRESU populated) and the missing QSSTRESU column is correct. Until then this scenario pinned the documented overreporting residual of sheet issue #171, which the --ORRESU condition removes."
+#library standard=sdtmig version=3-4
+dataset QS class=FINDINGS label="Questionnaires"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col QSSEQ    type=Num  label="Sequence Number"
+col QSTESTCD type=Char label="Question Short Name"
+col QSSTRESC type=Char label="Character Result/Finding in Std Format"
+col QSORRESU type=Char label="Original Units"
+---
+CDISCPILOT01 | QS | 01-701-1015 | 1 | ADAS01 | 3 |
+CDISCPILOT01 | QS | 01-701-1015 | 2 | ADAS02 | 5 |

@@ -1,7 +1,8 @@
 #!RuleTest
-#test CDISC-CG0425 expect=skipped domain=LB
+#test CDISC-CG0425 expect=violation domain=LB
 #note "LBSTRESU column absent while numeric standardised results are reported. Requirements.Variables.All [--STRESU, --STRESC, --ORRESU] gates the rule out -> auditable skip naming the absent variable, instead of one finding per row under absent = all-missing. Row 1 (GLUC 7.2) and row 2 (ALB 40) WOULD both fire were the gate removed; row 3 (HBSAG NEGATIVE) would not. Verdict 2-1 (absent-column-verdicts.tsv): the gate is paired with the minted dataset-sensitivity sister CDISC-CG9672, which reports the column's absence ONCE for the dataset - CDISC-CG9672-violation_no_stresu_column-LB is the other half of this pair and pins exactly these rows. This is the rule the absent-column defect was originally reported on."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset LB class=FINDINGS label="Laboratory Test Results"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

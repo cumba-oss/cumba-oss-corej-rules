@@ -19,12 +19,15 @@ config:
 library_mocks:
   classes:
     subject level analysis dataset: [ADSL]
+# PLAN-message-folded-corpus-alignment (2026-10-07): the trigger column is blank or absent on every
+# fixture row, so the rule now reports ONE dataset-level finding (Outcome.Message_Folded, D5) where
+# it reported per row; the per-row rows were replaced by the collapsed one (anchored at the first
+# firing row, columns listed by name).
 expected_violations:
-  - rule_id: CDISC-AD0418
-    dataset: ADSL
-    row_key: {STUDYID: S1, USUBJID: '002'}
-    status: SUCCESS
-    output_variables:
-      TRTSEQA: 'A'
-      TRTSEQAN: null
+- rule_id: CDISC-AD0418
+  dataset: ADSL
+  row_key: {STUDYID: S1, USUBJID: '002'}
+  status: SUCCESS
+  output_variables: {}
+  name_only: [TRTSEQA, TRTSEQAN]
 expected_errors: []
