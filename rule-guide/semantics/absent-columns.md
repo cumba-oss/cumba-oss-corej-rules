@@ -54,22 +54,29 @@ The position decides wherever the column is read (owner 2026-10-05,
 > value-level rule does not emit more than one finding per dataset for the sole reason that a
 > column is absent).
 
-## The usual consequence: silence
+## The usual consequence of a positive test: silence
 
-Most checks simply do not fire on an absent column, and that is usually correct.
+A **positive** test does not fire on an absent column, and that is usually correct.
 
-A [missing value](values-and-missing.md) fails most comparisons, matches no regex, and is in no
-literal list — so a check built from ordinary operators judges nothing and reports nothing:
+A [missing value](values-and-missing.md) fails `==`, `<`, `>`, a regex match and `in` — so a check
+built from positive tests judges nothing and reports nothing:
 
 ```yaml
 expression: 'AESTDY > AEENDY'      # AESTDY absent → no findings, no error
 ```
 
+⚠ **A negative test is the opposite.** `X != "Y"`, `X not in ["Y", "N"]`, `X !~ /re/`,
+`not is_integer(X)` and `not is_complete_date_part(X)` are **true** on the constant, so they fire on
+every row — see the next section.
+
 > **Silence is the safe default, but it is still silence.** Nothing in the output distinguishes
 > *"the rule ran and the data was fine"* from *"the column was not there"*. If that distinction
 > matters — and for a conformance rule it usually does — see the next section.
 
-## A predicate that does fire
+## The tests that do fire
+
+Two kinds of test are **true on every row** of an absent column: `empty(x)`, and every **negative**
+test.
 
 `empty(x)` reports **every row** of an absent column as empty. (`is_missing(x)` does not: it is
 true only for a genuine missing, so over an absent column it answers the column's default — false
@@ -84,6 +91,18 @@ expression: 'empty(AEENDTC)'     # fires on EVERY row when AEENDTC is absent
 A rule that reports a blank column will report the whole dataset when the column is missing
 entirely. That is usually what you want from a completeness rule — but decide it rather than
 discover it.
+
+A negative test does the same, for the same reason: the absent column reads as `""` (or as the
+missing, in a numeric position), and `"" != "UNREMARKABLE"` is true. So
+`AESER == "Y" and AEOUT != "FATAL"` reports every serious event when `AEOUT` is absent:
+
+```yaml
+expression: 'AESER == "Y" and AEOUT != "FATAL"'   # AEOUT absent → every serious event fires
+```
+
+Which of these a rule should do — report every row, report the absence once, or skip — depends on
+what the column is **for** in the rule; [Requirements](../authoring/requirements.md#which-columns-to-require)
+walks through the choice.
 
 ### Both folds are opt-in: `Message_Folded`
 
@@ -144,8 +163,10 @@ names a merge does supply are the primary's supplemental qualifiers (`AETRTEM`).
 ## What you do *not* have to write
 
 **You do not write defensive presence guards.** Because an absent column folds to a constant, a
-check does not need `var_exists(X) and …` in front of it to avoid misbehaving — it will not
-misbehave.
+check does not need `var_exists(X) and …` in front of it: a positive test is already silent, and
+where a test would fire on every row the answer is a requirement or `Message_Folded`, chosen by
+what the column is for ([Requirements](../authoring/requirements.md#which-columns-to-require)) —
+never a hand-written `var_exists` conjunct.
 
 Write a presence test only when presence is genuinely **part of the requirement**:
 

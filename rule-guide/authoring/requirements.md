@@ -44,6 +44,65 @@ the most expensive mistake in this chapter, and it is invisible from the outside
 Require what the check needs in order to **ask** its question. Never what the check is asking
 *about*.
 
+## Which columns to require
+
+<!-- Grounded: the decision procedure of the authoring guidelines §4.4 (2026-10-07; owner decisions
+     D1-D5 2026-10-05 and N1 2026-10-07), restated here in author language; the guide does not
+     link out. MFCA Q6 + the two 2026-10-07 trigger rulings (Message_Folded); M2-D24 (the boundary);
+     D-6 ("only skip on silence, never reduce number of findings"); R-5.25 (split a top-level or). -->
+
+The rule above says what never to require. This section says how to decide everything else. Walk it
+in order, column by column.
+
+**First, name what each column is *for* in the rule.** Every column a check reads plays exactly one
+of five parts:
+
+| part | the column … | example |
+|---|---|---|
+| **subject** | is what the finding is about | `--STRESU` in *"`--STRESU` is populated when numeric results are"* |
+| **trigger** | selects the records the obligation applies to | `AESER` in *"when `AESER` is `Y`, …"* |
+| **exemption** | excuses the record when it is populated | `--STAT` in *"… unless the test is marked NOT DONE"* |
+| **operand** | is compared with another column | both sides of `AGE != DM.AGE` |
+| **key** | groups, joins, or is a member of a unique set | `USUBJID` in `is_unique_set([USUBJID, --SEQ])` |
+
+That is a reading of the rule's intent, not of its syntax, and it is the one judgement no tool makes
+for you.
+
+**Then decide, part by part:**
+
+1. **The subject is never required** (the rule above). If its absence is itself a defect, the rule
+   reports it: read the subject **ungated** and give the rule
+   [`Message_Folded`](outcome.md#message_folded) — an absent or entirely blank subject then reports
+   **once per dataset** instead of once per record. If the subject's absence simply means there is
+   nothing to check (the source says *"X present in dataset"*), require it.
+2. **A subject the fold cannot reach** — tested by `!=`, `not in`, `!~`, a negated function, or
+   through a joined dataset (`DM.X`) — is the one exception to point 1: `Message_Folded` folds only
+   an `empty`-family test over the rule's own column. Require the subject on the rule, and report its
+   absence with a small companion rule of `Sensitivity: "Dataset"` that fires once per dataset when
+   the column is missing and the rest of the condition holds.
+3. **A trigger or an exemption** whose absence the rule should read as "every record applies" or
+   "nothing is excused" is **not required**. On a rule with `Message_Folded`, list it in
+   [`Keep_Row_Findings`](outcome.md#keep_row_findings), so its absence keeps the per-record findings.
+4. **A column read only by positive tests of the top-level `and`** — `AESEV == "SEVERE" and …` —
+   belongs in `All`: the rule cannot fire without it, and a skip says so where silence would not.
+   Gating it never blocks `Message_Folded`, because a positive test is not what the fold reacts to.
+5. **Two columns compared with each other** (`AGE != DM.AGE`) are required on **both** sides when
+   either may be absent: otherwise the absent side's constant compares unequal on every row.
+6. **A top-level `or`** of conditions that could each be reported on their own is split into one rule
+   per condition first. Where an `or` stays, never require a column only some of its branches read —
+   that skips the branches that do not need it; columns every branch needs form one `Any` group.
+7. **A key** is not required by default: an absent key simply drops out of the grouping, which is
+   exact. Require it only where dropping it makes the rule fire where it otherwise would not — the
+   only member of a unique set, or a join that would manufacture duplicates.
+8. **A dataset** the check reads (`domain=`, a dotted name, `_matched_`, a join without keys) goes in
+   `Datasets` when no part of the check says anything useful without it — and never when the rule
+   reports that dataset's absence.
+
+⛔ **One bound over all of it: a requirement may turn silence into a skip, never a finding into a
+skip.** Require a column only where the rule would otherwise run and report nothing. And after you
+split a rule or rewrite its check, walk this list again for each resulting rule: the absent-column
+exposure moves with the conditions.
+
 ## `Variables` — four facets, ANDed
 
 ```yaml

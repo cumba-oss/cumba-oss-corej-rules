@@ -46,8 +46,11 @@ loud mistakes catch themselves.
       treat it as empty. Does the check mean to judge blank rows?
 - [ ] **A missing value.** `!=` against a literal **fires** on a missing value, and so does
       `not in`. Did you mean *"where a value is recorded and it is not X"*?
-- [ ] **An absent column.** Most checks report nothing — but `empty()` fires on
-      **every row**, so a completeness rule reports the whole dataset when its column is gone.
+- [ ] **An absent column.** A positive test reports nothing — but `empty()` and every negative
+      test (`!=`, `not in`, `!~`, `not is_…`) fire on **every row**, so a completeness rule reports
+      the whole dataset when its column is gone. Is each such column required, read under
+      `Message_Folded`, or deliberately per row (see
+      [Which columns to require](../authoring/requirements.md#which-columns-to-require))?
 - [ ] **A zero-row dataset.** A row-reading rule is already inert; a metadata rule still fires.
       Neither needs a row-count guard, and neither should re-report the empty table.
 - [ ] **A partial date.** Comparisons quantify over the whole range, so `==`, `!=`, `<` and `>=`
