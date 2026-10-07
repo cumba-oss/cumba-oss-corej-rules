@@ -2,8 +2,9 @@
 #test CDISC-CG0028 expect=violation domain=AE
 # Rule:Description: Raise an error when Sequence Number (--SEQ), excluding Trial Summary Sequence Number (TSSEQ), is not a unique number per USUBJID per domain, nor a unique number per POOLID per domain, including when the domain is split into multiple files.
 #note "AESEQ=2 is repeated within USUBJID 01-701-1015, so --SEQ is not unique per USUBJID per domain"
-#expectViolationCount 1
+#expectViolationCount 2
 #expectViolationAt row=2 AESEQ=2 USUBJID=01-701-1015
+#expectViolationAt row=3 AESEQ=2 USUBJID=01-701-1015
 dataset AE label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN type=Char label="Domain Abbreviation"

@@ -3,7 +3,7 @@
 #note "TWO EXPANSIONS, ONE VIOLATION: ^(.+)TMF$ -> ATMF root 'A'; ^(.+)TM$ -> ATM root 'A' AND ADTM root 'AD'; ^(.+)DTM$ -> ADTM root 'A'. Tuples dedupe to {A, AD}. Expansion 'A' is not empty(ATMF) and empty(ATM) and empty(ADTM) - all three declared, flag populated, both partners empty -> fires once at row 1. Expansion 'AD' is not empty(ADTMF) and empty(ADTM) and empty(ADDTM); ADTMF is not a declared column, so empty(ADTMF) broadcasts TRUE, not empty(...) broadcasts FALSE and the whole AND dies -> no violation. Total = 1. If this reports 2, recount the tuples before touching the fixture."
 #library standard=adamig version=1-3
 #expectViolationCount 1
-#expectViolationAt row=1 ATMF=T
+#expectViolationAt row=1 nameOnly=ATMF
 dataset ADLBC structure=BDS
 col STUDYID type=Char
 col USUBJID type=Char

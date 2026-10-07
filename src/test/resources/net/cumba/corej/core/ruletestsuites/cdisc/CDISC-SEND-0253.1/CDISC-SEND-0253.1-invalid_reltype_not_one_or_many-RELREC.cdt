@@ -3,7 +3,7 @@
 #note "THE SECOND-CONJUNCT PIN (Fix #295 / M3-D16). ONE row whose only difference from row 3 of -invalid-RELREC (deliberately silent) is the RELTYPE cell: BOTH is not a member of the sheet's enumeration. The sheet Rule cell is a conjunction -- 'USUBJID, POOLID, and IDVARVAL are null AND (RELTYPE = \"ONE\" OR RELTYPE = \"MANY\")' -- and only the first half was implemented, so an out-of-enumeration RELTYPE went unreported. The added `RELTYPE not in [\"ONE\", \"MANY\"]` disjunct is the shape CDISC-SEND-0253, -0201, -0255 and -0390 already ship; the pair with row 3 is exactly discriminating."
 #library standard=sendig version=3-1-1
 #expectViolationCount 1
-#expectViolationAt row=1 nameOnly=RELTYPE
+#expectViolationAt row=1 RELTYPE=BOTH
 dataset RELREC label="Related Records"
 col STUDYID  type=Char label="Study Identifier"
 col RDOMAIN  type=Char label="Related Domain Abbreviation"

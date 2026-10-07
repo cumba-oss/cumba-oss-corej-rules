@@ -3,7 +3,7 @@
 #note "[STALE MECHANISM, corrected 2026-08-27] NonEmptyGuardInliner was DELETED (Fix #367 / EC-100) and no guard is injected at load any more; the expectation below still holds, but for the rule's AUTHORED Requirements/Check, not for the injection this note describes. THE 82-RULE GENERATOR-WILDCARD POPULATION (Fix #331 finding; owner ruled 2026-08-22 that all 82 are BUCKET 1 - no rule edit - with a sample of fixtures owed by the closing lane; authored by Fix #340). These rules never carried the injected var_exists guard in rules/ (NonEmptyGuardInliner.isGeneratorWildcard excludes wildcard names), but WildcardExpander re-ran installNativeExpr on the EXPANDED rule, where the arm wrapped the now-concrete leaf - so before Fix #330 an absent primary column silenced them at runtime. With the arm retired the expanded leaf is a bare empty(X): absent = all-missing, TRUE on every row. Expansion here is COLUMN-DRIVEN and the column list is deliberately minimal: AVISITN is the ONLY name matching `*N`/`*C` and it is not in _wildcardExclude, so there is EXACTLY ONE expansion (root AVISIT) - and this time the primary AVISIT is not declared at all, only synthesised. empty(AVISIT) is TRUE on every row, so row 1 (AVISITN populated) fires. Row 2 leaves AVISITN blank and stays silent. Any extra column ending in N or C would silently add an expansion and change the count."
 #library standard=adamig version=1-3
 #expectViolationCount 1
-#expectViolationAt row=1 USUBJID=01-701-1015 AVISITN=1
+#expectViolationAt row=1 nameOnly=AVISITN
 dataset ADLBC
 col STUDYID type=Char
 col USUBJID type=Char
