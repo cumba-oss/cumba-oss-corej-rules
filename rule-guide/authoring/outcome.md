@@ -141,14 +141,17 @@ every dataset-level finding). Without the key: 961 findings under `Message`.
 - With the key, an absent column the Check tests folds to **one** dataset-level finding under
   `Message_Folded` — when the absent column decides the whole Check (`X != "N"` over an absent `X`
   is true on every record), or when an `empty`-family leaf over the absent column is a collapse
-  trigger exactly as over a column blank on every record (it reads as all-missing). ⛔ Any **other**
+  trigger exactly as over a column blank on every record (it reads as all-missing) and every live
+  leaf of the Check is decided (next bullet). ⛔ Any **other**
   operator over an absent column with a per-record residual stays per record: an absent *guard*
   column (`X != "N"` in an `or`-branch, a qualifier the domain never carries) must not fold the
   findings the other conditions locate per record.
 - **Only a polarity-live leaf triggers, and only when every one is decided** (owner, 2026-10-07):
   a leaf is live when its column being absent or blank on every record can make the Check true —
   `empty(X)` is, `not empty(X)` never is (it is false over a blank or absent `X`), and a column
-  merely absent elsewhere in the Check triggers nothing. The rule collapses only when **every** live
+  merely absent elsewhere in the Check triggers nothing; nor does a leaf in a branch a presence fact
+  kills for the whole dataset (`not var_exists("SVPRESP") and empty(SVUPDES)` with `SVPRESP`
+  present). The rule collapses only when **every** live
   leaf is decided that way; while one live leaf's column is still filled on some record, it reports
   per record (`FDA-SD0021` over an AE whose `AEENDTC` is filled on some records: per record; over an
   MH with no end column at all: once).
@@ -182,6 +185,12 @@ Outcome:
 
 `--` resolves like any variable reference. An entry the check does not read is a load error. The
 list is inert on a rule without `Message_Folded`.
+
+A kept column's leaf **neither triggers nor blocks**: blank or absent on every record it does not
+collapse the rule, and filled on some records it does not hold back a collapse the other live leaves
+decide. `FDA-SD1320` — `empty(--STAT) and empty(--STRESC)`, `Keep_Row_Findings: [--STAT]` — reports
+one finding when `--STRESC` is blank on every record and some record has `--STAT` empty, however
+`--STAT` is filled elsewhere; while `--STRESC` is filled on some record it reports per record.
 
 ## `Severity`
 
