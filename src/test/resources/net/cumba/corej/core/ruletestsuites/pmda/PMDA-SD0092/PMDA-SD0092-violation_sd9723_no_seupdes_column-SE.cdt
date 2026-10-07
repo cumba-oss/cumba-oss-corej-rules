@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0092 expect=violation domain=SE
+#note "The sister half of the PMDA-SD0092 pair (minted 2026-09-11, M10/T1-37), serving PMDA-SD0092 and PMDA-SD1266 (one sister per target variable and package - identical 5-package sets). SEUPDES is not in the dataset (None satisfied) while rows 2 and 3 code ETCD='UNPLAN', so the remaining condition holds on two rows. Sensitivity is Dataset, so the absence is reported ONCE although both rows qualify. Same dataset shape as the parents' skipped_no_seupdes_column scenarios: the parents skip, this rule reports."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | SE | 001 | 1 | SCRN   | Screening
+S1 | SE | 001 | 2 | UNPLAN | Unplanned Element
+S1 | SE | 002 | 1 | UNPLAN | Unplanned Element

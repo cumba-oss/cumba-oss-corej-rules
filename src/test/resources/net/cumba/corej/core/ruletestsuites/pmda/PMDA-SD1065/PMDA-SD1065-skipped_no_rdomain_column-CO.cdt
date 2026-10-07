@@ -1,7 +1,8 @@
 #!RuleTest
-#test PMDA-SD1065 expect=skipped domain=CO
+#test PMDA-SD1065 expect=violation domain=CO
 #note "GATED 2026-09-11 (wave C3, T1-35): RDOMAIN joined Requirements.Variables.All, so the RDOMAIN column absent altogether now SKIPS with a reason naming the column instead of firing per IDVAR-populated row -- before the gate the bare empty() leaf on the absent column was TRUE on every row (absent = all-missing, EC-43). The absence itself is not silenced: the minted sister PMDA-SD9728 reports it once per dataset on this same shape."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset CO class="SPECIAL PURPOSE" label="Comments"
 col STUDYID  type=Char label="Study Identifier"
 col USUBJID  type=Char label="Unique Subject Identifier"

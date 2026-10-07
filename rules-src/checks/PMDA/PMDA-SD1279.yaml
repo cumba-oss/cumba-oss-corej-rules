@@ -10,10 +10,6 @@ Scope:
   Domains:
     Include:
     - "EC"
-Requirements:
-  Variables:
-    All:
-    - "ECDOSTXT"
 Check:
   expression: >-
     empty(ECDOSE) and (not var_exists("ECOCCUR") or ECOCCUR != "N") and ECSTAT != "NOT DONE" and
@@ -21,6 +17,10 @@ Check:
 Outcome:
   Message: "ECDOSTXT is empty when ECDOSE is missing, ECOCCUR does not equal 'N' and\
     \ ECSTAT does not equal 'NOT DONE'."
+  Message_Folded: "ECDOSTXT is absent or empty although ECDOSE is missing, ECOCCUR\
+    \ does not equal 'N' and ECSTAT does not equal 'NOT DONE'."
+  Keep_Row_Findings:
+  - "ECSTAT"
 Source:
   Message: "ECDOSTXT is null when ECDOSE is null and ECOCCUR does not equal 'N'"
   Description: "Dose Description (ECDOSTXT) should be populated when Dose (ECDOSE)\

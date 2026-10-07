@@ -1,7 +1,8 @@
 #!RuleTest
-#test PMDA-SD1118 expect=skipped domain=DS
+#test PMDA-SD1118 expect=violation domain=DS
 #note "AUTHORED BY Plan B phase 4d, the PMDA sister of FDA-SD1118-skipped_all_dates_absent-DS. NONE of DSSTDTC / DSDTC / DSSTDY is declared, so Requirements.Variables.Any [--STDTC, --DTC, --STDY] is unmet and the rule skips. ⚠ This does NOT weaken Fix #331: that fix flipped PMDA-SD1118-invalid_absent_stdtc-DS to violation and its note warns 'if this goes SILENT again, a guard is being injected — escalate, do not rewrite toward silence.' It has not gone silent — DSDTC and DSSTDY are present there, the Any leg is satisfied, and the rule still fires. The Any adoption changes the verdict only when EVERY listed column is absent, which is this scenario and no other in the suite."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset DS class=EVENTS label="Disposition"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

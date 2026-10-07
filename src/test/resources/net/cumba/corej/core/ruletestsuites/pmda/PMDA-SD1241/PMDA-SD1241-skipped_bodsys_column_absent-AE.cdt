@@ -1,7 +1,8 @@
 #!RuleTest
-#test PMDA-SD1241 expect=skipped domain=AE
+#test PMDA-SD1241 expect=violation domain=AE
 #note "AEBODSYS column absent while AEBDSYCD is populated. Requirements.Variables.All [--BDSYCD, --BODSYS] gates the rule out -> auditable skip instead of one finding per row under absent = all-missing (EC-43). Row 1 WOULD fire were the gate removed. Verdict 2-1 (T1-01): the absence is itself reportable, and the minted sister PMDA-SD9716 reports it ONCE for this dataset."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

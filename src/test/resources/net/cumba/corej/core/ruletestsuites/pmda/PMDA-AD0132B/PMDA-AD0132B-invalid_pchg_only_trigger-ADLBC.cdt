@@ -3,7 +3,7 @@
 #note "PCHG as the lone gate member AND the lone trigger, over a dataset with NO BASE column at all -- the two halves M2-D24 keeps apart, in one file. PCHG is the only entry of Requirements.Variables.Any [CHG, PCHG, R2BASE] that is declared, so the flat Any is satisfied and the rule executes (spell it All and this REDS as skipped). BASE is ABSENT, so the bare empty(BASE) leaf broadcast-folds TRUE (EC-43) and row 1, whose PCHG is populated, FIRES. ⛔ This is the scenario that proves the constraint: put BASE (or AVAL) into the Requirements facet and this file REDS as skipped -- the rule would stop detecting the very defect it exists for, silently, with every other gate green. Row 2 has PCHG missing -> first conjunct false -> silent. BASE is an absent Output_Variable and is not pinned."
 #library standard=adamig version=1-3
 #expectViolationCount 1
-#expectViolationAt row=1 AVAL=10 PCHG=20
+#expectViolationAt row=1 nameOnly=AVAL nameOnly=PCHG
 dataset ADLBC structure=BDS
 col STUDYID type=Char
 col USUBJID type=Char

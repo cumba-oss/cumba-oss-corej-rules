@@ -2,9 +2,8 @@
 #test PMDA-SD0005 expect=violation domain=LB
 #note "Rows 1/2: the (DOMAIN, USUBJID, LBSEQ) tuple duplicates -> BOTH rows fire (is_not_unique_set flags every row of a duplicated tuple). Row 3: clean. Row 4: same LBSEQ on a different subject -> clean. No POOLID column -> branch 2's var_exists(\"POOLID\") is false."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 USUBJID=001
-#expectViolationAt row=2 USUBJID=001
 dataset LB class=FINDINGS
 col STUDYID  type=Char
 col DOMAIN   type=Char

@@ -1,7 +1,8 @@
 #!RuleTest
-#test PMDA-SD1380 expect=skipped domain=AE
+#test PMDA-SD1380 expect=violation domain=AE
 #note "GATED 2026-09-11 (wave C3, T1-34 + T1-38): Requirements.Variables.Any [USUBJID, APID, SPDEVID, POOLID] -- the sheet says at least one of the four must be populated, so the gate skips only when NONE of the four columns exists, as here. Before the gate every row fired (all four empty() leaves true on absent columns). The absence itself is reported once per dataset by the minted sister PMDA-SD9727 on this same shape."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset AE class=EVENTS label="Adverse Events"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

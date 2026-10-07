@@ -1,7 +1,8 @@
 #!RuleTest
-#test PMDA-SD0092 expect=skipped domain=SE
+#test PMDA-SD0092 expect=violation domain=SE
 #note "SEUPDES column absent while row 2 codes ETCD='UNPLAN'. Requirements.Variables.All [ETCD, SEUPDES] now gates the rule out -> auditable skip naming the column instead of a violation carried by the bare empty(SEUPDES) leaf (absent = all-missing, EC-43). Verdict 2-1 (T1-37): the absence is itself reportable, and the minted sister PMDA-SD9723 reports it ONCE for this dataset. SUPERSEDES the 2026-08-27 rationale for REMOVING the gate ('no rule anywhere reports its absence') - the sister is exactly that rule, which is what the removal was missing."
 #library standard=sdtmig version=3-4
+#expectViolationCount 1
 dataset SE label="Subject Elements"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD0029 expect=violation domain=LB
+#note "The sister half of the PMDA-SD0029 pair (minted 2026-09-07). LB reports numeric standardised results but ships no LBSTRESU column. Sensitivity Dataset -> ONE warning although both rows qualify. Replaces the fire-per-record behaviour the retired PMDA-SD0029-invalid_stresu_column_absent-LB fixture used to pin."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+col LBSTRESC type=Char
+col LBORRESU type=Char label="Original Units"
+---
+S1 | LB | 001 | 1 | GLUC | 7.2 | mg/dL
+S1 | LB | 001 | 2 | ALB  | 40 | mg/dL

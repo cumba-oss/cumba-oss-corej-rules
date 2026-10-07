@@ -1,7 +1,7 @@
 #!RuleTest
 #test PMDA-SD2021 expect=violation domain=DM
 #note "FLIPPED noViolation -> violation by Fix #331 (M3-D18 / M2-D24 bucket 1, owner ruling 2026-08-22): NonEmptyGuardInliner's bare-emptiness arm is RETIRED (Fix #330), so the machine-emitted var_exists guard this scenario used to pin no longer exists; absent = all-missing, empty(X) is TRUE on every row and the rule reports the defect on exactly the rows its other conjuncts select (2 here). If this goes SILENT again, a guard is being injected -- escalate, do not rewrite toward silence. History, before Fix #330: FRESH, DISCRIMINATING. No AGE column; AGETXT IS declared and left EMPTY. Pins the sharpest derivation in the batch: the shipped expression carries a DERIVED var_exists(\"AGE\") in front of empty(AGE) in BOTH disjuncts, so an absent AGE column makes the whole rule false -- the exact mirror image of invalid_no_agetxt above, where an absent AGETXT column FIRES. Deliberate per CORE-RULES-GUARD-MATRIX.md section 2: AGE is Core=Exp, so its absence is a dedicated presence rule's finding and this rule stays quiet; AGETXT is Permissible and structurally absent from SDTMIG, so the author's fire-when-absent not var_exists arm is right for it. See finding CG0434-F1 / SD2021-F1. Do NOT propose a not var_exists(\"AGE\") arm."
-#expectViolationCount 2
+#expectViolationCount 1
 #library standard=sdtmig version=3-4
 dataset DM class="SPECIAL PURPOSE" label="Demographics"
 col STUDYID type=Char

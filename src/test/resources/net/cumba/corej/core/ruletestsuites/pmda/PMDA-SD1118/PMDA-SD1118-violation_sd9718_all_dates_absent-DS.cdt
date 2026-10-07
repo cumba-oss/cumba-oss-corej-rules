@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1118 expect=violation domain=DS
+#note "The sister half of the PMDA-SD1118 pair (minted 2026-09-11, M19/B5). NONE of DSSTDTC / DSDTC / DSSTDY is declared, so the parent's Any gate skips and this sister reports the structural defect ONCE. This is the M15 shape recorded in absent-column-exceptions.tsv: the parent's Check is nothing but its three absent-true leaves, so the canonical None hoist would leave no Check at all - the not var_exists conjunction stays in the Check, exactly as the live CDISC-CG0554 does, and Sensitivity derives Dataset (every leaf is a dataset-level fact), so it is deliberately NOT authored."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | COMPLETED | COMPLETED
+S1 | DS | 002 | 1 | ADVERSE EVENT | ADVERSE EVENT

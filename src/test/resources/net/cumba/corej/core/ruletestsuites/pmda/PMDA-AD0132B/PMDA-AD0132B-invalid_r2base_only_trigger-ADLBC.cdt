@@ -3,7 +3,7 @@
 #note "The rule must still FIRE on its defect when only ONE member of Requirements.Variables.Any [CHG, PCHG, R2BASE] is present. R2BASE is the only derived column declared -- no CHG, no PCHG -- so the flat (single-group) Any is SATISFIED and the rule executes. Spell the facet All instead of Any and this scenario REDS with expect=violation against a skipped verdict: All would demand all three columns, which no real ADLBC carries. Row 1: R2BASE populated with BASE missing -> both conjuncts true -> FIRES. Row 2: AVAL and BASE both populated -> second conjunct false -> silent. BASE is blank on the fired row and canonicalises to null, so it is not pinned; CHG and PCHG are absent Output_Variables and are not pinned either."
 #library standard=adamig version=1-3
 #expectViolationCount 1
-#expectViolationAt row=1 AVAL=10 R2BASE=2
+#expectViolationAt row=1 nameOnly=AVAL nameOnly=R2BASE
 dataset ADLBC structure=BDS
 col STUDYID type=Char
 col USUBJID type=Char

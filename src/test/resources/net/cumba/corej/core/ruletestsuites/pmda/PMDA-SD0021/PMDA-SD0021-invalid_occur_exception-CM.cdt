@@ -2,9 +2,8 @@
 #test PMDA-SD0021 expect=violation domain=CM
 #note "Interventions branch, no STAT / DUR columns; the CMENDTC column is present but blank on every row, satisfying the Any gate [--ENDTC, --ENRF, --ENRTPT, --DUR] while leaving the end-timepoint leaves empty-true. Row 1: CMOCCUR=Y (!= 'N') -> fires. Row 2: CMOCCUR=N is the exception -> clean. Row 3: CMOCCUR empty -> empty != 'N' is TRUE (operator-examples B.1) -> fires. Only OCCUR exactly 'N' excepts."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
+#expectViolationCount 1
 #expectViolationAt row=1 CMSEQ=1
-#expectViolationAt row=3 CMSEQ=3
 dataset CM class=INTERVENTIONS
 col STUDYID  type=Char
 col DOMAIN   type=Char

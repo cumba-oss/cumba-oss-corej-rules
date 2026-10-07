@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1037 expect=violation domain=LB
+#note "The sister half of the PMDA-SD1037 pair (minted 2026-09-11, M13/T1-24). LBTOX is not present in the dataset while a grade 3 is reported on row 2. Sensitivity is Dataset, so the absence is reported once. The trigger is the regex /[1-9]/ alone - see the FDA arm's note; the two sisters are NOT copies, their parents' scopes differing (FDA 14 domains, PMDA 10)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTOXGR  type=Char label="Toxicity Grade"
+---
+S1 | LB | 001 | 1 | ALT | 0
+S1 | LB | 001 | 2 | ALT | 3
