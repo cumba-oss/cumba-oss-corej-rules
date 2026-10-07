@@ -70,7 +70,7 @@ class MessageFoldedCoverageLintTest
     record Row(String id, String file, Sensitivity sensitivity, boolean collapsible,
             boolean mayAbsentFold, boolean capable, boolean collapsibleByAbsence,
             String absentColumns, int enumerated, boolean capped, boolean declaresKey,
-            String leaves, boolean residual, String blankTriggers, String absentTriggers, Rule rule)
+            String leaves, boolean residual, String blankTriggers, Rule rule)
     {
 
         boolean record()
@@ -80,12 +80,14 @@ class MessageFoldedCoverageLintTest
 
 
         /**
-         * Whether the key is demanded: a record-level rule the absent fold can decide TRUE, the P3
-         * collapse can report on absent columns, or the present-but-empty collapse can collapse.
+         * Whether the key is demanded: a record-level rule the absent fold can decide TRUE, or the
+         * present-but-empty collapse can collapse (a polarity-live trigger). An absent column is
+         * never a collapse trigger (PACK 4 review HIGH-1, per Q3): on its own it is the absent
+         * fold's, censused by {@code capable}.
          */
         boolean demanded()
         {
-            return record() && (capable || !blankTriggers.isEmpty() || !absentTriggers.isEmpty());
+            return record() && (capable || !blankTriggers.isEmpty());
         }
     }
 
@@ -161,8 +163,7 @@ class MessageFoldedCoverageLintTest
         return new Row(id, file, rule.getSensitivity(), FoldCapability.collapsible(rule),
                 FoldCapability.mayAbsentFold(rule), c.capable(), c.collapsibleByAbsence(),
                 String.join(",", absent), c.enumeratedLeaves(), c.capped(), key,
-                String.join(",", leaves), residual, triggerText(t.blank()), triggerText(t.absent()),
-                rule);
+                String.join(",", leaves), residual, triggerText(t.blank()), rule);
     }
 
 
@@ -195,10 +196,6 @@ class MessageFoldedCoverageLintTest
                 {
                     why.add("absent-fold");
                 }
-                if (!r.absentTriggers().isEmpty())
-                {
-                    why.add("absent-collapse:" + r.absentTriggers());
-                }
                 if (!r.blankTriggers().isEmpty())
                 {
                     why.add("collapse:" + r.blankTriggers());
@@ -217,8 +214,7 @@ class MessageFoldedCoverageLintTest
         StringBuilder sb = new StringBuilder(
                 "id\tfile\tsensitivity\tcollapsible\tmayAbsentFold\tabsentTrueCapable"
                         + "\tcollapsibleByAbsence\tabsentColumns\tenumerated\tcapped"
-                        + "\tdeclaresKey\tdemanded\tleaves\tresidual\tblankTriggers"
-                        + "\tabsentTriggers\n");
+                        + "\tdeclaresKey\tdemanded\tleaves\tresidual\tblankTriggers\n");
         for (Row r : rows)
         {
             sb.append(r.id()).append('\t').append(r.file()).append('\t')
@@ -228,8 +224,7 @@ class MessageFoldedCoverageLintTest
                     .append('\t').append(r.absentColumns()).append('\t').append(r.enumerated())
                     .append('\t').append(r.capped()).append('\t').append(r.declaresKey())
                     .append('\t').append(r.demanded()).append('\t').append(r.leaves()).append('\t')
-                    .append(r.residual()).append('\t').append(r.blankTriggers()).append('\t')
-                    .append(r.absentTriggers()).append('\n');
+                    .append(r.residual()).append('\t').append(r.blankTriggers()).append('\n');
         }
         Files.writeString(out, sb.toString(), StandardCharsets.UTF_8);
     }
@@ -260,10 +255,13 @@ class MessageFoldedCoverageLintTest
         List<Row> stripped = new ArrayList<>();
         for (Row r : rows)
         {
-            stripped.add(r == victim ? new Row(r.id(), r.file(), r.sensitivity(), r.collapsible(),
-                    r.mayAbsentFold(), r.capable(), r.collapsibleByAbsence(), r.absentColumns(),
-                    r.enumerated(), r.capped(), false, r.leaves(), r.residual(), r.blankTriggers(),
-                    r.absentTriggers(), r.rule()) : r);
+            stripped.add(
+                    r == victim
+                            ? new Row(r.id(), r.file(), r.sensitivity(), r.collapsible(),
+                                    r.mayAbsentFold(), r.capable(), r.collapsibleByAbsence(),
+                                    r.absentColumns(), r.enumerated(), r.capped(), false,
+                                    r.leaves(), r.residual(), r.blankTriggers(), r.rule())
+                            : r);
         }
         List<String> offenders = offenders(stripped);
         assertEquals(1, offenders.size(), offenders.toString());
