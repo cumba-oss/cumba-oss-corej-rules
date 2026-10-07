@@ -74,11 +74,11 @@ class BindingSubstitutabilityCorpusCensusTest
      * </ul>
      */
     private static final Set<String> EXPECTED = new TreeSet<>(Set.of(
-            "CDISC-AD0002 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: make it a binding's whole expression and read the binding",
-            "CDISC-AD0085 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: make it a binding's whole expression and read the binding",
-            "CDISC-AD0086 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: make it a binding's whole expression and read the binding",
-            "CDISC-AD0199 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: make it a binding's whole expression and read the binding",
-            "CDISC-AD0590 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: make it a binding's whole expression and read the binding",
+            "CDISC-AD0002 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
+            "CDISC-AD0085 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
+            "CDISC-AD0086 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
+            "CDISC-AD0199 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
+            "CDISC-AD0590 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
             "CDISC-CG0022 | binding `$relrec_links_lnkid` has no native expression form: Expression construct not supported by the native evaluator: shares_no_elements_with requires a reference name operand",
             "CDISC-CG0562 | argument 'group' of 'record_count' must be a plain column reference",
             "FDA-SD1117 | stage A: PARAMETER_TYPE: Check (ERROR): argument 'members' of 'is_unique_set' takes list<column-reference>, not list<string> at element 3",
