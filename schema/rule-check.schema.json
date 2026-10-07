@@ -343,7 +343,7 @@
         "boolean",
         "null"
       ],
-      "description": "Engine extension: when true, expanded rules are skipped for variables that have CDISC Library definitions."
+      "description": "Engine extension: when true, the expansions of a wildcard template are skipped for variables that have CDISC Library definitions. Honoured only on a wildcard template (a Check level names an engine-owned marker xx / zz / y / w / *); true on any other rule (e.g. a varname() cursor rule) is a load error."
     },
     "wildcardExclude": {
       "type": [
@@ -353,7 +353,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Engine extension (rule specification, Engine Fields - wildcardExclude): secondary columns that must NOT be treated as a pairing secondary when a bare-* / *N / *C template expands."
+      "description": "Engine extension (rule specification, Engine Fields - wildcardExclude): columns that must NOT be taken as an expansion secondary when a wildcard template expands - on any template (every non-bare-* wildcard), not only a bare-* / *N / *C pairing template. A non-empty list on a rule that is not a wildcard template is a load error."
     },
     "wildcardPairCatalogue": {
       "type": [
@@ -823,21 +823,21 @@
             "string",
             "null"
           ],
-          "description": "shared_variables only, and required there: the foreign dataset (e.g. ADSL) whose variables, shared by name with the dataset under validation, the token ranges over. A load error on the all_* sources."
+          "description": "shared_variables only, and required there: the foreign dataset (e.g. ADSL) whose variables, shared by name with the dataset under validation, the token ranges over. A load error on every other source (domain_from_variable and the all_* sources)."
         },
         "pattern": {
           "type": [
             "string",
             "null"
           ],
-          "description": "domain_from_variable only, and required there: the column-name shape the token appears in, e.g. &DOM&SEQ. Literal text, not a regular expression (matched ignoring case); it must contain the token exactly once, and the token's position is the capture. A load error on the all_* sources."
+          "description": "domain_from_variable only, and required there: the column-name shape the token appears in, e.g. &DOM&SEQ. Literal text, not a regular expression (matched ignoring case); it must contain the token exactly once, and the token's position is the capture. A load error on every other source (shared_variables and the all_* sources)."
         },
         "known_domain_only": {
           "type": [
             "boolean",
             "null"
           ],
-          "description": "domain_from_variable only: true keeps only captures the metadata library attests as standard dataset names (this excludes ADaM's own ASEQ / SRCSEQ / RECSEQ); false / null keeps every capture. Either way a capture whose dataset is not loaded is not expanded. A load error on the all_* sources."
+          "description": "domain_from_variable only: true keeps only captures the metadata library attests as standard dataset names (this excludes ADaM's own ASEQ / SRCSEQ / RECSEQ); false / null keeps every capture. Either way a capture whose dataset is not loaded is not expanded. A load error on every other source (shared_variables and the all_* sources)."
         }
       }
     },
@@ -902,7 +902,7 @@
             "string",
             "null"
           ],
-          "description": "inner or left (any case); any other value is a load error. Absent means inner. A Child: true entry is always left (another value is a load error); a keyed SUPP-- / SQ* / `--`-template / RELREC-named entry always runs as left."
+          "description": "inner or left (any case); any other value is a load error. Absent means inner. A Child: true entry is always left (another value is a load error). A keyed SUPP* / SQ* / RELREC-named entry always runs as left, and inner there is a load error. A `--`-template entry is resolved to its dataset and honours its Join_Type. On an entry with no keyed part (no Keys, or no Name) that is neither Child nor a forward RELREC entry, Join_Type is read by nothing and is a load error."
         },
         "Filter": {
           "type": [

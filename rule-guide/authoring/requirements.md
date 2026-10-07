@@ -474,10 +474,14 @@ It decides which set of variables a rule iterates when it walks variables rather
 skipIfLibraryDefined: true
 ```
 
-When `true`, the rule stands down if the CDISC Library already enforces the same constraint, so a
-sponsor does not receive the same finding twice from two authorities.
+A **wildcard template** only ([Wildcards](wildcards.md)): when `true`, the template is not expanded
+for a variable the CDISC Library already defines for the dataset, so a sponsor does not receive the
+same finding twice when a Library-driven check already covers that variable.
 
-Set it when your rule restates something the Library defines. Leave it absent otherwise.
+Set it on a template whose check restates something the Library defines. Leave it absent
+otherwise. On a rule that is not a template — no `Check` level names a wildcard token, e.g. a rule
+over the variable cursor `varname()` — nothing is expanded, so the field could never take effect:
+`true` there is a **load error**.
 
 ## `Supp_Merge`
 

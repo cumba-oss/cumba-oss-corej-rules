@@ -213,8 +213,9 @@ rule for that dataset — a distinct outcome from "ran and found nothing".
 rule iterates: the ones the data actually has, or the ones Define-XML declares. Use `Define` when
 the rule is about what was *promised* rather than what was delivered.
 
-**`skipIfLibraryDefined`** — when `true`, the rule stands down if the CDISC Library already
-enforces the same thing, so a finding is not raised twice by two authorities.
+**`skipIfLibraryDefined`** — on a wildcard template, when `true`, the template is not expanded for a
+variable the CDISC Library already defines, so a finding is not raised twice by two authorities.
+On a rule that is not a template it is a load error.
 
 **`Supp_Merge`** — the declared SUPP merge, on by default: the rule reads a `SUPP<domain>`
 qualifier as a value of the parent record (`empty(PCCALCN)`, `var_exists("PCCALCN")`) — the

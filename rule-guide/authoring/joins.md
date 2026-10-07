@@ -100,6 +100,16 @@ it [qualified](#a-qualified-key--joining-through-an-earlier-entry): `Keys: ["DM.
   [missing values](../semantics/values-and-missing.md) on the joined side.
 - **`inner`** keeps only primary rows that matched.
 
+Two kinds of entry fix the join type themselves, and a value that could never take effect is a
+**load error** rather than silently ignored:
+
+- A keyed entry naming a supplemental-qualifier or relationship dataset — `SUPP…` (including
+  `SUPP--`), `SQ…` or `RELREC` — always keeps every primary row (`left`). Write `left` or nothing;
+  `inner` there is a load error. (A `--` template such as `AE--` is resolved to its dataset first
+  and honours its `Join_Type`.)
+- An entry that builds no join at all — no `Keys` and neither `Child: true` nor the forward
+  `RELREC` entry, or `Keys` without a `Name` — takes no `Join_Type`; any value is a load error.
+
 > **The default is not a shrug.** With no `Join_Type` the join behaves as the rule's shape
 > implies, and for a rule about *"every AE must have a matching DM record"* that is the wrong
 > question to leave to a default — an `inner` join silently removes exactly the rows the rule

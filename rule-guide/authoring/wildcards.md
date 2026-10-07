@@ -164,6 +164,12 @@ Each entry is a literal name or a pattern. Any secondary column matching one is 
 pair never forms. These lists usually come straight from an *"Exceptions:"* column on the source
 sheet — copy them verbatim.
 
+The list works on **any** template, not only a pairing one: every column a wildcard other than a
+bare `*` matches is tested against it, and a match is not expanded. On a rule that is not a
+template at all — no `Check` level names a wildcard token — nothing is expanded, so the list could
+never take effect: that is a **load error**. The same holds for `skipIfLibraryDefined: true`
+([Requirements](requirements.md#skipiflibrarydefined)).
+
 **`wildcardPairCatalogue`** restricts expansion to pairs the CDISC standards actually define:
 
 ```yaml
@@ -197,7 +203,13 @@ column name: `not empty(&VAR&)`, `ADSL.&VAR&`. **`over`** names where the set co
 
 **`with`**, **`pattern`** and **`known_domain_only`** belong to those last two — the foreign
 dataset, the column-name shape (which must contain the token exactly once), and a restriction to
-domains the standard knows. The three `all_*` sources take none of them.
+domains the standard knows. Each source reads only its own:
+
+| `over` | reads | any other one is a load error |
+|---|---|---|
+| `shared_variables` | `with` (required) | `pattern`, `known_domain_only` |
+| `domain_from_variable` | `pattern` (required), `known_domain_only` | `with` |
+| `all_variables`, `all_numeric_variables`, `all_character_variables` | none | `with`, `pattern`, `known_domain_only` |
 
 ### Why the closing `&`
 
