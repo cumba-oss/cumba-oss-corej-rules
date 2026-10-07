@@ -148,6 +148,20 @@ tier, using shorthands:
 > takes the **full** token and rejects `BDS` at load. The two vocabularies look alike and are not
 > interchangeable.
 
+### Decode charset
+
+`extract_metadata("encoding")` / `("encoding_source")` ([functions](../reference/functions.md#extract_metadata))
+report the charset a reader decoded the dataset with. A scenario is a `.cdt` file, UTF-8 by the format, so it reports
+`UTF-8` / `FORMAT` unless the dataset header says otherwise — the way to simulate, say, an XPT read as latin1:
+
+```
+dataset AE class=EVENTS Encoding=ISO-8859-1 EncodingSource=CONFIGURED
+```
+
+- a declared `Encoding=` wins, with the declared `EncodingSource=`, else `DECLARED`;
+- without `Encoding=`, the scenario reports `UTF-8` / `FORMAT`;
+- an `EncodingSource=` without an `Encoding=` is dropped — the two keys are one unit.
+
 ## One word on `ERROR`
 
 The word means two different things in this format, one line apart:

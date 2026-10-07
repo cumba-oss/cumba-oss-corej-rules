@@ -128,7 +128,8 @@ dataset BW class=FINDINGS label="Body Weight" uri=file:///study/send/BW.xpt
 - it is **also** kept in the table-metadata map, so a scenario round-trips
   through `CdtWriter` unchanged;
 - `dataset_size` is a *different* channel: that one **is** an ordinary
-  table-metadata key (`dataset_size=6000000000`), read through the `default` arm.
+  table-metadata key (`dataset_size=6000000000`), read through its own
+  `dataset_size` arm (`meta.getMetaData("dataset_size")`).
 
 Worked examples: `cdisc/CDISC-SEND-0277/*` (an uppercase basename fires, a
 lowercase one does not, and a scenario with no `uri=` at all pins the
